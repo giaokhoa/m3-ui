@@ -52,6 +52,7 @@ These are not currently treated as bugs, but they are not exact Compose API/runt
 - Compose's `minimumInteractiveComponentSize()` is locally configurable. The web port defaults to a fixed 48px slot; user styles can override layout, but there is no public ThemeProvider-level minimum-target setting yet.
 - Compose exposes `RadioButtonColors` and `MutableInteractionSource`. The web API relies on ThemeProvider roles, CSS style overrides, RAC render state and event callbacks instead of matching those objects one-for-one.
 - Compose motion uses spring specs from the active `MotionScheme`. The web port samples the standard scheme into CSS `linear()` curves and fixed settle durations, so custom/expressive Compose motion schemes are not yet represented dynamically.
+- The pinned Compose screenshot suite also exercises the optional Material inset focus-ring ripple configuration. The shared web `Ripple` currently implements state layers and press waves only; there is no ThemeProvider-level equivalent of `LocalRippleThemeConfiguration` / inset focus rings yet. This is a cross-component primitive gap rather than a RadioButton-only fix.
 - The web component includes label and group error/description styling that Compose's control itself does not own. Those are web form semantics rather than RadioButton visual parity.
 
 Current `androidx-main` has introduced an internal styleable RadioButton path, but the public standard `RadioButton` still uses the same default 20dp icon, 2dp stroke, 12dp dot constant, 40dp state layer, `FastSpatial` dot motion and `DefaultEffects` color motion at the time of this audit.
@@ -59,3 +60,5 @@ Current `androidx-main` has introduced an internal styleable RadioButton path, b
 ## Regression coverage
 
 Unit tests lock token/default mappings. Storybook covers selected, unselected, disabled, read-only, horizontal group, control-only and theme-matrix cases. Playwright verifies radio-group selection and arrow-key semantics, visible pointer selection, 48/40/20px geometry, 2px stroke, 10px visible selected dot, Material control-color resolution, ambient-content-color hover layers, disabled color snap with retained dot motion, read-only selection, and accessible control-only names.
+
+Unlike the pinned Compose suite, this repository does not yet commit dedicated RadioButton screenshot goldens for selected/unselected/pressed/hovered/focused/disabled/animation states; current RadioButton browser coverage is DOM/computed-style based. Adding those goldens is a remaining verification gap, not a known runtime mismatch.
