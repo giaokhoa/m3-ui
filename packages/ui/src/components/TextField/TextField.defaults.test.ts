@@ -56,7 +56,9 @@ describe('filled TextField defaults', () => {
   });
 
   it('maps Material color roles through short ThemeProvider variables', () => {
-    expect(style['--_text-field-container-color']).toBe('var(--surface-variant)');
+    expect(style['--_text-field-container-color']).toBe(
+      'var(--surface-container-highest)',
+    );
     expect(style['--_text-field-text-color']).toBe('var(--on-surface)');
     expect(style['--_text-field-focused-indicator-color']).toBe('var(--primary)');
     expect(style['--_text-field-error-indicator-color']).toBe('var(--error)');
