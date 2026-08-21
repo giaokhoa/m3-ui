@@ -9,6 +9,7 @@ import { getButtonStyle } from './Button.defaults';
 import {
   endButtonInteraction,
   latestButtonInteraction,
+  latestButtonStateLayerInteraction,
   startButtonInteraction,
   type ButtonInteraction,
 } from './Button.interactions';
@@ -135,8 +136,10 @@ function ButtonImpl({
         <>
           <Ripple
             controller={ripple}
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            stateInteraction={latestButtonStateLayerInteraction(
+              activeInteractions,
+              renderProps.isFocusVisible,
+            )}
           />
           <span className="m3-button__content">
             {startIcon ? (
