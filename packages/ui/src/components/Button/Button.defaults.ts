@@ -25,6 +25,10 @@ function colorRoleVariable(role: string): string {
   return `var(--${name})`;
 }
 
+function typefaceRoleVariable(role: string): string {
+  return `var(--font-family-${role})`;
+}
+
 export const filledButtonBaseStyle: ButtonStyle = {
   '--_button-min-width': `${filledButtonTokens.minWidth}px`,
   '--_button-min-height': `${filledButtonTokens.minHeight}px`,
@@ -47,7 +51,9 @@ export const filledButtonBaseStyle: ButtonStyle = {
   '--_button-disabled-content-opacity': percent(
     filledButtonTokens.disabledContentOpacity,
   ),
-  '--_button-font-family': filledButtonTokens.labelTypography.fontFamily,
+  '--_button-font-family': typefaceRoleVariable(
+    filledButtonTokens.labelTypography.fontFamily,
+  ),
   '--_button-font-size': `${filledButtonTokens.labelTypography.fontSize}px`,
   '--_button-line-height': `${filledButtonTokens.labelTypography.lineHeight}px`,
   '--_button-font-weight': filledButtonTokens.labelTypography.fontWeight,
