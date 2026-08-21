@@ -78,6 +78,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@fontsource/roboto':
+        specifier: 5.3.0
+        version: 5.3.0
       '@m3/tokens':
         specifier: workspace:*
         version: link:../tokens
@@ -375,6 +378,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/roboto@5.3.0':
+    resolution: {integrity: sha512-BapRJOWYP+LZ21zp+wBQjfpPYKRoxc4LspJ/RLuI+HSMBD5u/X4O+ESDrSvEqDSy0rAl7GwBJ+09mdc16cVQ1Q==}
 
   '@internationalized/date@3.12.3':
     resolution: {integrity: sha512-fuLX+3ZKLsxI73y8b01EG/WjHb6gE6weCqlfawPO27kBWGMh9G1yH6Csv1uU7/cac9H2GHmOMt6CjmuQ1aia4Q==}
@@ -1841,6 +1847,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@fontsource/roboto@5.3.0': {}
 
   '@internationalized/date@3.12.3':
     dependencies:
