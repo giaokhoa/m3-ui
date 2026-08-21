@@ -1,0 +1,170 @@
+.m3-radio-button {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  color: var(--on-surface);
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m3-radio-button__control-slot {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  inline-size: var(--_radio-interactive-size);
+  block-size: var(--_radio-interactive-size);
+  align-items: center;
+  justify-content: center;
+}
+
+.m3-radio-button__state-layer {
+  position: absolute;
+  inset: 0;
+  --ripple-color: var(--_radio-unselected-state-layer);
+}
+
+.m3-radio-button[data-selected] .m3-radio-button__state-layer {
+  --ripple-color: var(--_radio-selected-state-layer);
+}
+
+.m3-radio-button__state-layer .m3-ripple {
+  border-radius: 0;
+  overflow: visible;
+}
+
+.m3-radio-button__state-layer .m3-ripple__state-layer {
+  inset: calc(
+    (var(--_radio-interactive-size) - var(--_radio-state-layer-size)) / 2
+  );
+  border-radius: 50%;
+}
+
+.m3-radio-button__control {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_radio-icon-size);
+  block-size: var(--_radio-icon-size);
+  align-items: center;
+  justify-content: center;
+  border: var(--_radio-stroke-width) solid currentColor;
+  border-radius: 50%;
+  color: var(--_radio-unselected-color);
+  transition: color var(--_radio-transition-duration) var(--_radio-transition-easing);
+}
+
+.m3-radio-button[data-selected] .m3-radio-button__control {
+  color: var(--_radio-selected-color);
+}
+
+.m3-radio-button__dot {
+  inline-size: calc(var(--_radio-dot-size) - var(--_radio-stroke-width));
+  block-size: calc(var(--_radio-dot-size) - var(--_radio-stroke-width));
+  border-radius: 50%;
+  background: currentColor;
+  transform: scale(0);
+  transition: transform var(--_radio-transition-duration) var(--_radio-transition-easing);
+}
+
+.m3-radio-button[data-selected] .m3-radio-button__dot {
+  transform: scale(1);
+}
+
+.m3-radio-button__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.m3-radio-button[data-disabled] {
+  cursor: default;
+}
+
+.m3-radio-button[data-disabled] .m3-radio-button__state-layer {
+  display: none;
+}
+
+.m3-radio-button[data-disabled] .m3-radio-button__control {
+  color: color-mix(
+    in srgb,
+    var(--_radio-disabled-unselected-color)
+      calc(var(--_radio-disabled-opacity) * 100%),
+    transparent
+  );
+  transition: none;
+}
+
+.m3-radio-button[data-disabled][data-selected] .m3-radio-button__control {
+  color: color-mix(
+    in srgb,
+    var(--_radio-disabled-selected-color)
+      calc(var(--_radio-disabled-opacity) * 100%),
+    transparent
+  );
+}
+
+.m3-radio-button[data-disabled] .m3-radio-button__dot {
+  transition: none;
+}
+
+.m3-radio-button[data-disabled] .m3-radio-button__label {
+  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+}
+
+.m3-radio-group {
+  display: inline-flex;
+  flex-direction: column;
+  color: var(--on-surface);
+  font: inherit;
+}
+
+.m3-radio-group__options {
+  display: flex;
+  flex-direction: column;
+}
+
+.m3-radio-group--horizontal .m3-radio-group__options {
+  flex-direction: row;
+}
+
+.m3-radio-group__label,
+.m3-radio-group__description,
+.m3-radio-group__error {
+  margin: 0;
+}
+
+.m3-radio-group__error {
+  color: var(--error);
+}
+
+.m3-radio-group[data-invalid]:has(.m3-radio-group__error)
+  .m3-radio-group__description {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-radio-button__control,
+  .m3-radio-button__dot {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .m3-radio-button__control,
+  .m3-radio-button[data-selected] .m3-radio-button__control {
+    color: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .m3-radio-button[data-focus-visible] .m3-radio-button__control-slot {
+    outline: 2px solid ButtonText;
+    outline-offset: -4px;
+  }
+
+  .m3-radio-button[data-disabled] .m3-radio-button__control,
+  .m3-radio-button[data-disabled] .m3-radio-button__label {
+    color: GrayText;
+  }
+}
