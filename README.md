@@ -26,6 +26,33 @@ pnpm typecheck
 
 Storybook is the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
 
+## Dev Container
+
+The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 10.0.0 and runs `pnpm install --frozen-lockfile` when the container is created.
+
+With VS Code and the Dev Containers extension:
+
+1. Clone and open the repository.
+2. Run **Dev Containers: Reopen in Container** from the command palette.
+3. Wait for the post-create dependency install to finish.
+4. Start the visual preview:
+
+```bash
+pnpm storybook
+```
+
+Storybook is forwarded to `http://localhost:6006` and opens automatically when supported by the Dev Containers client.
+
+To run the wider development workspace instead:
+
+```bash
+pnpm dev
+```
+
+The Vite playground is forwarded to `http://localhost:5173`. Both Storybook and Vite bind to `0.0.0.0` so they remain reachable through the container port forwarding layer.
+
+The container uses the non-root `node` user. The host repository stays mounted as the workspace, so source edits remain on the host while Node tooling runs inside the Linux container.
+
 ## Architecture before implementation
 
 Read [`docs/architecture/README.md`](docs/architecture/README.md) before porting a Material 3 component from Jetpack Compose.
