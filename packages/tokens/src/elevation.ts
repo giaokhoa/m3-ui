@@ -17,6 +17,25 @@ export interface ElevationShadowLayer {
   readonly opacity: number;
 }
 
+/**
+ * Current AndroidX Material3 internal elevation transition specs.
+ * Shared by buttons, cards, chips and other elevation-aware components.
+ */
+export const elevationMotionTokens = {
+  incoming: {
+    durationMs: 120,
+    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  outgoing: {
+    durationMs: 150,
+    easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
+  },
+  hoveredOutgoing: {
+    durationMs: 120,
+    easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
+  },
+} as const;
+
 export const elevationShadowLayers = {
   level0: [
     { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.2 },

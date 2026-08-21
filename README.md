@@ -18,23 +18,26 @@ pnpm install
 pnpm storybook
 pnpm dev
 pnpm test
+pnpm test:visual
 pnpm build
 pnpm typecheck
 ```
 
-`pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` creates a static Storybook build under `apps/storybook/dist`.
+`pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` builds Storybook and its workspace dependencies, then creates the static preview under `apps/storybook/dist`.
 
 Storybook is the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
 
+Playwright provides the committed visual-regression layer on top of Storybook. `pnpm test:visual` builds the static Storybook and compares Chromium screenshots with the committed Linux baselines. When an intentional visual change has been reviewed, run `pnpm test:visual:update` inside the devcontainer and commit the changed files under `apps/storybook/visual/__screenshots__/`.
+
 ## Dev Container
 
-The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 10.0.0 and runs `pnpm install --frozen-lockfile` when the container is created.
+The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 10.0.0, runs `pnpm install --frozen-lockfile`, and installs the Playwright Chromium headless shell plus its Linux dependencies when the container is created.
 
 With VS Code and the Dev Containers extension:
 
 1. Clone and open the repository.
 2. Run **Dev Containers: Reopen in Container** from the command palette.
-3. Wait for the post-create dependency install to finish.
+3. Wait for the post-create dependency and Chromium install to finish.
 4. Start the visual preview:
 
 ```bash
@@ -42,6 +45,18 @@ pnpm storybook
 ```
 
 Storybook is forwarded to `http://localhost:6006` and opens automatically when supported by the Dev Containers client.
+
+To run the committed visual regression suite in the same Linux/Chromium environment as CI:
+
+```bash
+pnpm test:visual
+```
+
+To regenerate baselines after reviewing an intentional visual change:
+
+```bash
+pnpm test:visual:update
+```
 
 To run the wider development workspace instead:
 
@@ -67,7 +82,7 @@ Key rules:
 - TypeScript must remain idiomatic; do not recreate `Modifier`, Kotlin `data class`, `.copy()`, `Dp`, or `InteractionSource` APIs.
 - Native HTML and React Aria Components provide web semantics and interaction state.
 - Visual state should be CSS-first when possible.
-- Parity is proven by independent token/default/behavior/layout tests.
+- Parity is proven by independent token/default/behavior/layout tests plus Chromium visual regression for covered stories.
 
 ## Component convention
 

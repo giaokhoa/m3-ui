@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { rippleTokens } from '@m3/tokens/ripple';
 import { stateLayerOpacity } from '@m3/tokens/state';
+import { describe, expect, it } from 'vitest';
 
 describe('ripple tokens', () => {
   it('matches current Material 3 state-layer opacity', () => {
@@ -12,14 +12,18 @@ describe('ripple tokens', () => {
     });
   });
 
-  it('keeps web ripple timing outside ThemeProvider', () => {
+  it('matches current Compose Material3 ripple motion', () => {
     expect(rippleTokens).toEqual({
-      growDurationMs: 450,
+      radiusDurationMs: 225,
       minimumPressDurationMs: 225,
       hoverTransitionDurationMs: 15,
-      fadeInDurationMs: 105,
-      fadeOutDurationMs: 375,
-      growEasing: 'cubic-bezier(0.2, 0, 0, 1)',
+      focusInTransitionDurationMs: 45,
+      fadeInDurationMs: 75,
+      fadeOutDurationMs: 150,
+      boundedExtraRadius: 10,
+      startRadiusLargestDimensionFactor: 0.3,
+      radiusEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      centerEasing: 'linear',
       opacityEasing: 'linear',
     });
   });

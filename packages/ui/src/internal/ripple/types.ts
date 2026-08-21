@@ -18,6 +18,9 @@ export interface RippleWave {
   readonly id: number;
   readonly x: number;
   readonly y: number;
+  readonly targetX: number;
+  readonly targetY: number;
   readonly diameter: number;
+  readonly startScale: number;
   readonly isReleasing: boolean;
 }
