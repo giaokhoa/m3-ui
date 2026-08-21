@@ -1,3 +1,4 @@
+# Temporary one-shot workflow; remove after the Linux Chromium baselines are committed.
 name: Bootstrap Button visual baselines
 
 on:
