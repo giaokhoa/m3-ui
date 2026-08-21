@@ -280,6 +280,15 @@
   color: var(--_text-field-error-leading-icon-color);
 }
 
+.m3-text-field[data-disabled] .m3-text-field__container {
+  background: color-mix(
+    in srgb,
+    var(--_text-field-disabled-container-color)
+      calc(var(--_text-field-disabled-container-opacity) * 100%),
+    transparent
+  );
+}
+
 .m3-text-field[data-disabled] .m3-text-field__control {
   color: color-mix(
     in srgb,
