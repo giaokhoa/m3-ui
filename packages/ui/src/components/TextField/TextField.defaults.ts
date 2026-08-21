@@ -7,8 +7,15 @@ function roleVariable(role: string): string {
   return `var(--${role.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)})`;
 }
 
-const { colors, contentPadding, containerShape, indicator, motion, typography } =
-  filledTextFieldTokens;
+const {
+  colors,
+  contentPadding,
+  containerShape,
+  indicator,
+  lineHeight,
+  motion,
+  typography,
+} = filledTextFieldTokens;
 
 export const filledTextFieldBaseStyle: TextFieldStyle = {
   '--_text-field-min-width': `${filledTextFieldTokens.minWidth}px`,
@@ -17,6 +24,11 @@ export const filledTextFieldBaseStyle: TextFieldStyle = {
   '--_text-field-padding-with-label': `${contentPadding.blockWithLabel}px`,
   '--_text-field-padding-without-label': `${contentPadding.blockWithoutLabel}px`,
   '--_text-field-supporting-top': `${contentPadding.supportingTop}px`,
+  '--_text-field-affix-padding': `${contentPadding.affix}px`,
+  '--_text-field-after-icon-padding': `${contentPadding.afterIcon}px`,
+  '--_text-field-input-min-line-height': `${lineHeight.inputMin}px`,
+  '--_text-field-focused-label-min-line-height': `${lineHeight.focusedLabelMin}px`,
+  '--_text-field-supporting-min-line-height': `${lineHeight.supportingMin}px`,
 
   '--_text-field-radius-top-start': `${containerShape.topStartRadius}px`,
   '--_text-field-radius-top-end': `${containerShape.topEndRadius}px`,
@@ -26,6 +38,7 @@ export const filledTextFieldBaseStyle: TextFieldStyle = {
   '--_text-field-indicator-width': `${indicator.unfocusedThickness}px`,
   '--_text-field-indicator-focused-width': `${indicator.focusedThickness}px`,
   '--_text-field-icon-size': `${filledTextFieldTokens.iconSize}px`,
+  '--_text-field-icon-slot-size': `${filledTextFieldTokens.iconSlotSize}px`,
 
   '--_text-field-container-color': roleVariable(colors.container),
   '--_text-field-text-color': roleVariable(colors.text),
