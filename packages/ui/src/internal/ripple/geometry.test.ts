@@ -60,4 +60,17 @@ describe('ripple geometry', () => {
     expect(geometry.x).toBe(50);
     expect(geometry.y).toBe(20);
   });
+
+  it('supports the fixed unbounded radius used by Material Checkbox', () => {
+    const checkboxBounds = { width: 48, height: 48 };
+    const geometry = getRippleWaveGeometry(
+      pressEvent('mouse', 24, 24),
+      checkboxBounds,
+      'center',
+      { radius: 20 },
+    );
+
+    expect(geometry.diameter).toBe(40);
+    expect(geometry.startScale).toBeCloseTo(14.4 / 20);
+  });
 });

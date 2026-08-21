@@ -1,4 +1,5 @@
 export * from './button.js';
+export * from './checkbox.js';
 export * from './elevation.js';
 export * from './motion.js';
 export * from './ripple.js';
