@@ -4,7 +4,10 @@ import {
   type ButtonVariant,
   type ButtonVariantTokens,
 } from '@m3/tokens/button';
-import type { ElevationLevel } from '@m3/tokens/elevation';
+import {
+  elevationMotionTokens,
+  type ElevationLevel,
+} from '@m3/tokens/elevation';
 import type { CSSProperties } from 'react';
 import { getElevationBoxShadow } from '../../internal/elevation';
 import type { ButtonInteraction } from './Button.interactions';
@@ -14,6 +17,7 @@ export type ButtonStyle = CSSProperties & Record<`--${string}`, string | number>
 export interface ButtonInteractionState {
   readonly isDisabled: boolean;
   readonly interaction: ButtonInteraction | null;
+  readonly previousInteraction?: ButtonInteraction | null;
 }
 
 const shapeRadius = {
@@ -93,6 +97,32 @@ export function resolveButtonElevation(
   }
 }
 
+export function resolveButtonElevationTransition({
+  isDisabled,
+  interaction,
+  previousInteraction = null,
+}: ButtonInteractionState): string {
+  if (isDisabled) {
+    return 'none';
+  }
+
+  if (interaction !== null) {
+    const { durationMs, easing } = elevationMotionTokens.incoming;
+    return `box-shadow ${durationMs}ms ${easing}`;
+  }
+
+  if (previousInteraction === null) {
+    return 'none';
+  }
+
+  const spec =
+    previousInteraction === 'hover'
+      ? elevationMotionTokens.hoveredOutgoing
+      : elevationMotionTokens.outgoing;
+
+  return `box-shadow ${spec.durationMs}ms ${spec.easing}`;
+}
+
 export function getButtonStyle(
   variant: ButtonVariant,
   state: ButtonInteractionState,
@@ -102,6 +132,7 @@ export function getButtonStyle(
   return {
     ...getButtonBaseStyle(tokens),
     boxShadow: getElevationBoxShadow(resolveButtonElevation(tokens, state)),
+    transition: resolveButtonElevationTransition(state),
   };
 }
 
