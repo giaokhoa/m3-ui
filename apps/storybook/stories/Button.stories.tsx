@@ -6,6 +6,7 @@ import {
   OutlinedButton,
   TextButton,
   ThemeProvider,
+  buttonShapesForSize,
 } from '@m3/ui';
 
 const meta = {
@@ -62,6 +63,10 @@ export const Variants: Story = {
 };
 
 export const DisabledVariants: Story = {
+  args: {
+    isDisabled: true,
+    children: 'Disabled button',
+  },
   render: () => (
     <div className="m3-storybook-center">
       <VariantStack disabled />
@@ -77,6 +82,52 @@ export const Icons: Story = {
         <FilledTonalButton startIcon={<SendIcon />}>Send</FilledTonalButton>
         <OutlinedButton endIcon={<SendIcon />}>Continue</OutlinedButton>
         <TextButton startIcon={<SendIcon />}>Share</TextButton>
+      </div>
+    </div>
+  ),
+};
+
+export const ExpressiveSizes: Story = {
+  render: () => (
+    <div className="m3-storybook-center">
+      <div className="m3-storybook-stack">
+        <Button size="extraSmall" startIcon={<SendIcon />}>
+          Extra small
+        </Button>
+        <Button size="small" startIcon={<SendIcon />}>
+          Small
+        </Button>
+        <Button size="medium" startIcon={<SendIcon />}>
+          Medium
+        </Button>
+        <Button size="large" startIcon={<SendIcon />}>
+          Large
+        </Button>
+        <Button size="extraLarge" startIcon={<SendIcon />}>
+          Extra large
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
+export const ExpressiveShapeMorph: Story = {
+  render: () => (
+    <div className="m3-storybook-center">
+      <div className="m3-storybook-stack">
+        <Button size="small" shapes={buttonShapesForSize('small')}>
+          Press small
+        </Button>
+        <FilledTonalButton
+          size="medium"
+          shapes={buttonShapesForSize('medium')}
+          startIcon={<SendIcon />}
+        >
+          Press medium
+        </FilledTonalButton>
+        <ElevatedButton size="large" shapes={buttonShapesForSize('large')}>
+          Press large
+        </ElevatedButton>
       </div>
     </div>
   ),
