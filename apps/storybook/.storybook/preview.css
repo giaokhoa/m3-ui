@@ -1,0 +1,52 @@
+html,
+body,
+#storybook-root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.m3-storybook-theme {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 32px;
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: sans-serif;
+}
+
+.m3-storybook-center {
+  display: grid;
+  min-height: calc(100vh - 64px);
+  place-items: center;
+}
+
+.m3-storybook-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.m3-storybook-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.m3-storybook-theme-card {
+  box-sizing: border-box;
+  min-height: 180px;
+  padding: 24px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+.m3-storybook-theme-card h3 {
+  margin: 0 0 24px;
+  font: 500 16px/24px sans-serif;
+}
