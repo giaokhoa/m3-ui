@@ -53,6 +53,12 @@ test.describe('Material 3 filled TextField visual parity', () => {
     await expect(root).toHaveScreenshot('text-field-focused.png');
   });
 
+  test('clicking the visible label focuses the control', async ({ page }) => {
+    const { input, root } = await openDefaultField(page);
+    await root.locator('.m3-text-field__label').click();
+    await expect(input).toBeFocused();
+  });
+
   test('invalid', async ({ page }) => {
     await openStory(page, 'components-textfield--invalid');
     await expect(page.locator('.m3-text-field')).toHaveScreenshot(
