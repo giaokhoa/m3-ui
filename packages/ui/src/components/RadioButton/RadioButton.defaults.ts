@@ -15,7 +15,6 @@ export const radioButtonBaseStyle: RadioButtonStyle = {
   '--_radio-icon-size': `${radioButtonTokens.iconSize}px`,
   '--_radio-state-layer-size': `${radioButtonTokens.stateLayerSize}px`,
   '--_radio-interactive-size': `${radioButtonTokens.minimumInteractiveSize}px`,
-  '--_radio-padding': `${radioButtonTokens.padding}px`,
   '--_radio-stroke-width': `${radioButtonTokens.strokeWidth}px`,
   '--_radio-dot-size': `${radioButtonTokens.dotSize}px`,
   '--_radio-selected-color': roleVariable(radioButtonTokens.colors.selected),
