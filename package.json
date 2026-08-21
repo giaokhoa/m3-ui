@@ -5,6 +5,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "storybook": "pnpm --filter @m3/storybook dev",
+    "build:storybook": "pnpm --filter @m3/storybook build",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean"
