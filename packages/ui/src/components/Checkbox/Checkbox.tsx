@@ -1,3 +1,4 @@
+import { checkboxTokens } from '@m3/tokens/checkbox';
 import { useState, type ReactNode } from 'react';
 import {
   Checkbox as AriaCheckbox,
@@ -60,7 +61,10 @@ export function Checkbox({
   onPressStart,
   ...props
 }: CheckboxProps) {
-  const ripple = useRipple({ origin: 'center' });
+  const ripple = useRipple({
+    origin: 'center',
+    radius: checkboxTokens.stateLayerSize / 2,
+  });
   const [activeInteractions, setActiveInteractions] = useState<
     StateLayerInteraction[]
   >([]);
