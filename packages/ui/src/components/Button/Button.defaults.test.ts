@@ -6,11 +6,13 @@ import {
   outlinedButtonTokens,
   textButtonTokens,
 } from '@m3/tokens/button';
+import { elevationMotionTokens } from '@m3/tokens/elevation';
 import { describe, expect, it } from 'vitest';
 import {
   filledButtonBaseStyle,
   getButtonStyle,
   resolveButtonElevation,
+  resolveButtonElevationTransition,
 } from './Button.defaults';
 
 const idleState = {
@@ -130,6 +132,52 @@ describe('Button parity', () => {
         interaction: 'hover',
       }),
     ).toBe('level0');
+  });
+
+  it('matches current AndroidX elevation animation specs', () => {
+    expect(elevationMotionTokens).toEqual({
+      incoming: {
+        durationMs: 120,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      outgoing: {
+        durationMs: 150,
+        easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
+      },
+      hoveredOutgoing: {
+        durationMs: 120,
+        easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
+      },
+    });
+
+    expect(
+      resolveButtonElevationTransition({
+        ...idleState,
+        interaction: 'hover',
+      }),
+    ).toBe('box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1)');
+
+    expect(
+      resolveButtonElevationTransition({
+        ...idleState,
+        previousInteraction: 'hover',
+      }),
+    ).toBe('box-shadow 120ms cubic-bezier(0.4, 0, 0.6, 1)');
+
+    expect(
+      resolveButtonElevationTransition({
+        ...idleState,
+        previousInteraction: 'press',
+      }),
+    ).toBe('box-shadow 150ms cubic-bezier(0.4, 0, 0.6, 1)');
+
+    expect(
+      resolveButtonElevationTransition({
+        ...idleState,
+        isDisabled: true,
+        previousInteraction: 'hover',
+      }),
+    ).toBe('none');
   });
 
   it('uses the theme shadow role for elevated hover elevation', () => {
