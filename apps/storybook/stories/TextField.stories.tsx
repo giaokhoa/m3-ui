@@ -90,7 +90,7 @@ export const Invalid: Story = {
   args: {
     defaultValue: 'Invalid value',
     isInvalid: true,
-    supportingText: undefined,
+    supportingText: 'Supporting guidance',
     description: undefined,
     errorMessage: 'This value needs attention',
   },
