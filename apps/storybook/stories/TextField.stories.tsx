@@ -169,7 +169,7 @@ export const States: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
+    <div className="m3-storybook-theme-grid m3-storybook-theme-grid--text-field">
       <ThemeProvider className="m3-storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <FieldStack />
