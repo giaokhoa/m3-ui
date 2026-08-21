@@ -34,7 +34,7 @@ describe('Filled Button parity', () => {
       iconSize: 18,
       iconSpacing: 8,
       labelTypography: {
-        fontFamily: 'sans-serif',
+        fontFamily: 'plain',
         fontSize: 14,
         lineHeight: 20,
         fontWeight: 500,
@@ -43,7 +43,7 @@ describe('Filled Button parity', () => {
     });
   });
 
-  it('maps Material color roles to ThemeProvider CSS variables', () => {
+  it('maps Material color and typeface roles to ThemeProvider CSS variables', () => {
     expect(filledButtonBaseStyle).toMatchObject({
       '--_button-container-color': 'var(--primary)',
       '--_button-content-color': 'var(--on-primary)',
@@ -51,6 +51,7 @@ describe('Filled Button parity', () => {
       '--_button-disabled-container-opacity': '10%',
       '--_button-disabled-content-color': 'var(--on-surface-variant)',
       '--_button-disabled-content-opacity': '38%',
+      '--_button-font-family': 'var(--font-family-plain)',
     });
     expect(JSON.stringify(filledButtonBaseStyle)).not.toMatch(/#[0-9a-f]{3,8}/i);
   });
