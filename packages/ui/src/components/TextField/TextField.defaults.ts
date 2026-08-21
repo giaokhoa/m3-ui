@@ -41,6 +41,7 @@ export const filledTextFieldBaseStyle: TextFieldStyle = {
   '--_text-field-icon-slot-size': `${filledTextFieldTokens.iconSlotSize}px`,
 
   '--_text-field-container-color': roleVariable(colors.container),
+  '--_text-field-disabled-container-color': roleVariable(colors.disabledContainer),
   '--_text-field-text-color': roleVariable(colors.text),
   '--_text-field-disabled-text-color': roleVariable(colors.disabledText),
   '--_text-field-cursor-color': roleVariable(colors.cursor),
@@ -71,6 +72,7 @@ export const filledTextFieldBaseStyle: TextFieldStyle = {
   '--_text-field-error-trailing-icon-color': roleVariable(colors.errorTrailingIcon),
   '--_text-field-prefix-color': roleVariable(colors.prefix),
   '--_text-field-suffix-color': roleVariable(colors.suffix),
+  '--_text-field-disabled-container-opacity': filledTextFieldTokens.disabledContainerOpacity,
   '--_text-field-disabled-opacity': filledTextFieldTokens.disabledOpacity,
 
   '--_text-field-body-large-font-family': 'var(--font-family-plain)',
