@@ -24,10 +24,10 @@ describe('RadioButton defaults', () => {
     expect(style['--_radio-disabled-opacity']).toBe(0.38);
   });
 
-  it('matches the Compose 100ms tween transition', () => {
-    expect(style['--_radio-transition-duration']).toBe('100ms');
-    expect(style['--_radio-transition-easing']).toBe(
-      'cubic-bezier(0.4, 0, 0.2, 1)',
-    );
+  it('maps pinned DefaultEffects color and FastSpatial dot motion', () => {
+    expect(style['--_radio-color-duration']).toBe('166ms');
+    expect(style['--_radio-dot-duration']).toBe('137ms');
+    expect(String(style['--_radio-color-easing'])).toContain('linear(');
+    expect(String(style['--_radio-dot-easing'])).toContain('linear(');
   });
 });
