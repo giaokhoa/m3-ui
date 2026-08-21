@@ -26,6 +26,7 @@
 
 .m3-ripple[data-focus-visible] .m3-ripple__state-layer {
   opacity: var(--_ripple-focus-opacity);
+  transition-duration: var(--_ripple-focus-in-duration);
 }
 
 .m3-ripple__wave {
@@ -35,9 +36,10 @@
   height: var(--_ripple-diameter);
   border-radius: 50%;
   opacity: var(--_ripple-pressed-opacity);
-  transform: translate(-50%, -50%) scale(0);
+  transform: translate(-50%, -50%) scale(var(--_ripple-start-scale));
   animation:
-    m3-ripple-grow var(--_ripple-grow-duration) var(--_ripple-grow-easing) forwards,
+    m3-ripple-radius var(--_ripple-radius-duration) var(--_ripple-radius-easing) forwards,
+    m3-ripple-center var(--_ripple-radius-duration) var(--_ripple-center-easing) forwards,
     m3-ripple-fade-in var(--_ripple-fade-in-duration) var(--_ripple-opacity-easing);
 }
 
@@ -46,9 +48,16 @@
   transition: opacity var(--_ripple-fade-out-duration) var(--_ripple-opacity-easing);
 }
 
-@keyframes m3-ripple-grow {
+@keyframes m3-ripple-radius {
   to {
     transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes m3-ripple-center {
+  to {
+    left: var(--_ripple-target-x);
+    top: var(--_ripple-target-y);
   }
 }
 
