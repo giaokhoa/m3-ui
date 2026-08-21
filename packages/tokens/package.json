@@ -16,6 +16,10 @@
       "types": "./dist/button.d.ts",
       "import": "./dist/button.js"
     },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "import": "./dist/checkbox.js"
+    },
     "./elevation": {
       "types": "./dist/elevation.d.ts",
       "import": "./dist/elevation.js"
