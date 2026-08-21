@@ -65,6 +65,17 @@ export const DisabledStates: Story = {
   ),
 };
 
+export const ReadOnly: Story = {
+  render: () => (
+    <div className="m3-storybook-center">
+      <RadioGroup aria-label="Read-only radio group" defaultValue="selected" isReadOnly>
+        <RadioButton value="selected">Selected</RadioButton>
+        <RadioButton value="other">Other</RadioButton>
+      </RadioGroup>
+    </div>
+  ),
+};
+
 export const HorizontalGroup: Story = {
   render: () => (
     <div className="m3-storybook-center">
