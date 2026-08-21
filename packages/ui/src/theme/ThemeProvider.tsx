@@ -9,13 +9,23 @@ import {
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
+import { defaultTypographyThemeStyle } from './typography/cssVariables';
 import type { ColorScheme, ThemeMode } from './types';
 
+const defaultFontStylesheet =
+  'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap';
+
+export type ThemeStyle = CSSProperties &
+  Record<`--${string}`, string | number | undefined>;
+
 export interface ThemeProviderProps
-  extends PropsWithChildren<Omit<HTMLAttributes<HTMLDivElement>, 'color'>> {
+  extends PropsWithChildren<
+    Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'style'>
+  > {
   mode?: ThemeMode;
   sourceColor?: string;
   contrastLevel?: number;
+  style?: ThemeStyle;
 }
 
 export interface ThemeContextValue {
@@ -26,8 +36,6 @@ export interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-type ThemeStyle = CSSProperties & Record<`--${string}`, string | number>;
 
 export function ThemeProvider({
   mode = 'light',
@@ -45,13 +53,13 @@ export function ThemeProvider({
     [sourceColor, mode, contrastLevel],
   );
 
-  const themeStyle = useMemo(
-    () =>
-      ({
-        ...schemeToCssVariables(scheme),
-        colorScheme: mode,
-        ...style,
-      }) as ThemeStyle,
+  const themeStyle = useMemo<ThemeStyle>(
+    () => ({
+      ...schemeToCssVariables(scheme),
+      ...defaultTypographyThemeStyle,
+      colorScheme: mode,
+      ...style,
+    }),
     [scheme, mode, style],
   );
 
@@ -62,6 +70,11 @@ export function ThemeProvider({
 
   return (
     <ThemeContext.Provider value={value}>
+      <link
+        href={defaultFontStylesheet}
+        precedence="m3-font"
+        rel="stylesheet"
+      />
       <div {...props} data-theme={mode} style={themeStyle}>
         {children}
       </div>
