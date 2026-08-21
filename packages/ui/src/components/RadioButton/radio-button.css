@@ -22,11 +22,8 @@
 .m3-radio-button__state-layer {
   position: absolute;
   inset: 0;
-  --ripple-color: var(--_radio-unselected-state-layer);
-}
-
-.m3-radio-button[data-selected] .m3-radio-button__state-layer {
-  --ripple-color: var(--_radio-selected-state-layer);
+  /* Compose passes Color.Unspecified to ripple(), which resolves LocalContentColor. */
+  --ripple-color: currentColor;
 }
 
 .m3-radio-button__state-layer .m3-ripple {
