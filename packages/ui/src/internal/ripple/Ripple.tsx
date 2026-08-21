@@ -23,9 +23,11 @@ export function Ripple({
 }: RippleProps) {
   const tokenStyle: RippleStyle = {
     '--_ripple-grow-duration': `${rippleTokens.growDurationMs}ms`,
+    '--_ripple-hover-duration': `${rippleTokens.hoverTransitionDurationMs}ms`,
     '--_ripple-fade-in-duration': `${rippleTokens.fadeInDurationMs}ms`,
     '--_ripple-fade-out-duration': `${rippleTokens.fadeOutDurationMs}ms`,
-    '--_ripple-easing': rippleTokens.easing,
+    '--_ripple-grow-easing': rippleTokens.growEasing,
+    '--_ripple-opacity-easing': rippleTokens.opacityEasing,
     '--_ripple-hover-opacity': stateLayerOpacity.hover,
     '--_ripple-focus-opacity': stateLayerOpacity.focus,
     '--_ripple-pressed-opacity': stateLayerOpacity.pressed,
