@@ -21,10 +21,20 @@
 
 .m3-checkbox__state-layer {
   position: absolute;
-  inline-size: var(--_checkbox-state-layer-size);
-  block-size: var(--_checkbox-state-layer-size);
-  border-radius: 50%;
+  inset: 0;
   --ripple-color: transparent;
+}
+
+.m3-checkbox__state-layer .m3-ripple {
+  border-radius: 0;
+  overflow: visible;
+}
+
+.m3-checkbox__state-layer .m3-ripple__state-layer {
+  inset: calc(
+    (var(--_checkbox-interactive-size) - var(--_checkbox-state-layer-size)) / 2
+  );
+  border-radius: 50%;
 }
 
 .m3-checkbox[data-selected] .m3-checkbox__state-layer,
