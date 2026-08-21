@@ -20,6 +20,20 @@ async function openDefaultField(page: Page) {
 }
 
 test.describe('Material 3 filled TextField visual parity', () => {
+  test('defaults to multiline semantics with a single-line opt-out', async ({ page }) => {
+    const { input } = await openDefaultField(page);
+    await expect(input).toHaveJSProperty('tagName', 'TEXTAREA');
+    await input.fill('First line');
+    await input.press('End');
+    await input.press('Enter');
+    await input.type('Second line');
+    await expect(input).toHaveValue('First line\nSecond line');
+
+    await openStory(page, 'components-textfield--single-line');
+    const singleLine = page.getByRole('textbox', { name: 'Single line' });
+    await expect(singleLine).toHaveJSProperty('tagName', 'INPUT');
+  });
+
   test('empty default', async ({ page }) => {
     const { root } = await openDefaultField(page);
     await expect(root).toHaveScreenshot('text-field-empty.png');
