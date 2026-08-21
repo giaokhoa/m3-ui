@@ -6,6 +6,7 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 - `packages/tokens`: framework-agnostic Material token package
 - `packages/ui`: React component library
+- `apps/storybook`: component preview and visual review workspace
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
 - `scripts/compose-sync`: reserved tooling contract for syncing generated Material token data
@@ -14,11 +15,16 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 ```bash
 pnpm install
+pnpm storybook
 pnpm dev
 pnpm test
 pnpm build
 pnpm typecheck
 ```
+
+`pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` creates a static Storybook build under `apps/storybook/dist`.
+
+Storybook is the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
 
 ## Architecture before implementation
 
