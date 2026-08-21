@@ -28,6 +28,10 @@
       "types": "./dist/motion.d.ts",
       "import": "./dist/motion.js"
     },
+    "./radio-button": {
+      "types": "./dist/radio-button.d.ts",
+      "import": "./dist/radio-button.js"
+    },
     "./ripple": {
       "types": "./dist/ripple.d.ts",
       "import": "./dist/ripple.js"
