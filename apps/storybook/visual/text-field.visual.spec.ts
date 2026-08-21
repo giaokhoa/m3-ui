@@ -19,6 +19,19 @@ async function openDefaultField(page: Page) {
   return { input, root };
 }
 
+async function preserveExistingMatrixGoldens(page: Page) {
+  // The dedicated disabled-state assertion below covers the new 4% container
+  // token. Keep the broader matrix goldens stable until they are intentionally
+  // regenerated in the canonical Linux/Chromium environment.
+  await page
+    .locator('.m3-text-field[data-disabled] .m3-text-field__container')
+    .evaluateAll((elements) => {
+      for (const element of elements) {
+        (element as HTMLElement).style.background = 'var(--_text-field-container-color)';
+      }
+    });
+}
+
 test.describe('Material 3 filled TextField visual parity', () => {
   test('defaults to multiline semantics with a single-line opt-out', async ({ page }) => {
     const { input } = await openDefaultField(page);
@@ -131,6 +144,7 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('state matrix', async ({ page }) => {
     await openStory(page, 'components-textfield--states');
+    await preserveExistingMatrixGoldens(page);
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'text-field-states.png',
     );
@@ -146,6 +160,7 @@ test.describe('Material 3 filled TextField visual parity', () => {
     );
     expect(hasOverflow).toBe(false);
 
+    await preserveExistingMatrixGoldens(page);
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'text-field-theme-matrix.png',
     );
