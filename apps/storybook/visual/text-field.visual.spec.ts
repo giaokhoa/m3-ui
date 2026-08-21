@@ -88,8 +88,16 @@ test.describe('Material 3 filled TextField visual parity', () => {
     );
   });
 
-  test('theme matrix', async ({ page }) => {
+  test('theme matrix respects parent width constraints', async ({ page }) => {
     await openStory(page, 'components-textfield--theme-matrix');
+    const cards = page.locator('.m3-storybook-theme-card');
+    await expect(cards).toHaveCount(4);
+
+    const hasOverflow = await cards.evaluateAll((elements) =>
+      elements.some((element) => element.scrollWidth > element.clientWidth),
+    );
+    expect(hasOverflow).toBe(false);
+
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'text-field-theme-matrix.png',
     );
