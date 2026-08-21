@@ -36,6 +36,10 @@
       "types": "./dist/state.d.ts",
       "import": "./dist/state.js"
     },
+    "./text-field": {
+      "types": "./dist/text-field.d.ts",
+      "import": "./dist/text-field.js"
+    },
     "./typography": {
       "types": "./dist/typography.d.ts",
       "import": "./dist/typography.js"
