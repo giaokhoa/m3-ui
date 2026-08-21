@@ -1,3 +1,4 @@
+import { rippleTokens } from '@m3/tokens/ripple';
 import type { RippleOrigin, RipplePressEvent } from './types';
 
 export interface RippleBounds {
@@ -8,7 +9,10 @@ export interface RippleBounds {
 export interface RippleWaveGeometry {
   readonly x: number;
   readonly y: number;
+  readonly targetX: number;
+  readonly targetY: number;
   readonly diameter: number;
+  readonly startScale: number;
 }
 
 export function getRippleWaveGeometry(
@@ -16,17 +20,28 @@ export function getRippleWaveGeometry(
   bounds: RippleBounds,
   origin: RippleOrigin,
 ): RippleWaveGeometry {
+  const targetX = bounds.width / 2;
+  const targetY = bounds.height / 2;
   const shouldCenter =
     origin === 'center' ||
     event.pointerType === 'keyboard' ||
     event.pointerType === 'virtual';
 
-  const x = shouldCenter ? bounds.width / 2 : event.x;
-  const y = shouldCenter ? bounds.height / 2 : event.y;
-  const radius = Math.hypot(
-    Math.max(x, bounds.width - x),
-    Math.max(y, bounds.height - y),
-  );
+  const x = shouldCenter ? targetX : event.x;
+  const y = shouldCenter ? targetY : event.y;
+  const endRadius =
+    Math.hypot(bounds.width, bounds.height) / 2 +
+    rippleTokens.boundedExtraRadius;
+  const startRadius =
+    Math.max(bounds.width, bounds.height) *
+    rippleTokens.startRadiusLargestDimensionFactor;
 
-  return { x, y, diameter: radius * 2 };
+  return {
+    x,
+    y,
+    targetX,
+    targetY,
+    diameter: endRadius * 2,
+    startScale: Math.min(1, startRadius / endRadius),
+  };
 }
