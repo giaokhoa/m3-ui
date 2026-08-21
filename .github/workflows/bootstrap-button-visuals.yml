@@ -1,9 +1,9 @@
 name: Bootstrap Button visual baselines
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/complete-button-family
+      - main
     paths:
       - .github/workflows/bootstrap-button-visuals.yml
 
@@ -12,10 +12,13 @@ permissions:
 
 jobs:
   bootstrap:
+    if: github.head_ref == 'feat/complete-button-family'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
