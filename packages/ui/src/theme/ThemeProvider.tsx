@@ -1,3 +1,6 @@
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 import {
   createContext,
   useContext,
@@ -9,6 +12,7 @@ import {
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
+import { defaultTypographyThemeStyle } from './typography';
 import type { ColorScheme, ThemeMode } from './types';
 
 export interface ThemeProviderProps
@@ -49,6 +53,7 @@ export function ThemeProvider({
     () =>
       ({
         ...schemeToCssVariables(scheme),
+        ...defaultTypographyThemeStyle,
         colorScheme: mode,
         ...style,
       }) as ThemeStyle,
