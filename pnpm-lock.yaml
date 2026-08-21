@@ -40,8 +40,13 @@ importers:
         specifier: ^7.0.0
         version: 7.3.6
 
+  packages/tokens: {}
+
   packages/ui:
     dependencies:
+      '@m3/tokens':
+        specifier: workspace:*
+        version: link:../tokens
       '@material/material-color-utilities':
         specifier: 0.3.0
         version: 0.3.0
