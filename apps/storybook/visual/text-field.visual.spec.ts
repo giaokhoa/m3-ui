@@ -90,11 +90,29 @@ test.describe('Material 3 filled TextField visual parity', () => {
     expect(colors.label).toBe(colors.resolvedError);
   });
 
-  test('disabled', async ({ page }) => {
+  test('disabled uses the Compose container alpha', async ({ page }) => {
     await openStory(page, 'components-textfield--disabled');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
-      'text-field-disabled.png',
-    );
+    const root = page.locator('.m3-text-field[data-disabled]');
+    await expect(root).toBeVisible();
+
+    const colors = await root.evaluate((element) => {
+      const container = element.querySelector<HTMLElement>('.m3-text-field__container');
+      const probe = document.createElement('span');
+      probe.style.background =
+        'color-mix(in srgb, var(--on-surface) 4%, transparent)';
+      probe.style.position = 'absolute';
+      probe.style.visibility = 'hidden';
+      element.append(probe);
+      const expected = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+
+      return {
+        expected,
+        actual: container ? getComputedStyle(container).backgroundColor : '',
+      };
+    });
+
+    expect(colors.actual).toBe(colors.expected);
   });
 
   test('affixes and icons', async ({ page }) => {
