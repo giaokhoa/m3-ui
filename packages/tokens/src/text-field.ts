@@ -14,8 +14,9 @@ export interface FilledTextFieldTypographyToken {
 }
 
 /**
- * Material 3 filled TextField values resolved from current AndroidX
- * FilledTextFieldTokens, TextFieldDefaults, TextFieldImpl and TypeScaleTokens.
+ * Material 3 filled TextField values resolved from AndroidX revision
+ * 160825094a81825468a95b115bfb1b541e549856 using FilledTextFieldTokens,
+ * TextFieldDefaults, TextFieldImpl and TypeScaleTokens.
  */
 export const filledTextFieldTokens = {
   minWidth: 280,
@@ -106,7 +107,8 @@ export const filledTextFieldTokens = {
   } satisfies Record<string, FilledTextFieldTypographyToken>,
 
   motion: {
-    // Current AndroidX standard MotionScheme springs sampled to their 1% settle point.
+    // AndroidX standard MotionScheme springs at the pinned revision, sampled to
+    // their 1% settle point for CSS transition timing.
     fastEffects: {
       durationMs: 108,
       easing:
