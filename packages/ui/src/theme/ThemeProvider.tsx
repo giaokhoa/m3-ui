@@ -12,7 +12,7 @@ import {
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
-import { defaultTypographyThemeStyle } from './typography';
+import { defaultTypographyThemeStyle } from './typography/cssVariables';
 import type { ColorScheme, ThemeMode } from './types';
 
 export type ThemeStyle = CSSProperties &
