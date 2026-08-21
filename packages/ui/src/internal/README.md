@@ -4,10 +4,12 @@ This directory contains reusable implementation details shared by public compone
 
 Internal primitives exist to keep component implementations small and to avoid duplicating Material behavior across families. They are not a second component library.
 
-## Planned structure
+## Structure
 
 ```text
 internal/
+├── elevation/
+├── ripple/
 ├── surface/
 ├── state-layer/
 ├── interactions/
@@ -16,14 +18,23 @@ internal/
 └── README.md
 ```
 
+## Token boundary
+
+Immutable Material values come from `@m3/tokens`. Internal primitives must not duplicate those constants or push them into `ThemeProvider`.
+
+`ThemeProvider` owns runtime/theme-dependent values such as color roles. For example, elevation geometry comes from `@m3/tokens/elevation`, while the actual shadow color comes from the theme CSS variable `--shadow`.
+
+Ripple timing and state opacity come from `@m3/tokens`; ripple color comes from a theme/component CSS variable such as `--on-surface` or `--on-primary`.
+
 ## Rules
 
 - Nothing under `internal/` is a stable public API unless deliberately promoted later.
 - Prefer narrow primitives over generic mega-abstractions.
 - Do not reproduce Compose call graphs mechanically.
 - Use native HTML and React Aria semantics before inventing interaction infrastructure.
+- RAC remains the source of press/hover/focus behavior; primitives consume its state/events rather than attaching competing interaction hooks.
 - Keep visual state in CSS when possible.
-- Internal modules may consume theme/token layers but must not import a public component merely to reuse behavior.
+- Internal modules may consume `@m3/tokens` and theme CSS variables but must not import a public component merely to reuse behavior.
 
 ## Extraction threshold
 
