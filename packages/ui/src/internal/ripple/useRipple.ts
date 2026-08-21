@@ -1,5 +1,5 @@
 import { rippleTokens } from '@m3/tokens/ripple';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { RippleOrigin, RipplePressEvent, RippleWave } from './types';
 
 export interface UseRippleOptions {
@@ -7,7 +7,7 @@ export interface UseRippleOptions {
 }
 
 export interface RippleController {
-  readonly containerRef: React.RefObject<HTMLSpanElement | null>;
+  readonly containerRef: RefObject<HTMLSpanElement | null>;
   readonly waves: readonly RippleWave[];
   onPressStart(event: RipplePressEvent): void;
   onPressEnd(): void;
