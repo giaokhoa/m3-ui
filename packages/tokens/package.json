@@ -31,6 +31,10 @@
     "./state": {
       "types": "./dist/state.d.ts",
       "import": "./dist/state.js"
+    },
+    "./typography": {
+      "types": "./dist/typography.d.ts",
+      "import": "./dist/typography.js"
     }
   },
   "scripts": {
