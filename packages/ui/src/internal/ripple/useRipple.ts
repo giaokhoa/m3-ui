@@ -5,6 +5,7 @@ import type { RippleOrigin, RipplePressEvent, RippleWave } from './types';
 
 export interface UseRippleOptions {
   origin?: RippleOrigin;
+  radius?: number;
 }
 
 export interface RippleController {
@@ -14,7 +15,10 @@ export interface RippleController {
   onPressEnd(): void;
 }
 
-export function useRipple({ origin = 'press' }: UseRippleOptions = {}): RippleController {
+export function useRipple({
+  origin = 'press',
+  radius,
+}: UseRippleOptions = {}): RippleController {
   const containerRef = useRef<HTMLSpanElement>(null);
   const [waves, setWaves] = useState<RippleWave[]>([]);
   const nextId = useRef(0);
@@ -51,7 +55,12 @@ export function useRipple({ origin = 'press' }: UseRippleOptions = {}): RippleCo
       const container = containerRef.current ?? event.target;
       const { width, height } = container.getBoundingClientRect();
       const id = nextId.current++;
-      const geometry = getRippleWaveGeometry(event, { width, height }, origin);
+      const geometry = getRippleWaveGeometry(
+        event,
+        { width, height },
+        origin,
+        { radius },
+      );
 
       activeWaveId.current = id;
       startedAt.current.set(id, Date.now());
@@ -60,7 +69,7 @@ export function useRipple({ origin = 'press' }: UseRippleOptions = {}): RippleCo
         { id, ...geometry, isReleasing: false },
       ]);
     },
-    [origin],
+    [origin, radius],
   );
 
   const onPressEnd = useCallback(() => {
