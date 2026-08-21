@@ -12,6 +12,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "import": "./dist/button.js"
+    },
     "./elevation": {
       "types": "./dist/elevation.d.ts",
       "import": "./dist/elevation.js"
