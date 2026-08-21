@@ -61,9 +61,10 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('invalid', async ({ page }) => {
     await openStory(page, 'components-textfield--invalid');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
-      'text-field-invalid.png',
-    );
+    const root = page.locator('.m3-text-field');
+    await expect(root.locator('.m3-text-field__error')).toBeVisible();
+    await expect(root.locator('.m3-text-field__supporting')).toBeHidden();
+    await expect(root).toHaveScreenshot('text-field-invalid.png');
   });
 
   test('invalid keeps error colors while focused', async ({ page }) => {
