@@ -3,7 +3,8 @@ import type { TypefaceRole } from './typography.js';
 
 export interface ButtonPaddingTokens {
   readonly block: number;
-  readonly inline: number;
+  readonly inlineStart: number;
+  readonly inlineEnd: number;
 }
 
 export interface TypographyStyleTokens {
@@ -14,17 +15,33 @@ export interface TypographyStyleTokens {
   readonly letterSpacing: number;
 }
 
-export interface FilledButtonTokens {
+export type ButtonColorRole =
+  | 'onPrimary'
+  | 'onSecondaryContainer'
+  | 'onSurface'
+  | 'onSurfaceVariant'
+  | 'outlineVariant'
+  | 'primary'
+  | 'secondaryContainer'
+  | 'surfaceContainerLow';
+
+export type ButtonContainerColor = ButtonColorRole | 'transparent';
+
+export interface ButtonVariantTokens {
   readonly minWidth: number;
   readonly minHeight: number;
   readonly contentPadding: ButtonPaddingTokens;
+  readonly iconContentPadding: ButtonPaddingTokens;
   readonly containerShape: 'full';
-  readonly containerColor: 'primary';
-  readonly contentColor: 'onPrimary';
-  readonly disabledContainerColor: 'onSurface';
+  readonly containerColor: ButtonContainerColor;
+  readonly contentColor: ButtonColorRole;
+  readonly disabledContainerColor: ButtonContainerColor;
   readonly disabledContainerOpacity: number;
-  readonly disabledContentColor: 'onSurfaceVariant';
+  readonly disabledContentColor: ButtonColorRole;
   readonly disabledContentOpacity: number;
+  readonly outlineColor: ButtonColorRole | 'transparent';
+  readonly outlineWidth: number;
+  readonly disabledOutlineOpacity: number;
   readonly defaultElevation: ElevationLevel;
   readonly hoveredElevation: ElevationLevel;
   readonly focusedElevation: ElevationLevel;
@@ -35,34 +52,15 @@ export interface FilledButtonTokens {
   readonly labelTypography: TypographyStyleTokens;
 }
 
-/**
- * Baseline filled button values from AndroidX Material3 `androidx-main`.
- *
- * Sources:
- * - ButtonDefaults in Button.kt
- * - FilledButtonTokens v0_11_0
- * - ButtonSmallTokens v0_11_0
- * - TypeScaleTokens LabelLarge
- */
-export const filledButtonTokens = {
+const commonButtonTokens = {
   minWidth: 58,
   minHeight: 40,
-  contentPadding: {
-    block: 8,
-    inline: 24,
-  },
   containerShape: 'full',
-  containerColor: 'primary',
-  contentColor: 'onPrimary',
-  disabledContainerColor: 'onSurface',
   disabledContainerOpacity: 0.1,
-  disabledContentColor: 'onSurfaceVariant',
   disabledContentOpacity: 0.38,
-  defaultElevation: 'level0',
-  hoveredElevation: 'level1',
-  focusedElevation: 'level0',
-  pressedElevation: 'level0',
-  disabledElevation: 'level0',
+  outlineColor: 'transparent',
+  outlineWidth: 0,
+  disabledOutlineOpacity: 0,
   iconSize: 18,
   iconSpacing: 8,
   labelTypography: {
@@ -72,4 +70,117 @@ export const filledButtonTokens = {
     fontWeight: 500,
     letterSpacing: 0.1,
   },
-} as const satisfies FilledButtonTokens;
+} as const;
+
+const standardContentPadding = {
+  block: 8,
+  inlineStart: 24,
+  inlineEnd: 24,
+} as const;
+
+const standardIconContentPadding = {
+  block: 8,
+  inlineStart: 16,
+  inlineEnd: 24,
+} as const;
+
+/** Baseline high-emphasis filled button values from AndroidX Material3. */
+export const filledButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: 'primary',
+  contentColor: 'onPrimary',
+  disabledContainerColor: 'onSurface',
+  disabledContentColor: 'onSurfaceVariant',
+  defaultElevation: 'level0',
+  hoveredElevation: 'level1',
+  focusedElevation: 'level0',
+  pressedElevation: 'level0',
+  disabledElevation: 'level0',
+} as const satisfies ButtonVariantTokens;
+
+/** Baseline elevated button values from AndroidX Material3. */
+export const elevatedButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: 'surfaceContainerLow',
+  contentColor: 'primary',
+  disabledContainerColor: 'onSurface',
+  disabledContentColor: 'onSurfaceVariant',
+  defaultElevation: 'level1',
+  hoveredElevation: 'level2',
+  focusedElevation: 'level1',
+  pressedElevation: 'level1',
+  disabledElevation: 'level0',
+} as const satisfies ButtonVariantTokens;
+
+/** Baseline filled tonal button values from AndroidX Material3. */
+export const filledTonalButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: 'secondaryContainer',
+  contentColor: 'onSecondaryContainer',
+  disabledContainerColor: 'onSurface',
+  disabledContentColor: 'onSurfaceVariant',
+  defaultElevation: 'level0',
+  hoveredElevation: 'level1',
+  focusedElevation: 'level0',
+  pressedElevation: 'level0',
+  disabledElevation: 'level0',
+} as const satisfies ButtonVariantTokens;
+
+/** Baseline outlined button values from current AndroidX Material3. */
+export const outlinedButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: 'transparent',
+  contentColor: 'onSurfaceVariant',
+  disabledContainerColor: 'transparent',
+  disabledContentColor: 'onSurfaceVariant',
+  outlineColor: 'outlineVariant',
+  outlineWidth: 1,
+  disabledOutlineOpacity: 0.1,
+  defaultElevation: 'level0',
+  hoveredElevation: 'level0',
+  focusedElevation: 'level0',
+  pressedElevation: 'level0',
+  disabledElevation: 'level0',
+} as const satisfies ButtonVariantTokens;
+
+/** Baseline text button values from current AndroidX Material3. */
+export const textButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: {
+    block: 8,
+    inlineStart: 12,
+    inlineEnd: 12,
+  },
+  iconContentPadding: {
+    block: 8,
+    inlineStart: 12,
+    inlineEnd: 16,
+  },
+  containerColor: 'transparent',
+  contentColor: 'primary',
+  disabledContainerColor: 'transparent',
+  disabledContentColor: 'onSurfaceVariant',
+  defaultElevation: 'level0',
+  hoveredElevation: 'level0',
+  focusedElevation: 'level0',
+  pressedElevation: 'level0',
+  disabledElevation: 'level0',
+} as const satisfies ButtonVariantTokens;
+
+export const buttonVariantTokens = {
+  filled: filledButtonTokens,
+  elevated: elevatedButtonTokens,
+  filledTonal: filledTonalButtonTokens,
+  outlined: outlinedButtonTokens,
+  text: textButtonTokens,
+} as const;
+
+export type ButtonVariant = keyof typeof buttonVariantTokens;
