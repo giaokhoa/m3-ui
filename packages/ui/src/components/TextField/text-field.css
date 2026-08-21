@@ -94,7 +94,8 @@
 .m3-text-field__textarea {
   display: block;
   min-block-size: var(--_text-field-input-min-line-height);
-  resize: vertical;
+  field-sizing: content;
+  resize: none;
 }
 
 .m3-text-field__control::placeholder {
