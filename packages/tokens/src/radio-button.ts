@@ -11,7 +11,8 @@ export type RadioButtonColorRole =
  * Runtime RadioButtonDefaults resolves the control color only from
  * enabled × selected. The generated hover/focus/pressed icon colors are not
  * promoted into extra control-color behavior here because the Compose runtime
- * does not use them for RadioButtonColors.
+ * does not use them for RadioButtonColors. Compose's ripple is created without
+ * an explicit color and therefore resolves from LocalContentColor instead.
  */
 export const radioButtonTokens = {
   iconSize: 20,
@@ -26,8 +27,6 @@ export const radioButtonTokens = {
     unselected: 'onSurfaceVariant',
     disabledSelected: 'onSurface',
     disabledUnselected: 'onSurface',
-    selectedStateLayer: 'primary',
-    unselectedStateLayer: 'onSurface',
   } satisfies Record<string, RadioButtonColorRole>,
 
   disabledOpacity: 0.38,
