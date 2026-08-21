@@ -7,6 +7,8 @@
     "dev": "turbo dev",
     "storybook": "pnpm --filter @m3/storybook dev",
     "build:storybook": "pnpm --filter @m3/storybook build",
+    "test:visual": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual",
+    "test:visual:update": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual:update",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean"
