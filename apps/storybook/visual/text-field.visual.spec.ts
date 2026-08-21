@@ -19,19 +19,6 @@ async function openDefaultField(page: Page) {
   return { input, root };
 }
 
-async function preserveExistingMatrixGoldens(page: Page) {
-  // The dedicated disabled-state assertion below covers the new 4% container
-  // token. Keep the broader matrix goldens stable until they are intentionally
-  // regenerated in the canonical Linux/Chromium environment.
-  await page
-    .locator('.m3-text-field[data-disabled] .m3-text-field__container')
-    .evaluateAll((elements) => {
-      for (const element of elements) {
-        (element as HTMLElement).style.background = 'var(--_text-field-container-color)';
-      }
-    });
-}
-
 test.describe('Material 3 filled TextField visual parity', () => {
   test('defaults to multiline semantics with a single-line opt-out', async ({ page }) => {
     const { input } = await openDefaultField(page);
@@ -103,29 +90,11 @@ test.describe('Material 3 filled TextField visual parity', () => {
     expect(colors.label).toBe(colors.resolvedError);
   });
 
-  test('disabled uses the Compose container alpha', async ({ page }) => {
+  test('disabled', async ({ page }) => {
     await openStory(page, 'components-textfield--disabled');
-    const root = page.locator('.m3-text-field[data-disabled]');
-    await expect(root).toBeVisible();
-
-    const colors = await root.evaluate((element) => {
-      const container = element.querySelector<HTMLElement>('.m3-text-field__container');
-      const probe = document.createElement('span');
-      probe.style.background =
-        'color-mix(in srgb, var(--on-surface) 4%, transparent)';
-      probe.style.position = 'absolute';
-      probe.style.visibility = 'hidden';
-      element.append(probe);
-      const expected = getComputedStyle(probe).backgroundColor;
-      probe.remove();
-
-      return {
-        expected,
-        actual: container ? getComputedStyle(container).backgroundColor : '',
-      };
-    });
-
-    expect(colors.actual).toBe(colors.expected);
+    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
+      'text-field-disabled.png',
+    );
   });
 
   test('affixes and icons', async ({ page }) => {
@@ -144,7 +113,6 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('state matrix', async ({ page }) => {
     await openStory(page, 'components-textfield--states');
-    await preserveExistingMatrixGoldens(page);
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'text-field-states.png',
     );
@@ -160,7 +128,6 @@ test.describe('Material 3 filled TextField visual parity', () => {
     );
     expect(hasOverflow).toBe(false);
 
-    await preserveExistingMatrixGoldens(page);
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'text-field-theme-matrix.png',
     );
