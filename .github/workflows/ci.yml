@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   verify:
-    name: Test, typecheck and build
+    name: Test, typecheck, build and visual regression
     runs-on: ubuntu-latest
 
     steps:
@@ -45,3 +45,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Install Chromium headless shell
+        run: pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium
+
+      - name: Visual regression
+        run: pnpm --filter @m3/storybook test:visual
