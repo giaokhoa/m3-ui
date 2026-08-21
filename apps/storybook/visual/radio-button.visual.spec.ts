@@ -30,8 +30,8 @@ test.describe('Material 3 RadioButton parity', () => {
   test('uses native radio-group selection and keyboard semantics', async ({ page }) => {
     await openStory(page, 'components-radiobutton--states');
     const group = page.getByRole('radiogroup', { name: 'Radio states' });
-    const selected = page.getByRole('radio', { name: 'Selected' });
-    const unselected = page.getByRole('radio', { name: 'Unselected' });
+    const selected = page.getByRole('radio', { name: 'Selected', exact: true });
+    const unselected = page.getByRole('radio', { name: 'Unselected', exact: true });
 
     await expect(group).toBeVisible();
     await expect(selected).toBeChecked();
@@ -40,6 +40,18 @@ test.describe('Material 3 RadioButton parity', () => {
     await selected.focus();
     await page.keyboard.press('ArrowDown');
     await expect(unselected).toBeFocused();
+    await expect(unselected).toBeChecked();
+    await expect(selected).not.toBeChecked();
+  });
+
+  test('visible radio surface handles pointer selection', async ({ page }) => {
+    await openStory(page, 'components-radiobutton--states');
+    const roots = page.locator('.m3-radio-button');
+    const selected = page.getByRole('radio', { name: 'Selected', exact: true });
+    const unselected = page.getByRole('radio', { name: 'Unselected', exact: true });
+
+    await expect(selected).toBeChecked();
+    await roots.nth(1).click();
     await expect(unselected).toBeChecked();
     await expect(selected).not.toBeChecked();
   });
@@ -134,9 +146,11 @@ test.describe('Material 3 RadioButton parity', () => {
       first,
       'color-mix(in srgb, var(--on-surface) 38%, transparent)',
     );
+    const selected = page.getByRole('radio', { name: 'Selected', exact: true });
+    const unselected = page.getByRole('radio', { name: 'Unselected', exact: true });
 
-    await expect(page.getByRole('radio', { name: 'Selected' })).toBeDisabled();
-    await expect(page.getByRole('radio', { name: 'Unselected' })).toBeDisabled();
+    await expect(selected).toBeDisabled();
+    await expect(unselected).toBeDisabled();
     await expect(first.locator('.m3-radio-button__control')).toHaveCSS(
       'color',
       expected,
@@ -161,22 +175,27 @@ test.describe('Material 3 RadioButton parity', () => {
     await expect(page.getByRole('radio')).toHaveCount(3);
   });
 
-  test('read-only group preserves selection', async ({ page }) => {
+  test('read-only group preserves selection through visible pointer surface', async ({ page }) => {
     await openStory(page, 'components-radiobutton--read-only');
-    const selected = page.getByRole('radio', { name: 'Selected' });
-    const other = page.getByRole('radio', { name: 'Other' });
+    const roots = page.locator('.m3-radio-button');
+    const selected = page.getByRole('radio', { name: 'Selected', exact: true });
+    const other = page.getByRole('radio', { name: 'Other', exact: true });
 
     await expect(selected).toBeChecked();
     await expect(other).not.toBeChecked();
-    await other.click();
+    await roots.nth(1).click();
     await expect(selected).toBeChecked();
     await expect(other).not.toBeChecked();
   });
 
   test('control-only radios retain explicit accessible names', async ({ page }) => {
     await openStory(page, 'components-radiobutton--control-only');
-    await expect(page.getByRole('radio', { name: 'Selected control' })).toBeChecked();
-    await expect(page.getByRole('radio', { name: 'Unselected control' })).not.toBeChecked();
+    await expect(
+      page.getByRole('radio', { name: 'Selected control', exact: true }),
+    ).toBeChecked();
+    await expect(
+      page.getByRole('radio', { name: 'Unselected control', exact: true }),
+    ).not.toBeChecked();
   });
 
   test('theme matrix stays inside parent width constraints', async ({ page }) => {
