@@ -1,4 +1,4 @@
-# Temporary one-shot workflow; remove after TextField baselines are reviewed.
+# Temporary one-shot workflow; final TextField review pass.
 name: Bootstrap TextField visual baselines
 
 on:
