@@ -20,19 +20,30 @@ function percent(value: number): string {
   return `${value * 100}%`;
 }
 
+function colorRoleVariable(role: string): string {
+  const name = role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  return `var(--${name})`;
+}
+
 export const filledButtonBaseStyle: ButtonStyle = {
   '--_button-min-width': `${filledButtonTokens.minWidth}px`,
   '--_button-min-height': `${filledButtonTokens.minHeight}px`,
   '--_button-padding-block': `${filledButtonTokens.contentPadding.block}px`,
   '--_button-padding-inline': `${filledButtonTokens.contentPadding.inline}px`,
   '--_button-container-radius': shapeRadius[filledButtonTokens.containerShape],
-  '--_button-container-color': `var(--${filledButtonTokens.containerColor})`,
-  '--_button-content-color': 'var(--on-primary)',
-  '--_button-disabled-container-color': 'var(--on-surface)',
+  '--_button-container-color': colorRoleVariable(
+    filledButtonTokens.containerColor,
+  ),
+  '--_button-content-color': colorRoleVariable(filledButtonTokens.contentColor),
+  '--_button-disabled-container-color': colorRoleVariable(
+    filledButtonTokens.disabledContainerColor,
+  ),
   '--_button-disabled-container-opacity': percent(
     filledButtonTokens.disabledContainerOpacity,
   ),
-  '--_button-disabled-content-color': 'var(--on-surface-variant)',
+  '--_button-disabled-content-color': colorRoleVariable(
+    filledButtonTokens.disabledContentColor,
+  ),
   '--_button-disabled-content-opacity': percent(
     filledButtonTokens.disabledContentOpacity,
   ),
