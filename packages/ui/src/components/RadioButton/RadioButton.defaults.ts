@@ -32,6 +32,8 @@ export const radioButtonBaseStyle: RadioButtonStyle = {
     radioButtonTokens.colors.unselectedStateLayer,
   ),
   '--_radio-disabled-opacity': radioButtonTokens.disabledOpacity,
-  '--_radio-transition-duration': `${radioButtonTokens.motion.durationMs}ms`,
-  '--_radio-transition-easing': radioButtonTokens.motion.easing,
+  '--_radio-color-duration': `${radioButtonTokens.motion.color.durationMs}ms`,
+  '--_radio-color-easing': radioButtonTokens.motion.color.easing,
+  '--_radio-dot-duration': `${radioButtonTokens.motion.dot.durationMs}ms`,
+  '--_radio-dot-easing': radioButtonTokens.motion.dot.easing,
 };
