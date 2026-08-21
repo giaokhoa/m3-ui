@@ -1,0 +1,51 @@
+export const elevationLevels = {
+  level0: 0,
+  level1: 1,
+  level2: 3,
+  level3: 6,
+  level4: 8,
+  level5: 12,
+} as const;
+
+export type ElevationLevel = keyof typeof elevationLevels;
+
+export interface ElevationShadowLayer {
+  readonly offsetX: number;
+  readonly offsetY: number;
+  readonly blurRadius: number;
+  readonly spreadRadius: number;
+  readonly opacity: number;
+}
+
+export const elevationShadowLayers = {
+  level0: [
+    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.2 },
+    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.14 },
+    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.12 },
+  ],
+  level1: [
+    { offsetX: 0, offsetY: 2, blurRadius: 1, spreadRadius: -1, opacity: 0.2 },
+    { offsetX: 0, offsetY: 1, blurRadius: 1, spreadRadius: 0, opacity: 0.14 },
+    { offsetX: 0, offsetY: 1, blurRadius: 3, spreadRadius: 0, opacity: 0.12 },
+  ],
+  level2: [
+    { offsetX: 0, offsetY: 3, blurRadius: 3, spreadRadius: -2, opacity: 0.2 },
+    { offsetX: 0, offsetY: 3, blurRadius: 4, spreadRadius: 0, opacity: 0.14 },
+    { offsetX: 0, offsetY: 1, blurRadius: 8, spreadRadius: 0, opacity: 0.12 },
+  ],
+  level3: [
+    { offsetX: 0, offsetY: 3, blurRadius: 5, spreadRadius: -1, opacity: 0.2 },
+    { offsetX: 0, offsetY: 6, blurRadius: 10, spreadRadius: 0, opacity: 0.14 },
+    { offsetX: 0, offsetY: 1, blurRadius: 18, spreadRadius: 0, opacity: 0.12 },
+  ],
+  level4: [
+    { offsetX: 0, offsetY: 5, blurRadius: 5, spreadRadius: -3, opacity: 0.2 },
+    { offsetX: 0, offsetY: 8, blurRadius: 10, spreadRadius: 1, opacity: 0.14 },
+    { offsetX: 0, offsetY: 3, blurRadius: 14, spreadRadius: 2, opacity: 0.12 },
+  ],
+  level5: [
+    { offsetX: 0, offsetY: 7, blurRadius: 8, spreadRadius: -4, opacity: 0.2 },
+    { offsetX: 0, offsetY: 12, blurRadius: 17, spreadRadius: 2, opacity: 0.14 },
+    { offsetX: 0, offsetY: 5, blurRadius: 22, spreadRadius: 4, opacity: 0.12 },
+  ],
+} as const satisfies Record<ElevationLevel, readonly ElevationShadowLayer[]>;

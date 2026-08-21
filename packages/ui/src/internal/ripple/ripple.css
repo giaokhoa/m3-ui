@@ -1,0 +1,63 @@
+.m3-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.m3-ripple__state-layer,
+.m3-ripple__wave {
+  position: absolute;
+  background: var(--ripple-color, var(--on-surface));
+}
+
+.m3-ripple__state-layer {
+  inset: 0;
+  opacity: 0;
+  transition:
+    opacity var(--_ripple-hover-duration) var(--_ripple-opacity-easing),
+    background-color var(--_ripple-hover-duration) var(--_ripple-opacity-easing);
+}
+
+.m3-ripple[data-hovered] .m3-ripple__state-layer {
+  opacity: var(--_ripple-hover-opacity);
+}
+
+.m3-ripple[data-focus-visible] .m3-ripple__state-layer {
+  opacity: var(--_ripple-focus-opacity);
+}
+
+.m3-ripple__wave {
+  left: var(--_ripple-x);
+  top: var(--_ripple-y);
+  width: var(--_ripple-diameter);
+  height: var(--_ripple-diameter);
+  border-radius: 50%;
+  opacity: var(--_ripple-pressed-opacity);
+  transform: translate(-50%, -50%) scale(0);
+  animation:
+    m3-ripple-grow var(--_ripple-grow-duration) var(--_ripple-grow-easing) forwards,
+    m3-ripple-fade-in var(--_ripple-fade-in-duration) var(--_ripple-opacity-easing);
+}
+
+.m3-ripple__wave[data-releasing] {
+  opacity: 0;
+  transition: opacity var(--_ripple-fade-out-duration) var(--_ripple-opacity-easing);
+}
+
+@keyframes m3-ripple-grow {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes m3-ripple-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: var(--_ripple-pressed-opacity);
+  }
+}

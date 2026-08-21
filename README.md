@@ -4,7 +4,8 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 ## Workspace
 
-- `packages/ui`: component library
+- `packages/tokens`: framework-agnostic Material token package
+- `packages/ui`: React component library
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
 - `scripts/compose-sync`: reserved tooling contract for syncing generated Material token data
@@ -28,7 +29,8 @@ The project targets 1:1 parity in Material behavior, tokens, defaults, states, l
 Key rules:
 
 - AndroidX Material3 is pinned as a source of truth for parity work.
-- Generated token data and handwritten React implementation are separate layers.
+- Immutable/generated token data belongs in `@m3/tokens`; handwritten React implementation belongs in `@m3/ui`.
+- `ThemeProvider` owns runtime theme values, not immutable specification constants.
 - TypeScript must remain idiomatic; do not recreate `Modifier`, Kotlin `data class`, `.copy()`, `Dp`, or `InteractionSource` APIs.
 - Native HTML and React Aria Components provide web semantics and interaction state.
 - Visual state should be CSS-first when possible.

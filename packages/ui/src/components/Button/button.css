@@ -1,15 +1,27 @@
 .m3-button {
+  position: relative;
   border: 0;
   border-radius: 999px;
   min-height: 40px;
   padding: 0 24px;
   font: inherit;
   cursor: pointer;
-  background: var(--primary, #6750a4);
-  color: var(--on-primary, #fff);
+  background: var(--primary);
+  color: var(--on-primary);
+  --ripple-color: var(--on-primary);
 }
 
-.m3-button:hover { filter: brightness(1.06); }
-.m3-button.is-pressed { transform: translateY(1px); }
-.m3-button[data-focus-visible] { outline: 3px solid currentColor; outline-offset: 2px; }
-.m3-button[data-disabled] { cursor: not-allowed; opacity: 0.38; }
+.m3-button__content {
+  position: relative;
+  z-index: 1;
+}
+
+.m3-button[data-focus-visible] {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+.m3-button[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.38;
+}

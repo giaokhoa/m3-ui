@@ -11,7 +11,12 @@ export default defineConfig({
       cssFileName: 'styles',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-aria-components'],
+      external: [
+        'react',
+        'react-dom',
+        'react-aria-components',
+        /^@m3\/tokens(?:\/.*)?$/,
+      ],
     },
   },
 });
