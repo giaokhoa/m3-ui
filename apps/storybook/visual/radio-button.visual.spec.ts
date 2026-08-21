@@ -103,6 +103,25 @@ test.describe('Material 3 RadioButton parity', () => {
     );
   });
 
+  test('uses selection-aware Material hover state layers', async ({ page }) => {
+    await openStory(page, 'components-radiobutton--states');
+    const roots = page.locator('.m3-radio-button');
+    const selectedRoot = roots.nth(0);
+    const unselectedRoot = roots.nth(1);
+    const primary = await resolvedColor(selectedRoot, 'var(--primary)');
+    const onSurface = await resolvedColor(unselectedRoot, 'var(--on-surface)');
+
+    await selectedRoot.hover();
+    const selectedLayer = selectedRoot.locator('.m3-ripple__state-layer');
+    await expect(selectedLayer).toHaveCSS('background-color', primary);
+    await expect(selectedLayer).toHaveCSS('opacity', '0.08');
+
+    await unselectedRoot.hover();
+    const unselectedLayer = unselectedRoot.locator('.m3-ripple__state-layer');
+    await expect(unselectedLayer).toHaveCSS('background-color', onSurface);
+    await expect(unselectedLayer).toHaveCSS('opacity', '0.08');
+  });
+
   test('disabled state snaps to OnSurface at 38 percent', async ({ page }) => {
     await openStory(page, 'components-radiobutton--disabled-states');
     const roots = page.locator('.m3-radio-button');
