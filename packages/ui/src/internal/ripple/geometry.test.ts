@@ -17,8 +17,9 @@ function pressEvent(
 
 describe('ripple geometry', () => {
   const bounds = { width: 100, height: 40 };
+  const endRadius = Math.hypot(100, 40) / 2 + 10;
 
-  it('uses RAC pointer coordinates for pointer presses', () => {
+  it('starts pointer ripples at RAC coordinates and moves them to center', () => {
     const geometry = getRippleWaveGeometry(
       pressEvent('mouse', 20, 10),
       bounds,
@@ -27,7 +28,10 @@ describe('ripple geometry', () => {
 
     expect(geometry.x).toBe(20);
     expect(geometry.y).toBe(10);
-    expect(geometry.diameter).toBeCloseTo(Math.hypot(80, 30) * 2);
+    expect(geometry.targetX).toBe(50);
+    expect(geometry.targetY).toBe(20);
+    expect(geometry.diameter).toBeCloseTo(endRadius * 2);
+    expect(geometry.startScale).toBeCloseTo(30 / endRadius);
   });
 
   it.each(['keyboard', 'virtual'] as const)(
@@ -41,6 +45,8 @@ describe('ripple geometry', () => {
 
       expect(geometry.x).toBe(50);
       expect(geometry.y).toBe(20);
+      expect(geometry.targetX).toBe(50);
+      expect(geometry.targetY).toBe(20);
     },
   );
 
