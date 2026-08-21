@@ -1,5 +1,9 @@
-import { Button as AriaButton, type ButtonProps as AriaButtonProps } from 'react-aria-components';
+import {
+  Button as AriaButton,
+  type ButtonProps as AriaButtonProps,
+} from 'react-aria-components';
 import { Ripple, useRipple } from '../../internal/ripple';
+import { getFilledButtonStyle } from './Button.defaults';
 import './button.css';
 
 export type ButtonProps = AriaButtonProps;
@@ -7,6 +11,7 @@ export type ButtonProps = AriaButtonProps;
 export function Button({
   children,
   className,
+  style,
   onPressStart,
   onPressEnd,
   ...props
@@ -31,6 +36,20 @@ export function Button({
           typeof className === 'function' ? className(renderProps) : className;
 
         return userClassName ? `m3-button ${userClassName}` : 'm3-button';
+      }}
+      style={(renderProps) => {
+        const userStyle =
+          typeof style === 'function' ? style(renderProps) : style;
+
+        return {
+          ...getFilledButtonStyle({
+            isDisabled: renderProps.isDisabled,
+            isPressed: renderProps.isPressed,
+            isFocused: renderProps.isFocused,
+            isHovered: renderProps.isHovered,
+          }),
+          ...userStyle,
+        };
       }}
       onPressEnd={handlePressEnd}
       onPressStart={handlePressStart}

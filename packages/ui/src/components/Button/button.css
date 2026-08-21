@@ -1,27 +1,49 @@
 .m3-button {
   position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--_button-min-width);
+  min-block-size: var(--_button-min-height);
+  margin: 0;
+  padding-block: var(--_button-padding-block);
+  padding-inline: var(--_button-padding-inline);
   border: 0;
-  border-radius: 999px;
-  min-height: 40px;
-  padding: 0 24px;
-  font: inherit;
+  border-radius: var(--_button-container-radius);
+  appearance: none;
+  background: var(--_button-container-color);
+  color: var(--_button-content-color);
+  font-family: var(--_button-font-family);
+  font-size: var(--_button-font-size);
+  font-weight: var(--_button-font-weight);
+  line-height: var(--_button-line-height);
+  letter-spacing: var(--_button-letter-spacing);
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
-  background: var(--primary);
-  color: var(--on-primary);
-  --ripple-color: var(--on-primary);
+  -webkit-tap-highlight-color: transparent;
+  --ripple-color: var(--_button-content-color);
 }
 
 .m3-button__content {
   position: relative;
   z-index: 1;
-}
-
-.m3-button[data-focus-visible] {
-  outline: 3px solid currentColor;
-  outline-offset: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .m3-button[data-disabled] {
-  cursor: not-allowed;
-  opacity: 0.38;
+  background: color-mix(
+    in srgb,
+    var(--_button-disabled-container-color) var(--_button-disabled-container-opacity),
+    transparent
+  );
+  color: color-mix(
+    in srgb,
+    var(--_button-disabled-content-color) var(--_button-disabled-content-opacity),
+    transparent
+  );
+  cursor: default;
 }
