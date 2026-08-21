@@ -19,6 +19,6 @@ describe('elevation', () => {
 
     expect(shadow).toContain('var(--shadow)');
     expect(shadow).not.toMatch(/#[0-9a-f]{3,8}/i);
-    expect(shadow.split(', ')).toHaveLength(3);
+    expect(shadow.match(/color-mix\(/g)).toHaveLength(3);
   });
 });
