@@ -105,10 +105,6 @@
   );
 }
 
-.m3-radio-button[data-disabled] .m3-radio-button__dot {
-  transition: none;
-}
-
 .m3-radio-button[data-disabled] .m3-radio-button__label {
   color: color-mix(in srgb, var(--on-surface) 38%, transparent);
 }
