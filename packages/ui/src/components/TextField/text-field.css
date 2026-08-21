@@ -2,6 +2,7 @@
   display: grid;
   gap: 6px;
   max-width: 320px;
+  color: var(--on-surface, #1d1b20);
 }
 
 .m3-text-field__label { font-weight: 600; }
@@ -9,14 +10,23 @@
 .m3-text-field__input {
   min-height: 48px;
   box-sizing: border-box;
-  border: 1px solid #79747e;
+  border: 1px solid var(--outline, #79747e);
   border-radius: 4px;
   padding: 0 16px;
   font: inherit;
-  background: transparent;
-  color: inherit;
+  background: var(--surface, transparent);
+  color: var(--on-surface, inherit);
 }
 
-.m3-text-field__input[data-focused] { outline: 2px solid #6750a4; outline-offset: -2px; }
-.m3-text-field__description { color: #49454f; font-size: 0.875rem; }
-.m3-text-field__error { color: #b3261e; font-size: 0.875rem; }
+.m3-text-field__input[data-focused] {
+  outline: 2px solid var(--primary, #6750a4);
+  outline-offset: -2px;
+}
+.m3-text-field__description {
+  color: var(--on-surface-variant, #49454f);
+  font-size: 0.875rem;
+}
+.m3-text-field__error {
+  color: var(--error, #b3261e);
+  font-size: 0.875rem;
+}

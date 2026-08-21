@@ -3,6 +3,7 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  color: var(--on-surface, #1d1b20);
 }
 
 .m3-checkbox__box {
@@ -10,14 +11,17 @@
   place-items: center;
   width: 18px;
   height: 18px;
-  border: 2px solid #79747e;
+  border: 2px solid var(--outline, #79747e);
   border-radius: 2px;
 }
 
 .m3-checkbox[data-selected] .m3-checkbox__box {
-  border-color: #6750a4;
-  background: #6750a4;
-  color: #fff;
+  border-color: var(--primary, #6750a4);
+  background: var(--primary, #6750a4);
+  color: var(--on-primary, #fff);
 }
 
-.m3-checkbox[data-focus-visible] { outline: 3px solid #6750a4; outline-offset: 4px; }
+.m3-checkbox[data-focus-visible] {
+  outline: 3px solid var(--primary, #6750a4);
+  outline-offset: 4px;
+}
