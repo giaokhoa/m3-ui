@@ -1,0 +1,56 @@
+export type ThemeMode = 'light' | 'dark';
+
+export interface ColorScheme {
+  background: string;
+  onBackground: string;
+  surface: string;
+  surfaceDim: string;
+  surfaceBright: string;
+  surfaceContainerLowest: string;
+  surfaceContainerLow: string;
+  surfaceContainer: string;
+  surfaceContainerHigh: string;
+  surfaceContainerHighest: string;
+  onSurface: string;
+  surfaceVariant: string;
+  onSurfaceVariant: string;
+  inverseSurface: string;
+  inverseOnSurface: string;
+  outline: string;
+  outlineVariant: string;
+  shadow: string;
+  scrim: string;
+  surfaceTint: string;
+  primary: string;
+  onPrimary: string;
+  primaryContainer: string;
+  onPrimaryContainer: string;
+  inversePrimary: string;
+  primaryFixed: string;
+  primaryFixedDim: string;
+  onPrimaryFixed: string;
+  onPrimaryFixedVariant: string;
+  secondary: string;
+  onSecondary: string;
+  secondaryContainer: string;
+  onSecondaryContainer: string;
+  secondaryFixed: string;
+  secondaryFixedDim: string;
+  onSecondaryFixed: string;
+  onSecondaryFixedVariant: string;
+  tertiary: string;
+  onTertiary: string;
+  tertiaryContainer: string;
+  onTertiaryContainer: string;
+  tertiaryFixed: string;
+  tertiaryFixedDim: string;
+  onTertiaryFixed: string;
+  onTertiaryFixedVariant: string;
+  error: string;
+  onError: string;
+  errorContainer: string;
+  onErrorContainer: string;
+}
+
+export type ColorRole = keyof ColorScheme;
+export type ColorCssVariable = `--${string}`;
