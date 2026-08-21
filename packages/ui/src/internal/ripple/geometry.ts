@@ -15,10 +15,15 @@ export interface RippleWaveGeometry {
   readonly startScale: number;
 }
 
+export interface RippleGeometryOptions {
+  readonly radius?: number;
+}
+
 export function getRippleWaveGeometry(
   event: RipplePressEvent,
   bounds: RippleBounds,
   origin: RippleOrigin,
+  { radius }: RippleGeometryOptions = {},
 ): RippleWaveGeometry {
   const targetX = bounds.width / 2;
   const targetY = bounds.height / 2;
@@ -30,8 +35,9 @@ export function getRippleWaveGeometry(
   const x = shouldCenter ? targetX : event.x;
   const y = shouldCenter ? targetY : event.y;
   const endRadius =
+    radius ??
     Math.hypot(bounds.width, bounds.height) / 2 +
-    rippleTokens.boundedExtraRadius;
+      rippleTokens.boundedExtraRadius;
   const startRadius =
     Math.max(bounds.width, bounds.height) *
     rippleTokens.startRadiusLargestDimensionFactor;
