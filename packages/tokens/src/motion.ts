@@ -1,4 +1,5 @@
 export const motionEasing = {
+  linear: 'linear',
   standard: 'cubic-bezier(0.2, 0, 0, 1)',
   standardAccelerate: 'cubic-bezier(.3,0,1,1)',
   standardDecelerate: 'cubic-bezier(0,0,0,1)',
