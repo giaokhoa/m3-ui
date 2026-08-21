@@ -38,7 +38,25 @@ export const checkboxTokens = {
     rightY: 0.3,
   },
 
-  snapAnimationDelayMs: 100,
+  motion: {
+    // Current AndroidX standard MotionScheme springs sampled to their 1% settle point.
+    defaultEffects: {
+      durationMs: 166,
+      easing:
+        'linear(0, 0.1434 10%, 0.3831 20%, 0.5918 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9689 80%, 0.9823 90%, 1)',
+    },
+    fastEffects: {
+      durationMs: 108,
+      easing:
+        'linear(0, 0.1434 10%, 0.383 20%, 0.5917 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9688 80%, 0.9823 90%, 1)',
+    },
+    defaultSpatial: {
+      durationMs: 194,
+      easing:
+        'linear(0, 0.0968 10%, 0.2871 20%, 0.4824 30%, 0.647 40%, 0.7717 50%, 0.8596 60%, 0.9181 70%, 0.9551 80%, 0.9774 90%, 1)',
+    },
+    snapDelayMs: 100,
+  },
 } as const;
 
 export type CheckboxTokens = typeof checkboxTokens;
