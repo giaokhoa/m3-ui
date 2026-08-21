@@ -15,7 +15,7 @@ export interface FilledTextFieldTypographyToken {
 
 /**
  * Material 3 filled TextField values resolved from current AndroidX
- * FilledTextFieldTokens, TextFieldDefaults and TypeScaleTokens.
+ * FilledTextFieldTokens, TextFieldDefaults, TextFieldImpl and TypeScaleTokens.
  */
 export const filledTextFieldTokens = {
   minWidth: 280,
@@ -26,6 +26,14 @@ export const filledTextFieldTokens = {
     blockWithLabel: 8,
     blockWithoutLabel: 16,
     supportingTop: 4,
+    affix: 2,
+    afterIcon: 4,
+  },
+
+  lineHeight: {
+    inputMin: 24,
+    focusedLabelMin: 16,
+    supportingMin: 16,
   },
 
   containerShape: {
@@ -41,6 +49,7 @@ export const filledTextFieldTokens = {
   },
 
   iconSize: 24,
+  iconSlotSize: 48,
 
   colors: {
     container: 'surfaceContainerHighest',
