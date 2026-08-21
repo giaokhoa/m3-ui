@@ -24,8 +24,12 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
   trailingIcon?: ReactNode;
   prefix?: ReactNode;
   suffix?: ReactNode;
-  /** Uses the same RAC TextField semantics with a native textarea control. */
+  /**
+   * Compose TextField defaults to MultiLine(minHeightInLines = 1). Set false
+   * to opt into single-line input semantics.
+   */
   isMultiline?: boolean;
+  /** Native textarea fallback row count. Modern browsers auto-size to content. */
   rows?: number;
 }
 
@@ -43,7 +47,7 @@ export function TextField({
   trailingIcon,
   prefix,
   suffix,
-  isMultiline = false,
+  isMultiline = true,
   rows,
   className,
   style,
@@ -93,7 +97,7 @@ export function TextField({
               <TextArea
                 className="m3-text-field__control m3-text-field__textarea"
                 placeholder={controlPlaceholder}
-                rows={rows}
+                rows={rows ?? 1}
               />
             ) : (
               <Input
