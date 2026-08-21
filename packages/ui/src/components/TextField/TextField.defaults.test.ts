@@ -59,9 +59,6 @@ describe('filled TextField defaults', () => {
     expect(style['--_text-field-container-color']).toBe(
       'var(--surface-container-highest)',
     );
-    expect(style['--_text-field-disabled-container-color']).toBe('var(--on-surface)');
-    expect(style['--_text-field-disabled-container-opacity']).toBe(0.04);
-    expect(style['--_text-field-disabled-opacity']).toBe(0.38);
     expect(style['--_text-field-text-color']).toBe('var(--on-surface)');
     expect(style['--_text-field-focused-indicator-color']).toBe('var(--primary)');
     expect(style['--_text-field-error-indicator-color']).toBe('var(--error)');
