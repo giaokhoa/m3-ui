@@ -16,9 +16,11 @@ describe('ripple tokens', () => {
     expect(rippleTokens).toEqual({
       growDurationMs: 450,
       minimumPressDurationMs: 225,
+      hoverTransitionDurationMs: 15,
       fadeInDurationMs: 105,
       fadeOutDurationMs: 375,
-      easing: 'cubic-bezier(0.2, 0, 0, 1)',
+      growEasing: 'cubic-bezier(0.2, 0, 0, 1)',
+      opacityEasing: 'linear',
     });
   });
 });
