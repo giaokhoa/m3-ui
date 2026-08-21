@@ -133,7 +133,6 @@
   letter-spacing: var(--_text-field-body-large-letter-spacing);
   text-overflow: ellipsis;
   white-space: nowrap;
-  pointer-events: none;
   transition:
     inset-block-start var(--_text-field-fast-spatial-duration)
       var(--_text-field-fast-spatial-easing),
