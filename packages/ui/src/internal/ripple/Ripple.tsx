@@ -5,22 +5,34 @@ import type { RippleController } from './useRipple';
 import './ripple.css';
 
 type RippleStyle = CSSProperties & Record<`--${string}`, string | number>;
+export type RippleStateInteraction = 'focus' | 'hover';
 
 export interface RippleProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   controller: RippleController;
+  stateInteraction?: RippleStateInteraction | null;
   isHovered?: boolean;
   isFocusVisible?: boolean;
 }
 
 export function Ripple({
   controller,
+  stateInteraction,
   isHovered = false,
   isFocusVisible = false,
   className,
   style,
   ...props
 }: RippleProps) {
+  const resolvedStateInteraction =
+    stateInteraction === undefined
+      ? isFocusVisible
+        ? 'focus'
+        : isHovered
+          ? 'hover'
+          : null
+      : stateInteraction;
+
   const tokenStyle: RippleStyle = {
     '--_ripple-radius-duration': `${rippleTokens.radiusDurationMs}ms`,
     '--_ripple-hover-duration': `${rippleTokens.hoverTransitionDurationMs}ms`,
@@ -42,8 +54,8 @@ export function Ripple({
       ref={controller.containerRef}
       aria-hidden="true"
       className={className ? `m3-ripple ${className}` : 'm3-ripple'}
-      data-focus-visible={isFocusVisible || undefined}
-      data-hovered={isHovered || undefined}
+      data-focus-visible={resolvedStateInteraction === 'focus' || undefined}
+      data-hovered={resolvedStateInteraction === 'hover' || undefined}
       style={tokenStyle}
     >
       <span className="m3-ripple__state-layer" />
