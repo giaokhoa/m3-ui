@@ -1,5 +1,6 @@
 import { rippleTokens } from '@m3/tokens/ripple';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { getRippleWaveGeometry } from './geometry';
 import type { RippleOrigin, RipplePressEvent, RippleWave } from './types';
 
 export interface UseRippleOptions {
@@ -11,27 +12,6 @@ export interface RippleController {
   readonly waves: readonly RippleWave[];
   onPressStart(event: RipplePressEvent): void;
   onPressEnd(): void;
-}
-
-function getWaveGeometry(
-  event: RipplePressEvent,
-  container: Element,
-  origin: RippleOrigin,
-) {
-  const { width, height } = container.getBoundingClientRect();
-  const shouldCenter =
-    origin === 'center' ||
-    event.pointerType === 'keyboard' ||
-    event.pointerType === 'virtual';
-
-  const x = shouldCenter ? width / 2 : event.x;
-  const y = shouldCenter ? height / 2 : event.y;
-  const radius = Math.hypot(
-    Math.max(x, width - x),
-    Math.max(y, height - y),
-  );
-
-  return { x, y, diameter: radius * 2 };
 }
 
 export function useRipple({ origin = 'press' }: UseRippleOptions = {}): RippleController {
@@ -69,8 +49,9 @@ export function useRipple({ origin = 'press' }: UseRippleOptions = {}): RippleCo
   const onPressStart = useCallback(
     (event: RipplePressEvent) => {
       const container = containerRef.current ?? event.target;
+      const { width, height } = container.getBoundingClientRect();
       const id = nextId.current++;
-      const geometry = getWaveGeometry(event, container, origin);
+      const geometry = getRippleWaveGeometry(event, { width, height }, origin);
 
       activeWaveId.current = id;
       startedAt.current.set(id, Date.now());
