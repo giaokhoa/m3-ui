@@ -6,8 +6,8 @@
   padding: 0 24px;
   font: inherit;
   cursor: pointer;
-  background: var(--primary, #6750a4);
-  color: var(--on-primary, #fff);
+  background: var(--primary);
+  color: var(--on-primary);
   --ripple-color: var(--on-primary);
 }
 
