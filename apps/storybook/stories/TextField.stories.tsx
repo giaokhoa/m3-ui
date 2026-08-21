@@ -60,6 +60,20 @@ export const Default: Story = {
   ),
 };
 
+export const SingleLine: Story = {
+  args: {
+    label: 'Single line',
+    defaultValue: 'Single-line value',
+    placeholder: undefined,
+    isMultiline: false,
+  },
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <TextField {...args} />
+    </div>
+  ),
+};
+
 export const WithValue: Story = {
   args: {
     defaultValue: 'Input text',
