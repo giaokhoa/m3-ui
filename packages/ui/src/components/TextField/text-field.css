@@ -255,6 +255,11 @@
   color: var(--_text-field-error-supporting-color);
 }
 
+.m3-text-field[data-invalid]:has(.m3-text-field__error)
+  .m3-text-field__supporting {
+  display: none;
+}
+
 .m3-text-field[data-invalid] .m3-text-field__indicator {
   background: var(--_text-field-error-indicator-color);
 }
