@@ -1,5 +1,5 @@
 import type { ButtonVariant } from '@m3/tokens/button';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -90,6 +90,13 @@ function ButtonImpl({
   };
 
   const interaction = latestButtonInteraction(activeInteractions);
+  const previousInteractionRef = useRef<ButtonInteraction | null>(null);
+  const previousInteraction = previousInteractionRef.current;
+
+  useEffect(() => {
+    previousInteractionRef.current = interaction;
+  }, [interaction]);
+
   const variantClass = variantClassName(variant);
 
   return (
@@ -112,6 +119,7 @@ function ButtonImpl({
           ...getButtonStyle(variant, {
             isDisabled: renderProps.isDisabled,
             interaction,
+            previousInteraction,
           }),
           ...userStyle,
         };
