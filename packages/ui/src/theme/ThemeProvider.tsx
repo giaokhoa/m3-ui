@@ -15,11 +15,17 @@ import { createDynamicColorScheme } from './dynamic';
 import { defaultTypographyThemeStyle } from './typography';
 import type { ColorScheme, ThemeMode } from './types';
 
+export type ThemeStyle = CSSProperties &
+  Record<`--${string}`, string | number | undefined>;
+
 export interface ThemeProviderProps
-  extends PropsWithChildren<Omit<HTMLAttributes<HTMLDivElement>, 'color'>> {
+  extends PropsWithChildren<
+    Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'style'>
+  > {
   mode?: ThemeMode;
   sourceColor?: string;
   contrastLevel?: number;
+  style?: ThemeStyle;
 }
 
 export interface ThemeContextValue {
@@ -30,8 +36,6 @@ export interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-type ThemeStyle = CSSProperties & Record<`--${string}`, string | number>;
 
 export function ThemeProvider({
   mode = 'light',
@@ -49,14 +53,13 @@ export function ThemeProvider({
     [sourceColor, mode, contrastLevel],
   );
 
-  const themeStyle = useMemo(
-    () =>
-      ({
-        ...schemeToCssVariables(scheme),
-        ...defaultTypographyThemeStyle,
-        colorScheme: mode,
-        ...style,
-      }) as ThemeStyle,
+  const themeStyle = useMemo<ThemeStyle>(
+    () => ({
+      ...schemeToCssVariables(scheme),
+      ...defaultTypographyThemeStyle,
+      colorScheme: mode,
+      ...style,
+    }),
     [scheme, mode, style],
   );
 
