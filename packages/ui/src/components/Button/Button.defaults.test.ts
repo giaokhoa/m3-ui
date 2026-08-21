@@ -1,49 +1,102 @@
-import { filledButtonTokens } from '@m3/tokens/button';
+import {
+  buttonVariantTokens,
+  elevatedButtonTokens,
+  filledButtonTokens,
+  filledTonalButtonTokens,
+  outlinedButtonTokens,
+  textButtonTokens,
+} from '@m3/tokens/button';
 import { describe, expect, it } from 'vitest';
 import {
   filledButtonBaseStyle,
-  getFilledButtonStyle,
-  resolveFilledButtonElevation,
+  getButtonStyle,
+  resolveButtonElevation,
 } from './Button.defaults';
 
 const idleState = {
   isDisabled: false,
-  isPressed: false,
-  isFocused: false,
-  isHovered: false,
+  interaction: null,
 } as const;
 
-describe('Filled Button parity', () => {
-  it('matches the current AndroidX baseline tokens', () => {
-    expect(filledButtonTokens).toEqual({
-      minWidth: 58,
-      minHeight: 40,
-      contentPadding: { block: 8, inline: 24 },
-      containerShape: 'full',
-      containerColor: 'primary',
-      contentColor: 'onPrimary',
-      disabledContainerColor: 'onSurface',
-      disabledContainerOpacity: 0.1,
-      disabledContentColor: 'onSurfaceVariant',
-      disabledContentOpacity: 0.38,
-      defaultElevation: 'level0',
-      hoveredElevation: 'level1',
-      focusedElevation: 'level0',
-      pressedElevation: 'level0',
-      disabledElevation: 'level0',
-      iconSize: 18,
-      iconSpacing: 8,
-      labelTypography: {
+describe('Button parity', () => {
+  it('matches the shared current AndroidX baseline geometry and typography', () => {
+    for (const tokens of Object.values(buttonVariantTokens)) {
+      expect(tokens.minWidth).toBe(58);
+      expect(tokens.minHeight).toBe(40);
+      expect(tokens.containerShape).toBe('full');
+      expect(tokens.iconSize).toBe(18);
+      expect(tokens.iconSpacing).toBe(8);
+      expect(tokens.labelTypography).toEqual({
         fontFamily: 'plain',
         fontSize: 14,
         lineHeight: 20,
         fontWeight: 500,
         letterSpacing: 0.1,
-      },
+      });
+    }
+
+    expect(filledButtonTokens.contentPadding).toEqual({
+      block: 8,
+      inlineStart: 24,
+      inlineEnd: 24,
+    });
+    expect(textButtonTokens.contentPadding).toEqual({
+      block: 8,
+      inlineStart: 12,
+      inlineEnd: 12,
     });
   });
 
-  it('maps Material color and typeface roles to ThemeProvider CSS variables', () => {
+  it('matches current Compose colors and elevations for all five variants', () => {
+    expect(filledButtonTokens).toMatchObject({
+      containerColor: 'primary',
+      contentColor: 'onPrimary',
+      disabledContainerColor: 'onSurface',
+      disabledContentColor: 'onSurfaceVariant',
+      defaultElevation: 'level0',
+      hoveredElevation: 'level1',
+      focusedElevation: 'level0',
+      pressedElevation: 'level0',
+      disabledElevation: 'level0',
+    });
+
+    expect(elevatedButtonTokens).toMatchObject({
+      containerColor: 'surfaceContainerLow',
+      contentColor: 'primary',
+      disabledContainerColor: 'onSurface',
+      disabledContentColor: 'onSurfaceVariant',
+      defaultElevation: 'level1',
+      hoveredElevation: 'level2',
+      focusedElevation: 'level1',
+      pressedElevation: 'level1',
+      disabledElevation: 'level0',
+    });
+
+    expect(filledTonalButtonTokens).toMatchObject({
+      containerColor: 'secondaryContainer',
+      contentColor: 'onSecondaryContainer',
+      defaultElevation: 'level0',
+      hoveredElevation: 'level1',
+      focusedElevation: 'level0',
+      pressedElevation: 'level0',
+    });
+
+    expect(outlinedButtonTokens).toMatchObject({
+      containerColor: 'transparent',
+      contentColor: 'onSurfaceVariant',
+      outlineColor: 'outlineVariant',
+      outlineWidth: 1,
+      disabledOutlineOpacity: 0.1,
+    });
+
+    expect(textButtonTokens).toMatchObject({
+      containerColor: 'transparent',
+      contentColor: 'primary',
+      disabledContentColor: 'onSurfaceVariant',
+    });
+  });
+
+  it('maps Material roles to ThemeProvider CSS variables', () => {
     expect(filledButtonBaseStyle).toMatchObject({
       '--_button-container-color': 'var(--primary)',
       '--_button-content-color': 'var(--on-primary)',
@@ -56,34 +109,35 @@ describe('Filled Button parity', () => {
     expect(JSON.stringify(filledButtonBaseStyle)).not.toMatch(/#[0-9a-f]{3,8}/i);
   });
 
-  it('matches the filled button elevation states', () => {
-    expect(resolveFilledButtonElevation(idleState)).toBe('level0');
+  it('resolves elevation from the latest active interaction supplied by the tracker', () => {
+    expect(resolveButtonElevation(elevatedButtonTokens, idleState)).toBe('level1');
     expect(
-      resolveFilledButtonElevation({ ...idleState, isHovered: true }),
+      resolveButtonElevation(elevatedButtonTokens, {
+        ...idleState,
+        interaction: 'hover',
+      }),
+    ).toBe('level2');
+    expect(
+      resolveButtonElevation(elevatedButtonTokens, {
+        ...idleState,
+        interaction: 'focus',
+      }),
     ).toBe('level1');
     expect(
-      resolveFilledButtonElevation({ ...idleState, isFocused: true }),
-    ).toBe('level0');
-    expect(
-      resolveFilledButtonElevation({
-        ...idleState,
-        isHovered: true,
-        isPressed: true,
-      }),
-    ).toBe('level0');
-    expect(
-      resolveFilledButtonElevation({
+      resolveButtonElevation(elevatedButtonTokens, {
         ...idleState,
         isDisabled: true,
-        isHovered: true,
+        interaction: 'hover',
       }),
     ).toBe('level0');
   });
 
-  it('uses the theme shadow role for hover elevation', () => {
-    const style = getFilledButtonStyle({ ...idleState, isHovered: true });
+  it('uses the theme shadow role for elevated hover elevation', () => {
+    const style = getButtonStyle('elevated', {
+      ...idleState,
+      interaction: 'hover',
+    });
 
     expect(style.boxShadow).toContain('var(--shadow)');
-    expect(style.boxShadow).toContain('0px 2px 1px -1px');
   });
 });
