@@ -22,11 +22,13 @@ export function Ripple({
   ...props
 }: RippleProps) {
   const tokenStyle: RippleStyle = {
-    '--_ripple-grow-duration': `${rippleTokens.growDurationMs}ms`,
+    '--_ripple-radius-duration': `${rippleTokens.radiusDurationMs}ms`,
     '--_ripple-hover-duration': `${rippleTokens.hoverTransitionDurationMs}ms`,
+    '--_ripple-focus-in-duration': `${rippleTokens.focusInTransitionDurationMs}ms`,
     '--_ripple-fade-in-duration': `${rippleTokens.fadeInDurationMs}ms`,
     '--_ripple-fade-out-duration': `${rippleTokens.fadeOutDurationMs}ms`,
-    '--_ripple-grow-easing': rippleTokens.growEasing,
+    '--_ripple-radius-easing': rippleTokens.radiusEasing,
+    '--_ripple-center-easing': rippleTokens.centerEasing,
     '--_ripple-opacity-easing': rippleTokens.opacityEasing,
     '--_ripple-hover-opacity': stateLayerOpacity.hover,
     '--_ripple-focus-opacity': stateLayerOpacity.focus,
@@ -49,7 +51,10 @@ export function Ripple({
         const waveStyle: RippleStyle = {
           '--_ripple-x': `${wave.x}px`,
           '--_ripple-y': `${wave.y}px`,
+          '--_ripple-target-x': `${wave.targetX}px`,
+          '--_ripple-target-y': `${wave.targetY}px`,
           '--_ripple-diameter': `${wave.diameter}px`,
+          '--_ripple-start-scale': wave.startScale,
         };
 
         return (
