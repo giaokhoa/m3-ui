@@ -97,6 +97,10 @@ test.describe('Material 3 RadioButton parity', () => {
       'color',
       primary,
     );
+    await expect(selectedRoot.locator('.m3-radio-button__control')).toHaveCSS(
+      'transition-duration',
+      '0.166s',
+    );
     await expect(unselectedRoot.locator('.m3-radio-button__control')).toHaveCSS(
       'color',
       onSurfaceVariant,
@@ -122,7 +126,7 @@ test.describe('Material 3 RadioButton parity', () => {
     await expect(unselectedLayer).toHaveCSS('opacity', '0.08');
   });
 
-  test('disabled color snaps while dot selection motion stays 100ms', async ({ page }) => {
+  test('disabled color snaps while dot keeps FastSpatial motion', async ({ page }) => {
     await openStory(page, 'components-radiobutton--disabled-states');
     const roots = page.locator('.m3-radio-button');
     const first = roots.nth(0);
@@ -143,7 +147,7 @@ test.describe('Material 3 RadioButton parity', () => {
     );
     await expect(first.locator('.m3-radio-button__dot')).toHaveCSS(
       'transition-duration',
-      '0.1s',
+      '0.137s',
     );
   });
 
