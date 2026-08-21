@@ -36,6 +36,10 @@ body {
   gap: 16px;
 }
 
+.m3-storybook-theme-grid--text-field {
+  grid-template-columns: repeat(auto-fit, minmax(328px, 1fr));
+}
+
 .m3-storybook-theme-card {
   box-sizing: border-box;
   min-height: 180px;
