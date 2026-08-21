@@ -1,4 +1,5 @@
 # Temporary one-shot workflow; remove after Checkbox baselines are committed.
+# Retry after targeting the RAC visual root and matching the fixed 20px ripple radius.
 name: Bootstrap Checkbox visual baselines
 
 on:
