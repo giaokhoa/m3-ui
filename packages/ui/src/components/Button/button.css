@@ -90,6 +90,12 @@
   cursor: default;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .m3-button {
+    transition: none !important;
+  }
+}
+
 @media (forced-colors: active) {
   .m3-button {
     border-color: ButtonText;
