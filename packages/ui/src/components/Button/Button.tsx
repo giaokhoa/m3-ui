@@ -1,11 +1,11 @@
-import type { ButtonVariant } from '@m3/tokens/button';
+import type { ButtonSize, ButtonVariant } from '@m3/tokens/button';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { getButtonStyle } from './Button.defaults';
+import { getButtonStyle, type ButtonShapes } from './Button.defaults';
 import {
   endButtonInteraction,
   latestButtonInteraction,
@@ -18,6 +18,16 @@ import './button.css';
 export interface ButtonProps extends AriaButtonProps {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
+  /**
+   * Applies AndroidX Material3 expressive size helper geometry. Omit this prop to
+   * keep the common non-expressive baseline defaults.
+   */
+  size?: ButtonSize;
+  /**
+   * Optional normal/pressed container shapes. Supplying shapes enables the
+   * Material expressive pressed-shape morph while preserving RAC interactions.
+   */
+  shapes?: ButtonShapes;
 }
 
 interface ButtonImplProps extends ButtonProps {
@@ -35,6 +45,8 @@ function ButtonImpl({
   style,
   startIcon,
   endIcon,
+  size,
+  shapes,
   onBlur,
   onFocus,
   onHoverEnd,
@@ -105,6 +117,7 @@ function ButtonImpl({
       {...props}
       data-has-end-icon={endIcon ? true : undefined}
       data-has-start-icon={startIcon ? true : undefined}
+      data-size={size}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
@@ -117,11 +130,15 @@ function ButtonImpl({
           typeof style === 'function' ? style(renderProps) : style;
 
         return {
-          ...getButtonStyle(variant, {
-            isDisabled: renderProps.isDisabled,
-            interaction,
-            previousInteraction,
-          }),
+          ...getButtonStyle(
+            variant,
+            {
+              isDisabled: renderProps.isDisabled,
+              interaction,
+              previousInteraction,
+            },
+            { size, shapes },
+          ),
           ...userStyle,
         };
       }}
