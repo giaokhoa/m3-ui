@@ -5,8 +5,8 @@ export type RadioButtonColorRole =
 
 /**
  * Material 3 RadioButton values resolved from AndroidX revision
- * 160825094a81825468a95b115bfb1b541e549856 using RadioButton.kt and
- * RadioButtonTokens.kt.
+ * 160825094a81825468a95b115bfb1b541e549856 using RadioButton.kt,
+ * RadioButtonTokens.kt and the standard MotionScheme.
  *
  * Runtime RadioButtonDefaults resolves the control color only from
  * enabled × selected. The generated hover/focus/pressed icon colors are not
@@ -33,8 +33,20 @@ export const radioButtonTokens = {
   disabledOpacity: 0.38,
 
   motion: {
-    durationMs: 100,
-    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    // RadioButton.kt uses DefaultEffects for control color and FastSpatial for
+    // the selected-dot radius at the pinned revision. The standard springs are
+    // sampled to their 1% settle point for CSS transitions, matching the other
+    // Material component ports in this repository.
+    color: {
+      durationMs: 166,
+      easing:
+        'linear(0, 0.1434 10%, 0.3831 20%, 0.5918 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9689 80%, 0.9823 90%, 1)',
+    },
+    dot: {
+      durationMs: 137,
+      easing:
+        'linear(0, 0.0969 10%, 0.2872 20%, 0.4827 30%, 0.6472 40%, 0.7719 50%, 0.8598 60%, 0.9183 70%, 0.9552 80%, 0.9774 90%, 1)',
+    },
   },
 } as const;
 
