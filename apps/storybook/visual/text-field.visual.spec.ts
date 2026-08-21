@@ -64,28 +64,30 @@ test.describe('Material 3 filled TextField visual parity', () => {
     await openStory(page, 'components-textfield--invalid');
     const root = page.locator('.m3-text-field');
     const input = page.getByRole('textbox', { name: 'Label' });
-    const indicator = root.locator('.m3-text-field__indicator');
-    const label = root.locator('.m3-text-field__label');
 
     await input.focus();
     await expect(input).toBeFocused();
 
     const colors = await root.evaluate((element) => {
-      const styles = getComputedStyle(element);
-      const indicatorElement = element.querySelector<HTMLElement>(
-        '.m3-text-field__indicator',
-      );
-      const labelElement = element.querySelector<HTMLElement>('.m3-text-field__label');
+      const indicator = element.querySelector<HTMLElement>('.m3-text-field__indicator');
+      const label = element.querySelector<HTMLElement>('.m3-text-field__label');
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--error)';
+      probe.style.position = 'absolute';
+      probe.style.visibility = 'hidden';
+      element.append(probe);
+      const resolvedError = getComputedStyle(probe).color;
+      probe.remove();
 
       return {
-        error: styles.getPropertyValue('--error').trim(),
-        indicator: indicatorElement ? getComputedStyle(indicatorElement).backgroundColor : '',
-        label: labelElement ? getComputedStyle(labelElement).color : '',
+        resolvedError,
+        indicator: indicator ? getComputedStyle(indicator).backgroundColor : '',
+        label: label ? getComputedStyle(label).color : '',
       };
     });
 
-    await expect(indicator).toHaveCSS('background-color', colors.error);
-    await expect(label).toHaveCSS('color', colors.error);
+    expect(colors.indicator).toBe(colors.resolvedError);
+    expect(colors.label).toBe(colors.resolvedError);
   });
 
   test('disabled', async ({ page }) => {
