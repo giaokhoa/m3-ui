@@ -15,7 +15,9 @@
 .m3-ripple__state-layer {
   inset: 0;
   opacity: 0;
-  transition: opacity var(--_ripple-fade-in-duration) var(--_ripple-easing);
+  transition:
+    opacity var(--_ripple-hover-duration) var(--_ripple-opacity-easing),
+    background-color var(--_ripple-hover-duration) var(--_ripple-opacity-easing);
 }
 
 .m3-ripple[data-hovered] .m3-ripple__state-layer {
@@ -35,13 +37,13 @@
   opacity: var(--_ripple-pressed-opacity);
   transform: translate(-50%, -50%) scale(0);
   animation:
-    m3-ripple-grow var(--_ripple-grow-duration) var(--_ripple-easing) forwards,
-    m3-ripple-fade-in var(--_ripple-fade-in-duration) var(--_ripple-easing) forwards;
+    m3-ripple-grow var(--_ripple-grow-duration) var(--_ripple-grow-easing) forwards,
+    m3-ripple-fade-in var(--_ripple-fade-in-duration) var(--_ripple-opacity-easing);
 }
 
 .m3-ripple__wave[data-releasing] {
   opacity: 0;
-  transition: opacity var(--_ripple-fade-out-duration) var(--_ripple-easing);
+  transition: opacity var(--_ripple-fade-out-duration) var(--_ripple-opacity-easing);
 }
 
 @keyframes m3-ripple-grow {
