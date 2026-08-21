@@ -134,6 +134,18 @@ test.describe('Material 3 RadioButton parity', () => {
     await expect(page.getByRole('radio')).toHaveCount(3);
   });
 
+  test('read-only group preserves selection', async ({ page }) => {
+    await openStory(page, 'components-radiobutton--read-only');
+    const selected = page.getByRole('radio', { name: 'Selected' });
+    const other = page.getByRole('radio', { name: 'Other' });
+
+    await expect(selected).toBeChecked();
+    await expect(other).not.toBeChecked();
+    await other.click();
+    await expect(selected).toBeChecked();
+    await expect(other).not.toBeChecked();
+  });
+
   test('control-only radios retain explicit accessible names', async ({ page }) => {
     await openStory(page, 'components-radiobutton--control-only');
     await expect(page.getByRole('radio', { name: 'Selected control' })).toBeChecked();
