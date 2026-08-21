@@ -53,7 +53,6 @@ export const filledTextFieldTokens = {
 
   colors: {
     container: 'surfaceContainerHighest',
-    disabledContainer: 'onSurface',
     text: 'onSurface',
     disabledText: 'onSurface',
     cursor: 'primary',
@@ -87,7 +86,6 @@ export const filledTextFieldTokens = {
     suffix: 'onSurfaceVariant',
   },
 
-  disabledContainerOpacity: 0.04,
   disabledOpacity: 0.38,
 
   typography: {
