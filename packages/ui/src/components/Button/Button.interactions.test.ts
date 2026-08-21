@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   endButtonInteraction,
   latestButtonInteraction,
+  latestButtonStateLayerInteraction,
   startButtonInteraction,
   type ButtonInteraction,
 } from './Button.interactions';
@@ -23,6 +24,7 @@ describe('Button interaction ordering', () => {
       ['focus', 'start'],
     ]);
     expect(latestButtonInteraction(active)).toBe('focus');
+    expect(latestButtonStateLayerInteraction(active, true)).toBe('focus');
   });
 
   it('lets hover win when it starts after focus', () => {
@@ -31,6 +33,7 @@ describe('Button interaction ordering', () => {
       ['hover', 'start'],
     ]);
     expect(latestButtonInteraction(active)).toBe('hover');
+    expect(latestButtonStateLayerInteraction(active, true)).toBe('hover');
   });
 
   it('returns to hover after a press is released', () => {
@@ -40,6 +43,21 @@ describe('Button interaction ordering', () => {
       ['press', 'end'],
     ]);
     expect(latestButtonInteraction(active)).toBe('hover');
+  });
+
+  it('keeps the latest visible hover/focus layer while press is active', () => {
+    const active = sequence([
+      ['focus', 'start'],
+      ['hover', 'start'],
+      ['press', 'start'],
+    ]);
+    expect(latestButtonInteraction(active)).toBe('press');
+    expect(latestButtonStateLayerInteraction(active, true)).toBe('hover');
+  });
+
+  it('does not draw a focus layer for pointer-only focus on the web', () => {
+    const active = sequence([['focus', 'start']]);
+    expect(latestButtonStateLayerInteraction(active, false)).toBeNull();
   });
 
   it('returns to focus when a later hover ends', () => {
