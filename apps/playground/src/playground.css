@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #1d1b20;
+  background: #fffbfe;
+}
+
+.playground { max-width: 760px; margin: 0 auto; padding: 64px 24px; }
+.playground__stack { display: grid; gap: 24px; justify-items: start; }

@@ -1,0 +1,23 @@
+.m3-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.m3-checkbox__box {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #79747e;
+  border-radius: 2px;
+}
+
+.m3-checkbox[data-selected] .m3-checkbox__box {
+  border-color: #6750a4;
+  background: #6750a4;
+  color: #fff;
+}
+
+.m3-checkbox[data-focus-visible] { outline: 3px solid #6750a4; outline-offset: 4px; }
