@@ -1,4 +1,5 @@
 import type { ElevationLevel } from './elevation.js';
+import type { TypefaceRole } from './typography.js';
 
 export interface ButtonPaddingTokens {
   readonly block: number;
@@ -6,7 +7,7 @@ export interface ButtonPaddingTokens {
 }
 
 export interface TypographyStyleTokens {
-  readonly fontFamily: 'sans-serif';
+  readonly fontFamily: TypefaceRole;
   readonly fontSize: number;
   readonly lineHeight: number;
   readonly fontWeight: number;
@@ -65,7 +66,7 @@ export const filledButtonTokens = {
   iconSize: 18,
   iconSpacing: 8,
   labelTypography: {
-    fontFamily: 'sans-serif',
+    fontFamily: 'plain',
     fontSize: 14,
     lineHeight: 20,
     fontWeight: 500,
