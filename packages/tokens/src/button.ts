@@ -6,6 +6,7 @@ export interface ButtonPaddingTokens {
 }
 
 export interface TypographyStyleTokens {
+  readonly fontFamily: 'sans-serif';
   readonly fontSize: number;
   readonly lineHeight: number;
   readonly fontWeight: number;
@@ -64,6 +65,7 @@ export const filledButtonTokens = {
   iconSize: 18,
   iconSpacing: 8,
   labelTypography: {
+    fontFamily: 'sans-serif',
     fontSize: 14,
     lineHeight: 20,
     fontWeight: 500,
