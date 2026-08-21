@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  refresh-theme-matrix:
+  refresh:
     if: github.head_ref == 'feat/text-field-parity'
     runs-on: ubuntu-latest
     steps:
@@ -41,23 +41,23 @@ jobs:
       - name: Build Storybook
         run: pnpm build:storybook
 
-      - name: Refresh TextField theme matrix baseline
-        run: pnpm --filter @m3/storybook exec playwright test visual/text-field.visual.spec.ts -g "theme matrix" --update-snapshots
+      - name: Refresh TextField baselines
+        run: pnpm --filter @m3/storybook exec playwright test visual/text-field.visual.spec.ts --update-snapshots
 
-      - name: Commit refreshed baseline
+      - name: Commit refreshed baselines
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/storybook/visual/__screenshots__/text-field.visual.spec.ts/text-field-theme-matrix.png
+          git add apps/storybook/visual/__screenshots__/text-field.visual.spec.ts
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "test: refresh TextField theme matrix baseline"
+          git commit -m "test: refresh TextField visual baselines"
           git push
 
-      - name: Upload refreshed baseline
+      - name: Upload refreshed baselines
         uses: actions/upload-artifact@v4
         with:
-          name: text-field-theme-matrix-review
-          path: apps/storybook/visual/__screenshots__/text-field.visual.spec.ts/text-field-theme-matrix.png
+          name: text-field-visual-baselines-final-review
+          path: apps/storybook/visual/__screenshots__/text-field.visual.spec.ts/*.png
           if-no-files-found: error
