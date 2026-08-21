@@ -52,6 +52,57 @@ export interface ButtonVariantTokens {
   readonly labelTypography: TypographyStyleTokens;
 }
 
+export type ButtonSize =
+  | 'extraSmall'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'extraLarge';
+
+export type ButtonPressedShape = 'small' | 'medium' | 'large';
+
+export interface ButtonSizeTokens {
+  readonly minHeight: number;
+  readonly contentPadding: ButtonPaddingTokens;
+  readonly iconContentPadding: ButtonPaddingTokens;
+  readonly iconSize: number;
+  readonly iconSpacing: number;
+  readonly typography: TypographyStyleTokens;
+  readonly pressedShape: ButtonPressedShape;
+}
+
+const labelLarge = {
+  fontFamily: 'plain',
+  fontSize: 14,
+  lineHeight: 20,
+  fontWeight: 500,
+  letterSpacing: 0.1,
+} as const satisfies TypographyStyleTokens;
+
+const titleMedium = {
+  fontFamily: 'plain',
+  fontSize: 16,
+  lineHeight: 24,
+  fontWeight: 500,
+  letterSpacing: 0.2,
+} as const satisfies TypographyStyleTokens;
+
+const headlineSmall = {
+  fontFamily: 'brand',
+  fontSize: 24,
+  lineHeight: 32,
+  fontWeight: 400,
+  letterSpacing: 0,
+} as const satisfies TypographyStyleTokens;
+
+const headlineLarge = {
+  fontFamily: 'brand',
+  fontSize: 32,
+  lineHeight: 40,
+  fontWeight: 400,
+  letterSpacing: 0,
+} as const satisfies TypographyStyleTokens;
+
 const commonButtonTokens = {
   minWidth: 58,
   minHeight: 40,
@@ -63,13 +114,7 @@ const commonButtonTokens = {
   disabledOutlineOpacity: 0,
   iconSize: 18,
   iconSpacing: 8,
-  labelTypography: {
-    fontFamily: 'plain',
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 500,
-    letterSpacing: 0.1,
-  },
+  labelTypography: labelLarge,
 } as const;
 
 const standardContentPadding = {
@@ -182,5 +227,57 @@ export const buttonVariantTokens = {
   outlined: outlinedButtonTokens,
   text: textButtonTokens,
 } as const;
+
+/**
+ * Current AndroidX expressive size helpers, represented as immutable web geometry.
+ * Omitting the web `size` prop keeps the non-expressive baseline button defaults above.
+ */
+export const buttonSizeTokens = {
+  extraSmall: {
+    minHeight: 32,
+    contentPadding: { block: 6, inlineStart: 12, inlineEnd: 12 },
+    iconContentPadding: { block: 6, inlineStart: 12, inlineEnd: 12 },
+    iconSize: 20,
+    iconSpacing: 4,
+    typography: labelLarge,
+    pressedShape: 'small',
+  },
+  small: {
+    minHeight: 40,
+    contentPadding: { block: 10, inlineStart: 16, inlineEnd: 16 },
+    iconContentPadding: { block: 10, inlineStart: 16, inlineEnd: 16 },
+    iconSize: 20,
+    iconSpacing: 8,
+    typography: labelLarge,
+    pressedShape: 'small',
+  },
+  medium: {
+    minHeight: 56,
+    contentPadding: { block: 16, inlineStart: 24, inlineEnd: 24 },
+    iconContentPadding: { block: 16, inlineStart: 24, inlineEnd: 24 },
+    iconSize: 24,
+    iconSpacing: 8,
+    typography: titleMedium,
+    pressedShape: 'medium',
+  },
+  large: {
+    minHeight: 96,
+    contentPadding: { block: 32, inlineStart: 48, inlineEnd: 48 },
+    iconContentPadding: { block: 32, inlineStart: 48, inlineEnd: 48 },
+    iconSize: 32,
+    iconSpacing: 12,
+    typography: headlineSmall,
+    pressedShape: 'large',
+  },
+  extraLarge: {
+    minHeight: 136,
+    contentPadding: { block: 48, inlineStart: 64, inlineEnd: 64 },
+    iconContentPadding: { block: 48, inlineStart: 64, inlineEnd: 64 },
+    iconSize: 40,
+    iconSpacing: 16,
+    typography: headlineLarge,
+    pressedShape: 'large',
+  },
+} as const satisfies Record<ButtonSize, ButtonSizeTokens>;
 
 export type ButtonVariant = keyof typeof buttonVariantTokens;
