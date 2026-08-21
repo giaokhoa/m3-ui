@@ -14,14 +14,14 @@ describe('RadioButton defaults', () => {
     expect(radioButtonTokens.dotSize).toBe(12);
   });
 
-  it('maps runtime colors through ThemeProvider roles', () => {
+  it('maps runtime control colors through ThemeProvider roles', () => {
     expect(style['--_radio-selected-color']).toBe('var(--primary)');
     expect(style['--_radio-unselected-color']).toBe('var(--on-surface-variant)');
     expect(style['--_radio-disabled-selected-color']).toBe('var(--on-surface)');
     expect(style['--_radio-disabled-unselected-color']).toBe('var(--on-surface)');
-    expect(style['--_radio-selected-state-layer']).toBe('var(--primary)');
-    expect(style['--_radio-unselected-state-layer']).toBe('var(--on-surface)');
     expect(style['--_radio-disabled-opacity']).toBe(0.38);
+    expect(style['--_radio-selected-state-layer']).toBeUndefined();
+    expect(style['--_radio-unselected-state-layer']).toBeUndefined();
   });
 
   it('maps pinned DefaultEffects color and FastSpatial dot motion', () => {
