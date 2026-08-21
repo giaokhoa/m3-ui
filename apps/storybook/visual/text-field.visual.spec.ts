@@ -60,6 +60,34 @@ test.describe('Material 3 filled TextField visual parity', () => {
     );
   });
 
+  test('invalid keeps error colors while focused', async ({ page }) => {
+    await openStory(page, 'components-textfield--invalid');
+    const root = page.locator('.m3-text-field');
+    const input = page.getByRole('textbox', { name: 'Label' });
+    const indicator = root.locator('.m3-text-field__indicator');
+    const label = root.locator('.m3-text-field__label');
+
+    await input.focus();
+    await expect(input).toBeFocused();
+
+    const colors = await root.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      const indicatorElement = element.querySelector<HTMLElement>(
+        '.m3-text-field__indicator',
+      );
+      const labelElement = element.querySelector<HTMLElement>('.m3-text-field__label');
+
+      return {
+        error: styles.getPropertyValue('--error').trim(),
+        indicator: indicatorElement ? getComputedStyle(indicatorElement).backgroundColor : '',
+        label: labelElement ? getComputedStyle(labelElement).color : '',
+      };
+    });
+
+    await expect(indicator).toHaveCSS('background-color', colors.error);
+    await expect(label).toHaveCSS('color', colors.error);
+  });
+
   test('disabled', async ({ page }) => {
     await openStory(page, 'components-textfield--disabled');
     await expect(page.locator('.m3-text-field')).toHaveScreenshot(
