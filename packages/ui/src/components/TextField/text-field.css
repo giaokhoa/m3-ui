@@ -46,7 +46,8 @@
 .m3-text-field__outlined-body {
   display: flex;
   min-block-size: calc(
-    var(--_text-field-min-height) - 2 * var(--_text-field-current-outline-width)
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
   );
 }
 
@@ -76,7 +77,8 @@
 
 .m3-text-field--outlined .m3-text-field__content {
   min-block-size: calc(
-    var(--_text-field-min-height) - 2 * var(--_text-field-current-outline-width)
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
   );
   padding-block: calc(
     var(--_text-field-padding-without-label) - var(--_text-field-current-outline-width)
@@ -218,7 +220,9 @@
   display: block;
   box-sizing: border-box;
   block-size: 0;
-  max-inline-size: calc(100% - 2 * var(--_text-field-padding-inline));
+  max-inline-size: calc(
+    100% - var(--_text-field-padding-inline) - var(--_text-field-padding-inline)
+  );
   float: none;
   margin: 0;
   margin-inline-start: calc(
@@ -252,7 +256,7 @@
   position: relative;
   display: block;
   max-inline-size: 100%;
-  inset-block-start: calc(-1 * var(--_text-field-outlined-top-padding));
+  inset-block-start: calc(0px - var(--_text-field-outlined-top-padding));
   transform: translateY(
     calc(
       var(--_text-field-outlined-top-padding) +
@@ -342,7 +346,8 @@
 
 .m3-text-field--outlined .m3-text-field__icon {
   min-block-size: calc(
-    var(--_text-field-min-height) - 2 * var(--_text-field-current-outline-width)
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
   );
 }
 
