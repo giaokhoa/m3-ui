@@ -41,6 +41,32 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('expressive size family', async ({ page }) => {
+    await openStory(page, 'components-button--expressive-sizes');
+    await expect(page.locator('#storybook-root')).toHaveScreenshot(
+      'button-expressive-sizes.png',
+    );
+  });
+
+  test('expressive pressed shape', async ({ page }) => {
+    await openStory(page, 'components-button--expressive-shape-morph');
+    const button = page.getByRole('button', { name: 'Press medium' });
+    await expect(button).toBeVisible();
+    await button.hover();
+    const box = await button.boundingBox();
+    if (!box) {
+      throw new Error('Expressive medium button has no bounding box');
+    }
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+
+    try {
+      await expect(button).toHaveScreenshot('button-expressive-pressed.png');
+    } finally {
+      await page.mouse.up();
+    }
+  });
+
   test('theme matrix', async ({ page }) => {
     await openStory(page, 'components-button--theme-matrix');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
