@@ -1,4 +1,4 @@
-import { motionEasing } from './motion';
+import { motionEasing } from './motion.js';
 
 export const rippleTokens = {
   growDurationMs: 450,
