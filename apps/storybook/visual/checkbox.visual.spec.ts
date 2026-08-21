@@ -12,9 +12,11 @@ async function openStory(page: Page, id: string) {
 
 async function openSelectedCheckbox(page: Page) {
   await openStory(page, 'components-checkbox--selected');
-  const checkbox = page.getByRole('checkbox', { name: 'Selected checkbox' });
-  await expect(checkbox).toBeVisible();
-  return checkbox;
+  const input = page.getByRole('checkbox', { name: 'Selected checkbox' });
+  const root = page.locator('.m3-checkbox');
+  await expect(input).toBeVisible();
+  await expect(root).toBeVisible();
+  return { input, root };
 }
 
 test.describe('Material 3 Checkbox visual parity', () => {
@@ -47,27 +49,27 @@ test.describe('Material 3 Checkbox visual parity', () => {
   });
 
   test('selected hover state layer', async ({ page }) => {
-    const checkbox = await openSelectedCheckbox(page);
-    await checkbox.hover();
-    await expect(checkbox).toHaveScreenshot('checkbox-selected-hover.png');
+    const { root } = await openSelectedCheckbox(page);
+    await root.hover();
+    await expect(root).toHaveScreenshot('checkbox-selected-hover.png');
   });
 
   test('selected keyboard focus state layer', async ({ page }) => {
-    const checkbox = await openSelectedCheckbox(page);
+    const { input, root } = await openSelectedCheckbox(page);
     await page.keyboard.press('Tab');
-    await expect(checkbox).toBeFocused();
-    await expect(checkbox).toHaveScreenshot('checkbox-selected-focus.png');
+    await expect(input).toBeFocused();
+    await expect(root).toHaveScreenshot('checkbox-selected-focus.png');
   });
 
   test('selected press ripple', async ({ page }) => {
-    const checkbox = await openSelectedCheckbox(page);
-    await checkbox.hover();
-    const box = await checkbox.boundingBox();
+    const { root } = await openSelectedCheckbox(page);
+    await root.hover();
+    const box = await root.boundingBox();
     if (!box) throw new Error('Checkbox bounds unavailable');
     await page.mouse.move(box.x + 24, box.y + box.height / 2);
     await page.mouse.down();
     try {
-      await expect(checkbox).toHaveScreenshot('checkbox-selected-pressed.png');
+      await expect(root).toHaveScreenshot('checkbox-selected-pressed.png');
     } finally {
       await page.mouse.up();
     }
