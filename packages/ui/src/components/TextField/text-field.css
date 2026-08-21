@@ -223,12 +223,14 @@
       var(--_text-field-fast-effects-easing);
 }
 
-.m3-text-field:has(.m3-text-field__control[data-focused]) .m3-text-field__indicator {
+.m3-text-field:where(:has(.m3-text-field__control[data-focused]))
+  .m3-text-field__indicator {
   block-size: var(--_text-field-indicator-focused-width);
   background: var(--_text-field-focused-indicator-color);
 }
 
-.m3-text-field:has(.m3-text-field__control[data-focused]) .m3-text-field__label {
+.m3-text-field:where(:has(.m3-text-field__control[data-focused]))
+  .m3-text-field__label {
   color: var(--_text-field-focused-label-color);
 }
 
