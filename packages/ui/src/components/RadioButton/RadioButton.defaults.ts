@@ -25,12 +25,6 @@ export const radioButtonBaseStyle: RadioButtonStyle = {
   '--_radio-disabled-unselected-color': roleVariable(
     radioButtonTokens.colors.disabledUnselected,
   ),
-  '--_radio-selected-state-layer': roleVariable(
-    radioButtonTokens.colors.selectedStateLayer,
-  ),
-  '--_radio-unselected-state-layer': roleVariable(
-    radioButtonTokens.colors.unselectedStateLayer,
-  ),
   '--_radio-disabled-opacity': radioButtonTokens.disabledOpacity,
   '--_radio-color-duration': `${radioButtonTokens.motion.color.durationMs}ms`,
   '--_radio-color-easing': radioButtonTokens.motion.color.easing,
