@@ -9,16 +9,46 @@
 
 .m3-text-field__container {
   position: relative;
-  display: flex;
   box-sizing: border-box;
   min-block-size: var(--_text-field-min-height);
-  overflow: hidden;
   border-radius:
     var(--_text-field-radius-top-start)
     var(--_text-field-radius-top-end)
     var(--_text-field-radius-bottom-end)
     var(--_text-field-radius-bottom-start);
   background: var(--_text-field-container-color);
+}
+
+.m3-text-field--filled .m3-text-field__container {
+  display: flex;
+  overflow: hidden;
+}
+
+.m3-text-field--outlined .m3-text-field__container {
+  --_text-field-current-outline-color: var(--_text-field-outline-color);
+  --_text-field-current-outline-width: var(--_text-field-outline-width);
+
+  display: block;
+  min-inline-size: 0;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+  border: var(--_text-field-current-outline-width) solid
+    var(--_text-field-current-outline-color);
+  background: transparent;
+  transition:
+    border-color var(--_text-field-fast-effects-duration)
+      var(--_text-field-fast-effects-easing),
+    border-width var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing);
+}
+
+.m3-text-field__outlined-body {
+  display: flex;
+  min-block-size: calc(
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
+  );
 }
 
 .m3-text-field__content {
@@ -37,12 +67,22 @@
   padding-inline-end: var(--_text-field-content-padding-end);
 }
 
-.m3-text-field--with-label .m3-text-field__content {
+.m3-text-field--filled.m3-text-field--with-label .m3-text-field__content {
   align-items: flex-start;
   padding-block-start: calc(
     var(--_text-field-padding-with-label) + var(--_text-field-focused-label-min-line-height)
   );
   padding-block-end: var(--_text-field-padding-with-label);
+}
+
+.m3-text-field--outlined .m3-text-field__content {
+  min-block-size: calc(
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
+  );
+  padding-block: calc(
+    var(--_text-field-padding-without-label) - var(--_text-field-current-outline-width)
+  );
 }
 
 .m3-text-field--with-leading .m3-text-field__content {
@@ -116,13 +156,7 @@
 }
 
 .m3-text-field__label {
-  position: absolute;
-  z-index: 1;
-  inset-block-start: calc(
-    (var(--_text-field-min-height) - var(--_text-field-body-large-line-height)) / 2
-  );
-  inset-inline-start: var(--_text-field-content-padding-start);
-  inset-inline-end: var(--_text-field-content-padding-end);
+  z-index: 3;
   min-block-size: var(--_text-field-focused-label-min-line-height);
   overflow: hidden;
   color: var(--_text-field-label-color);
@@ -133,6 +167,24 @@
   letter-spacing: var(--_text-field-body-large-letter-spacing);
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition:
+    color var(--_text-field-fast-effects-duration)
+      var(--_text-field-fast-effects-easing),
+    font-size var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing),
+    line-height var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing),
+    letter-spacing var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing);
+}
+
+.m3-text-field--filled .m3-text-field__label {
+  position: absolute;
+  inset-block-start: calc(
+    (var(--_text-field-min-height) - var(--_text-field-body-large-line-height)) / 2
+  );
+  inset-inline-start: var(--_text-field-content-padding-start);
+  inset-inline-end: var(--_text-field-content-padding-end);
   transition:
     inset-block-start var(--_text-field-fast-spatial-duration)
       var(--_text-field-fast-spatial-easing),
@@ -146,9 +198,13 @@
       var(--_text-field-fast-spatial-easing);
 }
 
-.m3-text-field--with-label:has(.m3-text-field__control[data-focused])
+.m3-text-field--filled.m3-text-field--with-label:has(
+    .m3-text-field__control[data-focused]
+  )
   .m3-text-field__label,
-.m3-text-field--with-label:has(.m3-text-field__control:not(:placeholder-shown))
+.m3-text-field--filled.m3-text-field--with-label:has(
+    .m3-text-field__control:not(:placeholder-shown)
+  )
   .m3-text-field__label {
   inset-block-start: var(--_text-field-padding-with-label);
   font-family: var(--_text-field-body-small-font-family);
@@ -156,6 +212,96 @@
   font-weight: var(--_text-field-body-small-font-weight);
   line-height: var(--_text-field-body-small-line-height);
   letter-spacing: var(--_text-field-body-small-letter-spacing);
+}
+
+.m3-text-field__outline-legend {
+  position: relative;
+  z-index: 2;
+  display: block;
+  box-sizing: border-box;
+  block-size: 0;
+  max-inline-size: calc(
+    100% - var(--_text-field-padding-inline) - var(--_text-field-padding-inline)
+  );
+  float: none;
+  margin: 0;
+  margin-inline-start: calc(
+    var(--_text-field-padding-inline) - var(--_text-field-cutout-padding-inline)
+  );
+  padding: 0 var(--_text-field-cutout-padding-inline);
+  line-height: 0;
+  white-space: nowrap;
+}
+
+.m3-text-field__outline-legend::after {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  inset-block-start: 0;
+  border-block-start: var(--_text-field-current-outline-width) solid
+    var(--_text-field-current-outline-color);
+  content: '';
+  opacity: 1;
+  pointer-events: none;
+  transition:
+    opacity var(--_text-field-fast-effects-duration)
+      var(--_text-field-fast-effects-easing),
+    border-color var(--_text-field-fast-effects-duration)
+      var(--_text-field-fast-effects-easing),
+    border-width var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing);
+}
+
+.m3-text-field--outlined .m3-text-field__label {
+  position: relative;
+  display: block;
+  max-inline-size: 100%;
+  inset-block-start: calc(0px - var(--_text-field-outlined-top-padding));
+  transform: translateY(
+    calc(
+      var(--_text-field-outlined-top-padding) +
+        (var(--_text-field-min-height) - var(--_text-field-body-large-line-height)) /
+        2
+    )
+  );
+  transition:
+    transform var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing),
+    color var(--_text-field-fast-effects-duration)
+      var(--_text-field-fast-effects-easing),
+    font-size var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing),
+    line-height var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing),
+    letter-spacing var(--_text-field-fast-spatial-duration)
+      var(--_text-field-fast-spatial-easing);
+}
+
+.m3-text-field--outlined.m3-text-field--with-label:has(
+    .m3-text-field__control[data-focused]
+  )
+  .m3-text-field__label,
+.m3-text-field--outlined.m3-text-field--with-label:has(
+    .m3-text-field__control:not(:placeholder-shown)
+  )
+  .m3-text-field__label {
+  transform: translateY(0);
+  font-family: var(--_text-field-body-small-font-family);
+  font-size: var(--_text-field-body-small-font-size);
+  font-weight: var(--_text-field-body-small-font-weight);
+  line-height: var(--_text-field-body-small-line-height);
+  letter-spacing: var(--_text-field-body-small-letter-spacing);
+}
+
+.m3-text-field--outlined.m3-text-field--with-label:has(
+    .m3-text-field__control[data-focused]
+  )
+  .m3-text-field__outline-legend::after,
+.m3-text-field--outlined.m3-text-field--with-label:has(
+    .m3-text-field__control:not(:placeholder-shown)
+  )
+  .m3-text-field__outline-legend::after {
+  opacity: 0;
 }
 
 .m3-text-field__prefix,
@@ -198,6 +344,13 @@
   color: var(--_text-field-leading-icon-color);
 }
 
+.m3-text-field--outlined .m3-text-field__icon {
+  min-block-size: calc(
+    var(--_text-field-min-height) - var(--_text-field-current-outline-width) -
+      var(--_text-field-current-outline-width)
+  );
+}
+
 .m3-text-field__icon--trailing {
   color: var(--_text-field-trailing-icon-color);
 }
@@ -222,7 +375,7 @@
       var(--_text-field-fast-effects-easing);
 }
 
-.m3-text-field:where(:has(.m3-text-field__control[data-focused]))
+.m3-text-field--filled:where(:has(.m3-text-field__control[data-focused]))
   .m3-text-field__indicator {
   block-size: var(--_text-field-indicator-focused-width);
   background: var(--_text-field-focused-indicator-color);
@@ -231,6 +384,12 @@
 .m3-text-field:where(:has(.m3-text-field__control[data-focused]))
   .m3-text-field__label {
   color: var(--_text-field-focused-label-color);
+}
+
+.m3-text-field--outlined:where(:has(.m3-text-field__control[data-focused]))
+  .m3-text-field__outlined-container {
+  --_text-field-current-outline-color: var(--_text-field-focused-outline-color);
+  --_text-field-current-outline-width: var(--_text-field-outline-focused-width);
 }
 
 .m3-text-field__supporting,
@@ -260,8 +419,12 @@
   display: none;
 }
 
-.m3-text-field[data-invalid] .m3-text-field__indicator {
+.m3-text-field--filled[data-invalid] .m3-text-field__indicator {
   background: var(--_text-field-error-indicator-color);
+}
+
+.m3-text-field--outlined[data-invalid] .m3-text-field__outlined-container {
+  --_text-field-current-outline-color: var(--_text-field-error-outline-color);
 }
 
 .m3-text-field[data-invalid] .m3-text-field__label {
@@ -313,7 +476,7 @@
   );
 }
 
-.m3-text-field[data-disabled] .m3-text-field__indicator {
+.m3-text-field--filled[data-disabled] .m3-text-field__indicator {
   block-size: var(--_text-field-indicator-width);
   background: color-mix(
     in srgb,
@@ -321,6 +484,16 @@
       calc(var(--_text-field-disabled-opacity) * 100%),
     transparent
   );
+}
+
+.m3-text-field--outlined[data-disabled] .m3-text-field__outlined-container {
+  --_text-field-current-outline-color: color-mix(
+    in srgb,
+    var(--_text-field-disabled-outline-color)
+      calc(var(--_text-field-disabled-outline-opacity) * 100%),
+    transparent
+  );
+  --_text-field-current-outline-width: var(--_text-field-outline-width);
 }
 
 .m3-text-field[data-disabled] .m3-text-field__supporting,
@@ -377,21 +550,36 @@
   .m3-text-field__control,
   .m3-text-field__label,
   .m3-text-field__supporting,
+  .m3-text-field__error,
   .m3-text-field__prefix,
   .m3-text-field__suffix,
   .m3-text-field__icon {
     color: CanvasText;
   }
 
-  .m3-text-field__indicator {
+  .m3-text-field--filled .m3-text-field__indicator {
     background: CanvasText;
   }
 
-  .m3-text-field:has(.m3-text-field__control[data-focused]) .m3-text-field__indicator {
+  .m3-text-field--filled:has(.m3-text-field__control[data-focused])
+    .m3-text-field__indicator {
     background: Highlight;
   }
 
-  .m3-text-field[data-disabled] .m3-text-field__indicator {
+  .m3-text-field--filled[data-disabled] .m3-text-field__indicator {
     background: GrayText;
+  }
+
+  .m3-text-field--outlined .m3-text-field__outlined-container {
+    --_text-field-current-outline-color: CanvasText;
+  }
+
+  .m3-text-field--outlined:has(.m3-text-field__control[data-focused])
+    .m3-text-field__outlined-container {
+    --_text-field-current-outline-color: Highlight;
+  }
+
+  .m3-text-field--outlined[data-disabled] .m3-text-field__outlined-container {
+    --_text-field-current-outline-color: GrayText;
   }
 }

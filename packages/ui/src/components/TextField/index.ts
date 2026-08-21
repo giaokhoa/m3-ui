@@ -1,1 +1,6 @@
-export { TextField, type TextFieldProps } from './TextField';
+export {
+  OutlinedTextField,
+  TextField,
+  type OutlinedTextFieldProps,
+  type TextFieldProps,
+} from './TextField';

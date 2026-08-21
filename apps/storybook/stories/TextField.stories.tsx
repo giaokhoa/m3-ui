@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TextField, ThemeProvider } from '@m3/ui';
+import { OutlinedTextField, TextField, ThemeProvider } from '@m3/ui';
 
 const meta = {
   title: 'Components/TextField',
@@ -47,7 +47,33 @@ function FieldStack() {
         isInvalid
         errorMessage="This value needs attention"
       />
-      <TextField label="Disabled" defaultValue="Input text" isDisabled supportingText="Supporting text" />
+      <TextField
+        label="Disabled"
+        defaultValue="Input text"
+        isDisabled
+        supportingText="Supporting text"
+      />
+    </div>
+  );
+}
+
+function OutlinedFieldStack() {
+  return (
+    <div style={{ display: 'grid', gap: 20 }}>
+      <OutlinedTextField label="Empty" placeholder="Placeholder" />
+      <OutlinedTextField label="Filled" defaultValue="Input text" />
+      <OutlinedTextField
+        label="Invalid"
+        defaultValue="Bad value"
+        isInvalid
+        errorMessage="This value needs attention"
+      />
+      <OutlinedTextField
+        label="Disabled"
+        defaultValue="Input text"
+        isDisabled
+        supportingText="Supporting text"
+      />
     </div>
   );
 }
@@ -210,6 +236,119 @@ export const ThemeMatrix: Story = {
       >
         <h3>Dynamic dark · #B3261E</h3>
         <FieldStack />
+      </ThemeProvider>
+    </div>
+  ),
+};
+
+export const OutlinedDefault: Story = {
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <OutlinedTextField {...args} />
+    </div>
+  ),
+};
+
+export const OutlinedSingleLine: Story = {
+  args: {
+    label: 'Single line',
+    defaultValue: 'Single-line value',
+    placeholder: undefined,
+    isMultiline: false,
+  },
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <OutlinedTextField {...args} />
+    </div>
+  ),
+};
+
+export const OutlinedInvalid: Story = {
+  args: {
+    defaultValue: 'Invalid value',
+    isInvalid: true,
+    supportingText: 'Supporting guidance',
+    description: undefined,
+    errorMessage: 'This value needs attention',
+  },
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <OutlinedTextField {...args} />
+    </div>
+  ),
+};
+
+export const OutlinedAffixesAndIcons: Story = {
+  args: {
+    label: 'Email',
+    defaultValue: 'hello',
+    placeholder: undefined,
+    leadingIcon: <MailIcon />,
+    trailingIcon: <ClearIcon />,
+    prefix: 'mailto:',
+    suffix: '@example.com',
+    supportingText: 'Leading/trailing icons and prefix/suffix slots',
+  },
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <OutlinedTextField {...args} />
+    </div>
+  ),
+};
+
+export const OutlinedMultiline: Story = {
+  args: {
+    label: 'Message',
+    defaultValue: 'An outlined multiline Material 3 field\nwith native textarea semantics.',
+    placeholder: undefined,
+    isMultiline: true,
+    rows: 3,
+    supportingText: 'Supporting text',
+  },
+  render: (args) => (
+    <div className="m3-storybook-center">
+      <OutlinedTextField {...args} />
+    </div>
+  ),
+};
+
+export const OutlinedStates: Story = {
+  render: () => (
+    <div className="m3-storybook-center">
+      <OutlinedFieldStack />
+    </div>
+  ),
+};
+
+export const OutlinedThemeMatrix: Story = {
+  render: () => (
+    <div className="m3-storybook-theme-grid">
+      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+        <h3>Outlined · Light</h3>
+        <OutlinedFieldStack />
+      </ThemeProvider>
+
+      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+        <h3>Outlined · Dark</h3>
+        <OutlinedFieldStack />
+      </ThemeProvider>
+
+      <ThemeProvider
+        className="m3-storybook-theme-card"
+        mode="light"
+        sourceColor="#006a60"
+      >
+        <h3>Outlined dynamic · #006A60</h3>
+        <OutlinedFieldStack />
+      </ThemeProvider>
+
+      <ThemeProvider
+        className="m3-storybook-theme-card"
+        mode="dark"
+        sourceColor="#b3261e"
+      >
+        <h3>Outlined dynamic dark · #B3261E</h3>
+        <OutlinedFieldStack />
       </ThemeProvider>
     </div>
   ),
