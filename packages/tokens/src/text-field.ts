@@ -3,7 +3,7 @@ export type FilledTextFieldColorRole =
   | 'onSurface'
   | 'onSurfaceVariant'
   | 'primary'
-  | 'surfaceVariant';
+  | 'surfaceContainerHighest';
 
 export interface FilledTextFieldTypographyToken {
   readonly fontFamilyRole: 'plain';
@@ -52,7 +52,7 @@ export const filledTextFieldTokens = {
   iconSlotSize: 48,
 
   colors: {
-    container: 'surfaceVariant',
+    container: 'surfaceContainerHighest',
     text: 'onSurface',
     disabledText: 'onSurface',
     cursor: 'primary',
