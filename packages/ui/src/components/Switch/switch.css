@@ -40,7 +40,7 @@
   position: absolute;
   z-index: 1;
   inset-block-start: 50%;
-  inset-inline-start: 8px;
+  inset-inline-start: var(--_switch-unchecked-thumb-offset);
   inline-size: var(--_switch-unchecked-thumb-size);
   block-size: var(--_switch-unchecked-thumb-size);
   transform: translateY(-50%);
@@ -92,7 +92,7 @@
 }
 
 .m3-switch[data-has-thumb-content]:not([data-selected]) .m3-switch__thumb-shell {
-  inset-inline-start: 4px;
+  inset-inline-start: var(--_switch-content-thumb-offset);
   inline-size: var(--_switch-checked-thumb-size);
   block-size: var(--_switch-checked-thumb-size);
 }
@@ -104,7 +104,7 @@
 }
 
 .m3-switch[data-selected] .m3-switch__thumb-shell {
-  inset-inline-start: 24px;
+  inset-inline-start: var(--_switch-checked-thumb-offset);
   inline-size: var(--_switch-checked-thumb-size);
   block-size: var(--_switch-checked-thumb-size);
 }
@@ -122,11 +122,11 @@
 }
 
 .m3-switch[data-pressed]:not([data-selected]) .m3-switch__thumb-shell {
-  inset-inline-start: var(--_switch-track-outline-width);
+  inset-inline-start: var(--_switch-pressed-unchecked-thumb-offset);
 }
 
 .m3-switch[data-pressed][data-selected] .m3-switch__thumb-shell {
-  inset-inline-start: 22px;
+  inset-inline-start: var(--_switch-pressed-checked-thumb-offset);
 }
 
 .m3-switch[data-disabled] {
