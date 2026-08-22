@@ -25,23 +25,23 @@ describe('Material 3 chip defaults', () => {
     expect(getChipRootStyle('assist')['--_chip-hit-size']).toBe('48px');
   });
 
-  it('maps flat and elevated action-chip colors/elevations from runtime defaults', () => {
+  it('keeps flat and elevated action-chip runtime colors as CSS expressions', () => {
     expect(assistChipTokens.containerColor).toBe('transparent');
-    expect(assistChipTokens.outlineColor).toBe('outlineVariant');
+    expect(assistChipTokens.outlineColor).toBe('var(--outline-variant)');
     expect(assistChipTokens.outlineWidth).toBe(1);
     expect(assistChipTokens.hoveredElevation).toBe('level0');
-    expect(elevatedAssistChipTokens.containerColor).toBe('surfaceContainerLow');
-    expect(elevatedAssistChipTokens.disabledContainerColor).toBe('onSurface');
+    expect(elevatedAssistChipTokens.containerColor).toBe('var(--surface-container-low)');
+    expect(elevatedAssistChipTokens.disabledContainerColor).toBe('var(--on-surface)');
     expect(elevatedAssistChipTokens.disabledContainerOpacity).toBe(0.12);
     expect(elevatedAssistChipTokens.defaultElevation).toBe('level1');
     expect(elevatedAssistChipTokens.hoveredElevation).toBe('level2');
-    expect(suggestionChipTokens.labelColor).toBe('onSurfaceVariant');
-    expect(suggestionChipTokens.leadingIconColor).toBe('primary');
+    expect(suggestionChipTokens.labelColor).toBe('var(--on-surface-variant)');
+    expect(suggestionChipTokens.leadingIconColor).toBe('var(--primary)');
   });
 
-  it('maps selectable state colors and borders without generated interaction colors', () => {
+  it('keeps selectable state colors direct and preserves rendered CSS values', () => {
     expect(filterChipTokens.unselectedContainerColor).toBe('transparent');
-    expect(filterChipTokens.selectedContainerColor).toBe('secondaryContainer');
+    expect(filterChipTokens.selectedContainerColor).toBe('var(--secondary-container)');
     expect(filterChipTokens.unselectedOutlineWidth).toBe(1);
     expect(filterChipTokens.selectedOutlineWidth).toBe(0);
     expect(filterChipTokens.hoveredElevation).toBe('level1');
@@ -50,7 +50,7 @@ describe('Material 3 chip defaults', () => {
     expect(selected['--_chip-label-color']).toBe('var(--on-secondary-container)');
     expect(selected['--_chip-outline-width']).toBe('0px');
     const disabledElevated = getChipStyle('elevatedFilter', { isDisabled: true, isSelected: false, interaction: null });
-    expect(elevatedFilterChipTokens.disabledUnselectedContainerColor).toBe('onSurface');
+    expect(elevatedFilterChipTokens.disabledUnselectedContainerColor).toBe('var(--on-surface)');
     expect(disabledElevated['--_chip-container-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, transparent)');
   });
 
