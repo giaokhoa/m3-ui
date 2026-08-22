@@ -91,7 +91,7 @@ test.describe('Material 3 Card parity', () => {
     await expect(cards.nth(0).locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
 
     await cards.nth(2).hover();
-    await expect(cards.nth(2).locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+    await expect(cards.nth(2).locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level1');
   });
 
   test('presses use full-surface ripple while elevation resolves to pressed state', async ({ page }) => {
