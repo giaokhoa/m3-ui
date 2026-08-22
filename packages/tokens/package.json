@@ -75,6 +75,8 @@
     "audit:material-web-pickers:complete": "node scripts/audit-material-web-pickers.mjs --require-complete",
     "audit:material-web-autocomplete": "node scripts/audit-material-web-autocomplete.mjs",
     "audit:material-web-autocomplete:complete": "node scripts/audit-material-web-autocomplete.mjs --require-complete",
+    "audit:material-web-menu-button": "node scripts/audit-material-web-menu-button.mjs",
+    "audit:material-web-menu-button:complete": "node scripts/audit-material-web-menu-button.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
