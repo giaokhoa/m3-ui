@@ -21,8 +21,8 @@ describe('ripple generated tokens', () => {
     expect(token.RippleBoundedExtraRadius).toBe('10px');
     expect(token.RippleStartRadiusLargestDimensionFactor).toBe(0.3);
     expect(token.RippleRadiusEasing).toBe('cubic-bezier(0.4, 0, 0.2, 1)');
-    expect(token.RippleCenterEasing).toBe('linear');
-    expect(token.RippleOpacityEasing).toBe('linear');
+    expect(token.RippleCenterEasing).toBe('cubic-bezier(0, 0, 1, 1)');
+    expect(token.RippleOpacityEasing).toBe('cubic-bezier(0, 0, 1, 1)');
   });
 
   it('matches the pinned AndroidX inset focus ring theme defaults', () => {
