@@ -1,5 +1,5 @@
 import * as token from '@m3/tokens';
-import { colorRole, msNumber, pxNumber } from '../../internal/tokenValues';
+import { msNumber, pxNumber } from '../../internal/tokenValues';
 
 export interface TextFieldTypographyToken {
   readonly fontFamilyRole: 'plain';
@@ -38,27 +38,27 @@ const motion = {
 } as const;
 
 const colors = {
-  text: colorRole(token.ComponentTextFieldSharedColorsText),
-  disabledText: colorRole(token.ComponentTextFieldSharedColorsDisabledText),
-  cursor: colorRole(token.ComponentTextFieldSharedColorsCursor),
-  errorCursor: colorRole(token.ComponentTextFieldSharedColorsErrorCursor),
-  label: colorRole(token.ComponentTextFieldSharedColorsLabel),
-  focusedLabel: colorRole(token.ComponentTextFieldSharedColorsFocusedLabel),
-  disabledLabel: colorRole(token.ComponentTextFieldSharedColorsDisabledLabel),
-  errorLabel: colorRole(token.ComponentTextFieldSharedColorsErrorLabel),
-  placeholder: colorRole(token.ComponentTextFieldSharedColorsPlaceholder),
-  disabledPlaceholder: colorRole(token.ComponentTextFieldSharedColorsDisabledPlaceholder),
-  supporting: colorRole(token.ComponentTextFieldSharedColorsSupporting),
-  disabledSupporting: colorRole(token.ComponentTextFieldSharedColorsDisabledSupporting),
-  errorSupporting: colorRole(token.ComponentTextFieldSharedColorsErrorSupporting),
-  leadingIcon: colorRole(token.ComponentTextFieldSharedColorsLeadingIcon),
-  trailingIcon: colorRole(token.ComponentTextFieldSharedColorsTrailingIcon),
-  disabledLeadingIcon: colorRole(token.ComponentTextFieldSharedColorsDisabledLeadingIcon),
-  disabledTrailingIcon: colorRole(token.ComponentTextFieldSharedColorsDisabledTrailingIcon),
-  errorLeadingIcon: colorRole(token.ComponentTextFieldSharedColorsErrorLeadingIcon),
-  errorTrailingIcon: colorRole(token.ComponentTextFieldSharedColorsErrorTrailingIcon),
-  prefix: colorRole(token.ComponentTextFieldSharedColorsPrefix),
-  suffix: colorRole(token.ComponentTextFieldSharedColorsSuffix),
+  text: token.ComponentTextFieldSharedColorsText,
+  disabledText: token.ComponentTextFieldSharedColorsDisabledText,
+  cursor: token.ComponentTextFieldSharedColorsCursor,
+  errorCursor: token.ComponentTextFieldSharedColorsErrorCursor,
+  label: token.ComponentTextFieldSharedColorsLabel,
+  focusedLabel: token.ComponentTextFieldSharedColorsFocusedLabel,
+  disabledLabel: token.ComponentTextFieldSharedColorsDisabledLabel,
+  errorLabel: token.ComponentTextFieldSharedColorsErrorLabel,
+  placeholder: token.ComponentTextFieldSharedColorsPlaceholder,
+  disabledPlaceholder: token.ComponentTextFieldSharedColorsDisabledPlaceholder,
+  supporting: token.ComponentTextFieldSharedColorsSupporting,
+  disabledSupporting: token.ComponentTextFieldSharedColorsDisabledSupporting,
+  errorSupporting: token.ComponentTextFieldSharedColorsErrorSupporting,
+  leadingIcon: token.ComponentTextFieldSharedColorsLeadingIcon,
+  trailingIcon: token.ComponentTextFieldSharedColorsTrailingIcon,
+  disabledLeadingIcon: token.ComponentTextFieldSharedColorsDisabledLeadingIcon,
+  disabledTrailingIcon: token.ComponentTextFieldSharedColorsDisabledTrailingIcon,
+  errorLeadingIcon: token.ComponentTextFieldSharedColorsErrorLeadingIcon,
+  errorTrailingIcon: token.ComponentTextFieldSharedColorsErrorTrailingIcon,
+  prefix: token.ComponentTextFieldSharedColorsPrefix,
+  suffix: token.ComponentTextFieldSharedColorsSuffix,
 } as const;
 
 const shared = {
@@ -99,11 +99,11 @@ export const filledTextFieldTokens = {
   },
   colors: {
     ...colors,
-    container: colorRole(token.ComponentTextFieldFilledColorsContainer),
-    indicator: colorRole(token.ComponentTextFieldFilledColorsIndicator),
-    focusedIndicator: colorRole(token.ComponentTextFieldFilledColorsFocusedIndicator),
-    disabledIndicator: colorRole(token.ComponentTextFieldFilledColorsDisabledIndicator),
-    errorIndicator: colorRole(token.ComponentTextFieldFilledColorsErrorIndicator),
+    container: token.ComponentTextFieldFilledColorsContainer,
+    indicator: token.ComponentTextFieldFilledColorsIndicator,
+    focusedIndicator: token.ComponentTextFieldFilledColorsFocusedIndicator,
+    disabledIndicator: token.ComponentTextFieldFilledColorsDisabledIndicator,
+    errorIndicator: token.ComponentTextFieldFilledColorsErrorIndicator,
   },
 } as const;
 
@@ -131,9 +131,9 @@ export const outlinedTextFieldTokens = {
   },
   colors: {
     ...colors,
-    outline: colorRole(token.ComponentTextFieldOutlinedColorsOutline),
-    focusedOutline: colorRole(token.ComponentTextFieldOutlinedColorsFocusedOutline),
-    disabledOutline: colorRole(token.ComponentTextFieldOutlinedColorsDisabledOutline),
-    errorOutline: colorRole(token.ComponentTextFieldOutlinedColorsErrorOutline),
+    outline: token.ComponentTextFieldOutlinedColorsOutline,
+    focusedOutline: token.ComponentTextFieldOutlinedColorsFocusedOutline,
+    disabledOutline: token.ComponentTextFieldOutlinedColorsDisabledOutline,
+    errorOutline: token.ComponentTextFieldOutlinedColorsErrorOutline,
   },
 } as const;
