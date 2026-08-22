@@ -1,9 +1,10 @@
-export const androidX = {
-  repository: 'androidx/androidx',
-  revision: '160825094a81825468a95b115bfb1b541e549856',
-  tokenRoot: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens',
-};
+import { material3Sources } from '../sources.mjs';
 
+export const androidX = material3Sources.compose;
+
+// Legacy narrow mappings remain here only while the full canonical corpus is being
+// expanded. Completeness is tracked independently by the source inventory audit;
+// this list must not be mistaken for the Material 3 token-file inventory.
 export const tokenSources = [
   'ElevationTokens.kt',
   'StateTokens.kt',
