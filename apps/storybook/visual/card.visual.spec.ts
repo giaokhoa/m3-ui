@@ -142,9 +142,12 @@ test.describe('Material 3 Card parity', () => {
     const outlinedStyle = await outlined.evaluate((element) =>
       getComputedStyle(element).getPropertyValue('--_card-disabled-outline-color').trim(),
     );
-    expect(outlinedStyle).toBe(
+    const outlinedResolved = await resolvedColor(outlined, outlinedStyle);
+    const expectedOutlined = await resolvedColor(
+      outlined,
       'color-mix(in srgb, var(--outline) 12%, var(--surface-container-low))',
     );
+    expect(outlinedResolved).toBe(expectedOutlined);
   });
 
   test('moves keyboard focus indication between opacity and inset-ring modes', async ({ page }) => {
