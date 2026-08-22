@@ -37,21 +37,21 @@ A runtime theme override such as the global font family may still use CSS inheri
 
 ## Style Dictionary API
 
-Style Dictionary 5.5.2 is the sole build engine. `style-dictionary.config.mjs` reads only `tokens/**/*.json` and emits `dist/generated/tokens.js` plus `tokens.d.ts` using built-in formats. The package root points directly to those artifacts.
+Style Dictionary 5.5.2 is the sole build engine. `style-dictionary.config.mjs` reads only `tokens/**/*.json` and emits `dist/generated/tokens.js` plus `tokens.d.ts` using built-in formats.
 
-UI foundations should consume the package root directly. The old core convenience subpaths `./motion`, `./ripple`, `./state`, and `./typography` are intentionally removed: ergonomic object projection belongs at the actual runtime consumer, not in a second token API layer.
+The package root is the **only runtime API**. There is no handwritten `src/` layer, no `./generated` alias, and no component/elevation convenience subpaths. UI code imports `@m3/tokens` directly. Ergonomic projections needed for arithmetic or component behavior live beside their consumers in `@m3/ui` and may only derive from generated values.
 
-A small set of component/elevation compatibility facades remains temporarily while their consumers are migrated. Those files may reshape generated values or convert CSS lengths/durations to numbers for existing arithmetic APIs, but may never own immutable design values. Architecture tests enforce this boundary and explicitly keep retired facades deleted.
+This boundary is intentional: `@m3/tokens` publishes the canonical generated vocabulary; it does not maintain a second object-shaped token API.
 
 ## Upstream audit
 
-AndroidX revision and file mappings live under `scripts/androidx/` and `audit-androidx.mjs`. The audit fetches pinned files, parses them in memory, normalizes semantic values, and compares them against canonical tokens. It has no renderer and no write path into `tokens/` or `src/`.
+AndroidX revision and file mappings live under `scripts/androidx/` and `audit-androidx.mjs`. The audit fetches pinned files, parses them in memory, normalizes semantic values, and compares them against canonical tokens. It has no renderer and no write path into `tokens/`.
 
 Colors are audited by semantic role identity (`Primary` ↔ `var(--primary)`), not by static hex values. Web-only/runtime adaptations are audited only when an upstream token actually owns the same semantic value; Defaults/layout behavior belongs in independent parity tests.
 
 ## Forbidden regressions
 
-Do **not** reintroduce: `scripts/compose-sync`; `src/generated/androidx`; retired core token facades; upstream files as Style Dictionary `source`/`include`; generators that write canonical DTCG; custom TypeScript generators duplicating Style Dictionary built-ins; static hex placeholders for ThemeProvider-owned roles; generic CSS-variable output for non-color immutable tokens; or handwritten design constants where a canonical token exists.
+Do **not** reintroduce: a handwritten token runtime `src/` layer; token-package compatibility facades or subpath aliases; `scripts/compose-sync`; `src/generated/androidx`; upstream files as Style Dictionary `source`/`include`; generators that write canonical DTCG; custom TypeScript generators duplicating Style Dictionary built-ins; static hex placeholders for ThemeProvider-owned roles; generic CSS-variable output for non-color immutable tokens; or handwritten design constants where a canonical token exists.
 
 If a future requirement appears to need one of these, treat it as an architecture change requiring explicit review rather than silently reviving the old direction.
 
