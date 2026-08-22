@@ -126,12 +126,16 @@ test.describe('Material 3 ripple focus parity', () => {
     expect(checkboxGeometry.target).toEqual([48, 48]);
     expect(checkboxGeometry.stateLayer).toEqual([40, 40]);
     expect(checkboxGeometry.ring).toEqual([18, 18]);
-    expect(checkboxGeometry.radius).toBe('25%');
+    expect(checkboxGeometry.radius).toBe('4.5px');
+    await expect
+      .poll(() => pseudoStyle(checkboxRing, '::before', 'border-top-left-radius'))
+      .toBe('3.5px');
 
     await page.keyboard.press('Tab');
     await expect(page.getByRole('radio', { name: 'Radio' })).toBeFocused();
 
     const radioRoot = page.locator('.m3-radio-button');
+    const radioRing = radioRoot.locator('.m3-ripple__focus-ring');
     const radioGeometry = await radioRoot.evaluate((element) => {
       const slot = element.querySelector<HTMLElement>('.m3-radio-button__control-slot')!;
       const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
@@ -149,7 +153,10 @@ test.describe('Material 3 ripple focus parity', () => {
     expect(radioGeometry.target).toEqual([48, 48]);
     expect(radioGeometry.stateLayer).toEqual([40, 40]);
     expect(radioGeometry.ring).toEqual([24, 24]);
-    expect(radioGeometry.radius).toBe('50%');
+    expect(radioGeometry.radius).toBe('12px');
+    await expect
+      .poll(() => pseudoStyle(radioRing, '::before', 'border-top-left-radius'))
+      .toBe('11px');
   });
 
   test('keeps inset focus ring while a newer hover state layer is active', async ({ page }) => {
