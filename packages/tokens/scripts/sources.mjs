@@ -37,6 +37,9 @@ export const material3Sources = Object.freeze({
     revision: 'cac97678831d48d4eb4a606ca50f92673a1dc20c',
     revisionAt: '2026-08-21T19:30:42Z',
     tokenRoot: 'tokens',
+    latestGeneratedRoot: 'tokens/versions/latest/sass',
+    latestGeneratedVersion: '34.0.21',
+    publicAdapterVersion: 'v0.192',
   }),
 });
 
