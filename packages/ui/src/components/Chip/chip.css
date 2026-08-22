@@ -2,7 +2,7 @@
   position: relative;
   display: inline-flex;
   box-sizing: border-box;
-  min-block-size: 48px;
+  min-block-size: var(--_chip-hit-size);
   align-items: center;
   justify-content: center;
   margin: 0;
