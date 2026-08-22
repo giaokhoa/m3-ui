@@ -1,0 +1,33 @@
+{
+  "source": {
+    "url": "https://m3.material.io/",
+    "kind": "normative-text",
+    "accessedAt": "2026-08-22",
+    "retrieval": "Official Material 3 homepage text indexed from m3.material.io; direct page body is JavaScript-gated."
+  },
+  "claims": {
+    "motionPhysics": {
+      "poweredByTokens": true,
+      "evidence": "Motion physics is described as powered by tokens."
+    },
+    "shapeLibrary": {
+      "count": 35,
+      "decorative": true,
+      "supportsMorph": true,
+      "evidence": "The expanded shape library has 35 shapes and built-in shape morph motion."
+    },
+    "expressive": {
+      "vibrantColors": true,
+      "intuitiveMotion": true,
+      "adaptiveComponents": true,
+      "flexibleTypography": true,
+      "contrastingShapes": true
+    },
+    "components": {
+      "toolbar": "new",
+      "splitButton": "new",
+      "progressIndicator": "updated",
+      "buttonGroup": "new"
+    }
+  }
+}
