@@ -55,6 +55,9 @@ jobs:
       - name: Require complete Material Web declaration coverage
         run: pnpm --filter @m3/tokens audit:material-web-declarations:complete
 
+      - name: Require complete Material Web Button size overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-button-sizes:complete
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 

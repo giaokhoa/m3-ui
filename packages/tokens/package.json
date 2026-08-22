@@ -26,6 +26,8 @@
     "audit:androidx": "node scripts/audit-androidx.mjs",
     "audit:material-web-declarations": "node scripts/audit-material-web-declarations.mjs",
     "audit:material-web-declarations:complete": "node scripts/audit-material-web-declarations.mjs --require-complete",
+    "audit:material-web-button-sizes": "node scripts/audit-material-web-button-sizes.mjs",
+    "audit:material-web-button-sizes:complete": "node scripts/audit-material-web-button-sizes.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
