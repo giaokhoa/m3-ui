@@ -1,8 +1,10 @@
+import { stateTokensGenerated } from './generated/androidx/state.js';
+
 export const stateLayerOpacity = {
-  dragged: 0.16,
-  focus: 0.1,
-  hover: 0.08,
-  pressed: 0.1,
+  dragged: stateTokensGenerated.draggedStateLayerOpacity,
+  focus: stateTokensGenerated.focusStateLayerOpacity,
+  hover: stateTokensGenerated.hoverStateLayerOpacity,
+  pressed: stateTokensGenerated.pressedStateLayerOpacity,
 } as const;
 
 export type StateLayerState = keyof typeof stateLayerOpacity;
