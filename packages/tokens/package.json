@@ -24,6 +24,10 @@
       "types": "./dist/checkbox.d.ts",
       "import": "./dist/checkbox.js"
     },
+    "./chip": {
+      "types": "./dist/chip.d.ts",
+      "import": "./dist/chip.js"
+    },
     "./elevation": {
       "types": "./dist/elevation.d.ts",
       "import": "./dist/elevation.js"
