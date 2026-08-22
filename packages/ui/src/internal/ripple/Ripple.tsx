@@ -15,7 +15,7 @@ export interface RippleProps
   isHovered?: boolean;
   isFocusVisible?: boolean;
   /** CSS radius that maps the component's Compose focusRingShape. */
-  focusRingRadius?: string | number;
+  focusRingRadius?: CSSProperties['borderRadius'];
 }
 
 export function Ripple({
@@ -68,10 +68,6 @@ export function Ripple({
     ...style,
   };
 
-  if (focusRingRadius !== undefined) {
-    tokenStyle['--_ripple-focus-ring-radius'] = focusRingRadius;
-  }
-
   return (
     <span
       {...props}
@@ -110,7 +106,14 @@ export function Ripple({
         );
       })}
       {rippleFocus === 'inset-ring' ? (
-        <span className="m3-ripple__focus-ring" />
+        <span
+          className="m3-ripple__focus-ring"
+          style={
+            focusRingRadius === undefined
+              ? undefined
+              : { borderRadius: focusRingRadius }
+          }
+        />
       ) : null}
     </span>
   );
