@@ -1,0 +1,19 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "switch-selected-icon-color",
+      "materialWeb": "primary",
+      "composeGenerated": "onPrimaryContainer",
+      "canonicalComposeSemantic": "component.switch.colors.checkedIcon = onPrimaryContainer",
+      "canonicalWebSemantic": "component.switch.webSelectedIconColor = primary",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 maps selected Switch icon colors to primary for enabled, focus, hover and pressed states, while pinned Compose generated tokens map those states to onPrimaryContainer. Preserve both source semantics explicitly."
+    }
+  ],
+  "schemaVersion": 1
+}
