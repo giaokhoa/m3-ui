@@ -28,9 +28,11 @@ describe('Switch defaults', () => {
     expect(switchTrackFocusRingRadius).toBe('16px');
   });
 
-  it('keeps the web label spacing in the canonical component contract', () => {
+  it('keeps web label defaults in the canonical component contract', () => {
     expect(token.ComponentSwitchLabelGap).toBe('8px');
+    expect(token.ComponentSwitchLabelColor).toBe('var(--on-surface)');
     expect(style['--_switch-label-gap']).toBe('8px');
+    expect(style['--_switch-label-color']).toBe('var(--on-surface)');
   });
 
   it('passes enabled dynamic color variables through unchanged', () => {
@@ -43,7 +45,8 @@ describe('Switch defaults', () => {
     expect(style['--_switch-unchecked-border-color']).toBe('var(--outline)');
   });
 
-  it('composites generated disabled colors over Surface', () => {
+  it('composites generated disabled colors over the canonical Surface target', () => {
+    expect(token.ComponentSwitchDisabledCompositeOver).toBe('var(--surface)');
     expect(style['--_switch-disabled-checked-thumb-color']).toBe('var(--surface)');
     expect(style['--_switch-disabled-checked-track-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, var(--surface))');
     expect(style['--_switch-disabled-unchecked-thumb-color']).toBe('color-mix(in srgb, var(--on-surface) 38%, var(--surface))');
