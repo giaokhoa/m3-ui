@@ -81,6 +81,7 @@ export function RadioButton({
               <span className="m3-radio-button__state-layer">
                 <Ripple
                   controller={ripple}
+                  focusRingRadius="50%"
                   isFocusVisible={renderProps.isFocusVisible}
                   isHovered={renderProps.isHovered}
                 />
