@@ -8,6 +8,11 @@ export const radioButtonTokens = {
   padding: pxNumber(token.ComponentRadioButtonPadding),
   strokeWidth: pxNumber(token.ComponentRadioButtonStrokeWidth),
   dotSize: pxNumber(token.ComponentRadioButtonDotSize),
+  labelColor: token.ComponentRadioButtonLabelColor,
+  group: {
+    contentColor: token.ComponentRadioButtonGroupContentColor,
+    errorColor: token.ComponentRadioButtonGroupErrorColor,
+  },
   colors: {
     selected: token.ComponentRadioButtonColorsSelected,
     unselected: token.ComponentRadioButtonColorsUnselected,
