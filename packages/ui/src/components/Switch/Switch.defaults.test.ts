@@ -15,6 +15,11 @@ describe('Switch defaults', () => {
     expect(switchTokens.checkedThumbSize).toBe(24);
     expect(switchTokens.pressedThumbSize).toBe(28);
     expect(switchTokens.iconSize).toBe(16);
+    expect(style['--_switch-unchecked-thumb-offset']).toBe('8px');
+    expect(style['--_switch-content-thumb-offset']).toBe('4px');
+    expect(style['--_switch-checked-thumb-offset']).toBe('24px');
+    expect(style['--_switch-pressed-unchecked-thumb-offset']).toBe('2px');
+    expect(style['--_switch-pressed-checked-thumb-offset']).toBe('22px');
   });
 
   it('maps enabled colors through ThemeProvider roles', () => {
