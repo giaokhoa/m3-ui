@@ -24,6 +24,7 @@
     "inventory:compose": "node scripts/inventory-compose.mjs",
     "inventory:material-web": "node scripts/inventory-material-web.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
+    "audit:material-web-declarations": "node scripts/audit-material-web-declarations.mjs",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
