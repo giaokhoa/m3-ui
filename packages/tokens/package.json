@@ -37,6 +37,8 @@
     "audit:material-web-fab-roles:complete": "node scripts/audit-material-web-fab-roles.mjs --require-complete",
     "audit:material-web-fab-surface": "node scripts/audit-material-web-fab-surface.mjs",
     "audit:material-web-fab-surface:complete": "node scripts/audit-material-web-fab-surface.mjs --require-complete",
+    "audit:material-web-fab-remaining": "node scripts/audit-material-web-fab-remaining.mjs",
+    "audit:material-web-fab-remaining:complete": "node scripts/audit-material-web-fab-remaining.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
