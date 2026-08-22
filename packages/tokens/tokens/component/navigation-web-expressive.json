@@ -1,0 +1,32 @@
+{
+  "component": {
+    "navigation": {
+      "bar": {
+        "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+        "itemIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "itemActiveFocusedStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemActiveFocusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "itemActiveHoveredStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemActiveHoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "itemActivePressedStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemActivePressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+        "itemInactiveFocusedStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemInactiveHoveredStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemInactivePressedStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" }
+      },
+      "rail": {
+        "state": {
+          "itemActiveFocusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "itemActiveHoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "itemActivePressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+        },
+        "expanded": {
+          "containerColor": { "$type": "string", "$value": "var(--surface)" }
+        },
+        "baselineItem": {
+          "shortContainerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } }
+        }
+      }
+    }
+  }
+}

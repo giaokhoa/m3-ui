@@ -47,6 +47,8 @@
     "audit:material-web-split-button:complete": "node scripts/audit-material-web-split-button.mjs --require-complete",
     "audit:material-web-button-group": "node scripts/audit-material-web-button-group.mjs",
     "audit:material-web-button-group:complete": "node scripts/audit-material-web-button-group.mjs --require-complete",
+    "audit:material-web-navigation-expressive": "node scripts/audit-material-web-navigation-expressive.mjs",
+    "audit:material-web-navigation-expressive:complete": "node scripts/audit-material-web-navigation-expressive.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
