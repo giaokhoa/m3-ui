@@ -1,0 +1,42 @@
+{
+  "component": {
+    "select": {
+      "filled": {
+        "menuCascadingMenuIndicatorIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "menuListItemContainerHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "menuContainerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "menuContainerElevation": { "$type": "string", "$value": "level2" },
+        "menuContainerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+        "menuContainerShape": { "$type": "string", "$value": "extraSmall" },
+        "menuListItemLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "menuListItemLabelTextFont": { "$type": "string", "$value": "labelLarge" },
+        "menuListItemSelectedContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "textFieldActiveIndicatorHeight": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+        "textFieldFocusActiveIndicatorHeight": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "textFieldLeadingIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "textFieldTrailingIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "textFieldContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "textFieldContainerShape": { "$type": "string", "$value": "extraSmallTop" },
+        "textFieldFocusActiveIndicatorColor": { "$type": "string", "$value": "var(--primary)" }
+      },
+      "outlined": {
+        "menuCascadingMenuIndicatorIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "menuListItemContainerHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "menuContainerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "menuContainerElevation": { "$type": "string", "$value": "level2" },
+        "menuContainerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+        "menuContainerShape": { "$type": "string", "$value": "extraSmall" },
+        "menuListItemLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "menuListItemLabelTextFont": { "$type": "string", "$value": "labelLarge" },
+        "menuListItemSelectedContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "textFieldDisabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
+        "textFieldDisabledOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+        "textFieldOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+        "textFieldLeadingIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "textFieldTrailingIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "textFieldContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "textFieldContainerShape": { "$type": "string", "$value": "extraSmall" }
+      }
+    }
+  }
+}

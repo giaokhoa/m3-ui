@@ -1,0 +1,27 @@
+{
+  "component": {
+    "carouselItem": {
+      "disabledContainerOpacity": { "$type": "number", "$value": 0.38 },
+      "withOutlineDisabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
+      "withOutlineOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "containerColor": { "$type": "string", "$value": "var(--surface)" },
+      "containerElevation": { "$type": "string", "$value": "level0" },
+      "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+      "containerShape": { "$type": "string", "$value": "extraLarge" },
+      "disabledContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "disabledContainerElevation": { "$type": "string", "$value": "level0" },
+      "focusContainerElevation": { "$type": "string", "$value": "level0" },
+      "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+      "focusStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "hoverContainerElevation": { "$type": "string", "$value": "level1" },
+      "hoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "pressedContainerElevation": { "$type": "string", "$value": "level0" },
+      "pressedStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "withOutlineDisabledOutlineColor": { "$type": "string", "$value": "var(--outline)" },
+      "withOutlineFocusOutlineColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "withOutlineHoverOutlineColor": { "$type": "string", "$value": "var(--outline)" },
+      "withOutlineOutlineColor": { "$type": "string", "$value": "var(--outline)" },
+      "withOutlinePressedOutlineColor": { "$type": "string", "$value": "var(--outline)" }
+    }
+  }
+}

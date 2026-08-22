@@ -1,0 +1,36 @@
+{
+  "component": {
+    "menuButton": {
+      "shared": {
+        "containerHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+        "trailingIconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+        "leadingIconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+        "labelTextFont": { "$type": "string", "$value": "labelLarge" },
+        "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" }
+      },
+      "filled": {
+        "containerColor": { "$type": "string", "$value": "var(--primary)" },
+        "containerElevation": { "$type": "string", "$value": "level0" },
+        "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledContainerOpacity": { "$type": "number", "$value": 0.12 },
+        "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+        "labelTextColor": { "$type": "string", "$value": "var(--on-primary)" }
+      },
+      "outlined": {
+        "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+        "outlineColor": { "$type": "string", "$value": "var(--outline)" },
+        "shape": { "$type": "string", "$value": "full" },
+        "labelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "trailingIconColor": { "$type": "string", "$value": "var(--primary)" },
+        "disabledContainerOpacity": { "$type": "number", "$value": 0.12 },
+        "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 }
+      },
+      "standard": {
+        "containerShape": { "$type": "string", "$value": "full" },
+        "labelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "trailingIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 }
+      }
+    }
+  }
+}

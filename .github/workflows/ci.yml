@@ -46,6 +46,12 @@ jobs:
       - name: Require complete Compose token coverage
         run: pnpm --filter @m3/tokens coverage:compose:complete
 
+      - name: Require complete Material Web token coverage
+        run: pnpm --filter @m3/tokens coverage:material-web:complete
+
+      - name: Require complete Material 3 union token coverage
+        run: pnpm --filter @m3/tokens coverage:union:complete
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 

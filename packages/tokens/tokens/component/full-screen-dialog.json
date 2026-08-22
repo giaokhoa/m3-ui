@@ -1,0 +1,16 @@
+{
+  "component": {
+    "fullScreenDialog": {
+      "headerContainerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+      "headerIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "containerColor": { "$type": "string", "$value": "var(--surface)" },
+      "containerElevation": { "$type": "string", "$value": "level0" },
+      "containerShape": { "$type": "string", "$value": "none" },
+      "headerActionLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "headerActionLabelTextFont": { "$type": "string", "$value": "labelLarge" },
+      "headerActionFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "headerActionHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "headerActionPressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" }
+    }
+  }
+}

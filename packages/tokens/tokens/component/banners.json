@@ -1,0 +1,45 @@
+{
+  "component": {
+    "banners": {
+      "standard": {
+        "containerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "bodyTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "iconColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "titleTextColor": { "$type": "string", "$value": "var(--on-surface)" }
+      },
+      "vibrant": {
+        "containerColor": { "$type": "string", "$value": "var(--primary-container)" },
+        "bodyTextColor": { "$type": "string", "$value": "var(--on-primary-container)" },
+        "iconColor": { "$type": "string", "$value": "var(--on-primary-container)" },
+        "titleTextColor": { "$type": "string", "$value": "var(--on-primary-container)" }
+      },
+      "closeButtonColor": { "$type": "string", "$value": "var(--primary)" },
+      "basic": {
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "mobileContainerHeight": { "$type": "dimension", "$value": { "value": 112, "unit": "px" } },
+        "twoLinesContainerHeight": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+        "iconContainerSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "shapeRound": { "$type": "string", "$value": "extraLarge" },
+        "shapeSquare": { "$type": "string", "$value": "none" },
+        "bodyTextFont": { "$type": "string", "$value": "bodyMedium" }
+      },
+      "rich": {
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "imageSize": { "$type": "dimension", "$value": { "value": 80, "unit": "px" } },
+        "shape": { "$type": "string", "$value": "extraLarge" },
+        "imageShape": { "$type": "string", "$value": "none" },
+        "bodyTextFont": { "$type": "string", "$value": "bodyMedium" }
+      },
+      "legacyLayout": {
+        "desktopSingleLineContainerHeight": { "$type": "dimension", "$value": { "value": 52, "unit": "px" } },
+        "desktopThreeLinesContainerHeight": { "$type": "dimension", "$value": { "value": 90, "unit": "px" } },
+        "desktopTwoLinesWithImageContainerHeight": { "$type": "dimension", "$value": { "value": 72, "unit": "px" } },
+        "mobileSingleLineContainerHeight": { "$type": "dimension", "$value": { "value": 54, "unit": "px" } },
+        "mobileTwoLinesContainerHeight": { "$type": "dimension", "$value": { "value": 112, "unit": "px" } },
+        "mobileTwoLinesWithImageContainerHeight": { "$type": "dimension", "$value": { "value": 120, "unit": "px" } },
+        "withImageImageSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } }
+      }
+    }
+  }
+}

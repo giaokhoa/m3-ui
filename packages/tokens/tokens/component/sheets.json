@@ -1,0 +1,26 @@
+{
+  "component": {
+    "sheetFloating": {
+      "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "containerElevation": { "$type": "string", "$value": "level1" },
+      "containerShape": { "$type": "string", "$value": "extraLarge" }
+    },
+    "sheetSide": {
+      "dockedContainerWidth": { "$type": "dimension", "$value": { "value": 256, "unit": "px" } },
+      "detachedContainerShape": { "$type": "string", "$value": "large" },
+      "dockedActionFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionPressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedContainerShape": { "$type": "string", "$value": "none" },
+      "dockedDividerColor": { "$type": "string", "$value": "var(--outline)" },
+      "dockedFocusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+      "dockedHeadlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+      "dockedHeadlineFont": { "$type": "string", "$value": "titleLarge" },
+      "dockedModalContainerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "dockedModalContainerElevation": { "$type": "string", "$value": "level1" },
+      "dockedModalContainerShape": { "$type": "string", "$value": "largeStart" },
+      "dockedStandardContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "dockedStandardContainerElevation": { "$type": "string", "$value": "level0" }
+    }
+  }
+}
