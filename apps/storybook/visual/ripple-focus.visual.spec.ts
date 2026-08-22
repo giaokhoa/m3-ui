@@ -49,7 +49,7 @@ test.describe('Material 3 ripple focus parity', () => {
     await expect(ripple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0.1');
   });
 
-  test('matches Compose inset ring dimensions, colors and full target bounds', async ({
+  test('matches Compose inset ring dimensions, colors and Button indication bounds', async ({
     page,
   }) => {
     await openStory(page, 'foundations-ripplefocus--inset-ring');
@@ -89,9 +89,12 @@ test.describe('Material 3 ripple focus parity', () => {
       };
     });
     expect(geometry.ring).toEqual(geometry.button);
+    expect(geometry.button[1]).toBe(40);
   });
 
-  test('maps Checkbox and RadioButton focus-ring shapes on 48px targets', async ({ page }) => {
+  test('separates Checkbox and Radio indication bounds from 48px touch targets', async ({
+    page,
+  }) => {
     await openStory(page, 'foundations-ripplefocus--inset-ring');
 
     await page.keyboard.press('Tab');
@@ -99,30 +102,52 @@ test.describe('Material 3 ripple focus parity', () => {
     await expect(page.getByRole('checkbox', { name: 'Checkbox' })).toBeFocused();
 
     const checkboxRoot = page.locator('.m3-checkbox');
+    const checkboxSlot = checkboxRoot.locator('.m3-checkbox__control-slot');
+    const checkboxStateLayer = checkboxRoot.locator('.m3-ripple__state-layer');
     const checkboxRing = checkboxRoot.locator('.m3-ripple__focus-ring');
-    const checkboxGeometry = await checkboxRing.evaluate((element) => {
-      const box = element.getBoundingClientRect();
+    const checkboxGeometry = await checkboxRoot.evaluate((element) => {
+      const slot = element.querySelector<HTMLElement>('.m3-checkbox__control-slot')!;
+      const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
+      const ring = element.querySelector<HTMLElement>('.m3-ripple__focus-ring')!;
+      const slotBox = slot.getBoundingClientRect();
+      const stateLayerBox = stateLayer.getBoundingClientRect();
+      const ringBox = ring.getBoundingClientRect();
       return {
-        size: [box.width, box.height],
-        radius: getComputedStyle(element).borderRadius,
+        target: [slotBox.width, slotBox.height],
+        stateLayer: [stateLayerBox.width, stateLayerBox.height],
+        ring: [ringBox.width, ringBox.height],
+        radius: getComputedStyle(ring).borderRadius,
       };
     });
-    expect(checkboxGeometry.size).toEqual([48, 48]);
+    await expect(checkboxSlot).toBeVisible();
+    await expect(checkboxStateLayer).toBeVisible();
+    await expect(checkboxRing).toBeVisible();
+    expect(checkboxGeometry.target).toEqual([48, 48]);
+    expect(checkboxGeometry.stateLayer).toEqual([40, 40]);
+    expect(checkboxGeometry.ring).toEqual([18, 18]);
     expect(checkboxGeometry.radius).toBe('25%');
 
     await page.keyboard.press('Tab');
     await expect(page.getByRole('radio', { name: 'Radio' })).toBeFocused();
 
     const radioRoot = page.locator('.m3-radio-button');
-    const radioRing = radioRoot.locator('.m3-ripple__focus-ring');
-    const radioGeometry = await radioRing.evaluate((element) => {
-      const box = element.getBoundingClientRect();
+    const radioGeometry = await radioRoot.evaluate((element) => {
+      const slot = element.querySelector<HTMLElement>('.m3-radio-button__control-slot')!;
+      const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
+      const ring = element.querySelector<HTMLElement>('.m3-ripple__focus-ring')!;
+      const slotBox = slot.getBoundingClientRect();
+      const stateLayerBox = stateLayer.getBoundingClientRect();
+      const ringBox = ring.getBoundingClientRect();
       return {
-        size: [box.width, box.height],
-        radius: getComputedStyle(element).borderRadius,
+        target: [slotBox.width, slotBox.height],
+        stateLayer: [stateLayerBox.width, stateLayerBox.height],
+        ring: [ringBox.width, ringBox.height],
+        radius: getComputedStyle(ring).borderRadius,
       };
     });
-    expect(radioGeometry.size).toEqual([48, 48]);
+    expect(radioGeometry.target).toEqual([48, 48]);
+    expect(radioGeometry.stateLayer).toEqual([40, 40]);
+    expect(radioGeometry.ring).toEqual([24, 24]);
     expect(radioGeometry.radius).toBe('50%');
   });
 
