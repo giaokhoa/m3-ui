@@ -4,7 +4,14 @@ export const androidX = {
   tokenRoot: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens',
 };
 
-export const tokenSources = ['ElevationTokens.kt', 'StateTokens.kt', 'SwitchTokens.kt'].map((file) => ({
-  file,
-  path: `${androidX.tokenRoot}/${file}`,
-}));
+export const tokenSources = [
+  'ElevationTokens.kt',
+  'StateTokens.kt',
+  'SwitchTokens.kt',
+  'FilledButtonTokens.kt',
+  'FilledCardTokens.kt',
+  'CheckboxTokens.kt',
+  'RadioButtonTokens.kt',
+  'AssistChipTokens.kt',
+  'FilledTextFieldTokens.kt',
+].map((file) => ({ file, path: `${androidX.tokenRoot}/${file}` }));
