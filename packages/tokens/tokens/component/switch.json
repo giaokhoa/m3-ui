@@ -15,6 +15,8 @@
       "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
       "labelGap": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+      "labelColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "disabledCompositeOver": { "$type": "string", "$value": "var(--surface)" },
       "colors": {
         "checkedThumb": { "$type": "string", "$value": "var(--on-primary)" },
         "checkedTrack": { "$type": "string", "$value": "var(--primary)" },
