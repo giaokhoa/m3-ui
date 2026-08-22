@@ -1,0 +1,36 @@
+{
+  "component": {
+    "tooltip": {
+      "rich": {
+        "actionFocusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionFocusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "actionHoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionHoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "actionPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionPressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+        "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" }
+      }
+    },
+    "snackbar": {
+      "action": {
+        "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+      },
+      "container": {
+        "shadowColor": { "$type": "string", "$value": "var(--shadow)" }
+      },
+      "icon": {
+        "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+      }
+    }
+  }
+}
