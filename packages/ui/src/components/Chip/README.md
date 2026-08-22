@@ -27,10 +27,11 @@ Assist and Suggestion chips use React Aria Button semantics. Filter and Input ch
 
 ## Geometry
 
-The semantic hit target and visual surface are separate, matching Compose's `minimumInteractiveComponentSize()` wrapping a 32dp chip surface:
+AndroidX tests the chip's normal layout height and expanded touch bounds separately. The web mapping keeps the semantic element and visible surface at 32px while an absolutely positioned generated hit box expands pointer hit-testing to at least 48px without inflating normal-flow layout:
 
-- minimum interactive height: 48px
-- visible container height: 32px
+- layout / visible container height: 32px
+- expanded pointer target height: 48px
+- expanded pointer target width: at least 48px
 - baseline container radius: 8px (`CornerSmall`)
 - label typography: LabelLarge
 - icon size: 18px
@@ -44,13 +45,13 @@ Generated hover/focus/pressed color tokens are not promoted to runtime behavior.
 
 Flat Assist/Suggestion use transparent containers with 1px `OutlineVariant`; disabled outline/content alpha is applied exactly from the generated tokens. Elevated action chips use `SurfaceContainerLow`, Level1 base elevation and Level2 hover elevation.
 
-Flat Filter/Input use transparent unselected containers, `SecondaryContainer` selected containers, 1px unselected outlines and no selected outline. Elevated Filter uses `SurfaceContainerLow` unselected and `SecondaryContainer` selected. Disabled selected/elevated containers use `OnSurface` at 12%; disabled content uses `OnSurface` at 38%.
+Flat Filter/Input use transparent unselected containers, `SecondaryContainer` selected containers, 1px unselected outlines and no selected outline. Elevated Filter uses `SurfaceContainerLow` unselected and `SecondaryContainer` selected. Disabled selected/elevated containers use `OnSurface` at 12%; disabled content uses `OnSurface` at 38%. InputChip applies its disabled 0.38 opacity directly to the avatar box, matching the pinned implementation rather than recoloring arbitrary avatar content.
 
 ## Elevation and expressive shapes
 
 Elevation tracks the latest still-active press/hover/focus interaction and uses the shared AndroidX internal elevation motion specs: 120ms incoming, 120ms hover-outgoing, and 150ms other outgoing transitions. Drag elevation tokens are preserved but no artificial public drag state is added without an InteractionSource equivalent.
 
-The Filter/ElevatedFilter/Input `shapes` prop maps the pinned expressive `ChipShapes` overload. Default expressive radii are 12px unselected, full selected, and 8px pressed, animated with the pinned FastSpatial motion. The expressive overload also uses the compact 4px icon spacing rules from AndroidX.
+The Filter/ElevatedFilter/Input `shapes` prop maps the pinned expressive `ChipShapes` overload. Default expressive radii are 12px unselected, full selected, and 8px pressed, animated with the pinned FastSpatial motion. The expressive overload also uses the compact 4px icon spacing rules from AndroidX. Its tonal Filter defaults change the unselected leading icon from `Primary` to `OnSurfaceVariant`; this is preserved rather than treating expressive mode as shape-only.
 
 ## Intentional web differences / remaining gaps
 
