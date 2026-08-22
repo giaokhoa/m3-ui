@@ -82,3 +82,14 @@ test('UI consumes @m3/tokens through the package root only', async () => {
     );
   }
 });
+
+test('UI keeps generated runtime color expressions intact', async () => {
+  for (const file of await sourceFiles(uiSourceRoot)) {
+    const source = await readFile(file, 'utf8');
+    assert.doesNotMatch(
+      source,
+      /\b(?:colorRole|roleVariable|colorRoleVariable)\b/,
+      `${file.pathname} must pass generated CSS color expressions through directly`,
+    );
+  }
+});
