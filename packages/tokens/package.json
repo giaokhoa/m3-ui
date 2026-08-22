@@ -30,6 +30,8 @@
     "audit:material-web-button-sizes:complete": "node scripts/audit-material-web-button-sizes.mjs --require-complete",
     "audit:material-web-button-variants": "node scripts/audit-material-web-button-variants.mjs",
     "audit:material-web-button-variants:complete": "node scripts/audit-material-web-button-variants.mjs --require-complete",
+    "audit:material-web-button-generic": "node scripts/audit-material-web-button-generic.mjs",
+    "audit:material-web-button-generic:complete": "node scripts/audit-material-web-button-generic.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",

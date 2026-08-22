@@ -1,0 +1,49 @@
+{
+  "policy": {
+    "scope": "Generic md-comp-button bridge drift between Material Web generic Button tokens and effective Compose baseline Button defaults.",
+    "rule": "The generic Web module is semantically remapped onto baseline layout, small expressive shape/motion, and Filled variant state tokens. Only genuine value disagreements are exceptions."
+  },
+  "drift": [
+    {
+      "id": "button-generic-icon-size",
+      "module": "md-comp-button",
+      "variable": "icon-size",
+      "canonicalPath": "component.button.baseline.iconSize",
+      "classification": "implementation-override",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "20px",
+      "composeRuntime": "18dp",
+      "canonical": "18px",
+      "reason": "Pinned Compose ButtonDefaults explicitly keeps IconSize at 18.dp with a TODO to update when the correct BaselineButtonTokens value becomes available; the generic Material Web token is already 20px."
+    },
+    {
+      "id": "button-generic-disabled-icon-color",
+      "module": "md-comp-button",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.filled.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeRuntime": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-generic-disabled-label-color",
+      "module": "md-comp-button",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.filled.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeRuntime": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    }
+  ],
+  "semanticRemaps": [
+    {
+      "id": "button-generic-layer-bridge",
+      "classification": "semantic-equivalent",
+      "reason": "Generic Material Web Button combines legacy baseline geometry, expressive small shape/motion, and Filled toggle state roles. The canonical corpus keeps those concerns in baseline, size.small, and variant.filled rather than duplicating a fourth hierarchy."
+    }
+  ]
+}

@@ -61,6 +61,9 @@ jobs:
       - name: Require complete Material Web Button variant overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-button-variants:complete
 
+      - name: Require complete Material Web generic Button overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-button-generic:complete
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 
