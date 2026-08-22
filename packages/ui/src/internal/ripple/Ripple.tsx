@@ -1,6 +1,7 @@
 import { rippleTokens } from '@m3/tokens/ripple';
 import { stateLayerOpacity } from '@m3/tokens/state';
 import type { CSSProperties, HTMLAttributes } from 'react';
+import { useTheme } from '../../theme/ThemeProvider';
 import type { RippleController } from './useRipple';
 import './ripple.css';
 
@@ -13,6 +14,17 @@ export interface RippleProps
   stateInteraction?: RippleStateInteraction | null;
   isHovered?: boolean;
   isFocusVisible?: boolean;
+  /** CSS length that maps the component's Compose focusRingShape corner radius. */
+  focusRingRadius?: string | number;
+  /**
+   * Inset from the Ripple host to the Compose indication coordinator bounds.
+   * This is distinct from the state-layer radius and minimum touch target.
+   */
+  focusRingInset?: CSSProperties['inset'];
+}
+
+function cssLength(value: string | number): string {
+  return typeof value === 'number' ? `${value}px` : value;
 }
 
 export function Ripple({
@@ -20,10 +32,13 @@ export function Ripple({
   stateInteraction,
   isHovered = false,
   isFocusVisible = false,
+  focusRingRadius,
+  focusRingInset,
   className,
   style,
   ...props
 }: RippleProps) {
+  const { rippleFocus } = useTheme();
   const resolvedStateInteraction =
     stateInteraction === undefined
       ? isFocusVisible
@@ -32,6 +47,8 @@ export function Ripple({
           ? 'hover'
           : null
       : stateInteraction;
+  const hasFocus = isFocusVisible || resolvedStateInteraction === 'focus';
+  const focusRing = rippleTokens.focusRing;
 
   const tokenStyle: RippleStyle = {
     '--_ripple-radius-duration': `${rippleTokens.radiusDurationMs}ms`,
@@ -45,8 +62,27 @@ export function Ripple({
     '--_ripple-hover-opacity': stateLayerOpacity.hover,
     '--_ripple-focus-opacity': stateLayerOpacity.focus,
     '--_ripple-pressed-opacity': stateLayerOpacity.pressed,
+    '--_ripple-focus-ring-outer-inset': `${focusRing.outerStrokeInset}px`,
+    '--_ripple-focus-ring-outer-width': `${focusRing.outerStrokeWidth}px`,
+    '--_ripple-focus-ring-inner-inset': `${focusRing.innerStrokeInset}px`,
+    '--_ripple-focus-ring-inner-width': `${focusRing.innerStrokeWidth}px`,
+    '--_ripple-focus-ring-outer-color': `var(--${focusRing.outerStrokeColorRole})`,
+    '--_ripple-focus-ring-inner-color': `var(--${focusRing.innerStrokeColorRole.replace(
+      /[A-Z]/g,
+      (letter) => `-${letter.toLowerCase()}`,
+    )})`,
+    '--_ripple-focus-ring-in-duration': `${focusRing.focusIn.durationMs}ms`,
+    '--_ripple-focus-ring-in-easing': focusRing.focusIn.easing,
+    '--_ripple-focus-ring-out-duration': `${focusRing.focusOut.durationMs}ms`,
+    '--_ripple-focus-ring-out-easing': focusRing.focusOut.easing,
+    ...(focusRingRadius === undefined
+      ? {}
+      : { '--_ripple-focus-ring-radius': cssLength(focusRingRadius) }),
     ...style,
   };
+
+  const focusRingStyle: CSSProperties | undefined =
+    focusRingInset === undefined ? undefined : { inset: focusRingInset };
 
   return (
     <span
@@ -54,8 +90,16 @@ export function Ripple({
       ref={controller.containerRef}
       aria-hidden="true"
       className={className ? `m3-ripple ${className}` : 'm3-ripple'}
-      data-focus-visible={resolvedStateInteraction === 'focus' || undefined}
+      data-focus-ring-radius={focusRingRadius === undefined ? undefined : true}
+      data-focus-visible={
+        rippleFocus === 'opacity' && resolvedStateInteraction === 'focus'
+          ? true
+          : undefined
+      }
       data-hovered={resolvedStateInteraction === 'hover' || undefined}
+      data-inset-focus-visible={
+        rippleFocus === 'inset-ring' && hasFocus ? true : undefined
+      }
       style={tokenStyle}
     >
       <span className="m3-ripple__state-layer" />
@@ -78,6 +122,9 @@ export function Ripple({
           />
         );
       })}
+      {rippleFocus === 'inset-ring' ? (
+        <span className="m3-ripple__focus-ring" style={focusRingStyle} />
+      ) : null}
     </span>
   );
 }

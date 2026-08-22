@@ -153,6 +153,8 @@ function ButtonImpl({
         <>
           <Ripple
             controller={ripple}
+            focusRingRadius="var(--_button-container-radius)"
+            isFocusVisible={renderProps.isFocusVisible}
             stateInteraction={latestButtonStateLayerInteraction(
               activeInteractions,
               renderProps.isFocusVisible,

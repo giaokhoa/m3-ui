@@ -18,6 +18,8 @@ const defaultFontStylesheet =
 export type ThemeStyle = CSSProperties &
   Record<`--${string}`, string | number | undefined>;
 
+export type RippleFocusIndication = 'opacity' | 'inset-ring';
+
 export interface ThemeProviderProps
   extends PropsWithChildren<
     Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'style'>
@@ -25,6 +27,12 @@ export interface ThemeProviderProps
   mode?: ThemeMode;
   sourceColor?: string;
   contrastLevel?: number;
+  /**
+   * Global Material ripple focus treatment. `opacity` matches the default
+   * AndroidX RippleThemeConfiguration; `inset-ring` maps to
+   * RippleDefaults.InsetFocusRingThemeConfiguration.
+   */
+  rippleFocus?: RippleFocusIndication;
   style?: ThemeStyle;
 }
 
@@ -32,6 +40,7 @@ export interface ThemeContextValue {
   mode: ThemeMode;
   sourceColor?: string;
   contrastLevel: number;
+  rippleFocus: RippleFocusIndication;
   scheme: ColorScheme;
 }
 
@@ -41,6 +50,7 @@ export function ThemeProvider({
   mode = 'light',
   sourceColor,
   contrastLevel = 0,
+  rippleFocus = 'opacity',
   children,
   style,
   ...props
@@ -64,8 +74,8 @@ export function ThemeProvider({
   );
 
   const value = useMemo(
-    () => ({ mode, sourceColor, contrastLevel, scheme }),
-    [mode, sourceColor, contrastLevel, scheme],
+    () => ({ mode, sourceColor, contrastLevel, rippleFocus, scheme }),
+    [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
 
   return (

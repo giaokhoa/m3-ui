@@ -13,18 +13,29 @@ describe('ripple tokens', () => {
   });
 
   it('matches current Compose Material3 ripple motion', () => {
-    expect(rippleTokens).toEqual({
-      radiusDurationMs: 225,
-      minimumPressDurationMs: 225,
-      hoverTransitionDurationMs: 15,
-      focusInTransitionDurationMs: 45,
-      fadeInDurationMs: 75,
-      fadeOutDurationMs: 150,
-      boundedExtraRadius: 10,
-      startRadiusLargestDimensionFactor: 0.3,
-      radiusEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-      centerEasing: 'linear',
-      opacityEasing: 'linear',
-    });
+    expect(rippleTokens.radiusDurationMs).toBe(225);
+    expect(rippleTokens.minimumPressDurationMs).toBe(225);
+    expect(rippleTokens.hoverTransitionDurationMs).toBe(15);
+    expect(rippleTokens.focusInTransitionDurationMs).toBe(45);
+    expect(rippleTokens.fadeInDurationMs).toBe(75);
+    expect(rippleTokens.fadeOutDurationMs).toBe(150);
+    expect(rippleTokens.boundedExtraRadius).toBe(10);
+    expect(rippleTokens.startRadiusLargestDimensionFactor).toBe(0.3);
+    expect(rippleTokens.radiusEasing).toBe('cubic-bezier(0.4, 0, 0.2, 1)');
+    expect(rippleTokens.centerEasing).toBe('linear');
+    expect(rippleTokens.opacityEasing).toBe('linear');
+  });
+
+  it('matches the pinned AndroidX inset focus ring theme defaults', () => {
+    expect(rippleTokens.focusRing.outerStrokeInset).toBe(0);
+    expect(rippleTokens.focusRing.outerStrokeWidth).toBe(2);
+    expect(rippleTokens.focusRing.innerStrokeInset).toBe(1);
+    expect(rippleTokens.focusRing.innerStrokeWidth).toBe(3);
+    expect(rippleTokens.focusRing.outerStrokeColorRole).toBe('secondary');
+    expect(rippleTokens.focusRing.innerStrokeColorRole).toBe('onSecondary');
+    expect(rippleTokens.focusRing.focusIn.durationMs).toBe(137);
+    expect(rippleTokens.focusRing.focusOut.durationMs).toBe(108);
+    expect(rippleTokens.focusRing.focusIn.easing).toContain('linear(');
+    expect(rippleTokens.focusRing.focusOut.easing).toContain('linear(');
   });
 });
