@@ -10,15 +10,13 @@ const valueFacades = [
   'checkbox.ts',
   'chip.ts',
   'elevation.ts',
-  'motion.ts',
   'radio-button.ts',
-  'ripple.ts',
-  'state.ts',
   'text-field.ts',
-  'typography.ts',
 ];
 
-test('value facades project Style Dictionary output instead of owning upstream snapshots', async () => {
+const removedCoreFacades = ['motion.ts', 'ripple.ts', 'state.ts', 'typography.ts'];
+
+test('remaining compatibility facades project Style Dictionary output', async () => {
   for (const file of valueFacades) {
     const source = await readFile(new URL(`src/${file}`, packageRoot), 'utf8');
     assert.match(source, /@m3\/tokens\/generated/, `${file} must consume generated tokens`);
@@ -26,7 +24,10 @@ test('value facades project Style Dictionary output instead of owning upstream s
   }
 });
 
-test('legacy upstream-to-runtime and dead root-facade paths stay deleted', async () => {
+test('retired compatibility and upstream-sync paths stay deleted', async () => {
+  for (const file of removedCoreFacades) {
+    await assert.rejects(access(new URL(`src/${file}`, packageRoot)));
+  }
   await assert.rejects(access(new URL('src/generated/androidx', packageRoot)));
   await assert.rejects(access(new URL('src/index.ts', packageRoot)));
   await assert.rejects(access(new URL('scripts/compose-sync', repoRoot)));
@@ -38,6 +39,11 @@ test('legacy upstream-to-runtime and dead root-facade paths stay deleted', async
       /compose:sync|scripts\/compose-sync/,
       `root script ${name} must not resurrect the legacy sync pipeline`,
     );
+  }
+
+  const manifest = JSON.parse(await readFile(new URL('package.json', packageRoot), 'utf8'));
+  for (const subpath of ['./motion', './ripple', './state', './typography']) {
+    assert.equal(Object.hasOwn(manifest.exports, subpath), false, `${subpath} must stay retired`);
   }
 });
 

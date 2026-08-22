@@ -22,17 +22,13 @@
     "./checkbox": { "types": "./dist/checkbox.d.ts", "import": "./dist/checkbox.js" },
     "./chip": { "types": "./dist/chip.d.ts", "import": "./dist/chip.js" },
     "./elevation": { "types": "./dist/elevation.d.ts", "import": "./dist/elevation.js" },
-    "./motion": { "types": "./dist/motion.d.ts", "import": "./dist/motion.js" },
     "./radio-button": { "types": "./dist/radio-button.d.ts", "import": "./dist/radio-button.js" },
-    "./ripple": { "types": "./dist/ripple.d.ts", "import": "./dist/ripple.js" },
-    "./state": { "types": "./dist/state.d.ts", "import": "./dist/state.js" },
-    "./text-field": { "types": "./dist/text-field.d.ts", "import": "./dist/text-field.js" },
-    "./typography": { "types": "./dist/typography.d.ts", "import": "./dist/typography.js" }
+    "./text-field": { "types": "./dist/text-field.d.ts", "import": "./dist/text-field.js" }
   },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
-    "build": "pnpm tokens:build && tsc -p tsconfig.build.json",
-    "test": "node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
+    "build": "rm -rf dist && pnpm tokens:build && tsc -p tsconfig.build.json",
+    "test": "rm -rf dist && node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",

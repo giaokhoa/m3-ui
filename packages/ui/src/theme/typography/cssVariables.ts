@@ -1,4 +1,4 @@
-import { materialTypefaceTokens } from '@m3/tokens/typography';
+import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3/tokens';
 import type { CSSProperties } from 'react';
 
 type TypographyThemeStyle = CSSProperties &
@@ -9,13 +9,7 @@ function toFontFamily(fontFamily: string, fallback: string): string {
 }
 
 export const defaultTypographyThemeStyle = {
-  '--font-family-plain': toFontFamily(
-    materialTypefaceTokens.plain,
-    materialTypefaceTokens.fallback,
-  ),
-  '--font-family-brand': toFontFamily(
-    materialTypefaceTokens.brand,
-    materialTypefaceTokens.fallback,
-  ),
+  '--font-family-plain': toFontFamily(TypefacePlain, TypefaceFallback),
+  '--font-family-brand': toFontFamily(TypefaceBrand, TypefaceFallback),
   fontFamily: 'var(--font-family-plain)',
 } as const satisfies TypographyThemeStyle;

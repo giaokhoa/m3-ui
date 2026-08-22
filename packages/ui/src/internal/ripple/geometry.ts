@@ -1,4 +1,8 @@
-import { rippleTokens } from '@m3/tokens/ripple';
+import {
+  RippleBoundedExtraRadius,
+  RippleStartRadiusLargestDimensionFactor,
+} from '@m3/tokens';
+import { pxNumber } from '../tokenValues';
 import type { RippleOrigin, RipplePressEvent } from './types';
 
 export interface RippleBounds {
@@ -19,6 +23,8 @@ export interface RippleGeometryOptions {
   readonly radius?: number;
 }
 
+const boundedExtraRadius = pxNumber(RippleBoundedExtraRadius);
+
 export function getRippleWaveGeometry(
   event: RipplePressEvent,
   bounds: RippleBounds,
@@ -35,12 +41,9 @@ export function getRippleWaveGeometry(
   const x = shouldCenter ? targetX : event.x;
   const y = shouldCenter ? targetY : event.y;
   const endRadius =
-    radius ??
-    Math.hypot(bounds.width, bounds.height) / 2 +
-      rippleTokens.boundedExtraRadius;
+    radius ?? Math.hypot(bounds.width, bounds.height) / 2 + boundedExtraRadius;
   const startRadius =
-    Math.max(bounds.width, bounds.height) *
-    rippleTokens.startRadiusLargestDimensionFactor;
+    Math.max(bounds.width, bounds.height) * RippleStartRadiusLargestDimensionFactor;
 
   return {
     x,
