@@ -32,7 +32,7 @@
 .m3-ripple__focus-ring {
   position: absolute;
   inset: 0;
-  border-radius: var(--_ripple-focus-ring-radius);
+  border-radius: inherit;
   pointer-events: none;
 }
 
