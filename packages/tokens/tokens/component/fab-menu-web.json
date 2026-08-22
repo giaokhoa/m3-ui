@@ -1,0 +1,64 @@
+{
+  "component": {
+    "fabMenu": {
+      "listItem": {
+        "webContainerElevation": { "$type": "string", "$value": "level0" },
+        "labelTypography": { "$type": "string", "$value": "titleMedium" },
+        "role": {
+          "primaryContainer": {
+            "containerColor": { "$type": "string", "$value": "{color.role.primaryContainer}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onPrimaryContainer}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          },
+          "secondaryContainer": {
+            "containerColor": { "$type": "string", "$value": "{color.role.secondaryContainer}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          },
+          "tertiaryContainer": {
+            "containerColor": { "$type": "string", "$value": "{color.role.tertiaryContainer}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onTertiaryContainer}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          }
+        }
+      },
+      "closeButton": {
+        "role": {
+          "primary": {
+            "containerColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onPrimary}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          },
+          "secondary": {
+            "containerColor": { "$type": "string", "$value": "{color.role.secondary}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onSecondary}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          },
+          "tertiary": {
+            "containerColor": { "$type": "string", "$value": "{color.role.tertiary}" },
+            "contentColor": { "$type": "string", "$value": "{color.role.onTertiary}" },
+            "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+            "focusedElevation": { "$type": "string", "$value": "level3" },
+            "hoveredElevation": { "$type": "string", "$value": "level4" },
+            "pressedElevation": { "$type": "string", "$value": "level3" }
+          }
+        }
+      }
+    }
+  }
+}
