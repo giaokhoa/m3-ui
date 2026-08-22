@@ -153,6 +153,7 @@ function ButtonImpl({
         <>
           <Ripple
             controller={ripple}
+            isFocusVisible={renderProps.isFocusVisible}
             stateInteraction={latestButtonStateLayerInteraction(
               activeInteractions,
               renderProps.isFocusVisible,
