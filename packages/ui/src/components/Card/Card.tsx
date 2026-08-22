@@ -186,7 +186,7 @@ function CardImpl({
         x: 0,
         y: 0,
       });
-      if (event.key === 'Enter') onPress();
+      if (event.key === 'Enter') onPress?.();
     }
     onKeyDown?.(event);
   };
@@ -219,7 +219,7 @@ function CardImpl({
       keyboardPressRef.current = null;
       ripple.onPressEnd();
     }
-  }, [disabled, ripple]);
+  }, [disabled, ripple.onPressEnd]);
 
   const elevationLevel = getCardElevationLevel(variant, disabled, interaction);
   const elevationMotion = getCardElevationMotion(
@@ -239,7 +239,7 @@ function CardImpl({
       aria-disabled={disabled || undefined}
       className={resolvedClassName}
       data-disabled={disabled || undefined}
-      data-focused={interaction === 'focus' || undefined}
+      data-focused={activeInteractions.includes('focus') || undefined}
       data-hovered={activeInteractions.includes('hover') || undefined}
       data-interactive={interactive || undefined}
       data-pressed={activeInteractions.includes('press') || undefined}
@@ -259,7 +259,7 @@ function CardImpl({
             });
             ripple.onPressEnd();
           }
-          onPress();
+          onPress?.();
         }
       }}
       onFocus={handleFocus}
@@ -272,9 +272,7 @@ function CardImpl({
       onPointerUp={handlePointerUp}
       role={role}
       style={{ ...tokenStyle, ...style }}
-      tabIndex={
-        tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)
-      }
+      tabIndex={tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)}
     >
       <Elevation
         className="m3-card__elevation"
