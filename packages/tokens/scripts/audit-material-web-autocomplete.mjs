@@ -42,6 +42,12 @@ function sourceValue(raw) {
   if (match) return { kind: 'value', value: camel(match[1]) };
   match = raw.match(/^md-sys-state\.\$(focus|hover|pressed)-state-layer-opacity$/);
   if (match) return { kind: 'canonical', path: `state.layer.opacity.${match[1]}` };
+  match = raw.match(/^md-sys-typescale\.\$([a-z0-9-]+)-(line-height|size)$/);
+  if (match) {
+    const style = camel(match[1]);
+    const field = match[2] === 'line-height' ? 'lineHeight' : 'fontSize';
+    return { kind: 'canonical', path: `typography.${style}.${field}` };
+  }
   return { kind: 'unsupported', value: raw };
 }
 function parseSass(text) {
