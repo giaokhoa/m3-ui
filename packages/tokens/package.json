@@ -63,7 +63,7 @@
     }
   },
   "scripts": {
-    "tokens:build": "style-dictionary build --config style-dictionary.config.json",
+    "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
     "build": "pnpm tokens:build && tsc -p tsconfig.build.json",
     "test": "node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
