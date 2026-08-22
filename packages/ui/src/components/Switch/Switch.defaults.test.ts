@@ -1,28 +1,34 @@
-import { switchTokens } from '@m3/tokens/switch';
+import * as token from '@m3/tokens/generated';
 import { describe, expect, it } from 'vitest';
-import { switchBaseStyle } from './Switch.defaults';
+import {
+  switchBaseStyle,
+  switchStateLayerRadius,
+  switchTrackFocusRingRadius,
+} from './Switch.defaults';
 
 const style = switchBaseStyle as Record<string, string | number>;
 
 describe('Switch defaults', () => {
-  it('matches pinned Compose geometry', () => {
-    expect(switchTokens.trackWidth).toBe(52);
-    expect(switchTokens.trackHeight).toBe(32);
-    expect(switchTokens.trackOutlineWidth).toBe(2);
-    expect(switchTokens.minimumInteractiveSize).toBe(48);
-    expect(switchTokens.stateLayerSize).toBe(40);
-    expect(switchTokens.uncheckedThumbSize).toBe(16);
-    expect(switchTokens.checkedThumbSize).toBe(24);
-    expect(switchTokens.pressedThumbSize).toBe(28);
-    expect(switchTokens.iconSize).toBe(16);
+  it('consumes generated canonical geometry', () => {
+    expect(token.ComponentSwitchTrackWidth).toBe('52px');
+    expect(token.ComponentSwitchTrackHeight).toBe('32px');
+    expect(token.ComponentSwitchTrackOutlineWidth).toBe('2px');
+    expect(token.ComponentSwitchMinimumInteractiveSize).toBe('48px');
+    expect(token.ComponentSwitchStateLayerSize).toBe('40px');
+    expect(token.ComponentSwitchHandleUnselectedSize).toBe('16px');
+    expect(token.ComponentSwitchHandleSelectedSize).toBe('24px');
+    expect(token.ComponentSwitchHandlePressedSize).toBe('28px');
+    expect(token.ComponentSwitchHandleIconSize).toBe('16px');
     expect(style['--_switch-unchecked-thumb-offset']).toBe('8px');
     expect(style['--_switch-content-thumb-offset']).toBe('4px');
     expect(style['--_switch-checked-thumb-offset']).toBe('24px');
     expect(style['--_switch-pressed-unchecked-thumb-offset']).toBe('2px');
     expect(style['--_switch-pressed-checked-thumb-offset']).toBe('22px');
+    expect(switchStateLayerRadius).toBe(20);
+    expect(switchTrackFocusRingRadius).toBe('16px');
   });
 
-  it('maps enabled colors through ThemeProvider roles', () => {
+  it('passes enabled dynamic color variables through unchanged', () => {
     expect(style['--_switch-checked-thumb-color']).toBe('var(--on-primary)');
     expect(style['--_switch-checked-track-color']).toBe('var(--primary)');
     expect(style['--_switch-checked-border-color']).toBe('transparent');
@@ -34,7 +40,7 @@ describe('Switch defaults', () => {
     expect(style['--_switch-unchecked-border-color']).toBe('var(--outline)');
   });
 
-  it('composites disabled colors over Surface like SwitchDefaults.colors', () => {
+  it('composites generated disabled colors over Surface', () => {
     expect(style['--_switch-disabled-checked-thumb-color']).toBe('var(--surface)');
     expect(style['--_switch-disabled-checked-track-color']).toBe(
       'color-mix(in srgb, var(--on-surface) 12%, var(--surface))',
@@ -50,7 +56,7 @@ describe('Switch defaults', () => {
     );
   });
 
-  it('uses FastSpatial only for non-pressed thumb geometry', () => {
+  it('uses canonical FastSpatial web adaptation values', () => {
     expect(style['--_switch-geometry-duration']).toBe('137ms');
     expect(String(style['--_switch-geometry-easing'])).toContain('linear(');
   });
