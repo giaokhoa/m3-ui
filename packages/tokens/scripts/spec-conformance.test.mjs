@@ -30,7 +30,7 @@ test('generated corpus covers the expressive component families named by the hom
   const token = await generated();
   assert.ok(Object.hasOwn(token, 'ComponentToolbarDockedContainerHeight'));
   assert.ok(Object.hasOwn(token, 'ComponentSplitButtonSizeSmallContainerHeight'));
-  assert.ok(Object.hasOwn(token, 'ComponentProgressIndicatorActiveIndicatorColor'));
+  assert.ok(Object.hasOwn(token, 'ComponentProgressIndicatorBaseActiveIndicatorColor'));
   assert.ok(Object.hasOwn(token, 'ComponentButtonGroupSmallContainerHeight'));
 });
 
