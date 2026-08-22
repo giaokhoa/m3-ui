@@ -3,15 +3,15 @@ export function compareTokenGraph(canonicalValues, referenceValues, mappings) {
   for (const mapping of mappings) {
     const canonicalExists = canonicalValues.has(mapping.canonical);
     const referenceExists = referenceValues.has(mapping.reference);
-    const canonical = canonicalValues.get(mapping.canonical);
-    const reference = referenceValues.get(mapping.reference);
+    const canonicalValue = canonicalValues.get(mapping.canonical);
+    const referenceValue = referenceValues.get(mapping.reference);
 
     let status = 'match';
     if (!canonicalExists) status = 'missing-canonical';
     else if (!referenceExists) status = 'missing-reference';
-    else if (!Object.is(canonical, reference)) status = 'mismatch';
+    else if (!Object.is(canonicalValue, referenceValue)) status = 'mismatch';
 
-    results.push({ ...mapping, status, canonical, reference });
+    results.push({ ...mapping, status, canonicalValue, referenceValue });
   }
   return results;
 }
