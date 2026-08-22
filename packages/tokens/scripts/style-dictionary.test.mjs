@@ -7,11 +7,16 @@ test('Style Dictionary emits runtime color strings and standard dimensions', asy
   const generated = await import(`${url.href}?test=${Date.now()}`);
 
   assert.equal(generated.ComponentButtonVariantFilledContainerColor, 'var(--primary)');
+  assert.equal(generated.ComponentButtonVariantElevatedContainerColor, 'var(--surface-container-low)');
+  assert.equal(generated.ComponentButtonVariantOutlinedOutlineColor, 'var(--outline-variant)');
   assert.equal(generated.ComponentSwitchColorsCheckedTrack, 'var(--primary)');
   assert.equal(generated.ComponentButtonBaselineMinHeight, '40px');
+  assert.equal(generated.ComponentButtonSizeMediumPaddingBlock, '16px');
+  assert.equal(generated.ShapeMedium, '12px');
+  assert.equal(generated.ComponentButtonVariantElevatedHoveredElevation, 'level2');
 });
 
-test('Style Dictionary emits TypeScript declarations', async () => {
+test('Style Dictionary emits TypeScript declarations with literal string values', async () => {
   const declarations = await readFile(
     new URL('../dist/generated/tokens.d.ts', import.meta.url),
     'utf8',
@@ -19,4 +24,6 @@ test('Style Dictionary emits TypeScript declarations', async () => {
 
   assert.match(declarations, /ComponentButtonVariantFilledContainerColor/);
   assert.match(declarations, /var\(--primary\)/);
+  assert.match(declarations, /ComponentButtonSizeMediumPaddingBlock/);
+  assert.match(declarations, /ShapeMedium/);
 });
