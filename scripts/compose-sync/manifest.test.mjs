@@ -1,46 +1,89 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { androidX, tokenSources } from './manifest.mjs';
+import {
+  androidX,
+  isAndroidXTokenEntry,
+  tokenSourceFromDirectoryEntry,
+  tokenSourcesFromDirectory,
+} from './manifest.mjs';
 
-test('pins one AndroidX revision and generates every tracked token source', () => {
+const entry = (name, sha, overrides = {}) => ({
+  name,
+  path: `${androidX.tokenRoot}/${name}`,
+  sha,
+  type: 'file',
+  ...overrides,
+});
+
+test('pins exactly one immutable AndroidX revision and token directory', () => {
+  assert.equal(androidX.repository, 'androidx/androidx');
   assert.match(androidX.revision, /^[0-9a-f]{40}$/);
-  assert.equal(tokenSources.length, 36);
-
-  for (const source of tokenSources) {
-    assert.match(source.file, /Tokens\.kt$/);
-    assert.ok(source.path.startsWith(`${androidX.tokenRoot}/`));
-    assert.match(source.blobSha, /^[0-9a-f]{40}$/);
-    assert.match(source.exportName, /^[a-z]\w*TokensGenerated$/);
-    assert.match(
-      source.output,
-      /^packages\/tokens\/src\/generated\/androidx\/[a-z0-9-]+\.ts$/,
-    );
-  }
+  assert.match(androidX.tokenRoot, /material3\/tokens$/);
 });
 
-test('manifest source, output and export identities are unique', () => {
-  for (const key of ['file', 'path', 'blobSha', 'exportName', 'output']) {
-    const values = tokenSources.map((source) => source[key]);
-    assert.equal(new Set(values).size, values.length, `${key} must be unique`);
-  }
+test('discovers every direct *Tokens.kt file and ignores unrelated entries', () => {
+  const sources = tokenSourcesFromDirectory([
+    entry('FilledButtonTokens.kt', 'a'.repeat(40)),
+    entry('FabPrimaryTokens.kt', 'b'.repeat(40)),
+    entry('README.md', 'c'.repeat(40)),
+    entry('NestedTokens.kt', 'd'.repeat(40), { type: 'dir' }),
+    entry('ElsewhereTokens.kt', 'e'.repeat(40), {
+      path: 'somewhere/else/ElsewhereTokens.kt',
+    }),
+  ]);
+
+  assert.deepEqual(
+    sources.map((source) => source.file),
+    ['FabPrimaryTokens.kt', 'FilledButtonTokens.kt'],
+  );
 });
 
-test('foundation token sets are synced in the same batch as components', () => {
-  const files = new Set(tokenSources.map((source) => source.file));
-  for (const required of [
-    'ElevationTokens.kt',
-    'ShapeKeyTokens.kt',
-    'ShapeTokens.kt',
-    'TypeScaleTokens.kt',
-    'TypefaceTokens.kt',
-    'TypographyKeyTokens.kt',
-    'TypographyTokens.kt',
-    'StateTokens.kt',
-    'StandardMotionTokens.kt',
-    'ExpressiveMotionTokens.kt',
-    'MotionSchemeKeyTokens.kt',
-    'MotionTokens.kt',
-  ]) {
-    assert.ok(files.has(required), `${required} must be part of the sync batch`);
-  }
+test('derives output and export identity mechanically from AndroidX filename', () => {
+  assert.deepEqual(
+    tokenSourceFromDirectoryEntry(
+      entry('ButtonXLargeTokens.kt', '1'.repeat(40)),
+    ),
+    {
+      file: 'ButtonXLargeTokens.kt',
+      path: `${androidX.tokenRoot}/ButtonXLargeTokens.kt`,
+      blobSha: '1'.repeat(40),
+      exportName: 'buttonXLargeTokensGenerated',
+      output:
+        'packages/tokens/src/generated/androidx/button-x-large.ts',
+    },
+  );
+});
+
+test('directory discovery sorts deterministically and validates uniqueness', () => {
+  const sources = tokenSourcesFromDirectory([
+    entry('SwitchTokens.kt', '2'.repeat(40)),
+    entry('CheckboxTokens.kt', '3'.repeat(40)),
+  ]);
+  assert.deepEqual(
+    sources.map((source) => source.file),
+    ['CheckboxTokens.kt', 'SwitchTokens.kt'],
+  );
+
+  assert.throws(
+    () =>
+      tokenSourcesFromDirectory([
+        entry('SwitchTokens.kt', '2'.repeat(40)),
+        entry('SwitchTokens.kt', '2'.repeat(40)),
+      ]),
+    /not unique/,
+  );
+});
+
+test('rejects invalid directory records and invalid blob SHAs', () => {
+  assert.equal(isAndroidXTokenEntry(null), false);
+  assert.equal(isAndroidXTokenEntry(entry('Button.kt', 'a'.repeat(40))), false);
+  assert.throws(
+    () => tokenSourceFromDirectoryEntry(entry('SwitchTokens.kt', 'bad')),
+    /Invalid Git blob SHA/,
+  );
+  assert.throws(() => tokenSourcesFromDirectory([]), /No \*Tokens\.kt files/);
+  assert.throws(
+    () => tokenSourcesFromDirectory({}),
+    /response must be an array/,
+  );
 });
