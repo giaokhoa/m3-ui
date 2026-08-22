@@ -67,6 +67,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-app-bar:complete
       - name: Require complete Material Web Progress Indicator overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-progress-indicator:complete
+      - name: Require complete Material Web Split Button overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-split-button:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
