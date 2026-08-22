@@ -44,7 +44,7 @@ When `ThemeProvider rippleFocus="inset-ring"` is enabled, Compose disables focus
 ## Web translations and remaining gaps
 
 - React Aria `Switch` provides role=`switch`, keyboard interaction, controlled/uncontrolled state, form naming and native hidden-input behavior.
-- Visible `children` are a web convenience label; Compose `Switch` itself does not render adjacent text.
+- Visible `children` are a web convenience label; Compose `Switch` itself does not render adjacent text. The 8px control-to-label gap is therefore an intentional **library-owned web token** (`component.switch.labelGap`), not an AndroidX parity mapping.
 - `thumbContent` is rendered inside the visual control and inherits the Material icon color. The visual control is aria-hidden because the native switch is the semantic source of truth.
 - RAC `isReadOnly` is the closest web state to Compose `onCheckedChange = null`, but it is intentionally not a literal port. Compose removes its toggleable modifier and minimum-interactive enforcement when the callback is null; the web component retains native switch semantics and the normal 52 × 48px interaction layout.
 - `LocalMinimumInteractiveComponentSize` has no public ThemeProvider equivalent yet.
@@ -53,4 +53,4 @@ When `ThemeProvider rippleFocus="inset-ring"` is enabled, Compose disables focus
 
 ## Verification
 
-Unit coverage locks geometry, theme-role mappings, surface compositing and FastSpatial timing. Storybook/Chromium coverage verifies native switch toggling, thumb geometry/offsets, press snap/release motion, disabled composites, RTL positioning, thumb content sizing, ambient state-layer behavior and opacity-vs-inset focus placement. The corresponding AndroidX screenshot matrix covers checked/unchecked, RTL, pressed, disabled, hover, opacity focus, inset focus, transition frames and checked/unchecked thumb icons.
+Unit coverage locks geometry, theme-role mappings, surface compositing, the library-owned web label gap, and FastSpatial timing. Storybook/Chromium coverage verifies native switch toggling, thumb geometry/offsets, press snap/release motion, disabled composites, RTL positioning, thumb content sizing, ambient state-layer behavior and opacity-vs-inset focus placement. The corresponding AndroidX screenshot matrix covers checked/unchecked, RTL, pressed, disabled, hover, opacity focus, inset focus, transition frames and checked/unchecked thumb icons.
