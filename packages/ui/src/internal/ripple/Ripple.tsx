@@ -23,7 +23,7 @@ export function Ripple({
   stateInteraction,
   isHovered = false,
   isFocusVisible = false,
-  focusRingRadius = 'inherit',
+  focusRingRadius,
   className,
   style,
   ...props
@@ -52,7 +52,6 @@ export function Ripple({
     '--_ripple-hover-opacity': stateLayerOpacity.hover,
     '--_ripple-focus-opacity': stateLayerOpacity.focus,
     '--_ripple-pressed-opacity': stateLayerOpacity.pressed,
-    '--_ripple-focus-ring-radius': focusRingRadius,
     '--_ripple-focus-ring-outer-inset': `${focusRing.outerStrokeInset}px`,
     '--_ripple-focus-ring-outer-width': `${focusRing.outerStrokeWidth}px`,
     '--_ripple-focus-ring-inner-inset': `${focusRing.innerStrokeInset}px`,
@@ -68,6 +67,10 @@ export function Ripple({
     '--_ripple-focus-ring-out-easing': focusRing.focusOut.easing,
     ...style,
   };
+
+  if (focusRingRadius !== undefined) {
+    tokenStyle['--_ripple-focus-ring-radius'] = focusRingRadius;
+  }
 
   return (
     <span
