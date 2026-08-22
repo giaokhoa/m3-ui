@@ -110,6 +110,7 @@ function resolveSelectableColors(
   tokens: SelectableChipVariantTokens,
   isDisabled: boolean,
   isSelected: boolean,
+  isExpressive: boolean,
 ) {
   if (isDisabled) {
     return {
@@ -142,7 +143,11 @@ function resolveSelectableColors(
       isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor,
     ),
     leading: roleVariable(
-      isSelected ? tokens.selectedLeadingIconColor : tokens.unselectedLeadingIconColor,
+      isSelected
+        ? tokens.selectedLeadingIconColor
+        : isExpressive
+          ? tokens.expressiveUnselectedLeadingIconColor
+          : tokens.unselectedLeadingIconColor,
     ),
     trailing: roleVariable(
       isSelected ? tokens.selectedTrailingIconColor : tokens.unselectedTrailingIconColor,
@@ -254,7 +259,12 @@ export function getChipStyle(
   const tokens = action ?? selectable!;
   const colors = action
     ? resolveActionColors(action, state.isDisabled)
-    : resolveSelectableColors(selectable!, state.isDisabled, state.isSelected ?? false);
+    : resolveSelectableColors(
+        selectable!,
+        state.isDisabled,
+        state.isSelected ?? false,
+        options.shapes !== undefined,
+      );
   const spacing = resolveSpacing(
     variant,
     options,
@@ -275,6 +285,9 @@ export function getChipStyle(
     '--_chip-trailing-icon-size': `${selectable?.trailingIconSize ?? action!.iconSize}px`,
     '--_chip-avatar-size': `${selectable?.avatarSize ?? 0}px`,
     '--_chip-avatar-radius': `${selectable?.avatarRadius ?? 0}px`,
+    '--_chip-avatar-opacity': state.isDisabled
+      ? (selectable?.disabledAvatarOpacity ?? 1)
+      : 1,
     '--_chip-container-color': colors.container,
     '--_chip-label-color': colors.label,
     '--_chip-leading-icon-color': colors.leading,
