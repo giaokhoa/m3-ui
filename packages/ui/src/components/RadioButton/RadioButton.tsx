@@ -23,6 +23,11 @@ export interface RadioGroupProps extends Omit<AriaRadioGroupProps, 'children'> {
   errorMessage?: FieldErrorProps['children'];
 }
 
+const radioIndicationSize =
+  radioButtonTokens.iconSize + radioButtonTokens.padding * 2;
+const radioFocusRingInset =
+  (radioButtonTokens.minimumInteractiveSize - radioIndicationSize) / 2;
+
 function joinClassNames(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
 }
@@ -81,6 +86,7 @@ export function RadioButton({
               <span className="m3-radio-button__state-layer">
                 <Ripple
                   controller={ripple}
+                  focusRingInset={radioFocusRingInset}
                   focusRingRadius="50%"
                   isFocusVisible={renderProps.isFocusVisible}
                   isHovered={renderProps.isHovered}
