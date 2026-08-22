@@ -41,6 +41,8 @@
     "audit:material-web-fab-remaining:complete": "node scripts/audit-material-web-fab-remaining.mjs --require-complete",
     "audit:material-web-app-bar": "node scripts/audit-material-web-app-bar.mjs",
     "audit:material-web-app-bar:complete": "node scripts/audit-material-web-app-bar.mjs --require-complete",
+    "audit:material-web-progress-indicator": "node scripts/audit-material-web-progress-indicator.mjs",
+    "audit:material-web-progress-indicator:complete": "node scripts/audit-material-web-progress-indicator.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
