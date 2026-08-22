@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "vite build && node scripts/build-styles.mjs && tsc -p tsconfig.build.json",
-    "test": "node --test scripts/*.test.mjs && vitest run",
+    "test": "node --test scripts/*.node-tests.mjs && vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
   },
