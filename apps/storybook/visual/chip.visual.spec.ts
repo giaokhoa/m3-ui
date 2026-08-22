@@ -1,0 +1,273 @@
+import { expect, test, type Locator, type Page } from '@playwright/test';
+
+async function openStory(page: Page, id: string) {
+  await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+  await expect(page.locator('#storybook-root')).toBeVisible();
+}
+
+async function resolvedColor(root: Locator, value: string): Promise<string> {
+  return root.evaluate((element, colorValue) => {
+    const probe = document.createElement('span');
+    probe.style.color = colorValue;
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    element.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  }, value);
+}
+
+function selectableChip(page: Page, name: string) {
+  // RAC Checkbox exposes the native input as the role-bearing element, while
+  // Material visuals are sibling content in the generated label root.
+  const control = page.getByRole('checkbox', { name, exact: true });
+  const root = page.locator('.m3-chip').filter({ has: control });
+  return { control, root };
+}
+
+test.describe('Material 3 Chip parity', () => {
+  test('uses Button semantics for action chips and Checkbox semantics for selectable chips', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-chip--action-variants');
+    await expect(page.getByRole('button', { name: 'Assist', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Elevated assist', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
+
+    await openStory(page, 'components-chip--selectable-states');
+    await expect(page.getByRole('checkbox', { name: 'Filter', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('checkbox', { name: 'Elevated filter', exact: true }),
+    ).toBeChecked();
+    await expect(page.getByRole('checkbox', { name: 'Input', exact: true })).toBeChecked();
+  });
+
+  test('keeps 32px layout bounds while expanding pointer hit bounds to 48px', async ({ page }) => {
+    await openStory(page, 'components-chip--action-variants');
+    const chip = page.getByRole('button', { name: 'Assist', exact: true });
+    const visual = chip.locator('.m3-chip__visual');
+    const geometry = await chip.evaluate((root) => {
+      const visualElement = root.querySelector<HTMLElement>('.m3-chip__visual')!;
+      const rootBox = root.getBoundingClientRect();
+      const visualBox = visualElement.getBoundingClientRect();
+      const hitStyle = getComputedStyle(root, '::before');
+      const testPoint = {
+        x: rootBox.left + rootBox.width / 2,
+        y: rootBox.top - 6,
+      };
+      return {
+        rootHeight: rootBox.height,
+        visualHeight: visualBox.height,
+        hitHeight: Number.parseFloat(hitStyle.height),
+        hitWidth: Number.parseFloat(hitStyle.width),
+        hitAboveVisual: document.elementFromPoint(testPoint.x, testPoint.y) === root,
+      };
+    });
+
+    expect(geometry.rootHeight).toBe(32);
+    expect(geometry.visualHeight).toBe(32);
+    expect(geometry.hitHeight).toBe(48);
+    expect(geometry.hitWidth).toBeGreaterThanOrEqual(48);
+    expect(geometry.hitAboveVisual).toBe(true);
+    await expect(visual).toHaveCSS('border-radius', '8px');
+  });
+
+  test('ports action chip flat/elevated containers, outlines and hover elevations', async ({ page }) => {
+    await openStory(page, 'components-chip--action-variants');
+    const chips = page.locator('.m3-chip');
+    const flat = chips.nth(0);
+    const elevated = chips.nth(1);
+
+    await expect(flat.locator('.m3-chip__surface')).toHaveCSS(
+      'background-color',
+      'rgba(0, 0, 0, 0)',
+    );
+    expect(
+      await flat.locator('.m3-chip__visual').evaluate((element) =>
+        getComputedStyle(element).getPropertyValue('--_chip-outline-width').trim(),
+      ),
+    ).toBe('1px');
+    await expect(flat.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+
+    const elevatedColor = await resolvedColor(elevated, 'var(--surface-container-low)');
+    await expect(elevated.locator('.m3-chip__surface')).toHaveCSS(
+      'background-color',
+      elevatedColor,
+    );
+    await expect(elevated.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level1');
+
+    await flat.hover();
+    await expect(flat.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+
+    await elevated.hover();
+    await expect(elevated.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level2');
+    await expect(elevated.locator('.m3-elevation')).toHaveCSS('transition-duration', '0.12s');
+  });
+
+  test('FilterChip toggles as a checkbox and resolves selected visual state', async ({ page }) => {
+    await openStory(page, 'components-chip--selectable-states');
+    const { control: filter, root } = selectableChip(page, 'Filter');
+    const visual = root.locator('.m3-chip__visual');
+
+    await expect(filter).not.toBeChecked();
+    expect(
+      await visual.evaluate((element) =>
+        getComputedStyle(element).getPropertyValue('--_chip-outline-width').trim(),
+      ),
+    ).toBe('1px');
+
+    await root.click();
+    await expect(filter).toBeChecked();
+    const selectedContainer = await resolvedColor(root, 'var(--secondary-container)');
+    const selectedLabel = await resolvedColor(root, 'var(--on-secondary-container)');
+    await expect(root.locator('.m3-chip__surface')).toHaveCSS(
+      'background-color',
+      selectedContainer,
+    );
+    await expect(root.locator('.m3-chip__label')).toHaveCSS('color', selectedLabel);
+    expect(
+      await visual.evaluate((element) =>
+        getComputedStyle(element).getPropertyValue('--_chip-outline-width').trim(),
+      ),
+    ).toBe('0px');
+
+    await filter.focus();
+    await page.keyboard.press('Space');
+    await expect(filter).not.toBeChecked();
+  });
+
+  test('flat FilterChip uses the runtime Level1 hover elevation', async ({ page }) => {
+    await openStory(page, 'components-chip--selectable-states');
+    const { root } = selectableChip(page, 'Filter');
+    await root.hover();
+    await expect(root.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level1');
+  });
+
+  test('InputChip gives avatar precedence and applies dynamic padding', async ({ page }) => {
+    await openStory(page, 'components-chip--selectable-states');
+    const { root } = selectableChip(page, 'Input');
+    await expect(root.locator('.m3-chip__avatar')).toHaveCount(1);
+    await expect(root.locator('.m3-chip__leading-icon')).toHaveCount(0);
+    await expect(root.locator('.m3-chip__avatar')).toHaveCSS('width', '24px');
+    await expect(root.locator('.m3-chip__avatar')).toHaveCSS('height', '24px');
+
+    const content = root.locator('.m3-chip__content');
+    await expect(content).toHaveCSS('padding-inline-start', '4px');
+    await expect(content).toHaveCSS('padding-inline-end', '8px');
+  });
+
+  test('disabled selectable chips use pinned container/content/avatar alpha', async ({ page }) => {
+    await openStory(page, 'components-chip--disabled-states');
+    const { control: filter, root: filterRoot } = selectableChip(page, 'Elevated filter');
+    await expect(filter).toBeDisabled();
+
+    const container = await resolvedColor(
+      filterRoot,
+      'color-mix(in srgb, var(--on-surface) 12%, transparent)',
+    );
+    const content = await resolvedColor(
+      filterRoot,
+      'color-mix(in srgb, var(--on-surface) 38%, transparent)',
+    );
+    await expect(filterRoot.locator('.m3-chip__surface')).toHaveCSS(
+      'background-color',
+      container,
+    );
+    await expect(filterRoot.locator('.m3-chip__label')).toHaveCSS('color', content);
+    await expect(filterRoot.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+
+    const { root: inputRoot } = selectableChip(page, 'Input');
+    await expect(inputRoot.locator('.m3-chip__avatar')).toHaveCSS('opacity', '0.38');
+  });
+
+  test('press ripple stays on the 32px visual surface', async ({ page }) => {
+    await openStory(page, 'components-chip--action-variants');
+    const chip = page.getByRole('button', { name: 'Assist', exact: true });
+    const visual = chip.locator('.m3-chip__visual');
+    const box = await visual.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await expect(chip).toHaveAttribute('data-pressed', 'true');
+    await expect(chip.locator('.m3-ripple__wave')).toHaveCount(1);
+    const rippleGeometry = await chip.locator('.m3-ripple').evaluate((element) => {
+      const ripple = element.getBoundingClientRect();
+      const surface = element.closest('.m3-chip__surface')!.getBoundingClientRect();
+      return { ripple: [ripple.width, ripple.height], surface: [surface.width, surface.height] };
+    });
+    expect(rippleGeometry.ripple).toEqual(rippleGeometry.surface);
+    expect(rippleGeometry.ripple[1]).toBe(32);
+    await page.mouse.up();
+  });
+
+  test('moves keyboard focus indication between opacity and inset-ring modes', async ({ page }) => {
+    await openStory(page, 'components-chip--focus-modes');
+    const chips = page.locator('.m3-chip');
+
+    await page.keyboard.press('Tab');
+    await expect(chips.nth(0)).toBeFocused();
+    const opacityRipple = chips.nth(0).locator('.m3-ripple');
+    await expect(opacityRipple).toHaveAttribute('data-focus-visible', 'true');
+    await expect(opacityRipple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0.1');
+
+    await page.keyboard.press('Tab');
+    await expect(chips.nth(1)).toBeFocused();
+    const insetRipple = chips.nth(1).locator('.m3-ripple');
+    await expect(insetRipple).toHaveAttribute('data-inset-focus-visible', 'true');
+    const ringGeometry = await insetRipple.locator('.m3-ripple__focus-ring').evaluate((element) => {
+      const ring = element.getBoundingClientRect();
+      const surface = element.closest('.m3-chip__surface')!.getBoundingClientRect();
+      return {
+        ring: [ring.width, ring.height],
+        surface: [surface.width, surface.height],
+        radius: getComputedStyle(element).borderRadius,
+      };
+    });
+    expect(ringGeometry.ring).toEqual(ringGeometry.surface);
+    expect(ringGeometry.ring[1]).toBe(32);
+    expect(ringGeometry.radius).toBe('8px');
+  });
+
+  test('expressive shapes use tonal color, compact gaps and 12px → full → 8px morph', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-chip--expressive-shapes');
+    const { control: filter, root } = selectableChip(page, 'Expressive filter');
+    const visual = root.locator('.m3-chip__visual');
+    const unselectedLeading = await resolvedColor(root, 'var(--on-surface-variant)');
+
+    await expect(visual).toHaveCSS('border-radius', '12px');
+    await expect(root.locator('.m3-chip__leading-icon')).toHaveCSS('color', unselectedLeading);
+    await expect(root.locator('.m3-chip__label')).toHaveCSS('margin-left', '4px');
+    await expect(root.locator('.m3-chip__trailing-icon')).toHaveCSS('margin-left', '4px');
+
+    await root.click();
+    await expect(filter).toBeChecked();
+    await expect(visual).toHaveCSS('border-radius', '9999px');
+
+    const box = await visual.boundingBox();
+    expect(box).not.toBeNull();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await expect(visual).toHaveCSS('border-radius', '8px');
+    await expect(visual).toHaveCSS('transition-duration', '0.137s');
+    await page.mouse.up();
+  });
+
+  test('theme matrix remains responsive', async ({ page }) => {
+    await openStory(page, 'components-chip--theme-matrix');
+    const themes = page.locator('.m3-storybook-theme-card');
+    await expect(themes).toHaveCount(4);
+    const overflow = await themes.evaluateAll((elements) =>
+      elements.some((element) => element.scrollWidth > element.clientWidth),
+    );
+    expect(overflow).toBe(false);
+  });
+});

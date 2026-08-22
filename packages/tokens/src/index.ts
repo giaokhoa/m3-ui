@@ -1,6 +1,7 @@
 export * from './button.js';
 export * from './card.js';
 export * from './checkbox.js';
+export * from './chip.js';
 export * from './elevation.js';
 export * from './motion.js';
 export * from './radio-button.js';

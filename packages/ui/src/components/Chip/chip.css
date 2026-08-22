@@ -1,0 +1,167 @@
+.m3-chip {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Compose reports the chip's visual/semantic layout at 32dp but expands the
+ * touch target independently to at least 48dp. A generated box gives the web
+ * control the same pointer hit area without changing normal-flow geometry.
+ */
+.m3-chip::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  inline-size: max(100%, var(--_chip-hit-size));
+  block-size: var(--_chip-hit-size);
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
+.m3-chip[data-disabled] {
+  cursor: default;
+}
+
+.m3-chip__visual {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  box-sizing: border-box;
+  block-size: var(--_chip-height);
+  min-block-size: var(--_chip-height);
+  align-items: stretch;
+  border-radius: var(--_chip-container-radius);
+  transition: var(--_chip-shape-transition);
+}
+
+.m3-chip__elevation {
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.m3-chip__surface {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  box-sizing: border-box;
+  block-size: 100%;
+  min-inline-size: 0;
+  align-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--_chip-container-color);
+  box-shadow: inset 0 0 0 var(--_chip-outline-width) var(--_chip-outline-color);
+  color: var(--_chip-label-color);
+  --ripple-color: var(--_chip-label-color);
+}
+
+.m3-chip__content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  block-size: 100%;
+  align-items: center;
+  padding-inline-start: var(--_chip-padding-inline-start);
+  padding-inline-end: var(--_chip-padding-inline-end);
+  font-family: var(--_chip-font-family);
+  font-size: var(--_chip-font-size);
+  font-weight: var(--_chip-font-weight);
+  line-height: var(--_chip-line-height);
+  letter-spacing: var(--_chip-letter-spacing);
+  white-space: nowrap;
+}
+
+.m3-chip__label {
+  display: inline-flex;
+  min-inline-size: 0;
+  align-items: center;
+  color: var(--_chip-label-color);
+}
+
+.m3-chip__leading-icon,
+.m3-chip__trailing-icon,
+.m3-chip__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.m3-chip__leading-icon {
+  inline-size: var(--_chip-leading-icon-size);
+  block-size: var(--_chip-leading-icon-size);
+  color: var(--_chip-leading-icon-color);
+}
+
+.m3-chip__trailing-icon {
+  inline-size: var(--_chip-trailing-icon-size);
+  block-size: var(--_chip-trailing-icon-size);
+  color: var(--_chip-trailing-icon-color);
+}
+
+.m3-chip__avatar {
+  inline-size: var(--_chip-avatar-size);
+  block-size: var(--_chip-avatar-size);
+  overflow: hidden;
+  border-radius: var(--_chip-avatar-radius);
+  opacity: var(--_chip-avatar-opacity);
+}
+
+.m3-chip__leading-icon + .m3-chip__label,
+.m3-chip__avatar + .m3-chip__label {
+  margin-inline-start: var(--_chip-leading-gap);
+}
+
+.m3-chip__label + .m3-chip__trailing-icon {
+  margin-inline-start: var(--_chip-trailing-gap);
+}
+
+.m3-chip__leading-icon > svg,
+.m3-chip__trailing-icon > svg,
+.m3-chip__avatar > img,
+.m3-chip__avatar > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-chip__visual,
+  .m3-chip__elevation {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .m3-chip__surface {
+    background: Canvas;
+    box-shadow: inset 0 0 0 max(1px, var(--_chip-outline-width)) CanvasText;
+    color: CanvasText;
+  }
+
+  .m3-chip[data-disabled] .m3-chip__surface {
+    box-shadow: inset 0 0 0 max(1px, var(--_chip-outline-width)) GrayText;
+    color: GrayText;
+  }
+
+  .m3-chip[data-focus-visible] .m3-chip__surface {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
