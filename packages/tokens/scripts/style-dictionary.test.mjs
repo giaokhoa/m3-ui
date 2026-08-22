@@ -62,10 +62,13 @@ test('Style Dictionary emits all baseline and emphasized Material 3 type styles'
   }
   assert.equal(token.TypographyDisplayLargeFontSize, '57px');
   assert.equal(token.TypographyDisplayLargeLetterSpacing, '-0.2px');
-  assert.equal(token.TypographyTitleMediumEmphasizedFontWeight, 700);
-  assert.equal(token.TypographyBodyLargeEmphasizedLetterSpacing, '0.15px');
+  assert.equal(token.TypographyDisplayLargeEmphasizedLetterSpacing, '-0.25px');
+  assert.equal(token.TypographyTitleMediumEmphasizedFontWeight, 600);
+  assert.equal(token.TypographyLabelLargeEmphasizedFontWeight, 600);
+  assert.equal(token.TypographyBodyLargeEmphasizedLetterSpacing, '0.5px');
   assert.equal(token.TypefaceWeightRegular, 400);
   assert.equal(token.TypefaceWeightMedium, 500);
+  assert.equal(token.TypefaceWeightSemiBold, 600);
   assert.equal(token.TypefaceWeightBold, 700);
 });
 
@@ -123,6 +126,7 @@ test('Style Dictionary emits TypeScript declarations with full foundation symbol
   assert.match(declarations, /SchemeBaselineDarkSurfaceContainerHigh/);
   assert.match(declarations, /ShapeCornerExtraExtraLarge/);
   assert.match(declarations, /TypographyDisplayLargeEmphasizedFontSize/);
+  assert.match(declarations, /TypefaceWeightSemiBold/);
   assert.match(declarations, /TypefaceWeightBold/);
   assert.match(declarations, /MotionEasingLegacy/);
   assert.match(declarations, /MotionSpringExpressiveFastSpatialStiffness/);
