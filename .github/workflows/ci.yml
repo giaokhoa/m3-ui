@@ -75,6 +75,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-navigation-expressive:complete
       - name: Require complete baseline Material Web Navigation overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-navigation-baseline:complete
+      - name: Require complete Material Web Toolbar overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-toolbar:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
