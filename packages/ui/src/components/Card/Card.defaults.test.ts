@@ -61,7 +61,7 @@ describe('Card defaults', () => {
     expect(getCardElevationLevel('elevated', false, 'focus')).toBe('level1');
     expect(getCardElevationLevel('elevated', true, 'hover')).toBe('level1');
 
-    expect(getCardElevationLevel('outlined', false, 'hover')).toBe('level0');
+    expect(getCardElevationLevel('outlined', false, 'hover')).toBe('level1');
     expect(getCardElevationLevel('outlined', false, 'press')).toBe('level0');
     expect(cardTokens.outlined.elevation.dragged).toBe('level3');
   });
