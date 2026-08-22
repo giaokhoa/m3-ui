@@ -1,25 +1,25 @@
 import * as token from '@m3/tokens';
 import type { CSSProperties } from 'react';
+import { pxNumber } from '../../internal/tokenValues';
 
 export type SwitchStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-function px(value: string): number { return Number.parseFloat(value); }
 function compositeOverSurface(color: string, opacity: number): string {
   return `color-mix(in srgb, ${color} ${opacity * 100}%, var(--surface))`;
 }
 
-const trackWidth = px(token.ComponentSwitchTrackWidth);
-const trackHeight = px(token.ComponentSwitchTrackHeight);
-const trackOutlineWidth = px(token.ComponentSwitchTrackOutlineWidth);
-const uncheckedThumbSize = px(token.ComponentSwitchHandleUnselectedSize);
-const checkedThumbSize = px(token.ComponentSwitchHandleSelectedSize);
+const trackWidth = pxNumber(token.ComponentSwitchTrackWidth);
+const trackHeight = pxNumber(token.ComponentSwitchTrackHeight);
+const trackOutlineWidth = pxNumber(token.ComponentSwitchTrackOutlineWidth);
+const uncheckedThumbSize = pxNumber(token.ComponentSwitchHandleUnselectedSize);
+const checkedThumbSize = pxNumber(token.ComponentSwitchHandleSelectedSize);
 const uncheckedThumbOffset = (trackHeight - uncheckedThumbSize) / 2;
 const contentThumbOffset = (trackHeight - checkedThumbSize) / 2;
 const checkedThumbOffset = trackWidth - checkedThumbSize - contentThumbOffset;
 const pressedUncheckedThumbOffset = trackOutlineWidth;
 const pressedCheckedThumbOffset = checkedThumbOffset - trackOutlineWidth;
 
-export const switchStateLayerRadius = px(token.ComponentSwitchStateLayerSize) / 2;
+export const switchStateLayerRadius = pxNumber(token.ComponentSwitchStateLayerSize) / 2;
 export const switchTrackFocusRingRadius = `${trackHeight / 2}px`;
 
 export const switchBaseStyle: SwitchStyle = {
@@ -28,6 +28,7 @@ export const switchBaseStyle: SwitchStyle = {
   '--_switch-track-outline-width': token.ComponentSwitchTrackOutlineWidth,
   '--_switch-min-interactive-size': token.ComponentSwitchMinimumInteractiveSize,
   '--_switch-state-layer-size': token.ComponentSwitchStateLayerSize,
+  '--_switch-label-gap': token.ComponentSwitchLabelGap,
   '--_switch-unchecked-thumb-size': token.ComponentSwitchHandleUnselectedSize,
   '--_switch-checked-thumb-size': token.ComponentSwitchHandleSelectedSize,
   '--_switch-pressed-thumb-size': token.ComponentSwitchHandlePressedSize,
