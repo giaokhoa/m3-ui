@@ -63,6 +63,7 @@ test.describe('Material 3 ripple focus parity', () => {
     await expect(ripple).toHaveAttribute('data-inset-focus-visible', 'true');
     await expect(ripple).not.toHaveAttribute('data-focus-visible', 'true');
     await expect(ripple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0');
+    await expect(ring).toHaveCSS('z-index', '2');
 
     await expect
       .poll(() => pseudoStyle(ring, '::before', 'border-top-width'))
