@@ -1,0 +1,35 @@
+{
+  "component": {
+    "progressIndicator": {
+      "base": {
+        "activeIndicatorColor": { "$type": "string", "$value": "var(--primary)" },
+        "activeShape": { "$type": "string", "$value": "full" },
+        "stopColor": { "$type": "string", "$value": "var(--primary)" },
+        "stopShape": { "$type": "string", "$value": "full" },
+        "trackColor": { "$type": "string", "$value": "var(--secondary-container)" },
+        "trackShape": { "$type": "string", "$value": "full" }
+      },
+      "circular": {
+        "activeThickness": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "activeWaveAmplitude": { "$type": "dimension", "$value": { "value": 1.6, "unit": "px" } },
+        "activeWaveWavelength": { "$type": "dimension", "$value": { "value": 15, "unit": "px" } },
+        "size": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+        "trackActiveSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "trackThickness": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "waveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } }
+      },
+      "linear": {
+        "activeThickness": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "activeWaveAmplitude": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+        "activeWaveWavelength": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+        "height": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "indeterminateActiveWaveWavelength": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+        "stopSize": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "stopTrailingSpace": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+        "trackActiveSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "trackThickness": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "waveHeight": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } }
+      }
+    }
+  }
+}

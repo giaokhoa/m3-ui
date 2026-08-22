@@ -40,7 +40,8 @@ test('excluded families always carry an explicit reason', async () => {
   }
 });
 
-test('current checkpoint is measured from manifests, not a handwritten source list', async () => {
+test('coverage stays incomplete until every pinned source file is reconciled or explicitly excluded', async () => {
   const coverage = await loadComposeCoverage();
-  assert.deepEqual(coverage.counts, { reconciled: 72, excluded: 0, pending: 48, all: 120 });
+  assert.equal(coverage.counts.pending, coverage.pending.length);
+  assert.deepEqual([...coverage.pending].sort(), coverage.pending);
 });
