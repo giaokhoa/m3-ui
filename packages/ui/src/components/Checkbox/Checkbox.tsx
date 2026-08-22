@@ -14,6 +14,7 @@ type StateLayerInteraction = 'focus' | 'hover';
 
 const checkboxFocusRingInset =
   (checkboxTokens.minimumInteractiveSize - checkboxTokens.containerSize) / 2;
+const checkboxFocusRingRadius = checkboxTokens.containerSize * 0.25;
 
 function startInteraction(
   active: readonly StateLayerInteraction[],
@@ -136,7 +137,7 @@ export function Checkbox({
                 <Ripple
                   controller={ripple}
                   focusRingInset={checkboxFocusRingInset}
-                  focusRingRadius="25%"
+                  focusRingRadius={checkboxFocusRingRadius}
                   isFocusVisible={renderProps.isFocusVisible}
                   stateInteraction={latestStateLayerInteraction(
                     activeInteractions,
