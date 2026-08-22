@@ -60,7 +60,7 @@ The shared elevation primitive uses the pinned Material 3 internal tween selecti
 - outgoing hover: 120ms, cubic-bezier(0.4, 0, 0.6, 1);
 - disabled/unknown baseline transitions snap.
 
-Drag elevation remains represented in `@m3/tokens/card`, but there is no invented public drag interaction state. Compose exposes drag elevation through `InteractionSource`; the web library does not yet expose an equivalent interaction-source API.
+Drag elevation remains represented in the canonical Card tokens and their UI-local projection, but there is no invented public drag interaction state. Compose exposes drag elevation through `InteractionSource`; the web library does not yet expose an equivalent interaction-source API.
 
 ## Clickable surface translation
 
