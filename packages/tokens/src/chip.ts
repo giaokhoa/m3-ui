@@ -61,6 +61,7 @@ export interface SelectableChipVariantTokens {
   readonly trailingIconSize: number;
   readonly avatarSize: number;
   readonly avatarRadius: number;
+  readonly disabledAvatarOpacity: number;
   readonly unselectedContainerColor: ChipContainerColor;
   readonly selectedContainerColor: ChipContainerColor;
   readonly disabledUnselectedContainerColor: ChipContainerColor;
@@ -69,6 +70,7 @@ export interface SelectableChipVariantTokens {
   readonly unselectedLabelColor: ChipColorRole;
   readonly selectedLabelColor: ChipColorRole;
   readonly unselectedLeadingIconColor: ChipColorRole;
+  readonly expressiveUnselectedLeadingIconColor: ChipColorRole;
   readonly selectedLeadingIconColor: ChipColorRole;
   readonly unselectedTrailingIconColor: ChipColorRole;
   readonly selectedTrailingIconColor: ChipColorRole;
@@ -213,6 +215,7 @@ const commonSelectable = {
   trailingIconSize: 18,
   avatarSize: 0,
   avatarRadius: 9999,
+  disabledAvatarOpacity: 1,
   disabledUnselectedContainerColor: 'transparent',
   disabledSelectedContainerColor: 'onSurface',
   disabledContainerOpacity: 0.12,
@@ -238,6 +241,7 @@ export const filterChipTokens = {
   unselectedLabelColor: 'onSurfaceVariant',
   selectedLabelColor: 'onSecondaryContainer',
   unselectedLeadingIconColor: 'primary',
+  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
   selectedLeadingIconColor: 'onSecondaryContainer',
   unselectedTrailingIconColor: 'onSurfaceVariant',
   selectedTrailingIconColor: 'onSecondaryContainer',
@@ -257,6 +261,7 @@ export const elevatedFilterChipTokens = {
   unselectedLabelColor: 'onSurfaceVariant',
   selectedLabelColor: 'onSecondaryContainer',
   unselectedLeadingIconColor: 'primary',
+  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
   selectedLeadingIconColor: 'onSecondaryContainer',
   unselectedTrailingIconColor: 'onSurfaceVariant',
   selectedTrailingIconColor: 'onSecondaryContainer',
@@ -273,11 +278,13 @@ export const elevatedFilterChipTokens = {
 export const inputChipTokens = {
   ...commonSelectable,
   avatarSize: 24,
+  disabledAvatarOpacity: 0.38,
   unselectedContainerColor: 'transparent',
   selectedContainerColor: 'secondaryContainer',
   unselectedLabelColor: 'onSurfaceVariant',
   selectedLabelColor: 'onSecondaryContainer',
   unselectedLeadingIconColor: 'onSurfaceVariant',
+  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
   selectedLeadingIconColor: 'primary',
   unselectedTrailingIconColor: 'onSurfaceVariant',
   selectedTrailingIconColor: 'onSecondaryContainer',
