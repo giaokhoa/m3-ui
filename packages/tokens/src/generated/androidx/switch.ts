@@ -7,6 +7,7 @@ export const switchTokensSource = {
   path: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/SwitchTokens.kt',
   blobSha: '1fd474ec436e63b0ec54c455f32445d2d4ef5123',
   version: 'v0_210',
+  declaration: 'object',
   object: 'SwitchTokens',
 } as const;
 

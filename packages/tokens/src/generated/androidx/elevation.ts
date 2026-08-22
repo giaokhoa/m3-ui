@@ -7,6 +7,7 @@ export const elevationTokensSource = {
   path: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/ElevationTokens.kt',
   blobSha: '5b5fd66d3a9e061ac9de98c4958344d2e7be923c',
   version: 'v0_103',
+  declaration: 'object',
   object: 'ElevationTokens',
 } as const;
 

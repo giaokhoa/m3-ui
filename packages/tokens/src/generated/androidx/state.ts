@@ -7,6 +7,7 @@ export const stateTokensSource = {
   path: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/StateTokens.kt',
   blobSha: '5a52d587e453e00fdbb345a775985e20d6a41d2c',
   version: 'v0_210',
+  declaration: 'object',
   object: 'StateTokens',
 } as const;
 
