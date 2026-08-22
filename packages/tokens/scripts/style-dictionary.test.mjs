@@ -29,6 +29,7 @@ test('Style Dictionary emits shared motion, typography, ripple and elevation tok
 
 test('Style Dictionary emits canonical current component families', async () => {
   const token = await generated('components');
+  assert.equal(token.ComponentSwitchLabelGap, '8px');
   assert.equal(token.ComponentCardVariantFilledContainerColor, 'var(--surface-container-highest)');
   assert.equal(token.ComponentCheckboxMotionBoxInDuration, '166ms');
   assert.equal(token.ComponentRadioButtonMotionDotDuration, '137ms');
@@ -43,6 +44,7 @@ test('Style Dictionary emits canonical current component families', async () => 
 test('Style Dictionary emits TypeScript declarations with literal string values', async () => {
   const declarations = await readFile(new URL('../dist/generated/tokens.d.ts', import.meta.url), 'utf8');
   assert.match(declarations, /ComponentButtonVariantFilledContainerColor/);
+  assert.match(declarations, /ComponentSwitchLabelGap/);
   assert.match(declarations, /MotionSpringFastSpatialDuration/);
   assert.match(declarations, /RippleFocusRingOuterStrokeColor/);
   assert.match(declarations, /ElevationShadowLevel5Layer3Opacity/);
