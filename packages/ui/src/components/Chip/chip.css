@@ -105,6 +105,7 @@
   block-size: var(--_chip-avatar-size);
   overflow: hidden;
   border-radius: var(--_chip-avatar-radius);
+  opacity: var(--_chip-avatar-opacity);
 }
 
 .m3-chip__leading-icon + .m3-chip__label,
