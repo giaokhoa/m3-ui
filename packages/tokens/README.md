@@ -29,6 +29,17 @@ Style Dictionary deep-merges these files into one graph. Duplicate canonical pat
 
 AndroidX Compose, the Material 3 Figma Design Kit, Material Web, and other upstreams are read-only references. Audit code owns source revision/mapping information; upstream data never generates or rewrites canonical or runtime token files.
 
+## Token ownership
+
+Canonical tokens represent stable design values, not every literal used by implementation code.
+
+- Reusable Material semantics belong in `core/`.
+- Component-owned immutable values belong in `component/`.
+- A deliberate stable web visual contract may also be a component token even when Compose has no equivalent. For example, `component.switch.labelGap` belongs to the web label rendered by this library and therefore has no AndroidX audit mapping.
+- Values derived arithmetically from canonical tokens remain runtime derivations rather than duplicate tokens.
+- Pure DOM/CSS mechanics and accessibility fallbacks stay in `@m3/ui`; examples include centering percentages and forced-colors system outlines.
+- Never alias two tokens merely because their numeric values are equal. An alias means shared semantic identity.
+
 ## Dynamic color
 
 `ThemeProvider` owns actual runtime Material colors. Canonical component colors are ordinary DTCG strings containing CSS role references such as `var(--primary)`. There is no static fallback color and no `$extensions` metadata. Non-color design values are generated as static JS/TypeScript values and are not generic root CSS variables.
