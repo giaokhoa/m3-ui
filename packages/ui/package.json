@@ -27,7 +27,6 @@
   "dependencies": {
     "@m3/tokens": "workspace:*",
     "@material/material-color-utilities": "0.3.0",
-    "react-aria": "3.51.0",
     "react-aria-components": "^1.0.0"
   },
   "devDependencies": {
