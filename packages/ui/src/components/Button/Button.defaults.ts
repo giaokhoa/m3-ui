@@ -348,10 +348,9 @@ export const buttonSizeTokens = {
   ),
 } as const satisfies Record<ButtonSize, ButtonSizeTokens>;
 
-// AndroidX currently animates ButtonShapes with MotionSchemeKeyTokens.DefaultEffects.
-// This is a web motion adaptation; token values above remain generated from DTCG.
+// AndroidX animates ButtonShapes with MotionSchemeKeyTokens.DefaultEffects.
 const buttonShapeTransition =
-  'border-radius 166ms linear(0, 0.1433 10%, 0.3829 20%, 0.5917 30%, 0.7431 40%, 0.8437 50%, 0.9072 60%, 0.9458 70%, 0.9688 80%, 0.9823 90%, 1)';
+  `border-radius ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`;
 
 function percent(value: number): string {
   return `${value * 100}%`;
@@ -404,7 +403,6 @@ export function getButtonBaseStyle(tokens: ButtonVariantTokens): ButtonStyle {
 
 export function getButtonSizeStyle(size: ButtonSize): ButtonStyle {
   const tokens = buttonSizeTokens[size];
-
   return {
     '--_button-min-height': tokens.minHeight,
     '--_button-padding-block': tokens.contentPadding.block,
@@ -428,16 +426,11 @@ export function resolveButtonElevation(
   { isDisabled, interaction }: ButtonInteractionState,
 ): ElevationLevel {
   if (isDisabled) return tokens.disabledElevation;
-
   switch (interaction) {
-    case 'press':
-      return tokens.pressedElevation;
-    case 'hover':
-      return tokens.hoveredElevation;
-    case 'focus':
-      return tokens.focusedElevation;
-    default:
-      return tokens.defaultElevation;
+    case 'press': return tokens.pressedElevation;
+    case 'hover': return tokens.hoveredElevation;
+    case 'focus': return tokens.focusedElevation;
+    default: return tokens.defaultElevation;
   }
 }
 
@@ -447,19 +440,14 @@ export function resolveButtonElevationTransition({
   previousInteraction = null,
 }: ButtonInteractionState): string {
   if (isDisabled) return 'none';
-
   if (interaction !== null) {
     const { durationMs, easing } = elevationMotionTokens.incoming;
     return `box-shadow ${durationMs}ms ${easing}`;
   }
-
   if (previousInteraction === null) return 'none';
-
-  const spec =
-    previousInteraction === 'hover'
-      ? elevationMotionTokens.hoveredOutgoing
-      : elevationMotionTokens.outgoing;
-
+  const spec = previousInteraction === 'hover'
+    ? elevationMotionTokens.hoveredOutgoing
+    : elevationMotionTokens.outgoing;
   return `box-shadow ${spec.durationMs}ms ${spec.easing}`;
 }
 
@@ -472,7 +460,6 @@ function resolveButtonTransition(
     elevationTransition === 'none' ? null : elevationTransition,
     hasAnimatedShape && !state.isDisabled ? buttonShapeTransition : null,
   ].filter((value): value is string => value !== null);
-
   return transitions.length > 0 ? transitions.join(', ') : 'none';
 }
 
@@ -488,13 +475,10 @@ export function getButtonStyle(
       ? options.shapes.pressedShape
       : options.shapes.shape
     : null;
-
   return {
     ...getButtonBaseStyle(tokens),
     ...(sizeStyle ?? {}),
-    ...(activeShape === null
-      ? {}
-      : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
+    ...(activeShape === null ? {} : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
     boxShadow: getElevationBoxShadow(resolveButtonElevation(tokens, state)),
     transition: resolveButtonTransition(state, options.shapes !== undefined),
   };
