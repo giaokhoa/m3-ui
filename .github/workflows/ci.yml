@@ -57,6 +57,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-icon-button-generic:complete
       - name: Require complete Material Web FAB size overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-fab-sizes:complete
+      - name: Require complete Material Web FAB role overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-fab-roles:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test

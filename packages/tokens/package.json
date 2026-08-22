@@ -33,6 +33,8 @@
     "audit:material-web-icon-button-generic:complete": "node scripts/audit-material-web-icon-button-generic.mjs --require-complete",
     "audit:material-web-fab-sizes": "node scripts/audit-material-web-fab-sizes.mjs",
     "audit:material-web-fab-sizes:complete": "node scripts/audit-material-web-fab-sizes.mjs --require-complete",
+    "audit:material-web-fab-roles": "node scripts/audit-material-web-fab-roles.mjs",
+    "audit:material-web-fab-roles:complete": "node scripts/audit-material-web-fab-roles.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
