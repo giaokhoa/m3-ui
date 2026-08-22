@@ -69,6 +69,8 @@
     "audit:material-web-small-controls:complete": "node scripts/audit-material-web-checkbox.mjs --require-complete && node scripts/audit-material-web-small-controls.mjs --require-complete",
     "audit:material-web-fab-menu": "node scripts/audit-material-web-fab-menu.mjs",
     "audit:material-web-fab-menu:complete": "node scripts/audit-material-web-fab-menu.mjs --require-complete",
+    "audit:material-web-switch": "node scripts/audit-material-web-switch.mjs",
+    "audit:material-web-switch:complete": "node scripts/audit-material-web-switch.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
