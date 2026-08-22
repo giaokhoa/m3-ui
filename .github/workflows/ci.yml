@@ -52,6 +52,9 @@ jobs:
       - name: Require complete Material 3 union token coverage
         run: pnpm --filter @m3/tokens coverage:union:complete
 
+      - name: Audit Material Web declaration coverage
+        run: pnpm --filter @m3/tokens audit:material-web-declarations
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 
