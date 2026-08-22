@@ -1,0 +1,24 @@
+{
+  "component": {
+    "menu": {
+      "base": {
+        "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" }
+      },
+      "segmented": {
+        "webCurrent": {
+          "activeContainerShape": { "$type": "string", "$value": "large" },
+          "groupPadding": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "horizontalContainerShape": { "$type": "string", "$value": "full" },
+          "itemFocusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.innerOffset}" },
+          "itemFocusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+          "itemLabelTextTypography": { "$type": "string", "$value": "labelLarge" },
+          "itemSupportingTextTypography": { "$type": "string", "$value": "bodySmall" },
+          "itemTrailingSupportingTextTypography": { "$type": "string", "$value": "labelLarge" }
+        }
+      },
+      "standard": {
+        "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" }
+      }
+    }
+  }
+}
