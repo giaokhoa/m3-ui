@@ -83,6 +83,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-card:complete
       - name: Require complete Material Web Dialog and Sheet overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-dialog-sheet:complete
+      - name: Require complete Material Web Search overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-search:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test

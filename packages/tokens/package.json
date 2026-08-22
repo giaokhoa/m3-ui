@@ -59,6 +59,8 @@
     "audit:material-web-card:complete": "node scripts/audit-material-web-card.mjs --require-complete",
     "audit:material-web-dialog-sheet": "node scripts/audit-material-web-dialog-sheet.mjs",
     "audit:material-web-dialog-sheet:complete": "node scripts/audit-material-web-dialog-sheet.mjs --require-complete",
+    "audit:material-web-search": "node scripts/audit-material-web-search.mjs",
+    "audit:material-web-search:complete": "node scripts/audit-material-web-search.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
