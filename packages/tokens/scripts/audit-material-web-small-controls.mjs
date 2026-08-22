@@ -35,6 +35,8 @@ function sourceValue(raw) {
   if (match) return { kind: 'value', value: `var(--${match[1]})` };
   match = raw.match(/^md-sys-state\.\$(focus|hover|pressed)-state-layer-opacity$/);
   if (match) return { kind: 'canonical', path: `state.layer.opacity.${match[1]}` };
+  match = raw.match(/^md-sys-state-focus-indicator\.\$(outer-offset|thickness)$/);
+  if (match) return { kind: 'canonical', path: `state.focusIndicator.${camel(match[1])}` };
   return { kind: 'unsupported', value: raw };
 }
 function pathForLoading(variable) {
