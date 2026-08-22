@@ -1,0 +1,60 @@
+{
+  "sources": {
+    "figma": { "name": "Material 3 Design Kit", "version": "1.25", "releasedAt": "2026-05-19" },
+    "compose": { "repository": "androidx/androidx", "revision": "ff9a7111302243197384c499d5e3461c1804cd6e", "revisionAt": "2026-08-22T05:52:17Z" },
+    "materialWeb": { "repository": "material-components/material-web", "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c", "revisionAt": "2026-08-21T19:30:42Z", "designSystemVersion": "v0.192" }
+  },
+  "shape": {
+    "canonical": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "extraLargeIncreased": 32, "extraExtraLarge": 48, "full": 9999 },
+    "figma": { "variableCount": 8, "values": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "full": 1000 }, "notObserved": ["extraLargeIncreased", "extraExtraLarge"] },
+    "compose": { "values": { "none": "RectangleShape", "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "extraLargeIncreased": 32, "extraExtraLarge": 48, "full": "CircleShape" } },
+    "materialWeb": { "values": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "extraLarge": 28, "full": 9999 }, "notObserved": ["largeIncreased", "extraLargeIncreased", "extraExtraLarge"] },
+    "drift": [
+      { "id": "shape-full-sentinel", "classification": "semantic-equivalent", "reason": "Figma uses 1000, Material Web and canonical use 9999, and Compose uses CircleShape; all represent a full/pill corner rather than a fixed normative radius." },
+      { "id": "shape-large-increased-web", "classification": "source-lag", "preferredReference": "compose+figma", "reason": "20 is present in current Compose and Figma but not Material Web v0.192." },
+      { "id": "shape-extra-large-increased", "classification": "reference-drift", "preferredReference": "compose", "reason": "32 is present in current Compose and canonical but was not observed in Figma V1.25 variables or Material Web v0.192." },
+      { "id": "shape-extra-extra-large", "classification": "reference-drift", "preferredReference": "compose", "reason": "48 is present in current Compose and canonical but was not observed in Figma V1.25 variables or Material Web v0.192." }
+    ]
+  },
+  "state": {
+    "canonical": { "hover": 0.08, "focus": 0.1, "pressed": 0.1, "dragged": 0.16 },
+    "compose": { "hover": 0.08, "focus": 0.1, "pressed": 0.1, "dragged": 0.16 },
+    "figma": { "observedOpacityVocabulary": [0.08, 0.1, 0.16] },
+    "materialWeb": { "hover": 0.08, "focus": 0.12, "pressed": 0.12, "dragged": 0.16 },
+    "drift": [{ "id": "state-focus-pressed-web", "classification": "source-lag", "preferredReference": "compose+figma", "reason": "Current Compose uses 0.10 for focus and pressed and Figma publishes 0.10 state-layer vocabulary; Material Web v0.192 still uses 0.12." }]
+  },
+  "typography": {
+    "canonical": { "baselineStyleCount": 15, "emphasizedStyleCount": 15 },
+    "compose": { "baselineStyleCount": 15, "emphasizedStyleCount": 15 },
+    "figma": { "typescaleVariableCount": 90, "baselineWeightCount": 15, "emphasizedWeightCount": 15, "emphasizedTextStyleCount": 15 },
+    "materialWeb": { "baselineStyleCount": 15, "fullEmphasizedStyleVocabularyObserved": false, "prominentWeightTokens": ["label-large-weight-prominent", "label-medium-weight-prominent"] },
+    "drift": [{ "id": "typography-emphasized-web", "classification": "source-lag", "preferredReference": "compose+figma", "reason": "Compose and Figma expose all 15 emphasized type styles while Material Web v0.192 does not." }]
+  },
+  "colorRoles": {
+    "canonical": { "count": 49, "includesShadow": true },
+    "figma": { "schemeVariableCount": 49, "includesShadow": true },
+    "compose": { "colorSchemeKeyCount": 48, "includesShadow": false },
+    "materialWeb": { "supportedSystemRoleCount": 49, "includesShadow": true },
+    "drift": [{ "id": "color-shadow-compose-partition", "classification": "implementation-partition", "preferredReference": "figma+materialWeb", "reason": "The Compose ColorSchemeKeyTokens object has 48 entries and omits Shadow, while Figma and Material Web expose a 49-role vocabulary including Shadow." }]
+  },
+  "motion": {
+    "canonical": { "standardSpringFamilies": 6, "expressiveSpringFamilies": 6 },
+    "compose": { "standardSpringFamilies": 6, "expressiveSpringFamilies": 6, "matchesCanonicalPhysics": true },
+    "figma": { "publishedSpringVariablesOrStylesObserved": false },
+    "materialWeb": { "classicDurationAndEasingObserved": true, "springPhysicsObserved": false },
+    "drift": [
+      { "id": "motion-spring-web", "classification": "source-lag", "preferredReference": "compose", "reason": "Material Web v0.192 has classic duration/easing tokens but no standard or expressive spring physics." },
+      { "id": "motion-spring-figma", "classification": "not-observed", "preferredReference": "compose", "reason": "Published Figma variables/styles search did not expose spring physics tokens." }
+    ]
+  },
+  "elevation": {
+    "canonical": { "semanticLevelDp": [0, 1, 3, 6, 8, 12], "shadowLayerCount": 3, "shadowOpacities": [0.2, 0.14, 0.12] },
+    "compose": { "semanticLevelDp": [0, 1, 3, 6, 8, 12] },
+    "figma": { "effectLevelsObserved": [1, 2, 3, 4, 5], "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15] },
+    "materialWeb": { "webLevelApi": [0, 1, 2, 3, 4, 5], "explicitlyRemapsDpToLevelNumber": true },
+    "drift": [
+      { "id": "elevation-web-level-api", "classification": "platform-adaptation", "reason": "Material Web explicitly maps elevation dp semantics to ordinal level numbers for its web API." },
+      { "id": "elevation-figma-shadow-recipe", "classification": "platform-adaptation", "reason": "Figma effect styles render two shadow layers at 0.30/0.15 while canonical web shadows use three layers at 0.20/0.14/0.12; semantic elevation level and rendered shadow recipe are audited separately." }
+    ]
+  }
+}
