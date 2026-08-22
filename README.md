@@ -9,7 +9,7 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 - `apps/storybook`: component preview and visual review workspace
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
-- `scripts/compose-sync`: reserved tooling contract for syncing generated Material token data
+- `scripts/compose-sync`: deterministic tooling for pinned AndroidX generated-token sync and drift checks
 
 ## Commands
 
@@ -21,6 +21,7 @@ pnpm test
 pnpm test:visual
 pnpm build
 pnpm typecheck
+pnpm compose:sync:check
 ```
 
 `pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` builds Storybook and its workspace dependencies, then creates the static preview under `apps/storybook/dist`.
@@ -28,6 +29,23 @@ pnpm typecheck
 Storybook is the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
 
 Playwright provides the committed visual-regression layer on top of Storybook. `pnpm test:visual` builds the static Storybook and compares Chromium screenshots with the committed Linux baselines. When an intentional visual change has been reviewed, run `pnpm test:visual:update` inside the devcontainer and commit the changed files under `apps/storybook/visual/__screenshots__/`.
+
+## CSS consumption
+
+For applications that use many Material components, import the complete stylesheet once:
+
+```ts
+import '@m3/ui/styles.css';
+```
+
+For smaller bundles, each public component family also has a self-contained CSS entry. For example:
+
+```ts
+import '@m3/ui/styles/button.css';
+import '@m3/ui/styles/text-field.css';
+```
+
+Available modular entries are `button.css`, `card.css`, `checkbox.css`, `chip.css`, `radio-button.css`, `switch.css`, and `text-field.css`. Each entry includes the internal Ripple/Elevation CSS that its component needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
 
 ## Dev Container
 
