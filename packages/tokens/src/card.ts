@@ -1,95 +1,31 @@
+import * as token from '@m3/tokens/generated';
 import type { ElevationLevel } from './elevation.js';
+import { colorRole, pxNumber } from './value.js';
 
 export type CardVariant = 'filled' | 'elevated' | 'outlined';
+export type CardColorRole = string;
+export interface CardElevationTokens { readonly default: ElevationLevel; readonly pressed: ElevationLevel; readonly focused: ElevationLevel; readonly hovered: ElevationLevel; readonly dragged: ElevationLevel; readonly disabled: ElevationLevel; }
+const elevation = (defaultLevel: ElevationLevel, pressed: ElevationLevel, focused: ElevationLevel, hovered: ElevationLevel, dragged: ElevationLevel, disabled: ElevationLevel): CardElevationTokens => ({ default: defaultLevel, pressed, focused, hovered, dragged, disabled });
 
-export type CardColorRole =
-  | 'onSurface'
-  | 'outline'
-  | 'outlineVariant'
-  | 'surface'
-  | 'surfaceContainerHighest'
-  | 'surfaceContainerLow'
-  | 'surfaceVariant';
-
-export interface CardElevationTokens {
-  readonly default: ElevationLevel;
-  readonly pressed: ElevationLevel;
-  readonly focused: ElevationLevel;
-  readonly hovered: ElevationLevel;
-  readonly dragged: ElevationLevel;
-  readonly disabled: ElevationLevel;
-}
-
-/**
- * Material 3 Card values resolved from AndroidX revision
- * 160825094a81825468a95b115bfb1b541e549856 using Card.kt,
- * FilledCardTokens.kt, ElevatedCardTokens.kt and OutlinedCardTokens.kt.
- *
- * Generated interaction outline colors are intentionally not promoted into
- * runtime behavior: CardDefaults.outlinedCardBorder() resolves only enabled vs
- * disabled at the pinned revision.
- */
 export const cardTokens = {
-  shapeRadius: 12,
-  minimumInteractiveSize: 48,
-  disabledContentOpacity: 0.38,
-
+  shapeRadius: pxNumber(token.ComponentCardBaseShapeRadius),
+  minimumInteractiveSize: pxNumber(token.ComponentCardBaseMinimumInteractiveSize),
+  disabledContentOpacity: token.ComponentCardBaseDisabledContentOpacity,
   filled: {
-    containerColor: 'surfaceContainerHighest',
-    contentColor: 'onSurface',
-    disabledContainerColor: 'surfaceVariant',
-    disabledContainerOpacity: 0.38,
-    disabledCompositeOver: 'surfaceContainerHighest',
-    elevation: {
-      default: 'level0',
-      pressed: 'level0',
-      focused: 'level0',
-      hovered: 'level1',
-      dragged: 'level3',
-      disabled: 'level0',
-    } satisfies CardElevationTokens,
+    containerColor: colorRole(token.ComponentCardVariantFilledContainerColor), contentColor: colorRole(token.ComponentCardVariantFilledContentColor),
+    disabledContainerColor: colorRole(token.ComponentCardVariantFilledDisabledContainerColor), disabledContainerOpacity: token.ComponentCardVariantFilledDisabledContainerOpacity, disabledCompositeOver: colorRole(token.ComponentCardVariantFilledDisabledCompositeOver),
+    elevation: elevation(token.ComponentCardVariantFilledElevationDefault as ElevationLevel, token.ComponentCardVariantFilledElevationPressed as ElevationLevel, token.ComponentCardVariantFilledElevationFocused as ElevationLevel, token.ComponentCardVariantFilledElevationHovered as ElevationLevel, token.ComponentCardVariantFilledElevationDragged as ElevationLevel, token.ComponentCardVariantFilledElevationDisabled as ElevationLevel),
   },
-
   elevated: {
-    containerColor: 'surfaceContainerLow',
-    contentColor: 'onSurface',
-    disabledContainerColor: 'surface',
-    disabledContainerOpacity: 0.38,
-    disabledCompositeOver: 'surface',
-    elevation: {
-      default: 'level1',
-      pressed: 'level1',
-      focused: 'level1',
-      hovered: 'level2',
-      dragged: 'level4',
-      disabled: 'level1',
-    } satisfies CardElevationTokens,
+    containerColor: colorRole(token.ComponentCardVariantElevatedContainerColor), contentColor: colorRole(token.ComponentCardVariantElevatedContentColor),
+    disabledContainerColor: colorRole(token.ComponentCardVariantElevatedDisabledContainerColor), disabledContainerOpacity: token.ComponentCardVariantElevatedDisabledContainerOpacity, disabledCompositeOver: colorRole(token.ComponentCardVariantElevatedDisabledCompositeOver),
+    elevation: elevation(token.ComponentCardVariantElevatedElevationDefault as ElevationLevel, token.ComponentCardVariantElevatedElevationPressed as ElevationLevel, token.ComponentCardVariantElevatedElevationFocused as ElevationLevel, token.ComponentCardVariantElevatedElevationHovered as ElevationLevel, token.ComponentCardVariantElevatedElevationDragged as ElevationLevel, token.ComponentCardVariantElevatedElevationDisabled as ElevationLevel),
   },
-
   outlined: {
-    containerColor: 'surface',
-    contentColor: 'onSurface',
-    disabledContainerColor: 'surface',
-    disabledContainerOpacity: 1,
-    disabledCompositeOver: 'surface',
-    outline: {
-      width: 1,
-      color: 'outlineVariant',
-      disabledColor: 'outline',
-      disabledOpacity: 0.12,
-      // CardDefaults.outlinedCardBorder() composites the disabled outline over
-      // ElevatedCardTokens.ContainerColor at the pinned AndroidX revision.
-      disabledCompositeOver: 'surfaceContainerLow',
-    },
-    elevation: {
-      default: 'level0',
-      pressed: 'level0',
-      focused: 'level0',
-      hovered: 'level0',
-      dragged: 'level3',
-      disabled: 'level0',
-    } satisfies CardElevationTokens,
+    containerColor: colorRole(token.ComponentCardVariantOutlinedContainerColor), contentColor: colorRole(token.ComponentCardVariantOutlinedContentColor),
+    disabledContainerColor: colorRole(token.ComponentCardVariantOutlinedDisabledContainerColor), disabledContainerOpacity: token.ComponentCardVariantOutlinedDisabledContainerOpacity, disabledCompositeOver: colorRole(token.ComponentCardVariantOutlinedDisabledCompositeOver),
+    outline: { width: pxNumber(token.ComponentCardVariantOutlinedOutlineWidth), color: colorRole(token.ComponentCardVariantOutlinedOutlineColor), disabledColor: colorRole(token.ComponentCardVariantOutlinedOutlineDisabledColor), disabledOpacity: token.ComponentCardVariantOutlinedOutlineDisabledOpacity, disabledCompositeOver: colorRole(token.ComponentCardVariantOutlinedOutlineDisabledCompositeOver) },
+    elevation: elevation(token.ComponentCardVariantOutlinedElevationDefault as ElevationLevel, token.ComponentCardVariantOutlinedElevationPressed as ElevationLevel, token.ComponentCardVariantOutlinedElevationFocused as ElevationLevel, token.ComponentCardVariantOutlinedElevationHovered as ElevationLevel, token.ComponentCardVariantOutlinedElevationDragged as ElevationLevel, token.ComponentCardVariantOutlinedElevationDisabled as ElevationLevel),
   },
-} as const satisfies Record<string, unknown>;
-
+} as const;
 export type CardTokens = typeof cardTokens;

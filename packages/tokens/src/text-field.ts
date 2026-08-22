@@ -1,218 +1,31 @@
-export type TextFieldColorRole =
-  | 'error'
-  | 'onSurface'
-  | 'onSurfaceVariant'
-  | 'outline'
-  | 'primary'
-  | 'surfaceContainerHighest';
+import * as token from '@m3/tokens/generated';
+import { colorRole, msNumber, pxNumber } from './value.js';
 
-export type FilledTextFieldColorRole = Exclude<TextFieldColorRole, 'outline'>;
-export type OutlinedTextFieldColorRole = Exclude<
-  TextFieldColorRole,
-  'surfaceContainerHighest'
->;
-
-export interface TextFieldTypographyToken {
-  readonly fontFamilyRole: 'plain';
-  readonly fontSize: number;
-  readonly lineHeight: number;
-  readonly fontWeight: 400;
-  readonly letterSpacing: number;
-}
-
-/** @deprecated Use TextFieldTypographyToken. */
+export type TextFieldColorRole = string;
+export type FilledTextFieldColorRole = string;
+export type OutlinedTextFieldColorRole = string;
+export interface TextFieldTypographyToken { readonly fontFamilyRole: 'plain'; readonly fontSize: number; readonly lineHeight: number; readonly fontWeight: 400; readonly letterSpacing: number; }
 export type FilledTextFieldTypographyToken = TextFieldTypographyToken;
-
-const textFieldTypography = {
-  bodyLarge: {
-    fontFamilyRole: 'plain',
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: 400,
-    letterSpacing: 0.5,
-  },
-  bodySmall: {
-    fontFamilyRole: 'plain',
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: 400,
-    letterSpacing: 0.4,
-  },
-} as const satisfies Record<string, TextFieldTypographyToken>;
-
-const textFieldMotion = {
-  // AndroidX standard MotionScheme springs at the pinned revision, sampled to
-  // their 1% settle point for CSS transition timing.
-  fastEffects: {
-    durationMs: 108,
-    easing:
-      'linear(0, 0.1434 10%, 0.383 20%, 0.5917 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9688 80%, 0.9823 90%, 1)',
-  },
-  fastSpatial: {
-    durationMs: 137,
-    easing:
-      'linear(0, 0.0969 10%, 0.2872 20%, 0.4827 30%, 0.6472 40%, 0.7719 50%, 0.8598 60%, 0.9183 70%, 0.9552 80%, 0.9774 90%, 1)',
-  },
+const typography = {
+  bodyLarge: { fontFamilyRole: token.ComponentTextFieldSharedTypographyBodyLargeFontFamily as 'plain', fontSize: pxNumber(token.ComponentTextFieldSharedTypographyBodyLargeFontSize), lineHeight: pxNumber(token.ComponentTextFieldSharedTypographyBodyLargeLineHeight), fontWeight: token.ComponentTextFieldSharedTypographyBodyLargeFontWeight as 400, letterSpacing: pxNumber(token.ComponentTextFieldSharedTypographyBodyLargeLetterSpacing) },
+  bodySmall: { fontFamilyRole: token.ComponentTextFieldSharedTypographyBodySmallFontFamily as 'plain', fontSize: pxNumber(token.ComponentTextFieldSharedTypographyBodySmallFontSize), lineHeight: pxNumber(token.ComponentTextFieldSharedTypographyBodySmallLineHeight), fontWeight: token.ComponentTextFieldSharedTypographyBodySmallFontWeight as 400, letterSpacing: pxNumber(token.ComponentTextFieldSharedTypographyBodySmallLetterSpacing) },
 } as const;
-
-/**
- * Material 3 filled TextField values resolved from AndroidX revision
- * 160825094a81825468a95b115bfb1b541e549856 using FilledTextFieldTokens,
- * TextFieldDefaults, TextFieldImpl and TypeScaleTokens.
- */
+const motion = { fastEffects: { durationMs: msNumber(token.ComponentTextFieldSharedMotionFastEffectsDuration), easing: token.ComponentTextFieldSharedMotionFastEffectsEasing }, fastSpatial: { durationMs: msNumber(token.ComponentTextFieldSharedMotionFastSpatialDuration), easing: token.ComponentTextFieldSharedMotionFastSpatialEasing } } as const;
+const colors = {
+  text: colorRole(token.ComponentTextFieldSharedColorsText), disabledText: colorRole(token.ComponentTextFieldSharedColorsDisabledText), cursor: colorRole(token.ComponentTextFieldSharedColorsCursor), errorCursor: colorRole(token.ComponentTextFieldSharedColorsErrorCursor), label: colorRole(token.ComponentTextFieldSharedColorsLabel), focusedLabel: colorRole(token.ComponentTextFieldSharedColorsFocusedLabel), disabledLabel: colorRole(token.ComponentTextFieldSharedColorsDisabledLabel), errorLabel: colorRole(token.ComponentTextFieldSharedColorsErrorLabel), placeholder: colorRole(token.ComponentTextFieldSharedColorsPlaceholder), disabledPlaceholder: colorRole(token.ComponentTextFieldSharedColorsDisabledPlaceholder), supporting: colorRole(token.ComponentTextFieldSharedColorsSupporting), disabledSupporting: colorRole(token.ComponentTextFieldSharedColorsDisabledSupporting), errorSupporting: colorRole(token.ComponentTextFieldSharedColorsErrorSupporting), leadingIcon: colorRole(token.ComponentTextFieldSharedColorsLeadingIcon), trailingIcon: colorRole(token.ComponentTextFieldSharedColorsTrailingIcon), disabledLeadingIcon: colorRole(token.ComponentTextFieldSharedColorsDisabledLeadingIcon), disabledTrailingIcon: colorRole(token.ComponentTextFieldSharedColorsDisabledTrailingIcon), errorLeadingIcon: colorRole(token.ComponentTextFieldSharedColorsErrorLeadingIcon), errorTrailingIcon: colorRole(token.ComponentTextFieldSharedColorsErrorTrailingIcon), prefix: colorRole(token.ComponentTextFieldSharedColorsPrefix), suffix: colorRole(token.ComponentTextFieldSharedColorsSuffix),
+} as const;
+const shared = { minWidth: pxNumber(token.ComponentTextFieldSharedMinWidth), minHeight: pxNumber(token.ComponentTextFieldSharedMinHeight), lineHeight: { inputMin: pxNumber(token.ComponentTextFieldSharedLineHeightInputMin), focusedLabelMin: pxNumber(token.ComponentTextFieldSharedLineHeightFocusedLabelMin), supportingMin: pxNumber(token.ComponentTextFieldSharedLineHeightSupportingMin) }, iconSize: pxNumber(token.ComponentTextFieldSharedIconSize), iconSlotSize: pxNumber(token.ComponentTextFieldSharedIconSlotSize), disabledOpacity: token.ComponentTextFieldSharedDisabledOpacity, colors, typography, motion } as const;
 export const filledTextFieldTokens = {
-  minWidth: 280,
-  minHeight: 56,
-
-  contentPadding: {
-    inline: 16,
-    blockWithLabel: 8,
-    blockWithoutLabel: 16,
-    supportingTop: 4,
-    affix: 2,
-    afterIcon: 4,
-  },
-
-  lineHeight: {
-    inputMin: 24,
-    focusedLabelMin: 16,
-    supportingMin: 16,
-  },
-
-  containerShape: {
-    topStartRadius: 4,
-    topEndRadius: 4,
-    bottomEndRadius: 0,
-    bottomStartRadius: 0,
-  },
-
-  indicator: {
-    unfocusedThickness: 1,
-    focusedThickness: 2,
-  },
-
-  iconSize: 24,
-  iconSlotSize: 48,
-
-  colors: {
-    container: 'surfaceContainerHighest',
-    text: 'onSurface',
-    disabledText: 'onSurface',
-    cursor: 'primary',
-    errorCursor: 'error',
-
-    indicator: 'onSurfaceVariant',
-    focusedIndicator: 'primary',
-    disabledIndicator: 'onSurface',
-    errorIndicator: 'error',
-
-    label: 'onSurfaceVariant',
-    focusedLabel: 'primary',
-    disabledLabel: 'onSurface',
-    errorLabel: 'error',
-
-    placeholder: 'onSurfaceVariant',
-    disabledPlaceholder: 'onSurface',
-
-    supporting: 'onSurfaceVariant',
-    disabledSupporting: 'onSurface',
-    errorSupporting: 'error',
-
-    leadingIcon: 'onSurfaceVariant',
-    trailingIcon: 'onSurfaceVariant',
-    disabledLeadingIcon: 'onSurface',
-    disabledTrailingIcon: 'onSurface',
-    errorLeadingIcon: 'onSurfaceVariant',
-    errorTrailingIcon: 'error',
-
-    prefix: 'onSurfaceVariant',
-    suffix: 'onSurfaceVariant',
-  },
-
-  disabledOpacity: 0.38,
-  typography: textFieldTypography,
-  motion: textFieldMotion,
+  ...shared,
+  contentPadding: { inline: pxNumber(token.ComponentTextFieldFilledContentPaddingInline), blockWithLabel: pxNumber(token.ComponentTextFieldFilledContentPaddingBlockWithLabel), blockWithoutLabel: pxNumber(token.ComponentTextFieldFilledContentPaddingBlockWithoutLabel), supportingTop: pxNumber(token.ComponentTextFieldFilledContentPaddingSupportingTop), affix: pxNumber(token.ComponentTextFieldFilledContentPaddingAffix), afterIcon: pxNumber(token.ComponentTextFieldFilledContentPaddingAfterIcon) },
+  containerShape: { topStartRadius: pxNumber(token.ComponentTextFieldFilledContainerShapeTopStartRadius), topEndRadius: pxNumber(token.ComponentTextFieldFilledContainerShapeTopEndRadius), bottomEndRadius: pxNumber(token.ComponentTextFieldFilledContainerShapeBottomEndRadius), bottomStartRadius: pxNumber(token.ComponentTextFieldFilledContainerShapeBottomStartRadius) }, indicator: { unfocusedThickness: pxNumber(token.ComponentTextFieldFilledIndicatorUnfocusedThickness), focusedThickness: pxNumber(token.ComponentTextFieldFilledIndicatorFocusedThickness) },
+  colors: { ...colors, container: colorRole(token.ComponentTextFieldFilledColorsContainer), indicator: colorRole(token.ComponentTextFieldFilledColorsIndicator), focusedIndicator: colorRole(token.ComponentTextFieldFilledColorsFocusedIndicator), disabledIndicator: colorRole(token.ComponentTextFieldFilledColorsDisabledIndicator), errorIndicator: colorRole(token.ComponentTextFieldFilledColorsErrorIndicator) },
 } as const;
-
-/**
- * Material 3 outlined TextField values resolved from the same AndroidX revision
- * as the filled field. The default container is transparent; the outline owns
- * the visual container state.
- */
 export const outlinedTextFieldTokens = {
-  minWidth: 280,
-  minHeight: 56,
-
-  contentPadding: {
-    inline: 16,
-    block: 16,
-    supportingTop: 4,
-    affix: 2,
-    afterIcon: 4,
-    cutoutInline: 4,
-    topPadding: 8,
-  },
-
-  lineHeight: {
-    inputMin: 24,
-    focusedLabelMin: 16,
-    supportingMin: 16,
-  },
-
-  containerShape: {
-    topStartRadius: 4,
-    topEndRadius: 4,
-    bottomEndRadius: 4,
-    bottomStartRadius: 4,
-  },
-
-  outline: {
-    unfocusedThickness: 1,
-    focusedThickness: 2,
-    disabledOpacity: 0.12,
-  },
-
-  iconSize: 24,
-  iconSlotSize: 48,
-
-  colors: {
-    text: 'onSurface',
-    disabledText: 'onSurface',
-    cursor: 'primary',
-    errorCursor: 'error',
-
-    outline: 'outline',
-    focusedOutline: 'primary',
-    disabledOutline: 'onSurface',
-    errorOutline: 'error',
-
-    label: 'onSurfaceVariant',
-    focusedLabel: 'primary',
-    disabledLabel: 'onSurface',
-    errorLabel: 'error',
-
-    placeholder: 'onSurfaceVariant',
-    disabledPlaceholder: 'onSurface',
-
-    supporting: 'onSurfaceVariant',
-    disabledSupporting: 'onSurface',
-    errorSupporting: 'error',
-
-    leadingIcon: 'onSurfaceVariant',
-    trailingIcon: 'onSurfaceVariant',
-    disabledLeadingIcon: 'onSurface',
-    disabledTrailingIcon: 'onSurface',
-    errorLeadingIcon: 'onSurfaceVariant',
-    errorTrailingIcon: 'error',
-
-    prefix: 'onSurfaceVariant',
-    suffix: 'onSurfaceVariant',
-  },
-
-  disabledOpacity: 0.38,
-  typography: textFieldTypography,
-  motion: textFieldMotion,
+  ...shared,
+  contentPadding: { inline: pxNumber(token.ComponentTextFieldOutlinedContentPaddingInline), block: pxNumber(token.ComponentTextFieldOutlinedContentPaddingBlock), supportingTop: pxNumber(token.ComponentTextFieldOutlinedContentPaddingSupportingTop), affix: pxNumber(token.ComponentTextFieldOutlinedContentPaddingAffix), afterIcon: pxNumber(token.ComponentTextFieldOutlinedContentPaddingAfterIcon), cutoutInline: pxNumber(token.ComponentTextFieldOutlinedContentPaddingCutoutInline), topPadding: pxNumber(token.ComponentTextFieldOutlinedContentPaddingTopPadding) },
+  containerShape: { topStartRadius: pxNumber(token.ComponentTextFieldOutlinedContainerShapeTopStartRadius), topEndRadius: pxNumber(token.ComponentTextFieldOutlinedContainerShapeTopEndRadius), bottomEndRadius: pxNumber(token.ComponentTextFieldOutlinedContainerShapeBottomEndRadius), bottomStartRadius: pxNumber(token.ComponentTextFieldOutlinedContainerShapeBottomStartRadius) }, outline: { unfocusedThickness: pxNumber(token.ComponentTextFieldOutlinedOutlineUnfocusedThickness), focusedThickness: pxNumber(token.ComponentTextFieldOutlinedOutlineFocusedThickness), disabledOpacity: token.ComponentTextFieldOutlinedOutlineDisabledOpacity },
+  colors: { ...colors, outline: colorRole(token.ComponentTextFieldOutlinedColorsOutline), focusedOutline: colorRole(token.ComponentTextFieldOutlinedColorsFocusedOutline), disabledOutline: colorRole(token.ComponentTextFieldOutlinedColorsDisabledOutline), errorOutline: colorRole(token.ComponentTextFieldOutlinedColorsErrorOutline) },
 } as const;
-
 export type FilledTextFieldTokens = typeof filledTextFieldTokens;
 export type OutlinedTextFieldTokens = typeof outlinedTextFieldTokens;

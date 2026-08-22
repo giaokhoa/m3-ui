@@ -1,12 +1,13 @@
-import { elevationTokensGenerated } from './generated/androidx/elevation.js';
+import * as token from '@m3/tokens/generated';
+import { msNumber, pxNumber } from './value.js';
 
 export const elevationLevels = {
-  level0: elevationTokensGenerated.level0,
-  level1: elevationTokensGenerated.level1,
-  level2: elevationTokensGenerated.level2,
-  level3: elevationTokensGenerated.level3,
-  level4: elevationTokensGenerated.level4,
-  level5: elevationTokensGenerated.level5,
+  level0: pxNumber(token.ElevationLevel0),
+  level1: pxNumber(token.ElevationLevel1),
+  level2: pxNumber(token.ElevationLevel2),
+  level3: pxNumber(token.ElevationLevel3),
+  level4: pxNumber(token.ElevationLevel4),
+  level5: pxNumber(token.ElevationLevel5),
 } as const;
 
 export type ElevationLevel = keyof typeof elevationLevels;
@@ -19,58 +20,45 @@ export interface ElevationShadowLayer {
   readonly opacity: number;
 }
 
-/**
- * Current AndroidX Material3 internal elevation transition specs.
- * Shared by buttons, cards, chips and other elevation-aware components.
- */
 export const elevationMotionTokens = {
-  incoming: {
-    durationMs: 120,
-    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-  outgoing: {
-    durationMs: 150,
-    easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
-  },
-  hoveredOutgoing: {
-    durationMs: 120,
-    easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
-  },
+  incoming: { durationMs: msNumber(token.MotionElevationIncomingDuration), easing: token.MotionElevationIncomingEasing },
+  outgoing: { durationMs: msNumber(token.MotionElevationOutgoingDuration), easing: token.MotionElevationOutgoingEasing },
+  hoveredOutgoing: { durationMs: msNumber(token.MotionElevationHoveredOutgoingDuration), easing: token.MotionElevationHoveredOutgoingEasing },
 } as const;
 
-/**
- * Web shadow geometry is a platform adaptation, not AndroidX generated token data.
- * Keep it handwritten next to the generated dp elevation levels.
- */
+function layer(offsetX: string, offsetY: string, blurRadius: string, spreadRadius: string, opacity: number): ElevationShadowLayer {
+  return { offsetX: pxNumber(offsetX), offsetY: pxNumber(offsetY), blurRadius: pxNumber(blurRadius), spreadRadius: pxNumber(spreadRadius), opacity };
+}
+
 export const elevationShadowLayers = {
   level0: [
-    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.2 },
-    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.14 },
-    { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.12 },
+    layer(token.ElevationShadowLevel0Layer1OffsetX, token.ElevationShadowLevel0Layer1OffsetY, token.ElevationShadowLevel0Layer1BlurRadius, token.ElevationShadowLevel0Layer1SpreadRadius, token.ElevationShadowLevel0Layer1Opacity),
+    layer(token.ElevationShadowLevel0Layer2OffsetX, token.ElevationShadowLevel0Layer2OffsetY, token.ElevationShadowLevel0Layer2BlurRadius, token.ElevationShadowLevel0Layer2SpreadRadius, token.ElevationShadowLevel0Layer2Opacity),
+    layer(token.ElevationShadowLevel0Layer3OffsetX, token.ElevationShadowLevel0Layer3OffsetY, token.ElevationShadowLevel0Layer3BlurRadius, token.ElevationShadowLevel0Layer3SpreadRadius, token.ElevationShadowLevel0Layer3Opacity),
   ],
   level1: [
-    { offsetX: 0, offsetY: 2, blurRadius: 1, spreadRadius: -1, opacity: 0.2 },
-    { offsetX: 0, offsetY: 1, blurRadius: 1, spreadRadius: 0, opacity: 0.14 },
-    { offsetX: 0, offsetY: 1, blurRadius: 3, spreadRadius: 0, opacity: 0.12 },
+    layer(token.ElevationShadowLevel1Layer1OffsetX, token.ElevationShadowLevel1Layer1OffsetY, token.ElevationShadowLevel1Layer1BlurRadius, token.ElevationShadowLevel1Layer1SpreadRadius, token.ElevationShadowLevel1Layer1Opacity),
+    layer(token.ElevationShadowLevel1Layer2OffsetX, token.ElevationShadowLevel1Layer2OffsetY, token.ElevationShadowLevel1Layer2BlurRadius, token.ElevationShadowLevel1Layer2SpreadRadius, token.ElevationShadowLevel1Layer2Opacity),
+    layer(token.ElevationShadowLevel1Layer3OffsetX, token.ElevationShadowLevel1Layer3OffsetY, token.ElevationShadowLevel1Layer3BlurRadius, token.ElevationShadowLevel1Layer3SpreadRadius, token.ElevationShadowLevel1Layer3Opacity),
   ],
   level2: [
-    { offsetX: 0, offsetY: 3, blurRadius: 3, spreadRadius: -2, opacity: 0.2 },
-    { offsetX: 0, offsetY: 3, blurRadius: 4, spreadRadius: 0, opacity: 0.14 },
-    { offsetX: 0, offsetY: 1, blurRadius: 8, spreadRadius: 0, opacity: 0.12 },
+    layer(token.ElevationShadowLevel2Layer1OffsetX, token.ElevationShadowLevel2Layer1OffsetY, token.ElevationShadowLevel2Layer1BlurRadius, token.ElevationShadowLevel2Layer1SpreadRadius, token.ElevationShadowLevel2Layer1Opacity),
+    layer(token.ElevationShadowLevel2Layer2OffsetX, token.ElevationShadowLevel2Layer2OffsetY, token.ElevationShadowLevel2Layer2BlurRadius, token.ElevationShadowLevel2Layer2SpreadRadius, token.ElevationShadowLevel2Layer2Opacity),
+    layer(token.ElevationShadowLevel2Layer3OffsetX, token.ElevationShadowLevel2Layer3OffsetY, token.ElevationShadowLevel2Layer3BlurRadius, token.ElevationShadowLevel2Layer3SpreadRadius, token.ElevationShadowLevel2Layer3Opacity),
   ],
   level3: [
-    { offsetX: 0, offsetY: 3, blurRadius: 5, spreadRadius: -1, opacity: 0.2 },
-    { offsetX: 0, offsetY: 6, blurRadius: 10, spreadRadius: 0, opacity: 0.14 },
-    { offsetX: 0, offsetY: 1, blurRadius: 18, spreadRadius: 0, opacity: 0.12 },
+    layer(token.ElevationShadowLevel3Layer1OffsetX, token.ElevationShadowLevel3Layer1OffsetY, token.ElevationShadowLevel3Layer1BlurRadius, token.ElevationShadowLevel3Layer1SpreadRadius, token.ElevationShadowLevel3Layer1Opacity),
+    layer(token.ElevationShadowLevel3Layer2OffsetX, token.ElevationShadowLevel3Layer2OffsetY, token.ElevationShadowLevel3Layer2BlurRadius, token.ElevationShadowLevel3Layer2SpreadRadius, token.ElevationShadowLevel3Layer2Opacity),
+    layer(token.ElevationShadowLevel3Layer3OffsetX, token.ElevationShadowLevel3Layer3OffsetY, token.ElevationShadowLevel3Layer3BlurRadius, token.ElevationShadowLevel3Layer3SpreadRadius, token.ElevationShadowLevel3Layer3Opacity),
   ],
   level4: [
-    { offsetX: 0, offsetY: 5, blurRadius: 5, spreadRadius: -3, opacity: 0.2 },
-    { offsetX: 0, offsetY: 8, blurRadius: 10, spreadRadius: 1, opacity: 0.14 },
-    { offsetX: 0, offsetY: 3, blurRadius: 14, spreadRadius: 2, opacity: 0.12 },
+    layer(token.ElevationShadowLevel4Layer1OffsetX, token.ElevationShadowLevel4Layer1OffsetY, token.ElevationShadowLevel4Layer1BlurRadius, token.ElevationShadowLevel4Layer1SpreadRadius, token.ElevationShadowLevel4Layer1Opacity),
+    layer(token.ElevationShadowLevel4Layer2OffsetX, token.ElevationShadowLevel4Layer2OffsetY, token.ElevationShadowLevel4Layer2BlurRadius, token.ElevationShadowLevel4Layer2SpreadRadius, token.ElevationShadowLevel4Layer2Opacity),
+    layer(token.ElevationShadowLevel4Layer3OffsetX, token.ElevationShadowLevel4Layer3OffsetY, token.ElevationShadowLevel4Layer3BlurRadius, token.ElevationShadowLevel4Layer3SpreadRadius, token.ElevationShadowLevel4Layer3Opacity),
   ],
   level5: [
-    { offsetX: 0, offsetY: 7, blurRadius: 8, spreadRadius: -4, opacity: 0.2 },
-    { offsetX: 0, offsetY: 12, blurRadius: 17, spreadRadius: 2, opacity: 0.14 },
-    { offsetX: 0, offsetY: 5, blurRadius: 22, spreadRadius: 4, opacity: 0.12 },
+    layer(token.ElevationShadowLevel5Layer1OffsetX, token.ElevationShadowLevel5Layer1OffsetY, token.ElevationShadowLevel5Layer1BlurRadius, token.ElevationShadowLevel5Layer1SpreadRadius, token.ElevationShadowLevel5Layer1Opacity),
+    layer(token.ElevationShadowLevel5Layer2OffsetX, token.ElevationShadowLevel5Layer2OffsetY, token.ElevationShadowLevel5Layer2BlurRadius, token.ElevationShadowLevel5Layer2SpreadRadius, token.ElevationShadowLevel5Layer2Opacity),
+    layer(token.ElevationShadowLevel5Layer3OffsetX, token.ElevationShadowLevel5Layer3OffsetY, token.ElevationShadowLevel5Layer3BlurRadius, token.ElevationShadowLevel5Layer3SpreadRadius, token.ElevationShadowLevel5Layer3Opacity),
   ],
 } as const satisfies Record<ElevationLevel, readonly ElevationShadowLayer[]>;
