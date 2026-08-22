@@ -1,0 +1,28 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "date-input-modal-container-color",
+      "materialWeb": "surfaceContainerHigh",
+      "composeGenerated": "surface",
+      "canonicalComposeSemantic": "component.dateInputModal.containerColor = surface",
+      "canonicalWebSemantic": "component.dateInputModal.webContainerColor = surfaceContainerHigh",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 uses surface-container-high for the Date Input modal container while pinned Compose generated tokens retain surface. Preserve both source semantics explicitly."
+    },
+    {
+      "id": "date-picker-modal-container-height",
+      "materialWeb": "524px",
+      "composeGenerated": "568dp",
+      "canonicalComposeSemantic": "component.datePickerModal.containerHeight = 568px",
+      "canonicalWebSemantic": "component.datePickerModal.webContainerHeight = 524px",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 defines the Date Picker modal at 524px high while pinned Compose generated tokens define 568dp. Preserve both source dimensions instead of overwriting either source."
+    }
+  ],
+  "schemaVersion": 1
+}
