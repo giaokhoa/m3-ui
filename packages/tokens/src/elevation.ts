@@ -1,10 +1,12 @@
+import { elevationTokensGenerated } from './generated/androidx/elevation.js';
+
 export const elevationLevels = {
-  level0: 0,
-  level1: 1,
-  level2: 3,
-  level3: 6,
-  level4: 8,
-  level5: 12,
+  level0: elevationTokensGenerated.level0,
+  level1: elevationTokensGenerated.level1,
+  level2: elevationTokensGenerated.level2,
+  level3: elevationTokensGenerated.level3,
+  level4: elevationTokensGenerated.level4,
+  level5: elevationTokensGenerated.level5,
 } as const;
 
 export type ElevationLevel = keyof typeof elevationLevels;
@@ -36,6 +38,10 @@ export const elevationMotionTokens = {
   },
 } as const;
 
+/**
+ * Web shadow geometry is a platform adaptation, not AndroidX generated token data.
+ * Keep it handwritten next to the generated dp elevation levels.
+ */
 export const elevationShadowLayers = {
   level0: [
     { offsetX: 0, offsetY: 0, blurRadius: 0, spreadRadius: 0, opacity: 0.2 },
