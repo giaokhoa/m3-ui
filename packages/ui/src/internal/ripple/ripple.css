@@ -29,6 +29,50 @@
   transition-duration: var(--_ripple-focus-in-duration);
 }
 
+.m3-ripple__focus-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--_ripple-focus-ring-radius);
+  pointer-events: none;
+}
+
+.m3-ripple__focus-ring::before,
+.m3-ripple__focus-ring::after {
+  position: absolute;
+  box-sizing: border-box;
+  content: '';
+  inset: 0;
+  border-style: solid;
+  border-width: 0;
+  border-radius: inherit;
+  transition-property: inset, border-width;
+  transition-duration: var(--_ripple-focus-ring-out-duration);
+  transition-timing-function: var(--_ripple-focus-ring-out-easing);
+}
+
+/* Compose draws the inner stroke first and the outer stroke second. */
+.m3-ripple__focus-ring::before {
+  border-color: var(--_ripple-focus-ring-inner-color);
+}
+
+.m3-ripple__focus-ring::after {
+  border-color: var(--_ripple-focus-ring-outer-color);
+}
+
+.m3-ripple[data-inset-focus-visible] .m3-ripple__focus-ring::before {
+  inset: var(--_ripple-focus-ring-inner-inset);
+  border-width: var(--_ripple-focus-ring-inner-width);
+  transition-duration: var(--_ripple-focus-ring-in-duration);
+  transition-timing-function: var(--_ripple-focus-ring-in-easing);
+}
+
+.m3-ripple[data-inset-focus-visible] .m3-ripple__focus-ring::after {
+  inset: var(--_ripple-focus-ring-outer-inset);
+  border-width: var(--_ripple-focus-ring-outer-width);
+  transition-duration: var(--_ripple-focus-ring-in-duration);
+  transition-timing-function: var(--_ripple-focus-ring-in-easing);
+}
+
 .m3-ripple__wave {
   left: var(--_ripple-x);
   top: var(--_ripple-y);
@@ -68,5 +112,19 @@
 
   to {
     opacity: var(--_ripple-pressed-opacity);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-ripple__focus-ring::before,
+  .m3-ripple__focus-ring::after {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  /* Component-level forced-colors focus affordances remain the source of truth. */
+  .m3-ripple__focus-ring {
+    display: none;
   }
 }
