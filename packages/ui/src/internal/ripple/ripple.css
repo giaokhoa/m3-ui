@@ -31,6 +31,7 @@
 
 .m3-ripple__focus-ring {
   position: absolute;
+  z-index: 2;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
