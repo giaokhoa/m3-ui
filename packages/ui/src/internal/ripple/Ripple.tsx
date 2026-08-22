@@ -87,9 +87,6 @@ export function Ripple({
       style={tokenStyle}
     >
       <span className="m3-ripple__state-layer" />
-      {rippleFocus === 'inset-ring' ? (
-        <span className="m3-ripple__focus-ring" />
-      ) : null}
       {controller.waves.map((wave) => {
         const waveStyle: RippleStyle = {
           '--_ripple-x': `${wave.x}px`,
@@ -109,6 +106,9 @@ export function Ripple({
           />
         );
       })}
+      {rippleFocus === 'inset-ring' ? (
+        <span className="m3-ripple__focus-ring" />
+      ) : null}
     </span>
   );
 }
