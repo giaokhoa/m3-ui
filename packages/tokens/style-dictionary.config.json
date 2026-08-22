@@ -2,16 +2,6 @@
   "source": ["tokens/**/*.json"],
   "usesDtcg": true,
   "platforms": {
-    "css": {
-      "transformGroup": "css",
-      "buildPath": "dist/generated/",
-      "files": [
-        {
-          "destination": "tokens.css",
-          "format": "css/variables"
-        }
-      ]
-    },
     "js": {
       "transformGroup": "js",
       "buildPath": "dist/generated/",
@@ -21,8 +11,11 @@
           "format": "javascript/es6"
         },
         {
-          "destination": "tokens.json",
-          "format": "json/nested"
+          "destination": "tokens.d.ts",
+          "format": "typescript/es6-declarations",
+          "options": {
+            "outputStringLiterals": true
+          }
         }
       ]
     }

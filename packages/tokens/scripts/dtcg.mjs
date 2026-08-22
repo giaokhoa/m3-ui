@@ -32,14 +32,6 @@ export function collectTokens(root) {
 
 export function validateCanonical(root) {
   const errors = [];
-  const metadata = root?.$extensions?.['m3-ui'];
-  if (metadata?.authority !== 'canonical') {
-    errors.push('root $extensions.m3-ui.authority must be "canonical"');
-  }
-  if (metadata?.policy !== 'manual-review') {
-    errors.push('root $extensions.m3-ui.policy must be "manual-review"');
-  }
-
   const tokens = collectTokens(root);
   if (tokens.size === 0) errors.push('canonical source contains no tokens');
 

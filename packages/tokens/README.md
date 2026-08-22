@@ -1,77 +1,58 @@
-# @m3/tokens
+# Tokens
 
-Canonical Material 3 design-token package shared by `@m3/ui` and future consumers.
+Target publish scope: `@m3-ui/tokens`. The workspace keeps its current package scope until the repository-wide namespace migration is done in one atomic change.
 
-## Authority model
+## Source of truth
 
-`tokens/**/*.json` is the **only authoritative token source in this repository**. It uses the DTCG `$type` / `$value` format and is owned, reviewed, and changed manually by this project.
+`tokens/**/*.json` is the only authoritative token source. The files use plain DTCG `$type` / `$value` tokens and intentionally contain no project-specific ownership, provenance, or audit metadata.
 
-AndroidX Compose, the Material 3 Figma Design Kit, Material Web, and other upstreams are references only. They may be parsed into temporary graphs for audit, but they must never generate or rewrite canonical DTCG files.
+AndroidX Compose, the Material 3 Figma Design Kit, Material Web, and other upstreams are read-only references. Audit code owns all source mapping and revision information; upstream data must never generate or rewrite canonical token files.
 
 ```text
 AndroidX Compose ─┐
 Figma M3 Kit ─────┼── normalize ──> read-only semantic diff
-Material Web ─────┘                         │
-                                           ▼
-                                  tokens/**/*.json
-                                  CANONICAL / REVIEWED
-                                           │
-                                           ▼
-                                    Style Dictionary
-                                           │
-                             ┌─────────────┼─────────────┐
-                             ▼             ▼             ▼
-                            CSS            JS            JSON
+Material Web ─────┘
+
+                         tokens/**/*.json
+                         CANONICAL / REVIEWED
+                                │
+                                ▼
+                         Style Dictionary
+                                │
+                       ┌────────┴────────┐
+                       ▼                 ▼
+                   tokens.js        tokens.d.ts
 ```
 
-The important consequence is that an upstream update cannot silently change the library. It can only make an audit fail. A maintainer then reviews the upstream change and deliberately edits the canonical token source if the project should adopt it.
+## Dynamic color
 
-## Package boundary
+`ThemeProvider` remains the owner of actual theme colors. It computes the scheme from `sourceColor`, mode, and contrast, then assigns role variables such as `--primary`, `--on-primary`, and `--surface` on the provider root.
 
-`@m3/tokens` must not depend on React, React Aria, DOM APIs, or `@m3/ui`. Runtime theme state does not belong here.
-
-`ThemeProvider` owns runtime decisions such as light/dark schemes and dynamic color. Components consume immutable geometry, state opacity, typography, shape, motion and component defaults from this package. Runtime theme colors remain CSS-variable driven where the value is inherently dynamic.
-
-## Canonical source
-
-The initial prototype is `tokens/m3.json`. It covers enough core, Button, and Switch data to prove the architecture before migrating every existing handwritten token module.
-
-Every canonical source must declare:
+Canonical component tokens refer to those runtime roles as ordinary DTCG strings:
 
 ```json
 {
-  "$extensions": {
-    "m3-ui": {
-      "authority": "canonical",
-      "policy": "manual-review"
-    }
+  "containerColor": {
+    "$type": "string",
+    "$value": "var(--primary)"
   }
 }
 ```
 
-`$extensions.m3-ui.references` may record upstream revisions used during review. That metadata is evidence, not authority.
+There is no static fallback color in the token package and no extra `$extensions` metadata. Nested `ThemeProvider`s continue to work through normal CSS custom-property inheritance.
 
-## Validation and tests
-
-- `pnpm --filter @m3/tokens validate` validates DTCG structure, ownership metadata, supported types, aliases and cycles.
-- `pnpm --filter @m3/tokens test` runs validation plus unit tests for alias resolution and drift classification.
-- `pnpm --filter @m3/tokens audit:androidx` parses the pinned AndroidX token sources and compares mapped values against canonical DTCG without writing files.
-
-The package test script participates in the workspace `turbo test`, so canonical validation runs in normal CI.
+All non-color values use their natural DTCG types, for example `dimension` and `number`. They are generated as JavaScript/TypeScript constants and do not become CSS custom properties.
 
 ## Style Dictionary
 
-`style-dictionary.config.json` is the generation contract. It reads only `tokens/**/*.json` and defines CSS, JavaScript and nested JSON outputs. Style Dictionary is deliberately downstream of the canonical source; replacing a formatter must never redefine token ownership.
+Style Dictionary is the build engine, not a sidecar formatter. `style-dictionary.config.json` uses its built-in `js` transform group, `javascript/es6`, and `typescript/es6-declarations` formats. No custom TypeScript generator is used.
 
-The repository currently keeps the existing TypeScript exports while this architecture is proven. The migration step is to generate those public exports from DTCG and then delete duplicate literals from `src/*.ts`.
+Generated files live under `dist/generated/` and are available from the temporary `./generated` package export while handwritten token modules are migrated. Once consumers are moved, duplicate handwritten token literals can be deleted.
 
-## Upstream audit policy
+## Validation and audit
 
-Audits are asymmetric:
+- `pnpm --filter @m3/tokens validate` validates canonical DTCG structure, aliases, cycles, and supported primitive types.
+- `pnpm --filter @m3/tokens test` validates the source, runs Style Dictionary, and tests both DTCG behavior and generated JS/TypeScript output.
+- `pnpm --filter @m3/tokens audit:androidx` compares mapped canonical values with the pinned AndroidX source without writing canonical files.
 
-- canonical exists + upstream differs → `mismatch`;
-- canonical exists + upstream disappeared → `missing-reference`;
-- mapped upstream exists + canonical is absent → `missing-canonical`;
-- equal semantic values → `match`.
-
-Audit code must be read-only. Tests explicitly verify that comparison does not mutate either graph.
+Audits are asymmetric: matching values pass; mismatches, missing canonical mappings, and missing upstream references fail review. Audit code must remain read-only.

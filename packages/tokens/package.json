@@ -13,6 +13,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./generated": {
+      "types": "./dist/generated/tokens.d.ts",
+      "import": "./dist/generated/tokens.js"
+    },
     "./button": {
       "types": "./dist/button.d.ts",
       "import": "./dist/button.js"
@@ -64,11 +68,15 @@
     "./source": "./tokens/m3.json"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "test": "node scripts/validate.mjs && node --test scripts/*.test.mjs",
+    "tokens:build": "style-dictionary build --config style-dictionary.config.json",
+    "build": "pnpm tokens:build && tsc -p tsconfig.build.json",
+    "test": "node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "style-dictionary": "5.5.2"
   }
 }

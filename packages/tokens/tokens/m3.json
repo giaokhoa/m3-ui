@@ -1,16 +1,4 @@
 {
-  "$description": "Canonical Material 3 design tokens owned by @m3/tokens. Upstream sources are references for audit only and never generate this file.",
-  "$extensions": {
-    "m3-ui": {
-      "authority": "canonical",
-      "policy": "manual-review",
-      "references": {
-        "androidxRevision": "160825094a81825468a95b115bfb1b541e549856",
-        "figmaLibrary": "Material 3 Design Kit",
-        "figmaVersion": "1.25"
-      }
-    }
-  },
   "state": {
     "layer": {
       "opacity": {
@@ -82,6 +70,39 @@
           "inlineEnd": { "$type": "dimension", "$value": "{component.button.baseline.padding.inlineEnd}" }
         }
       },
+      "variant": {
+        "filled": {
+          "containerColor": { "$type": "string", "$value": "var(--primary)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        },
+        "elevated": {
+          "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+          "contentColor": { "$type": "string", "$value": "var(--primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        },
+        "filledTonal": {
+          "containerColor": { "$type": "string", "$value": "var(--secondary-container)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        },
+        "outlined": {
+          "containerColor": { "$type": "string", "$value": "transparent" },
+          "contentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledContainerColor": { "$type": "string", "$value": "transparent" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "outlineColor": { "$type": "string", "$value": "var(--outline-variant)" }
+        },
+        "text": {
+          "containerColor": { "$type": "string", "$value": "transparent" },
+          "contentColor": { "$type": "string", "$value": "var(--primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "transparent" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        }
+      },
       "size": {
         "extraSmall": {
           "height": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
@@ -138,7 +159,25 @@
         "iconSize": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
       },
       "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
-      "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } }
+      "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "colors": {
+        "checkedThumb": { "$type": "string", "$value": "var(--on-primary)" },
+        "checkedTrack": { "$type": "string", "$value": "var(--primary)" },
+        "checkedBorder": { "$type": "string", "$value": "transparent" },
+        "checkedIcon": { "$type": "string", "$value": "var(--on-primary-container)" },
+        "uncheckedThumb": { "$type": "string", "$value": "var(--outline)" },
+        "uncheckedTrack": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "uncheckedBorder": { "$type": "string", "$value": "var(--outline)" },
+        "uncheckedIcon": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "disabledCheckedThumb": { "$type": "string", "$value": "var(--surface)" },
+        "disabledCheckedTrack": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledCheckedBorder": { "$type": "string", "$value": "transparent" },
+        "disabledCheckedIcon": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledUncheckedThumb": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledUncheckedTrack": { "$type": "string", "$value": "var(--surface-container-highest)" },
+        "disabledUncheckedBorder": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledUncheckedIcon": { "$type": "string", "$value": "var(--surface-container-highest)" }
+      }
     }
   }
 }
