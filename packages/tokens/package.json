@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "files": ["dist"],
+  "files": ["dist", "tokens"],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -60,10 +60,14 @@
     "./typography": {
       "types": "./dist/typography.d.ts",
       "import": "./dist/typography.js"
-    }
+    },
+    "./source": "./tokens/m3.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "test": "node scripts/validate.mjs && node --test scripts/*.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "audit:androidx": "node scripts/audit-androidx.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
   }
