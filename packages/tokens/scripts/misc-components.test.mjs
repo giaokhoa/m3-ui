@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+const generatedUrl = new URL('../dist/generated/tokens.js', import.meta.url);
+test('Style Dictionary emits reconciled small component families', async () => {
+  const token = await import(`${generatedUrl.href}?small-components=${Date.now()}`);
+  assert.equal(token.ComponentBadgeSmallSize, '6px');
+  assert.equal(token.ComponentBadgeLargeLabelTypography, 'labelSmall');
+  assert.equal(token.ComponentDividerColor, 'var(--outline-variant)');
+  assert.equal(token.ComponentDividerThickness, '1px');
+  assert.equal(token.ComponentDragHandleDefaultWidth, '4px');
+  assert.equal(token.ComponentDragHandleDraggedHeight, '52px');
+  assert.equal(token.ComponentDragHandlePressedShape, 'medium');
+  assert.equal(token.ComponentBottomAppBarContainerColor, 'var(--surface-container)');
+  assert.equal(token.ComponentBottomAppBarContainerElevation, 'level2');
+  assert.equal(token.ComponentBottomAppBarContainerHeight, '80px');
+  assert.equal(token.ComponentSnackbarActionLabelTextColor, 'var(--inverse-primary)');
+  assert.equal(token.ComponentSnackbarContainerShape, 'extraSmall');
+  assert.equal(token.ComponentSnackbarIconSize, '24px');
+  assert.equal(token.ComponentSnackbarSupportingTextTypography, 'bodyMedium');
+});
