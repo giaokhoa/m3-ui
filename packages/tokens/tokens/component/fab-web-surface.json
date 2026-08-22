@@ -1,0 +1,62 @@
+{
+  "component": {
+    "fab": {
+      "surface": {
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "containerWidth": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "containerColor": { "$type": "string", "$value": "var(--surface-container-high)" },
+        "containerElevation": { "$type": "string", "$value": "level3" },
+        "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+        "containerShape": { "$type": "string", "$value": "large" },
+        "focusContainerElevation": { "$type": "string", "$value": "level3" },
+        "focusIconColor": { "$type": "string", "$value": "var(--primary)" },
+        "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+        "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+        "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+        "focusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "hoverContainerElevation": { "$type": "string", "$value": "level4" },
+        "hoverIconColor": { "$type": "string", "$value": "var(--primary)" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "iconColor": { "$type": "string", "$value": "var(--primary)" },
+        "loweredContainerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+        "loweredContainerElevation": { "$type": "string", "$value": "level1" },
+        "loweredFocusContainerElevation": { "$type": "string", "$value": "level1" },
+        "loweredHoverContainerElevation": { "$type": "string", "$value": "level2" },
+        "loweredPressedContainerElevation": { "$type": "string", "$value": "level1" },
+        "pressedContainerElevation": { "$type": "string", "$value": "level3" },
+        "pressedIconColor": { "$type": "string", "$value": "var(--primary)" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+      },
+      "branded": {
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "containerWidth": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 36, "unit": "px" } },
+        "containerColor": { "$type": "string", "$value": "var(--surface-container-high)" },
+        "containerElevation": { "$type": "string", "$value": "level3" },
+        "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+        "containerShape": { "$type": "string", "$value": "large" },
+        "focusContainerElevation": { "$type": "string", "$value": "level3" },
+        "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+        "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+        "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+        "focusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "hoverContainerElevation": { "$type": "string", "$value": "level4" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "loweredContainerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+        "loweredContainerElevation": { "$type": "string", "$value": "level1" },
+        "loweredFocusContainerElevation": { "$type": "string", "$value": "level1" },
+        "loweredHoverContainerElevation": { "$type": "string", "$value": "level2" },
+        "loweredPressedContainerElevation": { "$type": "string", "$value": "level1" },
+        "pressedContainerElevation": { "$type": "string", "$value": "level3" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+      }
+    }
+  }
+}
