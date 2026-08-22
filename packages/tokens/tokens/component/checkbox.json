@@ -6,6 +6,7 @@
       "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
       "strokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "labelColor": { "$type": "string", "$value": "var(--on-surface)" },
       "colors": {
         "selectedContainer": { "$type": "string", "$value": "var(--primary)" },
         "selectedIcon": { "$type": "string", "$value": "var(--on-primary)" },
