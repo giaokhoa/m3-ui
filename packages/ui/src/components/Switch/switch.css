@@ -1,0 +1,197 @@
+.m3-switch {
+  position: relative;
+  display: inline-flex;
+  min-block-size: var(--_switch-min-interactive-size);
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--on-surface);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --ripple-color: currentColor;
+}
+
+.m3-switch__control-slot {
+  display: inline-flex;
+  inline-size: var(--_switch-track-width);
+  min-block-size: var(--_switch-min-interactive-size);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.m3-switch__track {
+  position: relative;
+  inline-size: var(--_switch-track-width);
+  block-size: var(--_switch-track-height);
+  flex: none;
+  border-radius: calc(var(--_switch-track-height) / 2);
+  background: var(--_switch-unchecked-track-color);
+  box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
+    var(--_switch-unchecked-border-color);
+}
+
+/* Track indication paints over the thumb, matching Compose drawContent() -> focus ring. */
+.m3-switch__track > .m3-ripple {
+  z-index: 2;
+}
+
+.m3-switch__thumb-shell {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 50%;
+  inset-inline-start: 8px;
+  inline-size: var(--_switch-unchecked-thumb-size);
+  block-size: var(--_switch-unchecked-thumb-size);
+  transform: translateY(-50%);
+  transition:
+    inset-inline-start var(--_switch-geometry-duration) var(--_switch-geometry-easing),
+    inline-size var(--_switch-geometry-duration) var(--_switch-geometry-easing),
+    block-size var(--_switch-geometry-duration) var(--_switch-geometry-easing);
+}
+
+.m3-switch__state-layer {
+  position: absolute;
+  z-index: 0;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: var(--_switch-state-layer-size);
+  block-size: var(--_switch-state-layer-size);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.m3-switch__thumb {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--_switch-unchecked-thumb-color);
+  color: var(--_switch-unchecked-icon-color);
+}
+
+.m3-switch__icon {
+  display: inline-flex;
+  inline-size: var(--_switch-icon-size);
+  block-size: var(--_switch-icon-size);
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.m3-switch__icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.m3-switch__label {
+  min-inline-size: 0;
+}
+
+.m3-switch[data-has-thumb-content]:not([data-selected]) .m3-switch__thumb-shell {
+  inset-inline-start: 4px;
+  inline-size: var(--_switch-checked-thumb-size);
+  block-size: var(--_switch-checked-thumb-size);
+}
+
+.m3-switch[data-selected] .m3-switch__track {
+  background: var(--_switch-checked-track-color);
+  box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
+    var(--_switch-checked-border-color);
+}
+
+.m3-switch[data-selected] .m3-switch__thumb-shell {
+  inset-inline-start: 24px;
+  inline-size: var(--_switch-checked-thumb-size);
+  block-size: var(--_switch-checked-thumb-size);
+}
+
+.m3-switch[data-selected] .m3-switch__thumb {
+  background: var(--_switch-checked-thumb-color);
+  color: var(--_switch-checked-icon-color);
+}
+
+/* ThumbNode uses SnapSpec while pressed. Release returns through FastSpatial. */
+.m3-switch[data-pressed] .m3-switch__thumb-shell {
+  inline-size: var(--_switch-pressed-thumb-size);
+  block-size: var(--_switch-pressed-thumb-size);
+  transition: none;
+}
+
+.m3-switch[data-pressed]:not([data-selected]) .m3-switch__thumb-shell {
+  inset-inline-start: var(--_switch-track-outline-width);
+}
+
+.m3-switch[data-pressed][data-selected] .m3-switch__thumb-shell {
+  inset-inline-start: 22px;
+}
+
+.m3-switch[data-disabled] {
+  cursor: default;
+}
+
+.m3-switch[data-disabled]:not([data-selected]) .m3-switch__track {
+  background: var(--_switch-disabled-unchecked-track-color);
+  box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
+    var(--_switch-disabled-unchecked-border-color);
+}
+
+.m3-switch[data-disabled]:not([data-selected]) .m3-switch__thumb {
+  background: var(--_switch-disabled-unchecked-thumb-color);
+  color: var(--_switch-disabled-unchecked-icon-color);
+}
+
+.m3-switch[data-disabled][data-selected] .m3-switch__track {
+  background: var(--_switch-disabled-checked-track-color);
+  box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
+    var(--_switch-disabled-checked-border-color);
+}
+
+.m3-switch[data-disabled][data-selected] .m3-switch__thumb {
+  background: var(--_switch-disabled-checked-thumb-color);
+  color: var(--_switch-disabled-checked-icon-color);
+}
+
+.m3-switch[data-disabled] .m3-switch__label {
+  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+}
+
+.m3-switch[data-readonly] {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-switch__thumb-shell {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .m3-switch__track {
+    background: Canvas;
+    box-shadow: inset 0 0 0 var(--_switch-track-outline-width) CanvasText;
+  }
+
+  .m3-switch__thumb,
+  .m3-switch[data-selected] .m3-switch__thumb {
+    background: CanvasText;
+    color: Canvas;
+  }
+
+  .m3-switch[data-focus-visible] .m3-switch__track {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  .m3-switch[data-disabled] .m3-switch__track {
+    box-shadow: inset 0 0 0 var(--_switch-track-outline-width) GrayText;
+  }
+
+  .m3-switch[data-disabled] .m3-switch__thumb,
+  .m3-switch[data-disabled] .m3-switch__label {
+    color: GrayText;
+  }
+}
