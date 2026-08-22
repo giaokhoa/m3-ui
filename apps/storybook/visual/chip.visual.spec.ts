@@ -21,6 +21,12 @@ async function resolvedColor(root: Locator, value: string): Promise<string> {
   }, value);
 }
 
+function selectableChip(page: Page, name: string) {
+  const control = page.getByRole('checkbox', { name, exact: true });
+  const root = page.locator('.m3-chip').filter({ has: control });
+  return { control, root };
+}
+
 test.describe('Material 3 Chip parity', () => {
   test('uses Button semantics for action chips and Checkbox semantics for selectable chips', async ({
     page,
@@ -104,8 +110,8 @@ test.describe('Material 3 Chip parity', () => {
 
   test('FilterChip toggles as a checkbox and resolves selected visual state', async ({ page }) => {
     await openStory(page, 'components-chip--selectable-states');
-    const filter = page.getByRole('checkbox', { name: 'Filter', exact: true });
-    const visual = filter.locator('.m3-chip__visual');
+    const { control: filter, root } = selectableChip(page, 'Filter');
+    const visual = root.locator('.m3-chip__visual');
 
     await expect(filter).not.toBeChecked();
     expect(
@@ -114,15 +120,15 @@ test.describe('Material 3 Chip parity', () => {
       ),
     ).toBe('1px');
 
-    await filter.click();
+    await root.click();
     await expect(filter).toBeChecked();
-    const selectedContainer = await resolvedColor(filter, 'var(--secondary-container)');
-    const selectedLabel = await resolvedColor(filter, 'var(--on-secondary-container)');
-    await expect(filter.locator('.m3-chip__surface')).toHaveCSS(
+    const selectedContainer = await resolvedColor(root, 'var(--secondary-container)');
+    const selectedLabel = await resolvedColor(root, 'var(--on-secondary-container)');
+    await expect(root.locator('.m3-chip__surface')).toHaveCSS(
       'background-color',
       selectedContainer,
     );
-    await expect(filter.locator('.m3-chip__label')).toHaveCSS('color', selectedLabel);
+    await expect(root.locator('.m3-chip__label')).toHaveCSS('color', selectedLabel);
     expect(
       await visual.evaluate((element) =>
         getComputedStyle(element).getPropertyValue('--_chip-outline-width').trim(),
@@ -136,46 +142,46 @@ test.describe('Material 3 Chip parity', () => {
 
   test('flat FilterChip uses the runtime Level1 hover elevation', async ({ page }) => {
     await openStory(page, 'components-chip--selectable-states');
-    const filter = page.getByRole('checkbox', { name: 'Filter', exact: true });
-    await filter.hover();
-    await expect(filter.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level1');
+    const { root } = selectableChip(page, 'Filter');
+    await root.hover();
+    await expect(root.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level1');
   });
 
   test('InputChip gives avatar precedence and applies dynamic padding', async ({ page }) => {
     await openStory(page, 'components-chip--selectable-states');
-    const input = page.getByRole('checkbox', { name: 'Input', exact: true });
-    await expect(input.locator('.m3-chip__avatar')).toHaveCount(1);
-    await expect(input.locator('.m3-chip__leading-icon')).toHaveCount(0);
-    await expect(input.locator('.m3-chip__avatar')).toHaveCSS('width', '24px');
-    await expect(input.locator('.m3-chip__avatar')).toHaveCSS('height', '24px');
+    const { root } = selectableChip(page, 'Input');
+    await expect(root.locator('.m3-chip__avatar')).toHaveCount(1);
+    await expect(root.locator('.m3-chip__leading-icon')).toHaveCount(0);
+    await expect(root.locator('.m3-chip__avatar')).toHaveCSS('width', '24px');
+    await expect(root.locator('.m3-chip__avatar')).toHaveCSS('height', '24px');
 
-    const content = input.locator('.m3-chip__content');
+    const content = root.locator('.m3-chip__content');
     await expect(content).toHaveCSS('padding-inline-start', '4px');
     await expect(content).toHaveCSS('padding-inline-end', '8px');
   });
 
   test('disabled selectable chips use pinned container/content/avatar alpha', async ({ page }) => {
     await openStory(page, 'components-chip--disabled-states');
-    const filter = page.getByRole('checkbox', {
-      name: 'Elevated filter',
-      exact: true,
-    });
+    const { control: filter, root: filterRoot } = selectableChip(page, 'Elevated filter');
     await expect(filter).toBeDisabled();
 
     const container = await resolvedColor(
-      filter,
+      filterRoot,
       'color-mix(in srgb, var(--on-surface) 12%, transparent)',
     );
     const content = await resolvedColor(
-      filter,
+      filterRoot,
       'color-mix(in srgb, var(--on-surface) 38%, transparent)',
     );
-    await expect(filter.locator('.m3-chip__surface')).toHaveCSS('background-color', container);
-    await expect(filter.locator('.m3-chip__label')).toHaveCSS('color', content);
-    await expect(filter.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+    await expect(filterRoot.locator('.m3-chip__surface')).toHaveCSS(
+      'background-color',
+      container,
+    );
+    await expect(filterRoot.locator('.m3-chip__label')).toHaveCSS('color', content);
+    await expect(filterRoot.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
 
-    const input = page.getByRole('checkbox', { name: 'Input', exact: true });
-    await expect(input.locator('.m3-chip__avatar')).toHaveCSS('opacity', '0.38');
+    const { root: inputRoot } = selectableChip(page, 'Input');
+    await expect(inputRoot.locator('.m3-chip__avatar')).toHaveCSS('opacity', '0.38');
   });
 
   test('press ripple stays on the 32px visual surface', async ({ page }) => {
@@ -231,16 +237,16 @@ test.describe('Material 3 Chip parity', () => {
     page,
   }) => {
     await openStory(page, 'components-chip--expressive-shapes');
-    const filter = page.getByRole('checkbox', { name: 'Expressive filter', exact: true });
-    const visual = filter.locator('.m3-chip__visual');
-    const unselectedLeading = await resolvedColor(filter, 'var(--on-surface-variant)');
+    const { control: filter, root } = selectableChip(page, 'Expressive filter');
+    const visual = root.locator('.m3-chip__visual');
+    const unselectedLeading = await resolvedColor(root, 'var(--on-surface-variant)');
 
     await expect(visual).toHaveCSS('border-radius', '12px');
-    await expect(filter.locator('.m3-chip__leading-icon')).toHaveCSS('color', unselectedLeading);
-    await expect(filter.locator('.m3-chip__label')).toHaveCSS('margin-left', '4px');
-    await expect(filter.locator('.m3-chip__trailing-icon')).toHaveCSS('margin-left', '4px');
+    await expect(root.locator('.m3-chip__leading-icon')).toHaveCSS('color', unselectedLeading);
+    await expect(root.locator('.m3-chip__label')).toHaveCSS('margin-left', '4px');
+    await expect(root.locator('.m3-chip__trailing-icon')).toHaveCSS('margin-left', '4px');
 
-    await filter.click();
+    await root.click();
     await expect(filter).toBeChecked();
     await expect(visual).toHaveCSS('border-radius', '9999px');
 
