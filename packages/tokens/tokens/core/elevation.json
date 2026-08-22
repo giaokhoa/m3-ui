@@ -1,11 +1,42 @@
 {
   "elevation": {
-    "$type": "dimension",
-    "level0": { "$value": { "value": 0, "unit": "px" } },
-    "level1": { "$value": { "value": 1, "unit": "px" } },
-    "level2": { "$value": { "value": 3, "unit": "px" } },
-    "level3": { "$value": { "value": 6, "unit": "px" } },
-    "level4": { "$value": { "value": 8, "unit": "px" } },
-    "level5": { "$value": { "value": 12, "unit": "px" } }
+    "level0": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+    "level1": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+    "level2": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+    "level3": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+    "level4": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+    "level5": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+    "shadow": {
+      "level0": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      },
+      "level1": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": -1, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      },
+      "level2": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": -2, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      },
+      "level3": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 5, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": -1, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      },
+      "level4": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 5, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 5, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": -3, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 14, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      },
+      "level5": {
+        "layer1": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 7, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": -4, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.2 } },
+        "layer2": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 17, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.14 } },
+        "layer3": { "offsetX": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }, "offsetY": { "$type": "dimension", "$value": { "value": 5, "unit": "px" } }, "blurRadius": { "$type": "dimension", "$value": { "value": 22, "unit": "px" } }, "spreadRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }, "opacity": { "$type": "number", "$value": 0.12 } }
+      }
+    }
   }
 }

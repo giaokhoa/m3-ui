@@ -1,0 +1,66 @@
+{
+  "component": {
+    "chip": {
+      "action": {
+        "base": {
+          "height": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+          "containerRadius": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "contentPaddingInline": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "iconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+          "disabledLabelColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledLabelOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledIconOpacity": { "$type": "number", "$value": 0.38 },
+          "draggedElevation": { "$type": "string", "$value": "level4" }
+        }
+      },
+      "selectable": {
+        "base": {
+          "height": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+          "containerRadius": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "contentPaddingInline": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "compactIconSpacing": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "leadingIconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+          "trailingIconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+          "avatarSize": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+          "avatarRadius": { "$type": "dimension", "$value": "{shape.full}" },
+          "disabledAvatarOpacity": { "$type": "number", "$value": 1 },
+          "disabledUnselectedContainerColor": { "$type": "string", "$value": "transparent" },
+          "disabledSelectedContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.12 },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentOpacity": { "$type": "number", "$value": 0.38 },
+          "unselectedOutlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
+          "selectedOutlineColor": { "$type": "string", "$value": "transparent" },
+          "disabledUnselectedOutlineColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledSelectedOutlineColor": { "$type": "string", "$value": "transparent" },
+          "unselectedOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "selectedOutlineWidth": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+          "disabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
+          "disabledElevation": { "$type": "string", "$value": "level0" },
+          "draggedElevation": { "$type": "string", "$value": "level4" }
+        }
+      },
+      "typography": {
+        "fontFamily": { "$type": "string", "$value": "{typography.labelLarge.fontFamily}" },
+        "fontSize": { "$type": "dimension", "$value": "{typography.labelLarge.fontSize}" },
+        "lineHeight": { "$type": "dimension", "$value": "{typography.labelLarge.lineHeight}" },
+        "fontWeight": { "$type": "number", "$value": "{typography.labelLarge.fontWeight}" },
+        "letterSpacing": { "$type": "dimension", "$value": "{typography.labelLarge.letterSpacing}" }
+      },
+      "shape": {
+        "unselectedRadius": { "$type": "dimension", "$value": "{shape.medium}" },
+        "selectedRadius": { "$type": "dimension", "$value": "{shape.full}" },
+        "pressedRadius": { "$type": "dimension", "$value": "{shape.small}" }
+      },
+      "inputPadding": {
+        "compact": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "withIcon": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }
+      }
+    }
+  }
+}
