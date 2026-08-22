@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": ["**/*.css"],
   "files": ["dist"],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -12,11 +13,12 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./styles/*.css": "./dist/styles/*.css"
   },
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json",
-    "test": "vitest run",
+    "build": "vite build && node scripts/build-styles.mjs && tsc -p tsconfig.build.json",
+    "test": "node --test scripts/*.test.mjs && vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
   },
