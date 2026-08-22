@@ -9,7 +9,10 @@
     "build:storybook": "pnpm --filter @m3/storybook... build",
     "test:visual": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual",
     "test:visual:update": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual:update",
-    "test": "turbo test",
+    "compose:sync": "node scripts/compose-sync/index.mjs",
+    "compose:sync:check": "node scripts/compose-sync/index.mjs --check",
+    "test:compose-sync": "node --test scripts/compose-sync/*.test.mjs",
+    "test": "pnpm test:compose-sync && turbo test",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean"
   },
