@@ -1,19 +1,16 @@
 # Compose sync tooling
 
-This directory contains the deterministic bridge from pinned AndroidX Material3 token sources to reviewable TypeScript data in `@m3/tokens`.
+This directory is the deterministic bridge from a pinned AndroidX Material3 token directory to reviewable TypeScript data in `@m3/tokens`.
 
-It deliberately does **not** translate Kotlin component implementations. React/DOM behavior remains handwritten and is audited against the pinned AndroidX component/default/test sources.
+It deliberately does **not** translate Kotlin component implementations. React/DOM behavior remains handwritten and is audited against pinned AndroidX component/default/test sources.
 
-## Pinned source
+## Source lock and discovery
 
-`manifest.mjs` is the source lock. It records one exact AndroidX revision plus every token source currently required by the foundations/components in this repository. Every entry has:
+`manifest.mjs` pins only the immutable AndroidX repository revision and Material3 token directory. It does **not** maintain a handwritten component-token allowlist.
 
-- upstream file/path;
-- exact Git blob SHA;
-- deterministic TypeScript export name;
-- deterministic generated output path.
+On every sync the runner asks GitHub for the directory at that exact commit, discovers every direct `*Tokens.kt` file, sorts them deterministically, derives output/export identities from filenames, then verifies each downloaded raw file against the Git blob SHA returned by GitHub for the pinned commit.
 
-The current manifest contains 36 token files. **All 36 are parsed and generated in the same sync batch.** There is no longer a separate "tracked but not generated" state.
+At the current pinned revision this discovers **120 token modules**, including foundations, already-ported components and not-yet-ported families such as AppBar, FAB, IconButton, Navigation, Dialog and Slider. Future component work therefore does not add token source mappings by hand.
 
 ## Commands
 
@@ -23,17 +20,19 @@ pnpm compose:sync:check
 pnpm test:compose-sync
 ```
 
-`compose:sync` performs three stages:
+`compose:sync` is a whole-directory transaction:
 
-1. fetch every manifest source and verify its exact Git blob SHA;
-2. parse/render the complete manifest in memory and validate token-reference dependency closure;
-3. only after every source succeeds, write the complete generated snapshot.
+1. discover every `*Tokens.kt` at the exact pinned revision;
+2. fetch every discovered source and verify its Git blob SHA;
+3. parse/render the complete directory in memory;
+4. validate cross-token reference closure;
+5. only after every source succeeds, replace the generated snapshot.
 
-That ordering is intentional: a parser failure cannot leave a half-regenerated token tree.
+A parser failure cannot leave a half-regenerated token tree. Snapshot replacement is staged in a temporary sibling directory with recovery of the previous directory on write failure.
 
-`compose:sync:check` performs the same full fetch/verify/parse/render pipeline but compares all committed outputs byte-for-byte instead of writing them. CI runs this command before the normal unit/type/build/browser gates.
+`compose:sync:check` runs the same discovery/fetch/verify/parse/render pipeline but compares the committed directory byte-for-byte, including extra or missing modules. CI runs it before the normal unit/type/build/browser gates.
 
-`test:compose-sync` is the offline test layer. It covers the parser grammar, manifest invariants and committed generated snapshot structure without requiring network access.
+`test:compose-sync` is the offline layer for parser grammar, discovery/identity rules and committed snapshot invariants.
 
 ## Generated boundary
 
@@ -43,42 +42,33 @@ Generated files live under:
 packages/tokens/src/generated/androidx/
 ```
 
-There is one generated module for every manifest source, plus a generated barrel. Every module records:
+There is one generated module for every discovered upstream `*Tokens.kt`, plus a generated barrel. Every module records repository, revision, upstream path, exact blob SHA, VERSION when present, declaration kind (`object`/`class`), token container name and normalized immutable token data.
 
-- repository and pinned revision;
-- upstream source path;
-- exact upstream blob SHA;
-- upstream VERSION when present (`null` when AndroidX omits one);
-- whether the source token container is an `object` or `class`;
-- AndroidX token object/class name;
-- normalized immutable token data.
+Production-facing files such as `button.ts`, `state.ts`, `elevation.ts`, `switch.ts`, `card.ts` and `chip.ts` remain stable facades. A facade must project generated data for values that Compose runtime obtains from generated tokens. Values that actually come from component/default runtime code or web adaptation remain handwritten with their upstream source and parity tests. Generated tokens that Compose does not consume must not be promoted into web behavior merely because they exist.
 
-Production-facing files such as `button.ts`, `state.ts`, `elevation.ts`, `switch.ts`, `card.ts` and `chip.ts` remain stable facades. They should project generated AndroidX data into the public token API and combine it only with explicitly handwritten web/runtime adaptations. New upstream-generated constants must not be copied into a facade by hand.
+## Supported generated grammar
 
-## Supported generated forms
+The parser intentionally covers the generated-token grammar rather than general Kotlin. The pinned 120-file directory currently validates these forms:
 
-The parser is intentionally a small generated-token grammar rather than a Kotlin parser. It supports the expression/declaration forms used by the pinned manifest, including:
-
-- `const val`, `inline val ... get()`, plain `val`, and generated class properties with `inline get()`;
-- numeric/opacity constants, `dp`, and `sp` values;
+- `const val`, inline getter vals, plain vals and generated class properties;
+- numeric/opacity constants, `dp` and `sp`;
 - color, elevation, shape, typography and cross-token references;
-- font-family/font-weight terminals;
-- plain symbols such as `CircleShape` / `RectangleShape`;
-- constructor/call expressions with positional or named arguments, including multiline shapes and cubic-bezier tokens;
-- Kotlin Elvis fallback used by generated typography (`fontFamily ?: ...`);
-- token files whose AndroidX source omits a VERSION marker.
+- font-family/font-weight terminals and plain symbols;
+- positional/named constructor or call expressions, including multiline shapes and cubic-bezier tokens;
+- Kotlin Elvis fallback used by generated typography;
+- sources with or without a VERSION marker.
 
-Unsupported operators/declaration shapes are fatal. The generator must never guess, silently drop a declaration, or fall back to `any`.
+Unsupported syntax is fatal. The generator must never silently drop a declaration, guess a value or fall back to `any`.
 
-## Tests and drift guarantees
+## Test and drift guarantees
 
-The sync contract has three independent gates:
+The contract has three independent gates:
 
-1. **Offline parser tests** exercise each supported expression/declaration family and failure behavior.
-2. **Offline manifest/snapshot tests** require every tracked source to have a unique generated module, verify generated provenance, and reject extra/missing generated modules.
-3. **CI full sync check** downloads all 36 pinned source blobs, verifies their SHA, parses all 36 in one batch, validates cross-token dependencies and compares every generated byte.
+1. **Offline parser tests** cover every supported expression/declaration family plus failure behavior.
+2. **Offline discovery/snapshot tests** cover directory filtering, deterministic identities, provenance, barrel/module parity and required foundation/unported families.
+3. **CI full sync integration** discovers all 120 sources from the pinned directory, verifies every raw blob SHA, parses the entire directory in one batch, validates dependency closure and byte-compares the complete generated snapshot.
 
-Normal TypeScript build/typecheck then compiles the generated snapshot as part of `@m3/tokens`, while component/default/Chromium tests catch runtime parity regressions in the public facade/UI layers.
+TypeScript build/typecheck then compiles the generated snapshot as part of `@m3/tokens`; component/default/Chromium tests cover runtime parity in facade/UI layers.
 
 ## Web/runtime adaptations stay handwritten
 
@@ -88,19 +78,18 @@ These are intentionally not disguised as generated Compose data:
 - CSS shadow geometry for Material elevation;
 - browser forced-colors behavior;
 - DOM/RAC semantics;
-- ripple wave implementation;
-- component runtime state resolution implemented in AndroidX `Defaults`/component code rather than generated token files.
+- ripple implementation;
+- runtime state/default resolution implemented in AndroidX component code rather than generated token files.
 
 ## Updating AndroidX
 
-An upstream revision bump is an explicit reviewed change:
+An upstream bump is explicit and reviewed:
 
-1. change the pinned revision in `manifest.mjs`;
-2. update expected blob SHAs for intentionally adopted source changes;
-3. update the parser only when AndroidX introduces a new generated-token syntax, with a focused test first;
-4. run `pnpm compose:sync` once for the full manifest;
-5. review the complete generated diff;
-6. run `pnpm compose:sync:check`, tests, typecheck, build and browser parity gates;
-7. document runtime source drift separately when generated token changes alter component behavior.
+1. change the pinned revision;
+2. run `pnpm compose:sync` once — newly added/removed token files are discovered automatically;
+3. if AndroidX introduces a new generated syntax, add a focused parser test and support it without fallback parsing;
+4. review the complete generated diff;
+5. run sync check, unit tests, typecheck, build and browser parity gates;
+6. separately audit runtime/default behavior for affected public facades.
 
-Do not point the generator at a moving AndroidX branch in normal builds or CI.
+Never point normal builds or CI at a moving AndroidX branch.
