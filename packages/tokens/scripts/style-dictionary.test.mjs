@@ -69,8 +69,12 @@ test('Style Dictionary emits all baseline and emphasized Material 3 type styles'
   assert.equal(token.TypefaceWeightBold, 700);
 });
 
-test('Style Dictionary preserves standard and expressive spring parameters', async () => {
+test('Style Dictionary preserves current Material 3 easing and spring vocabulary', async () => {
   const token = await generated('motion');
+  assert.equal(token.MotionEasingEmphasized, 'cubic-bezier(0.2, 0, 0, 1)');
+  assert.equal(token.MotionEasingLegacy, 'cubic-bezier(0.4, 0, 0.2, 1)');
+  assert.equal(token.MotionEasingLegacyAccelerate, 'cubic-bezier(0.4, 0, 1, 1)');
+  assert.equal(token.MotionEasingLegacyDecelerate, 'cubic-bezier(0, 0, 0.2, 1)');
   assert.equal(token.MotionSpringStandardDefaultSpatialDampingRatio, 0.9);
   assert.equal(token.MotionSpringStandardDefaultSpatialStiffness, 700);
   assert.equal(token.MotionSpringStandardFastEffectsStiffness, 3800);
@@ -82,8 +86,14 @@ test('Style Dictionary preserves standard and expressive spring parameters', asy
   assert.equal(token.MotionSpringExpressiveSlowSpatialStiffness, 200);
 });
 
-test('Style Dictionary emits shared motion, ripple and elevation tokens', async () => {
+test('Style Dictionary emits shared state, scrim, ripple and elevation tokens', async () => {
   const token = await generated('core');
+  assert.equal(token.StateLayerOpacityHover, 0.08);
+  assert.equal(token.StateLayerOpacityFocus, 0.1);
+  assert.equal(token.StateLayerOpacityPressed, 0.1);
+  assert.equal(token.StateLayerOpacityDragged, 0.16);
+  assert.equal(token.ScrimContainerColor, 'var(--scrim)');
+  assert.equal(token.ScrimContainerOpacity, 0.32);
   assert.equal(token.MotionSpringFastSpatialDuration, '137ms');
   assert.equal(token.TypographyBodyLargeFontSize, '16px');
   assert.equal(token.TypefacePlain, 'Roboto');
@@ -114,7 +124,9 @@ test('Style Dictionary emits TypeScript declarations with full foundation symbol
   assert.match(declarations, /ShapeCornerExtraExtraLarge/);
   assert.match(declarations, /TypographyDisplayLargeEmphasizedFontSize/);
   assert.match(declarations, /TypefaceWeightBold/);
+  assert.match(declarations, /MotionEasingLegacy/);
   assert.match(declarations, /MotionSpringExpressiveFastSpatialStiffness/);
+  assert.match(declarations, /ScrimContainerOpacity/);
   assert.match(declarations, /ComponentButtonVariantFilledContainerColor/);
   assert.match(declarations, /RippleFocusRingOuterStrokeColor/);
   assert.match(declarations, /ElevationShadowLevel5Layer3Opacity/);
