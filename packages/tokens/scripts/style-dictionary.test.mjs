@@ -16,6 +16,16 @@ test('Style Dictionary emits runtime color strings and standard dimensions', asy
   assert.equal(generated.ComponentButtonVariantElevatedHoveredElevation, 'level2');
 });
 
+test('Style Dictionary emits Switch runtime adaptations without custom formatters', async () => {
+  const url = new URL('../dist/generated/tokens.js', import.meta.url);
+  const generated = await import(`${url.href}?switch=${Date.now()}`);
+
+  assert.equal(generated.ComponentSwitchDisabledOpacityTrack, 0.12);
+  assert.equal(generated.ComponentSwitchDisabledOpacityUncheckedThumb, 0.38);
+  assert.equal(generated.ComponentSwitchMotionGeometryDuration, '137ms');
+  assert.match(generated.ComponentSwitchMotionGeometryEasing, /^linear\(/);
+});
+
 test('Style Dictionary emits TypeScript declarations with literal string values', async () => {
   const declarations = await readFile(
     new URL('../dist/generated/tokens.d.ts', import.meta.url),
@@ -26,4 +36,5 @@ test('Style Dictionary emits TypeScript declarations with literal string values'
   assert.match(declarations, /var\(--primary\)/);
   assert.match(declarations, /ComponentButtonSizeMediumPaddingBlock/);
   assert.match(declarations, /ShapeMedium/);
+  assert.match(declarations, /ComponentSwitchMotionGeometryDuration/);
 });
