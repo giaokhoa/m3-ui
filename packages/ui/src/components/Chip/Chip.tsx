@@ -10,6 +10,7 @@ import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import {
   getChipElevationMotion,
+  getChipRootStyle,
   getChipStyle,
   resolveChipElevation,
   type ChipShapeValue,
@@ -37,7 +38,8 @@ export interface ActionChipProps
   shape?: ChipShapeValue;
 }
 
-export interface SuggestionChipProps extends Omit<ActionChipProps, 'leadingIcon' | 'trailingIcon'> {
+export interface SuggestionChipProps
+  extends Omit<ActionChipProps, 'leadingIcon' | 'trailingIcon'> {
   icon?: ReactNode;
 }
 
@@ -245,7 +247,7 @@ function ActionChipImpl({
       data-variant={variant}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return userStyle;
+        return { ...getChipRootStyle(variant), ...userStyle };
       }}
       onBlur={handleBlur}
       onFocus={handleFocus}
@@ -334,7 +336,7 @@ function SelectableChipImpl({
       data-variant={variant}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return userStyle;
+        return { ...getChipRootStyle(variant), ...userStyle };
       }}
       onBlur={handleBlur}
       onFocus={handleFocus}
