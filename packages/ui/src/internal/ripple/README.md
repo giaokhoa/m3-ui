@@ -53,6 +53,7 @@ The focus ring is painted above component content, matching the lower-level Comp
 ## Web translations and remaining gaps
 
 - `ThemeProvider.rippleFocus` is the global web analogue of `LocalRippleThemeConfiguration`; the default is `opacity` so existing applications do not change behavior.
+- When a host does not set `--ripple-color`, the primitive uses inherited `currentColor`, matching Compose `Color.Unspecified` resolving through the current content color. It intentionally does not hardcode a theme role such as `onSurface`.
 - React Aria `isFocusVisible` is used rather than raw DOM focus so keyboard-visible focus semantics remain platform appropriate.
 - The shared primitive supports component shapes representable by CSS border radius. It does not yet expose arbitrary Compose `Shape` geometry.
 - Compose `LocalRippleConfiguration` supports subtree overrides for color, alpha, focus colors and disabling ripple entirely. The web primitive currently relies on component CSS variables/style overrides and does not expose a matching public provider.
