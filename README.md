@@ -4,12 +4,11 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 ## Workspace
 
-- `packages/tokens`: framework-agnostic Material token package
+- `packages/tokens`: canonical DTCG tokens, Style Dictionary build output, validation and read-only upstream audits
 - `packages/ui`: React component library
 - `apps/storybook`: component preview and visual review workspace
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
-- `scripts/compose-sync`: deterministic tooling for pinned AndroidX generated-token sync and drift checks
 
 ## Commands
 
@@ -21,7 +20,7 @@ pnpm test
 pnpm test:visual
 pnpm build
 pnpm typecheck
-pnpm compose:sync:check
+pnpm --filter @m3/tokens audit:androidx
 ```
 
 `pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` builds Storybook and its workspace dependencies, then creates the static preview under `apps/storybook/dist`.
@@ -56,67 +55,23 @@ With VS Code and the Dev Containers extension:
 1. Clone and open the repository.
 2. Run **Dev Containers: Reopen in Container** from the command palette.
 3. Wait for the post-create dependency and Chromium install to finish.
-4. Start the visual preview:
+4. Start the visual preview with `pnpm storybook`.
 
-```bash
-pnpm storybook
-```
-
-Storybook is forwarded to `http://localhost:6006` and opens automatically when supported by the Dev Containers client.
-
-To run the committed visual regression suite in the same Linux/Chromium environment as CI:
-
-```bash
-pnpm test:visual
-```
-
-To regenerate baselines after reviewing an intentional visual change:
-
-```bash
-pnpm test:visual:update
-```
-
-To run the wider development workspace instead:
-
-```bash
-pnpm dev
-```
-
-The Vite playground is forwarded to `http://localhost:5173`. Both Storybook and Vite bind to `0.0.0.0` so they remain reachable through the container port forwarding layer.
-
-The container uses the non-root `node` user. The host repository stays mounted as the workspace, so source edits remain on the host while Node tooling runs inside the Linux container.
+Storybook is forwarded to `http://localhost:6006` and opens automatically when supported by the Dev Containers client. The Vite playground is forwarded to `http://localhost:5173`.
 
 ## Architecture before implementation
 
-Read [`docs/architecture/README.md`](docs/architecture/README.md) before porting a Material 3 component from Jetpack Compose.
-
-The project targets 1:1 parity in Material behavior, tokens, defaults, states, layout, and accessibility where those concepts apply to the web. It does **not** translate Kotlin/Compose runtime code line by line.
+Read [`docs/architecture/README.md`](docs/architecture/README.md) and [`packages/tokens/README.md`](packages/tokens/README.md) before porting a Material 3 component.
 
 Key rules:
 
-- AndroidX Material3 is pinned as a source of truth for parity work.
-- Immutable/generated token data belongs in `@m3/tokens`; handwritten React implementation belongs in `@m3/ui`.
-- `ThemeProvider` owns runtime theme values, not immutable specification constants.
-- TypeScript must remain idiomatic; do not recreate `Modifier`, Kotlin `data class`, `.copy()`, `Dp`, or `InteractionSource` APIs.
+- `packages/tokens/tokens/**/*.json` is the manually reviewed canonical token graph.
+- Style Dictionary generates package artifacts from canonical DTCG; generated output is never edited by hand.
+- AndroidX Material3 is pinned and read only: upstream data is parsed in memory for audits and never generates canonical or runtime token files.
+- Immutable design values belong in the token graph; `ThemeProvider` owns runtime theme values such as dynamic colors.
 - Native HTML and React Aria Components provide web semantics and interaction state.
-- Visual state should be CSS-first when possible.
 - Parity is proven by independent token/default/behavior/layout tests plus Chromium visual regression for covered stories.
 
 ## Component convention
 
-Each public component family lives in its own folder under `packages/ui/src/components/`.
-
-A simple component may look like:
-
-```text
-packages/ui/src/components/Button/
-├── Button.tsx
-├── Button.types.ts
-├── Button.defaults.ts
-├── button.css
-└── index.ts
-```
-
-Do not create files mechanically; use only the separation a component actually needs. Complex component families may add an internal folder for layout/decoration logic.
-
-See [`packages/ui/src/components/README.md`](packages/ui/src/components/README.md) for the detailed component-layer contract.
+Each public component family lives in its own folder under `packages/ui/src/components/`. Keep public files small, prefer React Aria/native semantics, and do not duplicate canonical token values in component code.

@@ -2,39 +2,50 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-test('Style Dictionary emits runtime color strings and standard dimensions', async () => {
-  const url = new URL('../dist/generated/tokens.js', import.meta.url);
-  const generated = await import(`${url.href}?test=${Date.now()}`);
+const generatedUrl = new URL('../dist/generated/tokens.js', import.meta.url);
 
-  assert.equal(generated.ComponentButtonVariantFilledContainerColor, 'var(--primary)');
-  assert.equal(generated.ComponentButtonVariantElevatedContainerColor, 'var(--surface-container-low)');
-  assert.equal(generated.ComponentButtonVariantOutlinedOutlineColor, 'var(--outline-variant)');
-  assert.equal(generated.ComponentSwitchColorsCheckedTrack, 'var(--primary)');
-  assert.equal(generated.ComponentButtonBaselineMinHeight, '40px');
-  assert.equal(generated.ComponentButtonSizeMediumPaddingBlock, '16px');
-  assert.equal(generated.ShapeMedium, '12px');
-  assert.equal(generated.ComponentButtonVariantElevatedHoveredElevation, 'level2');
+async function generated(suffix) {
+  return import(`${generatedUrl.href}?${suffix}=${Date.now()}`);
+}
+
+test('Style Dictionary emits runtime color strings and standard dimensions', async () => {
+  const token = await generated('base');
+  assert.equal(token.ComponentButtonVariantFilledContainerColor, 'var(--primary)');
+  assert.equal(token.ComponentSwitchColorsCheckedTrack, 'var(--primary)');
+  assert.equal(token.ComponentButtonBaselineMinHeight, '40px');
+  assert.equal(token.ShapeMedium, '12px');
 });
 
-test('Style Dictionary emits Switch runtime adaptations without custom formatters', async () => {
-  const url = new URL('../dist/generated/tokens.js', import.meta.url);
-  const generated = await import(`${url.href}?switch=${Date.now()}`);
+test('Style Dictionary emits shared motion, typography, ripple and elevation tokens', async () => {
+  const token = await generated('core');
+  assert.equal(token.MotionSpringFastSpatialDuration, '137ms');
+  assert.equal(token.TypographyBodyLargeFontSize, '16px');
+  assert.equal(token.TypefacePlain, 'Roboto');
+  assert.equal(token.RippleFadeOutDuration, '150ms');
+  assert.equal(token.RippleFocusRingOuterStrokeColor, 'var(--secondary)');
+  assert.equal(token.ElevationShadowLevel4Layer2SpreadRadius, '1px');
+  assert.equal(token.ElevationShadowLevel5Layer3Opacity, 0.12);
+});
 
-  assert.equal(generated.ComponentSwitchDisabledOpacityTrack, 0.12);
-  assert.equal(generated.ComponentSwitchDisabledOpacityUncheckedThumb, 0.38);
-  assert.equal(generated.ComponentSwitchMotionGeometryDuration, '137ms');
-  assert.match(generated.ComponentSwitchMotionGeometryEasing, /^linear\(/);
+test('Style Dictionary emits canonical current component families', async () => {
+  const token = await generated('components');
+  assert.equal(token.ComponentCardVariantFilledContainerColor, 'var(--surface-container-highest)');
+  assert.equal(token.ComponentCheckboxMotionBoxInDuration, '166ms');
+  assert.equal(token.ComponentRadioButtonMotionDotDuration, '137ms');
+  assert.equal(token.ComponentTextFieldSharedTypographyBodyLargeFontSize, '16px');
+  assert.equal(token.ComponentTextFieldOutlinedColorsOutline, 'var(--outline)');
+  assert.equal(token.ComponentChipActionBaseHeight, '32px');
+  assert.equal(token.ComponentChipVariantFilterSelectedContainerColor, 'var(--secondary-container)');
+  assert.equal(token.ComponentChipShapeSelectedRadius, '9999px');
+  assert.equal(token.ComponentChipInputPaddingCompact, '4px');
 });
 
 test('Style Dictionary emits TypeScript declarations with literal string values', async () => {
-  const declarations = await readFile(
-    new URL('../dist/generated/tokens.d.ts', import.meta.url),
-    'utf8',
-  );
-
+  const declarations = await readFile(new URL('../dist/generated/tokens.d.ts', import.meta.url), 'utf8');
   assert.match(declarations, /ComponentButtonVariantFilledContainerColor/);
-  assert.match(declarations, /var\(--primary\)/);
-  assert.match(declarations, /ComponentButtonSizeMediumPaddingBlock/);
-  assert.match(declarations, /ShapeMedium/);
-  assert.match(declarations, /ComponentSwitchMotionGeometryDuration/);
+  assert.match(declarations, /MotionSpringFastSpatialDuration/);
+  assert.match(declarations, /RippleFocusRingOuterStrokeColor/);
+  assert.match(declarations, /ElevationShadowLevel5Layer3Opacity/);
+  assert.match(declarations, /ComponentChipVariantFilterSelectedContainerColor/);
+  assert.match(declarations, /ComponentTextFieldOutlinedColorsOutline/);
 });

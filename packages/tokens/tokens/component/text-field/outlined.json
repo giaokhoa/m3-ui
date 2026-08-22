@@ -1,0 +1,35 @@
+{
+  "component": {
+    "textField": {
+      "outlined": {
+        "contentPadding": {
+          "inline": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "block": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "supportingTop": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "affix": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "afterIcon": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "cutoutInline": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "topPadding": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }
+        },
+        "containerShape": {
+          "topStartRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "topEndRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "bottomEndRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "bottomStartRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }
+        },
+        "outline": {
+          "unfocusedThickness": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "focusedThickness": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "disabledOpacity": { "$type": "number", "$value": 0.12 }
+        },
+        "colors": {
+          "container": { "$type": "string", "$value": "transparent" },
+          "outline": { "$type": "string", "$value": "var(--outline)" },
+          "focusedOutline": { "$type": "string", "$value": "var(--primary)" },
+          "disabledOutline": { "$type": "string", "$value": "var(--on-surface)" },
+          "errorOutline": { "$type": "string", "$value": "var(--error)" }
+        }
+      }
+    }
+  }
+}

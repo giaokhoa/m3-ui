@@ -1,312 +1,46 @@
+import * as token from '@m3/tokens/generated';
 import type { ElevationLevel } from './elevation.js';
 import type { TypefaceRole } from './typography.js';
+import { colorRole, pxNumber } from './value.js';
 
-export type ChipColorRole =
-  | 'onSecondaryContainer'
-  | 'onSurface'
-  | 'onSurfaceVariant'
-  | 'outlineVariant'
-  | 'primary'
-  | 'secondaryContainer'
-  | 'surfaceContainerLow';
+export type ChipColorRole = string;
+export type ChipContainerColor = string;
+export interface ChipTypographyTokens { readonly fontFamily: TypefaceRole; readonly fontSize: number; readonly lineHeight: number; readonly fontWeight: number; readonly letterSpacing: number; }
+export interface ActionChipVariantTokens { readonly height:number; readonly minimumInteractiveSize:number; readonly containerRadius:number; readonly contentPaddingInline:number; readonly iconSpacing:number; readonly iconSize:number; readonly containerColor:string; readonly labelColor:string; readonly leadingIconColor:string; readonly trailingIconColor:string; readonly disabledContainerColor:string; readonly disabledContainerOpacity:number; readonly disabledLabelColor:string; readonly disabledLabelOpacity:number; readonly disabledIconColor:string; readonly disabledIconOpacity:number; readonly outlineColor:string; readonly outlineWidth:number; readonly disabledOutlineColor:string; readonly disabledOutlineOpacity:number; readonly defaultElevation:ElevationLevel; readonly hoveredElevation:ElevationLevel; readonly focusedElevation:ElevationLevel; readonly pressedElevation:ElevationLevel; readonly disabledElevation:ElevationLevel; readonly draggedElevation:ElevationLevel; readonly labelTypography:ChipTypographyTokens; }
+export interface SelectableChipVariantTokens { readonly height:number; readonly minimumInteractiveSize:number; readonly containerRadius:number; readonly contentPaddingInline:number; readonly iconSpacing:number; readonly compactIconSpacing:number; readonly leadingIconSize:number; readonly trailingIconSize:number; readonly avatarSize:number; readonly avatarRadius:number; readonly disabledAvatarOpacity:number; readonly unselectedContainerColor:string; readonly selectedContainerColor:string; readonly disabledUnselectedContainerColor:string; readonly disabledSelectedContainerColor:string; readonly disabledContainerOpacity:number; readonly unselectedLabelColor:string; readonly selectedLabelColor:string; readonly unselectedLeadingIconColor:string; readonly expressiveUnselectedLeadingIconColor:string; readonly selectedLeadingIconColor:string; readonly unselectedTrailingIconColor:string; readonly selectedTrailingIconColor:string; readonly disabledContentColor:string; readonly disabledContentOpacity:number; readonly unselectedOutlineColor:string; readonly selectedOutlineColor:string; readonly disabledUnselectedOutlineColor:string; readonly disabledSelectedOutlineColor:string; readonly unselectedOutlineWidth:number; readonly selectedOutlineWidth:number; readonly disabledOutlineOpacity:number; readonly defaultElevation:ElevationLevel; readonly hoveredElevation:ElevationLevel; readonly focusedElevation:ElevationLevel; readonly pressedElevation:ElevationLevel; readonly disabledElevation:ElevationLevel; readonly draggedElevation:ElevationLevel; readonly labelTypography:ChipTypographyTokens; }
+export type ChipVariant = 'assist' | 'elevatedAssist' | 'filter' | 'elevatedFilter' | 'input' | 'suggestion' | 'elevatedSuggestion';
 
-export type ChipContainerColor = ChipColorRole | 'transparent';
-
-export interface ChipTypographyTokens {
-  readonly fontFamily: TypefaceRole;
-  readonly fontSize: number;
-  readonly lineHeight: number;
-  readonly fontWeight: number;
-  readonly letterSpacing: number;
+const labelTypography = { fontFamily: token.ComponentChipTypographyFontFamily as TypefaceRole, fontSize: pxNumber(token.ComponentChipTypographyFontSize), lineHeight: pxNumber(token.ComponentChipTypographyLineHeight), fontWeight: token.ComponentChipTypographyFontWeight, letterSpacing: pxNumber(token.ComponentChipTypographyLetterSpacing) } as const;
+const commonAction = { height:pxNumber(token.ComponentChipActionBaseHeight), minimumInteractiveSize:pxNumber(token.ComponentChipActionBaseMinimumInteractiveSize), containerRadius:pxNumber(token.ComponentChipActionBaseContainerRadius), contentPaddingInline:pxNumber(token.ComponentChipActionBaseContentPaddingInline), iconSpacing:pxNumber(token.ComponentChipActionBaseIconSpacing), iconSize:pxNumber(token.ComponentChipActionBaseIconSize), disabledLabelColor:colorRole(token.ComponentChipActionBaseDisabledLabelColor), disabledLabelOpacity:token.ComponentChipActionBaseDisabledLabelOpacity, disabledIconColor:colorRole(token.ComponentChipActionBaseDisabledIconColor), disabledIconOpacity:token.ComponentChipActionBaseDisabledIconOpacity, draggedElevation:token.ComponentChipActionBaseDraggedElevation as ElevationLevel, labelTypography } as const;
+function action(prefix: 'Assist'|'ElevatedAssist'|'Suggestion'|'ElevatedSuggestion'): ActionChipVariantTokens {
+  const values = {
+    Assist: [token.ComponentChipVariantAssistContainerColor,token.ComponentChipVariantAssistLabelColor,token.ComponentChipVariantAssistLeadingIconColor,token.ComponentChipVariantAssistTrailingIconColor,token.ComponentChipVariantAssistDisabledContainerColor,token.ComponentChipVariantAssistDisabledContainerOpacity,token.ComponentChipVariantAssistOutlineColor,token.ComponentChipVariantAssistOutlineWidth,token.ComponentChipVariantAssistDisabledOutlineColor,token.ComponentChipVariantAssistDisabledOutlineOpacity,token.ComponentChipVariantAssistDefaultElevation,token.ComponentChipVariantAssistHoveredElevation,token.ComponentChipVariantAssistFocusedElevation,token.ComponentChipVariantAssistPressedElevation,token.ComponentChipVariantAssistDisabledElevation],
+    ElevatedAssist: [token.ComponentChipVariantElevatedAssistContainerColor,token.ComponentChipVariantElevatedAssistLabelColor,token.ComponentChipVariantElevatedAssistLeadingIconColor,token.ComponentChipVariantElevatedAssistTrailingIconColor,token.ComponentChipVariantElevatedAssistDisabledContainerColor,token.ComponentChipVariantElevatedAssistDisabledContainerOpacity,token.ComponentChipVariantElevatedAssistOutlineColor,token.ComponentChipVariantElevatedAssistOutlineWidth,token.ComponentChipVariantElevatedAssistDisabledOutlineColor,token.ComponentChipVariantElevatedAssistDisabledOutlineOpacity,token.ComponentChipVariantElevatedAssistDefaultElevation,token.ComponentChipVariantElevatedAssistHoveredElevation,token.ComponentChipVariantElevatedAssistFocusedElevation,token.ComponentChipVariantElevatedAssistPressedElevation,token.ComponentChipVariantElevatedAssistDisabledElevation],
+    Suggestion: [token.ComponentChipVariantSuggestionContainerColor,token.ComponentChipVariantSuggestionLabelColor,token.ComponentChipVariantSuggestionLeadingIconColor,token.ComponentChipVariantSuggestionTrailingIconColor,token.ComponentChipVariantSuggestionDisabledContainerColor,token.ComponentChipVariantSuggestionDisabledContainerOpacity,token.ComponentChipVariantSuggestionOutlineColor,token.ComponentChipVariantSuggestionOutlineWidth,token.ComponentChipVariantSuggestionDisabledOutlineColor,token.ComponentChipVariantSuggestionDisabledOutlineOpacity,token.ComponentChipVariantSuggestionDefaultElevation,token.ComponentChipVariantSuggestionHoveredElevation,token.ComponentChipVariantSuggestionFocusedElevation,token.ComponentChipVariantSuggestionPressedElevation,token.ComponentChipVariantSuggestionDisabledElevation],
+    ElevatedSuggestion: [token.ComponentChipVariantElevatedSuggestionContainerColor,token.ComponentChipVariantElevatedSuggestionLabelColor,token.ComponentChipVariantElevatedSuggestionLeadingIconColor,token.ComponentChipVariantElevatedSuggestionTrailingIconColor,token.ComponentChipVariantElevatedSuggestionDisabledContainerColor,token.ComponentChipVariantElevatedSuggestionDisabledContainerOpacity,token.ComponentChipVariantElevatedSuggestionOutlineColor,token.ComponentChipVariantElevatedSuggestionOutlineWidth,token.ComponentChipVariantElevatedSuggestionDisabledOutlineColor,token.ComponentChipVariantElevatedSuggestionDisabledOutlineOpacity,token.ComponentChipVariantElevatedSuggestionDefaultElevation,token.ComponentChipVariantElevatedSuggestionHoveredElevation,token.ComponentChipVariantElevatedSuggestionFocusedElevation,token.ComponentChipVariantElevatedSuggestionPressedElevation,token.ComponentChipVariantElevatedSuggestionDisabledElevation],
+  }[prefix];
+  return { ...commonAction, containerColor:colorRole(values[0] as string), labelColor:colorRole(values[1] as string), leadingIconColor:colorRole(values[2] as string), trailingIconColor:colorRole(values[3] as string), disabledContainerColor:colorRole(values[4] as string), disabledContainerOpacity:values[5] as number, outlineColor:colorRole(values[6] as string), outlineWidth:pxNumber(values[7] as string), disabledOutlineColor:colorRole(values[8] as string), disabledOutlineOpacity:values[9] as number, defaultElevation:values[10] as ElevationLevel, hoveredElevation:values[11] as ElevationLevel, focusedElevation:values[12] as ElevationLevel, pressedElevation:values[13] as ElevationLevel, disabledElevation:values[14] as ElevationLevel };
 }
+export const assistChipTokens=action('Assist'); export const elevatedAssistChipTokens=action('ElevatedAssist'); export const suggestionChipTokens=action('Suggestion'); export const elevatedSuggestionChipTokens=action('ElevatedSuggestion');
 
-export interface ActionChipVariantTokens {
-  readonly height: number;
-  readonly minimumInteractiveSize: number;
-  readonly containerRadius: number;
-  readonly contentPaddingInline: number;
-  readonly iconSpacing: number;
-  readonly iconSize: number;
-  readonly containerColor: ChipContainerColor;
-  readonly labelColor: ChipColorRole;
-  readonly leadingIconColor: ChipColorRole;
-  readonly trailingIconColor: ChipColorRole;
-  readonly disabledContainerColor: ChipContainerColor;
-  readonly disabledContainerOpacity: number;
-  readonly disabledLabelColor: ChipColorRole;
-  readonly disabledLabelOpacity: number;
-  readonly disabledIconColor: ChipColorRole;
-  readonly disabledIconOpacity: number;
-  readonly outlineColor: ChipColorRole | 'transparent';
-  readonly outlineWidth: number;
-  readonly disabledOutlineColor: ChipColorRole | 'transparent';
-  readonly disabledOutlineOpacity: number;
-  readonly defaultElevation: ElevationLevel;
-  readonly hoveredElevation: ElevationLevel;
-  readonly focusedElevation: ElevationLevel;
-  readonly pressedElevation: ElevationLevel;
-  readonly disabledElevation: ElevationLevel;
-  readonly draggedElevation: ElevationLevel;
-  readonly labelTypography: ChipTypographyTokens;
+const commonSelectable = { height:pxNumber(token.ComponentChipSelectableBaseHeight), minimumInteractiveSize:pxNumber(token.ComponentChipSelectableBaseMinimumInteractiveSize), containerRadius:pxNumber(token.ComponentChipSelectableBaseContainerRadius), contentPaddingInline:pxNumber(token.ComponentChipSelectableBaseContentPaddingInline), iconSpacing:pxNumber(token.ComponentChipSelectableBaseIconSpacing), compactIconSpacing:pxNumber(token.ComponentChipSelectableBaseCompactIconSpacing), leadingIconSize:pxNumber(token.ComponentChipSelectableBaseLeadingIconSize), trailingIconSize:pxNumber(token.ComponentChipSelectableBaseTrailingIconSize), avatarSize:pxNumber(token.ComponentChipSelectableBaseAvatarSize), avatarRadius:pxNumber(token.ComponentChipSelectableBaseAvatarRadius), disabledAvatarOpacity:token.ComponentChipSelectableBaseDisabledAvatarOpacity, disabledUnselectedContainerColor:colorRole(token.ComponentChipSelectableBaseDisabledUnselectedContainerColor), disabledSelectedContainerColor:colorRole(token.ComponentChipSelectableBaseDisabledSelectedContainerColor), disabledContainerOpacity:token.ComponentChipSelectableBaseDisabledContainerOpacity, disabledContentColor:colorRole(token.ComponentChipSelectableBaseDisabledContentColor), disabledContentOpacity:token.ComponentChipSelectableBaseDisabledContentOpacity, unselectedOutlineColor:colorRole(token.ComponentChipSelectableBaseUnselectedOutlineColor), selectedOutlineColor:colorRole(token.ComponentChipSelectableBaseSelectedOutlineColor), disabledUnselectedOutlineColor:colorRole(token.ComponentChipSelectableBaseDisabledUnselectedOutlineColor), disabledSelectedOutlineColor:colorRole(token.ComponentChipSelectableBaseDisabledSelectedOutlineColor), unselectedOutlineWidth:pxNumber(token.ComponentChipSelectableBaseUnselectedOutlineWidth), selectedOutlineWidth:pxNumber(token.ComponentChipSelectableBaseSelectedOutlineWidth), disabledOutlineOpacity:token.ComponentChipSelectableBaseDisabledOutlineOpacity, disabledElevation:token.ComponentChipSelectableBaseDisabledElevation as ElevationLevel, draggedElevation:token.ComponentChipSelectableBaseDraggedElevation as ElevationLevel, labelTypography } as const;
+function selectable(kind:'Filter'|'ElevatedFilter'|'Input'): SelectableChipVariantTokens {
+  const filter = kind==='Filter'; const elevated=kind==='ElevatedFilter';
+  const get = <T>(a:T,b:T,c:T) => filter?a:elevated?b:c;
+  return { ...commonSelectable,
+    avatarSize: kind==='Input'?pxNumber(token.ComponentChipVariantInputAvatarSize):commonSelectable.avatarSize,
+    disabledAvatarOpacity: kind==='Input'?token.ComponentChipVariantInputDisabledAvatarOpacity:commonSelectable.disabledAvatarOpacity,
+    unselectedContainerColor: colorRole(get(token.ComponentChipVariantFilterUnselectedContainerColor,token.ComponentChipVariantElevatedFilterUnselectedContainerColor,token.ComponentChipVariantInputUnselectedContainerColor)),
+    selectedContainerColor: colorRole(get(token.ComponentChipVariantFilterSelectedContainerColor,token.ComponentChipVariantElevatedFilterSelectedContainerColor,token.ComponentChipVariantInputSelectedContainerColor)),
+    disabledUnselectedContainerColor: elevated?colorRole(token.ComponentChipVariantElevatedFilterDisabledUnselectedContainerColor):commonSelectable.disabledUnselectedContainerColor,
+    unselectedLabelColor: colorRole(get(token.ComponentChipVariantFilterUnselectedLabelColor,token.ComponentChipVariantElevatedFilterUnselectedLabelColor,token.ComponentChipVariantInputUnselectedLabelColor)), selectedLabelColor:colorRole(get(token.ComponentChipVariantFilterSelectedLabelColor,token.ComponentChipVariantElevatedFilterSelectedLabelColor,token.ComponentChipVariantInputSelectedLabelColor)),
+    unselectedLeadingIconColor:colorRole(get(token.ComponentChipVariantFilterUnselectedLeadingIconColor,token.ComponentChipVariantElevatedFilterUnselectedLeadingIconColor,token.ComponentChipVariantInputUnselectedLeadingIconColor)), expressiveUnselectedLeadingIconColor:colorRole(get(token.ComponentChipVariantFilterExpressiveUnselectedLeadingIconColor,token.ComponentChipVariantElevatedFilterExpressiveUnselectedLeadingIconColor,token.ComponentChipVariantInputExpressiveUnselectedLeadingIconColor)), selectedLeadingIconColor:colorRole(get(token.ComponentChipVariantFilterSelectedLeadingIconColor,token.ComponentChipVariantElevatedFilterSelectedLeadingIconColor,token.ComponentChipVariantInputSelectedLeadingIconColor)), unselectedTrailingIconColor:colorRole(get(token.ComponentChipVariantFilterUnselectedTrailingIconColor,token.ComponentChipVariantElevatedFilterUnselectedTrailingIconColor,token.ComponentChipVariantInputUnselectedTrailingIconColor)), selectedTrailingIconColor:colorRole(get(token.ComponentChipVariantFilterSelectedTrailingIconColor,token.ComponentChipVariantElevatedFilterSelectedTrailingIconColor,token.ComponentChipVariantInputSelectedTrailingIconColor)),
+    unselectedOutlineColor:elevated?colorRole(token.ComponentChipVariantElevatedFilterUnselectedOutlineColor):commonSelectable.unselectedOutlineColor, disabledUnselectedOutlineColor:elevated?colorRole(token.ComponentChipVariantElevatedFilterDisabledUnselectedOutlineColor):commonSelectable.disabledUnselectedOutlineColor, unselectedOutlineWidth:elevated?pxNumber(token.ComponentChipVariantElevatedFilterUnselectedOutlineWidth):commonSelectable.unselectedOutlineWidth,
+    defaultElevation:get(token.ComponentChipVariantFilterDefaultElevation,token.ComponentChipVariantElevatedFilterDefaultElevation,token.ComponentChipVariantInputDefaultElevation) as ElevationLevel, hoveredElevation:get(token.ComponentChipVariantFilterHoveredElevation,token.ComponentChipVariantElevatedFilterHoveredElevation,token.ComponentChipVariantInputHoveredElevation) as ElevationLevel, focusedElevation:get(token.ComponentChipVariantFilterFocusedElevation,token.ComponentChipVariantElevatedFilterFocusedElevation,token.ComponentChipVariantInputFocusedElevation) as ElevationLevel, pressedElevation:get(token.ComponentChipVariantFilterPressedElevation,token.ComponentChipVariantElevatedFilterPressedElevation,token.ComponentChipVariantInputPressedElevation) as ElevationLevel,
+  };
 }
-
-export interface SelectableChipVariantTokens {
-  readonly height: number;
-  readonly minimumInteractiveSize: number;
-  readonly containerRadius: number;
-  readonly contentPaddingInline: number;
-  readonly iconSpacing: number;
-  readonly compactIconSpacing: number;
-  readonly leadingIconSize: number;
-  readonly trailingIconSize: number;
-  readonly avatarSize: number;
-  readonly avatarRadius: number;
-  readonly disabledAvatarOpacity: number;
-  readonly unselectedContainerColor: ChipContainerColor;
-  readonly selectedContainerColor: ChipContainerColor;
-  readonly disabledUnselectedContainerColor: ChipContainerColor;
-  readonly disabledSelectedContainerColor: ChipContainerColor;
-  readonly disabledContainerOpacity: number;
-  readonly unselectedLabelColor: ChipColorRole;
-  readonly selectedLabelColor: ChipColorRole;
-  readonly unselectedLeadingIconColor: ChipColorRole;
-  readonly expressiveUnselectedLeadingIconColor: ChipColorRole;
-  readonly selectedLeadingIconColor: ChipColorRole;
-  readonly unselectedTrailingIconColor: ChipColorRole;
-  readonly selectedTrailingIconColor: ChipColorRole;
-  readonly disabledContentColor: ChipColorRole;
-  readonly disabledContentOpacity: number;
-  readonly unselectedOutlineColor: ChipColorRole | 'transparent';
-  readonly selectedOutlineColor: ChipColorRole | 'transparent';
-  readonly disabledUnselectedOutlineColor: ChipColorRole | 'transparent';
-  readonly disabledSelectedOutlineColor: ChipColorRole | 'transparent';
-  readonly unselectedOutlineWidth: number;
-  readonly selectedOutlineWidth: number;
-  readonly disabledOutlineOpacity: number;
-  readonly defaultElevation: ElevationLevel;
-  readonly hoveredElevation: ElevationLevel;
-  readonly focusedElevation: ElevationLevel;
-  readonly pressedElevation: ElevationLevel;
-  readonly disabledElevation: ElevationLevel;
-  readonly draggedElevation: ElevationLevel;
-  readonly labelTypography: ChipTypographyTokens;
-}
-
-export type ChipVariant =
-  | 'assist'
-  | 'elevatedAssist'
-  | 'filter'
-  | 'elevatedFilter'
-  | 'input'
-  | 'suggestion'
-  | 'elevatedSuggestion';
-
-const labelLarge = {
-  fontFamily: 'plain',
-  fontSize: 14,
-  lineHeight: 20,
-  fontWeight: 500,
-  letterSpacing: 0.1,
-} as const satisfies ChipTypographyTokens;
-
-const commonAction = {
-  height: 32,
-  minimumInteractiveSize: 48,
-  containerRadius: 8,
-  contentPaddingInline: 8,
-  iconSpacing: 8,
-  iconSize: 18,
-  disabledLabelColor: 'onSurface',
-  disabledLabelOpacity: 0.38,
-  disabledIconColor: 'onSurface',
-  disabledIconOpacity: 0.38,
-  draggedElevation: 'level4',
-  labelTypography: labelLarge,
-} as const;
-
-/** AndroidX AssistChipTokens + AssistChipDefaults runtime defaults. */
-export const assistChipTokens = {
-  ...commonAction,
-  containerColor: 'transparent',
-  labelColor: 'onSurface',
-  leadingIconColor: 'primary',
-  trailingIconColor: 'primary',
-  disabledContainerColor: 'transparent',
-  disabledContainerOpacity: 0,
-  outlineColor: 'outlineVariant',
-  outlineWidth: 1,
-  disabledOutlineColor: 'onSurface',
-  disabledOutlineOpacity: 0.12,
-  defaultElevation: 'level0',
-  hoveredElevation: 'level0',
-  focusedElevation: 'level0',
-  pressedElevation: 'level0',
-  disabledElevation: 'level0',
-} as const satisfies ActionChipVariantTokens;
-
-/** AndroidX elevated AssistChip runtime defaults. */
-export const elevatedAssistChipTokens = {
-  ...commonAction,
-  containerColor: 'surfaceContainerLow',
-  labelColor: 'onSurface',
-  leadingIconColor: 'primary',
-  trailingIconColor: 'primary',
-  disabledContainerColor: 'onSurface',
-  disabledContainerOpacity: 0.12,
-  outlineColor: 'transparent',
-  outlineWidth: 0,
-  disabledOutlineColor: 'transparent',
-  disabledOutlineOpacity: 0,
-  defaultElevation: 'level1',
-  hoveredElevation: 'level2',
-  focusedElevation: 'level1',
-  pressedElevation: 'level1',
-  disabledElevation: 'level0',
-} as const satisfies ActionChipVariantTokens;
-
-/** AndroidX SuggestionChipTokens + SuggestionChipDefaults runtime defaults. */
-export const suggestionChipTokens = {
-  ...commonAction,
-  containerColor: 'transparent',
-  labelColor: 'onSurfaceVariant',
-  leadingIconColor: 'primary',
-  trailingIconColor: 'onSurfaceVariant',
-  disabledContainerColor: 'transparent',
-  disabledContainerOpacity: 0,
-  outlineColor: 'outlineVariant',
-  outlineWidth: 1,
-  disabledOutlineColor: 'onSurface',
-  disabledOutlineOpacity: 0.12,
-  defaultElevation: 'level0',
-  hoveredElevation: 'level0',
-  focusedElevation: 'level0',
-  pressedElevation: 'level0',
-  disabledElevation: 'level0',
-} as const satisfies ActionChipVariantTokens;
-
-/** AndroidX elevated SuggestionChip runtime defaults. */
-export const elevatedSuggestionChipTokens = {
-  ...commonAction,
-  containerColor: 'surfaceContainerLow',
-  labelColor: 'onSurfaceVariant',
-  leadingIconColor: 'primary',
-  trailingIconColor: 'onSurfaceVariant',
-  disabledContainerColor: 'onSurface',
-  disabledContainerOpacity: 0.12,
-  outlineColor: 'transparent',
-  outlineWidth: 0,
-  disabledOutlineColor: 'transparent',
-  disabledOutlineOpacity: 0,
-  defaultElevation: 'level1',
-  hoveredElevation: 'level2',
-  focusedElevation: 'level1',
-  pressedElevation: 'level1',
-  disabledElevation: 'level0',
-} as const satisfies ActionChipVariantTokens;
-
-const commonSelectable = {
-  height: 32,
-  minimumInteractiveSize: 48,
-  containerRadius: 8,
-  contentPaddingInline: 8,
-  iconSpacing: 8,
-  compactIconSpacing: 4,
-  leadingIconSize: 18,
-  trailingIconSize: 18,
-  avatarSize: 0,
-  avatarRadius: 9999,
-  disabledAvatarOpacity: 1,
-  disabledUnselectedContainerColor: 'transparent',
-  disabledSelectedContainerColor: 'onSurface',
-  disabledContainerOpacity: 0.12,
-  disabledContentColor: 'onSurface',
-  disabledContentOpacity: 0.38,
-  unselectedOutlineColor: 'outlineVariant',
-  selectedOutlineColor: 'transparent',
-  disabledUnselectedOutlineColor: 'onSurface',
-  disabledSelectedOutlineColor: 'transparent',
-  unselectedOutlineWidth: 1,
-  selectedOutlineWidth: 0,
-  disabledOutlineOpacity: 0.12,
-  disabledElevation: 'level0',
-  draggedElevation: 'level4',
-  labelTypography: labelLarge,
-} as const;
-
-/** AndroidX flat FilterChip runtime defaults. */
-export const filterChipTokens = {
-  ...commonSelectable,
-  unselectedContainerColor: 'transparent',
-  selectedContainerColor: 'secondaryContainer',
-  unselectedLabelColor: 'onSurfaceVariant',
-  selectedLabelColor: 'onSecondaryContainer',
-  unselectedLeadingIconColor: 'primary',
-  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
-  selectedLeadingIconColor: 'onSecondaryContainer',
-  unselectedTrailingIconColor: 'onSurfaceVariant',
-  selectedTrailingIconColor: 'onSecondaryContainer',
-  defaultElevation: 'level0',
-  // FilterChipDefaults intentionally uses the selected hover token for both states.
-  hoveredElevation: 'level1',
-  focusedElevation: 'level0',
-  pressedElevation: 'level0',
-} as const satisfies SelectableChipVariantTokens;
-
-/** AndroidX elevated FilterChip runtime defaults. */
-export const elevatedFilterChipTokens = {
-  ...commonSelectable,
-  unselectedContainerColor: 'surfaceContainerLow',
-  selectedContainerColor: 'secondaryContainer',
-  disabledUnselectedContainerColor: 'onSurface',
-  unselectedLabelColor: 'onSurfaceVariant',
-  selectedLabelColor: 'onSecondaryContainer',
-  unselectedLeadingIconColor: 'primary',
-  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
-  selectedLeadingIconColor: 'onSecondaryContainer',
-  unselectedTrailingIconColor: 'onSurfaceVariant',
-  selectedTrailingIconColor: 'onSecondaryContainer',
-  unselectedOutlineColor: 'transparent',
-  disabledUnselectedOutlineColor: 'transparent',
-  unselectedOutlineWidth: 0,
-  defaultElevation: 'level1',
-  hoveredElevation: 'level2',
-  focusedElevation: 'level1',
-  pressedElevation: 'level1',
-} as const satisfies SelectableChipVariantTokens;
-
-/** AndroidX InputChipTokens + InputChipDefaults runtime defaults. */
-export const inputChipTokens = {
-  ...commonSelectable,
-  avatarSize: 24,
-  disabledAvatarOpacity: 0.38,
-  unselectedContainerColor: 'transparent',
-  selectedContainerColor: 'secondaryContainer',
-  unselectedLabelColor: 'onSurfaceVariant',
-  selectedLabelColor: 'onSecondaryContainer',
-  unselectedLeadingIconColor: 'onSurfaceVariant',
-  expressiveUnselectedLeadingIconColor: 'onSurfaceVariant',
-  selectedLeadingIconColor: 'primary',
-  unselectedTrailingIconColor: 'onSurfaceVariant',
-  selectedTrailingIconColor: 'onSecondaryContainer',
-  defaultElevation: 'level0',
-  hoveredElevation: 'level0',
-  focusedElevation: 'level0',
-  pressedElevation: 'level0',
-} as const satisfies SelectableChipVariantTokens;
-
-export const chipVariantTokens = {
-  assist: assistChipTokens,
-  elevatedAssist: elevatedAssistChipTokens,
-  filter: filterChipTokens,
-  elevatedFilter: elevatedFilterChipTokens,
-  input: inputChipTokens,
-  suggestion: suggestionChipTokens,
-  elevatedSuggestion: elevatedSuggestionChipTokens,
-} as const;
-
-/** Expressive ChipShapes defaults from the pinned ChipsTokens table. */
-export const chipShapeTokens = {
-  unselectedRadius: 12,
-  selectedRadius: 9999,
-  pressedRadius: 8,
-} as const;
+export const filterChipTokens=selectable('Filter'); export const elevatedFilterChipTokens=selectable('ElevatedFilter'); export const inputChipTokens=selectable('Input');
+export const chipVariantTokens={assist:assistChipTokens,elevatedAssist:elevatedAssistChipTokens,filter:filterChipTokens,elevatedFilter:elevatedFilterChipTokens,input:inputChipTokens,suggestion:suggestionChipTokens,elevatedSuggestion:elevatedSuggestionChipTokens} as const;
+export const chipShapeTokens={unselectedRadius:pxNumber(token.ComponentChipShapeUnselectedRadius),selectedRadius:pxNumber(token.ComponentChipShapeSelectedRadius),pressedRadius:pxNumber(token.ComponentChipShapePressedRadius)} as const;
+export const chipInputPaddingTokens={compact:pxNumber(token.ComponentChipInputPaddingCompact),withIcon:pxNumber(token.ComponentChipInputPaddingWithIcon)} as const;
+export const chipShapeTransition=`border-radius ${token.MotionSpringFastSpatialDuration} ${token.MotionSpringFastSpatialEasing}`;

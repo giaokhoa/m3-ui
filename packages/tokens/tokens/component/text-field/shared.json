@@ -1,0 +1,67 @@
+{
+  "component": {
+    "textField": {
+      "shared": {
+        "minWidth": { "$type": "dimension", "$value": { "value": 280, "unit": "px" } },
+        "minHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "lineHeight": {
+          "inputMin": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+          "focusedLabelMin": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "supportingMin": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+        },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "iconSlotSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "disabledOpacity": { "$type": "number", "$value": 0.38 },
+        "colors": {
+          "text": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledText": { "$type": "string", "$value": "var(--on-surface)" },
+          "cursor": { "$type": "string", "$value": "var(--primary)" },
+          "errorCursor": { "$type": "string", "$value": "var(--error)" },
+          "label": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "focusedLabel": { "$type": "string", "$value": "var(--primary)" },
+          "disabledLabel": { "$type": "string", "$value": "var(--on-surface)" },
+          "errorLabel": { "$type": "string", "$value": "var(--error)" },
+          "placeholder": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledPlaceholder": { "$type": "string", "$value": "var(--on-surface)" },
+          "supporting": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledSupporting": { "$type": "string", "$value": "var(--on-surface)" },
+          "errorSupporting": { "$type": "string", "$value": "var(--error)" },
+          "leadingIcon": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "trailingIcon": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledLeadingIcon": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledTrailingIcon": { "$type": "string", "$value": "var(--on-surface)" },
+          "errorLeadingIcon": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "errorTrailingIcon": { "$type": "string", "$value": "var(--error)" },
+          "prefix": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "suffix": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        },
+        "typography": {
+          "bodyLarge": {
+            "fontFamily": { "$type": "string", "$value": "{typography.bodyLarge.fontFamily}" },
+            "fontSize": { "$type": "dimension", "$value": "{typography.bodyLarge.fontSize}" },
+            "lineHeight": { "$type": "dimension", "$value": "{typography.bodyLarge.lineHeight}" },
+            "fontWeight": { "$type": "number", "$value": "{typography.bodyLarge.fontWeight}" },
+            "letterSpacing": { "$type": "dimension", "$value": "{typography.bodyLarge.letterSpacing}" }
+          },
+          "bodySmall": {
+            "fontFamily": { "$type": "string", "$value": "{typography.bodySmall.fontFamily}" },
+            "fontSize": { "$type": "dimension", "$value": "{typography.bodySmall.fontSize}" },
+            "lineHeight": { "$type": "dimension", "$value": "{typography.bodySmall.lineHeight}" },
+            "fontWeight": { "$type": "number", "$value": "{typography.bodySmall.fontWeight}" },
+            "letterSpacing": { "$type": "dimension", "$value": "{typography.bodySmall.letterSpacing}" }
+          }
+        },
+        "motion": {
+          "fastEffects": {
+            "duration": { "$type": "string", "$value": "{motion.spring.fastEffects.duration}" },
+            "easing": { "$type": "string", "$value": "{motion.spring.fastEffects.easing}" }
+          },
+          "fastSpatial": {
+            "duration": { "$type": "string", "$value": "{motion.spring.fastSpatial.duration}" },
+            "easing": { "$type": "string", "$value": "{motion.spring.fastSpatial.easing}" }
+          }
+        }
+      }
+    }
+  }
+}

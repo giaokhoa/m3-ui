@@ -1,5 +1,7 @@
 import {
+  chipInputPaddingTokens,
   chipShapeTokens,
+  chipShapeTransition,
   chipVariantTokens,
   type ActionChipVariantTokens,
   type ChipColorRole,
@@ -34,9 +36,6 @@ export interface ChipStyleOptions {
   readonly hasTrailingIcon?: boolean;
   readonly hasAvatar?: boolean;
 }
-
-const fastSpatialShapeTransition =
-  'border-radius 137ms linear(0, 0.0969 10%, 0.2872 20%, 0.4827 30%, 0.6472 40%, 0.7719 50%, 0.8598 60%, 0.9183 70%, 0.9552 80%, 0.9774 90%, 1)';
 
 function roleVariable(role: ChipContainerColor): string {
   if (role === 'transparent') return 'transparent';
@@ -81,10 +80,7 @@ function selectableTokens(variant: ChipVariant): SelectableChipVariantTokens | n
   }
 }
 
-function resolveActionColors(
-  tokens: ActionChipVariantTokens,
-  isDisabled: boolean,
-) {
+function resolveActionColors(tokens: ActionChipVariantTokens, isDisabled: boolean) {
   if (isDisabled) {
     return {
       container: withOpacity(tokens.disabledContainerColor, tokens.disabledContainerOpacity),
@@ -115,33 +111,23 @@ function resolveSelectableColors(
   if (isDisabled) {
     return {
       container: withOpacity(
-        isSelected
-          ? tokens.disabledSelectedContainerColor
-          : tokens.disabledUnselectedContainerColor,
+        isSelected ? tokens.disabledSelectedContainerColor : tokens.disabledUnselectedContainerColor,
         tokens.disabledContainerOpacity,
       ),
       label: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity),
       leading: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity),
       trailing: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity),
       outline: withOpacity(
-        isSelected
-          ? tokens.disabledSelectedOutlineColor
-          : tokens.disabledUnselectedOutlineColor,
+        isSelected ? tokens.disabledSelectedOutlineColor : tokens.disabledUnselectedOutlineColor,
         tokens.disabledOutlineOpacity,
       ),
-      outlineWidth: isSelected
-        ? tokens.selectedOutlineWidth
-        : tokens.unselectedOutlineWidth,
+      outlineWidth: isSelected ? tokens.selectedOutlineWidth : tokens.unselectedOutlineWidth,
     };
   }
 
   return {
-    container: roleVariable(
-      isSelected ? tokens.selectedContainerColor : tokens.unselectedContainerColor,
-    ),
-    label: roleVariable(
-      isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor,
-    ),
+    container: roleVariable(isSelected ? tokens.selectedContainerColor : tokens.unselectedContainerColor),
+    label: roleVariable(isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor),
     leading: roleVariable(
       isSelected
         ? tokens.selectedLeadingIconColor
@@ -149,15 +135,9 @@ function resolveSelectableColors(
           ? tokens.expressiveUnselectedLeadingIconColor
           : tokens.unselectedLeadingIconColor,
     ),
-    trailing: roleVariable(
-      isSelected ? tokens.selectedTrailingIconColor : tokens.unselectedTrailingIconColor,
-    ),
-    outline: roleVariable(
-      isSelected ? tokens.selectedOutlineColor : tokens.unselectedOutlineColor,
-    ),
-    outlineWidth: isSelected
-      ? tokens.selectedOutlineWidth
-      : tokens.unselectedOutlineWidth,
+    trailing: roleVariable(isSelected ? tokens.selectedTrailingIconColor : tokens.unselectedTrailingIconColor),
+    outline: roleVariable(isSelected ? tokens.selectedOutlineColor : tokens.unselectedOutlineColor),
+    outlineWidth: isSelected ? tokens.selectedOutlineWidth : tokens.unselectedOutlineWidth,
   };
 }
 
@@ -238,15 +218,18 @@ function resolvePadding(
   standard: number,
 ) {
   if (variant !== 'input') return { start: standard, end: standard };
-  const start = options.hasAvatar || !options.hasLeadingIcon ? 4 : 8;
-  const end = options.hasTrailingIcon ? 8 : 4;
+  const start =
+    options.hasAvatar || !options.hasLeadingIcon
+      ? chipInputPaddingTokens.compact
+      : chipInputPaddingTokens.withIcon;
+  const end = options.hasTrailingIcon
+    ? chipInputPaddingTokens.withIcon
+    : chipInputPaddingTokens.compact;
   return { start, end };
 }
 
 export function getChipRootStyle(variant: ChipVariant): ChipStyle {
-  return {
-    '--_chip-hit-size': `${chipVariantTokens[variant].minimumInteractiveSize}px`,
-  };
+  return { '--_chip-hit-size': `${chipVariantTokens[variant].minimumInteractiveSize}px` };
 }
 
 export function getChipStyle(
@@ -285,9 +268,7 @@ export function getChipStyle(
     '--_chip-trailing-icon-size': `${selectable?.trailingIconSize ?? action!.iconSize}px`,
     '--_chip-avatar-size': `${selectable?.avatarSize ?? 0}px`,
     '--_chip-avatar-radius': `${selectable?.avatarRadius ?? 0}px`,
-    '--_chip-avatar-opacity': state.isDisabled
-      ? (selectable?.disabledAvatarOpacity ?? 1)
-      : 1,
+    '--_chip-avatar-opacity': state.isDisabled ? (selectable?.disabledAvatarOpacity ?? 1) : 1,
     '--_chip-container-color': colors.container,
     '--_chip-label-color': colors.label,
     '--_chip-leading-icon-color': colors.leading,
@@ -299,7 +280,7 @@ export function getChipStyle(
     '--_chip-line-height': `${typography.lineHeight}px`,
     '--_chip-font-weight': typography.fontWeight,
     '--_chip-letter-spacing': `${typography.letterSpacing}px`,
-    '--_chip-shape-transition': options.shapes ? fastSpatialShapeTransition : 'none',
+    '--_chip-shape-transition': options.shapes ? chipShapeTransition : 'none',
   };
 }
 

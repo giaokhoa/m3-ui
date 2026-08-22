@@ -1,3 +1,5 @@
+import * as token from '@m3/tokens/generated';
+
 export type TypefaceRole = 'plain' | 'brand';
 
 export interface MaterialTypefaceTokens {
@@ -6,15 +8,8 @@ export interface MaterialTypefaceTokens {
   readonly fallback: string;
 }
 
-/**
- * Material reference typefaces used by the default web theme.
- *
- * Material Web uses Roboto for both plain and brand typefaces by default.
- * The fallback remains generic so consumers can still render if the webfont
- * has not loaded yet.
- */
 export const materialTypefaceTokens = {
-  plain: 'Roboto',
-  brand: 'Roboto',
-  fallback: 'sans-serif',
+  plain: token.TypefacePlain,
+  brand: token.TypefaceBrand,
+  fallback: token.TypefaceFallback,
 } as const satisfies MaterialTypefaceTokens;
