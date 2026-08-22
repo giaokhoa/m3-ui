@@ -95,6 +95,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-fab-menu:complete
       - name: Require complete Material Web Switch overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-switch:complete
+      - name: Require complete Material Web Picker overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-pickers:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
