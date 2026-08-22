@@ -1,0 +1,61 @@
+{
+  "color": {
+    "role": {
+      "primary": { "$type": "string", "$value": "var(--primary)" },
+      "onPrimary": { "$type": "string", "$value": "var(--on-primary)" },
+      "primaryContainer": { "$type": "string", "$value": "var(--primary-container)" },
+      "onPrimaryContainer": { "$type": "string", "$value": "var(--on-primary-container)" },
+      "primaryFixed": { "$type": "string", "$value": "var(--primary-fixed)" },
+      "primaryFixedDim": { "$type": "string", "$value": "var(--primary-fixed-dim)" },
+      "onPrimaryFixed": { "$type": "string", "$value": "var(--on-primary-fixed)" },
+      "onPrimaryFixedVariant": { "$type": "string", "$value": "var(--on-primary-fixed-variant)" },
+
+      "secondary": { "$type": "string", "$value": "var(--secondary)" },
+      "onSecondary": { "$type": "string", "$value": "var(--on-secondary)" },
+      "secondaryContainer": { "$type": "string", "$value": "var(--secondary-container)" },
+      "onSecondaryContainer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+      "secondaryFixed": { "$type": "string", "$value": "var(--secondary-fixed)" },
+      "secondaryFixedDim": { "$type": "string", "$value": "var(--secondary-fixed-dim)" },
+      "onSecondaryFixed": { "$type": "string", "$value": "var(--on-secondary-fixed)" },
+      "onSecondaryFixedVariant": { "$type": "string", "$value": "var(--on-secondary-fixed-variant)" },
+
+      "tertiary": { "$type": "string", "$value": "var(--tertiary)" },
+      "onTertiary": { "$type": "string", "$value": "var(--on-tertiary)" },
+      "tertiaryContainer": { "$type": "string", "$value": "var(--tertiary-container)" },
+      "onTertiaryContainer": { "$type": "string", "$value": "var(--on-tertiary-container)" },
+      "tertiaryFixed": { "$type": "string", "$value": "var(--tertiary-fixed)" },
+      "tertiaryFixedDim": { "$type": "string", "$value": "var(--tertiary-fixed-dim)" },
+      "onTertiaryFixed": { "$type": "string", "$value": "var(--on-tertiary-fixed)" },
+      "onTertiaryFixedVariant": { "$type": "string", "$value": "var(--on-tertiary-fixed-variant)" },
+
+      "error": { "$type": "string", "$value": "var(--error)" },
+      "onError": { "$type": "string", "$value": "var(--on-error)" },
+      "errorContainer": { "$type": "string", "$value": "var(--error-container)" },
+      "onErrorContainer": { "$type": "string", "$value": "var(--on-error-container)" },
+
+      "surface": { "$type": "string", "$value": "var(--surface)" },
+      "surfaceDim": { "$type": "string", "$value": "var(--surface-dim)" },
+      "surfaceBright": { "$type": "string", "$value": "var(--surface-bright)" },
+      "surfaceContainerLowest": { "$type": "string", "$value": "var(--surface-container-lowest)" },
+      "surfaceContainerLow": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "surfaceContainer": { "$type": "string", "$value": "var(--surface-container)" },
+      "surfaceContainerHigh": { "$type": "string", "$value": "var(--surface-container-high)" },
+      "surfaceContainerHighest": { "$type": "string", "$value": "var(--surface-container-highest)" },
+      "onSurface": { "$type": "string", "$value": "var(--on-surface)" },
+      "onSurfaceVariant": { "$type": "string", "$value": "var(--on-surface-variant)" },
+      "surfaceVariant": { "$type": "string", "$value": "var(--surface-variant)" },
+      "surfaceTint": { "$type": "string", "$value": "var(--surface-tint)" },
+
+      "outline": { "$type": "string", "$value": "var(--outline)" },
+      "outlineVariant": { "$type": "string", "$value": "var(--outline-variant)" },
+      "inverseSurface": { "$type": "string", "$value": "var(--inverse-surface)" },
+      "inverseOnSurface": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+      "inversePrimary": { "$type": "string", "$value": "var(--inverse-primary)" },
+
+      "background": { "$type": "string", "$value": "var(--background)" },
+      "onBackground": { "$type": "string", "$value": "var(--on-background)" },
+      "scrim": { "$type": "string", "$value": "var(--scrim)" },
+      "shadow": { "$type": "string", "$value": "var(--shadow)" }
+    }
+  }
+}

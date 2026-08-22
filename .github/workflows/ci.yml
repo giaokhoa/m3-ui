@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Inventory pinned Compose token source
+        run: pnpm --filter @m3/tokens inventory:compose
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 

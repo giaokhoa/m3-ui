@@ -1,0 +1,1 @@
+{"component":{"divider":{"color":{"$type":"string","$value":"var(--outline-variant)"},"thickness":{"$type":"dimension","$value":{"value":1,"unit":"px"}}}}}

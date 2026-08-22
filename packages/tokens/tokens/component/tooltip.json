@@ -1,0 +1,26 @@
+{
+  "component": {
+    "tooltip": {
+      "plain": {
+        "containerColor": { "$type": "string", "$value": "var(--inverse-surface)" },
+        "containerShape": { "$type": "string", "$value": "extraSmall" },
+        "supportingTextColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "supportingTextTypography": { "$type": "string", "$value": "bodySmall" }
+      },
+      "rich": {
+        "actionFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionLabelTextTypography": { "$type": "string", "$value": "labelLarge" },
+        "actionPressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "containerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "containerElevation": { "$type": "string", "$value": "level2" },
+        "containerShape": { "$type": "string", "$value": "medium" },
+        "subheadColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "subheadTypography": { "$type": "string", "$value": "titleSmall" },
+        "supportingTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "supportingTextTypography": { "$type": "string", "$value": "bodyMedium" }
+      }
+    }
+  }
+}

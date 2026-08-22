@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/generated/tokens.js",
   "module": "./dist/generated/tokens.js",
   "types": "./dist/generated/tokens.d.ts",
@@ -19,8 +21,10 @@
     "build": "rm -rf dist && pnpm tokens:build",
     "test": "rm -rf dist && node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
+    "inventory:compose": "node scripts/inventory-compose.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "coverage:compose": "node scripts/coverage-compose.mjs"
   },
   "devDependencies": {
     "style-dictionary": "5.5.2"

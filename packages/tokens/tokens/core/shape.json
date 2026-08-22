@@ -1,9 +1,56 @@
 {
   "shape": {
-    "full": { "$type": "dimension", "$value": { "value": 9999, "unit": "px" } },
-    "small": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
-    "medium": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
-    "large": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
-    "extraLarge": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } }
+    "corner": {
+      "none": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+      "extraSmall": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "small": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+      "medium": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "large": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "largeIncreased": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+      "extraLarge": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } },
+      "extraLargeIncreased": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+      "extraExtraLarge": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "full": { "$type": "dimension", "$value": { "value": 9999, "unit": "px" } },
+      "extraSmallTop": {
+        "topStart": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+        "topEnd": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+        "bottomEnd": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "bottomStart": { "$type": "dimension", "$value": "{shape.corner.none}" }
+      },
+      "largeStart": {
+        "topStart": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "topEnd": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "bottomEnd": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "bottomStart": { "$type": "dimension", "$value": "{shape.corner.large}" }
+      },
+      "largeEnd": {
+        "topStart": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "topEnd": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "bottomEnd": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "bottomStart": { "$type": "dimension", "$value": "{shape.corner.none}" }
+      },
+      "largeTop": {
+        "topStart": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "topEnd": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "bottomEnd": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "bottomStart": { "$type": "dimension", "$value": "{shape.corner.none}" }
+      },
+      "extraLargeTop": {
+        "topStart": { "$type": "dimension", "$value": "{shape.corner.extraLarge}" },
+        "topEnd": { "$type": "dimension", "$value": "{shape.corner.extraLarge}" },
+        "bottomEnd": { "$type": "dimension", "$value": "{shape.corner.none}" },
+        "bottomStart": { "$type": "dimension", "$value": "{shape.corner.none}" }
+      }
+    },
+    "none": { "$type": "dimension", "$value": "{shape.corner.none}" },
+    "extraSmall": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+    "small": { "$type": "dimension", "$value": "{shape.corner.small}" },
+    "medium": { "$type": "dimension", "$value": "{shape.corner.medium}" },
+    "large": { "$type": "dimension", "$value": "{shape.corner.large}" },
+    "largeIncreased": { "$type": "dimension", "$value": "{shape.corner.largeIncreased}" },
+    "extraLarge": { "$type": "dimension", "$value": "{shape.corner.extraLarge}" },
+    "extraLargeIncreased": { "$type": "dimension", "$value": "{shape.corner.extraLargeIncreased}" },
+    "extraExtraLarge": { "$type": "dimension", "$value": "{shape.corner.extraExtraLarge}" },
+    "full": { "$type": "dimension", "$value": "{shape.corner.full}" }
   }
 }

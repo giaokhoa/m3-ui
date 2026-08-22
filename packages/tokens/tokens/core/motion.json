@@ -1,13 +1,16 @@
 {
   "motion": {
     "easing": {
-      "linear": { "$type": "string", "$value": "linear" },
+      "linear": { "$type": "string", "$value": "cubic-bezier(0, 0, 1, 1)" },
       "standard": { "$type": "string", "$value": "cubic-bezier(0.2, 0, 0, 1)" },
-      "standardAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,1,1)" },
-      "standardDecelerate": { "$type": "string", "$value": "cubic-bezier(0,0,0,1)" },
-      "emphasized": { "$type": "string", "$value": "cubic-bezier(.3,0,0,1)" },
-      "emphasizedAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,.8,.15)" },
-      "emphasizedDecelerate": { "$type": "string", "$value": "cubic-bezier(.05,.7,.1,1)" }
+      "standardAccelerate": { "$type": "string", "$value": "cubic-bezier(0.3, 0, 1, 1)" },
+      "standardDecelerate": { "$type": "string", "$value": "cubic-bezier(0, 0, 0, 1)" },
+      "emphasized": { "$type": "string", "$value": "{motion.easing.standard}" },
+      "emphasizedAccelerate": { "$type": "string", "$value": "cubic-bezier(0.3, 0, 0.8, 0.15)" },
+      "emphasizedDecelerate": { "$type": "string", "$value": "cubic-bezier(0.05, 0.7, 0.1, 1)" },
+      "legacy": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.2, 1)" },
+      "legacyAccelerate": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 1, 1)" },
+      "legacyDecelerate": { "$type": "string", "$value": "cubic-bezier(0, 0, 0.2, 1)" }
     },
     "duration": {
       "short1": { "$type": "string", "$value": "50ms" },
@@ -28,6 +31,58 @@
       "extraLong4": { "$type": "string", "$value": "1000ms" }
     },
     "spring": {
+      "standard": {
+        "defaultSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.9 },
+          "stiffness": { "$type": "number", "$value": 700 }
+        },
+        "defaultEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 1600 }
+        },
+        "fastSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.9 },
+          "stiffness": { "$type": "number", "$value": 1400 }
+        },
+        "fastEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 3800 }
+        },
+        "slowSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.9 },
+          "stiffness": { "$type": "number", "$value": 300 }
+        },
+        "slowEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 800 }
+        }
+      },
+      "expressive": {
+        "defaultSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.8 },
+          "stiffness": { "$type": "number", "$value": 380 }
+        },
+        "defaultEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 1600 }
+        },
+        "fastSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.6 },
+          "stiffness": { "$type": "number", "$value": 800 }
+        },
+        "fastEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 3800 }
+        },
+        "slowSpatial": {
+          "dampingRatio": { "$type": "number", "$value": 0.8 },
+          "stiffness": { "$type": "number", "$value": 200 }
+        },
+        "slowEffects": {
+          "dampingRatio": { "$type": "number", "$value": 1 },
+          "stiffness": { "$type": "number", "$value": 800 }
+        }
+      },
       "defaultEffects": {
         "duration": { "$type": "string", "$value": "166ms" },
         "easing": { "$type": "string", "$value": "linear(0, 0.1434 10%, 0.3831 20%, 0.5918 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9689 80%, 0.9823 90%, 1)" }

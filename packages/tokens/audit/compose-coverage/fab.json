@@ -1,0 +1,1 @@
+{"family":"fab","status":"reconciled","sources":["FabBaselineTokens.kt","FabSmallTokens.kt","FabMediumTokens.kt","FabLargeTokens.kt","FabPrimaryContainerTokens.kt","FabSecondaryContainerTokens.kt","ExtendedFabPrimaryTokens.kt","ExtendedFabSmallTokens.kt","ExtendedFabMediumTokens.kt","ExtendedFabLargeTokens.kt"],"canonical":["tokens/component/fab.json"]}
