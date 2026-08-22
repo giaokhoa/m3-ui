@@ -22,15 +22,15 @@ describe('Checkbox parity', () => {
     });
   });
 
-  it('matches current Material 3 color roles and disabled opacity', () => {
+  it('keeps current Material 3 colors as runtime CSS expressions', () => {
     expect(checkboxTokens).toMatchObject({
-      selectedContainerColor: 'primary',
-      selectedIconColor: 'onPrimary',
-      unselectedOutlineColor: 'onSurfaceVariant',
-      selectedDisabledContainerColor: 'onSurface',
+      selectedContainerColor: 'var(--primary)',
+      selectedIconColor: 'var(--on-primary)',
+      unselectedOutlineColor: 'var(--on-surface-variant)',
+      selectedDisabledContainerColor: 'var(--on-surface)',
       selectedDisabledContainerOpacity: 0.38,
-      selectedDisabledIconColor: 'surface',
-      unselectedDisabledOutlineColor: 'onSurface',
+      selectedDisabledIconColor: 'var(--surface)',
+      unselectedDisabledOutlineColor: 'var(--on-surface)',
       unselectedDisabledOutlineOpacity: 0.38,
     });
   });
@@ -42,7 +42,7 @@ describe('Checkbox parity', () => {
     expect(checkboxTokens.motion.snapDelayMs).toBe(100);
   });
 
-  it('maps roles through ThemeProvider variables without fixed colors', () => {
+  it('passes ThemeProvider variables through without fixed colors', () => {
     expect(checkboxBaseStyle).toMatchObject({
       '--_checkbox-container-size': '18px',
       '--_checkbox-state-layer-size': '40px',
