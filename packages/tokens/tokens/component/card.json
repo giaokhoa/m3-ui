@@ -55,7 +55,7 @@
             "default": { "$type": "string", "$value": "level0" },
             "pressed": { "$type": "string", "$value": "level0" },
             "focused": { "$type": "string", "$value": "level0" },
-            "hovered": { "$type": "string", "$value": "level0" },
+            "hovered": { "$type": "string", "$value": "level1" },
             "dragged": { "$type": "string", "$value": "level3" },
             "disabled": { "$type": "string", "$value": "level0" }
           }
