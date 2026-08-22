@@ -1,0 +1,33 @@
+{
+  "component": {
+    "textField": {
+      "filled": {
+        "contentPadding": {
+          "inline": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "blockWithLabel": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "blockWithoutLabel": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "supportingTop": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "affix": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "afterIcon": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }
+        },
+        "containerShape": {
+          "topStartRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "topEndRadius": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "bottomEndRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+          "bottomStartRadius": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }
+        },
+        "indicator": {
+          "unfocusedThickness": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "focusedThickness": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
+        },
+        "colors": {
+          "container": { "$type": "string", "$value": "var(--surface-container-highest)" },
+          "indicator": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "focusedIndicator": { "$type": "string", "$value": "var(--primary)" },
+          "disabledIndicator": { "$type": "string", "$value": "var(--on-surface)" },
+          "errorIndicator": { "$type": "string", "$value": "var(--error)" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "component": {
+    "radioButton": {
+      "iconSize": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+      "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+      "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "padding": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "strokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "dotSize": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "colors": {
+        "selected": { "$type": "string", "$value": "var(--primary)" },
+        "unselected": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "disabledSelected": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledUnselected": { "$type": "string", "$value": "var(--on-surface)" }
+      },
+      "disabledOpacity": { "$type": "number", "$value": 0.38 },
+      "motion": {
+        "color": {
+          "duration": { "$type": "string", "$value": "{motion.spring.defaultEffects.duration}" },
+          "easing": { "$type": "string", "$value": "{motion.spring.defaultEffects.easing}" }
+        },
+        "dot": {
+          "duration": { "$type": "string", "$value": "{motion.spring.fastSpatial.duration}" },
+          "easing": { "$type": "string", "$value": "{motion.spring.fastSpatial.easing}" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "component": {
+    "card": {
+      "base": {
+        "shapeRadius": { "$type": "dimension", "$value": "{shape.medium}" },
+        "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "disabledContentColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "disabledContentOpacity": { "$type": "number", "$value": 0.38 }
+      },
+      "variant": {
+        "filled": {
+          "containerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--surface-variant)" },
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledCompositeOver": { "$type": "string", "$value": "var(--surface-container-highest)" },
+          "elevation": {
+            "default": { "$type": "string", "$value": "level0" },
+            "pressed": { "$type": "string", "$value": "level0" },
+            "focused": { "$type": "string", "$value": "level0" },
+            "hovered": { "$type": "string", "$value": "level1" },
+            "dragged": { "$type": "string", "$value": "level3" },
+            "disabled": { "$type": "string", "$value": "level0" }
+          }
+        },
+        "elevated": {
+          "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--surface)" },
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledCompositeOver": { "$type": "string", "$value": "var(--surface)" },
+          "elevation": {
+            "default": { "$type": "string", "$value": "level1" },
+            "pressed": { "$type": "string", "$value": "level1" },
+            "focused": { "$type": "string", "$value": "level1" },
+            "hovered": { "$type": "string", "$value": "level2" },
+            "dragged": { "$type": "string", "$value": "level4" },
+            "disabled": { "$type": "string", "$value": "level1" }
+          }
+        },
+        "outlined": {
+          "containerColor": { "$type": "string", "$value": "var(--surface)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--surface)" },
+          "disabledContainerOpacity": { "$type": "number", "$value": 1 },
+          "disabledCompositeOver": { "$type": "string", "$value": "var(--surface)" },
+          "outline": {
+            "width": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+            "color": { "$type": "string", "$value": "var(--outline-variant)" },
+            "disabledColor": { "$type": "string", "$value": "var(--outline)" },
+            "disabledOpacity": { "$type": "number", "$value": 0.12 },
+            "disabledCompositeOver": { "$type": "string", "$value": "var(--surface-container-low)" }
+          },
+          "elevation": {
+            "default": { "$type": "string", "$value": "level0" },
+            "pressed": { "$type": "string", "$value": "level0" },
+            "focused": { "$type": "string", "$value": "level0" },
+            "hovered": { "$type": "string", "$value": "level0" },
+            "dragged": { "$type": "string", "$value": "level3" },
+            "disabled": { "$type": "string", "$value": "level0" }
+          }
+        }
+      }
+    }
+  }
+}
