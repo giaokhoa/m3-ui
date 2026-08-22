@@ -35,6 +35,10 @@ function resolvedValue(token, seen = new Set()) {
   seen.add(alias[1]);
   return resolvedValue(target, seen);
 }
+function resolvedAlias(alias) {
+  const match = alias.match(/^\{(.+)\}$/);
+  return match ? resolvedValue(canonical.get(match[1])) : alias;
+}
 function semanticTypography(module, variable) {
   const rules = [
     ['md-comp-dialog', /^action-label-text-(?:font|line-height|size|tracking|weight|type)$/, 'component.dialog.actionLabelTextFont', 'labelLarge'],
@@ -133,8 +137,9 @@ for (const module of modules) {
       continue;
     }
     const token = canonical.get(path);
-    const actual = expected.kind === 'alias' ? canonicalValue(token) : resolvedValue(token);
-    results.push({ module: module.module, ...declaration, path, expected: expected.value, actual, status: token && Object.is(actual, expected.value) ? 'reconciled-direct' : token ? 'mismatch' : 'pending' });
+    const expectedValue = expected.kind === 'alias' ? resolvedAlias(expected.value) : expected.value;
+    const actual = resolvedValue(token);
+    results.push({ module: module.module, ...declaration, path, expected: expectedValue, actual, status: token && Object.is(actual, expectedValue) ? 'reconciled-direct' : token ? 'mismatch' : 'pending' });
   }
 }
 const current = results.filter((result) => !result.status.startsWith('excluded-'));
