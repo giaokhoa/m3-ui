@@ -27,6 +27,7 @@ const radioIndicationSize =
   radioButtonTokens.iconSize + radioButtonTokens.padding * 2;
 const radioFocusRingInset =
   (radioButtonTokens.minimumInteractiveSize - radioIndicationSize) / 2;
+const radioFocusRingRadius = radioIndicationSize / 2;
 
 function joinClassNames(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
@@ -87,7 +88,7 @@ export function RadioButton({
                 <Ripple
                   controller={ripple}
                   focusRingInset={radioFocusRingInset}
-                  focusRingRadius="50%"
+                  focusRingRadius={radioFocusRingRadius}
                   isFocusVisible={renderProps.isFocusVisible}
                   isHovered={renderProps.isHovered}
                 />
