@@ -13,6 +13,7 @@ export const checkboxBaseStyle: CheckboxStyle = {
   '--_checkbox-state-layer-size': `${checkboxTokens.stateLayerSize}px`,
   '--_checkbox-interactive-size': `${checkboxTokens.minimumInteractiveSize}px`,
   '--_checkbox-stroke-width': `${checkboxTokens.strokeWidth}px`,
+  '--_checkbox-label-color': checkboxTokens.labelColor,
   '--_checkbox-selected-container': checkboxTokens.selectedContainerColor,
   '--_checkbox-selected-icon': checkboxTokens.selectedIconColor,
   '--_checkbox-unselected-outline': checkboxTokens.unselectedOutlineColor,
