@@ -65,6 +65,8 @@
     "audit:material-web-tooltip-snackbar-scrim:complete": "node scripts/audit-material-web-tooltip-snackbar-scrim.mjs --require-complete",
     "audit:material-web-chip": "node scripts/audit-material-web-chip.mjs",
     "audit:material-web-chip:complete": "node scripts/audit-material-web-chip.mjs --require-complete",
+    "audit:material-web-small-controls": "node scripts/audit-material-web-checkbox.mjs && node scripts/audit-material-web-small-controls.mjs",
+    "audit:material-web-small-controls:complete": "node scripts/audit-material-web-checkbox.mjs --require-complete && node scripts/audit-material-web-small-controls.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
