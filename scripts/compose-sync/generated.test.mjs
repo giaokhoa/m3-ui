@@ -11,6 +11,7 @@ const generatedDir = resolve(
   repoRoot,
   'packages/tokens/src/generated/androidx',
 );
+const pinnedSnapshotModuleCount = 120;
 
 async function generatedModules() {
   return (await readdir(generatedDir))
@@ -18,9 +19,13 @@ async function generatedModules() {
     .sort();
 }
 
-test('generated barrel exports every committed module exactly once', async () => {
+test('generated barrel exports the complete pinned directory exactly once', async () => {
   const modules = await generatedModules();
-  assert.ok(modules.length > 0, 'generated token snapshot must not be empty');
+  assert.equal(
+    modules.length,
+    pinnedSnapshotModuleCount,
+    'pinned AndroidX token directory size changed; review the revision/snapshot intentionally',
+  );
 
   const index = await readFile(resolve(generatedDir, 'index.ts'), 'utf8');
   const exports = [...index.matchAll(/export \* from '\.\/(.+)\.js';/g)]
@@ -57,18 +62,26 @@ test('every generated module has pinned AndroidX provenance and one token export
   }
 });
 
-test('committed snapshot includes foundations and unported component families', async () => {
+test('snapshot spans foundations, current components and future component families', async () => {
   const modules = new Set(await generatedModules());
   for (const required of [
+    'palette.ts',
+    'color-scheme-key.ts',
     'elevation.ts',
     'shape.ts',
     'type-scale.ts',
+    'typography.ts',
     'state.ts',
     'motion.ts',
     'filled-button.ts',
     'switch.ts',
     'app-bar.ts',
     'badge.ts',
+    'fab-primary-container.ts',
+    'icon-button.ts',
+    'navigation-bar.ts',
+    'dialog.ts',
+    'slider.ts',
   ]) {
     assert.ok(modules.has(required), `${required} must be discovered upstream`);
   }
