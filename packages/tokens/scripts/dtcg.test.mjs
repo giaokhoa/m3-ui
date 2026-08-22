@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
-import { collectTokens, resolveTokenValues, validateCanonical } from './dtcg.mjs';
+import {
+  collectTokens,
+  readCanonicalDirectory,
+  resolveTokenValues,
+  validateCanonical,
+} from './dtcg.mjs';
 
 test('accepts valid DTCG aliases and resolves dimensions to web numbers', () => {
   const source = {
@@ -24,6 +32,65 @@ test('accepts runtime CSS variable references as plain DTCG strings', () => {
   const validation = validateCanonical(source);
   assert.deepEqual(validation.errors, []);
   assert.equal(resolveTokenValues(validation.tokens).get('containerColor'), 'var(--primary)');
+});
+
+test('merges split canonical files into one token graph', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'm3-tokens-'));
+  try {
+    await mkdir(join(directory, 'component', 'button'), { recursive: true });
+    await writeFile(
+      join(directory, 'component', 'button', 'base.json'),
+      JSON.stringify({
+        component: {
+          button: {
+            height: { $type: 'dimension', $value: { value: 40, unit: 'px' } },
+          },
+        },
+      }),
+    );
+    await writeFile(
+      join(directory, 'component', 'button', 'colors.json'),
+      JSON.stringify({
+        component: {
+          button: {
+            containerColor: { $type: 'string', $value: 'var(--primary)' },
+          },
+        },
+      }),
+    );
+
+    const source = await readCanonicalDirectory(directory);
+    const validation = validateCanonical(source);
+    assert.deepEqual(validation.errors, []);
+    assert.equal(validation.tokens.get('component.button.height').value.value, 40);
+    assert.equal(
+      validation.tokens.get('component.button.containerColor').value,
+      'var(--primary)',
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('rejects duplicate canonical paths across split files', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'm3-tokens-'));
+  try {
+    await writeFile(
+      join(directory, 'a.json'),
+      JSON.stringify({ value: { $type: 'number', $value: 1 } }),
+    );
+    await writeFile(
+      join(directory, 'b.json'),
+      JSON.stringify({ value: { $type: 'number', $value: 2 } }),
+    );
+
+    await assert.rejects(
+      () => readCanonicalDirectory(directory),
+      /Duplicate canonical path: value/,
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test('rejects a missing alias target', () => {

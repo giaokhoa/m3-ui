@@ -1,16 +1,67 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export const ALIAS_PATTERN = /^\{([A-Za-z0-9_.-]+)\}$/;
 
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 export async function readCanonical(path) {
   return JSON.parse(await readFile(path, 'utf8'));
+}
+
+function mergeCanonical(target, source, path = []) {
+  for (const [key, value] of Object.entries(source)) {
+    const nextPath = [...path, key];
+    if (!Object.hasOwn(target, key)) {
+      target[key] = value;
+      continue;
+    }
+
+    const current = target[key];
+    if (
+      isObject(current) &&
+      isObject(value) &&
+      !Object.hasOwn(current, '$value') &&
+      !Object.hasOwn(value, '$value')
+    ) {
+      mergeCanonical(current, value, nextPath);
+      continue;
+    }
+
+    throw new Error(`Duplicate canonical path: ${nextPath.join('.')}`);
+  }
+  return target;
+}
+
+async function listJsonFiles(directory) {
+  const files = [];
+  const entries = await readdir(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await listJsonFiles(path)));
+    } else if (entry.isFile() && entry.name.endsWith('.json')) {
+      files.push(path);
+    }
+  }
+  return files.sort();
+}
+
+export async function readCanonicalDirectory(directory) {
+  const root = {};
+  for (const path of await listJsonFiles(directory)) {
+    mergeCanonical(root, await readCanonical(path));
+  }
+  return root;
 }
 
 export function collectTokens(root) {
   const tokens = new Map();
 
   function visit(node, path = [], inheritedType) {
-    if (!node || typeof node !== 'object' || Array.isArray(node)) return;
+    if (!isObject(node)) return;
     const type = node.$type ?? inheritedType;
 
     if (Object.hasOwn(node, '$value')) {

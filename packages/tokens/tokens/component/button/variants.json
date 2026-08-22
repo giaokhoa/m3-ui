@@ -1,0 +1,76 @@
+{
+  "component": {
+    "button": {
+      "variant": {
+        "filled": {
+          "containerColor": { "$type": "string", "$value": "var(--primary)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "defaultElevation": { "$type": "string", "$value": "level0" },
+          "hoveredElevation": { "$type": "string", "$value": "level1" },
+          "focusedElevation": { "$type": "string", "$value": "level0" },
+          "pressedElevation": { "$type": "string", "$value": "level0" },
+          "disabledElevation": { "$type": "string", "$value": "level0" }
+        },
+        "elevated": {
+          "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+          "contentColor": { "$type": "string", "$value": "var(--primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "defaultElevation": { "$type": "string", "$value": "level1" },
+          "hoveredElevation": { "$type": "string", "$value": "level2" },
+          "focusedElevation": { "$type": "string", "$value": "level1" },
+          "pressedElevation": { "$type": "string", "$value": "level1" },
+          "disabledElevation": { "$type": "string", "$value": "level0" }
+        },
+        "filledTonal": {
+          "containerColor": { "$type": "string", "$value": "var(--secondary-container)" },
+          "contentColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "defaultElevation": { "$type": "string", "$value": "level0" },
+          "hoveredElevation": { "$type": "string", "$value": "level1" },
+          "focusedElevation": { "$type": "string", "$value": "level0" },
+          "pressedElevation": { "$type": "string", "$value": "level0" },
+          "disabledElevation": { "$type": "string", "$value": "level0" }
+        },
+        "outlined": {
+          "containerColor": { "$type": "string", "$value": "transparent" },
+          "contentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledContainerColor": { "$type": "string", "$value": "transparent" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "outlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "disabledOutlineOpacity": { "$type": "number", "$value": 0.1 },
+          "defaultElevation": { "$type": "string", "$value": "level0" },
+          "hoveredElevation": { "$type": "string", "$value": "level0" },
+          "focusedElevation": { "$type": "string", "$value": "level0" },
+          "pressedElevation": { "$type": "string", "$value": "level0" },
+          "disabledElevation": { "$type": "string", "$value": "level0" }
+        },
+        "text": {
+          "containerColor": { "$type": "string", "$value": "transparent" },
+          "contentColor": { "$type": "string", "$value": "var(--primary)" },
+          "disabledContainerColor": { "$type": "string", "$value": "transparent" },
+          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+          },
+          "defaultElevation": { "$type": "string", "$value": "level0" },
+          "hoveredElevation": { "$type": "string", "$value": "level0" },
+          "focusedElevation": { "$type": "string", "$value": "level0" },
+          "pressedElevation": { "$type": "string", "$value": "level0" },
+          "disabledElevation": { "$type": "string", "$value": "level0" }
+        }
+      }
+    }
+  }
+}

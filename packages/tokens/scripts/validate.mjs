@@ -1,10 +1,10 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readCanonical, validateCanonical } from './dtcg.mjs';
+import { readCanonicalDirectory, validateCanonical } from './dtcg.mjs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const path = resolve(scriptDir, '../tokens/m3.json');
-const source = await readCanonical(path);
+const directory = resolve(scriptDir, '../tokens');
+const source = await readCanonicalDirectory(directory);
 const { errors, tokens } = validateCanonical(source);
 
 if (errors.length > 0) {

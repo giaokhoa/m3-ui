@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "files": ["dist", "tokens"],
+  "files": ["dist"],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -60,8 +60,7 @@
     "./typography": {
       "types": "./dist/typography.d.ts",
       "import": "./dist/typography.js"
-    },
-    "./source": "./tokens/m3.json"
+    }
   },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.json",
