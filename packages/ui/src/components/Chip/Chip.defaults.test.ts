@@ -21,6 +21,7 @@ describe('Material 3 chip defaults', () => {
     expect(assistChipTokens.containerRadius).toBe(8);
     expect(assistChipTokens.iconSize).toBe(18);
     expect(inputChipTokens.avatarSize).toBe(24);
+    expect(inputChipTokens.disabledAvatarOpacity).toBe(0.38);
     expect(getChipRootStyle('assist')['--_chip-hit-size']).toBe('48px');
   });
 
@@ -67,7 +68,7 @@ describe('Material 3 chip defaults', () => {
     );
   });
 
-  it('uses InputChip avatar/icon padding exactly like InputChipDefaults', () => {
+  it('uses InputChip avatar/icon padding and avatar opacity exactly like InputChipDefaults', () => {
     const plain = getChipStyle('input', {
       isDisabled: false,
       isSelected: false,
@@ -75,6 +76,7 @@ describe('Material 3 chip defaults', () => {
     });
     expect(plain['--_chip-padding-inline-start']).toBe('4px');
     expect(plain['--_chip-padding-inline-end']).toBe('4px');
+    expect(plain['--_chip-avatar-opacity']).toBe(1);
 
     const leading = getChipStyle(
       'input',
@@ -91,15 +93,23 @@ describe('Material 3 chip defaults', () => {
     );
     expect(avatarAndTrailing['--_chip-padding-inline-start']).toBe('4px');
     expect(avatarAndTrailing['--_chip-padding-inline-end']).toBe('8px');
+
+    const disabledAvatar = getChipStyle(
+      'input',
+      { isDisabled: true, isSelected: true, interaction: null },
+      { hasAvatar: true },
+    );
+    expect(disabledAvatar['--_chip-avatar-opacity']).toBe(0.38);
   });
 
-  it('ports the expressive ChipShapes defaults and compact spacing', () => {
+  it('ports expressive shapes, tonal leading color and compact spacing', () => {
     const unselected = getChipStyle(
       'filter',
       { isDisabled: false, isSelected: false, interaction: null },
       { shapes: {}, hasLeadingIcon: true, hasTrailingIcon: true },
     );
     expect(unselected['--_chip-container-radius']).toBe('12px');
+    expect(unselected['--_chip-leading-icon-color']).toBe('var(--on-surface-variant)');
     expect(unselected['--_chip-leading-gap']).toBe('4px');
     expect(unselected['--_chip-trailing-gap']).toBe('4px');
     expect(unselected['--_chip-shape-transition']).toContain('137ms');
