@@ -1,12 +1,12 @@
+import { elevationMotionTokens, type ElevationLevel } from '../../internal/elevation';
+import type { CSSProperties } from 'react';
+import type { CardInteraction } from './Card.interactions';
 import {
   cardTokens,
   type CardColorRole,
   type CardElevationTokens,
   type CardVariant,
-} from '@m3/tokens/card';
-import { elevationMotionTokens, type ElevationLevel } from '@m3/tokens/elevation';
-import type { CSSProperties } from 'react';
-import type { CardInteraction } from './Card.interactions';
+} from './Card.tokens';
 
 export type CardStyle = CSSProperties & Record<`--${string}`, string | number>;
 
@@ -47,14 +47,10 @@ export function getCardElevationLevel(
   if (isDisabled) return elevation.disabled;
 
   switch (interaction) {
-    case 'press':
-      return elevation.pressed;
-    case 'focus':
-      return elevation.focused;
-    case 'hover':
-      return elevation.hovered;
-    default:
-      return elevation.default;
+    case 'press': return elevation.pressed;
+    case 'focus': return elevation.focused;
+    case 'hover': return elevation.hovered;
+    default: return elevation.default;
   }
 }
 
@@ -63,9 +59,7 @@ export function getCardElevationMotion(
   interaction: CardInteraction | null,
   previousInteraction: CardInteraction | null,
 ) {
-  if (isDisabled) {
-    return { durationMs: 0, easing: 'linear' } as const;
-  }
+  if (isDisabled) return { durationMs: 0, easing: 'linear' } as const;
   if (interaction !== null) return elevationMotionTokens.incoming;
   if (previousInteraction === 'hover') return elevationMotionTokens.hoveredOutgoing;
   if (previousInteraction !== null) return elevationMotionTokens.outgoing;
@@ -77,12 +71,9 @@ export function getCardStyle(
   { isDisabled = false, shape }: { isDisabled?: boolean; shape?: CSSProperties['borderRadius'] } = {},
 ): CardStyle {
   const base: CardStyle = {
-    '--_card-container-radius':
-      cssLength(shape) ?? `${cardTokens.shapeRadius}px`,
+    '--_card-container-radius': cssLength(shape) ?? `${cardTokens.shapeRadius}px`,
     '--_card-min-interactive-size': `${cardTokens.minimumInteractiveSize}px`,
-    '--_card-disabled-content-color': `color-mix(in srgb, ${roleVariable(
-      'onSurface',
-    )} ${cardTokens.disabledContentOpacity * 100}%, transparent)`,
+    '--_card-disabled-content-color': `color-mix(in srgb, ${roleVariable('onSurface')} ${cardTokens.disabledContentOpacity * 100}%, transparent)`,
   };
 
   if (variant === 'filled') {
@@ -128,10 +119,6 @@ export function getCardStyle(
     ),
     '--_card-outline-width': `${cardTokens.outlined.outline.width}px`,
     '--_card-outline-color': roleVariable(cardTokens.outlined.outline.color),
-    '--_card-disabled-outline-color': `color-mix(in srgb, ${roleVariable(
-      cardTokens.outlined.outline.disabledColor,
-    )} ${cardTokens.outlined.outline.disabledOpacity * 100}%, ${roleVariable(
-      cardTokens.outlined.outline.disabledCompositeOver,
-    )})`,
+    '--_card-disabled-outline-color': `color-mix(in srgb, ${roleVariable(cardTokens.outlined.outline.disabledColor)} ${cardTokens.outlined.outline.disabledOpacity * 100}%, ${roleVariable(cardTokens.outlined.outline.disabledCompositeOver)})`,
   };
 }

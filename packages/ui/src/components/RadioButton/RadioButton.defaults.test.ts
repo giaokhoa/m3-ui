@@ -1,6 +1,6 @@
-import { radioButtonTokens } from '@m3/tokens/radio-button';
 import { describe, expect, it } from 'vitest';
 import { radioButtonBaseStyle } from './RadioButton.defaults';
+import { radioButtonTokens } from './RadioButton.tokens';
 
 const style = radioButtonBaseStyle as Record<string, string | number>;
 

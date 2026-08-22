@@ -1,4 +1,4 @@
-import { checkboxTokens, type CheckboxColorRole } from '@m3/tokens/checkbox';
+import { checkboxTokens } from './Checkbox.tokens';
 import type { CSSProperties } from 'react';
 
 export type CheckboxStyle = CSSProperties & Record<`--${string}`, string | number>;
@@ -7,7 +7,7 @@ function percent(value: number): string {
   return `${value * 100}%`;
 }
 
-function colorRoleVariable(role: CheckboxColorRole): string {
+function colorRoleVariable(role: string): string {
   const name = role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
   return `var(--${name})`;
 }
