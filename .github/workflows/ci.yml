@@ -63,6 +63,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-fab-surface:complete
       - name: Require complete remaining Material Web FAB overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-fab-remaining:complete
+      - name: Require complete Material Web App Bar overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-app-bar:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
