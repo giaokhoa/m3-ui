@@ -7,8 +7,6 @@ import {
   chipShapeTransition,
   chipVariantTokens,
   type ActionChipVariantTokens,
-  type ChipColorRole,
-  type ChipContainerColor,
   type ChipVariant,
   type SelectableChipVariantTokens,
 } from './Chip.tokens';
@@ -37,17 +35,11 @@ export interface ChipStyleOptions {
   readonly hasAvatar?: boolean;
 }
 
-function roleVariable(role: ChipContainerColor): string {
-  if (role === 'transparent') return 'transparent';
-  const name = role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-  return `var(--${name})`;
-}
-
 function typefaceVariable(role: string): string { return `var(--font-family-${role})`; }
-function withOpacity(color: ChipContainerColor, opacity: number): string {
+function withOpacity(color: string, opacity: number): string {
   if (color === 'transparent' || opacity <= 0) return 'transparent';
-  if (opacity >= 1) return roleVariable(color);
-  return `color-mix(in srgb, ${roleVariable(color)} ${opacity * 100}%, transparent)`;
+  if (opacity >= 1) return color;
+  return `color-mix(in srgb, ${color} ${opacity * 100}%, transparent)`;
 }
 function normalizeShape(value: ChipShapeValue): string | number { return typeof value === 'number' ? `${value}px` : value; }
 function actionTokens(variant: ChipVariant): ActionChipVariantTokens | null {
@@ -64,11 +56,11 @@ function selectableTokens(variant: ChipVariant): SelectableChipVariantTokens | n
 }
 function resolveActionColors(tokens: ActionChipVariantTokens, isDisabled: boolean) {
   if (isDisabled) return { container: withOpacity(tokens.disabledContainerColor, tokens.disabledContainerOpacity), label: withOpacity(tokens.disabledLabelColor, tokens.disabledLabelOpacity), leading: withOpacity(tokens.disabledIconColor, tokens.disabledIconOpacity), trailing: withOpacity(tokens.disabledIconColor, tokens.disabledIconOpacity), outline: withOpacity(tokens.disabledOutlineColor, tokens.disabledOutlineOpacity), outlineWidth: tokens.outlineWidth };
-  return { container: roleVariable(tokens.containerColor), label: roleVariable(tokens.labelColor), leading: roleVariable(tokens.leadingIconColor), trailing: roleVariable(tokens.trailingIconColor), outline: roleVariable(tokens.outlineColor), outlineWidth: tokens.outlineWidth };
+  return { container: tokens.containerColor, label: tokens.labelColor, leading: tokens.leadingIconColor, trailing: tokens.trailingIconColor, outline: tokens.outlineColor, outlineWidth: tokens.outlineWidth };
 }
 function resolveSelectableColors(tokens: SelectableChipVariantTokens, isDisabled: boolean, isSelected: boolean, isExpressive: boolean) {
   if (isDisabled) return { container: withOpacity(isSelected ? tokens.disabledSelectedContainerColor : tokens.disabledUnselectedContainerColor, tokens.disabledContainerOpacity), label: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity), leading: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity), trailing: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity), outline: withOpacity(isSelected ? tokens.disabledSelectedOutlineColor : tokens.disabledUnselectedOutlineColor, tokens.disabledOutlineOpacity), outlineWidth: isSelected ? tokens.selectedOutlineWidth : tokens.unselectedOutlineWidth };
-  return { container: roleVariable(isSelected ? tokens.selectedContainerColor : tokens.unselectedContainerColor), label: roleVariable(isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor), leading: roleVariable(isSelected ? tokens.selectedLeadingIconColor : isExpressive ? tokens.expressiveUnselectedLeadingIconColor : tokens.unselectedLeadingIconColor), trailing: roleVariable(isSelected ? tokens.selectedTrailingIconColor : tokens.unselectedTrailingIconColor), outline: roleVariable(isSelected ? tokens.selectedOutlineColor : tokens.unselectedOutlineColor), outlineWidth: isSelected ? tokens.selectedOutlineWidth : tokens.unselectedOutlineWidth };
+  return { container: isSelected ? tokens.selectedContainerColor : tokens.unselectedContainerColor, label: isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor, leading: isSelected ? tokens.selectedLeadingIconColor : isExpressive ? tokens.expressiveUnselectedLeadingIconColor : tokens.unselectedLeadingIconColor, trailing: isSelected ? tokens.selectedTrailingIconColor : tokens.unselectedTrailingIconColor, outline: isSelected ? tokens.selectedOutlineColor : tokens.unselectedOutlineColor, outlineWidth: isSelected ? tokens.selectedOutlineWidth : tokens.unselectedOutlineWidth };
 }
 export function resolveChipElevation(variant: ChipVariant, { isDisabled, interaction }: ChipInteractionState): ElevationLevel {
   const tokens = chipVariantTokens[variant];
@@ -118,4 +110,3 @@ export function getChipStyle(variant: ChipVariant, state: ChipInteractionState, 
     '--_chip-height': `${tokens.height}px`, '--_chip-container-radius': resolveRadius(state, options, tokens.containerRadius), '--_chip-padding-inline-start': `${padding.start}px`, '--_chip-padding-inline-end': `${padding.end}px`, '--_chip-leading-gap': `${spacing.leading}px`, '--_chip-trailing-gap': `${spacing.trailing}px`, '--_chip-leading-icon-size': `${selectable?.leadingIconSize ?? action!.iconSize}px`, '--_chip-trailing-icon-size': `${selectable?.trailingIconSize ?? action!.iconSize}px`, '--_chip-avatar-size': `${selectable?.avatarSize ?? 0}px`, '--_chip-avatar-radius': `${selectable?.avatarRadius ?? 0}px`, '--_chip-avatar-opacity': state.isDisabled ? (selectable?.disabledAvatarOpacity ?? 1) : 1, '--_chip-container-color': colors.container, '--_chip-label-color': colors.label, '--_chip-leading-icon-color': colors.leading, '--_chip-trailing-icon-color': colors.trailing, '--_chip-outline-color': colors.outline, '--_chip-outline-width': `${colors.outlineWidth}px`, '--_chip-font-family': typefaceVariable(typography.fontFamily), '--_chip-font-size': `${typography.fontSize}px`, '--_chip-line-height': `${typography.lineHeight}px`, '--_chip-font-weight': typography.fontWeight, '--_chip-letter-spacing': `${typography.letterSpacing}px`, '--_chip-shape-transition': options.shapes ? chipShapeTransition : 'none',
   };
 }
-export function colorRoleVariable(role: ChipColorRole): string { return roleVariable(role); }
