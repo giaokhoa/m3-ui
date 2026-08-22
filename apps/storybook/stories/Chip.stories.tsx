@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   AssistChip,
   ElevatedAssistChip,
@@ -54,8 +54,19 @@ function AvatarIcon() {
   );
 }
 
-function Row({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16 }}>{children}</div>;
+function Row({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 16,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function ActionVariantsRow({ disabled = false }: { disabled?: boolean }) {
@@ -137,7 +148,10 @@ export const SelectableStates: Story = {
 
 export const DisabledStates: Story = {
   render: () => (
-    <div className="m3-storybook-center" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}>
+    <div
+      className="m3-storybook-center"
+      style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}
+    >
       <ActionVariantsRow disabled />
       <SelectableRow disabled />
     </div>
