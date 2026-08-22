@@ -1,0 +1,93 @@
+{
+  "component": {
+    "button": {
+      "size": {
+        "extraSmall": {
+          "height": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }
+          },
+          "iconSize": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "typography": { "$type": "string", "$value": "labelLarge" },
+          "pressedShape": { "$type": "string", "$value": "small" }
+        },
+        "small": {
+          "height": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+          },
+          "iconSize": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "typography": { "$type": "string", "$value": "labelLarge" },
+          "pressedShape": { "$type": "string", "$value": "small" }
+        },
+        "medium": {
+          "height": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+          },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "typography": { "$type": "string", "$value": "titleMedium" },
+          "pressedShape": { "$type": "string", "$value": "medium" }
+        },
+        "large": {
+          "height": { "$type": "dimension", "$value": { "value": 96, "unit": "px" } },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } }
+          },
+          "iconSize": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+          "typography": { "$type": "string", "$value": "headlineSmall" },
+          "pressedShape": { "$type": "string", "$value": "large" }
+        },
+        "extraLarge": {
+          "height": { "$type": "dimension", "$value": { "value": 136, "unit": "px" } },
+          "padding": {
+            "block": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } }
+          },
+          "iconPadding": {
+            "block": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+            "inlineStart": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+            "inlineEnd": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } }
+          },
+          "iconSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "typography": { "$type": "string", "$value": "headlineLarge" },
+          "pressedShape": { "$type": "string", "$value": "large" }
+        }
+      }
+    }
+  }
+}

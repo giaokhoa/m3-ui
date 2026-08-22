@@ -1,55 +1,78 @@
-# @m3/tokens
+# Tokens
 
-Typed Material 3 token data shared by `@m3/ui` and future packages.
+Target publish scope: `@m3-ui/tokens`. The workspace keeps its current package scope until the repository-wide namespace migration is done in one atomic change.
 
-This package owns immutable specification/reference values. Runtime theme state does **not** belong here, and immutable token constants do **not** belong in `ThemeProvider`.
+## Source of truth
 
-## Dependency boundary
+`tokens/**/*.json` is the only authoritative token source. The files use plain DTCG `$type` / `$value` tokens and intentionally contain no project-specific ownership, provenance, or audit metadata.
+
+The canonical graph is split only for maintainability:
 
 ```text
-AndroidX / Material Web sources
-            ↓
-       @m3/tokens
-            ↓
-          @m3/ui
-            ↓
- ThemeProvider + components
+tokens/
+├── core/
+│   ├── state.json
+│   ├── elevation.json
+│   ├── shape.json
+│   └── typography.json
+└── component/
+    ├── button/
+    │   ├── base.json
+    │   ├── variants.json
+    │   └── sizes.json
+    ├── switch.json
+    └── ...
 ```
 
-`@m3/tokens` must not depend on React, React Aria, DOM APIs, or `@m3/ui`.
+All files merge into one token graph. Duplicate canonical paths are rejected. The source files are build inputs and are not part of the published package surface; consumers receive generated `dist` artifacts only.
 
-`ThemeProvider` owns runtime theme decisions such as light/dark color schemes and emits theme-dependent CSS variables such as `--primary`, `--on-surface`, and `--shadow`.
+AndroidX Compose, the Material 3 Figma Design Kit, Material Web, and other upstreams are read-only references. Audit code owns all source mapping and revision information; upstream data must never generate or rewrite canonical token files.
 
-Components import immutable values such as elevation geometry, state-layer opacity, motion duration, and ripple timing from `@m3/tokens`. Theme-dependent colors are read from CSS variables.
+```text
+AndroidX Compose ─┐
+Figma M3 Kit ─────┼── normalize ──> read-only semantic diff
+Material Web ─────┘
 
-## Current exports
-
-- `@m3/tokens/elevation`: Material elevation levels and web shadow geometry.
-- `@m3/tokens/state`: Material state-layer opacity values.
-- `@m3/tokens/motion`: Material motion durations/easing.
-- `@m3/tokens/ripple`: web ripple timing constants.
-
-## Sources
-
-The elevation level values follow AndroidX Material3 `ElevationTokens` (`0`, `1`, `3`, `6`, `8`, `12` dp).
-
-State-layer opacity follows AndroidX Material3 `StateTokens` v0_210 (`hover 0.08`, `focus 0.10`, `pressed 0.10`, `dragged 0.16`).
-
-Elevation shadow geometry follows Material's web elevation representation using three shadow layers (umbra, penumbra, ambient). Shadow color itself is intentionally not stored here; `@m3/ui` resolves it from the theme's `--shadow` CSS variable.
-
-Ripple timing is a web adaptation and is kept separate from AndroidX token generation so platform-specific behavior is explicit rather than disguised as generated Compose data.
-
-## Style rules
-
-Prefer plain immutable data and literal unions:
-
-```ts
-export const stateLayerOpacity = {
-  hover: 0.08,
-  focus: 0.1,
-  pressed: 0.1,
-  dragged: 0.16,
-} as const;
+                         tokens/**/*.json
+                         CANONICAL / REVIEWED
+                                │
+                                ▼
+                         Style Dictionary
+                                │
+                       ┌────────┴────────┐
+                       ▼                 ▼
+                   tokens.js        tokens.d.ts
 ```
 
-Do not reproduce Kotlin objects, `Dp`, `Color`, companion objects, or `.copy()` APIs.
+## Dynamic color
+
+`ThemeProvider` remains the owner of actual theme colors. It computes the scheme from `sourceColor`, mode, and contrast, then assigns role variables such as `--primary`, `--on-primary`, and `--surface` on the provider root.
+
+Canonical component tokens refer to those runtime roles as ordinary DTCG strings:
+
+```json
+{
+  "containerColor": {
+    "$type": "string",
+    "$value": "var(--primary)"
+  }
+}
+```
+
+There is no static fallback color and no extra `$extensions` metadata. Nested `ThemeProvider`s continue to work through normal CSS custom-property inheritance.
+
+All non-color values use their natural DTCG types, for example `dimension` and `number`. Style Dictionary emits them as JavaScript/TypeScript values; they do not become root CSS custom properties.
+
+## Style Dictionary
+
+Style Dictionary is the build engine, not a sidecar formatter. `style-dictionary.config.json` uses its built-in `js` transform group, `javascript/es6`, and `typescript/es6-declarations` formats. No custom TypeScript generator or formatter is used.
+
+Generated files live under `dist/generated/` and are exposed through `./generated` while existing consumers migrate. Button and Switch already consume generated values; remaining handwritten token modules are removed as each component moves to the canonical graph.
+
+## Validation and audit
+
+- `pnpm --filter @m3/tokens validate` merges all canonical files, rejects duplicate paths, and validates DTCG structure, aliases, cycles, and supported primitive types.
+- `pnpm --filter @m3/tokens test` validates the source, runs Style Dictionary, and tests both DTCG behavior and actual generated JS/TypeScript output.
+- `pnpm --filter @m3/tokens audit:androidx` compares mapped canonical values with the pinned AndroidX source without writing canonical files.
+
+Audits are asymmetric: matching values pass; mismatches, missing canonical mappings, and missing upstream references fail review. Audit code must remain read-only.

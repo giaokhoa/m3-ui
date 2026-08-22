@@ -1,0 +1,32 @@
+{
+  "typography": {
+    "labelLarge": {
+      "fontFamily": { "$type": "string", "$value": "plain" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 14, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 500 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0.1, "unit": "px" } }
+    },
+    "titleMedium": {
+      "fontFamily": { "$type": "string", "$value": "plain" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 500 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0.2, "unit": "px" } }
+    },
+    "headlineSmall": {
+      "fontFamily": { "$type": "string", "$value": "brand" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 400 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }
+    },
+    "headlineLarge": {
+      "fontFamily": { "$type": "string", "$value": "brand" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 400 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }
+    }
+  }
+}

@@ -1,16 +1,9 @@
-import {
-  buttonSizeTokens,
-  buttonVariantTokens,
-  type ButtonContainerColor,
-  type ButtonPressedShape,
-  type ButtonSize,
-  type ButtonVariant,
-  type ButtonVariantTokens,
-} from '@m3/tokens/button';
+import type { ButtonSize, ButtonVariant } from '@m3/tokens/button';
 import {
   elevationMotionTokens,
   type ElevationLevel,
 } from '@m3/tokens/elevation';
+import * as token from '@m3/tokens/generated';
 import type { CSSProperties } from 'react';
 import { getElevationBoxShadow } from '../../internal/elevation';
 import type { ButtonInteraction } from './Button.interactions';
@@ -34,32 +27,334 @@ export interface ButtonStyleOptions {
   readonly shapes?: ButtonShapes;
 }
 
+interface ButtonPaddingTokens {
+  readonly block: string;
+  readonly inlineStart: string;
+  readonly inlineEnd: string;
+}
+
+interface TypographyStyleTokens {
+  readonly fontFamily: string;
+  readonly fontSize: string;
+  readonly lineHeight: string;
+  readonly fontWeight: number;
+  readonly letterSpacing: string;
+}
+
+interface ButtonVariantTokens {
+  readonly minWidth: string;
+  readonly minHeight: string;
+  readonly contentPadding: ButtonPaddingTokens;
+  readonly iconContentPadding: ButtonPaddingTokens;
+  readonly containerShape: keyof typeof shapeRadius;
+  readonly containerColor: string;
+  readonly contentColor: string;
+  readonly disabledContainerColor: string;
+  readonly disabledContainerOpacity: number;
+  readonly disabledContentColor: string;
+  readonly disabledContentOpacity: number;
+  readonly outlineColor: string;
+  readonly outlineWidth: string;
+  readonly disabledOutlineOpacity: number;
+  readonly defaultElevation: ElevationLevel;
+  readonly hoveredElevation: ElevationLevel;
+  readonly focusedElevation: ElevationLevel;
+  readonly pressedElevation: ElevationLevel;
+  readonly disabledElevation: ElevationLevel;
+  readonly iconSize: string;
+  readonly iconSpacing: string;
+  readonly labelTypography: TypographyStyleTokens;
+}
+
+interface ButtonSizeTokens {
+  readonly minHeight: string;
+  readonly contentPadding: ButtonPaddingTokens;
+  readonly iconContentPadding: ButtonPaddingTokens;
+  readonly iconSize: string;
+  readonly iconSpacing: string;
+  readonly typography: TypographyStyleTokens;
+  readonly pressedShape: ButtonPressedShape;
+}
+
 const shapeRadius = {
-  full: '9999px',
-  small: '8px',
-  medium: '12px',
-  large: '16px',
-  extraLarge: '28px',
+  full: token.ShapeFull,
+  small: token.ShapeSmall,
+  medium: token.ShapeMedium,
+  large: token.ShapeLarge,
+  extraLarge: token.ShapeExtraLarge,
 } as const;
 
+type ButtonPressedShape = keyof typeof shapeRadius;
+type TypographyRole = keyof typeof typography;
+
+const typography = {
+  labelLarge: {
+    fontFamily: token.TypographyLabelLargeFontFamily,
+    fontSize: token.TypographyLabelLargeFontSize,
+    lineHeight: token.TypographyLabelLargeLineHeight,
+    fontWeight: token.TypographyLabelLargeFontWeight,
+    letterSpacing: token.TypographyLabelLargeLetterSpacing,
+  },
+  titleMedium: {
+    fontFamily: token.TypographyTitleMediumFontFamily,
+    fontSize: token.TypographyTitleMediumFontSize,
+    lineHeight: token.TypographyTitleMediumLineHeight,
+    fontWeight: token.TypographyTitleMediumFontWeight,
+    letterSpacing: token.TypographyTitleMediumLetterSpacing,
+  },
+  headlineSmall: {
+    fontFamily: token.TypographyHeadlineSmallFontFamily,
+    fontSize: token.TypographyHeadlineSmallFontSize,
+    lineHeight: token.TypographyHeadlineSmallLineHeight,
+    fontWeight: token.TypographyHeadlineSmallFontWeight,
+    letterSpacing: token.TypographyHeadlineSmallLetterSpacing,
+  },
+  headlineLarge: {
+    fontFamily: token.TypographyHeadlineLargeFontFamily,
+    fontSize: token.TypographyHeadlineLargeFontSize,
+    lineHeight: token.TypographyHeadlineLargeLineHeight,
+    fontWeight: token.TypographyHeadlineLargeFontWeight,
+    letterSpacing: token.TypographyHeadlineLargeLetterSpacing,
+  },
+} as const satisfies Record<string, TypographyStyleTokens>;
+
+const commonButtonTokens = {
+  minWidth: token.ComponentButtonBaselineMinWidth,
+  minHeight: token.ComponentButtonBaselineMinHeight,
+  containerShape: token.ComponentButtonBaselineContainerShape,
+  disabledContainerOpacity: token.ComponentButtonBaselineDisabledContainerOpacity,
+  disabledContentOpacity: token.ComponentButtonBaselineDisabledContentOpacity,
+  outlineColor: token.ComponentButtonBaselineOutlineColor,
+  outlineWidth: token.ComponentButtonBaselineOutlineWidth,
+  disabledOutlineOpacity: token.ComponentButtonBaselineDisabledOutlineOpacity,
+  iconSize: token.ComponentButtonBaselineIconSize,
+  iconSpacing: token.ComponentButtonBaselineIconSpacing,
+  labelTypography:
+    typography[token.ComponentButtonBaselineLabelTypography as TypographyRole],
+} as const;
+
+const standardContentPadding = {
+  block: token.ComponentButtonBaselinePaddingBlock,
+  inlineStart: token.ComponentButtonBaselinePaddingInlineStart,
+  inlineEnd: token.ComponentButtonBaselinePaddingInlineEnd,
+} as const;
+
+const standardIconContentPadding = {
+  block: token.ComponentButtonBaselineIconPaddingBlock,
+  inlineStart: token.ComponentButtonBaselineIconPaddingInlineStart,
+  inlineEnd: token.ComponentButtonBaselineIconPaddingInlineEnd,
+} as const;
+
+export const filledButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: token.ComponentButtonVariantFilledContainerColor,
+  contentColor: token.ComponentButtonVariantFilledContentColor,
+  disabledContainerColor: token.ComponentButtonVariantFilledDisabledContainerColor,
+  disabledContentColor: token.ComponentButtonVariantFilledDisabledContentColor,
+  defaultElevation: token.ComponentButtonVariantFilledDefaultElevation,
+  hoveredElevation: token.ComponentButtonVariantFilledHoveredElevation,
+  focusedElevation: token.ComponentButtonVariantFilledFocusedElevation,
+  pressedElevation: token.ComponentButtonVariantFilledPressedElevation,
+  disabledElevation: token.ComponentButtonVariantFilledDisabledElevation,
+} as const satisfies ButtonVariantTokens;
+
+export const elevatedButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: token.ComponentButtonVariantElevatedContainerColor,
+  contentColor: token.ComponentButtonVariantElevatedContentColor,
+  disabledContainerColor: token.ComponentButtonVariantElevatedDisabledContainerColor,
+  disabledContentColor: token.ComponentButtonVariantElevatedDisabledContentColor,
+  defaultElevation: token.ComponentButtonVariantElevatedDefaultElevation,
+  hoveredElevation: token.ComponentButtonVariantElevatedHoveredElevation,
+  focusedElevation: token.ComponentButtonVariantElevatedFocusedElevation,
+  pressedElevation: token.ComponentButtonVariantElevatedPressedElevation,
+  disabledElevation: token.ComponentButtonVariantElevatedDisabledElevation,
+} as const satisfies ButtonVariantTokens;
+
+export const filledTonalButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: token.ComponentButtonVariantFilledTonalContainerColor,
+  contentColor: token.ComponentButtonVariantFilledTonalContentColor,
+  disabledContainerColor:
+    token.ComponentButtonVariantFilledTonalDisabledContainerColor,
+  disabledContentColor: token.ComponentButtonVariantFilledTonalDisabledContentColor,
+  defaultElevation: token.ComponentButtonVariantFilledTonalDefaultElevation,
+  hoveredElevation: token.ComponentButtonVariantFilledTonalHoveredElevation,
+  focusedElevation: token.ComponentButtonVariantFilledTonalFocusedElevation,
+  pressedElevation: token.ComponentButtonVariantFilledTonalPressedElevation,
+  disabledElevation: token.ComponentButtonVariantFilledTonalDisabledElevation,
+} as const satisfies ButtonVariantTokens;
+
+export const outlinedButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: standardContentPadding,
+  iconContentPadding: standardIconContentPadding,
+  containerColor: token.ComponentButtonVariantOutlinedContainerColor,
+  contentColor: token.ComponentButtonVariantOutlinedContentColor,
+  disabledContainerColor: token.ComponentButtonVariantOutlinedDisabledContainerColor,
+  disabledContentColor: token.ComponentButtonVariantOutlinedDisabledContentColor,
+  outlineColor: token.ComponentButtonVariantOutlinedOutlineColor,
+  outlineWidth: token.ComponentButtonVariantOutlinedOutlineWidth,
+  disabledOutlineOpacity: token.ComponentButtonVariantOutlinedDisabledOutlineOpacity,
+  defaultElevation: token.ComponentButtonVariantOutlinedDefaultElevation,
+  hoveredElevation: token.ComponentButtonVariantOutlinedHoveredElevation,
+  focusedElevation: token.ComponentButtonVariantOutlinedFocusedElevation,
+  pressedElevation: token.ComponentButtonVariantOutlinedPressedElevation,
+  disabledElevation: token.ComponentButtonVariantOutlinedDisabledElevation,
+} as const satisfies ButtonVariantTokens;
+
+export const textButtonTokens = {
+  ...commonButtonTokens,
+  contentPadding: {
+    block: token.ComponentButtonVariantTextPaddingBlock,
+    inlineStart: token.ComponentButtonVariantTextPaddingInlineStart,
+    inlineEnd: token.ComponentButtonVariantTextPaddingInlineEnd,
+  },
+  iconContentPadding: {
+    block: token.ComponentButtonVariantTextIconPaddingBlock,
+    inlineStart: token.ComponentButtonVariantTextIconPaddingInlineStart,
+    inlineEnd: token.ComponentButtonVariantTextIconPaddingInlineEnd,
+  },
+  containerColor: token.ComponentButtonVariantTextContainerColor,
+  contentColor: token.ComponentButtonVariantTextContentColor,
+  disabledContainerColor: token.ComponentButtonVariantTextDisabledContainerColor,
+  disabledContentColor: token.ComponentButtonVariantTextDisabledContentColor,
+  defaultElevation: token.ComponentButtonVariantTextDefaultElevation,
+  hoveredElevation: token.ComponentButtonVariantTextHoveredElevation,
+  focusedElevation: token.ComponentButtonVariantTextFocusedElevation,
+  pressedElevation: token.ComponentButtonVariantTextPressedElevation,
+  disabledElevation: token.ComponentButtonVariantTextDisabledElevation,
+} as const satisfies ButtonVariantTokens;
+
+export const buttonVariantTokens = {
+  filled: filledButtonTokens,
+  elevated: elevatedButtonTokens,
+  filledTonal: filledTonalButtonTokens,
+  outlined: outlinedButtonTokens,
+  text: textButtonTokens,
+} as const satisfies Record<ButtonVariant, ButtonVariantTokens>;
+
+function sizeTokens(
+  minHeight: string,
+  contentPadding: ButtonPaddingTokens,
+  iconContentPadding: ButtonPaddingTokens,
+  iconSize: string,
+  iconSpacing: string,
+  typographyRole: TypographyRole,
+  pressedShape: ButtonPressedShape,
+): ButtonSizeTokens {
+  return {
+    minHeight,
+    contentPadding,
+    iconContentPadding,
+    iconSize,
+    iconSpacing,
+    typography: typography[typographyRole],
+    pressedShape,
+  };
+}
+
+export const buttonSizeTokens = {
+  extraSmall: sizeTokens(
+    token.ComponentButtonSizeExtraSmallHeight,
+    {
+      block: token.ComponentButtonSizeExtraSmallPaddingBlock,
+      inlineStart: token.ComponentButtonSizeExtraSmallPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeExtraSmallPaddingInlineEnd,
+    },
+    {
+      block: token.ComponentButtonSizeExtraSmallIconPaddingBlock,
+      inlineStart: token.ComponentButtonSizeExtraSmallIconPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeExtraSmallIconPaddingInlineEnd,
+    },
+    token.ComponentButtonSizeExtraSmallIconSize,
+    token.ComponentButtonSizeExtraSmallIconSpacing,
+    token.ComponentButtonSizeExtraSmallTypography as TypographyRole,
+    token.ComponentButtonSizeExtraSmallPressedShape as ButtonPressedShape,
+  ),
+  small: sizeTokens(
+    token.ComponentButtonSizeSmallHeight,
+    {
+      block: token.ComponentButtonSizeSmallPaddingBlock,
+      inlineStart: token.ComponentButtonSizeSmallPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeSmallPaddingInlineEnd,
+    },
+    {
+      block: token.ComponentButtonSizeSmallIconPaddingBlock,
+      inlineStart: token.ComponentButtonSizeSmallIconPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeSmallIconPaddingInlineEnd,
+    },
+    token.ComponentButtonSizeSmallIconSize,
+    token.ComponentButtonSizeSmallIconSpacing,
+    token.ComponentButtonSizeSmallTypography as TypographyRole,
+    token.ComponentButtonSizeSmallPressedShape as ButtonPressedShape,
+  ),
+  medium: sizeTokens(
+    token.ComponentButtonSizeMediumHeight,
+    {
+      block: token.ComponentButtonSizeMediumPaddingBlock,
+      inlineStart: token.ComponentButtonSizeMediumPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeMediumPaddingInlineEnd,
+    },
+    {
+      block: token.ComponentButtonSizeMediumIconPaddingBlock,
+      inlineStart: token.ComponentButtonSizeMediumIconPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeMediumIconPaddingInlineEnd,
+    },
+    token.ComponentButtonSizeMediumIconSize,
+    token.ComponentButtonSizeMediumIconSpacing,
+    token.ComponentButtonSizeMediumTypography as TypographyRole,
+    token.ComponentButtonSizeMediumPressedShape as ButtonPressedShape,
+  ),
+  large: sizeTokens(
+    token.ComponentButtonSizeLargeHeight,
+    {
+      block: token.ComponentButtonSizeLargePaddingBlock,
+      inlineStart: token.ComponentButtonSizeLargePaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeLargePaddingInlineEnd,
+    },
+    {
+      block: token.ComponentButtonSizeLargeIconPaddingBlock,
+      inlineStart: token.ComponentButtonSizeLargeIconPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeLargeIconPaddingInlineEnd,
+    },
+    token.ComponentButtonSizeLargeIconSize,
+    token.ComponentButtonSizeLargeIconSpacing,
+    token.ComponentButtonSizeLargeTypography as TypographyRole,
+    token.ComponentButtonSizeLargePressedShape as ButtonPressedShape,
+  ),
+  extraLarge: sizeTokens(
+    token.ComponentButtonSizeExtraLargeHeight,
+    {
+      block: token.ComponentButtonSizeExtraLargePaddingBlock,
+      inlineStart: token.ComponentButtonSizeExtraLargePaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeExtraLargePaddingInlineEnd,
+    },
+    {
+      block: token.ComponentButtonSizeExtraLargeIconPaddingBlock,
+      inlineStart: token.ComponentButtonSizeExtraLargeIconPaddingInlineStart,
+      inlineEnd: token.ComponentButtonSizeExtraLargeIconPaddingInlineEnd,
+    },
+    token.ComponentButtonSizeExtraLargeIconSize,
+    token.ComponentButtonSizeExtraLargeIconSpacing,
+    token.ComponentButtonSizeExtraLargeTypography as TypographyRole,
+    token.ComponentButtonSizeExtraLargePressedShape as ButtonPressedShape,
+  ),
+} as const satisfies Record<ButtonSize, ButtonSizeTokens>;
+
 // AndroidX currently animates ButtonShapes with MotionSchemeKeyTokens.DefaultEffects.
-// Both built-in Material motion schemes resolve that token to the same critically
-// damped spring (damping 1, stiffness 1600). This CSS linear() curve samples the
-// normalized spring response until Compose's Float visibility threshold is reached.
+// This is a web motion adaptation; token values above remain generated from DTCG.
 const buttonShapeTransition =
   'border-radius 166ms linear(0, 0.1433 10%, 0.3829 20%, 0.5917 30%, 0.7431 40%, 0.8437 50%, 0.9072 60%, 0.9458 70%, 0.9688 80%, 0.9823 90%, 1)';
 
 function percent(value: number): string {
   return `${value * 100}%`;
-}
-
-function colorRoleVariable(role: ButtonContainerColor): string {
-  if (role === 'transparent') {
-    return 'transparent';
-  }
-
-  const name = role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-  return `var(--${name})`;
 }
 
 function typefaceRoleVariable(role: string): string {
@@ -70,50 +365,40 @@ function normalizeShapeValue(value: ButtonShapeValue): string | number {
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-function pressedShapeRadius(role: ButtonPressedShape): string {
-  return shapeRadius[role];
-}
-
 export function buttonShapesForSize(size: ButtonSize): ButtonShapes {
   return {
-    shape: shapeRadius.full,
-    pressedShape: pressedShapeRadius(buttonSizeTokens[size].pressedShape),
+    shape: shapeRadius[commonButtonTokens.containerShape],
+    pressedShape: shapeRadius[buttonSizeTokens[size].pressedShape],
   };
 }
 
 export function getButtonBaseStyle(tokens: ButtonVariantTokens): ButtonStyle {
   return {
-    '--_button-min-width': `${tokens.minWidth}px`,
-    '--_button-min-height': `${tokens.minHeight}px`,
-    '--_button-padding-block': `${tokens.contentPadding.block}px`,
-    '--_button-padding-inline-start': `${tokens.contentPadding.inlineStart}px`,
-    '--_button-padding-inline-end': `${tokens.contentPadding.inlineEnd}px`,
-    '--_button-icon-padding-block': `${tokens.iconContentPadding.block}px`,
-    '--_button-icon-padding-inline-start': `${tokens.iconContentPadding.inlineStart}px`,
-    '--_button-icon-padding-inline-end': `${tokens.iconContentPadding.inlineEnd}px`,
+    '--_button-min-width': tokens.minWidth,
+    '--_button-min-height': tokens.minHeight,
+    '--_button-padding-block': tokens.contentPadding.block,
+    '--_button-padding-inline-start': tokens.contentPadding.inlineStart,
+    '--_button-padding-inline-end': tokens.contentPadding.inlineEnd,
+    '--_button-icon-padding-block': tokens.iconContentPadding.block,
+    '--_button-icon-padding-inline-start': tokens.iconContentPadding.inlineStart,
+    '--_button-icon-padding-inline-end': tokens.iconContentPadding.inlineEnd,
     '--_button-container-radius': shapeRadius[tokens.containerShape],
-    '--_button-container-color': colorRoleVariable(tokens.containerColor),
-    '--_button-content-color': colorRoleVariable(tokens.contentColor),
-    '--_button-disabled-container-color': colorRoleVariable(
-      tokens.disabledContainerColor,
-    ),
-    '--_button-disabled-container-opacity': percent(
-      tokens.disabledContainerOpacity,
-    ),
-    '--_button-disabled-content-color': colorRoleVariable(
-      tokens.disabledContentColor,
-    ),
+    '--_button-container-color': tokens.containerColor,
+    '--_button-content-color': tokens.contentColor,
+    '--_button-disabled-container-color': tokens.disabledContainerColor,
+    '--_button-disabled-container-opacity': percent(tokens.disabledContainerOpacity),
+    '--_button-disabled-content-color': tokens.disabledContentColor,
     '--_button-disabled-content-opacity': percent(tokens.disabledContentOpacity),
-    '--_button-outline-color': colorRoleVariable(tokens.outlineColor),
-    '--_button-outline-width': `${tokens.outlineWidth}px`,
+    '--_button-outline-color': tokens.outlineColor,
+    '--_button-outline-width': tokens.outlineWidth,
     '--_button-disabled-outline-opacity': percent(tokens.disabledOutlineOpacity),
     '--_button-font-family': typefaceRoleVariable(tokens.labelTypography.fontFamily),
-    '--_button-font-size': `${tokens.labelTypography.fontSize}px`,
-    '--_button-line-height': `${tokens.labelTypography.lineHeight}px`,
+    '--_button-font-size': tokens.labelTypography.fontSize,
+    '--_button-line-height': tokens.labelTypography.lineHeight,
     '--_button-font-weight': tokens.labelTypography.fontWeight,
-    '--_button-letter-spacing': `${tokens.labelTypography.letterSpacing}px`,
-    '--_button-icon-size': `${tokens.iconSize}px`,
-    '--_button-icon-spacing': `${tokens.iconSpacing}px`,
+    '--_button-letter-spacing': tokens.labelTypography.letterSpacing,
+    '--_button-icon-size': tokens.iconSize,
+    '--_button-icon-spacing': tokens.iconSpacing,
   };
 }
 
@@ -121,20 +406,20 @@ export function getButtonSizeStyle(size: ButtonSize): ButtonStyle {
   const tokens = buttonSizeTokens[size];
 
   return {
-    '--_button-min-height': `${tokens.minHeight}px`,
-    '--_button-padding-block': `${tokens.contentPadding.block}px`,
-    '--_button-padding-inline-start': `${tokens.contentPadding.inlineStart}px`,
-    '--_button-padding-inline-end': `${tokens.contentPadding.inlineEnd}px`,
-    '--_button-icon-padding-block': `${tokens.iconContentPadding.block}px`,
-    '--_button-icon-padding-inline-start': `${tokens.iconContentPadding.inlineStart}px`,
-    '--_button-icon-padding-inline-end': `${tokens.iconContentPadding.inlineEnd}px`,
+    '--_button-min-height': tokens.minHeight,
+    '--_button-padding-block': tokens.contentPadding.block,
+    '--_button-padding-inline-start': tokens.contentPadding.inlineStart,
+    '--_button-padding-inline-end': tokens.contentPadding.inlineEnd,
+    '--_button-icon-padding-block': tokens.iconContentPadding.block,
+    '--_button-icon-padding-inline-start': tokens.iconContentPadding.inlineStart,
+    '--_button-icon-padding-inline-end': tokens.iconContentPadding.inlineEnd,
     '--_button-font-family': typefaceRoleVariable(tokens.typography.fontFamily),
-    '--_button-font-size': `${tokens.typography.fontSize}px`,
-    '--_button-line-height': `${tokens.typography.lineHeight}px`,
+    '--_button-font-size': tokens.typography.fontSize,
+    '--_button-line-height': tokens.typography.lineHeight,
     '--_button-font-weight': tokens.typography.fontWeight,
-    '--_button-letter-spacing': `${tokens.typography.letterSpacing}px`,
-    '--_button-icon-size': `${tokens.iconSize}px`,
-    '--_button-icon-spacing': `${tokens.iconSpacing}px`,
+    '--_button-letter-spacing': tokens.typography.letterSpacing,
+    '--_button-icon-size': tokens.iconSize,
+    '--_button-icon-spacing': tokens.iconSpacing,
   };
 }
 
@@ -142,9 +427,7 @@ export function resolveButtonElevation(
   tokens: ButtonVariantTokens,
   { isDisabled, interaction }: ButtonInteractionState,
 ): ElevationLevel {
-  if (isDisabled) {
-    return tokens.disabledElevation;
-  }
+  if (isDisabled) return tokens.disabledElevation;
 
   switch (interaction) {
     case 'press':
@@ -163,18 +446,14 @@ export function resolveButtonElevationTransition({
   interaction,
   previousInteraction = null,
 }: ButtonInteractionState): string {
-  if (isDisabled) {
-    return 'none';
-  }
+  if (isDisabled) return 'none';
 
   if (interaction !== null) {
     const { durationMs, easing } = elevationMotionTokens.incoming;
     return `box-shadow ${durationMs}ms ${easing}`;
   }
 
-  if (previousInteraction === null) {
-    return 'none';
-  }
+  if (previousInteraction === null) return 'none';
 
   const spec =
     previousInteraction === 'hover'
@@ -221,9 +500,7 @@ export function getButtonStyle(
   };
 }
 
-export const filledButtonBaseStyle = getButtonBaseStyle(
-  buttonVariantTokens.filled,
-);
+export const filledButtonBaseStyle = getButtonBaseStyle(buttonVariantTokens.filled);
 
 export function getFilledButtonStyle(state: ButtonInteractionState): ButtonStyle {
   return getButtonStyle('filled', state);

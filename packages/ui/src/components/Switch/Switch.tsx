@@ -1,4 +1,3 @@
-import { switchTokens } from '@m3/tokens/switch';
 import { useState, type ReactNode } from 'react';
 import {
   Switch as AriaSwitch,
@@ -6,7 +5,11 @@ import {
 } from 'react-aria-components';
 import { Ripple, useRipple, type RippleStateInteraction } from '../../internal/ripple';
 import { useTheme } from '../../theme/ThemeProvider';
-import { switchBaseStyle } from './Switch.defaults';
+import {
+  switchBaseStyle,
+  switchStateLayerRadius,
+  switchTrackFocusRingRadius,
+} from './Switch.defaults';
 import './switch.css';
 
 export interface SwitchProps extends AriaSwitchProps {
@@ -74,7 +77,7 @@ export function Switch({
   const { rippleFocus } = useTheme();
   const thumbRipple = useRipple({
     origin: 'center',
-    radius: switchTokens.stateLayerSize / 2,
+    radius: switchStateLayerRadius,
   });
   const trackRipple = useRipple();
   const [activeInteractions, setActiveInteractions] = useState<
@@ -145,7 +148,7 @@ export function Switch({
               <span className="m3-switch__track">
                 <Ripple
                   controller={trackRipple}
-                  focusRingRadius={`${switchTokens.trackHeight / 2}px`}
+                  focusRingRadius={switchTrackFocusRingRadius}
                   isFocusVisible={
                     rippleFocus === 'inset-ring' && renderProps.isFocusVisible
                   }

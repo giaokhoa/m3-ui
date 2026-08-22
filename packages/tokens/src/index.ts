@@ -7,6 +7,5 @@ export * from './motion.js';
 export * from './radio-button.js';
 export * from './ripple.js';
 export * from './state.js';
-export * from './switch.js';
 export * from './text-field.js';
 export * from './typography.js';
