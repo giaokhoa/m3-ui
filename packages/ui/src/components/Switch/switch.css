@@ -5,7 +5,7 @@
   align-items: center;
   gap: var(--_switch-label-gap);
   margin: 0;
-  color: var(--on-surface);
+  color: var(--_switch-label-color);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   --ripple-color: currentColor;
@@ -158,7 +158,7 @@
 .m3-switch[data-disabled] .m3-switch__label {
   color: color-mix(
     in srgb,
-    var(--on-surface) var(--_switch-disabled-label-opacity),
+    var(--_switch-label-color) var(--_switch-disabled-label-opacity),
     transparent
   );
 }
