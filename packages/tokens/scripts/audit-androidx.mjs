@@ -1,10 +1,12 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { readCanonical, resolveTokenValues, validateCanonical } from './dtcg.mjs';
 import { compareTokenGraph, hasAuditDrift, summarizeAudit } from './audit.mjs';
 import { androidX, tokenSources } from '../../../scripts/compose-sync/manifest.mjs';
 import { parseAndroidXTokenFile } from '../../../scripts/compose-sync/parser.mjs';
 
-const canonicalPath = resolve('packages/tokens/tokens/m3.json');
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const canonicalPath = resolve(scriptDir, '../tokens/m3.json');
 const canonical = await readCanonical(canonicalPath);
 const validation = validateCanonical(canonical);
 if (validation.errors.length > 0) {
