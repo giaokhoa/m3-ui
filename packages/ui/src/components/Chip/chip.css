@@ -2,7 +2,6 @@
   position: relative;
   display: inline-flex;
   box-sizing: border-box;
-  min-block-size: var(--_chip-hit-size);
   align-items: center;
   justify-content: center;
   margin: 0;
@@ -18,12 +17,29 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+ * Compose reports the chip's visual/semantic layout at 32dp but expands the
+ * touch target independently to at least 48dp. A generated box gives the web
+ * control the same pointer hit area without changing normal-flow geometry.
+ */
+.m3-chip::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  inline-size: max(100%, var(--_chip-hit-size));
+  block-size: var(--_chip-hit-size);
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
 .m3-chip[data-disabled] {
   cursor: default;
 }
 
 .m3-chip__visual {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   box-sizing: border-box;
   block-size: var(--_chip-height);
