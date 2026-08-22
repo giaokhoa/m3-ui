@@ -22,7 +22,11 @@
       "rowItemLabelTextFont": { "$type": "string", "$value": "bodyMedium" },
       "rowItemOutlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
       "rowItemSelectedContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
-      "rowItemUnselectedContainerColor": { "$type": "string", "$value": "var(--surface)" }
+      "rowItemSelectedHoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemSelectedHoverStateLayerOpacity": { "$type": "number", "$value": 0.08 },
+      "rowItemUnselectedContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "rowItemUnselectedHoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemUnselectedHoverStateLayerOpacity": { "$type": "number", "$value": 0.08 }
     }
   }
 }
