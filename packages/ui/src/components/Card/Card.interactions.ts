@@ -1,33 +1,14 @@
-export type CardInteraction = 'focus' | 'hover' | 'press';
+import {
+  endInteraction,
+  latestInteraction,
+  latestStateLayerInteraction,
+  startInteraction,
+  type MaterialInteraction,
+} from '../../internal/interactions';
 
-export function startCardInteraction(
-  interactions: readonly CardInteraction[],
-  interaction: CardInteraction,
-): CardInteraction[] {
-  return [...interactions.filter((item) => item !== interaction), interaction];
-}
+export type CardInteraction = MaterialInteraction;
 
-export function endCardInteraction(
-  interactions: readonly CardInteraction[],
-  interaction: CardInteraction,
-): CardInteraction[] {
-  return interactions.filter((item) => item !== interaction);
-}
-
-export function latestCardInteraction(
-  interactions: readonly CardInteraction[],
-): CardInteraction | null {
-  return interactions.at(-1) ?? null;
-}
-
-export function latestCardStateLayerInteraction(
-  interactions: readonly CardInteraction[],
-  isFocusVisible: boolean,
-): 'focus' | 'hover' | null {
-  for (let index = interactions.length - 1; index >= 0; index -= 1) {
-    const interaction = interactions[index];
-    if (interaction === 'hover') return 'hover';
-    if (interaction === 'focus' && isFocusVisible) return 'focus';
-  }
-  return null;
-}
+export const startCardInteraction = startInteraction;
+export const endCardInteraction = endInteraction;
+export const latestCardInteraction = latestInteraction;
+export const latestCardStateLayerInteraction = latestStateLayerInteraction;
