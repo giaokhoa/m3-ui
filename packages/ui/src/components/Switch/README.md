@@ -13,6 +13,7 @@ The React Switch ports the Material 3 Compose runtime contract while React Aria 
 - `src/commonMain/kotlin/androidx/compose/material3/Switch.kt`
 - `src/commonMain/kotlin/androidx/compose/material3/tokens/SwitchTokens.kt`
 - `src/androidDeviceTest/kotlin/androidx/compose/material3/SwitchTest.kt`
+- `src/androidDeviceTest/kotlin/androidx/compose/material3/SwitchScreenshotTest.kt`
 
 ## Ported runtime contract
 
@@ -50,6 +51,6 @@ When `ThemeProvider rippleFocus="inset-ring"` is enabled, Compose disables focus
 - Compose itself still has a TODO for swipeable Switch behavior, so no drag gesture is added on the web.
 - Standard Compose springs are sampled into CSS `linear()` curves; custom runtime MotionScheme instances are not dynamically translated.
 
-## Verification target
+## Verification
 
-Unit coverage locks geometry, theme-role mappings, surface compositing and FastSpatial timing. Storybook/Chromium coverage should verify switch semantics, controlled toggling, thumb geometry/offsets, press snap/release motion, disabled composites, RTL positioning, thumb content sizing, and opacity-vs-inset focus placement.
+Unit coverage locks geometry, theme-role mappings, surface compositing and FastSpatial timing. Storybook/Chromium coverage verifies native switch toggling, thumb geometry/offsets, press snap/release motion, disabled composites, RTL positioning, thumb content sizing, ambient state-layer behavior and opacity-vs-inset focus placement. The corresponding AndroidX screenshot matrix covers checked/unchecked, RTL, pressed, disabled, hover, opacity focus, inset focus, transition frames and checked/unchecked thumb icons.
