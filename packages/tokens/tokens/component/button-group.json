@@ -1,1 +1,101 @@
-{"component":{"buttonGroup":{"small":{"betweenSpace":{"$type":"dimension","$value":{"value":12,"unit":"px"}},"containerHeight":{"$type":"dimension","$value":{"value":40,"unit":"px"}}},"connectedSmall":{"betweenSpace":{"$type":"dimension","$value":{"value":2,"unit":"px"}},"containerHeight":{"$type":"dimension","$value":{"value":40,"unit":"px"}},"containerShape":{"$type":"string","$value":"full"},"innerCornerSize":{"$type":"dimension","$value":"{shape.corner.small}"},"pressedInnerCornerSize":{"$type":"dimension","$value":"{shape.corner.extraSmall}"},"selectedInnerCornerSizePercent":{"$type":"number","$value":50}}}}}
+{
+  "component": {
+    "buttonGroup": {
+      "xSmall": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+        "pressedItemWidthMultiplierPercent": { "$type": "number", "$value": 15 },
+        "pressedItemWidthMotion": {
+          "spring": {
+            "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+            "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+          }
+        }
+      },
+      "small": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+        "pressedItemWidthMultiplierPercent": { "$type": "number", "$value": 15 },
+        "pressedItemWidthMotion": {
+          "spring": {
+            "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+            "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+          }
+        }
+      },
+      "medium": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "pressedItemWidthMultiplierPercent": { "$type": "number", "$value": 15 },
+        "pressedItemWidthMotion": {
+          "spring": {
+            "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+            "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+          }
+        }
+      },
+      "large": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 96, "unit": "px" } },
+        "pressedItemWidthMultiplierPercent": { "$type": "number", "$value": 15 },
+        "pressedItemWidthMotion": {
+          "spring": {
+            "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+            "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+          }
+        }
+      },
+      "xLarge": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 136, "unit": "px" } },
+        "pressedItemWidthMultiplierPercent": { "$type": "number", "$value": 15 },
+        "pressedItemWidthMotion": {
+          "spring": {
+            "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+            "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+          }
+        }
+      },
+      "connectedXSmall": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "innerCornerSize": { "$type": "dimension", "$value": "{shape.corner.small}" },
+        "pressedInnerCornerSize": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+        "selectedInnerCornerSizePercent": { "$type": "number", "$value": 50 }
+      },
+      "connectedSmall": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "innerCornerSize": { "$type": "dimension", "$value": "{shape.corner.small}" },
+        "pressedInnerCornerSize": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+        "selectedInnerCornerSizePercent": { "$type": "number", "$value": 50 }
+      },
+      "connectedMedium": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "innerCornerSize": { "$type": "dimension", "$value": "{shape.corner.small}" },
+        "pressedInnerCornerSize": { "$type": "dimension", "$value": "{shape.corner.extraSmall}" },
+        "selectedInnerCornerSizePercent": { "$type": "number", "$value": 50 }
+      },
+      "connectedLarge": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 96, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "innerCornerSize": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "pressedInnerCornerSize": { "$type": "dimension", "$value": "{shape.corner.medium}" },
+        "selectedInnerCornerSizePercent": { "$type": "number", "$value": 50 }
+      },
+      "connectedXLarge": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 136, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "innerCornerSize": { "$type": "dimension", "$value": "{shape.corner.largeIncreased}" },
+        "pressedInnerCornerSize": { "$type": "dimension", "$value": "{shape.corner.large}" },
+        "selectedInnerCornerSizePercent": { "$type": "number", "$value": 50 }
+      }
+    }
+  }
+}
