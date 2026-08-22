@@ -7,6 +7,11 @@
       "padding": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
       "strokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
       "dotSize": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "labelColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "group": {
+        "contentColor": { "$type": "string", "$value": "{component.radioButton.labelColor}" },
+        "errorColor": { "$type": "string", "$value": "var(--error)" }
+      },
       "colors": {
         "selected": { "$type": "string", "$value": "var(--primary)" },
         "unselected": { "$type": "string", "$value": "var(--on-surface-variant)" },
