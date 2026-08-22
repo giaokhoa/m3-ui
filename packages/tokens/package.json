@@ -4,18 +4,11 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/generated/tokens.js",
   "module": "./dist/generated/tokens.js",
   "types": "./dist/generated/tokens.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/generated/tokens.d.ts",
-      "import": "./dist/generated/tokens.js"
-    }
-  },
+  "exports": { ".": { "types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js" } },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
     "build": "rm -rf dist && pnpm tokens:build",
@@ -24,9 +17,8 @@
     "inventory:compose": "node scripts/inventory-compose.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
     "clean": "rm -rf dist",
-    "coverage:compose": "node scripts/coverage-compose.mjs"
+    "coverage:compose": "node scripts/coverage-compose.mjs",
+    "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete"
   },
-  "devDependencies": {
-    "style-dictionary": "5.5.2"
-  }
+  "devDependencies": { "style-dictionary": "5.5.2" }
 }

@@ -40,6 +40,9 @@ jobs:
       - name: Inventory pinned Compose token source
         run: pnpm --filter @m3/tokens inventory:compose
 
+      - name: Require complete Compose token coverage
+        run: pnpm --filter @m3/tokens coverage:compose:complete
+
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
 
