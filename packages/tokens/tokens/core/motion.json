@@ -1,13 +1,16 @@
 {
   "motion": {
     "easing": {
-      "linear": { "$type": "string", "$value": "linear" },
+      "linear": { "$type": "string", "$value": "cubic-bezier(0, 0, 1, 1)" },
       "standard": { "$type": "string", "$value": "cubic-bezier(0.2, 0, 0, 1)" },
-      "standardAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,1,1)" },
-      "standardDecelerate": { "$type": "string", "$value": "cubic-bezier(0,0,0,1)" },
-      "emphasized": { "$type": "string", "$value": "cubic-bezier(.3,0,0,1)" },
-      "emphasizedAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,.8,.15)" },
-      "emphasizedDecelerate": { "$type": "string", "$value": "cubic-bezier(.05,.7,.1,1)" }
+      "standardAccelerate": { "$type": "string", "$value": "cubic-bezier(0.3, 0, 1, 1)" },
+      "standardDecelerate": { "$type": "string", "$value": "cubic-bezier(0, 0, 0, 1)" },
+      "emphasized": { "$type": "string", "$value": "{motion.easing.standard}" },
+      "emphasizedAccelerate": { "$type": "string", "$value": "cubic-bezier(0.3, 0, 0.8, 0.15)" },
+      "emphasizedDecelerate": { "$type": "string", "$value": "cubic-bezier(0.05, 0.7, 0.1, 1)" },
+      "legacy": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.2, 1)" },
+      "legacyAccelerate": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 1, 1)" },
+      "legacyDecelerate": { "$type": "string", "$value": "cubic-bezier(0, 0, 0.2, 1)" }
     },
     "duration": {
       "short1": { "$type": "string", "$value": "50ms" },
