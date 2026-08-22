@@ -40,6 +40,9 @@ jobs:
       - name: Inventory pinned Compose token source
         run: pnpm --filter @m3/tokens inventory:compose
 
+      - name: Inventory pinned Material Web generated source
+        run: pnpm --filter @m3/tokens inventory:material-web
+
       - name: Require complete Compose token coverage
         run: pnpm --filter @m3/tokens coverage:compose:complete
 
