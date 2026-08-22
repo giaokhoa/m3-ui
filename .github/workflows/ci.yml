@@ -87,6 +87,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-search:complete
       - name: Require complete Material Web Tooltip Snackbar Scrim overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-tooltip-snackbar-scrim:complete
+      - name: Require complete Material Web Chip overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-chip:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
