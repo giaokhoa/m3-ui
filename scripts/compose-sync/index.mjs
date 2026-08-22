@@ -61,10 +61,16 @@ async function fetchWithRetry(url, description, options = {}) {
 }
 
 async function discoverTokenSources() {
+  const githubToken = process.env.GITHUB_TOKEN;
   const response = await fetchWithRetry(
     directoryUrl(),
     `AndroidX token directory ${androidX.tokenRoot}`,
-    { headers: { accept: 'application/vnd.github+json' } },
+    {
+      headers: {
+        accept: 'application/vnd.github+json',
+        ...(githubToken ? { authorization: `Bearer ${githubToken}` } : {}),
+      },
+    },
   );
   return tokenSourcesFromDirectory(await response.json());
 }
