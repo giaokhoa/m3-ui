@@ -143,7 +143,9 @@ test.describe('Material 3 Switch parity', () => {
     );
     const surface = await resolvedColor(checked, 'var(--surface)');
 
-    await expect(page.getByRole('switch', { name: 'Unchecked' })).toBeDisabled();
+    await expect(
+      page.getByRole('switch', { name: 'Unchecked', exact: true }),
+    ).toBeDisabled();
     await expect(unchecked.locator('.m3-switch__track')).toHaveCSS(
       'background-color',
       uncheckedTrack,
