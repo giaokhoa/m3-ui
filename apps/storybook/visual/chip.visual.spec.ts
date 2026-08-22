@@ -22,6 +22,8 @@ async function resolvedColor(root: Locator, value: string): Promise<string> {
 }
 
 function selectableChip(page: Page, name: string) {
+  // RAC Checkbox exposes the native input as the role-bearing element, while
+  // Material visuals are sibling content in the generated label root.
   const control = page.getByRole('checkbox', { name, exact: true });
   const root = page.locator('.m3-chip').filter({ has: control });
   return { control, root };
