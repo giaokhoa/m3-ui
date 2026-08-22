@@ -53,6 +53,7 @@ export const switchBaseStyle: SwitchStyle = {
   '--_switch-disabled-unchecked-track-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedTrack, token.ComponentSwitchDisabledOpacityTrack),
   '--_switch-disabled-unchecked-border-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedBorder, token.ComponentSwitchDisabledOpacityTrack),
   '--_switch-disabled-unchecked-icon-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedIcon, token.ComponentSwitchDisabledOpacityUncheckedIcon),
+  '--_switch-disabled-label-opacity': `${token.StateDisabledContentOpacity * 100}%`,
   '--_switch-geometry-duration': token.ComponentSwitchMotionGeometryDuration,
   '--_switch-geometry-easing': token.ComponentSwitchMotionGeometryEasing,
 };

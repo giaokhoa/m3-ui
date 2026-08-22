@@ -1,5 +1,5 @@
 import * as token from '@m3/tokens';
-import { colorRole, msNumber, pxNumber } from '../../internal/tokenValues';
+import { msNumber, pxNumber } from '../../internal/tokenValues';
 
 export const radioButtonTokens = {
   iconSize: pxNumber(token.ComponentRadioButtonIconSize),
@@ -9,12 +9,13 @@ export const radioButtonTokens = {
   strokeWidth: pxNumber(token.ComponentRadioButtonStrokeWidth),
   dotSize: pxNumber(token.ComponentRadioButtonDotSize),
   colors: {
-    selected: colorRole(token.ComponentRadioButtonColorsSelected),
-    unselected: colorRole(token.ComponentRadioButtonColorsUnselected),
-    disabledSelected: colorRole(token.ComponentRadioButtonColorsDisabledSelected),
-    disabledUnselected: colorRole(token.ComponentRadioButtonColorsDisabledUnselected),
+    selected: token.ComponentRadioButtonColorsSelected,
+    unselected: token.ComponentRadioButtonColorsUnselected,
+    disabledSelected: token.ComponentRadioButtonColorsDisabledSelected,
+    disabledUnselected: token.ComponentRadioButtonColorsDisabledUnselected,
   },
   disabledOpacity: token.ComponentRadioButtonDisabledOpacity,
+  disabledLabelOpacity: token.StateDisabledContentOpacity,
   motion: {
     color: {
       durationMs: msNumber(token.ComponentRadioButtonMotionColorDuration),

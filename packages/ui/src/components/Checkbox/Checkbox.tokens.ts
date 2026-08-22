@@ -1,5 +1,5 @@
 import * as token from '@m3/tokens';
-import { colorRole, msNumber, pxNumber } from '../../internal/tokenValues';
+import { msNumber, pxNumber } from '../../internal/tokenValues';
 
 export const checkboxTokens = {
   containerSize: pxNumber(token.ComponentCheckboxContainerSize),
@@ -7,14 +7,15 @@ export const checkboxTokens = {
   stateLayerSize: pxNumber(token.ComponentCheckboxStateLayerSize),
   minimumInteractiveSize: pxNumber(token.ComponentCheckboxMinimumInteractiveSize),
   strokeWidth: pxNumber(token.ComponentCheckboxStrokeWidth),
-  selectedContainerColor: colorRole(token.ComponentCheckboxColorsSelectedContainer),
-  selectedIconColor: colorRole(token.ComponentCheckboxColorsSelectedIcon),
-  unselectedOutlineColor: colorRole(token.ComponentCheckboxColorsUnselectedOutline),
-  selectedDisabledContainerColor: colorRole(token.ComponentCheckboxColorsDisabledSelectedContainer),
+  selectedContainerColor: token.ComponentCheckboxColorsSelectedContainer,
+  selectedIconColor: token.ComponentCheckboxColorsSelectedIcon,
+  unselectedOutlineColor: token.ComponentCheckboxColorsUnselectedOutline,
+  selectedDisabledContainerColor: token.ComponentCheckboxColorsDisabledSelectedContainer,
   selectedDisabledContainerOpacity: token.ComponentCheckboxDisabledOpacitySelectedContainer,
-  selectedDisabledIconColor: colorRole(token.ComponentCheckboxColorsDisabledSelectedIcon),
-  unselectedDisabledOutlineColor: colorRole(token.ComponentCheckboxColorsDisabledUnselectedOutline),
+  selectedDisabledIconColor: token.ComponentCheckboxColorsDisabledSelectedIcon,
+  unselectedDisabledOutlineColor: token.ComponentCheckboxColorsDisabledUnselectedOutline,
   unselectedDisabledOutlineOpacity: token.ComponentCheckboxDisabledOpacityUnselectedOutline,
+  disabledLabelOpacity: token.StateDisabledContentOpacity,
   checkPath: {
     leftX: token.ComponentCheckboxMarkCheckPathLeftX,
     leftY: token.ComponentCheckboxMarkCheckPathLeftY,

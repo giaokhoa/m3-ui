@@ -8,6 +8,9 @@
         "pressed": { "$value": 0.1 },
         "dragged": { "$value": 0.16 }
       }
+    },
+    "disabled": {
+      "contentOpacity": { "$type": "number", "$value": 0.38 }
     }
   }
 }

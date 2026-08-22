@@ -103,7 +103,11 @@
 }
 
 .m3-radio-button[data-disabled] .m3-radio-button__label {
-  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--on-surface) var(--_radio-disabled-label-opacity),
+    transparent
+  );
 }
 
 .m3-radio-group {
