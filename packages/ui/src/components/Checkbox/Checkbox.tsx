@@ -132,6 +132,8 @@ export function Checkbox({
               <span className="m3-checkbox__state-layer">
                 <Ripple
                   controller={ripple}
+                  focusRingRadius="25%"
+                  isFocusVisible={renderProps.isFocusVisible}
                   stateInteraction={latestStateLayerInteraction(
                     activeInteractions,
                     renderProps.isFocusVisible,
