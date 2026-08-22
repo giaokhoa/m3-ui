@@ -1,6 +1,10 @@
+import { readFile } from 'node:fs/promises';
 import { material3Sources } from './sources.mjs';
 
 const source = material3Sources.compose;
+const snapshot = JSON.parse(
+  await readFile(new URL('../audit/compose-token-files.json', import.meta.url), 'utf8'),
+);
 const url = `https://api.github.com/repos/${source.repository}/contents/${source.tokenRoot}?ref=${source.revision}`;
 const response = await fetch(url, {
   headers: {
@@ -16,29 +20,13 @@ const files = entries
   .map((entry) => entry.name)
   .sort();
 
-const foundation = new Set([
-  'ColorDarkTokens.kt',
-  'ColorLightTokens.kt',
-  'ColorSchemeKeyTokens.kt',
-  'ElevationTokens.kt',
-  'ExpressiveMotionTokens.kt',
-  'MotionSchemeKeyTokens.kt',
-  'MotionTokens.kt',
-  'PaletteTokens.kt',
-  'ScrimTokens.kt',
-  'ShapeKeyTokens.kt',
-  'ShapeTokens.kt',
-  'StandardMotionTokens.kt',
-  'StateTokens.kt',
-  'TypeScaleTokens.kt',
-  'TypefaceTokens.kt',
-  'TypographyKeyTokens.kt',
-  'TypographyTokens.kt',
-]);
-
+const foundation = new Set(snapshot.foundation);
 const foundationFiles = files.filter((file) => foundation.has(file));
 const componentFiles = files.filter((file) => !foundation.has(file));
-const unknownFoundation = [...foundation].filter((file) => !files.includes(file));
+const missingExpectedFoundation = snapshot.foundation.filter((file) => !files.includes(file));
+const expectedFiles = [...snapshot.foundation, ...snapshot.components].sort();
+const addedSinceSnapshot = files.filter((file) => !expectedFiles.includes(file));
+const missingSinceSnapshot = expectedFiles.filter((file) => !files.includes(file));
 
 const report = {
   source: {
@@ -53,8 +41,19 @@ const report = {
   },
   foundation: foundationFiles,
   components: componentFiles,
-  missingExpectedFoundationFiles: unknownFoundation,
+  missingExpectedFoundationFiles: missingExpectedFoundation,
+  snapshotDrift: {
+    added: addedSinceSnapshot,
+    missing: missingSinceSnapshot,
+  },
 };
 
 console.log(JSON.stringify(report, null, 2));
-if (unknownFoundation.length > 0) process.exitCode = 1;
+if (
+  source.revision !== snapshot.source.revision ||
+  missingExpectedFoundation.length > 0 ||
+  addedSinceSnapshot.length > 0 ||
+  missingSinceSnapshot.length > 0
+) {
+  process.exitCode = 1;
+}

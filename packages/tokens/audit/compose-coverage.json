@@ -1,0 +1,270 @@
+{
+  "sourceRevision": "ff9a7111302243197384c499d5e3461c1804cd6e",
+  "status": {
+    "reconciled": {
+      "AppBarLargeFlexibleTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AppBarLargeTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AppBarMediumFlexibleTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AppBarMediumTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AppBarSmallTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AppBarTokens.kt": [
+        "tokens/component/app-bar.json"
+      ],
+      "AssistChipTokens.kt": [
+        "tokens/component/chip/base.json",
+        "tokens/component/chip/action.json",
+        "tokens/component/chip/selectable.json"
+      ],
+      "BaselineButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ButtonLargeTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ButtonMediumTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ButtonSmallTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ButtonXLargeTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ButtonXSmallTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "CheckboxTokens.kt": [
+        "tokens/component/checkbox.json"
+      ],
+      "ChipsTokens.kt": [
+        "tokens/component/chip/base.json",
+        "tokens/component/chip/action.json",
+        "tokens/component/chip/selectable.json"
+      ],
+      "ColorDarkTokens.kt": [
+        "tokens/core/baseline-scheme.json"
+      ],
+      "ColorLightTokens.kt": [
+        "tokens/core/baseline-scheme.json"
+      ],
+      "ColorSchemeKeyTokens.kt": [
+        "tokens/core/color.json"
+      ],
+      "ElevatedButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "ElevatedCardTokens.kt": [
+        "tokens/component/card.json"
+      ],
+      "ElevationTokens.kt": [
+        "tokens/core/elevation.json"
+      ],
+      "ExpressiveMotionTokens.kt": [
+        "tokens/core/motion.json"
+      ],
+      "FilledButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "FilledCardTokens.kt": [
+        "tokens/component/card.json"
+      ],
+      "FilledTextFieldTokens.kt": [
+        "tokens/component/text-field/shared.json",
+        "tokens/component/text-field/filled.json",
+        "tokens/component/text-field/outlined.json"
+      ],
+      "FilledTonalButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "FilterChipTokens.kt": [
+        "tokens/component/chip/base.json",
+        "tokens/component/chip/action.json",
+        "tokens/component/chip/selectable.json"
+      ],
+      "InputChipTokens.kt": [
+        "tokens/component/chip/base.json",
+        "tokens/component/chip/action.json",
+        "tokens/component/chip/selectable.json"
+      ],
+      "MotionSchemeKeyTokens.kt": [
+        "tokens/core/motion.json"
+      ],
+      "MotionTokens.kt": [
+        "tokens/core/motion.json"
+      ],
+      "OutlinedButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "OutlinedCardTokens.kt": [
+        "tokens/component/card.json"
+      ],
+      "OutlinedTextFieldTokens.kt": [
+        "tokens/component/text-field/shared.json",
+        "tokens/component/text-field/filled.json",
+        "tokens/component/text-field/outlined.json"
+      ],
+      "PaletteTokens.kt": [
+        "tokens/core/palette.json"
+      ],
+      "RadioButtonTokens.kt": [
+        "tokens/component/radio-button.json"
+      ],
+      "ScrimTokens.kt": [
+        "tokens/core/scrim.json"
+      ],
+      "ShapeKeyTokens.kt": [
+        "tokens/core/shape.json"
+      ],
+      "ShapeTokens.kt": [
+        "tokens/core/shape.json"
+      ],
+      "StandardMotionTokens.kt": [
+        "tokens/core/motion.json"
+      ],
+      "StateTokens.kt": [
+        "tokens/core/state.json"
+      ],
+      "SuggestionChipTokens.kt": [
+        "tokens/component/chip/base.json",
+        "tokens/component/chip/action.json",
+        "tokens/component/chip/selectable.json"
+      ],
+      "SwitchTokens.kt": [
+        "tokens/component/switch.json"
+      ],
+      "TextButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "TonalButtonTokens.kt": [
+        "tokens/component/button/base.json",
+        "tokens/component/button/variants.json",
+        "tokens/component/button/sizes.json"
+      ],
+      "TypeScaleTokens.kt": [
+        "tokens/core/typography.json"
+      ],
+      "TypefaceTokens.kt": [
+        "tokens/core/typography.json"
+      ],
+      "TypographyKeyTokens.kt": [
+        "tokens/core/typography.json"
+      ],
+      "TypographyTokens.kt": [
+        "tokens/core/typography.json"
+      ]
+    },
+    "excluded": {},
+    "pending": [
+      "BadgeTokens.kt",
+      "BottomAppBarTokens.kt",
+      "ButtonGroupSmallTokens.kt",
+      "CircularProgressIndicatorTokens.kt",
+      "ConnectedButtonGroupSmallTokens.kt",
+      "DateInputModalTokens.kt",
+      "DatePickerModalTokens.kt",
+      "DialogTokens.kt",
+      "DividerTokens.kt",
+      "DockedToolbarTokens.kt",
+      "DragHandleTokens.kt",
+      "ExpandedListTokens.kt",
+      "ExtendedFabLargeTokens.kt",
+      "ExtendedFabMediumTokens.kt",
+      "ExtendedFabPrimaryTokens.kt",
+      "ExtendedFabSmallTokens.kt",
+      "FabBaselineTokens.kt",
+      "FabLargeTokens.kt",
+      "FabMediumTokens.kt",
+      "FabMenuBaselineTokens.kt",
+      "FabPrimaryContainerTokens.kt",
+      "FabSecondaryContainerTokens.kt",
+      "FabSmallTokens.kt",
+      "FilledAutocompleteTokens.kt",
+      "FilledIconButtonTokens.kt",
+      "FilledTonalIconButtonTokens.kt",
+      "FloatingToolbarTokens.kt",
+      "IconButtonTokens.kt",
+      "LargeIconButtonTokens.kt",
+      "LinearProgressIndicatorTokens.kt",
+      "ListTokens.kt",
+      "LoadingIndicatorTokens.kt",
+      "MediumIconButtonTokens.kt",
+      "MenuTokens.kt",
+      "NavigationBarHorizontalItemTokens.kt",
+      "NavigationBarTokens.kt",
+      "NavigationBarVerticalItemTokens.kt",
+      "NavigationDrawerTokens.kt",
+      "NavigationRailBaselineItemTokens.kt",
+      "NavigationRailCollapsedTokens.kt",
+      "NavigationRailColorTokens.kt",
+      "NavigationRailExpandedTokens.kt",
+      "NavigationRailHorizontalItemTokens.kt",
+      "NavigationRailVerticalItemTokens.kt",
+      "OutlinedAutocompleteTokens.kt",
+      "OutlinedIconButtonTokens.kt",
+      "OutlinedSegmentedButtonTokens.kt",
+      "PlainTooltipTokens.kt",
+      "PrimaryNavigationTabTokens.kt",
+      "ProgressIndicatorTokens.kt",
+      "ReorderListTokens.kt",
+      "RevealListTokens.kt",
+      "RichTooltipTokens.kt",
+      "SearchBarTokens.kt",
+      "SearchViewTokens.kt",
+      "SecondaryNavigationTabTokens.kt",
+      "SegmentedMenuTokens.kt",
+      "SheetBottomTokens.kt",
+      "SliderTokens.kt",
+      "SmallIconButtonTokens.kt",
+      "SnackbarTokens.kt",
+      "SplitButtonLargeTokens.kt",
+      "SplitButtonMediumTokens.kt",
+      "SplitButtonSmallTokens.kt",
+      "SplitButtonXLargeTokens.kt",
+      "SplitButtonXSmallTokens.kt",
+      "StandardMenuTokens.kt",
+      "TimeInputTokens.kt",
+      "TimePickerTokens.kt",
+      "VibrantMenuTokens.kt",
+      "XLargeIconButtonTokens.kt",
+      "XSmallIconButtonTokens.kt"
+    ]
+  },
+  "counts": {
+    "reconciled": 48,
+    "excluded": 0,
+    "pending": 72,
+    "all": 120
+  }
+}
