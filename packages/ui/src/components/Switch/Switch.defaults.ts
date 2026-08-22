@@ -11,6 +11,16 @@ function compositeOverSurface(role: SwitchColorRole, opacity: number): string {
   return `color-mix(in srgb, ${roleVariable(role)} ${opacity * 100}%, var(--surface))`;
 }
 
+const uncheckedThumbOffset =
+  (switchTokens.trackHeight - switchTokens.uncheckedThumbSize) / 2;
+const contentThumbOffset =
+  (switchTokens.trackHeight - switchTokens.checkedThumbSize) / 2;
+const checkedThumbOffset =
+  switchTokens.trackWidth - switchTokens.checkedThumbSize - contentThumbOffset;
+const pressedUncheckedThumbOffset = switchTokens.trackOutlineWidth;
+const pressedCheckedThumbOffset =
+  checkedThumbOffset - switchTokens.trackOutlineWidth;
+
 export const switchBaseStyle: SwitchStyle = {
   '--_switch-track-width': `${switchTokens.trackWidth}px`,
   '--_switch-track-height': `${switchTokens.trackHeight}px`,
@@ -21,6 +31,11 @@ export const switchBaseStyle: SwitchStyle = {
   '--_switch-checked-thumb-size': `${switchTokens.checkedThumbSize}px`,
   '--_switch-pressed-thumb-size': `${switchTokens.pressedThumbSize}px`,
   '--_switch-icon-size': `${switchTokens.iconSize}px`,
+  '--_switch-unchecked-thumb-offset': `${uncheckedThumbOffset}px`,
+  '--_switch-content-thumb-offset': `${contentThumbOffset}px`,
+  '--_switch-checked-thumb-offset': `${checkedThumbOffset}px`,
+  '--_switch-pressed-unchecked-thumb-offset': `${pressedUncheckedThumbOffset}px`,
+  '--_switch-pressed-checked-thumb-offset': `${pressedCheckedThumbOffset}px`,
   '--_switch-checked-thumb-color': roleVariable(switchTokens.colors.checkedThumb),
   '--_switch-checked-track-color': roleVariable(switchTokens.colors.checkedTrack),
   '--_switch-checked-border-color': 'transparent',
