@@ -40,7 +40,7 @@ test.describe('Material 3 Chip parity', () => {
     await expect(page.getByRole('checkbox', { name: 'Input', exact: true })).toBeChecked();
   });
 
-  test('separates the 48px semantic target from the 32px visual container', async ({ page }) => {
+  test('keeps 32px layout bounds while expanding pointer hit bounds to 48px', async ({ page }) => {
     await openStory(page, 'components-chip--action-variants');
     const chip = page.getByRole('button', { name: 'Assist', exact: true });
     const visual = chip.locator('.m3-chip__visual');
@@ -48,17 +48,25 @@ test.describe('Material 3 Chip parity', () => {
       const visualElement = root.querySelector<HTMLElement>('.m3-chip__visual')!;
       const rootBox = root.getBoundingClientRect();
       const visualBox = visualElement.getBoundingClientRect();
+      const hitStyle = getComputedStyle(root, '::before');
+      const testPoint = {
+        x: rootBox.left + rootBox.width / 2,
+        y: rootBox.top - 6,
+      };
       return {
         rootHeight: rootBox.height,
         visualHeight: visualBox.height,
-        topGap: visualBox.top - rootBox.top,
-        bottomGap: rootBox.bottom - visualBox.bottom,
+        hitHeight: Number.parseFloat(hitStyle.height),
+        hitWidth: Number.parseFloat(hitStyle.width),
+        hitAboveVisual: document.elementFromPoint(testPoint.x, testPoint.y) === root,
       };
     });
 
-    expect(geometry.rootHeight).toBeGreaterThanOrEqual(48);
+    expect(geometry.rootHeight).toBe(32);
     expect(geometry.visualHeight).toBe(32);
-    expect(Math.abs(geometry.topGap - geometry.bottomGap)).toBeLessThanOrEqual(0.5);
+    expect(geometry.hitHeight).toBe(48);
+    expect(geometry.hitWidth).toBeGreaterThanOrEqual(48);
+    expect(geometry.hitAboveVisual).toBe(true);
     await expect(visual).toHaveCSS('border-radius', '8px');
   });
 
@@ -146,9 +154,7 @@ test.describe('Material 3 Chip parity', () => {
     await expect(content).toHaveCSS('padding-inline-end', '8px');
   });
 
-  test('disabled elevated FilterChip uses OnSurface alpha for container and content', async ({
-    page,
-  }) => {
+  test('disabled selectable chips use pinned container/content/avatar alpha', async ({ page }) => {
     await openStory(page, 'components-chip--disabled-states');
     const filter = page.getByRole('checkbox', {
       name: 'Elevated filter',
@@ -167,6 +173,9 @@ test.describe('Material 3 Chip parity', () => {
     await expect(filter.locator('.m3-chip__surface')).toHaveCSS('background-color', container);
     await expect(filter.locator('.m3-chip__label')).toHaveCSS('color', content);
     await expect(filter.locator('.m3-elevation')).toHaveAttribute('data-elevation', 'level0');
+
+    const input = page.getByRole('checkbox', { name: 'Input', exact: true });
+    await expect(input.locator('.m3-chip__avatar')).toHaveCSS('opacity', '0.38');
   });
 
   test('press ripple stays on the 32px visual surface', async ({ page }) => {
@@ -218,15 +227,16 @@ test.describe('Material 3 Chip parity', () => {
     expect(ringGeometry.radius).toBe('8px');
   });
 
-  test('expressive shapes morph 12px → full → 8px pressed with compact spacing', async ({
+  test('expressive shapes use tonal color, compact gaps and 12px → full → 8px morph', async ({
     page,
   }) => {
     await openStory(page, 'components-chip--expressive-shapes');
     const filter = page.getByRole('checkbox', { name: 'Expressive filter', exact: true });
     const visual = filter.locator('.m3-chip__visual');
+    const unselectedLeading = await resolvedColor(filter, 'var(--on-surface-variant)');
 
     await expect(visual).toHaveCSS('border-radius', '12px');
-    await expect(filter.locator('.m3-chip__leading-icon')).toHaveCSS('margin-right', '0px');
+    await expect(filter.locator('.m3-chip__leading-icon')).toHaveCSS('color', unselectedLeading);
     await expect(filter.locator('.m3-chip__label')).toHaveCSS('margin-left', '4px');
     await expect(filter.locator('.m3-chip__trailing-icon')).toHaveCSS('margin-left', '4px');
 
