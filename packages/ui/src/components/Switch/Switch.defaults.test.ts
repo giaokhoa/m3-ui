@@ -28,6 +28,11 @@ describe('Switch defaults', () => {
     expect(switchTrackFocusRingRadius).toBe('16px');
   });
 
+  it('keeps the web label spacing in the canonical component contract', () => {
+    expect(token.ComponentSwitchLabelGap).toBe('8px');
+    expect(style['--_switch-label-gap']).toBe('8px');
+  });
+
   it('passes enabled dynamic color variables through unchanged', () => {
     expect(style['--_switch-checked-thumb-color']).toBe('var(--on-primary)');
     expect(style['--_switch-checked-track-color']).toBe('var(--primary)');
