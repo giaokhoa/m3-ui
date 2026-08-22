@@ -12,6 +12,9 @@ export interface CheckboxProps extends AriaCheckboxProps {}
 
 type StateLayerInteraction = 'focus' | 'hover';
 
+const checkboxFocusRingInset =
+  (checkboxTokens.minimumInteractiveSize - checkboxTokens.containerSize) / 2;
+
 function startInteraction(
   active: readonly StateLayerInteraction[],
   interaction: StateLayerInteraction,
@@ -132,6 +135,7 @@ export function Checkbox({
               <span className="m3-checkbox__state-layer">
                 <Ripple
                   controller={ripple}
+                  focusRingInset={checkboxFocusRingInset}
                   focusRingRadius="25%"
                   isFocusVisible={renderProps.isFocusVisible}
                   stateInteraction={latestStateLayerInteraction(
