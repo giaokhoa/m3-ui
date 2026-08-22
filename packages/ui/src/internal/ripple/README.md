@@ -12,6 +12,7 @@ The shared Ripple primitive translates Material 3 Compose indication behavior in
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Ripple.kt`
 - `compose/material3/material3-ripple/src/commonMain/kotlin/androidx/compose/material3/ripple/Ripple.kt`
 - `compose/material3/material3-ripple/src/commonMain/kotlin/androidx/compose/material3/ripple/RippleNodeConfiguration.kt`
+- `compose/material3/material3-ripple/src/commonMain/kotlin/androidx/compose/material3/ripple/Border.kt`
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/StateTokens.kt`
 - `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/RadioButtonTest.kt`
 - `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/CheckboxTest.kt`
@@ -41,11 +42,13 @@ The web Ripple host still spans each component's interaction slot for wave/state
 
 Focus-ring shapes are resolved at component callsites, matching Compose ownership:
 
-- Button: current container shape via inherited border radius;
-- Checkbox: `RoundedCornerShape(25)` mapped to 25%;
-- RadioButton: `CircleShape` mapped to 50%.
+- Button: current container radius through `--_button-container-radius`;
+- Checkbox: `RoundedCornerShape(25)` on the 18px indication bounds resolves to a 4.5px corner radius;
+- RadioButton: `CircleShape` on the 24px indication bounds resolves to a 12px corner radius.
 
-Inset focus remains active independently of the latest hover state-layer interaction, matching the lower-level Compose ripple node, where focus-ring interpolation tracks focus separately from opacity state-layer ordering.
+AndroidX `BorderLogic` creates the shape outline from the original indication size and then shrinks its corner radius by the animated border inset. The web implementation therefore carries the original radius as a CSS length and animates each pseudo-border radius to `radius - inset`; it intentionally does not re-evaluate a percentage radius against the smaller inset pseudo-element box. For example, Checkbox's inner focus outline ends at 3.5px, not 25% of a 16px box (4px).
+
+The focus ring is painted above component content, matching the lower-level Compose ordering of `drawContent()`, ripple waves, and then state/focus indication. Inset focus remains active independently of the latest hover state-layer interaction, because Compose tracks focus-ring interpolation separately from opacity state-layer ordering.
 
 ## Web translations and remaining gaps
 
@@ -59,4 +62,4 @@ Inset focus remains active independently of the latest hover state-layer interac
 
 ## Verification
 
-Unit tests lock Material state-layer and inset-ring constants. Storybook exposes opacity, inset-ring and side-by-side focus previews. Chromium tests verify default opacity behavior, stroke widths/insets/colors, Button 40px visual indication bounds, Checkbox 48/40/18 target/state/ring geometry, RadioButton 48/40/24 geometry, component focus-ring shapes, and the independent focus-ring + hover-state-layer case.
+Unit tests lock Material state-layer and inset-ring constants. Storybook exposes opacity, inset-ring and side-by-side focus previews. Chromium tests verify default opacity behavior, stroke widths/insets/colors, overlay ordering, Button 40px visual indication bounds, Checkbox 48/40/18 target/state/ring geometry with 4.5px → 3.5px inset radius, RadioButton 48/40/24 geometry with 12px → 11px inset radius, and the independent focus-ring + hover-state-layer case.
