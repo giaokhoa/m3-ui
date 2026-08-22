@@ -99,6 +99,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-pickers:complete
       - name: Require complete Material Web Autocomplete overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-autocomplete:complete
+      - name: Require complete Material Web Menu Button overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-menu-button:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
