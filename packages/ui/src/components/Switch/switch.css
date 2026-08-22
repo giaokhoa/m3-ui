@@ -156,7 +156,11 @@
 }
 
 .m3-switch[data-disabled] .m3-switch__label {
-  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--on-surface) var(--_switch-disabled-label-opacity),
+    transparent
+  );
 }
 
 .m3-switch[data-readonly] {

@@ -1,10 +1,10 @@
-import { cardTokens } from '@m3/tokens/card';
 import { describe, expect, it } from 'vitest';
 import {
   getCardElevationLevel,
   getCardElevationMotion,
   getCardStyle,
 } from './Card.defaults';
+import { cardTokens } from './Card.tokens';
 
 const filled = getCardStyle('filled') as Record<string, string | number>;
 const elevated = getCardStyle('elevated') as Record<string, string | number>;

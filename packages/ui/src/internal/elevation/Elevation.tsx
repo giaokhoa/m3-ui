@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes } from 'react';
-import type { ElevationLevel } from '@m3/tokens/elevation';
+import type { ElevationLevel } from './tokens';
 import { getElevationBoxShadow } from './elevation';
 import './elevation.css';
 

@@ -1,6 +1,6 @@
-import { checkboxTokens } from '@m3/tokens/checkbox';
 import { describe, expect, it } from 'vitest';
 import { checkboxBaseStyle } from './Checkbox.defaults';
+import { checkboxTokens } from './Checkbox.tokens';
 
 describe('Checkbox parity', () => {
   it('matches the corrected current Material 3 geometry', () => {

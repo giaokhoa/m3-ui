@@ -1,5 +1,4 @@
-import { rippleTokens } from '@m3/tokens/ripple';
-import { stateLayerOpacity } from '@m3/tokens/state';
+import * as token from '@m3/tokens';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { useTheme } from '../../theme/ThemeProvider';
 import type { RippleController } from './useRipple';
@@ -48,33 +47,29 @@ export function Ripple({
           : null
       : stateInteraction;
   const hasFocus = isFocusVisible || resolvedStateInteraction === 'focus';
-  const focusRing = rippleTokens.focusRing;
 
   const tokenStyle: RippleStyle = {
-    '--_ripple-radius-duration': `${rippleTokens.radiusDurationMs}ms`,
-    '--_ripple-hover-duration': `${rippleTokens.hoverTransitionDurationMs}ms`,
-    '--_ripple-focus-in-duration': `${rippleTokens.focusInTransitionDurationMs}ms`,
-    '--_ripple-fade-in-duration': `${rippleTokens.fadeInDurationMs}ms`,
-    '--_ripple-fade-out-duration': `${rippleTokens.fadeOutDurationMs}ms`,
-    '--_ripple-radius-easing': rippleTokens.radiusEasing,
-    '--_ripple-center-easing': rippleTokens.centerEasing,
-    '--_ripple-opacity-easing': rippleTokens.opacityEasing,
-    '--_ripple-hover-opacity': stateLayerOpacity.hover,
-    '--_ripple-focus-opacity': stateLayerOpacity.focus,
-    '--_ripple-pressed-opacity': stateLayerOpacity.pressed,
-    '--_ripple-focus-ring-outer-inset': `${focusRing.outerStrokeInset}px`,
-    '--_ripple-focus-ring-outer-width': `${focusRing.outerStrokeWidth}px`,
-    '--_ripple-focus-ring-inner-inset': `${focusRing.innerStrokeInset}px`,
-    '--_ripple-focus-ring-inner-width': `${focusRing.innerStrokeWidth}px`,
-    '--_ripple-focus-ring-outer-color': `var(--${focusRing.outerStrokeColorRole})`,
-    '--_ripple-focus-ring-inner-color': `var(--${focusRing.innerStrokeColorRole.replace(
-      /[A-Z]/g,
-      (letter) => `-${letter.toLowerCase()}`,
-    )})`,
-    '--_ripple-focus-ring-in-duration': `${focusRing.focusIn.durationMs}ms`,
-    '--_ripple-focus-ring-in-easing': focusRing.focusIn.easing,
-    '--_ripple-focus-ring-out-duration': `${focusRing.focusOut.durationMs}ms`,
-    '--_ripple-focus-ring-out-easing': focusRing.focusOut.easing,
+    '--_ripple-radius-duration': token.RippleRadiusDuration,
+    '--_ripple-hover-duration': token.RippleHoverTransitionDuration,
+    '--_ripple-focus-in-duration': token.RippleFocusInTransitionDuration,
+    '--_ripple-fade-in-duration': token.RippleFadeInDuration,
+    '--_ripple-fade-out-duration': token.RippleFadeOutDuration,
+    '--_ripple-radius-easing': token.RippleRadiusEasing,
+    '--_ripple-center-easing': token.RippleCenterEasing,
+    '--_ripple-opacity-easing': token.RippleOpacityEasing,
+    '--_ripple-hover-opacity': token.StateLayerOpacityHover,
+    '--_ripple-focus-opacity': token.StateLayerOpacityFocus,
+    '--_ripple-pressed-opacity': token.StateLayerOpacityPressed,
+    '--_ripple-focus-ring-outer-inset': token.RippleFocusRingOuterStrokeInset,
+    '--_ripple-focus-ring-outer-width': token.RippleFocusRingOuterStrokeWidth,
+    '--_ripple-focus-ring-inner-inset': token.RippleFocusRingInnerStrokeInset,
+    '--_ripple-focus-ring-inner-width': token.RippleFocusRingInnerStrokeWidth,
+    '--_ripple-focus-ring-outer-color': token.RippleFocusRingOuterStrokeColor,
+    '--_ripple-focus-ring-inner-color': token.RippleFocusRingInnerStrokeColor,
+    '--_ripple-focus-ring-in-duration': token.RippleFocusRingFocusInDuration,
+    '--_ripple-focus-ring-in-easing': token.RippleFocusRingFocusInEasing,
+    '--_ripple-focus-ring-out-duration': token.RippleFocusRingFocusOutDuration,
+    '--_ripple-focus-ring-out-easing': token.RippleFocusRingFocusOutEasing,
     ...(focusRingRadius === undefined
       ? {}
       : { '--_ripple-focus-ring-radius': cssLength(focusRingRadius) }),

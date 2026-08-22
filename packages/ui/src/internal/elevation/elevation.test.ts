@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { elevationLevels } from '@m3/tokens/elevation';
+import { elevationLevels } from './tokens';
 import { getElevationBoxShadow } from './elevation';
 
 describe('elevation', () => {

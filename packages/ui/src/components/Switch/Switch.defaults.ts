@@ -1,12 +1,9 @@
-import * as token from '@m3/tokens/generated';
+import * as token from '@m3/tokens';
 import type { CSSProperties } from 'react';
 
 export type SwitchStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-function px(value: string): number {
-  return Number.parseFloat(value);
-}
-
+function px(value: string): number { return Number.parseFloat(value); }
 function compositeOverSurface(color: string, opacity: number): string {
   return `color-mix(in srgb, ${color} ${opacity * 100}%, var(--surface))`;
 }
@@ -16,7 +13,6 @@ const trackHeight = px(token.ComponentSwitchTrackHeight);
 const trackOutlineWidth = px(token.ComponentSwitchTrackOutlineWidth);
 const uncheckedThumbSize = px(token.ComponentSwitchHandleUnselectedSize);
 const checkedThumbSize = px(token.ComponentSwitchHandleSelectedSize);
-
 const uncheckedThumbOffset = (trackHeight - uncheckedThumbSize) / 2;
 const contentThumbOffset = (trackHeight - checkedThumbSize) / 2;
 const checkedThumbOffset = trackWidth - checkedThumbSize - contentThumbOffset;
@@ -49,34 +45,15 @@ export const switchBaseStyle: SwitchStyle = {
   '--_switch-unchecked-track-color': token.ComponentSwitchColorsUncheckedTrack,
   '--_switch-unchecked-border-color': token.ComponentSwitchColorsUncheckedBorder,
   '--_switch-unchecked-icon-color': token.ComponentSwitchColorsUncheckedIcon,
-  '--_switch-disabled-checked-thumb-color':
-    token.ComponentSwitchColorsDisabledCheckedThumb,
-  '--_switch-disabled-checked-track-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledCheckedTrack,
-    token.ComponentSwitchDisabledOpacityTrack,
-  ),
-  '--_switch-disabled-checked-border-color':
-    token.ComponentSwitchColorsDisabledCheckedBorder,
-  '--_switch-disabled-checked-icon-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledCheckedIcon,
-    token.ComponentSwitchDisabledOpacityCheckedIcon,
-  ),
-  '--_switch-disabled-unchecked-thumb-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledUncheckedThumb,
-    token.ComponentSwitchDisabledOpacityUncheckedThumb,
-  ),
-  '--_switch-disabled-unchecked-track-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledUncheckedTrack,
-    token.ComponentSwitchDisabledOpacityTrack,
-  ),
-  '--_switch-disabled-unchecked-border-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledUncheckedBorder,
-    token.ComponentSwitchDisabledOpacityTrack,
-  ),
-  '--_switch-disabled-unchecked-icon-color': compositeOverSurface(
-    token.ComponentSwitchColorsDisabledUncheckedIcon,
-    token.ComponentSwitchDisabledOpacityUncheckedIcon,
-  ),
+  '--_switch-disabled-checked-thumb-color': token.ComponentSwitchColorsDisabledCheckedThumb,
+  '--_switch-disabled-checked-track-color': compositeOverSurface(token.ComponentSwitchColorsDisabledCheckedTrack, token.ComponentSwitchDisabledOpacityTrack),
+  '--_switch-disabled-checked-border-color': token.ComponentSwitchColorsDisabledCheckedBorder,
+  '--_switch-disabled-checked-icon-color': compositeOverSurface(token.ComponentSwitchColorsDisabledCheckedIcon, token.ComponentSwitchDisabledOpacityCheckedIcon),
+  '--_switch-disabled-unchecked-thumb-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedThumb, token.ComponentSwitchDisabledOpacityUncheckedThumb),
+  '--_switch-disabled-unchecked-track-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedTrack, token.ComponentSwitchDisabledOpacityTrack),
+  '--_switch-disabled-unchecked-border-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedBorder, token.ComponentSwitchDisabledOpacityTrack),
+  '--_switch-disabled-unchecked-icon-color': compositeOverSurface(token.ComponentSwitchColorsDisabledUncheckedIcon, token.ComponentSwitchDisabledOpacityUncheckedIcon),
+  '--_switch-disabled-label-opacity': `${token.StateDisabledContentOpacity * 100}%`,
   '--_switch-geometry-duration': token.ComponentSwitchMotionGeometryDuration,
   '--_switch-geometry-easing': token.ComponentSwitchMotionGeometryEasing,
 };

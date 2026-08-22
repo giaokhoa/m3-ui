@@ -1,12 +1,12 @@
-import type { ButtonSize, ButtonVariant } from '@m3/tokens/button';
+import * as token from '@m3/tokens';
+import type { CSSProperties } from 'react';
 import {
   elevationMotionTokens,
+  getElevationBoxShadow,
   type ElevationLevel,
-} from '@m3/tokens/elevation';
-import * as token from '@m3/tokens/generated';
-import type { CSSProperties } from 'react';
-import { getElevationBoxShadow } from '../../internal/elevation';
+} from '../../internal/elevation';
 import type { ButtonInteraction } from './Button.interactions';
+import type { ButtonSize, ButtonVariant } from './Button.types';
 
 export type ButtonStyle = CSSProperties & Record<`--${string}`, string | number>;
 export type ButtonShapeValue = string | number;
@@ -129,8 +129,7 @@ const commonButtonTokens = {
   disabledOutlineOpacity: token.ComponentButtonBaselineDisabledOutlineOpacity,
   iconSize: token.ComponentButtonBaselineIconSize,
   iconSpacing: token.ComponentButtonBaselineIconSpacing,
-  labelTypography:
-    typography[token.ComponentButtonBaselineLabelTypography as TypographyRole],
+  labelTypography: typography[token.ComponentButtonBaselineLabelTypography as TypographyRole],
 } as const;
 
 const standardContentPadding = {
@@ -181,8 +180,7 @@ export const filledTonalButtonTokens = {
   iconContentPadding: standardIconContentPadding,
   containerColor: token.ComponentButtonVariantFilledTonalContainerColor,
   contentColor: token.ComponentButtonVariantFilledTonalContentColor,
-  disabledContainerColor:
-    token.ComponentButtonVariantFilledTonalDisabledContainerColor,
+  disabledContainerColor: token.ComponentButtonVariantFilledTonalDisabledContainerColor,
   disabledContentColor: token.ComponentButtonVariantFilledTonalDisabledContentColor,
   defaultElevation: token.ComponentButtonVariantFilledTonalDefaultElevation,
   hoveredElevation: token.ComponentButtonVariantFilledTonalHoveredElevation,
@@ -348,21 +346,12 @@ export const buttonSizeTokens = {
   ),
 } as const satisfies Record<ButtonSize, ButtonSizeTokens>;
 
-// AndroidX animates ButtonShapes with MotionSchemeKeyTokens.DefaultEffects.
 const buttonShapeTransition =
   `border-radius ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`;
 
-function percent(value: number): string {
-  return `${value * 100}%`;
-}
-
-function typefaceRoleVariable(role: string): string {
-  return `var(--font-family-${role})`;
-}
-
-function normalizeShapeValue(value: ButtonShapeValue): string | number {
-  return typeof value === 'number' ? `${value}px` : value;
-}
+function percent(value: number): string { return `${value * 100}%`; }
+function typefaceRoleVariable(role: string): string { return `var(--font-family-${role})`; }
+function normalizeShapeValue(value: ButtonShapeValue): string | number { return typeof value === 'number' ? `${value}px` : value; }
 
 export function buttonShapesForSize(size: ButtonSize): ButtonShapes {
   return {
@@ -485,7 +474,6 @@ export function getButtonStyle(
 }
 
 export const filledButtonBaseStyle = getButtonBaseStyle(buttonVariantTokens.filled);
-
 export function getFilledButtonStyle(state: ButtonInteractionState): ButtonStyle {
   return getButtonStyle('filled', state);
 }

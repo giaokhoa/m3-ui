@@ -1,4 +1,8 @@
-import { elevationShadowLayers, type ElevationLevel, type ElevationShadowLayer } from '@m3/tokens/elevation';
+import {
+  elevationShadowLayers,
+  type ElevationLevel,
+  type ElevationShadowLayer,
+} from './tokens';
 
 const defaultShadowColor = 'var(--shadow)';
 

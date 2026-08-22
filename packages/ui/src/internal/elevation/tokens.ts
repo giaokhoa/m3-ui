@@ -1,5 +1,5 @@
-import * as token from '@m3/tokens/generated';
-import { msNumber, pxNumber } from './value.js';
+import * as token from '@m3/tokens';
+import { msNumber, pxNumber } from '../tokenValues';
 
 export const elevationLevels = {
   level0: pxNumber(token.ElevationLevel0),
@@ -21,13 +21,34 @@ export interface ElevationShadowLayer {
 }
 
 export const elevationMotionTokens = {
-  incoming: { durationMs: msNumber(token.MotionElevationIncomingDuration), easing: token.MotionElevationIncomingEasing },
-  outgoing: { durationMs: msNumber(token.MotionElevationOutgoingDuration), easing: token.MotionElevationOutgoingEasing },
-  hoveredOutgoing: { durationMs: msNumber(token.MotionElevationHoveredOutgoingDuration), easing: token.MotionElevationHoveredOutgoingEasing },
+  incoming: {
+    durationMs: msNumber(token.MotionElevationIncomingDuration),
+    easing: token.MotionElevationIncomingEasing,
+  },
+  outgoing: {
+    durationMs: msNumber(token.MotionElevationOutgoingDuration),
+    easing: token.MotionElevationOutgoingEasing,
+  },
+  hoveredOutgoing: {
+    durationMs: msNumber(token.MotionElevationHoveredOutgoingDuration),
+    easing: token.MotionElevationHoveredOutgoingEasing,
+  },
 } as const;
 
-function layer(offsetX: string, offsetY: string, blurRadius: string, spreadRadius: string, opacity: number): ElevationShadowLayer {
-  return { offsetX: pxNumber(offsetX), offsetY: pxNumber(offsetY), blurRadius: pxNumber(blurRadius), spreadRadius: pxNumber(spreadRadius), opacity };
+function layer(
+  offsetX: string,
+  offsetY: string,
+  blurRadius: string,
+  spreadRadius: string,
+  opacity: number,
+): ElevationShadowLayer {
+  return {
+    offsetX: pxNumber(offsetX),
+    offsetY: pxNumber(offsetY),
+    blurRadius: pxNumber(blurRadius),
+    spreadRadius: pxNumber(spreadRadius),
+    opacity,
+  };
 }
 
 export const elevationShadowLayers = {

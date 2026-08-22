@@ -1,10 +1,10 @@
-import { materialTypefaceTokens } from '@m3/tokens/typography';
+import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3/tokens';
 import { describe, expect, it } from 'vitest';
 import { defaultTypographyThemeStyle } from './cssVariables';
 
 describe('Material typography theme', () => {
-  it('uses Roboto for the default Material plain and brand typefaces', () => {
-    expect(materialTypefaceTokens).toEqual({
+  it('uses generated Roboto defaults for the Material plain and brand typefaces', () => {
+    expect({ plain: TypefacePlain, brand: TypefaceBrand, fallback: TypefaceFallback }).toEqual({
       plain: 'Roboto',
       brand: 'Roboto',
       fallback: 'sans-serif',

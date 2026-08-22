@@ -1,18 +1,17 @@
 export function pxNumber(value: string): number {
   if (!value.endsWith('px')) throw new Error(`Expected px token, received ${value}`);
-  const number = Number.parseFloat(value);
-  if (!Number.isFinite(number)) throw new Error(`Invalid px token: ${value}`);
-  return number;
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) throw new Error(`Invalid px token: ${value}`);
+  return parsed;
 }
 
 export function msNumber(value: string): number {
   if (!value.endsWith('ms')) throw new Error(`Expected ms token, received ${value}`);
-  const number = Number.parseFloat(value);
-  if (!Number.isFinite(number)) throw new Error(`Invalid ms token: ${value}`);
-  return number;
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) throw new Error(`Invalid ms token: ${value}`);
+  return parsed;
 }
 
-/** Compatibility adapter for legacy role-based facades. Canonical/generated colors stay as CSS var() strings. */
 export function colorRole(value: string): string {
   if (value === 'transparent') return value;
   const match = value.match(/^var\(--([a-z0-9-]+)\)$/);

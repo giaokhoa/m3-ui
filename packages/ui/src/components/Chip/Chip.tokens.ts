@@ -1,7 +1,8 @@
-import * as token from '@m3/tokens/generated';
-import type { ElevationLevel } from './elevation.js';
-import type { TypefaceRole } from './typography.js';
-import { colorRole, pxNumber } from './value.js';
+import * as token from '@m3/tokens';
+import type { ElevationLevel } from '../../internal/elevation';
+import { colorRole, pxNumber } from '../../internal/tokenValues';
+
+type TypefaceRole = 'plain' | 'brand';
 
 export type ChipColorRole = string;
 export type ChipContainerColor = string;

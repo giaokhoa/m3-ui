@@ -13,24 +13,15 @@ These rules are intentionally strict. They exist to prevent the token pipeline f
 5. Do not recreate `scripts/compose-sync`, `packages/tokens/src/generated/androidx`, or any equivalent upstream-to-runtime snapshot generator.
 6. Dynamic Material colors belong to `ThemeProvider`; canonical component color tokens contain runtime strings such as `var(--primary)`, not static hex fallbacks.
 7. Non-color design tokens are generated static values, not global CSS variables. An explicit runtime theme override such as font-family is a theme concern, not token transport.
-8. `packages/tokens/src/*.ts` may exist only as compatibility/projection facades. They may reshape generated values or convert CSS lengths/durations for arithmetic, but may not own immutable design values.
+8. `packages/tokens` has no handwritten runtime `src/` layer. UI-local projections may reshape generated values for arithmetic or behavior, but may only consume the package-root `@m3/tokens` API and may not own immutable design values.
 9. Component code may contain runtime behavior and derived calculations, but must not duplicate canonical token constants.
 10. A new upstream revision is adopted by reviewing canonical changes and audit drift; never by regenerating canonical files from upstream.
 
-The token package enforces the most important invariants in `packages/tokens/scripts/architecture.test.mjs`. Repository-specific Style Dictionary rules live in `/.agents/skills/style-dictionary/SKILL.md`.
+The token package enforces these boundaries in `packages/tokens/scripts/architecture.test.mjs`. Repository-specific Style Dictionary rules live in `/.agents/skills/style-dictionary/SKILL.md`.
 
 ## What “1:1” means
 
-A component is considered parity-complete when the web implementation matches the relevant Material contract for:
-
-- public variants and defaults;
-- semantic color-role mapping;
-- enabled, disabled, hovered, pressed, focused, selected, error, and related states;
-- layout metrics, minimum sizes, spacing, shape, elevation, and state layers;
-- controlled/uncontrolled behavior where a web equivalent exists;
-- accessibility semantics translated to native HTML/ARIA conventions;
-- visual output for equivalent theme inputs;
-- documented edge cases and relevant upstream regression behavior.
+A component is considered parity-complete when the web implementation matches the relevant Material contract for public variants/defaults, semantic color roles, interaction states, layout metrics, minimum sizes, spacing, shape, elevation, state layers, controlled/uncontrolled behavior where applicable, web accessibility semantics, equivalent-theme visual output, and documented edge cases.
 
 Parity does **not** mean reproducing Compose runtime abstractions. Do not port `Modifier`, `@Composable`, `CompositionLocal`, Kotlin data classes, `Dp` wrappers, or `MutableInteractionSource` literally when React, CSS, the DOM, or React Aria already provide the correct web abstraction.
 
@@ -52,7 +43,10 @@ Material Web ─────┘                ▲
                     tokens.js          tokens.d.ts
                          │
                          ▼
-              projections / UI consumers
+                @m3/tokens package root
+                         │
+                         ▼
+            UI-local projections / consumers
 ```
 
 AndroidX revision and file mappings live only in audit code under `packages/tokens/scripts/androidx/` and `packages/tokens/scripts/audit-androidx.mjs`. Audit code may fetch and parse pinned upstream files in memory; it has no renderer/write path into canonical tokens.
@@ -62,11 +56,9 @@ AndroidX revision and file mappings live only in audit code under `packages/toke
 ```text
 canonical DTCG
     ↓
-Style Dictionary generated API
+Style Dictionary generated @m3/tokens root
     ↓
-optional token projection facades
-    ↓
-theme foundations / internal primitives
+UI-local projections / theme foundations / internal primitives
     ↓
 component defaults
     ↓
@@ -75,7 +67,7 @@ public components
 apps / consumers
 ```
 
-Lower layers must not depend on public components. Production code must never import from test fixtures.
+Lower layers must not depend on public components. Production code must never import from test fixtures. UI source must not import `@m3/tokens/*` subpaths.
 
 ## Dynamic colors and CSS variables
 
@@ -104,7 +96,7 @@ Do not turn runtime semantic roles into fake concrete DTCG colors. Do not genera
 | visual `CompositionLocal` | CSS cascade where appropriate |
 | behavioral `CompositionLocal` | React Context only when JS access is required |
 | `Color` | CSS color string / semantic runtime role |
-| `Dp` | generated CSS length or numeric projection at arithmetic boundary |
+| `Dp` | generated CSS length or UI-local numeric projection at arithmetic boundary |
 | `Shape` | generated shape token / CSS radius |
 | `TextStyle` | generated typography values mapped to CSS |
 | `Modifier` | props + class names + CSS layout |
@@ -122,7 +114,7 @@ Before implementing a new component family:
 3. Add or update canonical DTCG manually under `packages/tokens/tokens/`; alias shared core tokens when semantic identity is genuinely shared.
 4. Extend read-only AndroidX/Figma audit mappings where a meaningful upstream counterpart exists. Compare semantic color/elevation/shape/typography identity rather than unrelated serialized representations.
 5. Let Style Dictionary generate JS and `.d.ts`; do not write a parallel TypeScript generator.
-6. Consume generated values directly or through a projection facade with no design literals.
+6. Import generated values from `@m3/tokens` root. If arithmetic or component ergonomics require projection, keep that projection local to the actual `@m3/ui` consumer and free of design literals.
 7. Implement behavior with React Aria/native HTML and CSS-first visual states.
 8. Add token/default/behavior/layout tests and Storybook visual regression coverage.
 9. Document intentional web differences.
@@ -131,16 +123,7 @@ If an upstream value does not map cleanly to the web implementation, document th
 
 ## Testing layers
 
-Every substantial port should be covered by:
-
-- **canonical validation** — DTCG shape, aliases, duplicates, cycles and supported types;
-- **generated-output tests** — real pinned Style Dictionary JS/TS output;
-- **read-only upstream audit** — semantic comparison against pinned AndroidX/Figma references where applicable;
-- **defaults/layout tests** — independent expected behavior and dimensions;
-- **interaction/accessibility tests** — React Aria/native semantics;
-- **Chromium visual regression** — covered Storybook states.
-
-Expected test data must not be generated from the production resolver being tested.
+Every substantial port should be covered by canonical validation, generated-output tests, read-only upstream audit where applicable, defaults/layout tests, interaction/accessibility tests, and Chromium Storybook visual regression. Expected test data must not be generated from the production resolver being tested.
 
 ## Review checklist
 
@@ -148,10 +131,11 @@ A component/token change is not ready until reviewers can answer yes to all rele
 
 - Is every immutable design value canonical DTCG or a deliberate runtime-derived value?
 - Does Style Dictionary remain the sole token build engine?
+- Does `@m3/tokens` expose only its generated package-root API?
 - Are upstream sources read-only and pinned?
 - Are dynamic colors runtime CSS-role references rather than static hex fallbacks?
 - Are non-color design tokens kept out of generic global CSS variables?
-- Are token projection facades free of design literals?
+- Are UI-local projections free of design literals and token subpath imports?
 - Are React Aria/native semantics used where available?
 - Are audit/test fixtures independent from production output?
 - Are intentional web adaptations documented?

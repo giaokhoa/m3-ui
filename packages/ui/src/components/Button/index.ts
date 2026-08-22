@@ -11,4 +11,4 @@ export {
   type ButtonShapes,
   type ButtonShapeValue,
 } from './Button.defaults';
-export type { ButtonSize } from '@m3/tokens/button';
+export type { ButtonSize } from './Button.types';

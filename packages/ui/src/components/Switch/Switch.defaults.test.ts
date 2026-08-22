@@ -1,4 +1,4 @@
-import * as token from '@m3/tokens/generated';
+import * as token from '@m3/tokens';
 import { describe, expect, it } from 'vitest';
 import {
   switchBaseStyle,
@@ -34,26 +34,16 @@ describe('Switch defaults', () => {
     expect(style['--_switch-checked-border-color']).toBe('transparent');
     expect(style['--_switch-checked-icon-color']).toBe('var(--on-primary-container)');
     expect(style['--_switch-unchecked-thumb-color']).toBe('var(--outline)');
-    expect(style['--_switch-unchecked-track-color']).toBe(
-      'var(--surface-container-highest)',
-    );
+    expect(style['--_switch-unchecked-track-color']).toBe('var(--surface-container-highest)');
     expect(style['--_switch-unchecked-border-color']).toBe('var(--outline)');
   });
 
   it('composites generated disabled colors over Surface', () => {
     expect(style['--_switch-disabled-checked-thumb-color']).toBe('var(--surface)');
-    expect(style['--_switch-disabled-checked-track-color']).toBe(
-      'color-mix(in srgb, var(--on-surface) 12%, var(--surface))',
-    );
-    expect(style['--_switch-disabled-unchecked-thumb-color']).toBe(
-      'color-mix(in srgb, var(--on-surface) 38%, var(--surface))',
-    );
-    expect(style['--_switch-disabled-unchecked-track-color']).toBe(
-      'color-mix(in srgb, var(--surface-container-highest) 12%, var(--surface))',
-    );
-    expect(style['--_switch-disabled-unchecked-border-color']).toBe(
-      'color-mix(in srgb, var(--on-surface) 12%, var(--surface))',
-    );
+    expect(style['--_switch-disabled-checked-track-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, var(--surface))');
+    expect(style['--_switch-disabled-unchecked-thumb-color']).toBe('color-mix(in srgb, var(--on-surface) 38%, var(--surface))');
+    expect(style['--_switch-disabled-unchecked-track-color']).toBe('color-mix(in srgb, var(--surface-container-highest) 12%, var(--surface))');
+    expect(style['--_switch-disabled-unchecked-border-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, var(--surface))');
   });
 
   it('uses canonical FastSpatial web adaptation values', () => {

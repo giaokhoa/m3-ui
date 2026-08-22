@@ -1,4 +1,3 @@
-import { checkboxTokens } from '@m3/tokens/checkbox';
 import { useState, type ReactNode } from 'react';
 import {
   Checkbox as AriaCheckbox,
@@ -6,6 +5,7 @@ import {
 } from 'react-aria-components';
 import { Ripple, useRipple, type RippleStateInteraction } from '../../internal/ripple';
 import { checkboxBaseStyle } from './Checkbox.defaults';
+import { checkboxTokens } from './Checkbox.tokens';
 import './checkbox.css';
 
 export interface CheckboxProps extends AriaCheckboxProps {}
@@ -36,12 +36,8 @@ function latestStateLayerInteraction(
 ): RippleStateInteraction | null {
   for (let index = active.length - 1; index >= 0; index -= 1) {
     const interaction = active[index];
-    if (interaction === 'hover') {
-      return 'hover';
-    }
-    if (interaction === 'focus' && isFocusVisible) {
-      return 'focus';
-    }
+    if (interaction === 'hover') return 'hover';
+    if (interaction === 'focus' && isFocusVisible) return 'focus';
   }
   return null;
 }
@@ -52,6 +48,13 @@ function resolveChildren(
 ) {
   return typeof children === 'function' ? children(renderProps) : children;
 }
+
+function point(x: number, y: number): string {
+  return `${x * checkboxTokens.containerSize} ${y * checkboxTokens.containerSize}`;
+}
+
+const checkPath = `M ${point(checkboxTokens.checkPath.leftX, checkboxTokens.checkPath.leftY)} L ${point(checkboxTokens.checkPath.crossX, checkboxTokens.checkPath.crossY)} L ${point(checkboxTokens.checkPath.rightX, checkboxTokens.checkPath.rightY)}`;
+const indeterminatePath = `M ${point(checkboxTokens.checkPath.leftX, checkboxTokens.checkPath.leftY)} L ${point(checkboxTokens.checkPath.rightX, checkboxTokens.checkPath.leftY)}`;
 
 export function Checkbox({
   children,
@@ -69,35 +72,28 @@ export function Checkbox({
     origin: 'center',
     radius: checkboxTokens.stateLayerSize / 2,
   });
-  const [activeInteractions, setActiveInteractions] = useState<
-    StateLayerInteraction[]
-  >([]);
+  const [activeInteractions, setActiveInteractions] = useState<StateLayerInteraction[]>([]);
 
   const handleHoverStart: AriaCheckboxProps['onHoverStart'] = (event) => {
     setActiveInteractions((active) => startInteraction(active, 'hover'));
     onHoverStart?.(event);
   };
-
   const handleHoverEnd: AriaCheckboxProps['onHoverEnd'] = (event) => {
     setActiveInteractions((active) => endInteraction(active, 'hover'));
     onHoverEnd?.(event);
   };
-
   const handleFocus: AriaCheckboxProps['onFocus'] = (event) => {
     setActiveInteractions((active) => startInteraction(active, 'focus'));
     onFocus?.(event);
   };
-
   const handleBlur: AriaCheckboxProps['onBlur'] = (event) => {
     setActiveInteractions((active) => endInteraction(active, 'focus'));
     onBlur?.(event);
   };
-
   const handlePressStart: AriaCheckboxProps['onPressStart'] = (event) => {
     ripple.onPressStart(event);
     onPressStart?.(event);
   };
-
   const handlePressEnd: AriaCheckboxProps['onPressEnd'] = (event) => {
     ripple.onPressEnd();
     onPressEnd?.(event);
@@ -107,8 +103,7 @@ export function Checkbox({
     <AriaCheckbox
       {...props}
       className={(renderProps) => {
-        const userClassName =
-          typeof className === 'function' ? className(renderProps) : className;
+        const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return userClassName ? `m3-checkbox ${userClassName}` : 'm3-checkbox';
       }}
       style={(renderProps) => {
@@ -129,7 +124,6 @@ export function Checkbox({
             ? 'checked'
             : 'unchecked';
         const label = resolveChildren(children, renderProps);
-
         return (
           <>
             <span className="m3-checkbox__control-slot" aria-hidden="true">
@@ -139,28 +133,17 @@ export function Checkbox({
                   focusRingInset={checkboxFocusRingInset}
                   focusRingRadius={checkboxFocusRingRadius}
                   isFocusVisible={renderProps.isFocusVisible}
-                  stateInteraction={latestStateLayerInteraction(
-                    activeInteractions,
-                    renderProps.isFocusVisible,
-                  )}
+                  stateInteraction={latestStateLayerInteraction(activeInteractions, renderProps.isFocusVisible)}
                 />
               </span>
               <span className="m3-checkbox__box" data-state={state}>
                 <svg
                   className="m3-checkbox__mark"
-                  viewBox="0 0 18 18"
+                  viewBox={`0 0 ${checkboxTokens.containerSize} ${checkboxTokens.containerSize}`}
                   focusable="false"
                 >
-                  <path
-                    className="m3-checkbox__check-path"
-                    pathLength="1"
-                    d="M 4.5 9 L 7.2 11.7 L 13.5 5.4"
-                  />
-                  <path
-                    className="m3-checkbox__indeterminate-path"
-                    pathLength="1"
-                    d="M 4.5 9 L 13.5 9"
-                  />
+                  <path className="m3-checkbox__check-path" pathLength="1" d={checkPath} />
+                  <path className="m3-checkbox__indeterminate-path" pathLength="1" d={indeterminatePath} />
                 </svg>
               </span>
             </span>

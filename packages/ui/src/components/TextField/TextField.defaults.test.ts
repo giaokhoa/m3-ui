@@ -1,18 +1,15 @@
-import {
-  filledTextFieldTokens,
-  outlinedTextFieldTokens,
-} from '@m3/tokens/text-field';
 import { describe, expect, it } from 'vitest';
 import {
   filledTextFieldBaseStyle,
   outlinedTextFieldBaseStyle,
 } from './TextField.defaults';
+import {
+  filledTextFieldTokens,
+  outlinedTextFieldTokens,
+} from './TextField.tokens';
 
 const filledStyle = filledTextFieldBaseStyle as Record<string, string | number>;
-const outlinedStyle = outlinedTextFieldBaseStyle as Record<
-  string,
-  string | number
->;
+const outlinedStyle = outlinedTextFieldBaseStyle as Record<string, string | number>;
 
 describe('filled TextField defaults', () => {
   it('matches the current Compose size, shape and indicator defaults', () => {
@@ -24,10 +21,7 @@ describe('filled TextField defaults', () => {
       bottomEndRadius: 0,
       bottomStartRadius: 0,
     });
-    expect(filledTextFieldTokens.indicator).toEqual({
-      unfocusedThickness: 1,
-      focusedThickness: 2,
-    });
+    expect(filledTextFieldTokens.indicator).toEqual({ unfocusedThickness: 1, focusedThickness: 2 });
   });
 
   it('matches current internal layout spacing', () => {
@@ -41,11 +35,7 @@ describe('filled TextField defaults', () => {
     });
     expect(filledTextFieldTokens.iconSize).toBe(24);
     expect(filledTextFieldTokens.iconSlotSize).toBe(48);
-    expect(filledTextFieldTokens.lineHeight).toEqual({
-      inputMin: 24,
-      focusedLabelMin: 16,
-      supportingMin: 16,
-    });
+    expect(filledTextFieldTokens.lineHeight).toEqual({ inputMin: 24, focusedLabelMin: 16, supportingMin: 16 });
   });
 
   it('uses BodyLarge for input and BodySmall for minimized/supporting text', () => {
@@ -66,13 +56,9 @@ describe('filled TextField defaults', () => {
   });
 
   it('maps Material color roles through short ThemeProvider variables', () => {
-    expect(filledStyle['--_text-field-container-color']).toBe(
-      'var(--surface-container-highest)',
-    );
+    expect(filledStyle['--_text-field-container-color']).toBe('var(--surface-container-highest)');
     expect(filledStyle['--_text-field-text-color']).toBe('var(--on-surface)');
-    expect(filledStyle['--_text-field-focused-indicator-color']).toBe(
-      'var(--primary)',
-    );
+    expect(filledStyle['--_text-field-focused-indicator-color']).toBe('var(--primary)');
     expect(filledStyle['--_text-field-error-indicator-color']).toBe('var(--error)');
     expect(filledStyle['--_text-field-focused-label-color']).toBe('var(--primary)');
     expect(filledStyle['--_text-field-error-label-color']).toBe('var(--error)');
@@ -81,12 +67,8 @@ describe('filled TextField defaults', () => {
   it('maps current standard FastEffects and FastSpatial motion', () => {
     expect(filledStyle['--_text-field-fast-effects-duration']).toBe('108ms');
     expect(filledStyle['--_text-field-fast-spatial-duration']).toBe('137ms');
-    expect(String(filledStyle['--_text-field-fast-effects-easing'])).toContain(
-      'linear(',
-    );
-    expect(String(filledStyle['--_text-field-fast-spatial-easing'])).toContain(
-      'linear(',
-    );
+    expect(String(filledStyle['--_text-field-fast-effects-easing'])).toContain('linear(');
+    expect(String(filledStyle['--_text-field-fast-spatial-easing'])).toContain('linear(');
   });
 });
 
@@ -122,22 +104,16 @@ describe('outlined TextField defaults', () => {
   });
 
   it('shares Material text typography and motion with filled fields', () => {
-    expect(outlinedTextFieldTokens.typography).toEqual(
-      filledTextFieldTokens.typography,
-    );
+    expect(outlinedTextFieldTokens.typography).toEqual(filledTextFieldTokens.typography);
     expect(outlinedTextFieldTokens.motion).toEqual(filledTextFieldTokens.motion);
   });
 
   it('maps outline states through ThemeProvider roles', () => {
     expect(outlinedStyle['--_text-field-container-color']).toBe('transparent');
     expect(outlinedStyle['--_text-field-outline-color']).toBe('var(--outline)');
-    expect(outlinedStyle['--_text-field-focused-outline-color']).toBe(
-      'var(--primary)',
-    );
+    expect(outlinedStyle['--_text-field-focused-outline-color']).toBe('var(--primary)');
     expect(outlinedStyle['--_text-field-error-outline-color']).toBe('var(--error)');
-    expect(outlinedStyle['--_text-field-disabled-outline-color']).toBe(
-      'var(--on-surface)',
-    );
+    expect(outlinedStyle['--_text-field-disabled-outline-color']).toBe('var(--on-surface)');
     expect(outlinedStyle['--_text-field-disabled-outline-opacity']).toBe(0.12);
     expect(outlinedStyle['--_text-field-outline-width']).toBe('1px');
     expect(outlinedStyle['--_text-field-outline-focused-width']).toBe('2px');

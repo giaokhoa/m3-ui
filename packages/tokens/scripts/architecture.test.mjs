@@ -1,37 +1,34 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import test from 'node:test';
 
 const packageRoot = new URL('../', import.meta.url);
 const repoRoot = new URL('../../../', import.meta.url);
+const uiSourceRoot = new URL('../ui/src/', packageRoot);
 
-const valueFacades = [
-  'card.ts',
-  'checkbox.ts',
-  'chip.ts',
-  'elevation.ts',
-  'motion.ts',
-  'radio-button.ts',
-  'ripple.ts',
-  'state.ts',
-  'text-field.ts',
-  'typography.ts',
-];
+async function sourceFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
 
-test('value facades project Style Dictionary output instead of owning upstream snapshots', async () => {
-  for (const file of valueFacades) {
-    const source = await readFile(new URL(`src/${file}`, packageRoot), 'utf8');
-    assert.match(source, /@m3\/tokens\/generated/, `${file} must consume generated tokens`);
-    assert.doesNotMatch(source, /generated\/androidx/, `${file} must not consume an AndroidX snapshot`);
+  for (const entry of entries) {
+    const url = new URL(entry.name, directory);
+    if (entry.isDirectory()) {
+      files.push(...(await sourceFiles(new URL(`${entry.name}/`, directory))));
+    } else if (/\.(?:ts|tsx|js|mjs)$/.test(entry.name)) {
+      files.push(url);
+    }
   }
-});
 
-test('legacy upstream-to-runtime and dead root-facade paths stay deleted', async () => {
-  await assert.rejects(access(new URL('src/generated/androidx', packageRoot)));
-  await assert.rejects(access(new URL('src/index.ts', packageRoot)));
-  await assert.rejects(access(new URL('scripts/compose-sync', repoRoot)));
+  return files;
+}
 
-  const rootManifest = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'));
+test('handwritten token runtime and upstream-sync layers stay deleted', async () => {
+  await assert.rejects(access(new URL('src/', packageRoot)));
+  await assert.rejects(access(new URL('scripts/compose-sync/', repoRoot)));
+
+  const rootManifest = JSON.parse(
+    await readFile(new URL('package.json', repoRoot), 'utf8'),
+  );
   for (const [name, command] of Object.entries(rootManifest.scripts ?? {})) {
     assert.doesNotMatch(
       `${name} ${command}`,
@@ -43,17 +40,45 @@ test('legacy upstream-to-runtime and dead root-facade paths stay deleted', async
 
 test('Style Dictionary reads only canonical DTCG and emits only typed JS artifacts', async () => {
   const configUrl = new URL('style-dictionary.config.mjs', packageRoot);
-  const { default: config } = await import(`${configUrl.href}?architecture=${Date.now()}`);
+  const { default: config } = await import(
+    `${configUrl.href}?architecture=${Date.now()}`
+  );
 
   assert.deepEqual(config.source, ['tokens/**/*.json']);
-  assert.equal(Object.hasOwn(config, 'include'), false, 'upstream references must never be Style Dictionary includes');
-  assert.deepEqual(Object.keys(config.platforms), ['js'], 'generic CSS-variable platforms are forbidden');
+  assert.equal(
+    Object.hasOwn(config, 'include'),
+    false,
+    'upstream references must never be Style Dictionary includes',
+  );
+  assert.deepEqual(
+    Object.keys(config.platforms),
+    ['js'],
+    'generic CSS-variable platforms are forbidden',
+  );
 });
 
-test('package root is the Style Dictionary generated API', async () => {
-  const manifest = JSON.parse(await readFile(new URL('package.json', packageRoot), 'utf8'));
+test('package exposes only the Style Dictionary generated root API', async () => {
+  const manifest = JSON.parse(
+    await readFile(new URL('package.json', packageRoot), 'utf8'),
+  );
+
   assert.equal(manifest.main, './dist/generated/tokens.js');
+  assert.equal(manifest.module, './dist/generated/tokens.js');
   assert.equal(manifest.types, './dist/generated/tokens.d.ts');
+  assert.deepEqual(Object.keys(manifest.exports), ['.']);
   assert.equal(manifest.exports['.'].import, './dist/generated/tokens.js');
   assert.equal(manifest.exports['.'].types, './dist/generated/tokens.d.ts');
+  assert.doesNotMatch(manifest.scripts.build, /\btsc\b/);
+  assert.equal(Object.hasOwn(manifest.scripts, 'typecheck'), false);
+});
+
+test('UI consumes @m3/tokens through the package root only', async () => {
+  for (const file of await sourceFiles(uiSourceRoot)) {
+    const source = await readFile(file, 'utf8');
+    assert.doesNotMatch(
+      source,
+      /['"]@m3\/tokens\//,
+      `${file.pathname} must import @m3/tokens through the package root`,
+    );
+  }
 });

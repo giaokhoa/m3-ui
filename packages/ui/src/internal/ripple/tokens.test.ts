@@ -1,41 +1,40 @@
-import { rippleTokens } from '@m3/tokens/ripple';
-import { stateLayerOpacity } from '@m3/tokens/state';
+import * as token from '@m3/tokens';
 import { describe, expect, it } from 'vitest';
 
-describe('ripple tokens', () => {
+describe('ripple generated tokens', () => {
   it('matches current Material 3 state-layer opacity', () => {
-    expect(stateLayerOpacity).toEqual({
-      dragged: 0.16,
-      focus: 0.1,
-      hover: 0.08,
-      pressed: 0.1,
-    });
+    expect({
+      dragged: token.StateLayerOpacityDragged,
+      focus: token.StateLayerOpacityFocus,
+      hover: token.StateLayerOpacityHover,
+      pressed: token.StateLayerOpacityPressed,
+    }).toEqual({ dragged: 0.16, focus: 0.1, hover: 0.08, pressed: 0.1 });
   });
 
   it('matches current Compose Material3 ripple motion', () => {
-    expect(rippleTokens.radiusDurationMs).toBe(225);
-    expect(rippleTokens.minimumPressDurationMs).toBe(225);
-    expect(rippleTokens.hoverTransitionDurationMs).toBe(15);
-    expect(rippleTokens.focusInTransitionDurationMs).toBe(45);
-    expect(rippleTokens.fadeInDurationMs).toBe(75);
-    expect(rippleTokens.fadeOutDurationMs).toBe(150);
-    expect(rippleTokens.boundedExtraRadius).toBe(10);
-    expect(rippleTokens.startRadiusLargestDimensionFactor).toBe(0.3);
-    expect(rippleTokens.radiusEasing).toBe('cubic-bezier(0.4, 0, 0.2, 1)');
-    expect(rippleTokens.centerEasing).toBe('linear');
-    expect(rippleTokens.opacityEasing).toBe('linear');
+    expect(token.RippleRadiusDuration).toBe('225ms');
+    expect(token.RippleMinimumPressDuration).toBe('225ms');
+    expect(token.RippleHoverTransitionDuration).toBe('15ms');
+    expect(token.RippleFocusInTransitionDuration).toBe('45ms');
+    expect(token.RippleFadeInDuration).toBe('75ms');
+    expect(token.RippleFadeOutDuration).toBe('150ms');
+    expect(token.RippleBoundedExtraRadius).toBe('10px');
+    expect(token.RippleStartRadiusLargestDimensionFactor).toBe(0.3);
+    expect(token.RippleRadiusEasing).toBe('cubic-bezier(0.4, 0, 0.2, 1)');
+    expect(token.RippleCenterEasing).toBe('linear');
+    expect(token.RippleOpacityEasing).toBe('linear');
   });
 
   it('matches the pinned AndroidX inset focus ring theme defaults', () => {
-    expect(rippleTokens.focusRing.outerStrokeInset).toBe(0);
-    expect(rippleTokens.focusRing.outerStrokeWidth).toBe(2);
-    expect(rippleTokens.focusRing.innerStrokeInset).toBe(1);
-    expect(rippleTokens.focusRing.innerStrokeWidth).toBe(3);
-    expect(rippleTokens.focusRing.outerStrokeColorRole).toBe('secondary');
-    expect(rippleTokens.focusRing.innerStrokeColorRole).toBe('onSecondary');
-    expect(rippleTokens.focusRing.focusIn.durationMs).toBe(137);
-    expect(rippleTokens.focusRing.focusOut.durationMs).toBe(108);
-    expect(rippleTokens.focusRing.focusIn.easing).toContain('linear(');
-    expect(rippleTokens.focusRing.focusOut.easing).toContain('linear(');
+    expect(token.RippleFocusRingOuterStrokeInset).toBe('0px');
+    expect(token.RippleFocusRingOuterStrokeWidth).toBe('2px');
+    expect(token.RippleFocusRingInnerStrokeInset).toBe('1px');
+    expect(token.RippleFocusRingInnerStrokeWidth).toBe('3px');
+    expect(token.RippleFocusRingOuterStrokeColor).toBe('var(--secondary)');
+    expect(token.RippleFocusRingInnerStrokeColor).toBe('var(--on-secondary)');
+    expect(token.RippleFocusRingFocusInDuration).toBe('137ms');
+    expect(token.RippleFocusRingFocusOutDuration).toBe('108ms');
+    expect(token.RippleFocusRingFocusInEasing).toContain('linear(');
+    expect(token.RippleFocusRingFocusOutEasing).toContain('linear(');
   });
 });

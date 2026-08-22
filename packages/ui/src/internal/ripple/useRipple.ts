@@ -1,5 +1,9 @@
-import { rippleTokens } from '@m3/tokens/ripple';
+import {
+  RippleFadeOutDuration,
+  RippleMinimumPressDuration,
+} from '@m3/tokens';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { msNumber } from '../tokenValues';
 import { getRippleWaveGeometry } from './geometry';
 import type { RippleOrigin, RipplePressEvent, RippleWave } from './types';
 
@@ -14,6 +18,9 @@ export interface RippleController {
   onPressStart(event: RipplePressEvent): void;
   onPressEnd(): void;
 }
+
+const fadeOutDurationMs = msNumber(RippleFadeOutDuration);
+const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
 
 export function useRipple({
   origin = 'press',
@@ -45,7 +52,7 @@ export function useRipple({
       schedule(() => {
         setWaves((current) => current.filter((wave) => wave.id !== id));
         startedAt.current.delete(id);
-      }, rippleTokens.fadeOutDurationMs);
+      }, fadeOutDurationMs);
     },
     [schedule],
   );
@@ -74,25 +81,17 @@ export function useRipple({
 
   const onPressEnd = useCallback(() => {
     const id = activeWaveId.current;
-    if (id === null) {
-      return;
-    }
+    if (id === null) return;
 
     activeWaveId.current = null;
     const elapsed = Date.now() - (startedAt.current.get(id) ?? Date.now());
-    const remaining = Math.max(
-      0,
-      rippleTokens.minimumPressDurationMs - elapsed,
-    );
-
+    const remaining = Math.max(0, minimumPressDurationMs - elapsed);
     schedule(() => releaseWave(id), remaining);
   }, [releaseWave, schedule]);
 
   useEffect(
     () => () => {
-      for (const timer of timers.current) {
-        clearTimeout(timer);
-      }
+      for (const timer of timers.current) clearTimeout(timer);
       timers.current.clear();
     },
     [],

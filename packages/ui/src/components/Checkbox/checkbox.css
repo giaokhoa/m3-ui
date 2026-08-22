@@ -125,7 +125,11 @@
 }
 
 .m3-checkbox[data-disabled] .m3-checkbox__label {
-  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--on-surface) var(--_checkbox-disabled-label-opacity),
+    transparent
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
