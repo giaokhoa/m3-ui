@@ -1,0 +1,16 @@
+{
+  "component": {
+    "dialog": {
+      "actionFocusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionFocusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+      "actionHoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionHoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+      "actionPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionPressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+    },
+    "sheetBottom": {
+      "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+      "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" }
+    }
+  }
+}
