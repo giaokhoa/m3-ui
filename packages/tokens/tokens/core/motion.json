@@ -1,0 +1,63 @@
+{
+  "motion": {
+    "easing": {
+      "linear": { "$type": "string", "$value": "linear" },
+      "standard": { "$type": "string", "$value": "cubic-bezier(0.2, 0, 0, 1)" },
+      "standardAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,1,1)" },
+      "standardDecelerate": { "$type": "string", "$value": "cubic-bezier(0,0,0,1)" },
+      "emphasized": { "$type": "string", "$value": "cubic-bezier(.3,0,0,1)" },
+      "emphasizedAccelerate": { "$type": "string", "$value": "cubic-bezier(.3,0,.8,.15)" },
+      "emphasizedDecelerate": { "$type": "string", "$value": "cubic-bezier(.05,.7,.1,1)" }
+    },
+    "duration": {
+      "short1": { "$type": "string", "$value": "50ms" },
+      "short2": { "$type": "string", "$value": "100ms" },
+      "short3": { "$type": "string", "$value": "150ms" },
+      "short4": { "$type": "string", "$value": "200ms" },
+      "medium1": { "$type": "string", "$value": "250ms" },
+      "medium2": { "$type": "string", "$value": "300ms" },
+      "medium3": { "$type": "string", "$value": "350ms" },
+      "medium4": { "$type": "string", "$value": "400ms" },
+      "long1": { "$type": "string", "$value": "450ms" },
+      "long2": { "$type": "string", "$value": "500ms" },
+      "long3": { "$type": "string", "$value": "550ms" },
+      "long4": { "$type": "string", "$value": "600ms" },
+      "extraLong1": { "$type": "string", "$value": "700ms" },
+      "extraLong2": { "$type": "string", "$value": "800ms" },
+      "extraLong3": { "$type": "string", "$value": "900ms" },
+      "extraLong4": { "$type": "string", "$value": "1000ms" }
+    },
+    "spring": {
+      "defaultEffects": {
+        "duration": { "$type": "string", "$value": "166ms" },
+        "easing": { "$type": "string", "$value": "linear(0, 0.1434 10%, 0.3831 20%, 0.5918 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9689 80%, 0.9823 90%, 1)" }
+      },
+      "fastEffects": {
+        "duration": { "$type": "string", "$value": "108ms" },
+        "easing": { "$type": "string", "$value": "linear(0, 0.1434 10%, 0.383 20%, 0.5917 30%, 0.7432 40%, 0.8438 50%, 0.9072 60%, 0.9459 70%, 0.9688 80%, 0.9823 90%, 1)" }
+      },
+      "defaultSpatial": {
+        "duration": { "$type": "string", "$value": "194ms" },
+        "easing": { "$type": "string", "$value": "linear(0, 0.0968 10%, 0.2871 20%, 0.4824 30%, 0.647 40%, 0.7717 50%, 0.8596 60%, 0.9181 70%, 0.9551 80%, 0.9774 90%, 1)" }
+      },
+      "fastSpatial": {
+        "duration": { "$type": "string", "$value": "137ms" },
+        "easing": { "$type": "string", "$value": "linear(0, 0.0969 10%, 0.2872 20%, 0.4827 30%, 0.6472 40%, 0.7719 50%, 0.8598 60%, 0.9183 70%, 0.9552 80%, 0.9774 90%, 1)" }
+      }
+    },
+    "elevation": {
+      "incoming": {
+        "duration": { "$type": "string", "$value": "120ms" },
+        "easing": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.2, 1)" }
+      },
+      "outgoing": {
+        "duration": { "$type": "string", "$value": "150ms" },
+        "easing": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.6, 1)" }
+      },
+      "hoveredOutgoing": {
+        "duration": { "$type": "string", "$value": "120ms" },
+        "easing": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.6, 1)" }
+      }
+    }
+  }
+}

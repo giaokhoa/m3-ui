@@ -16,14 +16,17 @@ test('Style Dictionary emits runtime color strings and standard dimensions', asy
   assert.equal(generated.ComponentButtonVariantElevatedHoveredElevation, 'level2');
 });
 
-test('Style Dictionary emits Switch runtime adaptations without custom formatters', async () => {
+test('Style Dictionary emits shared motion, typography and ripple tokens', async () => {
   const url = new URL('../dist/generated/tokens.js', import.meta.url);
-  const generated = await import(`${url.href}?switch=${Date.now()}`);
+  const generated = await import(`${url.href}?core=${Date.now()}`);
 
-  assert.equal(generated.ComponentSwitchDisabledOpacityTrack, 0.12);
-  assert.equal(generated.ComponentSwitchDisabledOpacityUncheckedThumb, 0.38);
+  assert.equal(generated.MotionSpringFastSpatialDuration, '137ms');
+  assert.match(generated.MotionSpringFastEffectsEasing, /^linear\(/);
+  assert.equal(generated.TypographyBodyLargeFontSize, '16px');
+  assert.equal(generated.TypefacePlain, 'Roboto');
+  assert.equal(generated.RippleFadeOutDuration, '150ms');
+  assert.equal(generated.RippleFocusRingOuterStrokeColor, 'var(--secondary)');
   assert.equal(generated.ComponentSwitchMotionGeometryDuration, '137ms');
-  assert.match(generated.ComponentSwitchMotionGeometryEasing, /^linear\(/);
 });
 
 test('Style Dictionary emits TypeScript declarations with literal string values', async () => {
@@ -36,5 +39,6 @@ test('Style Dictionary emits TypeScript declarations with literal string values'
   assert.match(declarations, /var\(--primary\)/);
   assert.match(declarations, /ComponentButtonSizeMediumPaddingBlock/);
   assert.match(declarations, /ShapeMedium/);
-  assert.match(declarations, /ComponentSwitchMotionGeometryDuration/);
+  assert.match(declarations, /MotionSpringFastSpatialDuration/);
+  assert.match(declarations, /RippleFocusRingOuterStrokeColor/);
 });

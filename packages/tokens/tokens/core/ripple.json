@@ -1,0 +1,31 @@
+{
+  "ripple": {
+    "radiusDuration": { "$type": "string", "$value": "225ms" },
+    "minimumPressDuration": { "$type": "string", "$value": "225ms" },
+    "hoverTransitionDuration": { "$type": "string", "$value": "15ms" },
+    "focusInTransitionDuration": { "$type": "string", "$value": "45ms" },
+    "fadeInDuration": { "$type": "string", "$value": "75ms" },
+    "fadeOutDuration": { "$type": "string", "$value": "{motion.duration.short3}" },
+    "boundedExtraRadius": { "$type": "dimension", "$value": { "value": 10, "unit": "px" } },
+    "startRadiusLargestDimensionFactor": { "$type": "number", "$value": 0.3 },
+    "radiusEasing": { "$type": "string", "$value": "cubic-bezier(0.4, 0, 0.2, 1)" },
+    "centerEasing": { "$type": "string", "$value": "{motion.easing.linear}" },
+    "opacityEasing": { "$type": "string", "$value": "{motion.easing.linear}" },
+    "focusRing": {
+      "outerStrokeInset": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+      "outerStrokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "innerStrokeInset": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "innerStrokeWidth": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+      "outerStrokeColor": { "$type": "string", "$value": "var(--secondary)" },
+      "innerStrokeColor": { "$type": "string", "$value": "var(--on-secondary)" },
+      "focusIn": {
+        "duration": { "$type": "string", "$value": "{motion.spring.fastSpatial.duration}" },
+        "easing": { "$type": "string", "$value": "{motion.spring.fastSpatial.easing}" }
+      },
+      "focusOut": {
+        "duration": { "$type": "string", "$value": "{motion.spring.fastEffects.duration}" },
+        "easing": { "$type": "string", "$value": "{motion.spring.fastEffects.easing}" }
+      }
+    }
+  }
+}

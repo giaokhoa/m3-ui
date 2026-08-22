@@ -1,4 +1,9 @@
 {
+  "typeface": {
+    "plain": { "$type": "string", "$value": "Roboto" },
+    "brand": { "$type": "string", "$value": "Roboto" },
+    "fallback": { "$type": "string", "$value": "sans-serif" }
+  },
   "typography": {
     "labelLarge": {
       "fontFamily": { "$type": "string", "$value": "plain" },
@@ -13,6 +18,20 @@
       "lineHeight": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
       "fontWeight": { "$type": "number", "$value": 500 },
       "letterSpacing": { "$type": "dimension", "$value": { "value": 0.2, "unit": "px" } }
+    },
+    "bodyLarge": {
+      "fontFamily": { "$type": "string", "$value": "plain" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 400 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0.5, "unit": "px" } }
+    },
+    "bodySmall": {
+      "fontFamily": { "$type": "string", "$value": "plain" },
+      "fontSize": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "lineHeight": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "fontWeight": { "$type": "number", "$value": 400 },
+      "letterSpacing": { "$type": "dimension", "$value": { "value": 0.4, "unit": "px" } }
     },
     "headlineSmall": {
       "fontFamily": { "$type": "string", "$value": "brand" },
