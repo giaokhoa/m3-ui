@@ -26,8 +26,9 @@ test('value facades project Style Dictionary output instead of owning upstream s
   }
 });
 
-test('legacy upstream-to-runtime sync paths stay deleted', async () => {
+test('legacy upstream-to-runtime and dead root-facade paths stay deleted', async () => {
   await assert.rejects(access(new URL('src/generated/androidx', packageRoot)));
+  await assert.rejects(access(new URL('src/index.ts', packageRoot)));
   await assert.rejects(access(new URL('scripts/compose-sync', repoRoot)));
 
   const rootManifest = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'));
