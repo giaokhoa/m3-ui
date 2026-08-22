@@ -3,8 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -17,67 +16,50 @@ jobs:
   verify:
     name: Test, typecheck, build and visual regression
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
           version: 10.0.0
           run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Inventory pinned Compose token source
         run: pnpm --filter @m3/tokens inventory:compose
-
       - name: Inventory pinned Material Web generated source
         run: pnpm --filter @m3/tokens inventory:material-web
-
       - name: Require complete Compose token coverage
         run: pnpm --filter @m3/tokens coverage:compose:complete
-
       - name: Require complete Material Web token coverage
         run: pnpm --filter @m3/tokens coverage:material-web:complete
-
       - name: Require complete Material 3 union token coverage
         run: pnpm --filter @m3/tokens coverage:union:complete
-
       - name: Require complete Material Web declaration coverage
         run: pnpm --filter @m3/tokens audit:material-web-declarations:complete
-
       - name: Require complete Material Web Button size overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-button-sizes:complete
-
       - name: Require complete Material Web Button variant overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-button-variants:complete
-
       - name: Require complete Material Web generic Button overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-button-generic:complete
-
+      - name: Require complete Material Web Icon Button size overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-icon-button-sizes:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
-
       - name: Test
         run: pnpm test
-
       - name: Typecheck
         run: pnpm typecheck
-
       - name: Build
         run: pnpm build
-
       - name: Install Chromium headless shell
         run: pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium
-
       - name: Visual regression
         run: pnpm --filter @m3/storybook test:visual
