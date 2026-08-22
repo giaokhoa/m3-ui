@@ -53,6 +53,6 @@ const summary = summarizeAudit(results);
 console.log(`AndroidX audit @ ${androidX.revision}`);
 console.log(`match=${summary.match} mismatch=${summary.mismatch} missingCanonical=${summary['missing-canonical']} missingReference=${summary['missing-reference']}`);
 for (const result of results.filter((item) => item.status !== 'match')) {
-  console.error(`- ${result.status}: ${result.canonical} canonical=${JSON.stringify(result.canonical)} reference=${JSON.stringify(result.reference)}`);
+  console.error(`- ${result.status}: ${result.canonical} <- ${result.reference}; canonical=${JSON.stringify(result.canonicalValue)} reference=${JSON.stringify(result.referenceValue)}`);
 }
 if (hasAuditDrift(results)) process.exitCode = 1;
