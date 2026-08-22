@@ -13,6 +13,8 @@ The shared Ripple primitive translates Material 3 Compose indication behavior in
 - `compose/material3/material3-ripple/src/commonMain/kotlin/androidx/compose/material3/ripple/Ripple.kt`
 - `compose/material3/material3-ripple/src/commonMain/kotlin/androidx/compose/material3/ripple/RippleNodeConfiguration.kt`
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/StateTokens.kt`
+- `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/RadioButtonTest.kt`
+- `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/CheckboxTest.kt`
 
 ## Ported runtime contract
 
@@ -29,7 +31,13 @@ The inset focus ring uses the pinned AndroidX defaults:
 - focusing motion: standard `FastSpatial` spring sampled to about 137ms for CSS;
 - unfocusing motion: standard `FastEffects` spring sampled to about 108ms for CSS.
 
-The ring is sized from the entire interaction node, independently of the ripple state-layer radius. This matters for RadioButton and Checkbox, where the interaction target is 48px while the state layer is 40px.
+The focus ring is sized from the indication modifier's coordinator bounds, not from the minimum touch-target layout and not from the state-layer radius. Compose modifier order makes these distinct for compact selection controls:
+
+- Button: the Surface indication follows the visual container bounds; the baseline button is 40px high;
+- Checkbox corrected M3 path: 48px minimum interactive layout, 40px state layer, 18px indication bounds;
+- RadioButton: 48px minimum interactive layout, 40px state layer, 24px indication bounds (`2px + 20px + 2px`).
+
+The web Ripple host still spans each component's interaction slot for wave/state-layer behavior, so Checkbox and RadioButton pass a token-derived `focusRingInset` to center the smaller Compose indication bounds inside that host.
 
 Focus-ring shapes are resolved at component callsites, matching Compose ownership:
 
@@ -51,4 +59,4 @@ Inset focus remains active independently of the latest hover state-layer interac
 
 ## Verification
 
-Unit tests lock Material state-layer and inset-ring constants. Storybook exposes opacity, inset-ring and side-by-side focus previews. Chromium tests verify default opacity behavior, full-target ring bounds, stroke widths/insets/colors, Button/Checkbox/RadioButton shapes, and the independent focus-ring + hover-state-layer case.
+Unit tests lock Material state-layer and inset-ring constants. Storybook exposes opacity, inset-ring and side-by-side focus previews. Chromium tests verify default opacity behavior, stroke widths/insets/colors, Button 40px visual indication bounds, Checkbox 48/40/18 target/state/ring geometry, RadioButton 48/40/24 geometry, component focus-ring shapes, and the independent focus-ring + hover-state-layer case.
