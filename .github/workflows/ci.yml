@@ -53,6 +53,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-icon-button-sizes:complete
       - name: Require complete Material Web Icon Button variant overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-icon-button-variants:complete
+      - name: Require complete Material Web generic Icon Button overlap coverage
+        run: pnpm --filter @m3/tokens audit:material-web-icon-button-generic:complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test

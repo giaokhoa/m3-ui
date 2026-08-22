@@ -29,6 +29,8 @@
     "audit:material-web-icon-button-sizes:complete": "node scripts/audit-material-web-icon-button-sizes.mjs --require-complete",
     "audit:material-web-icon-button-variants": "node scripts/audit-material-web-icon-button-variants.mjs",
     "audit:material-web-icon-button-variants:complete": "node scripts/audit-material-web-icon-button-variants.mjs --require-complete",
+    "audit:material-web-icon-button-generic": "node scripts/audit-material-web-icon-button-generic.mjs",
+    "audit:material-web-icon-button-generic:complete": "node scripts/audit-material-web-icon-button-generic.mjs --require-complete",
     "clean": "rm -rf dist",
     "coverage:compose": "node scripts/coverage-compose.mjs",
     "coverage:compose:complete": "node scripts/coverage-compose.mjs --require-complete",
