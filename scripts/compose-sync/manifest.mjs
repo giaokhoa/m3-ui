@@ -5,26 +5,36 @@ export const androidX = {
     'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens',
 };
 
-const token = (file, blobSha, generated = {}) => ({
-  file,
-  path: `${androidX.tokenRoot}/${file}`,
-  blobSha,
-  ...generated,
-});
+function lowerCamel(value) {
+  return value.length === 0 ? value : value[0].toLowerCase() + value.slice(1);
+}
+
+function kebab(value) {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+const token = (file, blobSha) => {
+  const objectName = file.replace(/\.kt$/, '');
+  if (!objectName.endsWith('Tokens')) {
+    throw new Error(`Token source must end in Tokens.kt: ${file}`);
+  }
+  const stem = objectName.slice(0, -'Tokens'.length);
+  return {
+    file,
+    path: `${androidX.tokenRoot}/${file}`,
+    blobSha,
+    exportName: `${lowerCamel(stem)}TokensGenerated`,
+    output: `packages/tokens/src/generated/androidx/${kebab(stem)}.ts`,
+  };
+};
 
 export const tokenSources = [
-  token('ElevationTokens.kt', '5b5fd66d3a9e061ac9de98c4958344d2e7be923c', {
-    exportName: 'elevationTokensGenerated',
-    output: 'packages/tokens/src/generated/androidx/elevation.ts',
-  }),
-  token('StateTokens.kt', '5a52d587e453e00fdbb345a775985e20d6a41d2c', {
-    exportName: 'stateTokensGenerated',
-    output: 'packages/tokens/src/generated/androidx/state.ts',
-  }),
-  token('SwitchTokens.kt', '1fd474ec436e63b0ec54c455f32445d2d4ef5123', {
-    exportName: 'switchTokensGenerated',
-    output: 'packages/tokens/src/generated/androidx/switch.ts',
-  }),
+  token('ElevationTokens.kt', '5b5fd66d3a9e061ac9de98c4958344d2e7be923c'),
+  token('StateTokens.kt', '5a52d587e453e00fdbb345a775985e20d6a41d2c'),
+  token('SwitchTokens.kt', '1fd474ec436e63b0ec54c455f32445d2d4ef5123'),
   token('FilledButtonTokens.kt', 'ed1d4ee4f451fc7b2d096ee70a5e50e660ad7d0a'),
   token('ElevatedButtonTokens.kt', 'b9ffc0d0f046806763fa838d6815420570d18b95'),
   token('FilledTonalButtonTokens.kt', 'b3c0a76019f053859859e14b9dffccf228d1a9f9'),
