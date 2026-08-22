@@ -9,16 +9,29 @@ const foundationDrift = JSON.parse(
   await readFile(new URL('../audit/foundation-drift.json', import.meta.url), 'utf8'),
 );
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const canonical = collectTokens(
-  await readCanonicalDirectory(resolve(scriptDir, '../tokens')),
-);
+const canonical = collectTokens(await readCanonicalDirectory(resolve(scriptDir, '../tokens')));
 
 const modules = [
   { module: 'md-comp-carousel-item', root: 'component.carouselItem' },
   {
+    module: 'md-comp-banner',
+    root: 'component.banners.legacyLayout',
+    paths: {
+      'desktop-with-single-line-container-height': 'component.banners.legacyLayout.desktopSingleLineContainerHeight',
+      'desktop-with-three-lines-container-height': 'component.banners.legacyLayout.desktopThreeLinesContainerHeight',
+      'desktop-with-two-lines-with-image-container-height': 'component.banners.legacyLayout.desktopTwoLinesWithImageContainerHeight',
+      'mobile-with-single-line-container-height': 'component.banners.legacyLayout.mobileSingleLineContainerHeight',
+      'mobile-with-two-lines-container-height': 'component.banners.legacyLayout.mobileTwoLinesContainerHeight',
+      'mobile-with-two-lines-with-image-container-height': 'component.banners.legacyLayout.mobileTwoLinesWithImageContainerHeight',
+      'with-image-image-size': 'component.banners.legacyLayout.withImageImageSize',
+      'with-image-image-shape': 'component.banners.legacyLayout.withImageImageShape',
+    },
+  },
+  {
     module: 'md-comp-banners',
     root: 'component.banners',
     paths: {
+      'banners-close-button-pressed-state-layer-color': 'component.banners.closeButtonPressedStateLayerColor',
       'standard-color': 'component.banners.standard.containerColor',
       'standard-body-text-color': 'component.banners.standard.bodyTextColor',
       'standard-icon-color': 'component.banners.standard.iconColor',
@@ -48,6 +61,12 @@ const modules = [
   { module: 'md-comp-sheet-side', root: 'component.sheetSide' },
 ];
 
+const directTypographyAliases = new Map([
+  ['md-comp-filled-select:text-field-label-text-populated-line-height', 'typography.bodySmall.lineHeight'],
+  ['md-comp-filled-select:text-field-label-text-populated-size', 'typography.bodySmall.fontSize'],
+  ['md-comp-outlined-select:text-field-label-text-populated-line-height', 'typography.bodySmall.lineHeight'],
+  ['md-comp-outlined-select:text-field-label-text-populated-size', 'typography.bodySmall.fontSize'],
+]);
 const stateValues = foundationDrift.state.materialWeb.latestGenerated;
 
 function camel(name) {
@@ -64,6 +83,10 @@ function canonicalValue(token) {
     return `${token.value.value}${token.value.unit}`;
   }
   return token.value;
+}
+
+function styleName(rawStyle, emphasized = false) {
+  return `${camel(rawStyle)}${emphasized ? 'Emphasized' : ''}`;
 }
 
 function normalizeRaw(raw) {
@@ -83,11 +106,14 @@ function normalizeRaw(raw) {
   match = value.match(/^md-sys-state\.\$([a-z]+)-state-layer-opacity$/);
   if (match) return { kind: 'value', value: stateValues[match[1]] };
   match = value.match(/^md-sys-state-focus-indicator\.\$(inner-offset|outer-offset|thickness)$/);
-  if (match) return { kind: 'foundation-reference', target: `state.focusIndicator.${camel(match[1])}` };
-  match = value.match(/^md-sys-typescale(?:-emphasized)?\.\$([a-z]+-[a-z]+)-(font|line-height|size|tracking|weight)$/);
+  if (match) return { kind: 'alias', target: `state.focusIndicator.${camel(match[1])}` };
+  match = value.match(/^md-sys-typescale(-emphasized)?\.\$([a-z]+-[a-z]+)-(font|line-height|size|tracking|weight)$/);
   if (match) {
-    if (match[2] === 'font') return { kind: 'value', value: camel(match[1]) };
-    return { kind: 'typography-decomposition', style: camel(match[1]) };
+    return {
+      kind: 'typography-decomposition',
+      style: styleName(match[2], Boolean(match[1])),
+      property: match[3],
+    };
   }
   return { kind: 'unsupported-source-value', raw: value };
 }
@@ -127,11 +153,9 @@ function parseSass(text) {
 }
 
 function typographyFontPath(path) {
-  if (path.endsWith('LineHeight')) return `${path.slice(0, -'LineHeight'.length)}Font`;
-  if (path.endsWith('Size')) return `${path.slice(0, -'Size'.length)}Font`;
-  if (path.endsWith('Tracking')) return `${path.slice(0, -'Tracking'.length)}Font`;
-  if (path.endsWith('Weight')) return `${path.slice(0, -'Weight'.length)}Font`;
-  if (path.endsWith('Type')) return `${path.slice(0, -'Type'.length)}Font`;
+  for (const suffix of ['LineHeight', 'Size', 'Tracking', 'Weight', 'Type']) {
+    if (path.endsWith(suffix)) return `${path.slice(0, -suffix.length)}Font`;
+  }
   return undefined;
 }
 
@@ -140,8 +164,7 @@ for (const module of modules) {
   const url = `https://raw.githubusercontent.com/${source.repository}/${source.revision}/${source.latestGeneratedRoot}/_${module.module}.scss`;
   const response = await fetch(url, { headers: { 'user-agent': 'm3-ui-token-declaration-audit' } });
   if (!response.ok) throw new Error(`Failed to fetch ${module.module}: ${response.status}`);
-  const declarations = parseSass(await response.text());
-  for (const declaration of declarations) {
+  for (const declaration of parseSass(await response.text())) {
     if (declaration.deprecated) {
       results.push({ module: module.module, ...declaration, status: 'excluded-deprecated' });
       continue;
@@ -161,18 +184,37 @@ for (const module of modules) {
     }
 
     const expected = normalizeRaw(declaration.raw);
-    if (expected.kind === 'foundation-reference') {
+    if (expected.kind === 'alias') {
+      const token = canonical.get(path);
+      const alias = `{${expected.target}}`;
       results.push({
         module: module.module,
         ...declaration,
         path,
-        status: canonical.has(expected.target) ? 'reconciled-foundation-reference' : 'pending-foundation',
-        canonicalPath: expected.target,
+        canonicalPath: path,
+        expected: alias,
+        actual: canonicalValue(token),
+        status: token && canonicalValue(token) === alias ? 'reconciled-alias' : token ? 'mismatch' : 'pending',
       });
       continue;
     }
     if (expected.kind === 'typography-decomposition') {
-      const fontPath = typographyFontPath(path);
+      const directTarget = directTypographyAliases.get(`${module.module}:${declaration.variable}`);
+      if (directTarget) {
+        const token = canonical.get(path);
+        const alias = `{${directTarget}}`;
+        results.push({
+          module: module.module,
+          ...declaration,
+          path,
+          canonicalPath: path,
+          expected: alias,
+          actual: canonicalValue(token),
+          status: token && canonicalValue(token) === alias ? 'reconciled-typography-alias' : token ? 'mismatch' : 'pending',
+        });
+        continue;
+      }
+      const fontPath = expected.property === 'font' ? path : typographyFontPath(path);
       const token = fontPath ? canonical.get(fontPath) : undefined;
       results.push({
         module: module.module,
