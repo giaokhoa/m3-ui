@@ -1,0 +1,67 @@
+{
+  "component": {
+    "switch": {
+      "track": {
+        "shape": { "$type": "string", "$value": "full" }
+      },
+      "handle": {
+        "shape": { "$type": "string", "$value": "full" }
+      },
+      "stateLayerShape": { "$type": "string", "$value": "full" },
+      "focusIndicator": {
+        "color": { "$type": "string", "$value": "{color.role.secondary}" },
+        "offset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+        "thickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" }
+      },
+      "webSelectedIconColor": { "$type": "string", "$value": "{color.role.primary}" },
+      "state": {
+        "selected": {
+          "focus": {
+            "handleColor": { "$type": "string", "$value": "{color.role.primaryContainer}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" }
+          },
+          "hover": {
+            "handleColor": { "$type": "string", "$value": "{color.role.primaryContainer}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+          },
+          "pressed": {
+            "handleColor": { "$type": "string", "$value": "{color.role.primaryContainer}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+          }
+        },
+        "unselected": {
+          "focus": {
+            "handleColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+            "iconColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "outlineColor": { "$type": "string", "$value": "{color.role.outline}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" }
+          },
+          "hover": {
+            "handleColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+            "iconColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "outlineColor": { "$type": "string", "$value": "{color.role.outline}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+          },
+          "pressed": {
+            "handleColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+            "iconColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "trackColor": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+            "outlineColor": { "$type": "string", "$value": "{color.role.outline}" },
+            "stateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+          }
+        }
+      }
+    }
+  }
+}
