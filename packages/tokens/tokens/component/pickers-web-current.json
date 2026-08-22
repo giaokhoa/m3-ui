@@ -1,0 +1,10 @@
+{
+  "component": {
+    "dateInputModal": {
+      "webContainerColor": { "$type": "string", "$value": "{color.role.surfaceContainerHigh}" }
+    },
+    "datePickerModal": {
+      "webContainerHeight": { "$type": "dimension", "$value": { "value": 524, "unit": "px" } }
+    }
+  }
+}
