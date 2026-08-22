@@ -37,3 +37,13 @@ export const publicComponentStyleSources = {
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
 };
+
+export const publicComponentModules = {
+  button: 'src/components/Button/Button.tsx',
+  card: 'src/components/Card/Card.tsx',
+  checkbox: 'src/components/Checkbox/Checkbox.tsx',
+  chip: 'src/components/Chip/Chip.tsx',
+  'radio-button': 'src/components/RadioButton/RadioButton.tsx',
+  switch: 'src/components/Switch/Switch.tsx',
+  'text-field': 'src/components/TextField/TextField.tsx',
+};
