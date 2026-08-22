@@ -1,15 +1,15 @@
 # Parity fixtures
 
-This directory stores explicit reference data used by parity tests.
-
-Fixtures must be independent from the implementation under test. They may be derived from pinned AndroidX generated tokens, upstream expected values, Material baseline data, or other explicitly documented source-of-truth files.
+This directory stores explicit reference data used by parity tests. Fixtures must remain independent from the production implementation being tested.
 
 ## Rules
 
-- include source metadata with each fixture;
-- prefer structured data over screenshots when exact values can be compared directly;
-- do not generate an expected fixture by importing the production resolver being tested;
-- update fixtures only when intentionally adopting an upstream source revision or correcting a documented mistake;
-- keep fixture diffs reviewable and deterministic.
+- Record the exact source/revision for upstream-derived expected data.
+- Prefer structured expected values over screenshots when exact values can be compared directly.
+- Never create expected fixtures by importing the production resolver under test.
+- Never add a repository-wide upstream sync generator to populate fixtures.
+- AndroidX/Figma tooling may fetch and normalize pinned upstream data **in memory for audits**; it must not write canonical token files or runtime token snapshots.
+- Update fixtures only when intentionally adopting an upstream revision or correcting a documented mistake.
+- Keep fixture diffs explicit, deterministic, and reviewable.
 
-Large/generated fixture sets should be produced by the future `scripts/compose-sync` tooling rather than manually maintained.
+If a future parity test needs a large upstream dataset, prefer a narrow read-only audit adapter or a deliberately reviewed static fixture. Do not recreate `scripts/compose-sync`, `packages/tokens/src/generated/androidx`, or an equivalent generated-runtime path.
