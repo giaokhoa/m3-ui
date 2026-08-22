@@ -117,7 +117,7 @@ function resolveSelectableColors(
         isSelected
           ? tokens.disabledSelectedContainerColor
           : tokens.disabledUnselectedContainerColor,
-        isSelected ? tokens.disabledContainerOpacity : 1,
+        tokens.disabledContainerOpacity,
       ),
       label: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity),
       leading: withOpacity(tokens.disabledContentColor, tokens.disabledContentOpacity),
@@ -138,7 +138,9 @@ function resolveSelectableColors(
     container: roleVariable(
       isSelected ? tokens.selectedContainerColor : tokens.unselectedContainerColor,
     ),
-    label: roleVariable(isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor),
+    label: roleVariable(
+      isSelected ? tokens.selectedLabelColor : tokens.unselectedLabelColor,
+    ),
     leading: roleVariable(
       isSelected ? tokens.selectedLeadingIconColor : tokens.unselectedLeadingIconColor,
     ),
@@ -210,7 +212,10 @@ function resolveSpacing(
   normal: number,
   compact: number,
 ) {
-  if (!options.shapes || (variant !== 'filter' && variant !== 'elevatedFilter' && variant !== 'input')) {
+  if (
+    !options.shapes ||
+    (variant !== 'filter' && variant !== 'elevatedFilter' && variant !== 'input')
+  ) {
     return { leading: normal, trailing: normal };
   }
 
@@ -222,11 +227,21 @@ function resolveSpacing(
   return { leading: normal, trailing: normal };
 }
 
-function resolvePadding(variant: ChipVariant, options: ChipStyleOptions, standard: number) {
+function resolvePadding(
+  variant: ChipVariant,
+  options: ChipStyleOptions,
+  standard: number,
+) {
   if (variant !== 'input') return { start: standard, end: standard };
   const start = options.hasAvatar || !options.hasLeadingIcon ? 4 : 8;
   const end = options.hasTrailingIcon ? 8 : 4;
   return { start, end };
+}
+
+export function getChipRootStyle(variant: ChipVariant): ChipStyle {
+  return {
+    '--_chip-hit-size': `${chipVariantTokens[variant].minimumInteractiveSize}px`,
+  };
 }
 
 export function getChipStyle(
@@ -250,7 +265,6 @@ export function getChipStyle(
   const typography = tokens.labelTypography;
 
   return {
-    '--_chip-hit-size': `${tokens.minimumInteractiveSize}px`,
     '--_chip-height': `${tokens.height}px`,
     '--_chip-container-radius': resolveRadius(state, options, tokens.containerRadius),
     '--_chip-padding-inline-start': `${padding.start}px`,
