@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { radioButtonBaseStyle } from './RadioButton.defaults';
+import { radioButtonBaseStyle, radioGroupBaseStyle } from './RadioButton.defaults';
 import { radioButtonTokens } from './RadioButton.tokens';
 
 const style = radioButtonBaseStyle as Record<string, string | number>;
+const groupStyle = radioGroupBaseStyle as Record<string, string | number>;
 
 describe('RadioButton defaults', () => {
   it('matches the pinned Compose geometry', () => {
@@ -15,6 +16,7 @@ describe('RadioButton defaults', () => {
   });
 
   it('maps runtime control colors through ThemeProvider roles', () => {
+    expect(style['--_radio-label-color']).toBe('var(--on-surface)');
     expect(style['--_radio-selected-color']).toBe('var(--primary)');
     expect(style['--_radio-unselected-color']).toBe('var(--on-surface-variant)');
     expect(style['--_radio-disabled-selected-color']).toBe('var(--on-surface)');
@@ -22,6 +24,11 @@ describe('RadioButton defaults', () => {
     expect(style['--_radio-disabled-opacity']).toBe(0.38);
     expect(style['--_radio-selected-state-layer']).toBeUndefined();
     expect(style['--_radio-unselected-state-layer']).toBeUndefined();
+  });
+
+  it('keeps RadioGroup wrapper colors derived from canonical core roles', () => {
+    expect(groupStyle['--_radio-group-content-color']).toBe('var(--on-surface)');
+    expect(groupStyle['--_radio-group-error-color']).toBe('var(--error)');
   });
 
   it('maps pinned DefaultEffects color and FastSpatial dot motion', () => {
