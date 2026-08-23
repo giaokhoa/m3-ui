@@ -105,6 +105,7 @@ function segmentedPath(variable) {
     'horizontal-icon-only-gap': `${root}.horizontalIconOnlySegmentedGap`,
     'active-container-shape': `${root}.webCurrent.activeContainerShape`,
     'horizontal-container-shape': `${root}.webCurrent.horizontalContainerShape`,
+    'menu-item-height': `${root}.item`,
     'menu-item-focus-indicator-outline-offset': `${root}.webCurrent.itemFocusIndicatorOutlineOffset`,
     'menu-item-focus-indicator-thickness': `${root}.webCurrent.itemFocusIndicatorThickness`,
   };
