@@ -26,11 +26,12 @@
     "drift": [{ "id": "state-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "compose+materialWebLatest", "reason": "Material Web latest generated 34.0.21 matches current Compose at 0.10 focus/pressed; only the v0.192 public adapter still exposes 0.12." }]
   },
   "typography": {
-    "canonical": { "baselineStyleCount": 15, "emphasizedStyleCount": 15, "weights": [400, 500, 600, 700] },
-    "compose": { "baselineStyleCount": 15, "emphasizedStyleCount": 15, "emphasizedBlockMarkedTodo": true, "knownEmphasizedDrift": { "bodyLargeTracking": 0.15, "displayLargeTracking": 0, "labelWeight": 700, "titleMediumSmallWeight": 700 } },
+    "canonical": { "baselineStyleCount": 15, "emphasizedStyleCount": 15, "weights": [400, 500, 600, 700], "displayLargeTracking": -0.2 },
+    "compose": { "baselineStyleCount": 15, "emphasizedStyleCount": 15, "displayLargeTracking": -0.2, "emphasizedBlockMarkedTodo": true, "knownEmphasizedDrift": { "bodyLargeTracking": 0.15, "displayLargeTracking": 0, "labelWeight": 700, "titleMediumSmallWeight": 700 } },
     "figma": { "typescaleVariableCount": 90, "baselineWeightCount": 15, "emphasizedWeightCount": 15, "emphasizedTextStyleCount": 15, "bodyLargeTracking": 0.5, "displayLargeTracking": -0.25, "semiBoldWeight": 600 },
     "materialWeb": { "latestGenerated": { "baselineStyleCount": 15, "emphasizedStyleCount": 15, "version": "34.0.21", "bodyLargeTracking": 0.5, "displayLargeTracking": -0.25, "semiBoldWeight": 600 }, "publicAdapter": { "fullEmphasizedStyleVocabularyObserved": false } },
     "drift": [
+      { "id": "typography-display-large-baseline-tracking", "classification": "cross-source-value-drift", "preferredReference": "normative-spec-review", "reason": "Live Figma V1.25 and Material Web latest generated 34.0.21 both expose Display Large tracking -0.25, while current Compose TypeScaleTokens v0_103 and canonical expose -0.2. material.io remains normative, so this discrepancy is recorded rather than silently changing the canonical token." },
       { "id": "typography-compose-emphasized-todo", "classification": "source-drift", "preferredReference": "figma+materialWebLatest", "reason": "Compose explicitly marks its emphasized TypeScale block TODO. Figma V1.25 and Material Web latest generated 34.0.21 agree on Body Large tracking 0.5, Display Large tracking -0.25, and SemiBold 600 for emphasized labels and medium/small titles." },
       { "id": "typography-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "materialWebLatest", "reason": "The latest generated Material Web corpus contains a full emphasized typescale while the older public adapter does not expose it." }
     ]
