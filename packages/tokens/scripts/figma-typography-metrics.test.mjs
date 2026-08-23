@@ -73,20 +73,34 @@ test('Figma exposes complete 15-role size, line-height, baseline-weight and emph
   assert.equal(values, 60);
 });
 
-test('Figma typography metric sweep agrees with canonical dimensions and intended baseline/emphasized weight classes', async () => {
+test('Figma typography metric sweep agrees with canonical dimensions and weight aliases', async () => {
   const canonical = JSON.parse(await readFile(resolve(scriptDir, '../tokens/core/typography.json'), 'utf8'));
-  const weights = { Regular: 400, Medium: 500, SemiBold: 600 };
+  const weightNumber = { Regular: 400, Medium: 500, SemiBold: 600 };
+  const weightAlias = {
+    Regular: '{typeface.weight.regular}',
+    Medium: '{typeface.weight.medium}',
+    SemiBold: '{typeface.weight.semiBold}',
+  };
+
   for (const entry of evidence.roles) {
     const baseline = canonical.typography[entry.role];
     const emphasized = canonical.typography[`${entry.role}Emphasized`];
     assert.ok(baseline, `missing canonical typography.${entry.role}`);
     assert.ok(emphasized, `missing canonical typography.${entry.role}Emphasized`);
+
     assert.equal(baseline.fontSize.$value.value, entry.size.baselineValue, `${entry.role} size differs from Figma`);
     assert.equal(baseline.lineHeight.$value.value, entry.lineHeight.baselineValue, `${entry.role} line height differs from Figma`);
-    assert.equal(canonical.typeface.weight[entry.weight.resolvedBaselineValue === 'Regular' ? 'regular' : 'medium'].$value, weights[entry.weight.resolvedBaselineValue], `${entry.role} baseline weight vocabulary mismatch`);
-    const emphasizedWeightName = entry.weightEmphasized.resolvedBaselineValue === 'SemiBold' ? 'semiBold' : 'medium';
-    assert.equal(canonical.typeface.weight[emphasizedWeightName].$value, weights[entry.weightEmphasized.resolvedBaselineValue], `${entry.role} emphasized weight vocabulary mismatch`);
     assert.equal(emphasized.fontSize.$value.value, entry.size.baselineValue, `${entry.role} emphasized size differs from Figma`);
     assert.equal(emphasized.lineHeight.$value.value, entry.lineHeight.baselineValue, `${entry.role} emphasized line height differs from Figma`);
+
+    const baselineWeight = entry.weight.resolvedBaselineValue;
+    const emphasizedWeight = entry.weightEmphasized.resolvedBaselineValue;
+    assert.equal(baseline.fontWeight.$value, weightAlias[baselineWeight], `${entry.role} baseline weight alias differs from Figma`);
+    assert.equal(emphasized.fontWeight.$value, weightAlias[emphasizedWeight], `${entry.role} emphasized weight alias differs from Figma`);
+
+    const baselineTokenName = baselineWeight === 'Regular' ? 'regular' : 'medium';
+    const emphasizedTokenName = emphasizedWeight === 'SemiBold' ? 'semiBold' : 'medium';
+    assert.equal(canonical.typeface.weight[baselineTokenName].$value, weightNumber[baselineWeight], `${entry.role} baseline weight number mismatch`);
+    assert.equal(canonical.typeface.weight[emphasizedTokenName].$value, weightNumber[emphasizedWeight], `${entry.role} emphasized weight number mismatch`);
   }
 });
