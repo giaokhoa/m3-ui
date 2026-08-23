@@ -35,7 +35,8 @@ This is intentionally a **single-source build / multi-reference audit** architec
 - Compose, Material Web, and Figma metadata live outside `tokens/` and therefore cannot enter generated output.
 - Cross-source disagreements are preserved as explicit drift records instead of being merged into a second token graph.
 - CI verifies that all reconciled Material Web modules are covered by strict declaration audits and that the strict-audit module union still equals the reconciled module set.
-- CI also scans every `*-drift.json` manifest, normalizes both `records` and `drift` schemas (including nested foundation drift), validates referenced canonical paths, detects duplicate drift IDs, and rejects stale pinned Compose/Material Web revisions.
+- CI scans every `*-drift.json` manifest, normalizes both `records` and `drift` schemas (including nested foundation drift), validates referenced canonical paths, detects duplicate drift IDs, and rejects stale pinned Compose/Material Web revisions.
+- CI also validates the pinned Figma evidence snapshot against `scripts/sources.mjs`; it never needs Figma credentials and never consumes Figma data as a token build input.
 
 The result is one Style Dictionary source of truth with independently measurable source drift, rather than several upstream token corpora being merged at build time.
 
@@ -61,7 +62,7 @@ Colors are audited by semantic role identity (`Primary` ↔ `var(--primary)`), n
 
 Cross-source exceptions live under `audit/*-drift.json`. `scripts/audit-drift-registry.mjs` treats those files as an audit registry rather than a build input. It reports drift by classification and source manifest while failing malformed records, stale pinned revisions, duplicate IDs, or `canonicalPath` references that no longer exist in the Style Dictionary graph.
 
-Figma remains a design reference rather than a build source. `scripts/sources.mjs` pins the Material 3 Design Kit library/version metadata; Figma observations may support drift classification, but they do not rewrite DTCG tokens.
+Figma remains a design reference rather than a build source. `scripts/sources.mjs` pins the Material 3 Design Kit library/version metadata. `audit/figma-reference-evidence.json` records a small, explicit read-only sample retrieved from that exact published library through Figma design-system search: Typescale variables, Shape corner variables, display text styles, and key-color fill styles. `scripts/audit-figma-reference.mjs` verifies that this evidence still agrees with the repository source pin, has valid unique Figma asset keys, and contains the expected representative families. The temporary Figma file used only to provide connector search context is deliberately not persisted in repository metadata. Figma observations may support drift classification, but neither the evidence snapshot nor live Figma ever rewrites DTCG tokens.
 
 ## Forbidden regressions
 
@@ -76,5 +77,6 @@ If a future requirement appears to need one of these, treat it as an architectur
 - `pnpm --filter @m3/tokens audit:androidx` performs the pinned read-only AndroidX audit.
 - `pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete` proves that strict declaration audits cover the entire reconciled Material Web module set.
 - `pnpm --filter @m3/tokens exec node scripts/audit-drift-registry.mjs --require-complete` validates and summarizes all documented cross-source drift.
+- `pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete` validates the pinned, read-only Figma reference evidence without contacting Figma.
 
 See `/.agents/skills/style-dictionary/SKILL.md` and `/docs/architecture/README.md` before changing the token pipeline.
