@@ -1,0 +1,89 @@
+{
+  "source": {
+    "kind": "design-reference",
+    "name": "Material 3 Design Kit",
+    "libraryKey": "lk-5a31d104cabc6a74d4edf6425e7bc6575e9c0f18cda7efb746193aef4d915b077d115c985e6cf49d36d97d455a17d5127a2cbbfbc618b8a70a38669dccb61462",
+    "version": "1.25",
+    "releasedAt": "2026-05-19",
+    "verifiedAt": "2026-08-23"
+  },
+  "method": {
+    "tool": "Figma search_design_system",
+    "scope": "includeLibraryKeys",
+    "note": "A temporary design file was used only as connector context. Its file key is intentionally not persisted. This evidence is read-only audit metadata and is never a Style Dictionary input."
+  },
+  "collections": [
+    {
+      "name": "Typescale",
+      "variableSetKey": "5b6fd1600acaad133b97e6b0da888b541605f574",
+      "observedByQuery": "display",
+      "samples": [
+        {
+          "name": "Static/Display Large/Font",
+          "key": "56318d894ccb161c490ef56f8e6150e8178ebf27",
+          "variableType": "STRING",
+          "scopes": ["FONT_FAMILY"]
+        },
+        {
+          "name": "Static/Display Large/Size",
+          "key": "a0537c8ce19814b83838e851e4e5ddfc8abc9686",
+          "variableType": "FLOAT",
+          "scopes": ["FONT_SIZE"]
+        },
+        {
+          "name": "Static/Display Large/Line Height",
+          "key": "c3afea7762d6882ff5f9828870dd943074fa75e0",
+          "variableType": "FLOAT",
+          "scopes": ["LINE_HEIGHT"]
+        },
+        {
+          "name": "Static/Display Large/Tracking",
+          "key": "c43d032b66c614d6648de7add15dea74b2b8f5c1",
+          "variableType": "FLOAT",
+          "scopes": ["LETTER_SPACING"]
+        },
+        {
+          "name": "Static/Display Large/Weight",
+          "key": "bd3c96cd96718087b8e081cfa29afab0ea4becfa",
+          "variableType": "STRING",
+          "scopes": ["FONT_STYLE"]
+        },
+        {
+          "name": "Static/Display Large/Weight-emphasized",
+          "key": "59c66c1e2055b78fc1d966e7ab03ff2665edd49f",
+          "variableType": "STRING",
+          "scopes": ["FONT_STYLE"]
+        }
+      ]
+    },
+    {
+      "name": "Shape",
+      "variableSetKey": "29e6e0c1324742b392abab1b1f998fb8952212b1",
+      "observedByQuery": "corner",
+      "samples": [
+        {"name": "Corner/None", "key": "014cd5a9d4bb83b3024fd85723073a1c8195ef4a", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Extra-small", "key": "a1edb055efed94c66ee20fd2e7e9de8521565506", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Small", "key": "c15e1badb18458209d16da6c413c58ee3e19dd83", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Medium", "key": "456d41a4999f543955ca6b9f406c1295615b4e04", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Large", "key": "a9a10aea3147aafd53eac1afe93005032b727d12", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Large-increased", "key": "da6b905de805501c70b43728e1622de74f38bd47", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Extra-large", "key": "484efbb72c3ff6c990f4c546bbc6d22daf4e3ed4", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]},
+        {"name": "Corner/Full", "key": "22cecfb7483738694e6a5dea4737c1e892d29f3c", "variableType": "FLOAT", "scopes": ["CORNER_RADIUS"]}
+      ]
+    }
+  ],
+  "styles": [
+    {"name": "M3/display/large", "styleType": "TEXT", "key": "6b5a01c3c7862efaa4ffffa9e97e5c5d4fceb9d6", "observedByQuery": "display"},
+    {"name": "M3/display/large-emphasized", "styleType": "TEXT", "key": "a2b64c431b252974550084ce6fc3f3956d81987c", "observedByQuery": "display"},
+    {"name": "M3/display/medium", "styleType": "TEXT", "key": "0008bc743f99bd891a0044e4b4f6af611cce3d79", "observedByQuery": "display"},
+    {"name": "M3/display/medium-emphasized", "styleType": "TEXT", "key": "be2c8fa242dfba6bfcb0316d8aa78b7f7f62c3ad", "observedByQuery": "display"},
+    {"name": "M3/display/small", "styleType": "TEXT", "key": "8079fe2bb4ae6fec1a4b2479286e78cb395b89f9", "observedByQuery": "display"},
+    {"name": "M3/display/small-emphasized", "styleType": "TEXT", "key": "d81756eadbeaa89b33826acbcc25a3cdee0b6338", "observedByQuery": "display"},
+    {"name": "M3/key-colors/primary", "styleType": "FILL", "key": "883291607d6e1b6cf42e850d0967009d0bd32f8c", "observedByQuery": "color"},
+    {"name": "M3/key-colors/secondary", "styleType": "FILL", "key": "133ed279d522eff2925ee2892392795973654cad", "observedByQuery": "color"},
+    {"name": "M3/key-colors/tertiary", "styleType": "FILL", "key": "61b0cc036d768592942828dfa5635c8e370401f7", "observedByQuery": "color"},
+    {"name": "M3/key-colors/error", "styleType": "FILL", "key": "3ada0bb82bf2dfca70b83d1065a9f70f50f82999", "observedByQuery": "color"},
+    {"name": "M3/key-colors/neutral", "styleType": "FILL", "key": "783454bd7a49e819e839d589fb34ed075f73f6aa", "observedByQuery": "color"},
+    {"name": "M3/key-colors/neutral-variant", "styleType": "FILL", "key": "ec3c204bdc20355127b6382e01111ec6bce8ffde", "observedByQuery": "color"}
+  ]
+}
