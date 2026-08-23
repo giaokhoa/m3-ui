@@ -3,7 +3,7 @@
   box-sizing: border-box;
   display: inline-flex;
   inline-size: max(var(--_icon-button-target-size), var(--_icon-button-container-width));
-  block-size: max(var(--_icon-button-target-size), var(--_icon-button-container-height));
+  block-size: var(--_icon-button-target-size);
   align-items: center;
   justify-content: center;
   padding: 0;
