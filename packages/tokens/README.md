@@ -62,7 +62,11 @@ Colors are audited by semantic role identity (`Primary` ↔ `var(--primary)`), n
 
 Cross-source exceptions live under `audit/*-drift.json`. `scripts/audit-drift-registry.mjs` treats those files as an audit registry rather than a build input. It reports drift by classification and source manifest while failing malformed records, stale pinned revisions, duplicate IDs, or `canonicalPath` references that no longer exist in the Style Dictionary graph.
 
-Figma remains a design reference rather than a build source. `scripts/sources.mjs` pins the Material 3 Design Kit library/version metadata. `audit/figma-reference-evidence.json` records explicit read-only evidence retrieved from that exact published library through Figma design-system search and variable resolution: the complete eight-value published Shape corner set, representative Typescale values and text/key-color styles, plus a complete **15/15 baseline typography tracking sweep**. `scripts/audit-figma-reference.mjs` verifies the source pin, Figma asset keys, resolved values, and all 15 baseline tracking roles offline in CI. The sweep currently shows Figma v1.25 and Material Web 34.0.21 agreeing on all 15 tracking roles while Compose/canonical differ at Display Large, Title Medium, and Body Medium; those differences stay in `foundation-drift.json` pending normative material.io review rather than rewriting canonical tokens from a reference source. The temporary Figma file used only to provide connector search context is deliberately not persisted in repository metadata. Neither the evidence snapshot nor live Figma ever rewrites DTCG tokens.
+Figma remains a design reference rather than a build source. `scripts/sources.mjs` pins the Material 3 Design Kit library/version metadata. `audit/figma-reference-evidence.json` records the complete eight-value published Shape corner set, representative Typescale values and text/key-color styles, plus a complete **15/15 baseline typography tracking sweep**. `audit/figma-typography-metrics-evidence.json` separately records the complete 15-role Typescale sweep for **size, line height, baseline weight, and emphasized weight (60 resolved metric values)**. Both snapshots were read from the exact pinned published library through Figma design-system search and `variables.importVariableByKeyAsync`; the temporary Figma file used only as connector context is deliberately not persisted.
+
+`scripts/audit-figma-reference.mjs` validates both evidence files offline in CI, including the source pin, key format/uniqueness, Shape/Typescale values, all 15 tracking roles, all 15 typography metric roles, all 60 metric values, and representative styles. `figma-typography-metrics.test.mjs` additionally cross-checks Figma dimensions and weight classes against the canonical DTCG graph, including the actual baseline/emphasized `fontWeight` aliases. The live sweep shows size, line height, and baseline weight agreeing across Figma v1.25, Compose, Material Web 34.0.21, and canonical. Figma emphasized weights agree with canonical and Material Web latest; Compose's emphasized block remains explicitly generated-source-lag/TODO evidence rather than a reason to rewrite canonical tokens.
+
+For baseline tracking, Figma v1.25 and Material Web 34.0.21 agree on all 15 roles while Compose/canonical differ at Display Large, Title Medium, and Body Medium. Those differences stay in `foundation-drift.json` pending normative material.io review rather than rewriting canonical tokens from a reference source. Neither Figma evidence snapshot nor live Figma ever enters `tokens/**/*.json` or rewrites DTCG tokens.
 
 ## Forbidden regressions
 
@@ -73,10 +77,10 @@ If a future requirement appears to need one of these, treat it as an architectur
 ## Validation and audit commands
 
 - `pnpm --filter @m3/tokens validate` validates the canonical graph.
-- `pnpm --filter @m3/tokens test` cleans generated output, runs Style Dictionary, generated-output tests, AndroidX-parser tests, and architecture guards.
+- `pnpm --filter @m3/tokens test` cleans generated output, runs Style Dictionary, generated-output tests, AndroidX-parser tests, architecture guards, and the complete Figma typography-metrics parity tests.
 - `pnpm --filter @m3/tokens audit:androidx` performs the pinned read-only AndroidX audit.
 - `pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete` proves that strict declaration audits cover the entire reconciled Material Web module set.
 - `pnpm --filter @m3/tokens exec node scripts/audit-drift-registry.mjs --require-complete` validates and summarizes all documented cross-source drift.
-- `pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete` validates the pinned, read-only Figma reference evidence without contacting Figma.
+- `pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete` validates both pinned, read-only Figma evidence snapshots without contacting Figma.
 
 See `/.agents/skills/style-dictionary/SKILL.md` and `/docs/architecture/README.md` before changing the token pipeline.
