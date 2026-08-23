@@ -1,9 +1,15 @@
 import type { ReactNode } from 'react';
 import {
   Button as AriaButton,
+  ToggleButton as AriaToggleButton,
   type ButtonProps as AriaButtonProps,
+  type ToggleButtonProps as AriaToggleButtonProps,
 } from 'react-aria-components';
-import { Ripple, useRipple } from '../../internal/ripple';
+import {
+  Ripple,
+  useRipple,
+  type RippleController,
+} from '../../internal/ripple';
 import {
   getIconButtonStyle,
   type IconButtonShapes,
@@ -17,37 +23,65 @@ import type {
 } from './IconButton.types';
 import './icon-button.css';
 
-interface CommonIconButtonProps extends Omit<AriaButtonProps, 'children' | 'style'> {
+interface IconButtonMaterialProps {
   children: ReactNode;
   size?: IconButtonSize;
   width?: IconButtonWidth;
   shape?: IconButtonShape;
+}
+
+export interface IconButtonProps
+  extends Omit<AriaButtonProps, 'children' | 'style'>,
+    IconButtonMaterialProps {
+  shapes?: IconButtonShapes;
   style?: AriaButtonProps['style'];
 }
 
-export interface IconButtonProps extends CommonIconButtonProps {
-  shapes?: IconButtonShapes;
-}
-
 export interface IconToggleButtonProps
-  extends Omit<CommonIconButtonProps, 'onPress'> {
+  extends Omit<
+      AriaToggleButtonProps,
+      'children' | 'style' | 'isSelected' | 'onChange'
+    >,
+    IconButtonMaterialProps {
   isSelected: boolean;
   onChange: (isSelected: boolean) => void;
   shapes?: IconToggleButtonShapes;
+  style?: AriaToggleButtonProps['style'];
 }
 
-interface IconButtonImplProps extends CommonIconButtonProps {
-  variant: IconButtonVariant;
-  isSelected?: boolean;
-  onSelectedChange?: (isSelected: boolean) => void;
-  shapes?: IconButtonShapes | IconToggleButtonShapes;
+interface SurfaceProps {
+  children: ReactNode;
+  ripple: RippleController;
+  isFocusVisible: boolean;
+  isHovered: boolean;
 }
 
 function variantClassName(variant: IconButtonVariant): string {
   return `m3-icon-button--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
 }
 
-function IconButtonImpl({
+function IconButtonSurface({
+  children,
+  ripple,
+  isFocusVisible,
+  isHovered,
+}: SurfaceProps) {
+  return (
+    <span className="m3-icon-button__surface">
+      <Ripple
+        controller={ripple}
+        focusRingRadius="var(--_icon-button-container-radius)"
+        isFocusVisible={isFocusVisible}
+        isHovered={isHovered}
+      />
+      <span aria-hidden="true" className="m3-icon-button__icon">
+        {children}
+      </span>
+    </span>
+  );
+}
+
+function ActionIconButtonImpl({
   variant,
   children,
   className,
@@ -56,19 +90,11 @@ function IconButtonImpl({
   width,
   shape,
   shapes,
-  isSelected,
-  onSelectedChange,
-  onPress,
   onPressStart,
   onPressEnd,
   ...props
-}: IconButtonImplProps) {
+}: IconButtonProps & { variant: IconButtonVariant }) {
   const ripple = useRipple({ origin: 'center' });
-  const isToggle = isSelected !== undefined;
-  const handlePress: AriaButtonProps['onPress'] = (event) => {
-    if (isToggle) onSelectedChange?.(!isSelected);
-    onPress?.(event);
-  };
   const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
     ripple.onPressStart(event);
     onPressStart?.(event);
@@ -81,8 +107,6 @@ function IconButtonImpl({
   return (
     <AriaButton
       {...props}
-      aria-pressed={isToggle ? isSelected : undefined}
-      data-selected={isToggle && isSelected ? true : undefined}
       data-size={size}
       data-variant={variant}
       data-width={width}
@@ -99,54 +123,106 @@ function IconButtonImpl({
             {
               isDisabled: renderProps.isDisabled,
               isPressed: renderProps.isPressed,
-              isSelected,
             },
             { size, width, shape, shapes },
           ),
           ...userStyle,
         };
       }}
-      onPress={handlePress}
       onPressEnd={handlePressEnd}
       onPressStart={handlePressStart}
     >
       {(renderProps) => (
-        <span className="m3-icon-button__surface">
-          <Ripple
-            controller={ripple}
-            focusRingRadius="var(--_icon-button-container-radius)"
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
-          />
-          <span aria-hidden="true" className="m3-icon-button__icon">
-            {children}
-          </span>
-        </span>
+        <IconButtonSurface
+          ripple={ripple}
+          isFocusVisible={renderProps.isFocusVisible}
+          isHovered={renderProps.isHovered}
+        >
+          {children}
+        </IconButtonSurface>
       )}
     </AriaButton>
   );
 }
 
+function ToggleIconButtonImpl({
+  variant,
+  children,
+  className,
+  style,
+  size,
+  width,
+  shape,
+  shapes,
+  isSelected,
+  onChange,
+  onPressStart,
+  onPressEnd,
+  ...props
+}: IconToggleButtonProps & { variant: IconButtonVariant }) {
+  const ripple = useRipple({ origin: 'center' });
+  const handlePressStart: AriaToggleButtonProps['onPressStart'] = (event) => {
+    ripple.onPressStart(event);
+    onPressStart?.(event);
+  };
+  const handlePressEnd: AriaToggleButtonProps['onPressEnd'] = (event) => {
+    ripple.onPressEnd();
+    onPressEnd?.(event);
+  };
+
+  return (
+    <AriaToggleButton
+      {...props}
+      isSelected={isSelected}
+      onChange={onChange}
+      data-size={size}
+      data-variant={variant}
+      data-width={width}
+      className={(renderProps) => {
+        const userClassName = typeof className === 'function' ? className(renderProps) : className;
+        const baseClassName = `m3-icon-button ${variantClassName(variant)}`;
+        return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
+      }}
+      style={(renderProps) => {
+        const userStyle = typeof style === 'function' ? style(renderProps) : style;
+        return {
+          ...getIconButtonStyle(
+            variant,
+            {
+              isDisabled: renderProps.isDisabled,
+              isPressed: renderProps.isPressed,
+              isSelected: renderProps.isSelected,
+            },
+            { size, width, shape, shapes },
+          ),
+          ...userStyle,
+        };
+      }}
+      onPressEnd={handlePressEnd}
+      onPressStart={handlePressStart}
+    >
+      {(renderProps) => (
+        <IconButtonSurface
+          ripple={ripple}
+          isFocusVisible={renderProps.isFocusVisible}
+          isHovered={renderProps.isHovered}
+        >
+          {children}
+        </IconButtonSurface>
+      )}
+    </AriaToggleButton>
+  );
+}
+
 function actionVariant(variant: IconButtonVariant) {
   return function MaterialIconButton(props: IconButtonProps) {
-    return <IconButtonImpl {...props} variant={variant} />;
+    return <ActionIconButtonImpl {...props} variant={variant} />;
   };
 }
 
 function toggleVariant(variant: IconButtonVariant) {
-  return function MaterialIconToggleButton({
-    isSelected,
-    onChange,
-    ...props
-  }: IconToggleButtonProps) {
-    return (
-      <IconButtonImpl
-        {...props}
-        variant={variant}
-        isSelected={isSelected}
-        onSelectedChange={onChange}
-      />
-    );
+  return function MaterialIconToggleButton(props: IconToggleButtonProps) {
+    return <ToggleIconButtonImpl {...props} variant={variant} />;
   };
 }
 
