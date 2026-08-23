@@ -20,6 +20,18 @@ async function openDefaultIconButton(page: Page) {
 }
 
 test.describe('Material 3 IconButton visual parity', () => {
+  test('default target keeps 48px semantics around a 40px visual surface', async ({ page }) => {
+    const button = await openDefaultIconButton(page);
+    const surface = button.locator('.m3-icon-button__surface');
+    const buttonBox = await button.boundingBox();
+    const surfaceBox = await surface.boundingBox();
+
+    expect(buttonBox?.width).toBe(48);
+    expect(buttonBox?.height).toBe(48);
+    expect(surfaceBox?.width).toBe(40);
+    expect(surfaceBox?.height).toBe(40);
+  });
+
   test('action variants', async ({ page }) => {
     await openStory(page, 'components-iconbutton--action-variants-story');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
@@ -29,6 +41,16 @@ test.describe('Material 3 IconButton visual parity', () => {
 
   test('toggle selected and unselected states', async ({ page }) => {
     await openStory(page, 'components-iconbutton--toggle-states');
+    const toggles = page.getByRole('button', { name: /toggle favorite/ });
+    await expect(toggles).toHaveCount(8);
+
+    for (let index = 0; index < 4; index += 1) {
+      await expect(toggles.nth(index)).toHaveAttribute('aria-pressed', 'false');
+    }
+    for (let index = 4; index < 8; index += 1) {
+      await expect(toggles.nth(index)).toHaveAttribute('aria-pressed', 'true');
+    }
+
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'icon-button-toggle-states.png',
     );
