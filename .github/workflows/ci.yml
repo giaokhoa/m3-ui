@@ -113,6 +113,8 @@ jobs:
         run: pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete
       - name: Audit cross-source drift registry
         run: pnpm --filter @m3/tokens exec node scripts/audit-drift-registry.mjs --require-complete
+      - name: Audit pinned Figma reference evidence
+        run: pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
