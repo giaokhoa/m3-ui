@@ -296,10 +296,18 @@ export function getIconButtonStyle(
   const shape = options.shape ?? 'round';
   const sizes = iconButtonSizeTokens[size];
   const colors = iconButtonVariantTokens[variant];
-  const defaultShapes = baseShapes(size, shape);
-  const shapes = options.shapes ?? defaultShapes;
-  const selectedShape = hasSelectedShape(shapes) ? shapes.selectedShape : shapes.shape;
-  const radius = state.isPressed ? shapes.pressedShape : state.isSelected ? selectedShape : shapes.shape;
+  const staticShape = baseShapes(size, shape).shape;
+  const expressiveShapes = options.shapes;
+  const selectedShape = expressiveShapes && hasSelectedShape(expressiveShapes)
+    ? expressiveShapes.selectedShape
+    : expressiveShapes?.shape;
+  const radius = expressiveShapes
+    ? state.isPressed
+      ? expressiveShapes.pressedShape
+      : state.isSelected
+        ? selectedShape ?? expressiveShapes.shape
+        : expressiveShapes.shape
+    : staticShape;
   const isToggle = state.isSelected !== undefined;
 
   let containerColor = isToggle
