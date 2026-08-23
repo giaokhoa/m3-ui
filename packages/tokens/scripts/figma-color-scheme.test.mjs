@@ -8,13 +8,13 @@ import { material3Sources } from './sources.mjs';
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const readJson = async (path) => JSON.parse(await readFile(resolve(scriptDir, path), 'utf8'));
 
-const [figmaEvidence, referenceEvidence, colorDoc, baselineDoc, paletteDoc, foundationDrift] = await Promise.all([
+const [figmaEvidence, referenceEvidence, colorDoc, baselineDoc, paletteDoc, colorDrift] = await Promise.all([
   readJson('../audit/figma-color-scheme-evidence.json'),
   readJson('../audit/color-light-on-container-reference-evidence.json'),
   readJson('../tokens/core/color.json'),
   readJson('../tokens/core/baseline-scheme.json'),
   readJson('../tokens/core/palette.json'),
-  readJson('../audit/foundation-drift.json'),
+  readJson('../audit/figma-color-scheme-drift.json'),
 ]);
 
 const normalizeHex = (value) => typeof value === 'string' ? value.toUpperCase() : value;
@@ -150,8 +150,8 @@ test('pinned generic Web color source and Android config override explain the fo
   );
 });
 
-test('foundation drift keeps Android platform override and Figma exact-value drift explicit instead of rewriting canonical colors', () => {
-  const records = new Map((foundationDrift.colorRoles?.drift ?? []).map((entry) => [entry.id, entry]));
+test('color drift manifest keeps Android platform override and Figma exact-value drift explicit instead of rewriting canonical colors', () => {
+  const records = new Map((colorDrift.records ?? []).map((entry) => [entry.id, entry]));
   assert.equal(records.get('color-light-on-container-platform-override')?.classification, 'implementation-override');
   assert.equal(records.get('color-light-on-container-platform-override')?.preferredReference, 'normative-spec-review');
   assert.equal(records.get('color-light-on-container-figma-exact-drift')?.classification, 'cross-source-color-drift');
