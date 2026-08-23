@@ -58,6 +58,9 @@ for (const collection of evidence.collections ?? []) {
   }
   collectionNames.add(collection.name);
   registerKey('variable-set', collection.name, collection.variableSetKey);
+  if (collection.mode !== 'Baseline') {
+    failures.push({ type: 'unexpected-collection-mode', collection: collection.name, actual: collection.mode ?? null });
+  }
 
   if (!Array.isArray(collection.samples) || collection.samples.length === 0) {
     failures.push({ type: 'missing-variable-samples', collection: collection.name });
@@ -87,27 +90,44 @@ for (const style of evidence.styles ?? []) {
   }
 }
 
-const requiredShapeNames = [
-  'Corner/None',
-  'Corner/Extra-small',
-  'Corner/Small',
-  'Corner/Medium',
-  'Corner/Large',
-  'Corner/Large-increased',
-  'Corner/Extra-large',
-  'Corner/Full',
-];
+const expectedShapeValues = new Map([
+  ['Corner/None', 0],
+  ['Corner/Extra-small', 4],
+  ['Corner/Small', 8],
+  ['Corner/Medium', 12],
+  ['Corner/Large', 16],
+  ['Corner/Large-increased', 20],
+  ['Corner/Extra-large', 28],
+  ['Corner/Full', 1000],
+]);
 const shape = (evidence.collections ?? []).find((collection) => collection.name === 'Shape');
-const shapeNames = new Set(shape?.samples?.map((sample) => sample.name) ?? []);
-for (const name of requiredShapeNames) {
-  if (!shapeNames.has(name)) failures.push({ type: 'missing-shape-evidence', name });
+const shapeSamples = new Map(shape?.samples?.map((sample) => [sample.name, sample]) ?? []);
+for (const [name, expectedValue] of expectedShapeValues) {
+  const sample = shapeSamples.get(name);
+  if (!sample) {
+    failures.push({ type: 'missing-shape-evidence', name });
+  } else if (sample.baselineValue !== expectedValue) {
+    failures.push({ type: 'figma-value-mismatch', collection: 'Shape', name, expected: expectedValue, actual: sample.baselineValue ?? null });
+  }
 }
 
+const expectedTypescaleValues = new Map([
+  ['Static/Display Large/Font', ['resolvedBaselineValue', 'Roboto']],
+  ['Static/Display Large/Size', ['baselineValue', 57]],
+  ['Static/Display Large/Line Height', ['baselineValue', 64]],
+  ['Static/Display Large/Tracking', ['baselineValue', -0.25]],
+  ['Static/Display Large/Weight', ['resolvedBaselineValue', 'Regular']],
+  ['Static/Display Large/Weight-emphasized', ['resolvedBaselineValue', 'Medium']],
+]);
 const typescale = (evidence.collections ?? []).find((collection) => collection.name === 'Typescale');
-const typescaleNames = new Set(typescale?.samples?.map((sample) => sample.name) ?? []);
-for (const suffix of ['Font', 'Size', 'Line Height', 'Tracking', 'Weight', 'Weight-emphasized']) {
-  const name = `Static/Display Large/${suffix}`;
-  if (!typescaleNames.has(name)) failures.push({ type: 'missing-typescale-evidence', name });
+const typescaleSamples = new Map(typescale?.samples?.map((sample) => [sample.name, sample]) ?? []);
+for (const [name, [valueField, expectedValue]] of expectedTypescaleValues) {
+  const sample = typescaleSamples.get(name);
+  if (!sample) {
+    failures.push({ type: 'missing-typescale-evidence', name });
+  } else if (sample[valueField] !== expectedValue) {
+    failures.push({ type: 'figma-value-mismatch', collection: 'Typescale', name, valueField, expected: expectedValue, actual: sample[valueField] ?? null });
+  }
 }
 
 const styleNames = new Set((evidence.styles ?? []).map((style) => style.name));
@@ -130,6 +150,7 @@ const summary = {
   libraryKey: source.libraryKey ?? null,
   collections: evidence.collections?.length ?? 0,
   variableSamples,
+  resolvedValueSamples: [...expectedShapeValues].length + [...expectedTypescaleValues].length,
   styles: evidence.styles?.length ?? 0,
   uniqueFigmaKeys: keys.size,
   failures: failures.length,
@@ -137,7 +158,7 @@ const summary = {
 };
 
 console.log(
-  `Figma reference evidence: collections=${summary.collections} variableSamples=${summary.variableSamples} styles=${summary.styles} uniqueKeys=${summary.uniqueFigmaKeys} failures=${summary.failures}`,
+  `Figma reference evidence: collections=${summary.collections} variableSamples=${summary.variableSamples} resolvedValues=${summary.resolvedValueSamples} styles=${summary.styles} uniqueKeys=${summary.uniqueFigmaKeys} failures=${summary.failures}`,
 );
 console.log(JSON.stringify(summary, null, 2));
 
