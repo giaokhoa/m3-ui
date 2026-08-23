@@ -54,6 +54,37 @@ describe('IconButton defaults', () => {
     expect(iconToggleButtonShapesForSize('small', 'square').selectedShape).toBe(token.ShapeFull);
   });
 
+  it('keeps baseline shapes static unless the expressive shapes overload is requested', () => {
+    const pressedAction = style('standard', { isDisabled: false, isPressed: true });
+    const selectedToggle = style('standard', { isDisabled: false, isPressed: false, isSelected: true });
+    const selectedSquareToggle = style(
+      'standard',
+      { isDisabled: false, isPressed: false, isSelected: true },
+      { shape: 'square' },
+    );
+
+    expect(pressedAction['--_icon-button-container-radius']).toBe(token.ShapeFull);
+    expect(selectedToggle['--_icon-button-container-radius']).toBe(token.ShapeFull);
+    expect(selectedSquareToggle['--_icon-button-container-radius']).toBe(token.ShapeMedium);
+  });
+
+  it('applies expressive selected shape while pressed shape takes interaction precedence', () => {
+    const shapes = iconToggleButtonShapesForSize('small', 'round');
+    const selected = style(
+      'standard',
+      { isDisabled: false, isPressed: false, isSelected: true },
+      { shapes },
+    );
+    const pressedSelected = style(
+      'standard',
+      { isDisabled: false, isPressed: true, isSelected: true },
+      { shapes },
+    );
+
+    expect(selected['--_icon-button-container-radius']).toBe(token.ShapeMedium);
+    expect(pressedSelected['--_icon-button-container-radius']).toBe(token.ShapeSmall);
+  });
+
   it('switches standard toggle content color without inventing a container', () => {
     const unselected = style('standard', { isDisabled: false, isPressed: false, isSelected: false });
     const selected = style('standard', { isDisabled: false, isPressed: false, isSelected: true });
