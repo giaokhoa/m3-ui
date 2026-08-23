@@ -40,12 +40,9 @@ jobs:
       - name: Install Chromium headless shell
         run: pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium
       - name: Bootstrap IconButton visual baselines
-        shell: bash
-        run: |
-          pnpm --filter @m3/storybook test:visual:update
-          while IFS= read -r file; do
-            echo "SNAPSHOT_BASE64_BEGIN $file"
-            base64 -w 0 "$file"
-            echo
-            echo "SNAPSHOT_BASE64_END $file"
-          done < <(find apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts -type f -name '*.png' | sort)
+        run: pnpm --filter @m3/storybook test:visual:update
+      - name: Upload IconButton visual baselines
+        uses: actions/upload-artifact@v4
+        with:
+          name: icon-button-visual-baselines
+          path: apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts
