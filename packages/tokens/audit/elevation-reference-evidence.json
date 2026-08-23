@@ -1,0 +1,237 @@
+{
+  "id": "material3-elevation-reference-evidence",
+  "status": "reference-audit",
+  "buildInput": false,
+  "verifiedAt": "2026-08-23",
+  "androidxCompose": {
+    "kind": "implementation-reference",
+    "name": "AndroidX Compose Material3",
+    "repository": "androidx/androidx",
+    "revision": "ff9a7111302243197384c499d5e3461c1804cd6e",
+    "revisionAt": "2026-08-22T05:52:17Z",
+    "file": {
+      "path": "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/ElevationTokens.kt",
+      "generatedVersion": "v0_103"
+    },
+    "semanticLevelDp": [0, 1, 3, 6, 8, 12]
+  },
+  "materialWeb": {
+    "kind": "implementation-reference",
+    "name": "Material Web",
+    "repository": "material-components/material-web",
+    "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "revisionAt": "2026-08-21T19:30:42Z",
+    "latestGenerated": {
+      "version": "34.0.21",
+      "path": "tokens/versions/latest/sass/_md-sys-elevation.scss",
+      "semanticLevelPx": [0, 1, 3, 6, 8, 12]
+    },
+    "publicAdapter": {
+      "version": "v0.192",
+      "generatedPath": "tokens/versions/v0_192/_md-sys-elevation.scss",
+      "wrapperPath": "tokens/_md-sys-elevation.scss",
+      "generatedSemanticLevelPx": [0, 1, 3, 6, 8, 12],
+      "publicLevelApi": [0, 1, 2, 3, 4, 5],
+      "explicitlyRemapsDpToLevelNumber": true
+    },
+    "renderer": {
+      "path": "elevation/internal/_elevation.scss",
+      "shadowLayerCount": 2,
+      "shadowOpacities": [0.3, 0.15],
+      "normalizedByLevel": {
+        "1": {
+          "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+          "ambient": { "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 1, "opacity": 0.15 }
+        },
+        "2": {
+          "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+          "ambient": { "offsetX": 0, "offsetY": 2, "blurRadius": 6, "spreadRadius": 2, "opacity": 0.15 }
+        },
+        "3": {
+          "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          "ambient": { "offsetX": 0, "offsetY": 4, "blurRadius": 8, "spreadRadius": 3, "opacity": 0.15 }
+        },
+        "4": {
+          "key": { "offsetX": 0, "offsetY": 2, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          "ambient": { "offsetX": 0, "offsetY": 6, "blurRadius": 10, "spreadRadius": 4, "opacity": 0.15 }
+        },
+        "5": {
+          "key": { "offsetX": 0, "offsetY": 4, "blurRadius": 4, "spreadRadius": 0, "opacity": 0.3 },
+          "ambient": { "offsetX": 0, "offsetY": 8, "blurRadius": 12, "spreadRadius": 6, "opacity": 0.15 }
+        }
+      }
+    }
+  },
+  "figmaMaterial3Kit": {
+    "kind": "design-reference",
+    "name": "Material 3 Design Kit",
+    "libraryKey": "lk-5a31d104cabc6a74d4edf6425e7bc6575e9c0f18cda7efb746193aef4d915b077d115c985e6cf49d36d97d455a17d5127a2cbbfbc618b8a70a38669dccb61462",
+    "version": "1.25",
+    "releasedAt": "2026-05-19",
+    "readOnly": true,
+    "publishedSearch": {
+      "query": "elevation",
+      "variables": 0,
+      "styles": 10,
+      "effectStyles": 10
+    },
+    "normalization": "Figma float alpha values are normalized to 0.30/0.15, and effect order is normalized by semantic opacity so Light/Dark ordering differences do not become false recipe drift.",
+    "effectStyles": [
+      {
+        "theme": "light",
+        "level": 1,
+        "name": "M3/Elevation Light/1",
+        "key": "ae7b88a37b8a35111f8613c97c062229546aa639",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 1, "opacity": 0.15 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 }
+        ]
+      },
+      {
+        "theme": "light",
+        "level": 2,
+        "name": "M3/Elevation Light/2",
+        "key": "49de2b404e10c7e4ede0a3d50d9ebc421e746da6",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 2, "blurRadius": 6, "spreadRadius": 2, "opacity": 0.15 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 }
+        ]
+      },
+      {
+        "theme": "light",
+        "level": 3,
+        "name": "M3/Elevation Light/3",
+        "key": "e9b5c939edb2bf47116c5b6f0bf3543e4bc9b816",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 4, "blurRadius": 8, "spreadRadius": 3, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "light",
+        "level": 4,
+        "name": "M3/Elevation Light/4",
+        "key": "3c96e79254af7e27bcc53183c4bc3e613a404896",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 2, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 6, "blurRadius": 10, "spreadRadius": 4, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "light",
+        "level": 5,
+        "name": "M3/Elevation Light/5",
+        "key": "624a5f09f9159a4a586efca9d665d82c1ee1f07a",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 4, "blurRadius": 4, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 8, "blurRadius": 12, "spreadRadius": 6, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "dark",
+        "level": 1,
+        "name": "M3/Elevation Dark/1",
+        "key": "5d2da3ae97da251c1fedb2c392d4afe54c282a00",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 1, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "dark",
+        "level": 2,
+        "name": "M3/Elevation Dark/2",
+        "key": "2448e8e1e73289015d8f34143e0eb4ff8ab8b928",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 2, "blurRadius": 6, "spreadRadius": 2, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "dark",
+        "level": 3,
+        "name": "M3/Elevation Dark/3",
+        "key": "23797bea4710cd0793bd952c409e3951bd8b8c63",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 4, "blurRadius": 8, "spreadRadius": 3, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "dark",
+        "level": 4,
+        "name": "M3/Elevation Dark/4",
+        "key": "ecd9b58034687b337a05ab519fee5b73fae12188",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 2, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 6, "blurRadius": 10, "spreadRadius": 4, "opacity": 0.15 }
+        ]
+      },
+      {
+        "theme": "dark",
+        "level": 5,
+        "name": "M3/Elevation Dark/5",
+        "key": "618dd53be6045f8e18776a7924cdf55026c5f023",
+        "effects": [
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 4, "blurRadius": 4, "spreadRadius": 0, "opacity": 0.3 },
+          { "type": "DROP_SHADOW", "offsetX": 0, "offsetY": 8, "blurRadius": 12, "spreadRadius": 6, "opacity": 0.15 }
+        ]
+      }
+    ],
+    "normalizedByLevel": {
+      "1": {
+        "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+        "ambient": { "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 1, "opacity": 0.15 }
+      },
+      "2": {
+        "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 2, "spreadRadius": 0, "opacity": 0.3 },
+        "ambient": { "offsetX": 0, "offsetY": 2, "blurRadius": 6, "spreadRadius": 2, "opacity": 0.15 }
+      },
+      "3": {
+        "key": { "offsetX": 0, "offsetY": 1, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+        "ambient": { "offsetX": 0, "offsetY": 4, "blurRadius": 8, "spreadRadius": 3, "opacity": 0.15 }
+      },
+      "4": {
+        "key": { "offsetX": 0, "offsetY": 2, "blurRadius": 3, "spreadRadius": 0, "opacity": 0.3 },
+        "ambient": { "offsetX": 0, "offsetY": 6, "blurRadius": 10, "spreadRadius": 4, "opacity": 0.15 }
+      },
+      "5": {
+        "key": { "offsetX": 0, "offsetY": 4, "blurRadius": 4, "spreadRadius": 0, "opacity": 0.3 },
+        "ambient": { "offsetX": 0, "offsetY": 8, "blurRadius": 12, "spreadRadius": 6, "opacity": 0.15 }
+      }
+    }
+  },
+  "canonicalSummary": {
+    "semanticLevelPx": [0, 1, 3, 6, 8, 12],
+    "shadowLayerCount": 3,
+    "shadowOpacities": [0.2, 0.14, 0.12]
+  },
+  "reconciliation": {
+    "semanticLevels": {
+      "canonicalVsComposeMatches": 6,
+      "canonicalVsMaterialWebLatestMatches": 6,
+      "mismatches": 0
+    },
+    "materialWebPublicAdapter": {
+      "semanticValuesPreservedBehindAdapter": true,
+      "ordinalApiRemap": true
+    },
+    "figmaVsMaterialWebRenderer": {
+      "publishedEffectStyles": 10,
+      "styleMatches": 10,
+      "uniqueLevelRecipeMatches": 5,
+      "lightDarkEquivalentLevels": 5,
+      "mismatches": 0
+    },
+    "canonicalVsFigmaMaterialWebRenderer": {
+      "levelsCompared": 5,
+      "exactRecipeMatches": 0,
+      "mismatches": 5,
+      "canonicalLayers": 3,
+      "referenceLayers": 2,
+      "canonicalMutationRequired": false,
+      "preferredReference": "normative-spec-review"
+    },
+    "note": "Canonical semantic elevation levels agree with pinned Compose and Material Web generated values. Figma V1.25 Light/Dark elevation effect styles and Material Web's current elevation renderer independently agree on the same two-layer key/ambient shadow geometry for levels 1-5. Canonical shadow tokens still use a different three-layer recipe; that difference is preserved for normative material.io review instead of mutating canonical DTCG from implementation/design references."
+  }
+}
