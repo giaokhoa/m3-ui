@@ -65,6 +65,25 @@ test.describe('Material 3 IconButton visual parity', () => {
 
   test('expressive size family', async ({ page }) => {
     await openStory(page, 'components-iconbutton--expressive-sizes');
+
+    const sizes = [
+      ['extraSmall', 32],
+      ['small', 40],
+      ['medium', 56],
+      ['large', 96],
+      ['extraLarge', 136],
+    ] as const;
+
+    for (const [size, surfaceHeight] of sizes) {
+      const button = page.getByRole('button', { name: `${size} favorite` });
+      const surface = button.locator('.m3-icon-button__surface');
+      const buttonBox = await button.boundingBox();
+      const surfaceBox = await surface.boundingBox();
+
+      expect(surfaceBox?.height).toBe(surfaceHeight);
+      expect(buttonBox?.height).toBe(Math.max(48, surfaceHeight));
+    }
+
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
       'icon-button-expressive-sizes.png',
     );
