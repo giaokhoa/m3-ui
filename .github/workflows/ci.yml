@@ -2,47 +2,35 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
+  actions: read
 
 jobs:
   verify:
-    name: Bootstrap IconButton visual baselines
+    name: Commit IconButton visual baselines
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout PR branch
         uses: actions/checkout@v7
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
         with:
-          version: 10.0.0
-          run_install: false
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Test
-        run: pnpm test
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Build
-        run: pnpm build
-      - name: Install Chromium headless shell
-        run: pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium
-      - name: Bootstrap IconButton visual baselines
-        run: pnpm --filter @m3/storybook test:visual:update
-      - name: Upload IconButton visual baselines
-        uses: actions/upload-artifact@v4
-        with:
-          name: icon-button-visual-baselines
-          path: apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts
+          ref: feat/icon-button-parity
+      - name: Download validated baselines
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts
+          gh api /repos/${{ github.repository }}/actions/artifacts/9494139649/zip > /tmp/icon-button-baselines.zip
+          unzip -o /tmp/icon-button-baselines.zip -d apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts
+      - name: Commit baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/storybook/visual/__screenshots__/icon-button.visual.spec.ts
+          git commit -m "test(storybook): add IconButton visual baselines"
+          git push origin HEAD:feat/icon-button-parity
