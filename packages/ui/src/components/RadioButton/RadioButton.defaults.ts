@@ -9,6 +9,7 @@ export const radioButtonBaseStyle: RadioButtonStyle = {
   '--_radio-interactive-size': `${radioButtonTokens.minimumInteractiveSize}px`,
   '--_radio-stroke-width': `${radioButtonTokens.strokeWidth}px`,
   '--_radio-dot-size': `${radioButtonTokens.dotSize}px`,
+  '--_radio-label-color': radioButtonTokens.labelColor,
   '--_radio-selected-color': radioButtonTokens.colors.selected,
   '--_radio-unselected-color': radioButtonTokens.colors.unselected,
   '--_radio-disabled-selected-color': radioButtonTokens.colors.disabledSelected,
@@ -19,4 +20,9 @@ export const radioButtonBaseStyle: RadioButtonStyle = {
   '--_radio-color-easing': radioButtonTokens.motion.color.easing,
   '--_radio-dot-duration': `${radioButtonTokens.motion.dot.durationMs}ms`,
   '--_radio-dot-easing': radioButtonTokens.motion.dot.easing,
+};
+
+export const radioGroupBaseStyle: RadioButtonStyle = {
+  '--_radio-group-content-color': radioButtonTokens.group.contentColor,
+  '--_radio-group-error-color': radioButtonTokens.group.errorColor,
 };
