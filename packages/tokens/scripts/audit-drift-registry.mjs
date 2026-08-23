@@ -7,6 +7,10 @@ import { material3Sources } from './sources.mjs';
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const auditDir = resolve(scriptDir, '../audit');
 const canonical = collectTokens(await readCanonicalDirectory(resolve(scriptDir, '../tokens')));
+const typographyTrackingEvidenceFile = 'typography-tracking-reference-evidence.json';
+const typographyTrackingEvidence = JSON.parse(
+  await readFile(resolve(auditDir, typographyTrackingEvidenceFile), 'utf8'),
+);
 
 const driftFiles = (await readdir(auditDir))
   .filter((name) => name.endsWith('-drift.json') || name === 'foundation-drift.json')
@@ -98,6 +102,34 @@ for (const file of driftFiles) {
   }
 }
 
+const corroboratingReferenceChecks = [
+  {
+    path: 'materialComponentsAndroid.revision',
+    expected: material3Sources.materialComponentsAndroid.revision,
+    actual: typographyTrackingEvidence.materialComponentsAndroid?.revision,
+  },
+  {
+    path: 'materialComponentsAndroid.generatedVersion',
+    expected: material3Sources.materialComponentsAndroid.generatedVersion,
+    actual: typographyTrackingEvidence.materialComponentsAndroid?.generatedVersion,
+  },
+  {
+    path: 'flutter.revision',
+    expected: material3Sources.flutter.revision,
+    actual: typographyTrackingEvidence.flutter?.revision,
+  },
+  {
+    path: 'flutter.generatedFrom',
+    expected: material3Sources.flutter.generatedFrom,
+    actual: typographyTrackingEvidence.flutter?.generatedFrom,
+  },
+];
+for (const check of corroboratingReferenceChecks) {
+  if (check.actual !== check.expected) {
+    revisionMismatches.push({ file: typographyTrackingEvidenceFile, ...check });
+  }
+}
+
 const byId = new Map();
 for (const drift of drifts) {
   const previous = byId.get(drift.id) ?? [];
@@ -126,6 +158,10 @@ const summary = {
     materialWeb: `${material3Sources.materialWeb.repository}@${material3Sources.materialWeb.revision}`,
     materialWebGeneratedVersion: material3Sources.materialWeb.latestGeneratedVersion,
     figma: `${material3Sources.figma.name} ${material3Sources.figma.version}`,
+    materialComponentsAndroid: `${material3Sources.materialComponentsAndroid.repository}@${material3Sources.materialComponentsAndroid.revision}`,
+    materialComponentsAndroidGeneratedVersion: material3Sources.materialComponentsAndroid.generatedVersion,
+    flutter: `${material3Sources.flutter.repository}@${material3Sources.flutter.revision}`,
+    flutterGeneratedFrom: material3Sources.flutter.generatedFrom,
   },
   counts: {
     manifests: driftFiles.length,
