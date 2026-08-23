@@ -49,6 +49,21 @@ function revisionChecks(value, trail = [], output = []) {
       ) {
         output.push({ path, expected: material3Sources.materialWeb.latestGeneratedVersion, actual: child });
       }
+      if (path.endsWith('materialComponentsAndroid.revision')) {
+        output.push({ path, expected: material3Sources.materialComponentsAndroid.revision, actual: child });
+      }
+      if (
+        key === 'materialComponentsAndroidGeneratedVersion' ||
+        path.endsWith('materialComponentsAndroid.generatedVersion')
+      ) {
+        output.push({ path, expected: material3Sources.materialComponentsAndroid.generatedVersion, actual: child });
+      }
+      if (path.endsWith('flutter.revision')) {
+        output.push({ path, expected: material3Sources.flutter.revision, actual: child });
+      }
+      if (path.endsWith('flutter.generatedFrom')) {
+        output.push({ path, expected: material3Sources.flutter.generatedFrom, actual: child });
+      }
     }
     revisionChecks(child, nextTrail, output);
   }
