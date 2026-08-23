@@ -277,6 +277,11 @@ export function iconToggleButtonShapesForSize(
   return baseShapes(size, shape);
 }
 
+function hasSelectedShape(shapes: IconButtonShapes): shapes is IconToggleButtonShapes {
+  if (!('selectedShape' in shapes)) return false;
+  return typeof shapes.selectedShape === 'string' || typeof shapes.selectedShape === 'number';
+}
+
 function cssLength(value: IconButtonShapeValue): string {
   return typeof value === 'number' ? `${value}px` : value;
 }
@@ -293,7 +298,7 @@ export function getIconButtonStyle(
   const colors = iconButtonVariantTokens[variant];
   const defaultShapes = baseShapes(size, shape);
   const shapes = options.shapes ?? defaultShapes;
-  const selectedShape = 'selectedShape' in shapes ? shapes.selectedShape : shapes.shape;
+  const selectedShape = hasSelectedShape(shapes) ? shapes.selectedShape : shapes.shape;
   const radius = state.isPressed ? shapes.pressedShape : state.isSelected ? selectedShape : shapes.shape;
   const isToggle = state.isSelected !== undefined;
 
