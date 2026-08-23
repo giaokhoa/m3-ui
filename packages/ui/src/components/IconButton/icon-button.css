@@ -1,0 +1,90 @@
+.m3-icon-button {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: max(var(--_icon-button-target-size), var(--_icon-button-container-width));
+  block-size: var(--_icon-button-target-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m3-icon-button__surface {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_icon-button-container-width);
+  block-size: var(--_icon-button-container-height);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: var(--_icon-button-outline-width) solid var(--_icon-button-outline-color);
+  border-radius: var(--_icon-button-container-radius);
+  background: var(--_icon-button-container-color);
+  color: var(--_icon-button-content-color);
+  transition:
+    border-radius var(--_icon-button-shape-duration) var(--_icon-button-shape-easing),
+    background-color 100ms linear,
+    border-color 100ms linear,
+    color 100ms linear;
+  --ripple-color: currentColor;
+}
+
+.m3-icon-button__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  inline-size: var(--_icon-button-icon-size);
+  block-size: var(--_icon-button-icon-size);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.m3-icon-button__icon > svg,
+.m3-icon-button__icon > img {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.m3-icon-button[data-disabled] {
+  cursor: default;
+}
+
+.m3-icon-button[data-disabled] .m3-icon-button__surface {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-icon-button__surface {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .m3-icon-button__surface,
+  .m3-icon-button[data-selected] .m3-icon-button__surface {
+    border-color: ButtonText;
+    background: Canvas;
+    color: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .m3-icon-button[data-focus-visible] .m3-icon-button__surface {
+    outline: 2px solid ButtonText;
+    outline-offset: 2px;
+  }
+
+  .m3-icon-button[data-disabled] .m3-icon-button__surface {
+    border-color: GrayText;
+    color: GrayText;
+  }
+}
