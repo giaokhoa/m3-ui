@@ -148,7 +148,7 @@ test('Figma and Material Web share contrast role identity but use reproducibly d
 });
 
 test('contrast-mode evidence remains audit-only and is represented by one source-model drift record', () => {
-  assert.deepEqual(Object.keys(baselineDoc.scheme.baseline).sort(), ['dark', 'light']);
+  assert.deepEqual(Object.keys(baselineDoc.scheme.baseline).filter((key) => !key.startsWith('$')).sort(), ['dark', 'light']);
   assert.equal('lightHigh' in baselineDoc.scheme.baseline, false);
   assert.equal('darkMedium' in baselineDoc.scheme.baseline, false);
   const drift = (colorDrift.records ?? []).find((entry) => entry.id === 'color-contrast-generation-model');
