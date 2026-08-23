@@ -10,19 +10,33 @@ test('material.io remains the normative textual spec', () => {
   }
 });
 
-test('Figma, Compose and Material Web remain reference sources, not spec', () => {
+test('Figma and implementation corpora remain reference sources, not spec', () => {
   assert.equal(material3Sources.figma.kind, 'design-reference');
-  assert.equal(material3Sources.compose.kind, 'implementation-reference');
-  assert.equal(material3Sources.materialWeb.kind, 'implementation-reference');
+  for (const source of [
+    material3Sources.compose,
+    material3Sources.materialWeb,
+    material3Sources.materialComponentsAndroid,
+    material3Sources.flutter,
+  ]) {
+    assert.equal(source.kind, 'implementation-reference');
+    assert.notEqual(source.kind, 'normative-text');
+  }
   assert.notEqual(material3Sources.figma.kind, 'normative-text');
-  assert.notEqual(material3Sources.compose.kind, 'normative-text');
-  assert.notEqual(material3Sources.materialWeb.kind, 'normative-text');
 });
 
 test('source metadata is pinned so freshness decisions are reproducible', () => {
-  assert.match(material3Sources.compose.revision, /^[0-9a-f]{40}$/);
-  assert.match(material3Sources.materialWeb.revision, /^[0-9a-f]{40}$/);
+  for (const source of [
+    material3Sources.compose,
+    material3Sources.materialWeb,
+    material3Sources.materialComponentsAndroid,
+    material3Sources.flutter,
+  ]) {
+    assert.match(source.revision, /^[0-9a-f]{40}$/);
+    assert.ok(Number.isFinite(sourceFreshness(source)));
+  }
   assert.match(material3Sources.figma.version, /^\d+\.\d+$/);
   assert.ok(sourceFreshness(material3Sources.compose) > sourceFreshness(material3Sources.figma));
   assert.ok(sourceFreshness(material3Sources.materialWeb) > sourceFreshness(material3Sources.figma));
+  assert.ok(sourceFreshness(material3Sources.materialComponentsAndroid) > sourceFreshness(material3Sources.figma));
+  assert.ok(sourceFreshness(material3Sources.flutter) > sourceFreshness(material3Sources.figma));
 });
