@@ -75,7 +75,10 @@ test.describe('Material 3 IconButton visual parity', () => {
     ] as const;
 
     for (const [size, surfaceHeight] of sizes) {
-      const button = page.getByRole('button', { name: `${size} favorite` });
+      const button = page.getByRole('button', {
+        name: `${size} favorite`,
+        exact: true,
+      });
       const surface = button.locator('.m3-icon-button__surface');
       const buttonBox = await button.boundingBox();
       const surfaceBox = await surface.boundingBox();
