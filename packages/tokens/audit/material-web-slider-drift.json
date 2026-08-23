@@ -1,0 +1,64 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "slider-stop-indicator-color",
+      "materialWeb": "onSecondaryContainer",
+      "composeGenerated": "secondaryContainer",
+      "canonicalComposeSemantic": "component.slider.stopIndicatorColor = secondaryContainer",
+      "canonicalWebSemantic": "component.slider.webCurrent.stopIndicatorColor = onSecondaryContainer",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 uses onSecondaryContainer for the unselected stop indicator while pinned Compose generated SliderTokens keeps SecondaryContainer. Preserve both semantics."
+    },
+    {
+      "id": "slider-stop-indicator-selected-color",
+      "materialWeb": "onPrimary",
+      "composeGenerated": "secondaryContainer",
+      "canonicalComposeSemantic": "component.slider.stopIndicatorColorSelected = secondaryContainer",
+      "canonicalWebSemantic": "component.slider.webCurrent.stopIndicatorColorSelected = onPrimary",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 uses onPrimary for the selected stop indicator while pinned Compose generated SliderTokens keeps SecondaryContainer. Preserve both semantics."
+    },
+    {
+      "id": "slider-stop-indicator-trailing-space",
+      "materialWeb": "4px",
+      "composeGenerated": "6dp",
+      "canonicalComposeSemantic": "component.slider.stopIndicatorTrailingSpace = 6px",
+      "canonicalWebSemantic": "component.slider.webCurrent.stopIndicatorTrailingSpace = 4px",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 reduced stop-indicator trailing space to 4px while pinned Compose generated SliderTokens remains 6dp."
+    },
+    {
+      "id": "slider-disabled-stop-indicator-model",
+      "materialWeb": "active=inverseOnSurface; inactive=onSurface",
+      "composeGenerated": "single disabledStopColor=onSurface",
+      "canonicalComposeSemantic": "component.slider.disabledStopColor = onSurface",
+      "canonicalWebSemantic": "component.slider.webCurrent.disabledActiveStopIndicatorContainerColor = inverseOnSurface; component.slider.webCurrent.disabledInactiveStopIndicatorContainerColor = onSurface",
+      "classification": "source-model-drift",
+      "reason": "Material Web now models active and inactive disabled stop indicators separately, while Compose generated SliderTokens exposes one disabled stop color. The active Web role therefore cannot be represented by the Compose token without losing source fidelity."
+    },
+    {
+      "id": "slider-active-track-corner-model",
+      "materialWeb": "inner=0 2px 2px 0; outer=full",
+      "composeGenerated": "activeTrackShapeLeading=full",
+      "canonicalComposeSemantic": "component.slider.activeTrackShapeLeading = full",
+      "canonicalWebSemantic": "component.slider.webCurrent.activeTrackInnerCornerCornerSize = 0 2px 2px 0; component.slider.webCurrent.activeTrackOuterCornerCornerSize = full",
+      "classification": "source-model-drift",
+      "reason": "Material Web 34.0.21 split active-track corner semantics into inner and outer corners; Compose generated SliderTokens retains the older leading-shape semantic. Keep the Web split explicitly instead of coercing the inner corner tuple into the Compose shape token."
+    },
+    {
+      "id": "slider-value-indicator-label-metrics",
+      "materialWeb": "font/size/lineHeight=labelLarge; tracking/weight=bodyLarge",
+      "composeGenerated": "valueIndicatorLabelTextFont=LabelLarge",
+      "canonicalComposeSemantic": "component.slider.valueIndicatorLabelTextFont = labelLarge",
+      "canonicalWebSemantic": "component.slider.webCurrent.valueIndicatorLabelTextTracking = bodyLarge.tracking; component.slider.webCurrent.valueIndicatorLabelTextWeight = bodyLarge.weight",
+      "classification": "source-model-drift",
+      "reason": "Material Web 34.0.21 mixes LabelLarge font/size/line-height with BodyLarge tracking and weight for the value indicator. Compose exposes a single LabelLarge typography semantic, so the two Web metric overrides are preserved explicitly."
+    }
+  ],
+  "schemaVersion": 1
+}
