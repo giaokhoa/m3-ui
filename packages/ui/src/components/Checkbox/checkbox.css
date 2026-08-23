@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   margin: 0;
-  color: var(--on-surface);
+  color: var(--_checkbox-label-color);
   font: inherit;
   cursor: pointer;
   user-select: none;
@@ -127,7 +127,7 @@
 .m3-checkbox[data-disabled] .m3-checkbox__label {
   color: color-mix(
     in srgb,
-    var(--on-surface) var(--_checkbox-disabled-label-opacity),
+    var(--_checkbox-label-color) var(--_checkbox-disabled-label-opacity),
     transparent
   );
 }
