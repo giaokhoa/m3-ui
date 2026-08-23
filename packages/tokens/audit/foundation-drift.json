@@ -84,11 +84,16 @@
   "elevation": {
     "canonical": { "semanticLevelDp": [0, 1, 3, 6, 8, 12], "shadowLayerCount": 3, "shadowOpacities": [0.2, 0.14, 0.12] },
     "compose": { "semanticLevelDp": [0, 1, 3, 6, 8, 12] },
-    "figma": { "effectLevelsObserved": [1, 2, 3, 4, 5], "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15] },
-    "materialWeb": { "latestGeneratedSemanticLevelDp": [0, 1, 3, 6, 8, 12], "publicAdapterLevelApi": [0, 1, 2, 3, 4, 5], "publicAdapterExplicitlyRemapsDpToLevelNumber": true },
+    "figma": { "effectStyleCount": 10, "lightEffectLevelsObserved": [1, 2, 3, 4, 5], "darkEffectLevelsObserved": [1, 2, 3, 4, 5], "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15] },
+    "materialWeb": {
+      "latestGeneratedSemanticLevelDp": [0, 1, 3, 6, 8, 12],
+      "publicAdapterLevelApi": [0, 1, 2, 3, 4, 5],
+      "publicAdapterExplicitlyRemapsDpToLevelNumber": true,
+      "renderer": { "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15], "matchesFigmaEffectRecipes": true, "matchedLevels": [1, 2, 3, 4, 5] }
+    },
     "drift": [
       { "id": "elevation-web-level-api", "classification": "platform-adaptation", "reason": "Material Web latest generated values match the semantic dp scale; its public wrapper deliberately remaps them to ordinal 0-5 level numbers for the web API." },
-      { "id": "elevation-figma-shadow-recipe", "classification": "platform-adaptation", "reason": "Figma effect styles render two shadow layers at 0.30/0.15 while canonical web shadows use three layers at 0.20/0.14/0.12; semantic elevation level and rendered shadow recipe are audited separately." }
+      { "id": "elevation-figma-shadow-recipe", "classification": "cross-source-value-drift", "preferredReference": "normative-spec-review", "reason": "Figma V1.25 Light/Dark elevation effect styles and the pinned Material Web elevation renderer agree on the same two-layer key/ambient shadow recipes at levels 1-5 (0.30 key plus 0.15 ambient, with matching geometry), while canonical shadow tokens use three-layer 0.20/0.14/0.12 recipes. This is cross-source recipe drift rather than a Figma-only platform adaptation; canonical remains unchanged pending normative material.io evidence." }
     ]
   }
 }
