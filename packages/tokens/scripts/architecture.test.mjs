@@ -72,6 +72,19 @@ test('package exposes only the Style Dictionary generated root API', async () =>
   assert.equal(Object.hasOwn(manifest.scripts, 'typecheck'), false);
 });
 
+test('Style Dictionary skill describes the enforced token ownership boundary', async () => {
+  const skill = await readFile(
+    new URL('.agents/skills/style-dictionary/SKILL.md', repoRoot),
+    'utf8',
+  );
+
+  assert.match(skill, /no handwritten runtime `src\/` layer/i);
+  assert.match(skill, /Do not create `packages\/tokens\/src\/`/);
+  assert.match(skill, /runtime projections\/types belong beside their consumers in `@m3\/ui`/i);
+  assert.match(skill, /If an upstream source does not own a web-only token/i);
+  assert.doesNotMatch(skill, /src\/.*optional handwritten API\/types/i);
+});
+
 test('UI consumes @m3/tokens through the package root only', async () => {
   for (const file of await sourceFiles(uiSourceRoot)) {
     const source = await readFile(file, 'utf8');
