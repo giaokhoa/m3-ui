@@ -19,6 +19,10 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
+  args: {
+    'aria-label': 'Favorite',
+    children: <FavoriteIcon />,
+  },
 } satisfies Meta<typeof IconButton>;
 
 export default meta;
