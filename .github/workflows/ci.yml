@@ -109,6 +109,8 @@ jobs:
         run: pnpm --filter @m3/tokens audit:material-web-menu:complete
       - name: Require complete Material Web Slider overlap coverage
         run: pnpm --filter @m3/tokens audit:material-web-slider:complete
+      - name: Require strict declaration audit module union
+        run: pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3/tokens audit:androidx
       - name: Test
