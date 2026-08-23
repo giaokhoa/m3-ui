@@ -1,0 +1,68 @@
+{
+  "verifiedAt": "2026-08-23",
+  "buildInput": false,
+  "roleOrder": [
+    "displayLarge", "displayMedium", "displaySmall",
+    "headlineLarge", "headlineMedium", "headlineSmall",
+    "titleLarge", "titleMedium", "titleSmall",
+    "bodyLarge", "bodyMedium", "bodySmall",
+    "labelLarge", "labelMedium", "labelSmall"
+  ],
+  "materialComponentsAndroid": {
+    "kind": "implementation-reference",
+    "name": "Material Components Android",
+    "repository": "material-components/material-components-android",
+    "revision": "ac7e18efeefb331850c561faf9ab8bf81d27ba68",
+    "revisionAt": "2026-06-22T20:08:47Z",
+    "generatedVersion": "34.0.0",
+    "tokenFile": "lib/java/com/google/android/material/typography/res/values/tokens.xml",
+    "generatedTokenSet": "md.sys.typescale",
+    "platform": "android",
+    "audience": "3p",
+    "font": "static",
+    "roles": {
+      "displayLarge": { "fontSizeSp": 57, "letterSpacingEm": -0.00438596, "trackingPx": -0.25 },
+      "displayMedium": { "fontSizeSp": 45, "letterSpacingEm": 0, "trackingPx": 0 },
+      "displaySmall": { "fontSizeSp": 36, "letterSpacingEm": 0, "trackingPx": 0 },
+      "headlineLarge": { "fontSizeSp": 32, "letterSpacingEm": 0, "trackingPx": 0 },
+      "headlineMedium": { "fontSizeSp": 28, "letterSpacingEm": 0, "trackingPx": 0 },
+      "headlineSmall": { "fontSizeSp": 24, "letterSpacingEm": 0, "trackingPx": 0 },
+      "titleLarge": { "fontSizeSp": 22, "letterSpacingEm": 0, "trackingPx": 0 },
+      "titleMedium": { "fontSizeSp": 16, "letterSpacingEm": 0.009375, "trackingPx": 0.15 },
+      "titleSmall": { "fontSizeSp": 14, "letterSpacingEm": 0.00714286, "trackingPx": 0.1 },
+      "bodyLarge": { "fontSizeSp": 16, "letterSpacingEm": 0.03125, "trackingPx": 0.5 },
+      "bodyMedium": { "fontSizeSp": 14, "letterSpacingEm": 0.01785714, "trackingPx": 0.25 },
+      "bodySmall": { "fontSizeSp": 12, "letterSpacingEm": 0.03333333, "trackingPx": 0.4 },
+      "labelLarge": { "fontSizeSp": 14, "letterSpacingEm": 0.00714286, "trackingPx": 0.1 },
+      "labelMedium": { "fontSizeSp": 12, "letterSpacingEm": 0.04166667, "trackingPx": 0.5 },
+      "labelSmall": { "fontSizeSp": 11, "letterSpacingEm": 0.04545455, "trackingPx": 0.5 }
+    }
+  },
+  "flutter": {
+    "kind": "implementation-reference",
+    "name": "Flutter Material",
+    "repository": "flutter/flutter",
+    "revision": "4ebf37fe7df0a130ba5bee17315b98f905c10b34",
+    "revisionAt": "2026-08-22T20:55:48Z",
+    "tokenFile": "packages/flutter/lib/src/material/typography.dart",
+    "generatedFrom": "Material Design token database",
+    "generatedClass": "_M3Typography",
+    "roles": {
+      "displayLarge": -0.25,
+      "displayMedium": 0,
+      "displaySmall": 0,
+      "headlineLarge": 0,
+      "headlineMedium": 0,
+      "headlineSmall": 0,
+      "titleLarge": 0,
+      "titleMedium": 0.15,
+      "titleSmall": 0.1,
+      "bodyLarge": 0.5,
+      "bodyMedium": 0.25,
+      "bodySmall": 0.4,
+      "labelLarge": 0.1,
+      "labelMedium": 0.5,
+      "labelSmall": 0.5
+    }
+  }
+}
