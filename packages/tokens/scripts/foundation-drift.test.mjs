@@ -89,7 +89,7 @@ test('motion distinguishes latest Material Web standard springs from missing exp
   assert.equal(drift('motion', 'motion-spring-figma').classification, 'not-observed');
 });
 
-test('elevation latest generated semantics match while render/API adaptations stay separate', async () => {
+test('elevation semantic levels match while API adaptation and shadow-recipe drift stay separate', async () => {
   const token = await generated();
   assert.deepEqual([token.ElevationLevel0, token.ElevationLevel1, token.ElevationLevel2, token.ElevationLevel3, token.ElevationLevel4, token.ElevationLevel5], ['0px', '1px', '3px', '6px', '8px', '12px']);
   assert.deepEqual(audit.elevation.materialWeb.latestGeneratedSemanticLevelDp, [0, 1, 3, 6, 8, 12]);
@@ -97,7 +97,11 @@ test('elevation latest generated semantics match while render/API adaptations st
   assert.equal(token.ElevationShadowLevel5Layer1Opacity, 0.2);
   assert.equal(token.ElevationShadowLevel5Layer2Opacity, 0.14);
   assert.equal(token.ElevationShadowLevel5Layer3Opacity, 0.12);
+  assert.equal(audit.elevation.figma.effectStyleCount, 10);
   assert.equal(audit.elevation.figma.shadowLayerCount, 2);
+  assert.equal(audit.elevation.materialWeb.renderer.shadowLayerCount, 2);
+  assert.equal(audit.elevation.materialWeb.renderer.matchesFigmaEffectRecipes, true);
   assert.equal(drift('elevation', 'elevation-web-level-api').classification, 'platform-adaptation');
-  assert.equal(drift('elevation', 'elevation-figma-shadow-recipe').classification, 'platform-adaptation');
+  assert.equal(drift('elevation', 'elevation-figma-shadow-recipe').classification, 'cross-source-value-drift');
+  assert.equal(drift('elevation', 'elevation-figma-shadow-recipe').preferredReference, 'normative-spec-review');
 });
