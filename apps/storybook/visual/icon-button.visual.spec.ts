@@ -22,7 +22,7 @@ async function openDefaultIconButton(page: Page) {
 test.describe('Material 3 IconButton visual parity', () => {
   test('default target keeps 48px semantics around a 40px visual surface', async ({ page }) => {
     const button = await openDefaultIconButton(page);
-    const surface = button.locator('.m3-icon-button__surface');
+    const surface = button.locator('.icon-button__surface');
     const buttonBox = await button.boundingBox();
     const surfaceBox = await surface.boundingBox();
 
@@ -79,7 +79,7 @@ test.describe('Material 3 IconButton visual parity', () => {
         name: `${size} favorite`,
         exact: true,
       });
-      const surface = button.locator('.m3-icon-button__surface');
+      const surface = button.locator('.icon-button__surface');
       const buttonBox = await button.boundingBox();
       const surfaceBox = await surface.boundingBox();
 
