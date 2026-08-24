@@ -1,0 +1,37 @@
+.m3-loading-indicator {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--_loading-width);
+  block-size: var(--_loading-height);
+  overflow: hidden;
+  border-radius: var(--_loading-container-radius);
+  background: var(--_loading-container-color);
+  color: var(--_loading-indicator-color);
+  vertical-align: middle;
+}
+
+.m3-loading-indicator__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+
+.m3-loading-indicator__active {
+  fill: currentColor;
+}
+
+@media (forced-colors: active) {
+  .m3-loading-indicator {
+    --_loading-indicator-color: CanvasText;
+  }
+
+  .m3-loading-indicator--contained {
+    --_loading-container-color: Canvas;
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+}

@@ -4,6 +4,7 @@ export * from './Checkbox';
 export * from './Chip';
 export * from './Fab';
 export * from './IconButton';
+export * from './LoadingIndicator';
 export * from './ProgressIndicator';
 export * from './RadioButton';
 export * from './Slider';
