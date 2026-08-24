@@ -26,6 +26,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/IconButton/icon-button.css',
   ],
+  'loading-indicator': ['src/components/LoadingIndicator/loading-indicator.css'],
   'progress-indicator': ['src/components/ProgressIndicator/progress-indicator.css'],
   'radio-button': [
     'src/internal/ripple/ripple.css',
@@ -49,6 +50,7 @@ export const publicComponentStyleSources = {
   chip: 'src/components/Chip/chip.css',
   fab: 'src/components/Fab/fab.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
+  'loading-indicator': 'src/components/LoadingIndicator/loading-indicator.css',
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   slider: 'src/components/Slider/slider.css',
@@ -63,6 +65,7 @@ export const publicComponentModules = {
   chip: 'src/components/Chip/Chip.tsx',
   fab: 'src/components/Fab/Fab.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
+  'loading-indicator': 'src/components/LoadingIndicator/LoadingIndicator.tsx',
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   slider: 'src/components/Slider/Slider.tsx',
