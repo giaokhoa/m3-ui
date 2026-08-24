@@ -16,10 +16,10 @@ test.describe('Material 3 Slider browser contract', () => {
   test('single slider keeps RAC native semantics and Compose interaction geometry', async ({ page }) => {
     await openStory(page, 'components-slider--default');
     const slider = page.getByRole('slider', { name: 'Volume' });
-    const track = page.locator('.m3-slider__track');
-    const activeSegment = page.locator('.m3-slider__segment--active');
-    const nub = page.locator('.m3-slider__handle-nub');
-    const stop = page.locator('.m3-slider__stop');
+    const track = page.locator('.slider__track');
+    const activeSegment = page.locator('.slider__segment--active');
+    const nub = page.locator('.slider__handle-nub');
+    const stop = page.locator('.slider__stop');
 
     await expect(slider).toHaveAttribute('min', '0');
     await expect(slider).toHaveAttribute('max', '100');
@@ -70,9 +70,9 @@ test.describe('Material 3 Slider browser contract', () => {
     ] as const;
 
     for (const [size, trackHeight, handleHeight] of expectations) {
-      const root = page.locator(`.m3-slider[data-size="${size}"]`);
-      const segment = root.locator('.m3-slider__segment--active');
-      const nub = root.locator('.m3-slider__handle-nub');
+      const root = page.locator(`.slider[data-size="${size}"]`);
+      const segment = root.locator('.slider__segment--active');
+      const nub = root.locator('.slider__handle-nub');
       expect((await segment.boundingBox())?.height).toBe(trackHeight);
       expect((await nub.boundingBox())?.height).toBe(handleHeight);
     }
@@ -80,19 +80,19 @@ test.describe('Material 3 Slider browser contract', () => {
 
   test('discrete ticks and value indicators remain explicit web adaptations', async ({ page }) => {
     await openStory(page, 'components-slider--discrete-ticks');
-    const single = page.locator('.m3-slider').first();
-    await expect(single.locator('.m3-slider__tick')).toHaveCount(6);
+    const single = page.locator('.slider').first();
+    await expect(single.locator('.slider__tick')).toHaveCount(6);
 
     const slider = page.getByRole('slider', { name: 'Rating' });
     await slider.focus();
-    await expect(single.locator('.m3-slider__value-indicator')).toHaveText('60');
+    await expect(single.locator('.slider__value-indicator')).toHaveText('60');
   });
 
   test('vertical orientation swaps the canonical handle axes', async ({ page }) => {
     await openStory(page, 'components-slider--vertical');
     const slider = page.getByRole('slider', { name: 'Vertical volume' });
     await expect(slider).toHaveAttribute('aria-orientation', 'vertical');
-    const nub = page.locator('.m3-slider').first().locator('.m3-slider__handle-nub');
+    const nub = page.locator('.slider').first().locator('.slider__handle-nub');
     const box = await nub.boundingBox();
     expect(box?.width).toBe(44);
     expect(box?.height).toBe(4);
