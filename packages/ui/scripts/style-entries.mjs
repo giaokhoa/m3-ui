@@ -47,6 +47,7 @@ export const styleEntries = {
     'src/components/Switch/switch.css',
   ],
   'text-field': ['src/components/TextField/text-field.css'],
+  tooltip: ['src/components/Tooltip/tooltip.css'],
 };
 
 export const publicComponentStyleSources = {
@@ -65,6 +66,7 @@ export const publicComponentStyleSources = {
   slider: 'src/components/Slider/slider.css',
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
+  tooltip: 'src/components/Tooltip/tooltip.css',
 };
 
 export const publicComponentModules = {
@@ -83,4 +85,5 @@ export const publicComponentModules = {
   slider: 'src/components/Slider/Slider.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
+  tooltip: 'src/components/Tooltip/Tooltip.tsx',
 };

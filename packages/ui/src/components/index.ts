@@ -13,3 +13,4 @@ export * from './RadioButton';
 export * from './Slider';
 export * from './Switch';
 export * from './TextField';
+export * from './Tooltip';
