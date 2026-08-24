@@ -198,9 +198,7 @@
 }
 
 .m3-slider[data-orientation='horizontal'] .m3-slider__stop {
-  inset-inline-start: calc(
-    100% - var(--_slider-stop-trailing-space) - var(--_slider-stop-size) / 2
-  );
+  inset-inline-start: calc(100% - var(--_slider-stop-center-inset));
 }
 
 .m3-slider[data-orientation='vertical'] .m3-slider__stop,
@@ -209,9 +207,7 @@
 }
 
 .m3-slider[data-orientation='vertical'] .m3-slider__stop {
-  inset-block-start: calc(
-    var(--_slider-stop-trailing-space) + var(--_slider-stop-size) / 2
-  );
+  inset-block-start: var(--_slider-stop-center-inset);
   transform: translate(-50%, -50%);
 }
 
