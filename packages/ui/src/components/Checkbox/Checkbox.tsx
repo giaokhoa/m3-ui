@@ -104,7 +104,7 @@ export function Checkbox({
       {...props}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        return userClassName ? `m3-checkbox ${userClassName}` : 'm3-checkbox';
+        return userClassName ? `checkbox ${userClassName}` : 'checkbox';
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
@@ -126,8 +126,8 @@ export function Checkbox({
         const label = resolveChildren(children, renderProps);
         return (
           <>
-            <span className="m3-checkbox__control-slot" aria-hidden="true">
-              <span className="m3-checkbox__state-layer">
+            <span className="checkbox__control-slot" aria-hidden="true">
+              <span className="checkbox__state-layer">
                 <Ripple
                   controller={ripple}
                   focusRingInset={checkboxFocusRingInset}
@@ -136,19 +136,19 @@ export function Checkbox({
                   stateInteraction={latestStateLayerInteraction(activeInteractions, renderProps.isFocusVisible)}
                 />
               </span>
-              <span className="m3-checkbox__box" data-state={state}>
+              <span className="checkbox__box" data-state={state}>
                 <svg
-                  className="m3-checkbox__mark"
+                  className="checkbox__mark"
                   viewBox={`0 0 ${checkboxTokens.containerSize} ${checkboxTokens.containerSize}`}
                   focusable="false"
                 >
-                  <path className="m3-checkbox__check-path" pathLength="1" d={checkPath} />
-                  <path className="m3-checkbox__indeterminate-path" pathLength="1" d={indeterminatePath} />
+                  <path className="checkbox__check-path" pathLength="1" d={checkPath} />
+                  <path className="checkbox__indeterminate-path" pathLength="1" d={indeterminatePath} />
                 </svg>
               </span>
             </span>
             {label !== undefined && label !== null ? (
-              <span className="m3-checkbox__label">{label}</span>
+              <span className="checkbox__label">{label}</span>
             ) : null}
           </>
         );

@@ -57,7 +57,7 @@ interface SurfaceProps {
 }
 
 function variantClassName(variant: IconButtonVariant): string {
-  return `m3-icon-button--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+  return `icon-button--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
 }
 
 function IconButtonSurface({
@@ -67,14 +67,14 @@ function IconButtonSurface({
   isHovered,
 }: SurfaceProps) {
   return (
-    <span className="m3-icon-button__surface">
+    <span className="icon-button__surface">
       <Ripple
         controller={ripple}
         focusRingRadius="var(--_icon-button-container-radius)"
         isFocusVisible={isFocusVisible}
         isHovered={isHovered}
       />
-      <span aria-hidden="true" className="m3-icon-button__icon">
+      <span aria-hidden="true" className="icon-button__icon">
         {children}
       </span>
     </span>
@@ -112,7 +112,7 @@ function ActionIconButtonImpl({
       data-width={width}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        const baseClassName = `m3-icon-button ${variantClassName(variant)}`;
+        const baseClassName = `icon-button ${variantClassName(variant)}`;
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {
@@ -180,7 +180,7 @@ function ToggleIconButtonImpl({
       data-width={width}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        const baseClassName = `m3-icon-button ${variantClassName(variant)}`;
+        const baseClassName = `icon-button ${variantClassName(variant)}`;
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {

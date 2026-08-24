@@ -121,7 +121,7 @@ export function Switch({
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
-        return joinClassNames('m3-switch', userClassName);
+        return joinClassNames('switch', userClassName);
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
@@ -144,8 +144,8 @@ export function Switch({
 
         return (
           <>
-            <span className="m3-switch__control-slot" aria-hidden="true">
-              <span className="m3-switch__track">
+            <span className="switch__control-slot" aria-hidden="true">
+              <span className="switch__track">
                 <Ripple
                   controller={trackRipple}
                   focusRingRadius={switchTrackFocusRingRadius}
@@ -153,8 +153,8 @@ export function Switch({
                     rippleFocus === 'inset-ring' && renderProps.isFocusVisible
                   }
                 />
-                <span className="m3-switch__thumb-shell">
-                  <span className="m3-switch__state-layer">
+                <span className="switch__thumb-shell">
+                  <span className="switch__state-layer">
                     <Ripple
                       controller={thumbRipple}
                       isFocusVisible={
@@ -163,15 +163,15 @@ export function Switch({
                       stateInteraction={thumbStateInteraction}
                     />
                   </span>
-                  <span className="m3-switch__thumb">
+                  <span className="switch__thumb">
                     {thumbContent != null ? (
-                      <span className="m3-switch__icon">{thumbContent}</span>
+                      <span className="switch__icon">{thumbContent}</span>
                     ) : null}
                   </span>
                 </span>
               </span>
             </span>
-            {label != null ? <span className="m3-switch__label">{label}</span> : null}
+            {label != null ? <span className="switch__label">{label}</span> : null}
           </>
         );
       }}

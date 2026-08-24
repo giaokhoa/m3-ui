@@ -84,7 +84,7 @@ export function Ripple({
       {...props}
       ref={controller.containerRef}
       aria-hidden="true"
-      className={className ? `m3-ripple ${className}` : 'm3-ripple'}
+      className={className ? `ripple ${className}` : 'ripple'}
       data-focus-ring-radius={focusRingRadius === undefined ? undefined : true}
       data-focus-visible={
         rippleFocus === 'opacity' && resolvedStateInteraction === 'focus'
@@ -97,7 +97,7 @@ export function Ripple({
       }
       style={tokenStyle}
     >
-      <span className="m3-ripple__state-layer" />
+      <span className="ripple__state-layer" />
       {controller.waves.map((wave) => {
         const waveStyle: RippleStyle = {
           '--_ripple-x': `${wave.x}px`,
@@ -111,14 +111,14 @@ export function Ripple({
         return (
           <span
             key={wave.id}
-            className="m3-ripple__wave"
+            className="ripple__wave"
             data-releasing={wave.isReleasing || undefined}
             style={waveStyle}
           />
         );
       })}
       {rippleFocus === 'inset-ring' ? (
-        <span className="m3-ripple__focus-ring" style={focusRingStyle} />
+        <span className="ripple__focus-ring" style={focusRingStyle} />
       ) : null}
     </span>
   );

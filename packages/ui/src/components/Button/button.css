@@ -1,4 +1,4 @@
-.m3-button {
+.button {
   position: relative;
   display: inline-flex;
   box-sizing: border-box;
@@ -28,22 +28,22 @@
   --ripple-color: var(--_button-content-color);
 }
 
-.m3-button[data-has-start-icon] {
+.button[data-has-start-icon] {
   padding-inline-start: var(--_button-icon-padding-inline-start);
   padding-inline-end: var(--_button-icon-padding-inline-end);
 }
 
-.m3-button[data-has-end-icon]:not([data-has-start-icon]) {
+.button[data-has-end-icon]:not([data-has-start-icon]) {
   padding-inline-start: var(--_button-icon-padding-inline-end);
   padding-inline-end: var(--_button-icon-padding-inline-start);
 }
 
-.m3-button[data-has-start-icon][data-has-end-icon] {
+.button[data-has-start-icon][data-has-end-icon] {
   padding-inline-start: var(--_button-icon-padding-inline-start);
   padding-inline-end: var(--_button-icon-padding-inline-start);
 }
 
-.m3-button__content {
+.button__content {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -51,12 +51,12 @@
   justify-content: center;
 }
 
-.m3-button[data-has-start-icon] .m3-button__content,
-.m3-button[data-has-end-icon] .m3-button__content {
+.button[data-has-start-icon] .button__content,
+.button[data-has-end-icon] .button__content {
   gap: var(--_button-icon-spacing);
 }
 
-.m3-button__icon {
+.button__icon {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -66,12 +66,12 @@
   color: currentColor;
 }
 
-.m3-button__icon > svg {
+.button__icon > svg {
   inline-size: 100%;
   block-size: 100%;
 }
 
-.m3-button[data-disabled] {
+.button[data-disabled] {
   border-color: color-mix(
     in srgb,
     var(--_button-outline-color) var(--_button-disabled-outline-opacity),
@@ -91,22 +91,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-button {
+  .button {
     transition: none !important;
   }
 }
 
 @media (forced-colors: active) {
-  .m3-button {
+  .button {
     border-color: ButtonText;
   }
 
-  .m3-button:focus-visible {
+  .button:focus-visible {
     outline: 2px solid ButtonText;
     outline-offset: 2px;
   }
 
-  .m3-button[data-disabled] {
+  .button[data-disabled] {
     border-color: GrayText;
     color: GrayText;
   }

@@ -36,7 +36,7 @@ function SendIcon() {
 
 function VariantStack({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="m3-storybook-stack">
+    <div className="storybook-stack">
       <Button isDisabled={disabled}>Filled</Button>
       <ElevatedButton isDisabled={disabled}>Elevated</ElevatedButton>
       <FilledTonalButton isDisabled={disabled}>Filled tonal</FilledTonalButton>
@@ -48,7 +48,7 @@ function VariantStack({ disabled = false }: { disabled?: boolean }) {
 
 export const Default: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Button {...args} />
     </div>
   ),
@@ -56,7 +56,7 @@ export const Default: Story = {
 
 export const Variants: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <VariantStack />
     </div>
   ),
@@ -68,7 +68,7 @@ export const DisabledVariants: Story = {
     children: 'Disabled button',
   },
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <VariantStack disabled />
     </div>
   ),
@@ -76,8 +76,8 @@ export const DisabledVariants: Story = {
 
 export const Icons: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <Button startIcon={<SendIcon />}>Send</Button>
         <FilledTonalButton startIcon={<SendIcon />}>Send</FilledTonalButton>
         <OutlinedButton endIcon={<SendIcon />}>Continue</OutlinedButton>
@@ -89,8 +89,8 @@ export const Icons: Story = {
 
 export const ExpressiveSizes: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <Button size="extraSmall" startIcon={<SendIcon />}>
           Extra small
         </Button>
@@ -113,8 +113,8 @@ export const ExpressiveSizes: Story = {
 
 export const ExpressiveShapeMorph: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <Button size="small" shapes={buttonShapesForSize('small')}>
           Press small
         </Button>
@@ -135,8 +135,8 @@ export const ExpressiveShapeMorph: Story = {
 
 export const ContentLengths: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <Button>OK</Button>
         <Button>Filled button</Button>
         <Button>A considerably longer button label</Button>
@@ -148,19 +148,19 @@ export const ContentLengths: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <VariantStack />
       </ThemeProvider>
 
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <VariantStack />
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         sourceColor="#006a60"
       >
@@ -169,7 +169,7 @@ export const ThemeMatrix: Story = {
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="dark"
         sourceColor="#b3261e"
       >

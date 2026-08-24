@@ -8,7 +8,7 @@ body {
   margin: 0;
 }
 
-.m3-storybook-theme {
+.storybook-theme {
   box-sizing: border-box;
   min-height: 100vh;
   padding: 32px;
@@ -17,26 +17,26 @@ body {
   font-family: sans-serif;
 }
 
-.m3-storybook-center {
+.storybook-center {
   display: grid;
   min-height: calc(100vh - 64px);
   place-items: center;
 }
 
-.m3-storybook-stack {
+.storybook-stack {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   align-items: center;
 }
 
-.m3-storybook-theme-grid {
+.storybook-theme-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
 
-.m3-storybook-theme-card {
+.storybook-theme-card {
   box-sizing: border-box;
   min-height: 180px;
   padding: 24px;
@@ -46,7 +46,7 @@ body {
   color: var(--on-surface);
 }
 
-.m3-storybook-theme-card h3 {
+.storybook-theme-card h3 {
   margin: 0 0 24px;
   font: 500 16px/24px sans-serif;
 }

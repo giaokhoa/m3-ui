@@ -37,7 +37,7 @@ function Row({ children }: { children: ReactNode }) {
 
 export const Default: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <LoadingIndicator aria-label="Loading" />
     </div>
   ),
@@ -45,7 +45,7 @@ export const Default: Story = {
 
 export const Determinate: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Row>
         <LoadingIndicator aria-label="Loading 0 percent" value={0} />
         <LoadingIndicator aria-label="Loading 25 percent" value={0.25} />
@@ -59,7 +59,7 @@ export const Determinate: Story = {
 
 export const Contained: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Row>
         <ContainedLoadingIndicator aria-label="Contained loading" />
         <ContainedLoadingIndicator
@@ -87,20 +87,20 @@ function ThemeSet() {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ThemeSet />
       </ThemeProvider>

@@ -40,7 +40,7 @@ function Row({ children }: { children: ReactNode }) {
 
 export const Default: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <LinearProgressIndicator aria-label="Loading progress" value={0.45} />
     </div>
   ),
@@ -49,7 +49,7 @@ export const Default: Story = {
 export const StandardTypes: Story = {
   name: 'Standard types',
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Row>
         <LinearProgressIndicator aria-label="Linear 65 percent" value={0.65} />
         <LinearProgressIndicator aria-label="Linear loading" isIndeterminate />
@@ -63,7 +63,7 @@ export const StandardTypes: Story = {
 export const ExpressiveWavy: Story = {
   name: 'Expressive wavy',
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Row>
         <LinearWavyProgressIndicator aria-label="Wavy linear 60 percent" value={0.6} />
         <LinearWavyProgressIndicator aria-label="Wavy linear loading" isIndeterminate />
@@ -77,7 +77,7 @@ export const ExpressiveWavy: Story = {
 export const WavyAmplitudeLifecycle: Story = {
   name: 'Wavy amplitude lifecycle',
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 24 }}>
         {[0.05, 0.1, 0.5, 0.94, 0.95, 1].map((value) => (
           <div key={value} style={{ alignItems: 'center', display: 'flex', gap: 16 }}>
@@ -95,7 +95,7 @@ export const WavyAmplitudeLifecycle: Story = {
 
 export const FourColor: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Row>
         <LinearProgressIndicator aria-label="Four color linear loading" fourColor isIndeterminate />
         <CircularProgressIndicator aria-label="Four color circular loading" fourColor isIndeterminate />
@@ -106,7 +106,7 @@ export const FourColor: Story = {
 
 export const Buffer: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <LinearProgressIndicator
         aria-label="Buffered download"
         bufferValue={0.8}
@@ -131,20 +131,20 @@ function ThemeSet() {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ThemeSet />
       </ThemeProvider>

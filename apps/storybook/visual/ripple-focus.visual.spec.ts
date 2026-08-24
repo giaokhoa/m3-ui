@@ -42,11 +42,11 @@ test.describe('Material 3 ripple focus parity', () => {
     await page.keyboard.press('Tab');
     await expect(button).toBeFocused();
 
-    const ripple = button.locator('.m3-ripple');
+    const ripple = button.locator('.ripple');
     await expect(ripple).toHaveAttribute('data-focus-visible', 'true');
     await expect(ripple).not.toHaveAttribute('data-inset-focus-visible', 'true');
-    await expect(ripple.locator('.m3-ripple__focus-ring')).toHaveCount(0);
-    await expect(ripple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0.1');
+    await expect(ripple.locator('.ripple__focus-ring')).toHaveCount(0);
+    await expect(ripple.locator('.ripple__state-layer')).toHaveCSS('opacity', '0.1');
   });
 
   test('matches Compose inset ring dimensions, colors and Button indication bounds', async ({
@@ -58,11 +58,11 @@ test.describe('Material 3 ripple focus parity', () => {
     await page.keyboard.press('Tab');
     await expect(button).toBeFocused();
 
-    const ripple = button.locator('.m3-ripple');
-    const ring = ripple.locator('.m3-ripple__focus-ring');
+    const ripple = button.locator('.ripple');
+    const ring = ripple.locator('.ripple__focus-ring');
     await expect(ripple).toHaveAttribute('data-inset-focus-visible', 'true');
     await expect(ripple).not.toHaveAttribute('data-focus-visible', 'true');
-    await expect(ripple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0');
+    await expect(ripple.locator('.ripple__state-layer')).toHaveCSS('opacity', '0');
     await expect(ring).toHaveCSS('z-index', '2');
 
     await expect
@@ -82,7 +82,7 @@ test.describe('Material 3 ripple focus parity', () => {
     const geometry = await button.evaluate((element) => {
       const buttonBox = element.getBoundingClientRect();
       const ringBox = element
-        .querySelector<HTMLElement>('.m3-ripple__focus-ring')!
+        .querySelector<HTMLElement>('.ripple__focus-ring')!
         .getBoundingClientRect();
       return {
         button: [buttonBox.width, buttonBox.height],
@@ -102,14 +102,14 @@ test.describe('Material 3 ripple focus parity', () => {
     await page.keyboard.press('Tab');
     await expect(page.getByRole('checkbox', { name: 'Checkbox' })).toBeFocused();
 
-    const checkboxRoot = page.locator('.m3-checkbox');
-    const checkboxSlot = checkboxRoot.locator('.m3-checkbox__control-slot');
-    const checkboxStateLayer = checkboxRoot.locator('.m3-ripple__state-layer');
-    const checkboxRing = checkboxRoot.locator('.m3-ripple__focus-ring');
+    const checkboxRoot = page.locator('.checkbox');
+    const checkboxSlot = checkboxRoot.locator('.checkbox__control-slot');
+    const checkboxStateLayer = checkboxRoot.locator('.ripple__state-layer');
+    const checkboxRing = checkboxRoot.locator('.ripple__focus-ring');
     const checkboxGeometry = await checkboxRoot.evaluate((element) => {
-      const slot = element.querySelector<HTMLElement>('.m3-checkbox__control-slot')!;
-      const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
-      const ring = element.querySelector<HTMLElement>('.m3-ripple__focus-ring')!;
+      const slot = element.querySelector<HTMLElement>('.checkbox__control-slot')!;
+      const stateLayer = element.querySelector<HTMLElement>('.ripple__state-layer')!;
+      const ring = element.querySelector<HTMLElement>('.ripple__focus-ring')!;
       const slotBox = slot.getBoundingClientRect();
       const stateLayerBox = stateLayer.getBoundingClientRect();
       const ringBox = ring.getBoundingClientRect();
@@ -134,12 +134,12 @@ test.describe('Material 3 ripple focus parity', () => {
     await page.keyboard.press('Tab');
     await expect(page.getByRole('radio', { name: 'Radio' })).toBeFocused();
 
-    const radioRoot = page.locator('.m3-radio-button');
-    const radioRing = radioRoot.locator('.m3-ripple__focus-ring');
+    const radioRoot = page.locator('.radio-button');
+    const radioRing = radioRoot.locator('.ripple__focus-ring');
     const radioGeometry = await radioRoot.evaluate((element) => {
-      const slot = element.querySelector<HTMLElement>('.m3-radio-button__control-slot')!;
-      const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
-      const ring = element.querySelector<HTMLElement>('.m3-ripple__focus-ring')!;
+      const slot = element.querySelector<HTMLElement>('.radio-button__control-slot')!;
+      const stateLayer = element.querySelector<HTMLElement>('.ripple__state-layer')!;
+      const ring = element.querySelector<HTMLElement>('.ripple__focus-ring')!;
       const slotBox = slot.getBoundingClientRect();
       const stateLayerBox = stateLayer.getBoundingClientRect();
       const ringBox = ring.getBoundingClientRect();
@@ -167,12 +167,12 @@ test.describe('Material 3 ripple focus parity', () => {
     await expect(button).toBeFocused();
     await button.hover();
 
-    const ripple = button.locator('.m3-ripple');
+    const ripple = button.locator('.ripple');
     await expect(ripple).toHaveAttribute('data-inset-focus-visible', 'true');
     await expect(ripple).toHaveAttribute('data-hovered', 'true');
-    await expect(ripple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0.08');
+    await expect(ripple.locator('.ripple__state-layer')).toHaveCSS('opacity', '0.08');
     await expect
-      .poll(() => pseudoStyle(ripple.locator('.m3-ripple__focus-ring'), '::after', 'border-top-width'))
+      .poll(() => pseudoStyle(ripple.locator('.ripple__focus-ring'), '::after', 'border-top-width'))
       .toBe('2px');
   });
 });

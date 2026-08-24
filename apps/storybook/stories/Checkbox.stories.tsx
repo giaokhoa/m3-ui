@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>;
 
 function StateStack({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="m3-storybook-stack">
+    <div className="storybook-stack">
       <Checkbox isDisabled={disabled}>Unchecked</Checkbox>
       <Checkbox isDisabled={disabled} isSelected>
         Checked
@@ -31,7 +31,7 @@ function StateStack({ disabled = false }: { disabled?: boolean }) {
 
 export const Default: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Checkbox {...args} />
     </div>
   ),
@@ -43,7 +43,7 @@ export const Selected: Story = {
     children: 'Selected checkbox',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Checkbox {...args} />
     </div>
   ),
@@ -55,7 +55,7 @@ export const Indeterminate: Story = {
     children: 'Indeterminate checkbox',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Checkbox {...args} />
     </div>
   ),
@@ -63,7 +63,7 @@ export const Indeterminate: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <StateStack />
     </div>
   ),
@@ -71,7 +71,7 @@ export const States: Story = {
 
 export const DisabledStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <StateStack disabled />
     </div>
   ),
@@ -79,8 +79,8 @@ export const DisabledStates: Story = {
 
 export const ControlOnly: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <Checkbox aria-label="Unchecked control" />
         <Checkbox aria-label="Checked control" isSelected />
         <Checkbox aria-label="Indeterminate control" isIndeterminate />
@@ -91,17 +91,17 @@ export const ControlOnly: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <StateStack />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <StateStack />
       </ThemeProvider>
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         sourceColor="#006a60"
       >
@@ -109,7 +109,7 @@ export const ThemeMatrix: Story = {
         <StateStack />
       </ThemeProvider>
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="dark"
         sourceColor="#b3261e"
       >

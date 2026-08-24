@@ -18,7 +18,7 @@ const sizes: SliderSize[] = ['xSmall', 'small', 'medium', 'large', 'xLarge'];
 
 function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 28, inlineSize: 'min(720px, 80vw)' }}>{children}</div>
     </div>
   );
@@ -74,7 +74,7 @@ export const DiscreteTicks: Story = {
 
 export const Vertical: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ alignItems: 'end', display: 'flex', gap: 48, blockSize: 360 }}>
         <Slider aria-label="Vertical volume" defaultValue={40} orientation="vertical" />
         <RangeSlider
@@ -119,20 +119,20 @@ function ThemeSet() {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ThemeSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ThemeSet />
       </ThemeProvider>

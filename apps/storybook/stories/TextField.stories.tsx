@@ -80,7 +80,7 @@ function OutlinedFieldStack() {
 
 export const Default: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -94,7 +94,7 @@ export const SingleLine: Story = {
     isMultiline: false,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -106,7 +106,7 @@ export const WithValue: Story = {
     placeholder: undefined,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -121,7 +121,7 @@ export const Invalid: Story = {
     errorMessage: 'This value needs attention',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -133,7 +133,7 @@ export const Disabled: Story = {
     isDisabled: true,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -145,7 +145,7 @@ export const ReadOnly: Story = {
     isReadOnly: true,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -159,7 +159,7 @@ export const WithoutLabel: Story = {
     supportingText: undefined,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -177,7 +177,7 @@ export const AffixesAndIcons: Story = {
     supportingText: 'Leading/trailing icons and prefix/suffix slots',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -193,7 +193,7 @@ export const Multiline: Story = {
     supportingText: 'Supporting text',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <TextField {...args} />
     </div>
   ),
@@ -201,7 +201,7 @@ export const Multiline: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <FieldStack />
     </div>
   ),
@@ -209,19 +209,19 @@ export const States: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <FieldStack />
       </ThemeProvider>
 
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <FieldStack />
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         sourceColor="#006a60"
       >
@@ -230,7 +230,7 @@ export const ThemeMatrix: Story = {
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="dark"
         sourceColor="#b3261e"
       >
@@ -243,7 +243,7 @@ export const ThemeMatrix: Story = {
 
 export const OutlinedDefault: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedTextField {...args} />
     </div>
   ),
@@ -257,7 +257,7 @@ export const OutlinedSingleLine: Story = {
     isMultiline: false,
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedTextField {...args} />
     </div>
   ),
@@ -272,7 +272,7 @@ export const OutlinedInvalid: Story = {
     errorMessage: 'This value needs attention',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedTextField {...args} />
     </div>
   ),
@@ -290,7 +290,7 @@ export const OutlinedAffixesAndIcons: Story = {
     supportingText: 'Leading/trailing icons and prefix/suffix slots',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedTextField {...args} />
     </div>
   ),
@@ -306,7 +306,7 @@ export const OutlinedMultiline: Story = {
     supportingText: 'Supporting text',
   },
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedTextField {...args} />
     </div>
   ),
@@ -314,7 +314,7 @@ export const OutlinedMultiline: Story = {
 
 export const OutlinedStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <OutlinedFieldStack />
     </div>
   ),
@@ -322,19 +322,19 @@ export const OutlinedStates: Story = {
 
 export const OutlinedThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Outlined · Light</h3>
         <OutlinedFieldStack />
       </ThemeProvider>
 
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Outlined · Dark</h3>
         <OutlinedFieldStack />
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         sourceColor="#006a60"
       >
@@ -343,7 +343,7 @@ export const OutlinedThemeMatrix: Story = {
       </ThemeProvider>
 
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="dark"
         sourceColor="#b3261e"
       >

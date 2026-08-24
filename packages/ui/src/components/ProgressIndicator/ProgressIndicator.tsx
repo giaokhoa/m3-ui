@@ -88,9 +88,9 @@ function classes(
   userClassName: string | undefined,
 ): string {
   const names = [
-    'm3-progress-indicator',
-    `m3-progress-indicator--${kind}`,
-    wavy ? 'm3-progress-indicator--wavy' : 'm3-progress-indicator--standard',
+    'progress-indicator',
+    `progress-indicator--${kind}`,
+    wavy ? 'progress-indicator--wavy' : 'progress-indicator--standard',
   ];
   if (userClassName) names.push(userClassName);
   return names.join(' ');
@@ -163,7 +163,7 @@ function LinearDeterminateVisual({
   return (
     <svg
       aria-hidden="true"
-      className="m3-progress-indicator__svg"
+      className="progress-indicator__svg"
       preserveAspectRatio="none"
       viewBox={`0 0 ${width} ${height}`}
     >
@@ -174,7 +174,7 @@ function LinearDeterminateVisual({
       </defs>
       {trackLineStart < trackLineEnd && (
         <line
-          className="m3-progress-indicator__track"
+          className="progress-indicator__track"
           vectorEffect="non-scaling-stroke"
           x1={trackLineStart}
           x2={trackLineEnd}
@@ -185,7 +185,7 @@ function LinearDeterminateVisual({
       {fraction > 0 &&
         (wavy ? (
           <path
-            className="m3-progress-indicator__active m3-progress-indicator__wave-path"
+            className="progress-indicator__active progress-indicator__wave-path"
             clipPath={`url(#${clipId})`}
             d={wavePath}
             style={phaseStyle}
@@ -193,7 +193,7 @@ function LinearDeterminateVisual({
           />
         ) : (
           <line
-            className="m3-progress-indicator__active"
+            className="progress-indicator__active"
             vectorEffect="non-scaling-stroke"
             x1={activeThickness / 2}
             x2={Math.max(activeThickness / 2, activeEnd - activeThickness / 2)}
@@ -202,7 +202,7 @@ function LinearDeterminateVisual({
           />
         ))}
       <circle
-        className="m3-progress-indicator__stop"
+        className="progress-indicator__stop"
         cx={stopCenter}
         cy={height / 2}
         r={stopSize / 2}
@@ -241,18 +241,18 @@ function LinearIndeterminateVisual({
   return (
     <span
       aria-hidden="true"
-      className={`m3-progress-indicator__linear-indeterminate${
+      className={`progress-indicator__linear-indeterminate${
         fourColor
-          ? ' m3-progress-indicator__linear-indeterminate--four-color'
+          ? ' progress-indicator__linear-indeterminate--four-color'
           : ''
       }`}
     >
-      <span className="m3-progress-indicator__linear-bar m3-progress-indicator__linear-bar--primary">
-        <span className="m3-progress-indicator__linear-bar-inner">
+      <span className="progress-indicator__linear-bar progress-indicator__linear-bar--primary">
+        <span className="progress-indicator__linear-bar-inner">
           {wavy && (
             <svg preserveAspectRatio="none" viewBox={`0 0 240 ${height}`}>
               <path
-                className="m3-progress-indicator__active m3-progress-indicator__wave-path"
+                className="progress-indicator__active progress-indicator__wave-path"
                 d={wavePath}
                 vectorEffect="non-scaling-stroke"
               />
@@ -260,12 +260,12 @@ function LinearIndeterminateVisual({
           )}
         </span>
       </span>
-      <span className="m3-progress-indicator__linear-bar m3-progress-indicator__linear-bar--secondary">
-        <span className="m3-progress-indicator__linear-bar-inner">
+      <span className="progress-indicator__linear-bar progress-indicator__linear-bar--secondary">
+        <span className="progress-indicator__linear-bar-inner">
           {wavy && (
             <svg preserveAspectRatio="none" viewBox={`0 0 240 ${height}`}>
               <path
-                className="m3-progress-indicator__active m3-progress-indicator__wave-path"
+                className="progress-indicator__active progress-indicator__wave-path"
                 d={wavePath}
                 vectorEffect="non-scaling-stroke"
               />
@@ -285,14 +285,14 @@ function LinearBufferVisual({
   bufferFraction: number;
 }) {
   return (
-    <span aria-hidden="true" className="m3-progress-indicator__buffer">
-      <span className="m3-progress-indicator__buffer-dots" />
+    <span aria-hidden="true" className="progress-indicator__buffer">
+      <span className="progress-indicator__buffer-dots" />
       <span
-        className="m3-progress-indicator__buffer-track"
+        className="progress-indicator__buffer-track"
         style={{ transform: `scaleX(${bufferFraction})` }}
       />
       <span
-        className="m3-progress-indicator__buffer-active"
+        className="progress-indicator__buffer-active"
         style={{ transform: `scaleX(${fraction})` }}
       />
     </span>
@@ -405,14 +405,14 @@ function CircularDeterminateVisual({
   return (
     <svg
       aria-hidden="true"
-      className="m3-progress-indicator__svg m3-progress-indicator__circular-svg"
+      className="progress-indicator__svg progress-indicator__circular-svg"
       viewBox={`0 0 ${size} ${size}`}
     >
       {!wavy ? (
         <>
           {trackLength > 0 && (
             <circle
-              className="m3-progress-indicator__track"
+              className="progress-indicator__track"
               cx={size / 2}
               cy={size / 2}
               pathLength={100}
@@ -423,7 +423,7 @@ function CircularDeterminateVisual({
           )}
           {fraction > 0 && (
             <circle
-              className="m3-progress-indicator__active m3-progress-indicator__circular-active"
+              className="progress-indicator__active progress-indicator__circular-active"
               cx={size / 2}
               cy={size / 2}
               pathLength={100}
@@ -436,7 +436,7 @@ function CircularDeterminateVisual({
         <>
           {trackLength > 0 && (
             <circle
-              className="m3-progress-indicator__track"
+              className="progress-indicator__track"
               cx={size / 2}
               cy={size / 2}
               pathLength={100}
@@ -447,7 +447,7 @@ function CircularDeterminateVisual({
           )}
           {fraction > 0 && (
             <CircularWavePath
-              className="m3-progress-indicator__active m3-progress-indicator__circular-wave-path"
+              className="progress-indicator__active progress-indicator__circular-wave-path"
               duration={phaseDuration}
               frames={activeWaveFrames}
             />
@@ -523,17 +523,17 @@ function CircularIndeterminateVisual({
   return (
     <svg
       aria-hidden="true"
-      className={`m3-progress-indicator__svg m3-progress-indicator__circular-svg m3-progress-indicator__circular-indeterminate${
+      className={`progress-indicator__svg progress-indicator__circular-svg progress-indicator__circular-indeterminate${
         fourColor
-          ? ' m3-progress-indicator__circular-indeterminate--four-color'
+          ? ' progress-indicator__circular-indeterminate--four-color'
           : ''
       }`}
       viewBox={`0 0 ${size} ${size}`}
     >
-      <g className="m3-progress-indicator__circular-global-rotation">
-        <g className="m3-progress-indicator__circular-additional-rotation">
+      <g className="progress-indicator__circular-global-rotation">
+        <g className="progress-indicator__circular-additional-rotation">
           <circle
-            className="m3-progress-indicator__track m3-progress-indicator__circular-indeterminate-track"
+            className="progress-indicator__track progress-indicator__circular-indeterminate-track"
             cx={size / 2}
             cy={size / 2}
             pathLength={100}
@@ -542,14 +542,14 @@ function CircularIndeterminateVisual({
           />
           {wavy ? (
             <CircularWavePath
-              className="m3-progress-indicator__active m3-progress-indicator__circular-indeterminate-active"
+              className="progress-indicator__active progress-indicator__circular-indeterminate-active"
               duration={phaseDuration}
               frames={waveFrames}
               pathLength={100}
             />
           ) : (
             <circle
-              className="m3-progress-indicator__active m3-progress-indicator__circular-indeterminate-active"
+              className="progress-indicator__active progress-indicator__circular-indeterminate-active"
               cx={size / 2}
               cy={size / 2}
               pathLength={100}

@@ -13,7 +13,7 @@ async function openStory(page: Page, id: string) {
 async function openDefaultField(page: Page) {
   await openStory(page, 'components-textfield--default');
   const input = page.getByRole('textbox', { name: 'Label' });
-  const root = page.locator('.m3-text-field');
+  const root = page.locator('.text-field');
   await expect(input).toBeVisible();
   await expect(root).toBeVisible();
   return { input, root };
@@ -22,8 +22,8 @@ async function openDefaultField(page: Page) {
 async function openOutlinedDefaultField(page: Page) {
   await openStory(page, 'components-textfield--outlined-default');
   const input = page.getByRole('textbox', { name: 'Label' });
-  const root = page.locator('.m3-text-field--outlined');
-  const container = root.locator('.m3-text-field__outlined-container');
+  const root = page.locator('.text-field--outlined');
+  const container = root.locator('.text-field__outlined-container');
   await expect(input).toBeVisible();
   await expect(root).toBeVisible();
   await expect(container).toBeVisible();
@@ -52,7 +52,7 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('filled value', async ({ page }) => {
     await openStory(page, 'components-textfield--with-value');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
+    await expect(page.locator('.text-field')).toHaveScreenshot(
       'text-field-with-value.png',
     );
   });
@@ -66,29 +66,29 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('clicking the visible label focuses the control', async ({ page }) => {
     const { input, root } = await openDefaultField(page);
-    await root.locator('.m3-text-field__label').click();
+    await root.locator('.text-field__label').click();
     await expect(input).toBeFocused();
   });
 
   test('invalid', async ({ page }) => {
     await openStory(page, 'components-textfield--invalid');
-    const root = page.locator('.m3-text-field');
-    await expect(root.locator('.m3-text-field__error')).toBeVisible();
-    await expect(root.locator('.m3-text-field__supporting')).toBeHidden();
+    const root = page.locator('.text-field');
+    await expect(root.locator('.text-field__error')).toBeVisible();
+    await expect(root.locator('.text-field__supporting')).toBeHidden();
     await expect(root).toHaveScreenshot('text-field-invalid.png');
   });
 
   test('invalid keeps error colors while focused', async ({ page }) => {
     await openStory(page, 'components-textfield--invalid');
-    const root = page.locator('.m3-text-field');
+    const root = page.locator('.text-field');
     const input = page.getByRole('textbox', { name: 'Label' });
 
     await input.focus();
     await expect(input).toBeFocused();
 
     const colors = await root.evaluate((element) => {
-      const indicator = element.querySelector<HTMLElement>('.m3-text-field__indicator');
-      const label = element.querySelector<HTMLElement>('.m3-text-field__label');
+      const indicator = element.querySelector<HTMLElement>('.text-field__indicator');
+      const label = element.querySelector<HTMLElement>('.text-field__label');
       const probe = document.createElement('span');
       probe.style.color = 'var(--error)';
       probe.style.position = 'absolute';
@@ -110,21 +110,21 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('disabled', async ({ page }) => {
     await openStory(page, 'components-textfield--disabled');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
+    await expect(page.locator('.text-field')).toHaveScreenshot(
       'text-field-disabled.png',
     );
   });
 
   test('affixes and icons', async ({ page }) => {
     await openStory(page, 'components-textfield--affixes-and-icons');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
+    await expect(page.locator('.text-field')).toHaveScreenshot(
       'text-field-affixes-icons.png',
     );
   });
 
   test('multiline', async ({ page }) => {
     await openStory(page, 'components-textfield--multiline');
-    await expect(page.locator('.m3-text-field')).toHaveScreenshot(
+    await expect(page.locator('.text-field')).toHaveScreenshot(
       'text-field-multiline.png',
     );
   });
@@ -138,7 +138,7 @@ test.describe('Material 3 filled TextField visual parity', () => {
 
   test('theme matrix respects parent width constraints', async ({ page }) => {
     await openStory(page, 'components-textfield--theme-matrix');
-    const cards = page.locator('.m3-storybook-theme-card');
+    const cards = page.locator('.storybook-theme-card');
     await expect(cards).toHaveCount(4);
 
     const hasOverflow = await cards.evaluateAll((elements) =>
@@ -181,13 +181,13 @@ test.describe('Material 3 outlined TextField parity', () => {
     page,
   }) => {
     const { input, root, container } = await openOutlinedDefaultField(page);
-    const label = root.locator('.m3-text-field__label');
-    const legend = root.locator('.m3-text-field__outline-legend');
+    const label = root.locator('.text-field__label');
+    const legend = root.locator('.text-field__outline-legend');
 
     const before = await root.evaluate((element) => {
-      const labelElement = element.querySelector<HTMLElement>('.m3-text-field__label');
+      const labelElement = element.querySelector<HTMLElement>('.text-field__label');
       const legendElement = element.querySelector<HTMLElement>(
-        '.m3-text-field__outline-legend',
+        '.text-field__outline-legend',
       );
       return {
         fontSize: labelElement ? getComputedStyle(labelElement).fontSize : '',
@@ -212,18 +212,18 @@ test.describe('Material 3 outlined TextField parity', () => {
 
   test('keeps the error outline and label while invalid and focused', async ({ page }) => {
     await openStory(page, 'components-textfield--outlined-invalid');
-    const root = page.locator('.m3-text-field--outlined');
+    const root = page.locator('.text-field--outlined');
     const input = page.getByRole('textbox', { name: 'Label' });
-    const container = root.locator('.m3-text-field__outlined-container');
+    const container = root.locator('.text-field__outlined-container');
 
     await input.focus();
     await expect(input).toBeFocused();
 
     const colors = await root.evaluate((element) => {
       const containerElement = element.querySelector<HTMLElement>(
-        '.m3-text-field__outlined-container',
+        '.text-field__outlined-container',
       );
-      const label = element.querySelector<HTMLElement>('.m3-text-field__label');
+      const label = element.querySelector<HTMLElement>('.text-field__label');
       const probe = document.createElement('span');
       probe.style.color = 'var(--error)';
       probe.style.position = 'absolute';
@@ -242,8 +242,8 @@ test.describe('Material 3 outlined TextField parity', () => {
     expect(colors.outline).toBe(colors.resolvedError);
     expect(colors.label).toBe(colors.resolvedError);
     await expect(container).toHaveCSS('border-top-width', '2px');
-    await expect(root.locator('.m3-text-field__error')).toBeVisible();
-    await expect(root.locator('.m3-text-field__supporting')).toBeHidden();
+    await expect(root.locator('.text-field__error')).toBeVisible();
+    await expect(root.locator('.text-field__supporting')).toBeHidden();
   });
 
   test('keeps multiline semantics and supports the single-line opt-out', async ({ page }) => {
@@ -257,7 +257,7 @@ test.describe('Material 3 outlined TextField parity', () => {
 
   test('outlined theme matrix respects parent width constraints', async ({ page }) => {
     await openStory(page, 'components-textfield--outlined-theme-matrix');
-    const cards = page.locator('.m3-storybook-theme-card');
+    const cards = page.locator('.storybook-theme-card');
     await expect(cards).toHaveCount(4);
 
     const hasOverflow = await cards.evaluateAll((elements) =>

@@ -146,11 +146,11 @@ function LoadingVisual({ value }: { value?: number }) {
   return (
     <svg
       aria-hidden="true"
-      className="m3-loading-indicator__svg"
+      className="loading-indicator__svg"
       viewBox={`0 0 ${size} ${size}`}
     >
       <g transform={`rotate(${rotation} ${size / 2} ${size / 2})`}>
-        <path className="m3-loading-indicator__active" d={path} />
+        <path className="loading-indicator__active" d={path} />
       </g>
     </svg>
   );
@@ -187,8 +187,8 @@ function LoadingRoot({
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
         return [
-          'm3-loading-indicator',
-          contained && 'm3-loading-indicator--contained',
+          'loading-indicator',
+          contained && 'loading-indicator--contained',
           userClassName,
         ]
           .filter(Boolean)

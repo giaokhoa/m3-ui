@@ -72,43 +72,43 @@ function TextFieldImpl({
   const controlPlaceholder = placeholder ?? (label ? ' ' : undefined);
 
   const staticClasses = joinClassNames(
-    'm3-text-field',
-    `m3-text-field--${variant}`,
-    label ? 'm3-text-field--with-label' : null,
-    leadingIcon ? 'm3-text-field--with-leading' : null,
-    trailingIcon ? 'm3-text-field--with-trailing' : null,
-    isMultiline ? 'm3-text-field--multiline' : null,
+    'text-field',
+    `text-field--${variant}`,
+    label ? 'text-field--with-label' : null,
+    leadingIcon ? 'text-field--with-leading' : null,
+    trailingIcon ? 'text-field--with-trailing' : null,
+    isMultiline ? 'text-field--multiline' : null,
   );
 
   const inputRow = (
-    <div className="m3-text-field__input-row">
-      {prefix ? <span className="m3-text-field__prefix">{prefix}</span> : null}
+    <div className="text-field__input-row">
+      {prefix ? <span className="text-field__prefix">{prefix}</span> : null}
 
       {isMultiline ? (
         <TextArea
-          className="m3-text-field__control m3-text-field__textarea"
+          className="text-field__control text-field__textarea"
           placeholder={controlPlaceholder}
           rows={rows ?? 1}
         />
       ) : (
         <Input
-          className="m3-text-field__control m3-text-field__input"
+          className="text-field__control text-field__input"
           placeholder={controlPlaceholder}
         />
       )}
 
-      {suffix ? <span className="m3-text-field__suffix">{suffix}</span> : null}
+      {suffix ? <span className="text-field__suffix">{suffix}</span> : null}
     </div>
   );
 
   const leading = leadingIcon ? (
-    <span className="m3-text-field__icon m3-text-field__icon--leading">
+    <span className="text-field__icon text-field__icon--leading">
       {leadingIcon}
     </span>
   ) : null;
 
   const trailing = trailingIcon ? (
-    <span className="m3-text-field__icon m3-text-field__icon--trailing">
+    <span className="text-field__icon text-field__icon--trailing">
       {trailingIcon}
     </span>
   ) : null;
@@ -131,43 +131,43 @@ function TextFieldImpl({
       }}
     >
       {variant === 'filled' ? (
-        <div className="m3-text-field__container">
+        <div className="text-field__container">
           {leading}
 
-          <div className="m3-text-field__content">
-            {label ? <Label className="m3-text-field__label">{label}</Label> : null}
+          <div className="text-field__content">
+            {label ? <Label className="text-field__label">{label}</Label> : null}
             {inputRow}
           </div>
 
           {trailing}
-          <span className="m3-text-field__indicator" aria-hidden="true" />
+          <span className="text-field__indicator" aria-hidden="true" />
         </div>
       ) : (
         <fieldset
-          className="m3-text-field__container m3-text-field__outlined-container"
+          className="text-field__container text-field__outlined-container"
           role="presentation"
         >
           {label ? (
-            <legend className="m3-text-field__outline-legend" role="presentation">
-              <Label className="m3-text-field__label">{label}</Label>
+            <legend className="text-field__outline-legend" role="presentation">
+              <Label className="text-field__label">{label}</Label>
             </legend>
           ) : null}
 
-          <div className="m3-text-field__outlined-body">
+          <div className="text-field__outlined-body">
             {leading}
-            <div className="m3-text-field__content">{inputRow}</div>
+            <div className="text-field__content">{inputRow}</div>
             {trailing}
           </div>
         </fieldset>
       )}
 
       {resolvedSupportingText != null ? (
-        <Text slot="description" className="m3-text-field__supporting">
+        <Text slot="description" className="text-field__supporting">
           {resolvedSupportingText}
         </Text>
       ) : null}
 
-      <FieldError className="m3-text-field__error">{errorMessage}</FieldError>
+      <FieldError className="text-field__error">{errorMessage}</FieldError>
     </AriaTextField>
   );
 }

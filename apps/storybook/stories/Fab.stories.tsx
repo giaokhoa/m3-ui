@@ -58,7 +58,7 @@ const variants: readonly FabVariant[] = [
 
 function VariantSet() {
   return (
-    <div className="m3-storybook-stack" style={{ flexWrap: 'wrap' }}>
+    <div className="storybook-stack" style={{ flexWrap: 'wrap' }}>
       {variants.map((variant) => (
         <FloatingActionButton
           key={variant}
@@ -75,7 +75,7 @@ function VariantSet() {
 function ThemeSample() {
   return (
     <div style={{ display: 'grid', gap: 20 }}>
-      <div className="m3-storybook-stack">
+      <div className="storybook-stack">
         <FloatingActionButton aria-label="Primary container create">
           <PlusIcon />
         </FloatingActionButton>
@@ -98,7 +98,7 @@ function ThemeSample() {
 
 export const Default: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <FloatingActionButton aria-label="Create">
         <PlusIcon />
       </FloatingActionButton>
@@ -108,8 +108,8 @@ export const Default: Story = {
 
 export const SizeFamily: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <SmallFloatingActionButton aria-label="Small create"><PlusIcon /></SmallFloatingActionButton>
         <FloatingActionButton aria-label="Baseline create"><PlusIcon /></FloatingActionButton>
         <MediumFloatingActionButton aria-label="Medium create"><PlusIcon /></MediumFloatingActionButton>
@@ -121,7 +121,7 @@ export const SizeFamily: Story = {
 
 export const ColorFamilies: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <VariantSet />
     </div>
   ),
@@ -129,8 +129,8 @@ export const ColorFamilies: Story = {
 
 export const Branded: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <BrandedFloatingActionButton aria-label="Branded normal">
           <BrandIcon />
         </BrandedFloatingActionButton>
@@ -147,8 +147,8 @@ export const Branded: Story = {
 
 export const LoweredElevation: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <FloatingActionButton aria-label="Surface normal" variant="surface"><PlusIcon /></FloatingActionButton>
         <FloatingActionButton aria-label="Surface lowered" elevation="lowered" variant="surface"><PlusIcon /></FloatingActionButton>
         <FloatingActionButton aria-label="Primary container lowered" elevation="lowered"><PlusIcon /></FloatingActionButton>
@@ -159,7 +159,7 @@ export const LoweredElevation: Story = {
 
 export const ExtendedSizes: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 20, justifyItems: 'start' }}>
         <ExtendedFloatingActionButton icon={<PlusIcon />}>Baseline extended</ExtendedFloatingActionButton>
         <SmallExtendedFloatingActionButton icon={<PlusIcon />}>Small extended</SmallExtendedFloatingActionButton>
@@ -172,7 +172,7 @@ export const ExtendedSizes: Story = {
 
 export const TextOnlyExtended: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 20, justifyItems: 'start' }}>
         <ExtendedFloatingActionButton>Baseline text</ExtendedFloatingActionButton>
         <SmallExtendedFloatingActionButton>Small text</SmallExtendedFloatingActionButton>
@@ -185,8 +185,8 @@ export const TextOnlyExtended: Story = {
 
 export const CollapsedExtended: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <ExtendedFloatingActionButton aria-label="Baseline collapsed" expanded={false} icon={<PlusIcon />}>Create</ExtendedFloatingActionButton>
         <SmallExtendedFloatingActionButton aria-label="Small collapsed" expanded={false} icon={<PlusIcon />}>Create</SmallExtendedFloatingActionButton>
         <MediumExtendedFloatingActionButton aria-label="Medium collapsed" expanded={false} icon={<PlusIcon />}>Create</MediumExtendedFloatingActionButton>
@@ -198,20 +198,20 @@ export const CollapsedExtended: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ThemeSample />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ThemeSample />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ThemeSample />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ThemeSample />
       </ThemeProvider>

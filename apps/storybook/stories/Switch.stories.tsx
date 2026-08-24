@@ -49,7 +49,7 @@ function StateSet({ disabled = false }: { disabled?: boolean }) {
 
 export const Default: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Switch {...args} />
     </div>
   ),
@@ -57,7 +57,7 @@ export const Default: Story = {
 
 export const Checked: Story = {
   render: (args) => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Switch {...args} defaultSelected />
     </div>
   ),
@@ -65,7 +65,7 @@ export const Checked: Story = {
 
 export const WithThumbContent: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <StateSet />
     </div>
   ),
@@ -73,7 +73,7 @@ export const WithThumbContent: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <StateSet />
     </div>
   ),
@@ -81,7 +81,7 @@ export const States: Story = {
 
 export const DisabledStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <StateSet disabled />
     </div>
   ),
@@ -89,7 +89,7 @@ export const DisabledStates: Story = {
 
 export const ReadOnly: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Switch defaultSelected isReadOnly>
         Read-only
       </Switch>
@@ -99,7 +99,7 @@ export const ReadOnly: Story = {
 
 export const ControlOnly: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Switch aria-label="Airplane mode" />
     </div>
   ),
@@ -107,13 +107,13 @@ export const ControlOnly: Story = {
 
 export const FocusModes: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" rippleFocus="opacity">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light" rippleFocus="opacity">
         <h3>Opacity focus</h3>
         <Switch>Opacity switch</Switch>
       </ThemeProvider>
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         rippleFocus="inset-ring"
       >
@@ -126,17 +126,17 @@ export const FocusModes: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <StateSet />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <StateSet />
       </ThemeProvider>
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="light"
         sourceColor="#006a60"
       >
@@ -144,7 +144,7 @@ export const ThemeMatrix: Story = {
         <StateSet />
       </ThemeProvider>
       <ThemeProvider
-        className="m3-storybook-theme-card"
+        className="storybook-theme-card"
         mode="dark"
         sourceColor="#b3261e"
       >

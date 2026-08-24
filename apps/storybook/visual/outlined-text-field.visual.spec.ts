@@ -8,10 +8,10 @@ async function openOutlinedDefault(page: Page) {
     await document.fonts.ready;
   });
 
-  const root = page.locator('.m3-text-field--outlined');
-  const container = root.locator('.m3-text-field__outlined-container');
-  const label = root.locator('.m3-text-field__label');
-  const legend = root.locator('.m3-text-field__outline-legend');
+  const root = page.locator('.text-field--outlined');
+  const container = root.locator('.text-field__outlined-container');
+  const label = root.locator('.text-field__label');
+  const legend = root.locator('.text-field__outline-legend');
   const input = page.getByRole('textbox', { name: 'Label' });
 
   await expect(root).toBeVisible();

@@ -178,7 +178,7 @@ function FabImpl({
       data-variant={branded ? 'branded' : variant}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        const baseClassName = branded ? 'm3-fab m3-fab--branded' : 'm3-fab';
+        const baseClassName = branded ? 'fab fab--branded' : 'fab';
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {
@@ -215,9 +215,9 @@ function FabImpl({
         );
 
         return (
-          <span className="m3-fab__visual">
+          <span className="fab__visual">
             <Elevation
-              className="m3-fab__elevation"
+              className="fab__elevation"
               level={level}
               style={{
                 transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
@@ -225,7 +225,7 @@ function FabImpl({
                 transitionTimingFunction: motion?.easing,
               }}
             />
-            <span className="m3-fab__surface">
+            <span className="fab__surface">
               <Ripple
                 controller={interactions.ripple}
                 focusRingRadius="var(--_fab-container-radius)"
@@ -235,7 +235,7 @@ function FabImpl({
                   renderProps.isFocusVisible,
                 )}
               />
-              <span aria-hidden="true" className="m3-fab__icon">{children}</span>
+              <span aria-hidden="true" className="fab__icon">{children}</span>
             </span>
           </span>
         );
@@ -293,8 +293,8 @@ function ExtendedFabImpl({
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         const baseClassName = branded
-          ? 'm3-fab m3-fab--extended m3-fab--branded-extended'
-          : 'm3-fab m3-fab--extended';
+          ? 'fab fab--extended fab--branded-extended'
+          : 'fab fab--extended';
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {
@@ -331,9 +331,9 @@ function ExtendedFabImpl({
         );
 
         return (
-          <span className="m3-fab__visual">
+          <span className="fab__visual">
             <Elevation
-              className="m3-fab__elevation"
+              className="fab__elevation"
               level={level}
               style={{
                 transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
@@ -341,7 +341,7 @@ function ExtendedFabImpl({
                 transitionTimingFunction: motion?.easing,
               }}
             />
-            <span className="m3-fab__surface">
+            <span className="fab__surface">
               <Ripple
                 controller={interactions.ripple}
                 focusRingRadius="var(--_fab-container-radius)"
@@ -351,13 +351,13 @@ function ExtendedFabImpl({
                   renderProps.isFocusVisible,
                 )}
               />
-              <span className="m3-fab__content">
+              <span className="fab__content">
                 {hasIcon ? (
-                  <span aria-hidden="true" className="m3-fab__icon">{icon}</span>
+                  <span aria-hidden="true" className="fab__icon">{icon}</span>
                 ) : null}
                 <span
                   aria-hidden={hasIcon && !resolvedExpanded ? true : undefined}
-                  className="m3-fab__label"
+                  className="fab__label"
                 >
                   {children}
                 </span>

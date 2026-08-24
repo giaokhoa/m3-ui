@@ -96,31 +96,31 @@ function TrackSegments({ renderProps }: { renderProps: SliderTrackRenderProps })
   const isRange = state.values.length > 1;
 
   return (
-    <span aria-hidden="true" className="m3-slider__segments">
+    <span aria-hidden="true" className="slider__segments">
       {activeStart > 0 ? (
         <span
-          className="m3-slider__segment m3-slider__segment--inactive m3-slider__segment--leading"
+          className="slider__segment slider__segment--inactive slider__segment--leading"
           style={segmentStyle(0, activeStart, orientation)}
         />
       ) : null}
       {activeEnd > activeStart ? (
         <span
           className={cx(
-            'm3-slider__segment',
-            'm3-slider__segment--active',
-            isRange && 'm3-slider__segment--range',
+            'slider__segment',
+            'slider__segment--active',
+            isRange && 'slider__segment--range',
           )}
           style={segmentStyle(activeStart, activeEnd, orientation)}
         />
       ) : null}
       {activeEnd < 100 ? (
         <span
-          className="m3-slider__segment m3-slider__segment--inactive m3-slider__segment--trailing"
+          className="slider__segment slider__segment--inactive slider__segment--trailing"
           style={segmentStyle(activeEnd, 100, orientation)}
         />
       ) : null}
       <span
-        className="m3-slider__stop"
+        className="slider__stop"
         data-selected={activeEnd >= 100 || undefined}
       />
     </span>
@@ -149,7 +149,7 @@ function TickMarks({
   const [activeStart, activeEnd] = activeBounds(renderProps.state);
 
   return (
-    <span aria-hidden="true" className="m3-slider__ticks">
+    <span aria-hidden="true" className="slider__ticks">
       {ticks.map((value, index) => {
         const percent = ((value - minValue) / (maxValue - minValue)) * 100;
         const selected = percent >= activeStart - 1e-7 && percent <= activeEnd + 1e-7;
@@ -160,7 +160,7 @@ function TickMarks({
         return (
           <span
             key={`${index}-${value}`}
-            className="m3-slider__tick"
+            className="slider__tick"
             data-selected={selected || undefined}
             style={style}
           />
@@ -187,17 +187,17 @@ function ThumbVisual({
 
   return (
     <>
-      <span aria-hidden="true" className="m3-slider__handle">
+      <span aria-hidden="true" className="slider__handle">
         <Ripple
           controller={ripple}
           focusRingRadius="var(--_slider-handle-radius)"
           isFocusVisible={renderProps.isFocusVisible}
           stateInteraction={null}
         />
-        <span className="m3-slider__handle-nub" />
+        <span className="slider__handle-nub" />
       </span>
       {showValueIndicator && active ? (
-        <span aria-hidden="true" className="m3-slider__value-indicator">
+        <span aria-hidden="true" className="slider__value-indicator">
           {getValueLabel ? getValueLabel(value, index) : value}
         </span>
       ) : null}
@@ -225,8 +225,8 @@ function MaterialSliderBody({
 }: MaterialSliderBodyProps) {
   return (
     <>
-      {label ? <AriaLabel className="m3-slider__label">{label}</AriaLabel> : null}
-      <AriaSliderTrack className="m3-slider__track">
+      {label ? <AriaLabel className="slider__label">{label}</AriaLabel> : null}
+      <AriaSliderTrack className="slider__track">
         {(trackProps) => {
           const thumbCount = trackProps.state.values.length;
           return (
@@ -244,7 +244,7 @@ function MaterialSliderBody({
                 <AriaSliderThumb
                   key={index}
                   aria-label={thumbLabel(label, thumbLabels, index, thumbCount, rootAriaLabel)}
-                  className="m3-slider__thumb"
+                  className="slider__thumb"
                   index={index}
                 >
                   {(thumbProps) => (
@@ -288,7 +288,7 @@ export function Slider({
       data-size={size}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        return cx('m3-slider', userClassName);
+        return cx('slider', userClassName);
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
@@ -341,7 +341,7 @@ export function RangeSlider({
       data-size={size}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        return cx('m3-slider', 'm3-slider--range', userClassName);
+        return cx('slider', 'slider--range', userClassName);
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
