@@ -36,8 +36,8 @@ export class Point {
         return new Point(interpolate(start.x, stop.x, fraction), interpolate(start.y, stop.y, fraction));
     }
 
-    copy(x: number = this.x, y: number = this.y): Point {
-        return new Point(x, y);
+    copy(x?: number, y?: number): Point {
+        return new Point(x ?? this.x, y ?? this.y);
     }
 
     getDistance(): number {
