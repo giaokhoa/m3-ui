@@ -46,9 +46,14 @@ export abstract class Feature {
     }
 
     private static validated(feature: Feature): Feature {
-        if (feature.cubics.length === 0) throw new Error("Features need at least one cubic.");
+        if (feature.cubics.length === 0) {
+            throw new Error("Features need at least one cubic.");
+        }
         if (!Feature.isContinuous(feature)) {
-            throw new Error("Feature must be continuous, with the anchor points of all cubics matching the anchor points of the preceding and succeeding cubics");
+            throw new Error(
+                "Feature must be continuous, with the anchor points of all cubics " +
+                "matching the anchor points of the preceding and succeeding cubics"
+            );
         }
         return feature;
     }
@@ -57,7 +62,12 @@ export abstract class Feature {
         let prevCubic = feature.cubics[0];
         for (let i = 1; i < feature.cubics.length; i++) {
             const cubic = feature.cubics[i];
-            if (Math.abs(cubic.anchor0X - prevCubic.anchor1X) > DistanceEpsilon || Math.abs(cubic.anchor0Y - prevCubic.anchor1Y) > DistanceEpsilon) return false;
+            if (
+                Math.abs(cubic.anchor0X - prevCubic.anchor1X) > DistanceEpsilon ||
+                Math.abs(cubic.anchor0Y - prevCubic.anchor1Y) > DistanceEpsilon
+            ) {
+                return false;
+            }
             prevCubic = cubic;
         }
         return true;
@@ -65,33 +75,60 @@ export abstract class Feature {
 }
 
 export class Edge extends Feature {
-    constructor(cubics: Cubic[]) { super(cubics); }
-    transformed(f: PointTransformer): Edge { return new Edge(this.cubics.map(c => c.transformed(f))); }
-    reversed(): Edge { return new Edge(this.cubics.map(c => c.reverse()).reverse()); }
+    constructor(cubics: Cubic[]) {
+        super(cubics);
+    }
+
+    transformed(f: PointTransformer): Edge {
+        return new Edge(this.cubics.map(c => c.transformed(f)));
+    }
+
+    reversed(): Edge {
+        return new Edge(this.cubics.map(c => c.reverse()).reverse());
+    }
+
     equals(other: Feature): boolean {
         if (this === other) return true;
-        if (!(other instanceof Edge) || this.cubics.length !== other.cubics.length) return false;
+        if (!(other instanceof Edge)) return false;
+        if (this.cubics.length !== other.cubics.length) return false;
         return this.cubics.every((c, i) => c.equals(other.cubics[i]));
     }
+
     get isIgnorableFeature(): boolean { return true; }
     get isEdge(): boolean { return true; }
     get isConvexCorner(): boolean { return false; }
     get isConcaveCorner(): boolean { return false; }
+
     toString(): string { return "Edge"; }
 }
 
 export class Corner extends Feature {
-    constructor(cubics: Cubic[], public convex: boolean = true) { super(cubics); }
-    transformed(f: PointTransformer): Corner { return new Corner(this.cubics.map(c => c.transformed(f)), this.convex); }
-    reversed(): Corner { return new Corner(this.cubics.map(c => c.reverse()).reverse(), !this.convex); }
+    constructor(cubics: Cubic[], public convex: boolean = true) {
+        super(cubics);
+    }
+
+    transformed(f: PointTransformer): Corner {
+        return new Corner(this.cubics.map(c => c.transformed(f)), this.convex);
+    }
+
+    reversed(): Corner {
+        return new Corner(this.cubics.map(c => c.reverse()).reverse(), !this.convex);
+    }
+
     equals(other: Feature): boolean {
         if (this === other) return true;
-        if (!(other instanceof Corner) || this.convex !== other.convex || this.cubics.length !== other.cubics.length) return false;
+        if (!(other instanceof Corner)) return false;
+        if (this.convex !== other.convex) return false;
+        if (this.cubics.length !== other.cubics.length) return false;
         return this.cubics.every((c, i) => c.equals(other.cubics[i]));
     }
+
     get isIgnorableFeature(): boolean { return false; }
     get isEdge(): boolean { return false; }
     get isConvexCorner(): boolean { return this.convex; }
     get isConcaveCorner(): boolean { return !this.convex; }
-    toString(): string { return `Corner: cubics=${this.cubics.map(c => `[${c}]`).join(", ")} convex=${this.convex}`; }
+
+    toString(): string {
+        return `Corner: cubics=${this.cubics.map(c => `[${c}]`).join(", ")} convex=${this.convex}`;
+    }
 }
