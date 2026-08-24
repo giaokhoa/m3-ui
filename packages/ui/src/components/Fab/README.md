@@ -1,0 +1,55 @@
+# FAB
+
+Material 3 floating action button family mapped to the canonical `@m3/tokens` Style Dictionary graph, pinned AndroidX Compose runtime behavior, and current Material Web public FAB adaptations.
+
+## Runtime contract
+
+- `FloatingActionButton`, `SmallFloatingActionButton`, `MediumFloatingActionButton`, and `LargeFloatingActionButton` map the current Compose size helpers.
+- `ExtendedFloatingActionButton` plus small/medium/large helpers support both Compose public overload families: text-only content and icon + label with `expanded` collapse behavior.
+- `BrandedFloatingActionButton` maps current Material Web `md-branded-fab`. Supplying `label` switches the same public component to its current extended branded form.
+- React Aria `Button` owns button semantics and keyboard/pointer interaction.
+- Clickable Compose `Surface` applies `minimumInteractiveComponentSize()`, so the 40px Small FAB keeps a 48px semantic target. Larger FABs naturally exceed that minimum.
+- Active hover/focus/press interactions are ordered like Compose `InteractionSource`; the most recently started active interaction owns the current elevation.
+- Default elevation is level 3, hover is level 4, focus/press are level 3. `elevation="lowered"` maps level 1 with hover level 2.
+- Elevation motion mirrors Material3 `animateElevation`: incoming interactions use the 120ms incoming tween, hover exit uses the 120ms hovered-outgoing tween, and press/focus exit uses the 150ms outgoing tween.
+- Ripple and focus indication are clipped to the visual container while the elevation layer remains outside that clip.
+- Compose exposes no FAB `enabled` parameter, so this component intentionally does not add an `isDisabled` API or synthetic disabled token state.
+
+## Color families
+
+The default remains Compose's primary-container / on-primary-container pair. `variant` also exposes current canonical cross-platform FAB families:
+
+- `primaryContainer`
+- `secondaryContainer`
+- `tertiaryContainer`
+- `surface`
+- `primary`
+- `secondary`
+- `tertiary`
+
+The first three preserve current container-role families. `surface` and the solid base-color variants preserve the pinned Material Web public FAB vocabulary. `containerColor` and `contentColor` remain higher-priority Compose-style overrides for regular and Extended FABs.
+
+Branded FAB intentionally has no `variant` or `contentColor` API. Current Material Web branded tokens own the surface/elevation/state layer, but not a forced icon color, allowing multicolor brand artwork to retain its own paint.
+
+## Token/runtime reconciliation
+
+Canonical FAB values come only from the Style Dictionary source graph, including:
+
+- `component/fab.json` for Compose-aligned sizes, container roles, elevation, and expressive Extended sizes.
+- `component/fab-web-roles.json` for current Material Web solid role variants.
+- `component/fab-web-surface.json` for current surface and branded FAB projections.
+- `component/fab-web-extended.json` for baseline Extended spacing plus current surface/branded Extended projections.
+
+No UI implementation file generates or mutates canonical tokens.
+
+Current AndroidX runtime TODOs are resolved at the consumer boundary:
+
+- Large FAB icon: runtime explicitly uses 36dp; canonical current value is 36px.
+- Medium FAB and medium Extended FAB shape: runtime explicitly uses `ShapeDefaults.LargeIncreased`; canonical current value is `largeIncreased`.
+- Medium and large Extended icon/label gaps use the effective runtime 12dp / 16dp values, which are also represented by the canonical current size projection.
+
+Baseline Extended leading/trailing/icon-label spacing (16/20/12) is canonical current Web evidence. Two layout mechanics remain runtime-only Compose values because upstream component tokens do not own them: expanded baseline minimum width 80dp and baseline text-only horizontal padding 20dp. They stay local to the UI projection rather than being fabricated as DTCG tokens.
+
+Current Material Web large surface/branded generated modules are deprecated/dispositioned by the repository's source audit and therefore are not promoted into public current size APIs.
+
+For collapsed icon + label Extended FABs, a string label is promoted to `aria-label` automatically when no explicit accessible name is supplied. Non-string collapsed labels should provide `aria-label` explicitly. Text-only Extended FABs remain expanded and expose their visible label normally.
