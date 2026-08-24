@@ -29,7 +29,7 @@ test.describe('Material 3 Switch parity', () => {
   }) => {
     await openStory(page, 'components-switch--default');
     const control = page.getByRole('switch', { name: 'Switch label' });
-    const root = page.locator('.m3-switch');
+    const root = page.locator('.switch');
 
     await expect(control).not.toBeChecked();
     await root.click();
@@ -42,14 +42,14 @@ test.describe('Material 3 Switch parity', () => {
 
   test('matches track, target, thumb and thumb-content geometry', async ({ page }) => {
     await openStory(page, 'components-switch--states');
-    const roots = page.locator('.m3-switch');
+    const roots = page.locator('.switch');
 
     const geometry = await roots.evaluateAll((elements) =>
       elements.map((element) => {
-        const slot = element.querySelector<HTMLElement>('.m3-switch__control-slot')!;
-        const track = element.querySelector<HTMLElement>('.m3-switch__track')!;
-        const thumb = element.querySelector<HTMLElement>('.m3-switch__thumb-shell')!;
-        const icon = element.querySelector<HTMLElement>('.m3-switch__icon');
+        const slot = element.querySelector<HTMLElement>('.switch__control-slot')!;
+        const track = element.querySelector<HTMLElement>('.switch__track')!;
+        const thumb = element.querySelector<HTMLElement>('.switch__thumb-shell')!;
+        const icon = element.querySelector<HTMLElement>('.switch__icon');
         const trackBox = track.getBoundingClientRect();
         const thumbBox = thumb.getBoundingClientRect();
         const iconBox = icon?.getBoundingClientRect();
@@ -77,9 +77,9 @@ test.describe('Material 3 Switch parity', () => {
 
   test('snaps to pressed geometry and uses FastSpatial when released', async ({ page }) => {
     await openStory(page, 'components-switch--default');
-    const root = page.locator('.m3-switch');
-    const track = root.locator('.m3-switch__track');
-    const thumb = root.locator('.m3-switch__thumb-shell');
+    const root = page.locator('.switch');
+    const track = root.locator('.switch__track');
+    const thumb = root.locator('.switch__thumb-shell');
     const rootBox = await root.boundingBox();
     expect(rootBox).not.toBeNull();
 
@@ -89,9 +89,9 @@ test.describe('Material 3 Switch parity', () => {
 
     const pressed = await root.evaluate((element) => {
       const trackBox = element
-        .querySelector<HTMLElement>('.m3-switch__track')!
+        .querySelector<HTMLElement>('.switch__track')!
         .getBoundingClientRect();
-      const thumbElement = element.querySelector<HTMLElement>('.m3-switch__thumb-shell')!;
+      const thumbElement = element.querySelector<HTMLElement>('.switch__thumb-shell')!;
       const thumbBox = thumbElement.getBoundingClientRect();
       return {
         size: [thumbBox.width, thumbBox.height],
@@ -112,11 +112,11 @@ test.describe('Material 3 Switch parity', () => {
 
   test('keeps the 40px ambient-content state layer on the moving thumb', async ({ page }) => {
     await openStory(page, 'components-switch--states');
-    const root = page.locator('.m3-switch').first();
+    const root = page.locator('.switch').first();
     const onSurface = await resolvedColor(root, 'var(--on-surface)');
 
     await root.hover();
-    const layer = root.locator('.m3-switch__state-layer .m3-ripple__state-layer');
+    const layer = root.locator('.switch__state-layer .ripple__state-layer');
     const layerBox = await layer.boundingBox();
     expect(layerBox && [layerBox.width, layerBox.height]).toEqual([40, 40]);
     await expect(layer).toHaveCSS('background-color', onSurface);
@@ -125,7 +125,7 @@ test.describe('Material 3 Switch parity', () => {
 
   test('composites disabled colors over Surface rather than transparency', async ({ page }) => {
     await openStory(page, 'components-switch--disabled-states');
-    const roots = page.locator('.m3-switch');
+    const roots = page.locator('.switch');
     const unchecked = roots.nth(0);
     const checked = roots.nth(1);
 
@@ -146,19 +146,19 @@ test.describe('Material 3 Switch parity', () => {
     await expect(
       page.getByRole('switch', { name: 'Unchecked', exact: true }),
     ).toBeDisabled();
-    await expect(unchecked.locator('.m3-switch__track')).toHaveCSS(
+    await expect(unchecked.locator('.switch__track')).toHaveCSS(
       'background-color',
       uncheckedTrack,
     );
-    await expect(unchecked.locator('.m3-switch__thumb')).toHaveCSS(
+    await expect(unchecked.locator('.switch__thumb')).toHaveCSS(
       'background-color',
       uncheckedThumb,
     );
-    await expect(checked.locator('.m3-switch__track')).toHaveCSS(
+    await expect(checked.locator('.switch__track')).toHaveCSS(
       'background-color',
       checkedTrack,
     );
-    await expect(checked.locator('.m3-switch__thumb')).toHaveCSS(
+    await expect(checked.locator('.switch__thumb')).toHaveCSS(
       'background-color',
       surface,
     );
@@ -170,25 +170,25 @@ test.describe('Material 3 Switch parity', () => {
 
     await page.keyboard.press('Tab');
     await expect(switches.nth(0)).toBeFocused();
-    const opacityRoot = page.locator('.m3-switch').nth(0);
+    const opacityRoot = page.locator('.switch').nth(0);
     const opacityThumbRipple = opacityRoot.locator(
-      '.m3-switch__state-layer .m3-ripple',
+      '.switch__state-layer .ripple',
     );
     await expect(opacityThumbRipple).toHaveAttribute('data-focus-visible', 'true');
     await expect(
-      opacityThumbRipple.locator('.m3-ripple__state-layer'),
+      opacityThumbRipple.locator('.ripple__state-layer'),
     ).toHaveCSS('opacity', '0.1');
 
     await page.keyboard.press('Tab');
     await expect(switches.nth(1)).toBeFocused();
-    const insetRoot = page.locator('.m3-switch').nth(1);
-    const trackRipple = insetRoot.locator('.m3-switch__track > .m3-ripple');
-    const thumbRipple = insetRoot.locator('.m3-switch__state-layer .m3-ripple');
+    const insetRoot = page.locator('.switch').nth(1);
+    const trackRipple = insetRoot.locator('.switch__track > .ripple');
+    const thumbRipple = insetRoot.locator('.switch__state-layer .ripple');
     await expect(trackRipple).toHaveAttribute('data-inset-focus-visible', 'true');
     await expect(thumbRipple).not.toHaveAttribute('data-focus-visible', 'true');
-    await expect(thumbRipple.locator('.m3-ripple__state-layer')).toHaveCSS('opacity', '0');
+    await expect(thumbRipple.locator('.ripple__state-layer')).toHaveCSS('opacity', '0');
 
-    const ring = trackRipple.locator('.m3-ripple__focus-ring');
+    const ring = trackRipple.locator('.ripple__focus-ring');
     const geometry = await ring.evaluate((element) => {
       const box = element.getBoundingClientRect();
       return {
@@ -205,10 +205,10 @@ test.describe('Material 3 Switch parity', () => {
     await page.evaluate(() => {
       document.documentElement.dir = 'rtl';
     });
-    const root = page.locator('.m3-switch').first();
+    const root = page.locator('.switch').first();
     const geometry = await root.evaluate((element) => {
-      const track = element.querySelector<HTMLElement>('.m3-switch__track')!;
-      const thumb = element.querySelector<HTMLElement>('.m3-switch__thumb-shell')!;
+      const track = element.querySelector<HTMLElement>('.switch__track')!;
+      const thumb = element.querySelector<HTMLElement>('.switch__thumb-shell')!;
       const trackBox = track.getBoundingClientRect();
       const thumbBox = thumb.getBoundingClientRect();
       return trackBox.right - thumbBox.right;
@@ -219,7 +219,7 @@ test.describe('Material 3 Switch parity', () => {
   test('read-only web translation preserves selection', async ({ page }) => {
     await openStory(page, 'components-switch--read-only');
     const control = page.getByRole('switch', { name: 'Read-only' });
-    const root = page.locator('.m3-switch');
+    const root = page.locator('.switch');
     await expect(control).toBeChecked();
     await root.click();
     await expect(control).toBeChecked();
