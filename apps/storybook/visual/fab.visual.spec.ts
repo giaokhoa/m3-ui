@@ -25,7 +25,7 @@ async function expectFabGeometry(
   visualSize: number,
 ) {
   const button = page.getByRole('button', { name, exact: true });
-  const visual = button.locator('.m3-fab__visual');
+  const visual = button.locator('.fab__visual');
   const buttonBox = await button.boundingBox();
   const visualBox = await visual.boundingBox();
 
@@ -73,9 +73,9 @@ test.describe('Material 3 FAB visual parity', () => {
     const normal = page.getByRole('button', { name: 'Branded normal', exact: true });
     const lowered = page.getByRole('button', { name: 'Branded lowered', exact: true });
     const extended = page.getByRole('button', { name: 'Branded extended', exact: true });
-    const normalIconBox = await normal.locator('.m3-fab__icon').boundingBox();
-    const extendedIconBox = await extended.locator('.m3-fab__icon').boundingBox();
-    const extendedVisualBox = await extended.locator('.m3-fab__visual').boundingBox();
+    const normalIconBox = await normal.locator('.fab__icon').boundingBox();
+    const extendedIconBox = await extended.locator('.fab__icon').boundingBox();
+    const extendedVisualBox = await extended.locator('.fab__visual').boundingBox();
 
     await expectFabGeometry(page, 'Branded normal', 56);
     await expectFabGeometry(page, 'Branded lowered', 56);
@@ -84,8 +84,8 @@ test.describe('Material 3 FAB visual parity', () => {
     await expect(extended).toHaveAttribute('data-variant', 'branded');
     await expect(extended).toHaveAttribute('data-extended', 'true');
     await expect(extended).toHaveAttribute('data-has-icon', 'true');
-    await expect(normal.locator('.m3-fab__elevation')).toHaveAttribute('data-elevation', 'level3');
-    await expect(lowered.locator('.m3-fab__elevation')).toHaveAttribute('data-elevation', 'level1');
+    await expect(normal.locator('.fab__elevation')).toHaveAttribute('data-elevation', 'level3');
+    await expect(lowered.locator('.fab__elevation')).toHaveAttribute('data-elevation', 'level1');
     expect(normalIconBox?.width).toBe(36);
     expect(normalIconBox?.height).toBe(36);
     expect(extendedIconBox?.width).toBe(36);
@@ -105,8 +105,8 @@ test.describe('Material 3 FAB visual parity', () => {
 
     const normal = page.getByRole('button', { name: 'Surface normal', exact: true });
     const lowered = page.getByRole('button', { name: 'Surface lowered', exact: true });
-    const normalElevation = normal.locator('.m3-fab__elevation');
-    const loweredElevation = lowered.locator('.m3-fab__elevation');
+    const normalElevation = normal.locator('.fab__elevation');
+    const loweredElevation = lowered.locator('.fab__elevation');
 
     await expect(normalElevation).toHaveAttribute('data-elevation', 'level3');
     await expect(loweredElevation).toHaveAttribute('data-elevation', 'level1');
@@ -135,8 +135,8 @@ test.describe('Material 3 FAB visual parity', () => {
 
     for (const [name, height, minWidth] of sizes) {
       const button = page.getByRole('button', { name, exact: true });
-      const visual = button.locator('.m3-fab__visual');
-      const label = button.locator('.m3-fab__label');
+      const visual = button.locator('.fab__visual');
+      const label = button.locator('.fab__label');
       const buttonBox = await button.boundingBox();
       const visualBox = await visual.boundingBox();
 
@@ -163,15 +163,15 @@ test.describe('Material 3 FAB visual parity', () => {
 
     for (const [name, height, minWidth] of sizes) {
       const button = page.getByRole('button', { name, exact: true });
-      const visual = button.locator('.m3-fab__visual');
-      const label = button.locator('.m3-fab__label');
+      const visual = button.locator('.fab__visual');
+      const label = button.locator('.fab__label');
       const visualBox = await visual.boundingBox();
 
       expect(visualBox?.height).toBe(height);
       expect(visualBox?.width ?? 0).toBeGreaterThanOrEqual(minWidth);
       await expect(button).toHaveAttribute('data-expanded', 'true');
       await expect(button).not.toHaveAttribute('data-has-icon', 'true');
-      await expect(button.locator('.m3-fab__icon')).toHaveCount(0);
+      await expect(button.locator('.fab__icon')).toHaveCount(0);
       await expect(label).not.toHaveAttribute('aria-hidden', 'true');
     }
 
@@ -190,8 +190,8 @@ test.describe('Material 3 FAB visual parity', () => {
 
     for (const [name, size] of sizes) {
       const button = page.getByRole('button', { name, exact: true });
-      const visual = button.locator('.m3-fab__visual');
-      const label = button.locator('.m3-fab__label');
+      const visual = button.locator('.fab__visual');
+      const label = button.locator('.fab__label');
       const visualBox = await visual.boundingBox();
 
       expect(visualBox?.width).toBe(size);
