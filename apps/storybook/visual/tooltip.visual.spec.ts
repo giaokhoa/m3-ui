@@ -49,6 +49,21 @@ async function hoverDefault(page: Page) {
   return { trigger, tooltip };
 }
 
+async function hoverRich(page: Page) {
+  await openStory(page, 'components-tooltip--rich');
+  const trigger = page.getByTestId('rich-tooltip-trigger');
+  await trigger.hover();
+  const tooltip = page.getByTestId('rich-tooltip');
+  await expect(tooltip).toBeVisible();
+  await waitForTooltipSettled(tooltip);
+  return {
+    trigger,
+    tooltip,
+    dialog: tooltip.getByRole('dialog'),
+    action: page.getByTestId('rich-tooltip-action'),
+  };
+}
+
 test.describe('Material 3 PlainTooltip browser contract', () => {
   test('uses Compose 40x24 minimum geometry, 200px cap and canonical Body Small treatment', async ({
     page,
@@ -160,5 +175,124 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
     expect(motion.duration).toContain('0.108s');
     expect(motion.duration).toContain('0.137s');
     expect(motion.timing).toContain('linear(');
+  });
+});
+
+test.describe('Material 3 RichTooltip browser contract', () => {
+  test('uses Compose 40px floor/320px cap, level2 surface and canonical RichTooltip typography', async ({
+    page,
+  }) => {
+    const { tooltip } = await hoverRich(page);
+    const box = await tooltip.boundingBox();
+    const surface = await tooltip.evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return {
+        minWidth: computed.minWidth,
+        minHeight: computed.minHeight,
+        maxWidth: computed.maxWidth,
+        borderRadius: computed.borderRadius,
+        boxShadow: computed.boxShadow,
+      };
+    });
+    const content = tooltip.locator('.rich-tooltip__content');
+    const contentPadding = await content.evaluate((element) => getComputedStyle(element).paddingInline);
+    const title = tooltip.locator('.rich-tooltip__title');
+    const text = tooltip.locator('.rich-tooltip__text');
+    const titleType = await title.evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return {
+        fontSize: computed.fontSize,
+        lineHeight: computed.lineHeight,
+        fontWeight: computed.fontWeight,
+        letterSpacing: computed.letterSpacing,
+      };
+    });
+    const textType = await text.evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return {
+        fontSize: computed.fontSize,
+        lineHeight: computed.lineHeight,
+        fontWeight: computed.fontWeight,
+        letterSpacing: computed.letterSpacing,
+      };
+    });
+
+    expect(box?.width).toBeGreaterThanOrEqual(40);
+    expect(box?.width).toBeLessThanOrEqual(320.7);
+    expect(surface.minWidth).toBe('40px');
+    expect(surface.minHeight).toBe('24px');
+    expect(surface.maxWidth).toBe('320px');
+    expect(surface.borderRadius).toBe('12px');
+    expect(surface.boxShadow).not.toBe('none');
+    expect(contentPadding).toBe('16px');
+    expect(titleType).toEqual({
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: '500',
+      letterSpacing: '0.1px',
+    });
+    expect(textType).toEqual({
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: '400',
+      letterSpacing: '0.2px',
+    });
+  });
+
+  test('uses dialog semantics and exposes the relationship on the real trigger', async ({ page }) => {
+    const { trigger, dialog, action, tooltip } = await hoverRich(page);
+    const dialogId = await dialog.getAttribute('id');
+    expect(dialogId).toBeTruthy();
+    await expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(trigger).toHaveAttribute('aria-controls', dialogId ?? '');
+    await expect(dialog).toHaveAttribute('role', 'dialog');
+    await expect(dialog).toHaveAttribute('aria-describedby', /.+/);
+
+    await action.click();
+    await expect(tooltip).toBeHidden();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('persistent rich tooltip survives pointer travel and dismisses on outside interaction', async ({
+    page,
+  }) => {
+    const { action, tooltip } = await hoverRich(page);
+    await action.hover();
+    await expect(tooltip).toBeVisible();
+    await page.mouse.move(1, 1);
+    await expect(tooltip).toBeVisible();
+    await page.mouse.click(1, 1);
+    await expect(tooltip).toBeHidden();
+  });
+
+  test('keyboard focus opens the rich tooltip and Tab reaches its action', async ({ page }) => {
+    await openStory(page, 'components-tooltip--rich');
+    const trigger = page.getByTestId('rich-tooltip-trigger');
+    const tooltip = page.getByTestId('rich-tooltip');
+    const action = page.getByTestId('rich-tooltip-action');
+
+    await page.keyboard.press('Tab');
+    await expect(trigger).toBeFocused();
+    await expect(tooltip).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(action).toBeFocused();
+    await expect(tooltip).toBeVisible();
+  });
+
+  test('text-only rich tooltip keeps Compose 4px block padding and closes on pointer exit when non-persistent', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-tooltip--rich-text-only');
+    const trigger = page.getByTestId('rich-text-only-trigger');
+    await trigger.hover();
+    const tooltip = page.getByTestId('rich-text-only-tooltip');
+    await expect(tooltip).toBeVisible();
+    const text = tooltip.locator('.rich-tooltip__text');
+    const padding = await text.evaluate((element) => getComputedStyle(element).paddingBlock);
+    expect(padding).toBe('4px');
+
+    await page.mouse.move(1, 1);
+    await expect(tooltip).toBeHidden();
   });
 });
