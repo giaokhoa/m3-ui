@@ -197,6 +197,11 @@
   transform: translate(-50%, -50%);
 }
 
+.m3-slider[data-orientation='horizontal']:dir(rtl) .m3-slider__stop,
+.m3-slider[data-orientation='horizontal']:dir(rtl) .m3-slider__tick {
+  transform: translate(50%, -50%);
+}
+
 .m3-slider[data-orientation='horizontal'] .m3-slider__stop {
   inset-inline-start: calc(100% - var(--_slider-stop-center-inset));
 }
