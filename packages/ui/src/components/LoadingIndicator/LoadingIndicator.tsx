@@ -20,8 +20,8 @@ import {
   indeterminateLoadingPolygons,
   morphSequence,
   processedMorphPath,
-  springMorphProgress,
 } from './LoadingIndicator.geometry';
+import { indeterminateLoadingFrame } from './LoadingIndicator.motion';
 import './loading-indicator.css';
 
 const determinateMorphs = morphSequence(determinateLoadingPolygons, false);
@@ -133,29 +133,14 @@ function LoadingVisual({ value }: { value?: number }) {
     );
     rotation = -progress * loadingIndicatorRuntime.determinateRotation;
   } else {
-    const intervalCount = Math.floor(
-      elapsed / loadingIndicatorRuntime.morphIntervalMs,
-    );
-    const morphIndex = intervalCount % indeterminateMorphs.length;
-    const intervalElapsed =
-      elapsed % loadingIndicatorRuntime.morphIntervalMs;
-    const morphProgress = springMorphProgress(intervalElapsed);
-    const targetRotation =
-      ((intervalCount + 1) * loadingIndicatorRuntime.quarterRotation) % 360;
-    const globalRotation =
-      ((elapsed % loadingIndicatorRuntime.globalRotationDurationMs) /
-        loadingIndicatorRuntime.globalRotationDurationMs) *
-      360;
+    const frame = indeterminateLoadingFrame(elapsed, indeterminateMorphs.length);
     path = processedMorphPath(
-      indeterminateMorphs[morphIndex],
-      morphProgress,
+      indeterminateMorphs[frame.morphIndex],
+      frame.morphProgress,
       size,
       indeterminateScaleFactor,
     );
-    rotation =
-      morphProgress * loadingIndicatorRuntime.quarterRotation +
-      targetRotation +
-      globalRotation;
+    rotation = frame.rotation;
   }
 
   return (
