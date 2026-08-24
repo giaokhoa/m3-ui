@@ -44,7 +44,7 @@ import '@m3/ui/styles/button.css';
 import '@m3/ui/styles/text-field.css';
 ```
 
-Available modular entries are `button.css`, `card.css`, `checkbox.css`, `chip.css`, `radio-button.css`, `switch.css`, and `text-field.css`. Each entry includes the internal Ripple/Elevation CSS that its component needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
+Available modular entries are `button.css`, `card.css`, `checkbox.css`, `chip.css`, `divider.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `progress-indicator.css`, `radio-button.css`, `slider.css`, `switch.css`, and `text-field.css`. Each entry includes the internal Ripple/Elevation CSS that its component needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
 
 ## Dev Container
 

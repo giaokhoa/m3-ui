@@ -17,6 +17,7 @@ export const styleEntries = {
     'src/internal/elevation/elevation.css',
     'src/components/Chip/chip.css',
   ],
+  divider: ['src/components/Divider/divider.css'],
   fab: [
     'src/internal/ripple/ripple.css',
     'src/internal/elevation/elevation.css',
@@ -48,6 +49,7 @@ export const publicComponentStyleSources = {
   card: 'src/components/Card/card.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
+  divider: 'src/components/Divider/divider.css',
   fab: 'src/components/Fab/fab.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
   'loading-indicator': 'src/components/LoadingIndicator/loading-indicator.css',
@@ -63,6 +65,7 @@ export const publicComponentModules = {
   card: 'src/components/Card/Card.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
+  divider: 'src/components/Divider/Divider.tsx',
   fab: 'src/components/Fab/Fab.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
   'loading-indicator': 'src/components/LoadingIndicator/LoadingIndicator.tsx',
