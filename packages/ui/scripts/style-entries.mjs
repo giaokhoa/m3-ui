@@ -17,6 +17,10 @@ export const styleEntries = {
     'src/internal/elevation/elevation.css',
     'src/components/Chip/chip.css',
   ],
+  'icon-button': [
+    'src/internal/ripple/ripple.css',
+    'src/components/IconButton/icon-button.css',
+  ],
   'radio-button': [
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
@@ -33,6 +37,7 @@ export const publicComponentStyleSources = {
   card: 'src/components/Card/card.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
+  'icon-button': 'src/components/IconButton/icon-button.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
@@ -43,6 +48,7 @@ export const publicComponentModules = {
   card: 'src/components/Card/Card.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
+  'icon-button': 'src/components/IconButton/IconButton.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
