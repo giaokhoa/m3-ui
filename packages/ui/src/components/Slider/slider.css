@@ -11,10 +11,42 @@
 }
 
 .m3-slider__track {
+  --_slider-start-current-handle-width: var(--_slider-handle-width);
+  --_slider-end-current-handle-width: var(--_slider-handle-width);
+  --_slider-start-track-gap: calc(
+    var(--_slider-start-current-handle-width) / 2 + var(--_slider-track-gap)
+  );
+  --_slider-end-track-gap: calc(
+    var(--_slider-end-current-handle-width) / 2 + var(--_slider-track-gap)
+  );
   position: relative;
   box-sizing: border-box;
   touch-action: none;
   user-select: none;
+}
+
+.m3-slider:not(.m3-slider--range) .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-focused]) {
+  --_slider-end-current-handle-width: var(--_slider-focus-handle-width);
+}
+
+.m3-slider:not(.m3-slider--range) .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-dragging]) {
+  --_slider-end-current-handle-width: var(--_slider-pressed-handle-width);
+}
+
+.m3-slider--range .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-focused]) {
+  --_slider-start-current-handle-width: var(--_slider-focus-handle-width);
+}
+
+.m3-slider--range .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-dragging]) {
+  --_slider-start-current-handle-width: var(--_slider-pressed-handle-width);
+}
+
+.m3-slider--range .m3-slider__track:has(.m3-slider__thumb:last-of-type[data-focused]) {
+  --_slider-end-current-handle-width: var(--_slider-focus-handle-width);
+}
+
+.m3-slider--range .m3-slider__track:has(.m3-slider__thumb:last-of-type[data-dragging]) {
+  --_slider-end-current-handle-width: var(--_slider-pressed-handle-width);
 }
 
 .m3-slider[data-orientation='horizontal'] .m3-slider__track {
@@ -41,6 +73,13 @@
   box-sizing: border-box;
 }
 
+.m3-slider__segment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+}
+
 .m3-slider[data-orientation='horizontal'] .m3-slider__segment {
   inset-block-start: 50%;
   transform: translateY(-50%);
@@ -51,37 +90,55 @@
   transform: translateX(-50%);
 }
 
-.m3-slider__segment--active {
+.m3-slider__segment--active::before {
   background: var(--_slider-active-track-color);
 }
 
 .m3-slider[data-orientation='horizontal'] .m3-slider__segment--active {
   block-size: var(--_slider-active-track-thickness);
+}
+
+.m3-slider[data-orientation='horizontal'] .m3-slider__segment--active::before {
   border-start-start-radius: var(--_slider-active-outer-radius);
   border-end-start-radius: var(--_slider-active-outer-radius);
   border-start-end-radius: var(--_slider-inner-radius);
   border-end-end-radius: var(--_slider-inner-radius);
 }
 
-.m3-slider[data-orientation='horizontal'] .m3-slider__segment--active.m3-slider__segment--range {
+.m3-slider:not(.m3-slider--range)[data-orientation='horizontal'] .m3-slider__segment--active::before {
+  inset-inline-end: var(--_slider-end-track-gap);
+}
+
+.m3-slider[data-orientation='horizontal'] .m3-slider__segment--active.m3-slider__segment--range::before {
+  inset-inline-start: var(--_slider-start-track-gap);
+  inset-inline-end: var(--_slider-end-track-gap);
   border-start-start-radius: var(--_slider-inner-radius);
   border-end-start-radius: var(--_slider-inner-radius);
 }
 
 .m3-slider[data-orientation='vertical'] .m3-slider__segment--active {
   inline-size: var(--_slider-active-track-thickness);
+}
+
+.m3-slider[data-orientation='vertical'] .m3-slider__segment--active::before {
   border-end-start-radius: var(--_slider-active-outer-radius);
   border-end-end-radius: var(--_slider-active-outer-radius);
   border-start-start-radius: var(--_slider-inner-radius);
   border-start-end-radius: var(--_slider-inner-radius);
 }
 
-.m3-slider[data-orientation='vertical'] .m3-slider__segment--active.m3-slider__segment--range {
+.m3-slider:not(.m3-slider--range)[data-orientation='vertical'] .m3-slider__segment--active::before {
+  inset-block-start: var(--_slider-end-track-gap);
+}
+
+.m3-slider[data-orientation='vertical'] .m3-slider__segment--active.m3-slider__segment--range::before {
+  inset-block-start: var(--_slider-end-track-gap);
+  inset-block-end: var(--_slider-start-track-gap);
   border-end-start-radius: var(--_slider-inner-radius);
   border-end-end-radius: var(--_slider-inner-radius);
 }
 
-.m3-slider__segment--inactive {
+.m3-slider__segment--inactive::before {
   background: var(--_slider-inactive-track-color);
 }
 
@@ -89,14 +146,16 @@
   block-size: var(--_slider-inactive-track-thickness);
 }
 
-.m3-slider[data-orientation='horizontal'] .m3-slider__segment--leading {
+.m3-slider[data-orientation='horizontal'] .m3-slider__segment--leading::before {
+  inset-inline-end: var(--_slider-start-track-gap);
   border-start-start-radius: var(--_slider-inactive-outer-radius);
   border-end-start-radius: var(--_slider-inactive-outer-radius);
   border-start-end-radius: var(--_slider-inner-radius);
   border-end-end-radius: var(--_slider-inner-radius);
 }
 
-.m3-slider[data-orientation='horizontal'] .m3-slider__segment--trailing {
+.m3-slider[data-orientation='horizontal'] .m3-slider__segment--trailing::before {
+  inset-inline-start: var(--_slider-end-track-gap);
   border-start-start-radius: var(--_slider-inner-radius);
   border-end-start-radius: var(--_slider-inner-radius);
   border-start-end-radius: var(--_slider-inactive-outer-radius);
@@ -107,14 +166,16 @@
   inline-size: var(--_slider-inactive-track-thickness);
 }
 
-.m3-slider[data-orientation='vertical'] .m3-slider__segment--leading {
+.m3-slider[data-orientation='vertical'] .m3-slider__segment--leading::before {
+  inset-block-start: var(--_slider-start-track-gap);
   border-end-start-radius: var(--_slider-inactive-outer-radius);
   border-end-end-radius: var(--_slider-inactive-outer-radius);
   border-start-start-radius: var(--_slider-inner-radius);
   border-start-end-radius: var(--_slider-inner-radius);
 }
 
-.m3-slider[data-orientation='vertical'] .m3-slider__segment--trailing {
+.m3-slider[data-orientation='vertical'] .m3-slider__segment--trailing::before {
+  inset-block-end: var(--_slider-end-track-gap);
   border-end-start-radius: var(--_slider-inner-radius);
   border-end-end-radius: var(--_slider-inner-radius);
   border-start-start-radius: var(--_slider-inactive-outer-radius);
@@ -129,7 +190,6 @@
   block-size: var(--_slider-stop-size);
   border-radius: 50%;
   background: var(--_slider-stop-color);
-  transform: translate(-50%, -50%);
 }
 
 .m3-slider__stop[data-selected],
@@ -140,10 +200,13 @@
 .m3-slider[data-orientation='horizontal'] .m3-slider__stop,
 .m3-slider[data-orientation='horizontal'] .m3-slider__tick {
   inset-block-start: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .m3-slider[data-orientation='horizontal'] .m3-slider__stop {
-  inset-inline-start: 100%;
+  inset-inline-start: calc(
+    100% - var(--_slider-stop-trailing-space) - var(--_slider-stop-size) / 2
+  );
 }
 
 .m3-slider[data-orientation='vertical'] .m3-slider__stop,
@@ -152,17 +215,30 @@
 }
 
 .m3-slider[data-orientation='vertical'] .m3-slider__stop {
-  bottom: 100%;
+  inset-block-start: calc(
+    var(--_slider-stop-trailing-space) + var(--_slider-stop-size) / 2
+  );
+  transform: translate(-50%, -50%);
+}
+
+.m3-slider[data-orientation='vertical'] .m3-slider__tick {
+  transform: translate(-50%, 50%);
 }
 
 .m3-slider[data-disabled] .m3-slider__segment--active {
-  background: var(--_slider-disabled-active-track-color);
   opacity: var(--_slider-disabled-active-track-opacity);
 }
 
+.m3-slider[data-disabled] .m3-slider__segment--active::before {
+  background: var(--_slider-disabled-active-track-color);
+}
+
 .m3-slider[data-disabled] .m3-slider__segment--inactive {
-  background: var(--_slider-disabled-inactive-track-color);
   opacity: var(--_slider-disabled-inactive-track-opacity);
+}
+
+.m3-slider[data-disabled] .m3-slider__segment--inactive::before {
+  background: var(--_slider-disabled-inactive-track-color);
 }
 
 .m3-slider[data-disabled] .m3-slider__tick[data-selected],
@@ -307,21 +383,21 @@
     forced-color-adjust: none;
   }
 
-  .m3-slider__segment--active,
+  .m3-slider__segment--active::before,
   .m3-slider__handle-nub,
   .m3-slider__tick[data-selected],
   .m3-slider__stop[data-selected] {
     background: Highlight;
   }
 
-  .m3-slider__segment--inactive,
+  .m3-slider__segment--inactive::before,
   .m3-slider__tick:not([data-selected]),
   .m3-slider__stop:not([data-selected]) {
     background: CanvasText;
   }
 
   .m3-slider__thumb[data-disabled] .m3-slider__handle-nub,
-  .m3-slider[data-disabled] .m3-slider__segment,
+  .m3-slider[data-disabled] .m3-slider__segment::before,
   .m3-slider[data-disabled] .m3-slider__stop,
   .m3-slider[data-disabled] .m3-slider__tick {
     background: GrayText;
