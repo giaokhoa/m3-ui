@@ -42,6 +42,12 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/Slider/slider.css',
   ],
+  snackbar: [
+    'src/internal/ripple/ripple.css',
+    'src/components/Button/button.css',
+    'src/components/IconButton/icon-button.css',
+    'src/components/Snackbar/snackbar.css',
+  ],
   switch: [
     'src/internal/ripple/ripple.css',
     'src/components/Switch/switch.css',
@@ -64,6 +70,7 @@ export const publicComponentStyleSources = {
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   slider: 'src/components/Slider/slider.css',
+  snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
   tooltip: 'src/components/Tooltip/tooltip.css',
@@ -83,6 +90,7 @@ export const publicComponentModules = {
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   slider: 'src/components/Slider/Slider.tsx',
+  snackbar: 'src/components/Snackbar/Snackbar.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
   tooltip: 'src/components/Tooltip/Tooltip.tsx',
