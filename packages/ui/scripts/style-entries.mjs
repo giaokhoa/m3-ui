@@ -31,6 +31,10 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
   ],
+  slider: [
+    'src/internal/ripple/ripple.css',
+    'src/components/Slider/slider.css',
+  ],
   switch: [
     'src/internal/ripple/ripple.css',
     'src/components/Switch/switch.css',
@@ -47,6 +51,7 @@ export const publicComponentStyleSources = {
   'icon-button': 'src/components/IconButton/icon-button.css',
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
+  slider: 'src/components/Slider/slider.css',
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
 };
@@ -60,6 +65,7 @@ export const publicComponentModules = {
   'icon-button': 'src/components/IconButton/IconButton.tsx',
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
+  slider: 'src/components/Slider/Slider.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
 };

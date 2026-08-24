@@ -6,5 +6,6 @@ export * from './Fab';
 export * from './IconButton';
 export * from './ProgressIndicator';
 export * from './RadioButton';
+export * from './Slider';
 export * from './Switch';
 export * from './TextField';
