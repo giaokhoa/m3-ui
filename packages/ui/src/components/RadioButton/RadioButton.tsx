@@ -10,7 +10,7 @@ import {
   type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { radioButtonBaseStyle } from './RadioButton.defaults';
+import { radioButtonBaseStyle, radioGroupBaseStyle } from './RadioButton.defaults';
 import { radioButtonTokens } from './RadioButton.tokens';
 import './radio-button.css';
 
@@ -120,7 +120,10 @@ export function RadioGroup({
           userClassName,
         );
       }}
-      style={style}
+      style={(renderProps) => {
+        const userStyle = typeof style === 'function' ? style(renderProps) : style;
+        return { ...radioGroupBaseStyle, ...userStyle };
+      }}
     >
       {label != null ? <Label className="m3-radio-group__label">{label}</Label> : null}
       <div className="m3-radio-group__options">{children}</div>

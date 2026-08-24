@@ -28,6 +28,11 @@ describe('Switch defaults', () => {
     expect(switchTrackFocusRingRadius).toBe('16px');
   });
 
+  it('derives wrapper label color from the canonical runtime role', () => {
+    expect(token.ColorRoleOnSurface).toBe('var(--on-surface)');
+    expect(style['--_switch-label-color']).toBe('var(--on-surface)');
+  });
+
   it('passes enabled dynamic color variables through unchanged', () => {
     expect(style['--_switch-checked-thumb-color']).toBe('var(--on-primary)');
     expect(style['--_switch-checked-track-color']).toBe('var(--primary)');
@@ -38,7 +43,8 @@ describe('Switch defaults', () => {
     expect(style['--_switch-unchecked-border-color']).toBe('var(--outline)');
   });
 
-  it('composites generated disabled colors over Surface', () => {
+  it('composites generated disabled colors over the canonical Surface role', () => {
+    expect(token.ColorRoleSurface).toBe('var(--surface)');
     expect(style['--_switch-disabled-checked-thumb-color']).toBe('var(--surface)');
     expect(style['--_switch-disabled-checked-track-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, var(--surface))');
     expect(style['--_switch-disabled-unchecked-thumb-color']).toBe('color-mix(in srgb, var(--on-surface) 38%, var(--surface))');

@@ -9,7 +9,7 @@
 .m3-ripple__state-layer,
 .m3-ripple__wave {
   position: absolute;
-  background: var(--ripple-color, var(--on-surface));
+  background: var(--ripple-color, currentColor);
 }
 
 .m3-ripple__state-layer {

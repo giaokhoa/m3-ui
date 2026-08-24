@@ -7,6 +7,7 @@ export const checkboxTokens = {
   stateLayerSize: pxNumber(token.ComponentCheckboxStateLayerSize),
   minimumInteractiveSize: pxNumber(token.ComponentCheckboxMinimumInteractiveSize),
   strokeWidth: pxNumber(token.ComponentCheckboxStrokeWidth),
+  labelColor: token.ColorRoleOnSurface,
   selectedContainerColor: token.ComponentCheckboxColorsSelectedContainer,
   selectedIconColor: token.ComponentCheckboxColorsSelectedIcon,
   unselectedOutlineColor: token.ComponentCheckboxColorsUnselectedOutline,

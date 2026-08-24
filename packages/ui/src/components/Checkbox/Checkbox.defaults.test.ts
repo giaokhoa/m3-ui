@@ -24,6 +24,7 @@ describe('Checkbox parity', () => {
 
   it('keeps current Material 3 colors as runtime CSS expressions', () => {
     expect(checkboxTokens).toMatchObject({
+      labelColor: 'var(--on-surface)',
       selectedContainerColor: 'var(--primary)',
       selectedIconColor: 'var(--on-primary)',
       unselectedOutlineColor: 'var(--on-surface-variant)',
@@ -47,6 +48,7 @@ describe('Checkbox parity', () => {
       '--_checkbox-container-size': '18px',
       '--_checkbox-state-layer-size': '40px',
       '--_checkbox-interactive-size': '48px',
+      '--_checkbox-label-color': 'var(--on-surface)',
       '--_checkbox-selected-container': 'var(--primary)',
       '--_checkbox-selected-icon': 'var(--on-primary)',
       '--_checkbox-unselected-outline': 'var(--on-surface-variant)',
