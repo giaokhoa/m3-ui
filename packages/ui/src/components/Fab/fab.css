@@ -1,0 +1,158 @@
+.m3-fab {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_fab-target-size);
+  block-size: var(--_fab-target-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m3-fab__visual {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_fab-container-width);
+  block-size: var(--_fab-container-height);
+  flex: none;
+  border-radius: var(--_fab-container-radius);
+}
+
+.m3-fab__elevation {
+  border-radius: var(--_fab-container-radius);
+}
+
+.m3-fab__surface {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: 100%;
+  block-size: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--_fab-container-color);
+  color: var(--_fab-content-color);
+  --ripple-color: var(--_fab-state-layer-color, currentColor);
+}
+
+.m3-fab__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  inline-size: var(--_fab-icon-size);
+  block-size: var(--_fab-icon-size);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.m3-fab__icon > svg,
+.m3-fab__icon > img {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.m3-fab--extended {
+  inline-size: auto;
+  min-inline-size: var(--_fab-target-size);
+}
+
+.m3-fab--extended .m3-fab__visual {
+  inline-size: auto;
+  min-inline-size: var(--_fab-container-width);
+}
+
+.m3-fab__content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  min-inline-size: var(--_fab-container-width);
+  block-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+  color: inherit;
+  transition:
+    gap var(--_fab-expand-size-duration) var(--_fab-expand-size-easing),
+    padding-inline var(--_fab-expand-size-duration) var(--_fab-expand-size-easing);
+}
+
+.m3-fab__label {
+  display: inline-block;
+  max-inline-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: var(--_fab-label-color, inherit);
+  font-family: var(--_fab-label-font-family);
+  font-size: var(--_fab-label-font-size);
+  font-weight: var(--_fab-label-font-weight);
+  line-height: var(--_fab-label-line-height);
+  letter-spacing: var(--_fab-label-letter-spacing);
+  white-space: nowrap;
+  transition:
+    max-inline-size var(--_fab-expand-size-duration) var(--_fab-expand-size-easing),
+    opacity var(--_fab-expand-opacity-duration) var(--_fab-expand-opacity-easing);
+}
+
+.m3-fab--extended[data-has-icon][data-expanded] .m3-fab__content {
+  min-inline-size: var(--_fab-expanded-min-width);
+  justify-content: flex-start;
+  gap: var(--_fab-icon-label-space);
+  padding-inline-start: var(--_fab-leading-space);
+  padding-inline-end: var(--_fab-trailing-space);
+}
+
+.m3-fab--extended[data-has-icon][data-expanded] .m3-fab__label,
+.m3-fab--extended:not([data-has-icon]) .m3-fab__label {
+  max-inline-size: 32rem;
+  opacity: 1;
+}
+
+.m3-fab--extended:not([data-has-icon]) .m3-fab__content {
+  min-inline-size: var(--_fab-expanded-min-width);
+  justify-content: center;
+  padding-inline-start: var(--_fab-text-only-leading-space);
+  padding-inline-end: var(--_fab-text-only-trailing-space);
+}
+
+.m3-fab--branded-extended[data-interaction='focus'] .m3-fab__label {
+  color: var(--_fab-focus-label-color);
+}
+
+.m3-fab--branded-extended[data-interaction='hover'] .m3-fab__label {
+  color: var(--_fab-hover-label-color);
+}
+
+.m3-fab--branded-extended[data-interaction='press'] .m3-fab__label {
+  color: var(--_fab-pressed-label-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-fab__elevation,
+  .m3-fab__content,
+  .m3-fab__label {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .m3-fab__surface {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    forced-color-adjust: none;
+  }
+}
