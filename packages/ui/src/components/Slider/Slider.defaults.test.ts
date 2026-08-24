@@ -61,7 +61,7 @@ describe('Material 3 Slider defaults', () => {
     });
   });
 
-  it('emits size-aware CSS variables from generated tokens', () => {
+  it('emits size-aware CSS variables and resolved runtime gaps', () => {
     const style = getSliderStyle('xLarge');
     expect(style['--_slider-handle-length']).toBe('108px');
     expect(style['--_slider-active-track-thickness']).toBe('96px');
@@ -70,5 +70,11 @@ describe('Material 3 Slider defaults', () => {
     expect(style['--_slider-handle-color']).toBe('var(--primary)');
     expect(style['--_slider-disabled-active-track-opacity']).toBe(0.38);
     expect(style['--_slider-disabled-inactive-track-opacity']).toBe(0.12);
+    expect(style['--_slider-default-thumb-track-gap']).toBe('8px');
+    expect(style['--_slider-focus-thumb-track-gap']).toBe('7px');
+    expect(style['--_slider-pressed-thumb-track-gap']).toBe('7px');
+    expect(style['--_slider-disabled-thumb-track-gap']).toBe('8px');
+    expect(style['--_slider-stop-trailing-space']).toBe('4px');
+    expect(style['--_slider-stop-center-inset']).toBe('6px');
   });
 });
