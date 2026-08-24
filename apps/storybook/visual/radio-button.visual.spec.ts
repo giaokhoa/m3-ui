@@ -46,7 +46,7 @@ test.describe('Material 3 RadioButton parity', () => {
 
   test('visible radio surface handles pointer selection', async ({ page }) => {
     await openStory(page, 'components-radiobutton--states');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const selected = page.getByRole('radio', { name: 'Selected', exact: true });
     const unselected = page.getByRole('radio', { name: 'Unselected', exact: true });
 
@@ -58,15 +58,15 @@ test.describe('Material 3 RadioButton parity', () => {
 
   test('matches Compose control and state-layer geometry', async ({ page }) => {
     await openStory(page, 'components-radiobutton--states');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const selectedRoot = roots.nth(0);
     const unselectedRoot = roots.nth(1);
 
     const geometry = await selectedRoot.evaluate((element) => {
-      const slot = element.querySelector<HTMLElement>('.m3-radio-button__control-slot')!;
-      const stateLayer = element.querySelector<HTMLElement>('.m3-ripple__state-layer')!;
-      const control = element.querySelector<HTMLElement>('.m3-radio-button__control')!;
-      const dot = element.querySelector<HTMLElement>('.m3-radio-button__dot')!;
+      const slot = element.querySelector<HTMLElement>('.radio-button__control-slot')!;
+      const stateLayer = element.querySelector<HTMLElement>('.ripple__state-layer')!;
+      const control = element.querySelector<HTMLElement>('.radio-button__control')!;
+      const dot = element.querySelector<HTMLElement>('.radio-button__dot')!;
       const slotBox = slot.getBoundingClientRect();
       const stateLayerBox = stateLayer.getBoundingClientRect();
       const controlBox = control.getBoundingClientRect();
@@ -89,14 +89,14 @@ test.describe('Material 3 RadioButton parity', () => {
     expect(geometry.borderWidth).toBe('2px');
 
     const hiddenDotWidth = await unselectedRoot
-      .locator('.m3-radio-button__dot')
+      .locator('.radio-button__dot')
       .evaluate((element) => element.getBoundingClientRect().width);
     expect(hiddenDotWidth).toBe(0);
   });
 
   test('maps selected and unselected runtime colors to theme roles', async ({ page }) => {
     await openStory(page, 'components-radiobutton--states');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const selectedRoot = roots.nth(0);
     const unselectedRoot = roots.nth(1);
     const primary = await resolvedColor(selectedRoot, 'var(--primary)');
@@ -105,15 +105,15 @@ test.describe('Material 3 RadioButton parity', () => {
       'var(--on-surface-variant)',
     );
 
-    await expect(selectedRoot.locator('.m3-radio-button__control')).toHaveCSS(
+    await expect(selectedRoot.locator('.radio-button__control')).toHaveCSS(
       'color',
       primary,
     );
-    await expect(selectedRoot.locator('.m3-radio-button__control')).toHaveCSS(
+    await expect(selectedRoot.locator('.radio-button__control')).toHaveCSS(
       'transition-duration',
       '0.166s',
     );
-    await expect(unselectedRoot.locator('.m3-radio-button__control')).toHaveCSS(
+    await expect(unselectedRoot.locator('.radio-button__control')).toHaveCSS(
       'color',
       onSurfaceVariant,
     );
@@ -123,25 +123,25 @@ test.describe('Material 3 RadioButton parity', () => {
     page,
   }) => {
     await openStory(page, 'components-radiobutton--states');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const selectedRoot = roots.nth(0);
     const unselectedRoot = roots.nth(1);
     const onSurface = await resolvedColor(selectedRoot, 'var(--on-surface)');
 
     await selectedRoot.hover();
-    const selectedLayer = selectedRoot.locator('.m3-ripple__state-layer');
+    const selectedLayer = selectedRoot.locator('.ripple__state-layer');
     await expect(selectedLayer).toHaveCSS('background-color', onSurface);
     await expect(selectedLayer).toHaveCSS('opacity', '0.08');
 
     await unselectedRoot.hover();
-    const unselectedLayer = unselectedRoot.locator('.m3-ripple__state-layer');
+    const unselectedLayer = unselectedRoot.locator('.ripple__state-layer');
     await expect(unselectedLayer).toHaveCSS('background-color', onSurface);
     await expect(unselectedLayer).toHaveCSS('opacity', '0.08');
   });
 
   test('disabled color snaps while dot keeps FastSpatial motion', async ({ page }) => {
     await openStory(page, 'components-radiobutton--disabled-states');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const first = roots.nth(0);
     const expected = await resolvedColor(
       first,
@@ -152,15 +152,15 @@ test.describe('Material 3 RadioButton parity', () => {
 
     await expect(selected).toBeDisabled();
     await expect(unselected).toBeDisabled();
-    await expect(first.locator('.m3-radio-button__control')).toHaveCSS(
+    await expect(first.locator('.radio-button__control')).toHaveCSS(
       'color',
       expected,
     );
-    await expect(first.locator('.m3-radio-button__control')).toHaveCSS(
+    await expect(first.locator('.radio-button__control')).toHaveCSS(
       'transition-duration',
       '0s',
     );
-    await expect(first.locator('.m3-radio-button__dot')).toHaveCSS(
+    await expect(first.locator('.radio-button__dot')).toHaveCSS(
       'transition-duration',
       '0.137s',
     );
@@ -172,13 +172,13 @@ test.describe('Material 3 RadioButton parity', () => {
 
     await expect(group).toBeVisible();
     await expect(page.getByText('Choose one option')).toBeVisible();
-    await expect(page.locator('.m3-radio-group')).toHaveClass(/m3-radio-group--horizontal/);
+    await expect(page.locator('.radio-group')).toHaveClass(/radio-group--horizontal/);
     await expect(page.getByRole('radio')).toHaveCount(3);
   });
 
   test('read-only group preserves selection through visible pointer surface', async ({ page }) => {
     await openStory(page, 'components-radiobutton--read-only');
-    const roots = page.locator('.m3-radio-button');
+    const roots = page.locator('.radio-button');
     const selected = page.getByRole('radio', { name: 'Selected', exact: true });
     const other = page.getByRole('radio', { name: 'Other', exact: true });
 
@@ -201,7 +201,7 @@ test.describe('Material 3 RadioButton parity', () => {
 
   test('theme matrix stays inside parent width constraints', async ({ page }) => {
     await openStory(page, 'components-radiobutton--theme-matrix');
-    const cards = page.locator('.m3-storybook-theme-card');
+    const cards = page.locator('.storybook-theme-card');
     await expect(cards).toHaveCount(4);
 
     const hasOverflow = await cards.evaluateAll((elements) =>
