@@ -43,9 +43,13 @@ test.describe('Material 3 LoadingIndicator browser contract', () => {
 
   test('contained variant exposes the canonical container treatment', async ({ page }) => {
     await openStory(page, 'components-loadingindicator--contained');
-    const contained = page.getByRole('progressbar', { name: 'Contained loading' });
+    const contained = page.getByRole('progressbar', {
+      name: 'Contained loading',
+      exact: true,
+    });
     const determinate = page.getByRole('progressbar', {
       name: 'Contained loading 60 percent',
+      exact: true,
     });
 
     await expect(contained).toHaveAttribute('data-contained', 'true');
