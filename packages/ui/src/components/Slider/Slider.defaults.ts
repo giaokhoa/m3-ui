@@ -128,6 +128,7 @@ export function getSliderStyle(size: SliderSize = 'xSmall'): SliderStyle {
     '--_slider-disabled-inactive-track-color': sliderTokens.disabledInactiveTrackColor,
     '--_slider-disabled-inactive-track-opacity': sliderTokens.disabledInactiveTrackOpacity,
     '--_slider-stop-size': `${sliderTokens.stopSize}px`,
+    '--_slider-stop-trailing-space': `${sliderTokens.stopTrailingSpace}px`,
     '--_slider-stop-color': sliderTokens.stopColor,
     '--_slider-selected-stop-color': sliderTokens.selectedStopColor,
     '--_slider-disabled-active-stop-color': sliderTokens.disabledActiveStopColor,
