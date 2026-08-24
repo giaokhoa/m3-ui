@@ -267,19 +267,3 @@ export function clampProgress(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.min(1, Math.max(0, value));
 }
-
-export function springMorphProgress(elapsedMs: number): number {
-  const seconds = Math.max(0, elapsedMs) / 1000;
-  const dampingRatio = 0.6;
-  const stiffness = 200;
-  const naturalFrequency = Math.sqrt(stiffness);
-  const dampedFrequency = naturalFrequency * Math.sqrt(1 - dampingRatio ** 2);
-  const envelope = Math.exp(-dampingRatio * naturalFrequency * seconds);
-  return (
-    1 -
-    envelope *
-      (Math.cos(dampedFrequency * seconds) +
-        ((dampingRatio * naturalFrequency) / dampedFrequency) *
-          Math.sin(dampedFrequency * seconds))
-  );
-}
