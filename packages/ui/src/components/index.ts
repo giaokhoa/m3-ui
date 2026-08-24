@@ -11,6 +11,7 @@ export * from './LoadingIndicator';
 export * from './ProgressIndicator';
 export * from './RadioButton';
 export * from './Slider';
+export * from './Snackbar';
 export * from './Switch';
 export * from './TextField';
 export * from './Tooltip';
