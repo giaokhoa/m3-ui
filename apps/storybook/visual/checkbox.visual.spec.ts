@@ -13,7 +13,7 @@ async function openStory(page: Page, id: string) {
 async function openSelectedCheckbox(page: Page) {
   await openStory(page, 'components-checkbox--selected');
   const input = page.getByRole('checkbox', { name: 'Selected checkbox' });
-  const root = page.locator('.m3-checkbox');
+  const root = page.locator('.checkbox');
   await expect(input).toBeVisible();
   await expect(root).toBeVisible();
   return { input, root };
