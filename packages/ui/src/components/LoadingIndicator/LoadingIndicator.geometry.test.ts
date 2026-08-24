@@ -34,7 +34,7 @@ describe('Material 3 Loading Indicator geometry', () => {
       ...determinateLoadingPolygons,
       ...indeterminateLoadingPolygons,
     ]) {
-      const bounds = polygon.calculateBounds([], false);
+      const bounds = polygon.calculateBounds([0, 0, 0, 0], false);
       expect(bounds).toHaveLength(4);
       expect(bounds.every(Number.isFinite)).toBe(true);
       expect(bounds[2]).toBeGreaterThan(bounds[0]);
