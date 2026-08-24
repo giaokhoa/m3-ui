@@ -17,6 +17,8 @@ Pinned AndroidX Compose source: `androidx/androidx@ff9a7111302243197384c499d5e34
 
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/LoadingIndicator.kt`
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialShapes.kt`
+- `compose/animation/animation-core/src/commonMain/kotlin/androidx/compose/animation/core/FloatAnimationSpec.kt`
+- `compose/animation/animation-core/src/commonMain/kotlin/androidx/compose/animation/core/SpringEstimation.kt`
 
 Canonical component tokens come only from `packages/tokens/tokens/component/loading-indicator.json`:
 
@@ -31,6 +33,7 @@ Renderer mechanics remain beside the component instead of becoming fabricated to
 - 650ms morph cadence
 - 4666ms global rotation
 - spring damping ratio 0.6, stiffness 200, visibility threshold 0.1
+- the pinned AndroidX duration estimator resolves that spring to 297ms; the end shape is then held for the remainder of each 650ms cadence
 - determinate counter-clockwise 180° rotation
 - indeterminate quarter-turn morph rotation
 
