@@ -41,7 +41,7 @@ function FavoriteIcon() {
 
 function ActionVariants({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="m3-storybook-stack">
+    <div className="storybook-stack">
       <IconButton aria-label="Standard favorite" isDisabled={disabled}><FavoriteIcon /></IconButton>
       <FilledIconButton aria-label="Filled favorite" isDisabled={disabled}><FavoriteIcon /></FilledIconButton>
       <FilledTonalIconButton aria-label="Tonal favorite" isDisabled={disabled}><FavoriteIcon /></FilledTonalIconButton>
@@ -53,7 +53,7 @@ function ActionVariants({ disabled = false }: { disabled?: boolean }) {
 function ToggleVariants({ selected, disabled = false }: { selected: boolean; disabled?: boolean }) {
   const noop = () => {};
   return (
-    <div className="m3-storybook-stack">
+    <div className="storybook-stack">
       <IconToggleButton aria-label="Standard toggle favorite" isDisabled={disabled} isSelected={selected} onChange={noop}><FavoriteIcon /></IconToggleButton>
       <FilledIconToggleButton aria-label="Filled toggle favorite" isDisabled={disabled} isSelected={selected} onChange={noop}><FavoriteIcon /></FilledIconToggleButton>
       <FilledTonalIconToggleButton aria-label="Tonal toggle favorite" isDisabled={disabled} isSelected={selected} onChange={noop}><FavoriteIcon /></FilledTonalIconToggleButton>
@@ -64,7 +64,7 @@ function ToggleVariants({ selected, disabled = false }: { selected: boolean; dis
 
 export const Default: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <IconButton aria-label="Favorite"><FavoriteIcon /></IconButton>
     </div>
   ),
@@ -73,7 +73,7 @@ export const Default: Story = {
 export const ActionVariantsStory: Story = {
   name: 'Action variants',
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <ActionVariants />
     </div>
   ),
@@ -81,7 +81,7 @@ export const ActionVariantsStory: Story = {
 
 export const ToggleStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 24 }}>
         <ToggleVariants selected={false} />
         <ToggleVariants selected />
@@ -92,7 +92,7 @@ export const ToggleStates: Story = {
 
 export const DisabledStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 24 }}>
         <ActionVariants disabled />
         <ToggleVariants disabled selected={false} />
@@ -104,8 +104,8 @@ export const DisabledStates: Story = {
 
 export const ExpressiveSizes: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         {(['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const).map((size) => (
           <FilledTonalIconButton key={size} aria-label={`${size} favorite`} size={size}>
             <FavoriteIcon />
@@ -118,14 +118,14 @@ export const ExpressiveSizes: Story = {
 
 export const WidthsAndShapes: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <div style={{ display: 'grid', gap: 24 }}>
-        <div className="m3-storybook-stack">
+        <div className="storybook-stack">
           <OutlinedIconButton aria-label="Narrow round" width="narrow"><FavoriteIcon /></OutlinedIconButton>
           <OutlinedIconButton aria-label="Default round" width="default"><FavoriteIcon /></OutlinedIconButton>
           <OutlinedIconButton aria-label="Wide round" width="wide"><FavoriteIcon /></OutlinedIconButton>
         </div>
-        <div className="m3-storybook-stack">
+        <div className="storybook-stack">
           <FilledTonalIconButton aria-label="Round" shape="round"><FavoriteIcon /></FilledTonalIconButton>
           <FilledTonalIconButton aria-label="Square" shape="square"><FavoriteIcon /></FilledTonalIconButton>
         </div>
@@ -136,8 +136,8 @@ export const WidthsAndShapes: Story = {
 
 export const ExpressiveShapeMorph: Story = {
   render: () => (
-    <div className="m3-storybook-center">
-      <div className="m3-storybook-stack">
+    <div className="storybook-center">
+      <div className="storybook-stack">
         <FilledTonalIconButton
           aria-label="Press round favorite"
           size="medium"
@@ -169,20 +169,20 @@ export const ExpressiveShapeMorph: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ActionVariants />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ActionVariants />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ToggleVariants selected />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ToggleVariants selected />
       </ThemeProvider>
