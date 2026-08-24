@@ -127,7 +127,7 @@ export class Cubic {
         }
 
         const ya = -this.anchor0Y + 3 * this.control0Y - 3 * this.control1Y + this.anchor1Y;
-        const yb = 2 * this.anchor0Y - 4 * this.control0X + 2 * this.control1Y;
+        const yb = 2 * this.anchor0Y - 4 * this.control0Y + 2 * this.control1Y;
         const yc = -this.anchor0Y + this.control0Y;
 
         if (this.zeroIsh(ya)) {
