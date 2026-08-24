@@ -166,14 +166,18 @@ export namespace MeasuredPolygon {
         }
 
         updateProgressRange(
-            startOutlineProgress: number = this.startOutlineProgress,
-            endOutlineProgress: number = this.endOutlineProgress
+            startOutlineProgress?: number,
+            endOutlineProgress?: number
         ) {
-            if (endOutlineProgress < startOutlineProgress) {
+            const resolvedStartOutlineProgress =
+                startOutlineProgress ?? this.startOutlineProgress;
+            const resolvedEndOutlineProgress =
+                endOutlineProgress ?? this.endOutlineProgress;
+            if (resolvedEndOutlineProgress < resolvedStartOutlineProgress) {
                 throw new Error("endOutlineProgress is expected to be equal or greater than startOutlineProgress");
             }
-            this.startOutlineProgress = startOutlineProgress;
-            this.endOutlineProgress = endOutlineProgress;
+            this.startOutlineProgress = resolvedStartOutlineProgress;
+            this.endOutlineProgress = resolvedEndOutlineProgress;
         }
 
         cutAtProgress(cutOutlineProgress: number): [MeasuredCubic, MeasuredCubic] {
