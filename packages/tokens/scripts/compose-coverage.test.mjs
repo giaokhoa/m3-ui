@@ -40,8 +40,9 @@ test('excluded families always carry an explicit reason', async () => {
   }
 });
 
-test('coverage stays incomplete until every pinned source file is reconciled or explicitly excluded', async () => {
+test('coverage is complete for every pinned Compose token source file', async () => {
   const coverage = await loadComposeCoverage();
-  assert.equal(coverage.counts.pending, coverage.pending.length);
-  assert.deepEqual([...coverage.pending].sort(), coverage.pending);
+  assert.equal(coverage.counts.pending, 0);
+  assert.deepEqual(coverage.pending, []);
+  assert.equal(coverage.counts.reconciled + coverage.counts.excluded, coverage.counts.all);
 });

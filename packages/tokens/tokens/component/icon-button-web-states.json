@@ -1,0 +1,64 @@
+{
+  "component": {
+    "iconButton": {
+      "standard": {
+        "focusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.focusedColor}" },
+        "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+        "hoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.hoveredColor}" },
+        "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.pressedColor}" },
+        "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+        "selectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.selectedFocusedColor}" },
+        "selectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.selectedHoveredColor}" },
+        "selectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.selectedPressedColor}" },
+        "unselectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.unselectedFocusedColor}" },
+        "unselectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.unselectedHoveredColor}" },
+        "unselectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.standard.unselectedPressedColor}" }
+      },
+      "variant": {
+        "filled": {
+          "focusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.focusedColor}" },
+          "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "hoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.hoveredColor}" },
+          "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "pressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.pressedColor}" },
+          "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+          "selectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.selectedFocusedColor}" },
+          "selectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.selectedHoveredColor}" },
+          "selectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.selectedPressedColor}" },
+          "unselectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.unselectedFocusedColor}" },
+          "unselectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.unselectedHoveredColor}" },
+          "unselectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filled.unselectedPressedColor}" }
+        },
+        "filledTonal": {
+          "focusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.focusedColor}" },
+          "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "hoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.hoveredColor}" },
+          "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "pressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.pressedColor}" },
+          "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+          "selectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.selectedFocusedColor}" },
+          "selectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.selectedHoveredColor}" },
+          "selectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.selectedPressedColor}" },
+          "unselectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.unselectedFocusedColor}" },
+          "unselectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.unselectedHoveredColor}" },
+          "unselectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.filledTonal.unselectedPressedColor}" }
+        },
+        "outlined": {
+          "focusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.focusedColor}" },
+          "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "hoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.hoveredColor}" },
+          "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "pressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.pressedColor}" },
+          "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+          "selectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.selectedFocusedColor}" },
+          "selectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.selectedHoveredColor}" },
+          "selectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.selectedPressedColor}" },
+          "unselectedFocusedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.unselectedFocusedColor}" },
+          "unselectedHoveredStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.unselectedHoveredColor}" },
+          "unselectedPressedStateLayerColor": { "$type": "string", "$value": "{component.iconButton.variant.outlined.unselectedPressedColor}" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "sources": {
+    "figma": { "name": "Material 3 Design Kit", "version": "1.25", "releasedAt": "2026-05-19" },
+    "compose": { "repository": "androidx/androidx", "revision": "ff9a7111302243197384c499d5e3461c1804cd6e", "generatedVersion": "v0_210" },
+    "materialWeb": { "repository": "material-components/material-web", "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c", "latestGeneratedVersion": "34.0.21" },
+    "materialComponentsAndroid": { "repository": "material-components/material-components-android", "revision": "ac7e18efeefb331850c561faf9ab8bf81d27ba68", "generatedVersion": "34.0.0" }
+  },
+  "evidence": {
+    "figma": "figma-color-scheme-evidence.json",
+    "platformComparison": "color-light-on-container-reference-evidence.json",
+    "figmaContrast": "figma-color-contrast-evidence.json",
+    "materialWebContrast": "material-web-color-contrast-evidence.json"
+  },
+  "records": [
+    {
+      "id": "color-light-on-container-platform-override",
+      "classification": "implementation-override",
+      "preferredReference": "normative-spec-review",
+      "roles": ["onPrimaryContainer", "onSecondaryContainer", "onTertiaryContainer", "onErrorContainer"],
+      "reason": "Material Web latest generated 34.0.21 uses the generic light on-container model at tone 30 for all four roles. Material Components Android generated 34.0.0 explicitly comments that those generic tone-30 resources are overridden by Android config to tone 10; pinned Compose ColorLightTokens v0_210 and the canonical baseline scheme use the same effective tone-10 model. This is an intentional platform/config divergence, not sufficient evidence to rewrite canonical colors while material.io remains the normative textual specification."
+    },
+    {
+      "id": "color-light-on-container-figma-exact-drift",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "normative-spec-review",
+      "roles": ["onPrimaryContainer", "onSecondaryContainer", "onErrorContainer"],
+      "reason": "Figma Material 3 Design Kit v1.25 follows the higher-contrast light on-container direction but does not exactly equal Material Web's generic tone-30 baseline for three roles: Primary is #4F378A vs Web #4F378B, Secondary is #4A4459 vs Web #4A4458, and Error is #852221 vs Web #8C1D18. Tertiary matches Web exactly at #633B48. Preserve Figma's published values as design-reference evidence rather than normalizing them to Web palette aliases."
+    },
+    {
+      "id": "color-contrast-generation-model",
+      "classification": "source-model-drift",
+      "preferredReference": "normative-spec-review",
+      "roles": ["all-49-semantic-color-roles"],
+      "reason": "Figma Material 3 Design Kit v1.25 and Material Web generated 34.0.21 expose the same 49 semantic role vocabulary for Light/Dark high-contrast and medium-contrast modes, but their generated values are systematically different. Exact parity is only 21/49 for Light High Contrast, 19/49 for Light Medium Contrast, 22/49 for Dark High Contrast, and 13/49 for Dark Medium Contrast. The divergence spans accent tones, fixed roles, surfaces, outlines, inverses, and on-colors, so it is treated as a contrast-generation model difference rather than dozens of independent token errors. Contrast-mode evidence stays audit-only and does not expand the canonical runtime token graph pending normative material.io guidance."
+    }
+  ]
+}

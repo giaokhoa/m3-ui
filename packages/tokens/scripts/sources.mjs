@@ -37,6 +37,27 @@ export const material3Sources = Object.freeze({
     revision: 'cac97678831d48d4eb4a606ca50f92673a1dc20c',
     revisionAt: '2026-08-21T19:30:42Z',
     tokenRoot: 'tokens',
+    latestGeneratedRoot: 'tokens/versions/latest/sass',
+    latestGeneratedVersion: '34.0.21',
+    publicAdapterVersion: 'v0.192',
+  }),
+  materialComponentsAndroid: Object.freeze({
+    kind: 'implementation-reference',
+    name: 'Material Components Android',
+    repository: 'material-components/material-components-android',
+    revision: 'ac7e18efeefb331850c561faf9ab8bf81d27ba68',
+    revisionAt: '2026-06-22T20:08:47Z',
+    tokenFile: 'lib/java/com/google/android/material/typography/res/values/tokens.xml',
+    generatedVersion: '34.0.0',
+  }),
+  flutter: Object.freeze({
+    kind: 'implementation-reference',
+    name: 'Flutter Material',
+    repository: 'flutter/flutter',
+    revision: '4ebf37fe7df0a130ba5bee17315b98f905c10b34',
+    revisionAt: '2026-08-22T20:55:48Z',
+    tokenFile: 'packages/flutter/lib/src/material/typography.dart',
+    generatedFrom: 'Material Design token database',
   }),
 });
 

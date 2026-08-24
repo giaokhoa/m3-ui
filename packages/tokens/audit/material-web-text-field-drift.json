@@ -1,0 +1,19 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "outlined-text-field-focus-outline-width",
+      "materialWeb": "3px",
+      "composeGenerated": "2dp",
+      "canonicalComposeSemantic": "component.textField.outlined.outline.focusedThickness = 2px",
+      "canonicalWebSemantic": "component.textField.outlined.webCurrent.focusOutlineWidth = 3px",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 defines the current focused outline width as 3px while pinned Compose generated tokens retain 2dp. Preserve both source semantics explicitly."
+    }
+  ],
+  "schemaVersion": 1
+}

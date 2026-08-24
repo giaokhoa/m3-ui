@@ -1,0 +1,48 @@
+{
+  "component": {
+    "dragHandle": {
+      "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+      "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+      "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+      "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+    },
+    "radioButton": {
+      "state": {
+        "selected": {
+          "focus": {
+            "iconColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" }
+          },
+          "hover": {
+            "iconColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+          },
+          "pressed": {
+            "iconColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+          }
+        },
+        "unselected": {
+          "focus": {
+            "iconColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" }
+          },
+          "hover": {
+            "iconColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+          },
+          "pressed": {
+            "iconColor": { "$type": "string", "$value": "var(--on-surface)" },
+            "stateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+            "stateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+          }
+        }
+      }
+    }
+  }
+}

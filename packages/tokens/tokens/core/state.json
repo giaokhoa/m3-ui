@@ -11,6 +11,11 @@
     },
     "disabled": {
       "contentOpacity": { "$type": "number", "$value": 0.38 }
+    },
+    "focusIndicator": {
+      "innerOffset": { "$type": "dimension", "$value": { "value": -3, "unit": "px" } },
+      "outerOffset": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "thickness": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } }
     }
   }
 }

@@ -1,0 +1,19 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "primary-navigation-tab-active-indicator-shape",
+      "materialWeb": "3px 3px 0px 0px",
+      "composeGenerated": "RoundedCornerShape(3.dp)",
+      "canonicalComposeSemantic": "component.navigation.tab.primary.activeIndicatorShape = 3px",
+      "canonicalWebSemantic": "component.navigation.tab.primary.webActiveIndicatorShape = 3px 3px 0px 0px",
+      "classification": "source-model-drift",
+      "reason": "Material Web tokenizes a top-rounded indicator with square bottom corners, while pinned Compose tokenizes a uniform 3dp rounded shape. Preserve both source semantics instead of silently collapsing either representation."
+    }
+  ],
+  "schemaVersion": 1
+}

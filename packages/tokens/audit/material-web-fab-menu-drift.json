@@ -1,0 +1,19 @@
+{
+  "source": {
+    "materialWebRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "materialWebGeneratedVersion": "34.0.21",
+    "composeRevision": "ff9a7111302243197384c499d5e3461c1804cd6e"
+  },
+  "records": [
+    {
+      "id": "fab-menu-list-item-container-elevation",
+      "materialWeb": "level0",
+      "composeGenerated": "ElevationTokens.Level3",
+      "canonicalComposeSemantic": "component.fabMenu.listItem.containerElevation = level3",
+      "canonicalWebSemantic": "component.fabMenu.listItem.webContainerElevation = level0",
+      "classification": "source-model-drift",
+      "reason": "Pinned Material Web 34.0.21 tokenizes the FAB Menu list-item base elevation as level0, while pinned Compose generated tokens retain level3. Preserve both source semantics instead of overwriting the Compose canonical value."
+    }
+  ],
+  "schemaVersion": 1
+}

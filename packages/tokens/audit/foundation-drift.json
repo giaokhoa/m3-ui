@@ -1,0 +1,99 @@
+{
+  "sources": {
+    "figma": { "name": "Material 3 Design Kit", "version": "1.25", "releasedAt": "2026-05-19" },
+    "compose": { "repository": "androidx/androidx", "revision": "ff9a7111302243197384c499d5e3461c1804cd6e", "revisionAt": "2026-08-22T05:52:17Z" },
+    "materialWeb": { "repository": "material-components/material-web", "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c", "revisionAt": "2026-08-21T19:30:42Z", "latestGeneratedVersion": "34.0.21", "publicAdapterVersion": "v0.192" }
+  },
+  "shape": {
+    "canonical": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "extraLargeIncreased": 32, "extraExtraLarge": 48, "full": 9999 },
+    "figma": { "variableCount": 8, "values": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "full": 1000 }, "notObserved": ["extraLargeIncreased", "extraExtraLarge"] },
+    "compose": { "values": { "none": "RectangleShape", "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "extraLargeIncreased": 32, "extraExtraLarge": 48, "full": "CircleShape" } },
+    "materialWeb": {
+      "latestGenerated": { "values": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "largeIncreased": 20, "extraLarge": 28, "extraLargeIncreased": 32, "extraExtraLarge": 48, "full": 9999 } },
+      "publicAdapter": { "values": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "extraLarge": 28, "full": 9999 }, "notObserved": ["largeIncreased", "extraLargeIncreased", "extraExtraLarge"] }
+    },
+    "drift": [
+      { "id": "shape-full-sentinel", "classification": "semantic-equivalent", "reason": "Figma uses 1000, Material Web and canonical use 9999, and Compose uses CircleShape; all represent a full/pill corner rather than a fixed normative radius." },
+      { "id": "shape-figma-new-radii", "classification": "reference-drift", "preferredReference": "compose+materialWebLatest", "reason": "Current Compose and Material Web latest generated 34.0.21 agree on 32 and 48; those variables were not observed in Figma V1.25." },
+      { "id": "shape-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "materialWebLatest", "reason": "The public Material Web shape wrapper still targets v0.192 and omits 20, 32, and 48 even though the latest generated corpus contains them." }
+    ]
+  },
+  "state": {
+    "canonical": { "hover": 0.08, "focus": 0.1, "pressed": 0.1, "dragged": 0.16 },
+    "compose": { "hover": 0.08, "focus": 0.1, "pressed": 0.1, "dragged": 0.16 },
+    "figma": { "observedOpacityVocabulary": [0.08, 0.1, 0.16] },
+    "materialWeb": { "latestGenerated": { "hover": 0.08, "focus": 0.1, "pressed": 0.1, "dragged": 0.16, "disabled": 0.38 }, "publicAdapter": { "hover": 0.08, "focus": 0.12, "pressed": 0.12, "dragged": 0.16 } },
+    "drift": [{ "id": "state-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "compose+materialWebLatest", "reason": "Material Web latest generated 34.0.21 matches current Compose at 0.10 focus/pressed; only the v0.192 public adapter still exposes 0.12." }]
+  },
+  "typography": {
+    "canonical": {
+      "baselineStyleCount": 15,
+      "emphasizedStyleCount": 15,
+      "weights": [400, 500, 600, 700],
+      "baselineTracking": { "displayLarge": -0.2, "displayMedium": 0, "displaySmall": 0, "headlineLarge": 0, "headlineMedium": 0, "headlineSmall": 0, "titleLarge": 0, "titleMedium": 0.2, "titleSmall": 0.1, "bodyLarge": 0.5, "bodyMedium": 0.2, "bodySmall": 0.4, "labelLarge": 0.1, "labelMedium": 0.5, "labelSmall": 0.5 }
+    },
+    "compose": {
+      "baselineStyleCount": 15,
+      "emphasizedStyleCount": 15,
+      "baselineTracking": { "displayLarge": -0.2, "displayMedium": 0, "displaySmall": 0, "headlineLarge": 0, "headlineMedium": 0, "headlineSmall": 0, "titleLarge": 0, "titleMedium": 0.2, "titleSmall": 0.1, "bodyLarge": 0.5, "bodyMedium": 0.2, "bodySmall": 0.4, "labelLarge": 0.1, "labelMedium": 0.5, "labelSmall": 0.5 },
+      "emphasizedBlockMarkedTodo": true,
+      "knownEmphasizedDrift": { "bodyLargeTracking": 0.15, "displayLargeTracking": 0, "labelWeight": 700, "titleMediumSmallWeight": 700 }
+    },
+    "figma": {
+      "typescaleVariableCount": 90,
+      "baselineWeightCount": 15,
+      "emphasizedWeightCount": 15,
+      "emphasizedTextStyleCount": 15,
+      "baselineTracking": { "displayLarge": -0.25, "displayMedium": 0, "displaySmall": 0, "headlineLarge": 0, "headlineMedium": 0, "headlineSmall": 0, "titleLarge": 0, "titleMedium": 0.15, "titleSmall": 0.1, "bodyLarge": 0.5, "bodyMedium": 0.25, "bodySmall": 0.4, "labelLarge": 0.1, "labelMedium": 0.5, "labelSmall": 0.5 },
+      "semiBoldWeight": 600
+    },
+    "materialWeb": {
+      "latestGenerated": {
+        "baselineStyleCount": 15,
+        "emphasizedStyleCount": 15,
+        "version": "34.0.21",
+        "baselineTracking": { "displayLarge": -0.25, "displayMedium": 0, "displaySmall": 0, "headlineLarge": 0, "headlineMedium": 0, "headlineSmall": 0, "titleLarge": 0, "titleMedium": 0.15, "titleSmall": 0.1, "bodyLarge": 0.5, "bodyMedium": 0.25, "bodySmall": 0.4, "labelLarge": 0.1, "labelMedium": 0.5, "labelSmall": 0.5 },
+        "semiBoldWeight": 600
+      },
+      "publicAdapter": { "fullEmphasizedStyleVocabularyObserved": false }
+    },
+    "drift": [
+      { "id": "typography-baseline-tracking-source-lag", "classification": "cross-source-value-drift", "preferredReference": "normative-spec-review", "reason": "Figma V1.25, Material Web latest generated 34.0.21, Material Components Android generated 34.0.0, and Flutter's Material-token-database-generated _M3Typography agree on all 15 baseline tracking roles. Current Compose TypeScaleTokens v0_103 and canonical differ only at Display Large (-0.2 vs -0.25), Title Medium (0.2 vs 0.15), and Body Medium (0.2 vs 0.25). material.io remains normative, so this four-reference consensus is recorded for review rather than silently changing canonical tokens." },
+      { "id": "typography-compose-emphasized-todo", "classification": "source-drift", "preferredReference": "figma+materialWebLatest", "reason": "Compose explicitly marks its emphasized TypeScale block TODO. Figma V1.25 and Material Web latest generated 34.0.21 agree on Body Large tracking 0.5, Display Large tracking -0.25, and SemiBold 600 for emphasized labels and medium/small titles." },
+      { "id": "typography-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "materialWebLatest", "reason": "The latest generated Material Web corpus contains a full emphasized typescale while the older public adapter does not expose it." }
+    ]
+  },
+  "colorRoles": {
+    "canonical": { "count": 49, "includesShadow": true },
+    "figma": { "schemeVariableCount": 49, "includesShadow": true },
+    "compose": { "colorSchemeKeyCount": 48, "includesShadow": false },
+    "materialWeb": { "latestGeneratedRoleCount": 49, "publicSupportedRoleCount": 49, "includesShadow": true },
+    "drift": [{ "id": "color-shadow-compose-partition", "classification": "implementation-partition", "preferredReference": "figma+materialWeb", "reason": "The Compose ColorSchemeKeyTokens object has 48 entries and omits Shadow, while Figma and Material Web expose a 49-role vocabulary including Shadow." }]
+  },
+  "motion": {
+    "canonical": { "standardSpringFamilies": 6, "expressiveSpringFamilies": 6 },
+    "compose": { "standardSpringFamilies": 6, "expressiveSpringFamilies": 6, "matchesCanonicalPhysics": true },
+    "figma": { "publishedSpringVariablesOrStylesObserved": false },
+    "materialWeb": { "latestGenerated": { "classicDurationAndEasingObserved": true, "standardSpringFamilies": 6, "expressiveSpringFamiliesObserved": 0 }, "publicAdapter": { "springPhysicsObserved": false } },
+    "drift": [
+      { "id": "motion-expressive-web-latest", "classification": "source-lag", "preferredReference": "compose", "reason": "Material Web latest generated 34.0.21 now contains standard spring physics matching Compose but no expressive spring set was observed." },
+      { "id": "motion-web-public-adapter", "classification": "public-adapter-lag", "preferredReference": "materialWebLatest", "reason": "The public v0.192 motion adapter exposes duration/easing but not the standard spring physics present in the latest generated corpus." },
+      { "id": "motion-spring-figma", "classification": "not-observed", "preferredReference": "compose+materialWebLatest", "reason": "Published Figma variables/styles search did not expose spring physics tokens." }
+    ]
+  },
+  "elevation": {
+    "canonical": { "semanticLevelDp": [0, 1, 3, 6, 8, 12], "shadowLayerCount": 3, "shadowOpacities": [0.2, 0.14, 0.12] },
+    "compose": { "semanticLevelDp": [0, 1, 3, 6, 8, 12] },
+    "figma": { "effectStyleCount": 10, "lightEffectLevelsObserved": [1, 2, 3, 4, 5], "darkEffectLevelsObserved": [1, 2, 3, 4, 5], "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15] },
+    "materialWeb": {
+      "latestGeneratedSemanticLevelDp": [0, 1, 3, 6, 8, 12],
+      "publicAdapterLevelApi": [0, 1, 2, 3, 4, 5],
+      "publicAdapterExplicitlyRemapsDpToLevelNumber": true,
+      "renderer": { "shadowLayerCount": 2, "shadowOpacities": [0.3, 0.15], "matchesFigmaEffectRecipes": true, "matchedLevels": [1, 2, 3, 4, 5] }
+    },
+    "drift": [
+      { "id": "elevation-web-level-api", "classification": "platform-adaptation", "reason": "Material Web latest generated values match the semantic dp scale; its public wrapper deliberately remaps them to ordinal 0-5 level numbers for the web API." },
+      { "id": "elevation-figma-shadow-recipe", "classification": "cross-source-value-drift", "preferredReference": "normative-spec-review", "reason": "Figma V1.25 Light/Dark elevation effect styles and the pinned Material Web elevation renderer agree on the same two-layer key/ambient shadow recipes at levels 1-5 (0.30 key plus 0.15 ambient, with matching geometry), while canonical shadow tokens use three-layer 0.20/0.14/0.12 recipes. This is cross-source recipe drift rather than a Figma-only platform adaptation; canonical remains unchanged pending normative material.io evidence." }
+    ]
+  }
+}

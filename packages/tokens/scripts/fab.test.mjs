@@ -1,18 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 const generatedUrl = new URL('../dist/generated/tokens.js', import.meta.url);
-test('Style Dictionary emits the reconciled FAB family without inventing commented-out tokens', async () => {
+test('Style Dictionary emits the reconciled FAB family across current source and runtime evidence', async () => {
   const token = await import(`${generatedUrl.href}?fab=${Date.now()}`);
   assert.equal(token.ComponentFabSizeSmallContainerHeight, '40px');
   assert.equal(token.ComponentFabSizeBaselineContainerShape, 'large');
   assert.equal(token.ComponentFabSizeMediumContainerHeight, '80px');
-  assert.equal(Object.hasOwn(token, 'ComponentFabSizeMediumContainerShape'), false);
+  assert.equal(token.ComponentFabSizeMediumContainerShape, 'largeIncreased');
   assert.equal(token.ComponentFabSizeLargeContainerShape, 'extraLarge');
+  assert.equal(token.ComponentFabSizeLargeIconSize, '36px');
   assert.equal(token.ComponentFabContainerPrimaryContainerColor, 'var(--primary-container)');
   assert.equal(token.ComponentFabContainerPrimaryHoveredContainerElevation, 'level4');
   assert.equal(token.ComponentFabContainerSecondaryIconColor, 'var(--on-secondary-container)');
   assert.equal(token.ComponentFabExtendedPrimaryLoweredHoverContainerElevation, 'level2');
+  assert.equal(token.ComponentFabExtendedSizeSmallLabelTextTypography, 'titleMedium');
   assert.equal(token.ComponentFabExtendedSizeMediumLeadingSpace, '26px');
-  assert.equal(Object.hasOwn(token, 'ComponentFabExtendedSizeMediumContainerShape'), false);
-  assert.equal(token.ComponentFabExtendedSizeLargeIconLabelSpace, '20px');
+  assert.equal(token.ComponentFabExtendedSizeMediumContainerShape, 'largeIncreased');
+  assert.equal(token.ComponentFabExtendedSizeMediumIconLabelSpace, '12px');
+  assert.equal(token.ComponentFabExtendedSizeMediumLabelTextTypography, 'titleLarge');
+  assert.equal(token.ComponentFabExtendedSizeLargeIconLabelSpace, '16px');
+  assert.equal(token.ComponentFabExtendedSizeLargeIconSize, '36px');
+  assert.equal(token.ComponentFabExtendedSizeLargeLabelTextTypography, 'headlineSmall');
 });

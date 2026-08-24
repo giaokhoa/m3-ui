@@ -1,0 +1,22 @@
+{
+  "family": "slider-sizes",
+  "status": "reconciled",
+  "sources": [
+    "md-comp-slider-xsmall",
+    "md-comp-slider-small",
+    "md-comp-slider-medium",
+    "md-comp-slider-large",
+    "md-comp-slider-xlarge"
+  ],
+  "canonical": ["tokens/component/slider-sizes.json"],
+  "evidence": {
+    "materialWeb": "generated v34.0.21 numeric declarations",
+    "figma": {
+      "component": "Standard slider",
+      "componentKey": "4851d51e7cd3b6f9988e35f1ea59cbd4d382627b",
+      "sizeVariants": ["XSmall", "Small", "Medium", "Large", "XLarge"]
+    },
+    "compose": "No size-specific SliderTokens.kt files in the pinned 120-file denominator",
+    "spec": "not text-verified"
+  }
+}
