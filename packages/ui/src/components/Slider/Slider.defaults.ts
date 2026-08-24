@@ -105,6 +105,10 @@ function thumbTrackGap(handleWidth: number): number {
   return sliderRuntime.baselineTrackGap + handleWidth / 2;
 }
 
+function stopCenterInset(): number {
+  return sliderTokens.stopTrailingSpace + sliderTokens.stopSize / 2;
+}
+
 export function getSliderStyle(size: SliderSize = 'xSmall'): SliderStyle {
   const sizeTokens = sliderSizeTokens[size];
   return {
@@ -136,6 +140,7 @@ export function getSliderStyle(size: SliderSize = 'xSmall'): SliderStyle {
     '--_slider-disabled-inactive-track-opacity': sliderTokens.disabledInactiveTrackOpacity,
     '--_slider-stop-size': `${sliderTokens.stopSize}px`,
     '--_slider-stop-trailing-space': `${sliderTokens.stopTrailingSpace}px`,
+    '--_slider-stop-center-inset': `${stopCenterInset()}px`,
     '--_slider-stop-color': sliderTokens.stopColor,
     '--_slider-selected-stop-color': sliderTokens.selectedStopColor,
     '--_slider-disabled-active-stop-color': sliderTokens.disabledActiveStopColor,
