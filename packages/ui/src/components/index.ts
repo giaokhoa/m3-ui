@@ -4,6 +4,7 @@ export * from './Card';
 export * from './Checkbox';
 export * from './Chip';
 export * from './Divider';
+export * from './DragHandle';
 export * from './Fab';
 export * from './IconButton';
 export * from './LoadingIndicator';
