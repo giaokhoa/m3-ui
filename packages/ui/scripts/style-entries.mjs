@@ -26,6 +26,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/IconButton/icon-button.css',
   ],
+  'progress-indicator': ['src/components/ProgressIndicator/progress-indicator.css'],
   'radio-button': [
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
@@ -44,6 +45,7 @@ export const publicComponentStyleSources = {
   chip: 'src/components/Chip/chip.css',
   fab: 'src/components/Fab/fab.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
+  'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   switch: 'src/components/Switch/switch.css',
   'text-field': 'src/components/TextField/text-field.css',
@@ -56,6 +58,7 @@ export const publicComponentModules = {
   chip: 'src/components/Chip/Chip.tsx',
   fab: 'src/components/Fab/Fab.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
+  'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
