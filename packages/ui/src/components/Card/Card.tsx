@@ -43,7 +43,7 @@ function isNestedInteractive(target: EventTarget | null, root: HTMLElement): boo
   const interactive = target.closest(nestedInteractiveSelector);
   return interactive !== null && interactive !== root && root.contains(interactive);
 }
-function variantClassName(variant: CardVariant): string { return `m3-card--${variant}`; }
+function variantClassName(variant: CardVariant): string { return `card--${variant}`; }
 
 function CardImpl({
   variant, children, className, style, onPress, isDisabled = false, shape, role, tabIndex,
@@ -102,7 +102,7 @@ function CardImpl({
   const elevationLevel = getCardElevationLevel(variant, disabled, interaction);
   const elevationMotion = getCardElevationMotion(disabled, interaction, previousInteraction);
   const tokenStyle = getCardStyle(variant, { isDisabled: disabled, shape });
-  const baseClassName = `m3-card ${variantClassName(variant)}`;
+  const baseClassName = `card ${variantClassName(variant)}`;
   const resolvedClassName = className ? `${baseClassName} ${className}` : baseClassName;
 
   return (
@@ -137,12 +137,12 @@ function CardImpl({
       style={{ ...tokenStyle, ...style }}
       tabIndex={tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)}
     >
-      <Elevation className="m3-card__elevation" level={elevationLevel} style={{ transitionDuration: `${elevationMotion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: elevationMotion.easing }} />
-      <div className="m3-card__surface">
+      <Elevation className="card__elevation" level={elevationLevel} style={{ transitionDuration: `${elevationMotion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: elevationMotion.easing }} />
+      <div className="card__surface">
         {interactive ? (
           <Ripple controller={ripple} focusRingRadius="var(--_card-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestCardStateLayerInteraction(activeInteractions, isFocusVisible)} />
         ) : null}
-        <div className="m3-card__content">{children}</div>
+        <div className="card__content">{children}</div>
       </div>
     </div>
   );

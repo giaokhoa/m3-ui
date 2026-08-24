@@ -1,4 +1,4 @@
-.m3-card {
+.card {
   position: relative;
   display: block;
   border-radius: var(--_card-container-radius);
@@ -6,7 +6,7 @@
   outline: none;
 }
 
-.m3-card[data-interactive] {
+.card[data-interactive] {
   min-inline-size: var(--_card-min-interactive-size);
   min-block-size: var(--_card-min-interactive-size);
   cursor: pointer;
@@ -14,16 +14,16 @@
   --ripple-color: currentColor;
 }
 
-.m3-card[data-disabled] {
+.card[data-disabled] {
   cursor: default;
   color: var(--_card-disabled-content-color);
 }
 
-.m3-card__elevation {
+.card__elevation {
   z-index: 0;
 }
 
-.m3-card__surface {
+.card__surface {
   position: relative;
   z-index: 1;
   display: block;
@@ -36,18 +36,18 @@
   color: inherit;
 }
 
-.m3-card[data-interactive] .m3-card__surface {
+.card[data-interactive] .card__surface {
   min-inline-size: var(--_card-min-interactive-size);
   min-block-size: var(--_card-min-interactive-size);
 }
 
-.m3-card[data-disabled] .m3-card__surface {
+.card[data-disabled] .card__surface {
   background: var(--_card-disabled-container-color);
   box-shadow: inset 0 0 0 var(--_card-outline-width)
     var(--_card-disabled-outline-color);
 }
 
-.m3-card__content {
+.card__content {
   position: relative;
   z-index: 1;
   display: flex;
@@ -56,29 +56,29 @@
   color: inherit;
 }
 
-.m3-card > .m3-card__elevation {
+.card > .card__elevation {
   border-radius: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-card__elevation {
+  .card__elevation {
     transition: none !important;
   }
 }
 
 @media (forced-colors: active) {
-  .m3-card__surface {
+  .card__surface {
     background: Canvas;
     box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width)) CanvasText;
     color: CanvasText;
   }
 
-  .m3-card[data-disabled] .m3-card__surface {
+  .card[data-disabled] .card__surface {
     box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width)) GrayText;
     color: GrayText;
   }
 
-  .m3-card[data-interactive]:focus-visible .m3-card__surface {
+  .card[data-interactive]:focus-visible .card__surface {
     outline: 2px solid Highlight;
     outline-offset: -2px;
   }

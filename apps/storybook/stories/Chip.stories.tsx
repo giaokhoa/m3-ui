@@ -132,7 +132,7 @@ function SelectableRow({ disabled = false }: { disabled?: boolean }) {
 
 export const ActionVariants: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <ActionVariantsRow />
     </div>
   ),
@@ -140,7 +140,7 @@ export const ActionVariants: Story = {
 
 export const SelectableStates: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <SelectableRow />
     </div>
   ),
@@ -149,7 +149,7 @@ export const SelectableStates: Story = {
 export const DisabledStates: Story = {
   render: () => (
     <div
-      className="m3-storybook-center"
+      className="storybook-center"
       style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}
     >
       <ActionVariantsRow disabled />
@@ -162,7 +162,7 @@ export const ExpressiveShapes: Story = {
   render: () => {
     const [selected, setSelected] = useState(false);
     return (
-      <div className="m3-storybook-center">
+      <div className="storybook-center">
         <FilterChip
           shapes={{}}
           isSelected={selected}
@@ -188,7 +188,7 @@ export const ExpressiveShapes: Story = {
 
 export const FocusModes: Story = {
   render: () => (
-    <div className="m3-storybook-center" style={{ gap: 32 }}>
+    <div className="storybook-center" style={{ gap: 32 }}>
       <ThemeProvider rippleFocus="opacity">
         <AssistChip onPress={() => {}}>Opacity focus</AssistChip>
       </ThemeProvider>
@@ -201,23 +201,23 @@ export const FocusModes: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <ActionVariantsRow />
         <SelectableRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <ActionVariantsRow />
         <SelectableRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <ActionVariantsRow />
         <SelectableRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <ActionVariantsRow />
         <SelectableRow />

@@ -51,7 +51,7 @@ interface ActionChipImplProps extends ActionChipProps { variant: 'assist' | 'ele
 interface SelectableChipImplProps extends SelectableChipProps { variant: 'filter' | 'elevatedFilter' | 'input'; }
 
 function variantClassName(variant: ChipVariant): string {
-  return `m3-chip--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+  return `chip--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
 }
 function resolveButtonChildren(children: AriaButtonProps['children'], renderProps: Parameters<Exclude<AriaButtonProps['children'], ReactNode>>[0]) { return typeof children === 'function' ? children(renderProps) : children; }
 function resolveCheckboxChildren(children: AriaCheckboxProps['children'], renderProps: Parameters<Exclude<AriaCheckboxProps['children'], ReactNode>>[0]) { return typeof children === 'function' ? children(renderProps) : children; }
@@ -64,14 +64,14 @@ function ChipVisual({ variant, label, slots, controller, activeInteractions, pre
   const motion = getChipElevationMotion(state);
   const style = getChipStyle(variant, state, { shape, shapes, hasLeadingIcon: slots.leadingIcon != null, hasTrailingIcon: slots.trailingIcon != null, hasAvatar: slots.avatar != null });
   return (
-    <span className="m3-chip__visual" data-selected={isSelected || undefined} data-expressive-shapes={shapes ? true : undefined} style={style}>
-      <Elevation className="m3-chip__elevation" level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
-      <span className="m3-chip__surface">
+    <span className="chip__visual" data-selected={isSelected || undefined} data-expressive-shapes={shapes ? true : undefined} style={style}>
+      <Elevation className="chip__elevation" level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
+      <span className="chip__surface">
         <Ripple controller={controller} focusRingRadius="var(--_chip-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestChipStateLayerInteraction(activeInteractions, isFocusVisible)} />
-        <span className="m3-chip__content">
-          {slots.avatar != null ? <span aria-hidden="true" className="m3-chip__avatar">{slots.avatar}</span> : slots.leadingIcon != null ? <span aria-hidden="true" className="m3-chip__leading-icon">{slots.leadingIcon}</span> : null}
-          <span className="m3-chip__label">{label}</span>
-          {slots.trailingIcon != null ? <span aria-hidden="true" className="m3-chip__trailing-icon">{slots.trailingIcon}</span> : null}
+        <span className="chip__content">
+          {slots.avatar != null ? <span aria-hidden="true" className="chip__avatar">{slots.avatar}</span> : slots.leadingIcon != null ? <span aria-hidden="true" className="chip__leading-icon">{slots.leadingIcon}</span> : null}
+          <span className="chip__label">{label}</span>
+          {slots.trailingIcon != null ? <span aria-hidden="true" className="chip__trailing-icon">{slots.trailingIcon}</span> : null}
         </span>
       </span>
     </span>
@@ -92,7 +92,7 @@ function useChipInteractions() {
 
 function ActionChipImpl({ variant, children, className, style, leadingIcon, trailingIcon, shape, onBlur, onFocus, onHoverEnd, onHoverStart, onPressEnd, onPressStart, ...props }: ActionChipImplProps) {
   const interactions = useChipInteractions();
-  const baseClassName = `m3-chip ${variantClassName(variant)}`;
+  const baseClassName = `chip ${variantClassName(variant)}`;
   const handleHoverStart: AriaButtonProps['onHoverStart'] = (event) => { interactions.start('hover'); onHoverStart?.(event); };
   const handleHoverEnd: AriaButtonProps['onHoverEnd'] = (event) => { interactions.end('hover'); onHoverEnd?.(event); };
   const handleFocus: AriaButtonProps['onFocus'] = (event) => { interactions.start('focus'); onFocus?.(event); };
@@ -108,7 +108,7 @@ function ActionChipImpl({ variant, children, className, style, leadingIcon, trai
 
 function SelectableChipImpl({ variant, children, className, style, leadingIcon, trailingIcon, avatar, shape, shapes, onBlur, onFocus, onHoverEnd, onHoverStart, onPressEnd, onPressStart, ...props }: SelectableChipImplProps) {
   const interactions = useChipInteractions();
-  const baseClassName = `m3-chip ${variantClassName(variant)}`;
+  const baseClassName = `chip ${variantClassName(variant)}`;
   const handleHoverStart: AriaCheckboxProps['onHoverStart'] = (event) => { interactions.start('hover'); onHoverStart?.(event); };
   const handleHoverEnd: AriaCheckboxProps['onHoverEnd'] = (event) => { interactions.end('hover'); onHoverEnd?.(event); };
   const handleFocus: AriaCheckboxProps['onFocus'] = (event) => { interactions.start('focus'); onFocus?.(event); };

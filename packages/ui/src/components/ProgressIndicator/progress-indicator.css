@@ -1,4 +1,4 @@
-.m3-progress-indicator {
+.progress-indicator {
   box-sizing: border-box;
   color: var(--_progress-active-color);
   contain: layout paint style;
@@ -7,7 +7,7 @@
   vertical-align: middle;
 }
 
-.m3-progress-indicator--linear {
+.progress-indicator--linear {
   border-radius: var(--_progress-track-radius);
   display: inline-flex;
   height: var(--_progress-linear-height);
@@ -15,56 +15,56 @@
   width: var(--_progress-linear-width);
 }
 
-.m3-progress-indicator--circular {
+.progress-indicator--circular {
   display: inline-flex;
   height: var(--_progress-circular-size);
   width: var(--_progress-circular-size);
 }
 
-.m3-progress-indicator__svg {
+.progress-indicator__svg {
   display: block;
   height: 100%;
   overflow: hidden;
   width: 100%;
 }
 
-.m3-progress-indicator--linear:dir(rtl) .m3-progress-indicator__svg,
-.m3-progress-indicator--linear:dir(rtl) .m3-progress-indicator__linear-indeterminate,
-.m3-progress-indicator--linear:dir(rtl) .m3-progress-indicator__buffer {
+.progress-indicator--linear:dir(rtl) .progress-indicator__svg,
+.progress-indicator--linear:dir(rtl) .progress-indicator__linear-indeterminate,
+.progress-indicator--linear:dir(rtl) .progress-indicator__buffer {
   transform: scaleX(-1);
 }
 
-.m3-progress-indicator__active,
-.m3-progress-indicator__track {
+.progress-indicator__active,
+.progress-indicator__track {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.m3-progress-indicator__active {
+.progress-indicator__active {
   stroke: var(--_progress-active-color);
   stroke-width: var(--_progress-linear-active-thickness);
 }
 
-.m3-progress-indicator__track {
+.progress-indicator__track {
   stroke: var(--_progress-track-color);
   stroke-width: var(--_progress-linear-track-thickness);
 }
 
-.m3-progress-indicator--circular .m3-progress-indicator__active {
+.progress-indicator--circular .progress-indicator__active {
   stroke-width: var(--_progress-circular-active-thickness);
 }
 
-.m3-progress-indicator--circular .m3-progress-indicator__track {
+.progress-indicator--circular .progress-indicator__track {
   stroke-width: var(--_progress-circular-track-thickness);
 }
 
-.m3-progress-indicator__stop {
+.progress-indicator__stop {
   fill: var(--_progress-stop-color);
 }
 
-.m3-progress-indicator--standard .m3-progress-indicator__active:not(.m3-progress-indicator__circular-indeterminate-active),
-.m3-progress-indicator--standard .m3-progress-indicator__track {
+.progress-indicator--standard .progress-indicator__active:not(.progress-indicator__circular-indeterminate-active),
+.progress-indicator--standard .progress-indicator__track {
   transition:
     stroke-dasharray var(--_progress-determinate-duration)
       var(--_progress-determinate-easing),
@@ -72,7 +72,7 @@
       var(--_progress-determinate-easing);
 }
 
-.m3-progress-indicator--linear .m3-progress-indicator__wave-path {
+.progress-indicator--linear .progress-indicator__wave-path {
   animation: m3-progress-wave-phase var(--_progress-wave-duration) linear infinite;
   transform-box: fill-box;
 }
@@ -84,7 +84,7 @@
 }
 
 /* Material Web public linear indeterminate renderer. */
-.m3-progress-indicator__linear-indeterminate {
+.progress-indicator__linear-indeterminate {
   align-items: center;
   background: var(--_progress-track-color);
   border-radius: inherit;
@@ -95,27 +95,27 @@
   position: absolute;
 }
 
-.m3-progress-indicator__linear-bar,
-.m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-bar,
+.progress-indicator__linear-bar-inner {
   height: var(--_progress-linear-active-thickness);
   position: absolute;
   width: 100%;
 }
 
-.m3-progress-indicator__linear-bar {
+.progress-indicator__linear-bar {
   transform-origin: left center;
 }
 
-.m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-bar-inner {
   background: var(--_progress-active-color);
   inset: 0;
 }
 
-.m3-progress-indicator--wavy .m3-progress-indicator__linear-bar-inner {
+.progress-indicator--wavy .progress-indicator__linear-bar-inner {
   background: transparent;
 }
 
-.m3-progress-indicator__linear-bar-inner svg {
+.progress-indicator__linear-bar-inner svg {
   height: var(--_progress-linear-height);
   inset: 50% 0 auto;
   overflow: visible;
@@ -124,41 +124,41 @@
   width: 100%;
 }
 
-.m3-progress-indicator__linear-bar--primary {
+.progress-indicator__linear-bar--primary {
   animation: m3-progress-primary-translate linear infinite
     var(--_progress-linear-indeterminate-duration);
   inset-inline-start: -145.167%;
 }
 
-.m3-progress-indicator__linear-bar--primary
-  > .m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-bar--primary
+  > .progress-indicator__linear-bar-inner {
   animation: m3-progress-primary-scale linear infinite
     var(--_progress-linear-indeterminate-duration);
 }
 
-.m3-progress-indicator__linear-bar--secondary {
+.progress-indicator__linear-bar--secondary {
   animation: m3-progress-secondary-translate linear infinite
     var(--_progress-linear-indeterminate-duration);
   inset-inline-start: -54.8889%;
 }
 
-.m3-progress-indicator__linear-bar--secondary
-  > .m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-bar--secondary
+  > .progress-indicator__linear-bar-inner {
   animation: m3-progress-secondary-scale linear infinite
     var(--_progress-linear-indeterminate-duration);
 }
 
-.m3-progress-indicator__linear-indeterminate--four-color
-  .m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-indeterminate--four-color
+  .progress-indicator__linear-bar-inner {
   animation-name: m3-progress-primary-scale, m3-progress-four-color-background;
   animation-duration:
     var(--_progress-linear-indeterminate-duration),
     calc(var(--_progress-linear-indeterminate-duration) * 2);
 }
 
-.m3-progress-indicator__linear-indeterminate--four-color
-  .m3-progress-indicator__linear-bar--secondary
-  > .m3-progress-indicator__linear-bar-inner {
+.progress-indicator__linear-indeterminate--four-color
+  .progress-indicator__linear-bar--secondary
+  > .progress-indicator__linear-bar-inner {
   animation-name: m3-progress-secondary-scale, m3-progress-four-color-background;
 }
 
@@ -218,36 +218,36 @@
 }
 
 /* Material Web buffer adaptation. */
-.m3-progress-indicator__buffer {
+.progress-indicator__buffer {
   border-radius: inherit;
   inset: 0;
   overflow: hidden;
   position: absolute;
 }
 
-.m3-progress-indicator__buffer-active,
-.m3-progress-indicator__buffer-track,
-.m3-progress-indicator__buffer-dots {
+.progress-indicator__buffer-active,
+.progress-indicator__buffer-track,
+.progress-indicator__buffer-dots {
   inset: 0;
   position: absolute;
   transform-origin: left center;
 }
 
-.m3-progress-indicator__buffer-active {
+.progress-indicator__buffer-active {
   background: var(--_progress-active-color);
   border-radius: var(--_progress-active-radius);
   transition: transform var(--_progress-determinate-duration)
     var(--_progress-determinate-easing);
 }
 
-.m3-progress-indicator__buffer-track {
+.progress-indicator__buffer-track {
   background: var(--_progress-track-color);
   border-radius: var(--_progress-track-radius);
   transition: transform var(--_progress-determinate-duration)
     var(--_progress-determinate-easing);
 }
 
-.m3-progress-indicator__buffer-dots {
+.progress-indicator__buffer-dots {
   background-color: var(--_progress-track-color);
   background-image: radial-gradient(
     circle,
@@ -260,40 +260,40 @@
 
 /* Compose-current circular indeterminate motion: 6s global rotation, stepped
    additional rotation, and 10%..87% sweep. */
-.m3-progress-indicator__circular-svg {
+.progress-indicator__circular-svg {
   overflow: visible;
   transform: rotate(-90deg);
 }
 
-.m3-progress-indicator__circular-global-rotation,
-.m3-progress-indicator__circular-additional-rotation {
+.progress-indicator__circular-global-rotation,
+.progress-indicator__circular-additional-rotation {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.m3-progress-indicator__circular-global-rotation {
+.progress-indicator__circular-global-rotation {
   animation: m3-progress-circular-global var(--_progress-circular-duration) linear infinite;
 }
 
-.m3-progress-indicator__circular-additional-rotation {
+.progress-indicator__circular-additional-rotation {
   animation: m3-progress-circular-additional var(--_progress-circular-duration) linear infinite;
 }
 
-.m3-progress-indicator__circular-indeterminate-track {
+.progress-indicator__circular-indeterminate-track {
   animation: m3-progress-circular-track var(--_progress-circular-duration)
     var(--_progress-easing-standard) infinite;
   stroke-dasharray: var(--_progress-circular-track-dash-min);
   stroke-dashoffset: var(--_progress-circular-track-offset-min);
 }
 
-.m3-progress-indicator__circular-indeterminate-active {
+.progress-indicator__circular-indeterminate-active {
   animation: m3-progress-circular-sweep var(--_progress-circular-duration)
     var(--_progress-easing-standard) infinite;
   stroke-dasharray: 10 90;
 }
 
-.m3-progress-indicator__circular-indeterminate--four-color
-  .m3-progress-indicator__circular-indeterminate-active {
+.progress-indicator__circular-indeterminate--four-color
+  .progress-indicator__circular-indeterminate-active {
   animation-name: m3-progress-circular-sweep, m3-progress-four-color-stroke;
   animation-duration:
     var(--_progress-circular-duration),
@@ -360,25 +360,25 @@
 }
 
 @media (forced-colors: active) {
-  .m3-progress-indicator__active,
-  .m3-progress-indicator__circular-indeterminate-active {
+  .progress-indicator__active,
+  .progress-indicator__circular-indeterminate-active {
     stroke: CanvasText;
   }
 
-  .m3-progress-indicator__linear-bar-inner,
-  .m3-progress-indicator__buffer-active {
+  .progress-indicator__linear-bar-inner,
+  .progress-indicator__buffer-active {
     background: CanvasText;
   }
 
-  .m3-progress-indicator__track,
-  .m3-progress-indicator__buffer-track {
+  .progress-indicator__track,
+  .progress-indicator__buffer-track {
     stroke: GrayText;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-progress-indicator *,
-  .m3-progress-indicator__wave-path {
+  .progress-indicator *,
+  .progress-indicator__wave-path {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition: none !important;

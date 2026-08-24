@@ -21,7 +21,7 @@ const preview: Preview = {
   decorators: [
     (Story, context) => (
       <ThemeProvider
-        className="m3-storybook-theme"
+        className="storybook-theme"
         mode={context.globals.theme === 'dark' ? 'dark' : 'light'}
       >
         <Story />

@@ -1,4 +1,4 @@
-.m3-icon-button {
+.icon-button {
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
@@ -16,7 +16,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.m3-icon-button__surface {
+.icon-button__surface {
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
@@ -38,7 +38,7 @@
   --ripple-color: currentColor;
 }
 
-.m3-icon-button__icon {
+.icon-button__icon {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -49,41 +49,41 @@
   pointer-events: none;
 }
 
-.m3-icon-button__icon > svg,
-.m3-icon-button__icon > img {
+.icon-button__icon > svg,
+.icon-button__icon > img {
   inline-size: 100%;
   block-size: 100%;
 }
 
-.m3-icon-button[data-disabled] {
+.icon-button[data-disabled] {
   cursor: default;
 }
 
-.m3-icon-button[data-disabled] .m3-icon-button__surface {
+.icon-button[data-disabled] .icon-button__surface {
   transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-icon-button__surface {
+  .icon-button__surface {
     transition: none;
   }
 }
 
 @media (forced-colors: active) {
-  .m3-icon-button__surface,
-  .m3-icon-button[data-selected] .m3-icon-button__surface {
+  .icon-button__surface,
+  .icon-button[data-selected] .icon-button__surface {
     border-color: ButtonText;
     background: Canvas;
     color: ButtonText;
     forced-color-adjust: none;
   }
 
-  .m3-icon-button[data-focus-visible] .m3-icon-button__surface {
+  .icon-button[data-focus-visible] .icon-button__surface {
     outline: 2px solid ButtonText;
     outline-offset: 2px;
   }
 
-  .m3-icon-button[data-disabled] .m3-icon-button__surface {
+  .icon-button[data-disabled] .icon-button__surface {
     border-color: GrayText;
     color: GrayText;
   }

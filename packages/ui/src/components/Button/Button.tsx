@@ -35,7 +35,7 @@ interface ButtonImplProps extends ButtonProps {
 }
 
 function variantClassName(variant: ButtonVariant): string {
-  return `m3-button--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+  return `button--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
 }
 
 function ButtonImpl({
@@ -105,7 +105,7 @@ function ButtonImpl({
       data-size={size}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        const baseClassName = `m3-button ${variantClass}`;
+        const baseClassName = `button ${variantClass}`;
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {
@@ -141,13 +141,13 @@ function ButtonImpl({
               renderProps.isFocusVisible,
             )}
           />
-          <span className="m3-button__content">
+          <span className="button__content">
             {startIcon ? (
-              <span aria-hidden="true" className="m3-button__icon">{startIcon}</span>
+              <span aria-hidden="true" className="button__icon">{startIcon}</span>
             ) : null}
             {typeof children === 'function' ? children(renderProps) : children}
             {endIcon ? (
-              <span aria-hidden="true" className="m3-button__icon">{endIcon}</span>
+              <span aria-hidden="true" className="button__icon">{endIcon}</span>
             ) : null}
           </span>
         </>

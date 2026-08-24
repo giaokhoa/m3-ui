@@ -24,7 +24,7 @@ export function Elevation({
     <span
       {...props}
       aria-hidden="true"
-      className={className ? `m3-elevation ${className}` : 'm3-elevation'}
+      className={className ? `elevation ${className}` : 'elevation'}
       data-elevation={level}
       style={elevationStyle}
     />

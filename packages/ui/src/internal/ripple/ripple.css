@@ -1,4 +1,4 @@
-.m3-ripple {
+.ripple {
   position: absolute;
   inset: 0;
   border-radius: inherit;
@@ -6,13 +6,13 @@
   pointer-events: none;
 }
 
-.m3-ripple__state-layer,
-.m3-ripple__wave {
+.ripple__state-layer,
+.ripple__wave {
   position: absolute;
   background: var(--ripple-color, currentColor);
 }
 
-.m3-ripple__state-layer {
+.ripple__state-layer {
   inset: 0;
   opacity: 0;
   transition:
@@ -20,16 +20,16 @@
     background-color var(--_ripple-hover-duration) var(--_ripple-opacity-easing);
 }
 
-.m3-ripple[data-hovered] .m3-ripple__state-layer {
+.ripple[data-hovered] .ripple__state-layer {
   opacity: var(--_ripple-hover-opacity);
 }
 
-.m3-ripple[data-focus-visible] .m3-ripple__state-layer {
+.ripple[data-focus-visible] .ripple__state-layer {
   opacity: var(--_ripple-focus-opacity);
   transition-duration: var(--_ripple-focus-in-duration);
 }
 
-.m3-ripple__focus-ring {
+.ripple__focus-ring {
   position: absolute;
   z-index: 2;
   inset: 0;
@@ -37,12 +37,12 @@
   pointer-events: none;
 }
 
-.m3-ripple[data-focus-ring-radius] .m3-ripple__focus-ring {
+.ripple[data-focus-ring-radius] .ripple__focus-ring {
   border-radius: var(--_ripple-focus-ring-radius);
 }
 
-.m3-ripple__focus-ring::before,
-.m3-ripple__focus-ring::after {
+.ripple__focus-ring::before,
+.ripple__focus-ring::after {
   position: absolute;
   box-sizing: border-box;
   content: '';
@@ -55,29 +55,29 @@
   transition-timing-function: var(--_ripple-focus-ring-out-easing);
 }
 
-.m3-ripple[data-focus-ring-radius] .m3-ripple__focus-ring::before,
-.m3-ripple[data-focus-ring-radius] .m3-ripple__focus-ring::after {
+.ripple[data-focus-ring-radius] .ripple__focus-ring::before,
+.ripple[data-focus-ring-radius] .ripple__focus-ring::after {
   border-radius: var(--_ripple-focus-ring-radius);
 }
 
 /* Compose draws the inner stroke first and the outer stroke second. */
-.m3-ripple__focus-ring::before {
+.ripple__focus-ring::before {
   border-color: var(--_ripple-focus-ring-inner-color);
 }
 
-.m3-ripple__focus-ring::after {
+.ripple__focus-ring::after {
   border-color: var(--_ripple-focus-ring-outer-color);
 }
 
-.m3-ripple[data-inset-focus-visible] .m3-ripple__focus-ring::before {
+.ripple[data-inset-focus-visible] .ripple__focus-ring::before {
   inset: var(--_ripple-focus-ring-inner-inset);
   border-width: var(--_ripple-focus-ring-inner-width);
   transition-duration: var(--_ripple-focus-ring-in-duration);
   transition-timing-function: var(--_ripple-focus-ring-in-easing);
 }
 
-.m3-ripple[data-inset-focus-visible][data-focus-ring-radius]
-  .m3-ripple__focus-ring::before {
+.ripple[data-inset-focus-visible][data-focus-ring-radius]
+  .ripple__focus-ring::before {
   border-radius: max(
     0px,
     calc(
@@ -86,15 +86,15 @@
   );
 }
 
-.m3-ripple[data-inset-focus-visible] .m3-ripple__focus-ring::after {
+.ripple[data-inset-focus-visible] .ripple__focus-ring::after {
   inset: var(--_ripple-focus-ring-outer-inset);
   border-width: var(--_ripple-focus-ring-outer-width);
   transition-duration: var(--_ripple-focus-ring-in-duration);
   transition-timing-function: var(--_ripple-focus-ring-in-easing);
 }
 
-.m3-ripple[data-inset-focus-visible][data-focus-ring-radius]
-  .m3-ripple__focus-ring::after {
+.ripple[data-inset-focus-visible][data-focus-ring-radius]
+  .ripple__focus-ring::after {
   border-radius: max(
     0px,
     calc(
@@ -103,7 +103,7 @@
   );
 }
 
-.m3-ripple__wave {
+.ripple__wave {
   left: var(--_ripple-x);
   top: var(--_ripple-y);
   width: var(--_ripple-diameter);
@@ -117,7 +117,7 @@
     m3-ripple-fade-in var(--_ripple-fade-in-duration) var(--_ripple-opacity-easing);
 }
 
-.m3-ripple__wave[data-releasing] {
+.ripple__wave[data-releasing] {
   opacity: 0;
   transition: opacity var(--_ripple-fade-out-duration) var(--_ripple-opacity-easing);
 }
@@ -146,15 +146,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-ripple__focus-ring::before,
-  .m3-ripple__focus-ring::after {
+  .ripple__focus-ring::before,
+  .ripple__focus-ring::after {
     transition: none;
   }
 }
 
 @media (forced-colors: active) {
   /* Component-level forced-colors focus affordances remain the source of truth. */
-  .m3-ripple__focus-ring {
+  .ripple__focus-ring {
     display: none;
   }
 }

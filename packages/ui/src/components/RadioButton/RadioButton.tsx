@@ -61,7 +61,7 @@ export function RadioButton({
       {...props}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
-        return joinClassNames('m3-radio-button', userClassName);
+        return joinClassNames('radio-button', userClassName);
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
@@ -74,8 +74,8 @@ export function RadioButton({
         const label = resolveChildren(children, renderProps);
         return (
           <>
-            <span className="m3-radio-button__control-slot" aria-hidden="true">
-              <span className="m3-radio-button__state-layer">
+            <span className="radio-button__control-slot" aria-hidden="true">
+              <span className="radio-button__state-layer">
                 <Ripple
                   controller={ripple}
                   focusRingInset={radioFocusRingInset}
@@ -84,12 +84,12 @@ export function RadioButton({
                   isHovered={renderProps.isHovered}
                 />
               </span>
-              <span className="m3-radio-button__control">
-                <span className="m3-radio-button__dot" />
+              <span className="radio-button__control">
+                <span className="radio-button__dot" />
               </span>
             </span>
             {label !== undefined && label !== null ? (
-              <span className="m3-radio-button__label">{label}</span>
+              <span className="radio-button__label">{label}</span>
             ) : null}
           </>
         );
@@ -115,8 +115,8 @@ export function RadioGroup({
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames(
-          'm3-radio-group',
-          orientation === 'horizontal' ? 'm3-radio-group--horizontal' : null,
+          'radio-group',
+          orientation === 'horizontal' ? 'radio-group--horizontal' : null,
           userClassName,
         );
       }}
@@ -125,12 +125,12 @@ export function RadioGroup({
         return { ...radioGroupBaseStyle, ...userStyle };
       }}
     >
-      {label != null ? <Label className="m3-radio-group__label">{label}</Label> : null}
-      <div className="m3-radio-group__options">{children}</div>
+      {label != null ? <Label className="radio-group__label">{label}</Label> : null}
+      <div className="radio-group__options">{children}</div>
       {description != null ? (
-        <Text slot="description" className="m3-radio-group__description">{description}</Text>
+        <Text slot="description" className="radio-group__description">{description}</Text>
       ) : null}
-      <FieldError className="m3-radio-group__error">{errorMessage}</FieldError>
+      <FieldError className="radio-group__error">{errorMessage}</FieldError>
     </AriaRadioGroup>
   );
 }

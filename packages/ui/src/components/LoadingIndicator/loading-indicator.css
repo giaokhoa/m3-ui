@@ -1,4 +1,4 @@
-.m3-loading-indicator {
+.loading-indicator {
   box-sizing: border-box;
   position: relative;
   display: inline-grid;
@@ -13,23 +13,23 @@
   vertical-align: middle;
 }
 
-.m3-loading-indicator__svg {
+.loading-indicator__svg {
   display: block;
   inline-size: 100%;
   block-size: 100%;
   overflow: visible;
 }
 
-.m3-loading-indicator__active {
+.loading-indicator__active {
   fill: currentColor;
 }
 
 @media (forced-colors: active) {
-  .m3-loading-indicator {
+  .loading-indicator {
     --_loading-indicator-color: CanvasText;
   }
 
-  .m3-loading-indicator--contained {
+  .loading-indicator--contained {
     --_loading-container-color: Canvas;
     outline: 1px solid CanvasText;
     outline-offset: -1px;

@@ -75,7 +75,7 @@ function ClickableRow() {
 
 export const Variants: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <VariantRow />
     </div>
   ),
@@ -83,7 +83,7 @@ export const Variants: Story = {
 
 export const Clickable: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <ClickableRow />
     </div>
   ),
@@ -91,7 +91,7 @@ export const Clickable: Story = {
 
 export const Disabled: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <VariantRow disabled />
     </div>
   ),
@@ -99,7 +99,7 @@ export const Disabled: Story = {
 
 export const CustomShape: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Card style={cardStyle} shape={4}>
         <Content title="4px shape override" />
       </Card>
@@ -109,7 +109,7 @@ export const CustomShape: Story = {
 
 export const FocusModes: Story = {
   render: () => (
-    <div className="m3-storybook-center" style={{ gap: 32 }}>
+    <div className="storybook-center" style={{ gap: 32 }}>
       <ThemeProvider rippleFocus="opacity">
         <Card style={cardStyle} onPress={() => {}}>
           <Content title="Opacity focus" />
@@ -129,7 +129,7 @@ export const NestedAction: Story = {
     const [cardCount, setCardCount] = useState(0);
     const [buttonCount, setButtonCount] = useState(0);
     return (
-      <div className="m3-storybook-center">
+      <div className="storybook-center">
         <Card style={cardStyle} onPress={() => setCardCount((value) => value + 1)}>
           <div style={contentStyle}>
             <strong>Card with child action</strong>
@@ -145,7 +145,7 @@ export const NestedAction: Story = {
 
 export const RoleOptIn: Story = {
   render: () => (
-    <div className="m3-storybook-center">
+    <div className="storybook-center">
       <Card aria-label="Action card" role="button" style={cardStyle} onPress={() => {}}>
         <Content title="Explicit web button role" />
       </Card>
@@ -155,20 +155,20 @@ export const RoleOptIn: Story = {
 
 export const ThemeMatrix: Story = {
   render: () => (
-    <div className="m3-storybook-theme-grid">
-      <ThemeProvider className="m3-storybook-theme-card" mode="light">
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
         <h3>Baseline · Light</h3>
         <VariantRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark">
+      <ThemeProvider className="storybook-theme-card" mode="dark">
         <h3>Baseline · Dark</h3>
         <VariantRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="light" sourceColor="#006a60">
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
         <h3>Dynamic · #006A60</h3>
         <VariantRow />
       </ThemeProvider>
-      <ThemeProvider className="m3-storybook-theme-card" mode="dark" sourceColor="#b3261e">
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
         <h3>Dynamic dark · #B3261E</h3>
         <VariantRow />
       </ThemeProvider>

@@ -1,4 +1,4 @@
-.m3-switch {
+.switch {
   position: relative;
   display: inline-flex;
   min-block-size: var(--_switch-min-interactive-size);
@@ -11,7 +11,7 @@
   --ripple-color: currentColor;
 }
 
-.m3-switch__control-slot {
+.switch__control-slot {
   display: inline-flex;
   inline-size: var(--_switch-track-width);
   min-block-size: var(--_switch-min-interactive-size);
@@ -20,7 +20,7 @@
   justify-content: center;
 }
 
-.m3-switch__track {
+.switch__track {
   position: relative;
   inline-size: var(--_switch-track-width);
   block-size: var(--_switch-track-height);
@@ -32,11 +32,11 @@
 }
 
 /* Track indication paints over the thumb, matching Compose drawContent() -> focus ring. */
-.m3-switch__track > .m3-ripple {
+.switch__track > .ripple {
   z-index: 2;
 }
 
-.m3-switch__thumb-shell {
+.switch__thumb-shell {
   position: absolute;
   z-index: 1;
   inset-block-start: 50%;
@@ -50,7 +50,7 @@
     block-size var(--_switch-geometry-duration) var(--_switch-geometry-easing);
 }
 
-.m3-switch__state-layer {
+.switch__state-layer {
   position: absolute;
   z-index: 0;
   inset-block-start: 50%;
@@ -61,7 +61,7 @@
   transform: translate(-50%, -50%);
 }
 
-.m3-switch__thumb {
+.switch__thumb {
   position: absolute;
   z-index: 1;
   inset: 0;
@@ -73,7 +73,7 @@
   color: var(--_switch-unchecked-icon-color);
 }
 
-.m3-switch__icon {
+.switch__icon {
   display: inline-flex;
   inline-size: var(--_switch-icon-size);
   block-size: var(--_switch-icon-size);
@@ -82,80 +82,80 @@
   color: currentColor;
 }
 
-.m3-switch__icon > svg {
+.switch__icon > svg {
   inline-size: 100%;
   block-size: 100%;
 }
 
-.m3-switch__label {
+.switch__label {
   min-inline-size: 0;
 }
 
-.m3-switch[data-has-thumb-content]:not([data-selected]) .m3-switch__thumb-shell {
+.switch[data-has-thumb-content]:not([data-selected]) .switch__thumb-shell {
   inset-inline-start: var(--_switch-content-thumb-offset);
   inline-size: var(--_switch-checked-thumb-size);
   block-size: var(--_switch-checked-thumb-size);
 }
 
-.m3-switch[data-selected] .m3-switch__track {
+.switch[data-selected] .switch__track {
   background: var(--_switch-checked-track-color);
   box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
     var(--_switch-checked-border-color);
 }
 
-.m3-switch[data-selected] .m3-switch__thumb-shell {
+.switch[data-selected] .switch__thumb-shell {
   inset-inline-start: var(--_switch-checked-thumb-offset);
   inline-size: var(--_switch-checked-thumb-size);
   block-size: var(--_switch-checked-thumb-size);
 }
 
-.m3-switch[data-selected] .m3-switch__thumb {
+.switch[data-selected] .switch__thumb {
   background: var(--_switch-checked-thumb-color);
   color: var(--_switch-checked-icon-color);
 }
 
 /* ThumbNode uses SnapSpec while pressed. Release returns through FastSpatial. */
-.m3-switch[data-pressed] .m3-switch__thumb-shell {
+.switch[data-pressed] .switch__thumb-shell {
   inline-size: var(--_switch-pressed-thumb-size);
   block-size: var(--_switch-pressed-thumb-size);
   transition: none;
 }
 
-.m3-switch[data-pressed]:not([data-selected]) .m3-switch__thumb-shell {
+.switch[data-pressed]:not([data-selected]) .switch__thumb-shell {
   inset-inline-start: var(--_switch-pressed-unchecked-thumb-offset);
 }
 
-.m3-switch[data-pressed][data-selected] .m3-switch__thumb-shell {
+.switch[data-pressed][data-selected] .switch__thumb-shell {
   inset-inline-start: var(--_switch-pressed-checked-thumb-offset);
 }
 
-.m3-switch[data-disabled] {
+.switch[data-disabled] {
   cursor: default;
 }
 
-.m3-switch[data-disabled]:not([data-selected]) .m3-switch__track {
+.switch[data-disabled]:not([data-selected]) .switch__track {
   background: var(--_switch-disabled-unchecked-track-color);
   box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
     var(--_switch-disabled-unchecked-border-color);
 }
 
-.m3-switch[data-disabled]:not([data-selected]) .m3-switch__thumb {
+.switch[data-disabled]:not([data-selected]) .switch__thumb {
   background: var(--_switch-disabled-unchecked-thumb-color);
   color: var(--_switch-disabled-unchecked-icon-color);
 }
 
-.m3-switch[data-disabled][data-selected] .m3-switch__track {
+.switch[data-disabled][data-selected] .switch__track {
   background: var(--_switch-disabled-checked-track-color);
   box-shadow: inset 0 0 0 var(--_switch-track-outline-width)
     var(--_switch-disabled-checked-border-color);
 }
 
-.m3-switch[data-disabled][data-selected] .m3-switch__thumb {
+.switch[data-disabled][data-selected] .switch__thumb {
   background: var(--_switch-disabled-checked-thumb-color);
   color: var(--_switch-disabled-checked-icon-color);
 }
 
-.m3-switch[data-disabled] .m3-switch__label {
+.switch[data-disabled] .switch__label {
   color: color-mix(
     in srgb,
     var(--_switch-label-color) var(--_switch-disabled-label-opacity),
@@ -163,39 +163,39 @@
   );
 }
 
-.m3-switch[data-readonly] {
+.switch[data-readonly] {
   cursor: default;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m3-switch__thumb-shell {
+  .switch__thumb-shell {
     transition: none;
   }
 }
 
 @media (forced-colors: active) {
-  .m3-switch__track {
+  .switch__track {
     background: Canvas;
     box-shadow: inset 0 0 0 var(--_switch-track-outline-width) CanvasText;
   }
 
-  .m3-switch__thumb,
-  .m3-switch[data-selected] .m3-switch__thumb {
+  .switch__thumb,
+  .switch[data-selected] .switch__thumb {
     background: CanvasText;
     color: Canvas;
   }
 
-  .m3-switch[data-focus-visible] .m3-switch__track {
+  .switch[data-focus-visible] .switch__track {
     outline: 2px solid CanvasText;
     outline-offset: 2px;
   }
 
-  .m3-switch[data-disabled] .m3-switch__track {
+  .switch[data-disabled] .switch__track {
     box-shadow: inset 0 0 0 var(--_switch-track-outline-width) GrayText;
   }
 
-  .m3-switch[data-disabled] .m3-switch__thumb,
-  .m3-switch[data-disabled] .m3-switch__label {
+  .switch[data-disabled] .switch__thumb,
+  .switch[data-disabled] .switch__label {
     color: GrayText;
   }
 }
