@@ -1,68 +1,95 @@
 ---
 name: style-dictionary
-description: Use when editing @m3-ui/tokens canonical DTCG files, Style Dictionary configuration, generated token outputs, filters, transforms, formats, or token package structure.
+description: Use when editing @m3-ui/tokens canonical DTCG files, Style Dictionary configuration, generated token output, token ownership, filters, transforms, formats, audits, or token package structure.
 ---
 
 # Style Dictionary
 
-This skill defines how this repository uses Style Dictionary. It is based on the Style Dictionary v5 documentation and the pinned package version used by this repository.
+This skill defines how this repository uses Style Dictionary. It combines verified Style Dictionary v5 behavior with repository-specific architecture rules.
 
-Validated against Style Dictionary 5.5.2. Re-check the official docs and changelog before changing major/minor versions or adopting newly added DTCG types.
+Validated against Style Dictionary **5.5.2**. Re-check the official docs and changelog before changing the pinned version or introducing a DTCG type/feature not already covered by generated-output tests.
 
-## Mental model
+## Non-negotiable repository invariant
 
-Style Dictionary is configuration-driven. Treat its lifecycle as:
+The token flow is one-way:
+
+```text
+canonical DTCG in packages/tokens/tokens/**/*.json
+                    │
+                    ▼
+             Style Dictionary
+                    │
+                    ▼
+       dist/generated/tokens.js
+       dist/generated/tokens.d.ts
+                    │
+                    ▼
+              @m3/tokens
+                    │
+                    ▼
+               @m3/ui
+```
+
+AndroidX Compose, Material 3 Figma, Material Web and other upstreams are **read-only audit references**. They never generate or rewrite canonical DTCG or runtime package files.
+
+`@m3/tokens` has **no handwritten runtime `src/` layer**. The package root is the generated Style Dictionary API. Do not recreate compatibility facades, component subpaths, a `./generated` alias, or a second TypeScript build.
+
+The future publish scope is `@m3-ui/tokens`; the workspace keeps `@m3/tokens` until the repository-wide namespace migration is performed atomically.
+
+## Style Dictionary mental model
+
+Style Dictionary is configuration-driven. Its relevant lifecycle is:
 
 1. parse config;
-2. find `source` / `include` token files;
+2. find `source` / `include` files;
 3. parse token files;
 4. deep-merge them into one dictionary;
 5. run preprocessors;
 6. run platform transforms;
-7. resolve token references;
+7. resolve references;
 8. filter + format output files;
 9. run actions.
 
-This ordering matters. Folder boundaries disappear after the deep merge. Cross-file aliases are valid because reference resolution happens against the merged dictionary.
+Folder boundaries disappear after deep merge. Cross-file aliases work because reference resolution operates on the merged dictionary.
 
 ## Official behavior vs repository convention
 
-Style Dictionary does **not** prescribe one canonical token folder taxonomy. Its docs explicitly allow token files to live anywhere as long as config points to them, and all matched source files are deep-merged.
+Style Dictionary does **not** prescribe a canonical folder taxonomy. It accepts files matched by configuration and deep-merges them.
 
-Therefore:
+Always distinguish:
 
-- statements under **Style Dictionary behavior** describe upstream behavior;
-- statements under **Repository rule** are deliberate `m3-ui` conventions and must be followed in this repository.
+- **Style Dictionary behavior**: upstream functionality documented by Style Dictionary;
+- **Repository rule**: architecture deliberately chosen for this repository.
 
-Do not present repository conventions as requirements of Style Dictionary itself.
+Never describe `core/` / `component/` or other repository conventions as requirements of Style Dictionary itself.
 
 ## Repository folder structure
 
-Use this package shape:
+Representative package shape; the complete component corpus is broader than this abbreviated tree:
 
 ```text
 packages/tokens/
-├── tokens/                         # canonical DTCG source; human-reviewed
-│   ├── core/                       # reusable non-component tokens
+├── tokens/                         # only canonical immutable token source
+│   ├── core/                       # reusable foundations + runtime roles
+│   │   ├── color.json
 │   │   ├── state.json
 │   │   ├── elevation.json
 │   │   ├── shape.json
 │   │   ├── typography.json
-│   │   └── motion.json
-│   └── component/                  # component-specific tokens
+│   │   ├── motion.json
+│   │   └── ripple.json
+│   └── component/                  # full canonical Material 3 component corpus
 │       ├── button/
-│       │   ├── base.json
-│       │   ├── variants.json
-│       │   └── sizes.json
+│       ├── checkbox.json
+│       ├── radio-button.json
 │       ├── switch.json
-│       └── text-field/
-│           ├── shared.json
-│           ├── filled.json
-│           └── outlined.json
-├── style-dictionary.config.mjs     # package-local Style Dictionary config
-├── scripts/                        # validation + upstream read-only audits
-├── src/                            # optional handwritten API/types only
-├── dist/                           # generated/publish output; disposable
+│       ├── text-field/
+│       └── ...
+├── audit/                          # checked-in read-only evidence + drift
+├── spec/                           # captured normative textual evidence
+├── scripts/                        # validation + read-only upstream audits
+├── style-dictionary.config.mjs
+├── dist/                           # generated/disposable build output
 │   └── generated/
 │       ├── tokens.js
 │       └── tokens.d.ts
@@ -70,21 +97,40 @@ packages/tokens/
 └── README.md
 ```
 
-### Repository rules for folders
+Repository rules:
 
-- `tokens/**` is the only canonical design-token source.
-- Split canonical files by semantic ownership, not by output platform.
-- Never create canonical `tokens/web`, `tokens/react`, `tokens/android`, or `tokens/compose` trees. Platform adaptation belongs in Style Dictionary platforms/transforms or runtime code.
-- `core/` contains values reusable across components. A component should alias a core value instead of copying it.
-- `component/` contains component-specific values and aliases.
-- Large component families may use a subfolder; small components may use one JSON file.
-- A token path must have exactly one canonical definition across all source files. Do not rely on deep-merge overwrite order.
-- `dist/**` is generated. Never hand-edit it and never make it canonical.
-- `src/**` must not duplicate canonical token values. It may contain types or runtime adapters that cannot be represented by generated exports.
+- `tokens/**/*.json` is the only canonical token source.
+- `core/` owns reusable semantic values.
+- `component/` owns component-specific values and aliases.
+- `audit/` and `spec/` are evidence, not Style Dictionary build inputs.
+- Large component families may use subfolders; small families may use one file.
+- Split source files by semantic ownership, never by target platform.
+- Never create `tokens/web`, `tokens/react`, `tokens/android`, `tokens/compose`, or upstream snapshot trees.
+- A token path has exactly one canonical definition. Never depend on deep-merge overwrite order.
+- `dist/**` is disposable generated output. Never hand-edit it or treat it as source.
+- **Do not create `packages/tokens/src/`.** Runtime projections/types belong beside their consumers in `@m3/ui`; the token package itself publishes generated values and declarations only.
 
-Token path changes affect generated symbol names. Treat renaming or moving a token path as a public-API change once generated exports are consumed outside the package.
+Token path changes rename generated symbols. Once consumers use those exports, treat path renames as public-API changes.
 
-## Canonical token format
+## Deciding what is a token
+
+Do not tokenise every numeric literal, and do not leave actual design values in UI code.
+
+Use this decision order:
+
+1. **Immutable Material value with stable semantic identity** → canonical DTCG.
+2. **Same semantic value reused by multiple components** → canonical `core` token; components alias it.
+3. **Immutable component-specific design value** → canonical `component` token.
+4. **Theme-dependent Material color role** → use an existing canonical runtime role or a Material-owned component color string such as `var(--primary)`; ThemeProvider supplies the runtime role value.
+5. **Value derived arithmetically from canonical tokens at runtime** → derive it in `@m3/ui`; do not store the derived result as another token unless it has independent semantic identity.
+6. **Web-only visual contract deliberately owned by this library** → canonical component token only if it is a stable design choice with genuine semantic identity.
+7. **Pure platform mechanics/accessibility fallback/algorithm scaffolding** → keep local to UI code and document why it is not a Material token. Examples include forced-colors system-color outlines, percentages used to center transforms, array indices, counters, transient animation state, and wrapper layout that upstream component tokens do not own.
+
+Never alias values merely because their numbers happen to match. Aliases express shared semantic identity, not numeric deduplication.
+
+If an upstream source does not own a web-only token, do not invent an AndroidX/Figma/Material Web audit mapping for it. Cover that value with consumer/parity tests instead.
+
+## Canonical DTCG format
 
 Use plain DTCG `$type` / `$value` syntax.
 
@@ -99,20 +145,20 @@ Use plain DTCG `$type` / `$value` syntax.
 }
 ```
 
-### Repository rules for DTCG
+Rules:
 
-- Use `$value`, never legacy `value`.
-- Use `$type` on each token or inherit it from an unambiguous group.
-- Prefer native DTCG primitive types such as `dimension`, `number`, `duration`, and `string` when supported by the pinned Style Dictionary version.
-- Dimensions must use DTCG dimension objects with explicit units: `{ "value": 8, "unit": "px" }` or `rem`.
-- Do not encode dimensions as bare numbers.
-- Aliases use DTCG/Style Dictionary references such as `{shape.small}` and may cross files.
-- Do not put upstream revision/provenance metadata into canonical token files. Upstream source mapping belongs in audit code.
-- Do not add project-specific `$extensions` unless a concrete cross-tool requirement appears and is separately reviewed.
+- use `$value`, never legacy `value`;
+- use `$type` on a token or inherit it only from an unambiguous group;
+- use native DTCG primitive types supported by the pinned Style Dictionary version;
+- dimensions use explicit DTCG objects such as `{ "value": 8, "unit": "px" }`;
+- never encode dimensions as bare numbers;
+- aliases use references such as `{shape.small}` and may cross files;
+- upstream revision/provenance belongs in audit code, not canonical token JSON;
+- do not add project-specific `$extensions` unless a concrete cross-tool requirement is separately reviewed.
 
 ### Dynamic Material colors
 
-ThemeProvider owns actual runtime Material color values. Canonical component tokens refer to runtime roles as ordinary strings:
+ThemeProvider owns actual runtime Material colors. Canonical Material-owned color tokens are ordinary DTCG strings containing the runtime CSS expression:
 
 ```json
 {
@@ -123,61 +169,53 @@ ThemeProvider owns actual runtime Material color values. Canonical component tok
 }
 ```
 
-Do not convert these values to static hex colors and do not mark them as DTCG `color` tokens. They are runtime CSS-variable references, not static color data.
+Do not replace these with static hex placeholders and do not mark them as DTCG `color` values. `var(--primary)` is a runtime expression, not static color data.
+
+The generated expression must flow through unchanged:
+
+```text
+DTCG var(--primary)
+  -> Style Dictionary
+  -> @m3/tokens
+  -> UI projection/defaults
+  -> CSS
+```
+
+UI code must not decode it into `primary`, camel-case it, or reconstruct `var(--primary)` later. Wrapper semantics that only need a global runtime role should consume exports such as `ColorRoleOnSurface` rather than inventing fake component tokens.
 
 ## DTCG compatibility
 
-Style Dictionary has first-class DTCG support from v4 and normally auto-detects DTCG input. Do not set `usesDtcg` in config unless there is a demonstrated auto-detection problem.
+Style Dictionary has first-class DTCG support and normally auto-detects DTCG input. Do not set `usesDtcg` unless a demonstrated auto-detection problem exists.
 
-The Style Dictionary docs currently warn that the latest DTCG 2025.10 format is not yet fully supported. Version 5.4 added support for the 2025.10 dimension object form across built-in transforms. Before introducing a new DTCG type or composite shape, verify support in the docs/changelog for the exact pinned Style Dictionary version and add generated-output tests.
+Style Dictionary support for the newest DTCG specification evolves over time. Before adding a new composite/type, verify support against the exact pinned version and add generated-output tests for the serialized value and declaration type.
 
-## `source`, `include`, and `tokens`
+## `source`, `include`, and inline `tokens`
 
 ### Style Dictionary behavior
 
-- `source` is an array of glob patterns. All matched token files are deep-merged.
-- `include` is a base collection; matching `source` tokens override matching `include` tokens.
-- `tokens` can provide inline token objects from config.
+- `source` matches token files that are parsed and deep-merged.
+- `include` acts as a base collection that `source` can override.
+- config may also provide inline `tokens`.
 
 ### Repository rule
 
-Use only:
+Use only canonical source:
 
 ```js
 source: ['tokens/**/*.json']
 ```
 
-Do not use `include` for AndroidX, Figma, Material Web, or any other upstream reference. Upstreams are audit oracles only and must never enter the Style Dictionary build graph.
+Do not use `include` for AndroidX, Figma, Material Web, or another upstream. Do not place canonical values inline in config. Upstreams are audit oracles only.
 
-Do not put canonical tokens inline in config. Canonical values belong in `tokens/**/*.json`, where they can be reviewed and diffed independently of build configuration.
+## Configuration
 
-## Configuration format
-
-Style Dictionary supports JSON, JSONC, JSON5, and JavaScript ES module configs.
-
-### Repository rule
-
-Use a JavaScript ES module config named:
+Use the package-local ESM config:
 
 ```text
 packages/tokens/style-dictionary.config.mjs
 ```
 
-Use JS rather than JSON because this repository requires enum constants, strict logging, and may later need filters without inventing stringly-typed config.
-
-The package script must invoke the config explicitly:
-
-```json
-{
-  "scripts": {
-    "tokens:build": "style-dictionary build --config style-dictionary.config.mjs"
-  }
-}
-```
-
-## Canonical config pattern
-
-Use Style Dictionary enum-like constants instead of hardcoded built-in names:
+Use official enums for built-in names and strict logging:
 
 ```js
 import {
@@ -222,224 +260,194 @@ export default {
 };
 ```
 
-### Why this config is the default
+Why:
 
-- `source` reads only canonical DTCG.
-- `warnings: error` makes source token collisions, generated name collisions, empty filtered files, and related warnings fail CI instead of being silently tolerated.
-- broken references throw.
-- `transformGroups.js` supplies the official JS transform group.
-- `buildPath` ends with `/`, as required by Style Dictionary config semantics.
-- `javascript/es6` and `typescript/es6-declarations` are built-in formats; do not replace them with a custom generator without a proven requirement.
-- `outputStringLiterals: true` preserves literal string types in generated declarations.
-- `showFileHeader: false` removes generated timestamps and keeps output deterministic.
+- canonical DTCG is the only source;
+- warnings/collisions fail CI instead of being silently tolerated;
+- broken references throw;
+- built-in `js` transforms and formats are the actual build engine;
+- JS and declarations share one naming pipeline;
+- literal string declarations preserve values such as `var(--primary)`;
+- generated headers have no timestamp, keeping output deterministic.
 
-## Transform groups are not neutral
+The build script invokes this config explicitly:
 
-A transform group is an ordered list of transforms. The built-in `js` group currently includes:
+```json
+{
+  "tokens:build": "style-dictionary build --config style-dictionary.config.mjs"
+}
+```
 
-- `attribute/cti`;
-- `name/pascal`;
-- `size/rem`;
-- `color/hex`.
+## Transforms
 
-Do not assume a transform group merely changes names.
+A transform group is ordered behavior, not a neutral label. The built-in JS group applies naming/value transforms before formatting.
 
-### Repository consequences
+Repository rules:
 
-- Generated JS identifiers are PascalCase path-derived names.
-- Runtime CSS-variable color references are `$type: string`, so the color transform must not reinterpret them as static colors.
-- Canonical dimensions use explicit DTCG `px`/`rem` units. Style Dictionary 5.4+ supports these dimension objects; generated-output tests must verify the exact serialized values we depend on.
-- If a consumer needs a different unit conversion, create a separate platform or deliberate transform path. Do not rewrite canonical units to fit one platform.
+- use built-ins before registering custom transforms;
+- do not assume `transformGroup: js` leaves every value untouched;
+- keep runtime CSS color references typed as strings so color transforms cannot reinterpret them;
+- if transform ordering becomes important, define and review an explicit group instead of relying on accidental append order;
+- never write a transform merely to recreate an ergonomic handwritten token facade.
 
-When adding standalone `transforms` alongside a `transformGroup`, remember that Style Dictionary appends standalone transforms after the group. If transform ordering matters, define a reviewed custom transform group rather than depending on accidental ordering.
+A consumer that needs numeric `px`/`ms` values for arithmetic/timers may parse the generated string in narrow `@m3/ui` helpers. That conversion is a runtime boundary, not another token table.
 
-## Platforms
+## Platforms, files, filters, formats
 
-A platform is an output target, not a canonical token layer.
+A Style Dictionary platform is an output target, not a canonical token layer.
 
-Each platform may define:
+Current repository rule: there is only the typed JS platform. Do **not** add a generic `css/variables` platform: ThemeProvider owns runtime color variables, while non-color immutable values stay generated JS values.
 
-- `transformGroup` and/or ordered `transforms`;
-- `buildPath`;
-- `files`;
-- `options`;
-- `prefix`;
-- `preprocessors`;
-- `expand`;
-- `actions`.
+Add another platform only for a real consumer with different output semantics and explicit review.
 
-### Repository rules
-
-- Add a platform only when there is a real consumer with different output semantics.
-- Do not duplicate source trees to create platform-specific values.
-- Avoid `prefix` for the JS public API unless explicitly required; changing it renames every generated export.
-- Keep platform-specific configuration in config, not token files.
-
-## Files and formats
-
-A platform `files` array describes generated files. `destination` is appended to the platform `buildPath`.
-
-Use built-in formats first.
-
-For this package, the default pair is:
+Use built-in formats first:
 
 - `formats.javascriptEs6` -> `tokens.js`;
 - `formats.typescriptEs6Declarations` -> `tokens.d.ts`.
 
-A custom format is justified only when built-in output cannot satisfy a real public API requirement. Before registering one, check the built-in formats and format helpers.
+If output later needs to be split per component, keep one canonical graph and use multiple `files` plus filters. Do not create platform-specific canonical source trees or independent dictionaries by default.
 
-Keep custom format options under the file/platform `options` object because Style Dictionary merges platform and file options and gives file-level values precedence.
+Style Dictionary resolves aliases before formatting. The literal `var(--primary)` value is not a Style Dictionary alias and does not need `outputReferences`.
 
-## Filters and split outputs
+Do not enable `outputReferences` or `expand` mechanically. Verify exact support and consumer need before using either.
 
-If consumers later require one output file per component, do **not** create separate canonical source roots or separate Style Dictionary instances per component by default.
+## Custom hooks
 
-Use the official split-output pattern:
+Prefer zero custom parsers, preprocessors, transforms, formats, or actions.
 
-1. keep one merged canonical source graph;
-2. generate multiple `files` entries;
-3. apply file-level `filter`s so each output receives the relevant subset.
+Use an extension hook only at the lifecycle stage that actually owns the requirement. Never write a custom generator simply to reshape data that should be modeled in canonical DTCG or emitted by a built-in format.
 
-Style Dictionary filters run after transforms and before formats.
+## Generated package API
 
-Be careful when combining filters with reference-preserving formats: a token may reference a token filtered out of the file. Use Style Dictionary's reference helpers / `outputReferencesFilter` where appropriate instead of emitting broken references.
+`@m3/tokens` exposes only the generated root API:
 
-## References and `outputReferences`
-
-Style Dictionary resolves aliases by default before formatting.
-
-Only some built-in formats support `outputReferences`; `javascript/es6` is not one of the documented reference-preserving formats. Therefore JS output should be treated as resolved values.
-
-For CSS-variable output, `css/variables` can preserve aliases with `outputReferences: true` when that is intentionally desired.
-
-Do not enable `outputReferences` mechanically. Preserve aliases only when the output format and consumer benefit from the reference chain and the filtered output still contains valid referenced tokens.
-
-The runtime Material strings such as `var(--primary)` are literal token values, not Style Dictionary aliases, so they do not require `outputReferences`.
-
-## Composite tokens and `expand`
-
-`expand` is `false` by default. It decomposes object-valued composite tokens into separate tokens.
-
-### Repository rule
-
-Do not enable `expand: true` globally as a convenience.
-
-If the canonical model later uses DTCG composite tokens such as typography, border, shadow, or transition:
-
-1. verify exact support in the pinned Style Dictionary version;
-2. decide whether the target format can consume the composite value directly;
-3. if expansion is needed, prefer deliberate platform-level `expand` configuration;
-4. test the generated token names and types.
-
-Global expansion cannot be undone by a platform-level config, so it has a much larger blast radius.
-
-## Parsers, preprocessors, transforms, formats, actions
-
-Use extension hooks only at the lifecycle stage matching the problem:
-
-- parser: custom input file syntax;
-- preprocessor: mutate/normalize the merged dictionary before transforms;
-- transform: platform-specific token name/attribute/value conversion;
-- filter: choose which transformed tokens enter a file;
-- format: serialize a file;
-- action: post-build side effect such as copying assets.
-
-### Repository rule
-
-Prefer zero custom hooks. The canonical source should be valid DTCG JSON and standard JS/TS generation should use built-ins.
-
-Never write a custom generator simply to reshape data that should have been modeled correctly in canonical DTCG.
-
-## Generated API
-
-Generated files are disposable build artifacts, but once package consumers import their exports, the generated names are public API.
+```text
+@m3/tokens package root
+  -> dist/generated/tokens.js
+  -> dist/generated/tokens.d.ts
+```
 
 Rules:
 
-- never hand-edit `dist/generated/**`;
-- never commit a second handwritten copy of generated token values;
-- build JS and declarations from the same platform/naming transform;
-- tests must import actual generated JS, not a hand-maintained mirror;
-- package exports should point to generated artifacts only after those artifacts are stable and tested;
-- public type-only helpers may remain handwritten when Style Dictionary cannot express the ergonomic TypeScript API, but they must not duplicate values.
+- no handwritten runtime `src/` layer;
+- no `./generated` alias;
+- no component/core convenience subpaths;
+- no separate token-package `tsc` build;
+- no handwritten type/value facades;
+- never copy generated values into TypeScript modules;
+- ergonomic projection objects/types needed by a component live beside that component in `@m3/ui` and derive from the package-root generated exports.
 
-## Validation and testing pattern
+Generated files are disposable build artifacts, but generated export names become API once consumed. Build JS and declarations from the same naming pipeline and test the real generated artifacts.
 
-Every token change should pass these layers:
+## Upstream audit
+
+Audit is intentionally asymmetric:
+
+```text
+AndroidX / Figma / Material Web / other references
+                  │
+                  ▼
+          normalize/read in memory
+                  │
+                  ▼
+          compare against canonical DTCG
+```
+
+Never reverse this arrow.
+
+Audit code may contain pinned revisions, captured evidence, and mapping tables. It must not contain a renderer/write path into `tokens/`.
+
+For dynamic colors compare semantic role identity, e.g. AndroidX `Primary` ↔ canonical `var(--primary)`, rather than static hex values.
+
+Only audit a web-only/library-owned value against an upstream when that upstream actually owns the same semantic value. Otherwise verify it in consumer/parity tests and document the adaptation.
+
+## Validation and tests
+
+Every token/config change should pass:
 
 1. **Canonical validation**
-   - parse every `tokens/**/*.json` file;
-   - merge into one graph;
-   - reject duplicate canonical paths;
-   - reject unsupported types;
-   - reject missing aliases and alias cycles;
-   - reject legacy `value` fields.
+   - parse all `tokens/**/*.json`;
+   - merge one graph;
+   - reject duplicate paths;
+   - reject unsupported/legacy fields;
+   - reject missing aliases and cycles.
 
-2. **Style Dictionary build test**
-   - run the real pinned Style Dictionary binary;
-   - import `dist/generated/tokens.js`;
-   - assert representative dimensions, numbers, aliases, runtime CSS-variable strings, and generated names;
-   - inspect `tokens.d.ts` for expected declarations/literal strings.
+2. **Real Style Dictionary build**
+   - run pinned Style Dictionary;
+   - import actual generated JS;
+   - assert representative dimensions, numbers, aliases, runtime CSS strings and symbol names;
+   - inspect generated `.d.ts` declarations.
 
-3. **Upstream audit**
-   - normalize AndroidX/Figma/etc. into read-only reference graphs;
-   - compare against canonical;
-   - never rewrite canonical from upstream.
+3. **Architecture guards**
+   - token package has no handwritten `src/`;
+   - package exports only `.`;
+   - UI imports only package root;
+   - no upstream source enters Style Dictionary;
+   - no generic CSS platform appears;
+   - runtime color expressions are not decoded/re-encoded.
 
-4. **Consumer tests**
-   - migrate components to generated exports;
-   - run unit/type/build tests;
-   - run visual regression when rendering may be affected.
+4. **Read-only upstream audit**
+   - compare canonical mappings against pinned upstream sources;
+   - preserve explicit drift/evidence rather than rewriting canonical;
+   - zero write path.
+
+5. **Consumer verification**
+   - unit tests;
+   - typecheck;
+   - build;
+   - visual regression when rendering can change.
 
 ## Determinism
 
-Published/generated output must be reproducible from the same canonical source, config, and pinned Style Dictionary version.
+- pin Style Dictionary and the lockfile;
+- fail warnings/collisions;
+- disable generated timestamps;
+- never require upstream network access during package build;
+- keep upstream network access in explicit audit commands only;
+- never hand-edit or time-vary generated output.
 
-Rules:
-
-- pin the Style Dictionary version in `package.json` and lockfile;
-- disable timestamped generated headers;
-- fail warnings in CI;
-- never depend on upstream network data during the package build;
-- upstream network access belongs only in explicit audit commands;
-- do not commit generated data whose contents depend on current time or source fetch order.
-
-## Anti-patterns
+## Forbidden regressions
 
 Do not:
 
+- recreate `packages/tokens/src/`;
+- recreate token compatibility facades/subpath aliases;
+- recreate `scripts/compose-sync` or `src/generated/androidx`;
 - treat AndroidX/Figma/Material Web as Style Dictionary `source` or `include`;
 - generate canonical DTCG from upstream;
-- maintain one giant token JSON because Style Dictionary can deep-merge files;
-- rely on duplicate source paths being overwritten by merge order;
 - organize canonical tokens by target platform;
-- hardcode Style Dictionary format/transform names in JS config when enums exist;
-- set `usesDtcg: true` without a demonstrated need;
-- silence warnings that should fail CI;
-- add custom transforms or formats before checking built-ins;
-- enable `expand` globally without a composite-token design;
-- assume `transformGroup: js` preserves values untouched;
-- expect JS built-in formats to preserve Style Dictionary aliases;
+- maintain one giant canonical JSON merely because Style Dictionary can merge it;
+- rely on duplicate source paths being overwritten;
+- use static hex placeholders for ThemeProvider-owned color roles;
+- decode `var(--role)` into a semantic name and reconstruct it later;
+- add generic CSS-variable output for immutable non-color tokens;
+- handwrite a TypeScript generator when built-in formats work;
 - hand-edit `dist/generated`;
-- copy generated values back into handwritten TypeScript modules.
+- copy generated values back into UI or token-package constant tables;
+- alias unrelated tokens only because their numeric values match;
+- tokenise pure CSS/DOM mechanics or wrapper-only defaults as if they were Material design tokens.
+
+If a future requirement appears to need one of these, treat it as an architecture change requiring explicit review rather than silently reviving an old direction.
 
 ## Change checklist
 
-When changing tokens or config:
+When changing tokens/config:
 
+- [ ] value has stable semantic identity and belongs in the token graph;
 - [ ] canonical file is under `tokens/core` or `tokens/component`;
-- [ ] token path is defined once across the full source graph;
+- [ ] path is defined once;
 - [ ] DTCG `$type` / `$value` is used;
-- [ ] dimensions have explicit `px` or `rem` units;
-- [ ] reusable value aliases a `core` token instead of being copied;
-- [ ] dynamic Material color is a `var(--role)` string if it is ThemeProvider-owned;
-- [ ] config uses official enums for built-ins;
-- [ ] no upstream reference was added to `source`/`include`;
-- [ ] no unnecessary custom hook was added;
-- [ ] real Style Dictionary generated-output tests pass;
-- [ ] declaration output still matches JS names;
-- [ ] consumer tests pass;
-- [ ] visual regression passes when applicable.
+- [ ] dimensions have explicit units;
+- [ ] reusable semantic value aliases a core token instead of being copied;
+- [ ] runtime Material color is a direct `var(--role)` string or an existing runtime role export;
+- [ ] no upstream reference entered `source` / `include`;
+- [ ] no compatibility facade or token-package `src/` was added;
+- [ ] no unnecessary custom hook/platform was added;
+- [ ] real generated-output tests pass;
+- [ ] JS and declaration names still match;
+- [ ] upstream audit passes for mapped Material-owned values;
+- [ ] consumer unit/type/build tests pass;
+- [ ] visual regression passes when rendering is affected.
 
 ## Official references
 
