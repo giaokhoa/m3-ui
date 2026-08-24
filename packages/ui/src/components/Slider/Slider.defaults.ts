@@ -101,6 +101,10 @@ export const sliderRuntime = {
   baselineTrackGap: pxNumber(token.ComponentSliderActiveHandleLeadingSpace),
 } as const;
 
+function thumbTrackGap(handleWidth: number): number {
+  return sliderRuntime.baselineTrackGap + handleWidth / 2;
+}
+
 export function getSliderStyle(size: SliderSize = 'xSmall'): SliderStyle {
   const sizeTokens = sliderSizeTokens[size];
   return {
@@ -110,12 +114,15 @@ export function getSliderStyle(size: SliderSize = 'xSmall'): SliderStyle {
     '--_slider-focus-handle-width': `${sliderTokens.focusHandleWidth}px`,
     '--_slider-pressed-handle-width': `${sliderTokens.pressedHandleWidth}px`,
     '--_slider-disabled-handle-width': `${sliderTokens.disabledHandleWidth}px`,
+    '--_slider-default-thumb-track-gap': `${thumbTrackGap(sliderTokens.handleWidth)}px`,
+    '--_slider-focus-thumb-track-gap': `${thumbTrackGap(sliderTokens.focusHandleWidth)}px`,
+    '--_slider-pressed-thumb-track-gap': `${thumbTrackGap(sliderTokens.pressedHandleWidth)}px`,
+    '--_slider-disabled-thumb-track-gap': `${thumbTrackGap(sliderTokens.disabledHandleWidth)}px`,
     '--_slider-active-track-thickness': `${sizeTokens.activeTrackThickness}px`,
     '--_slider-inactive-track-thickness': `${sizeTokens.inactiveTrackThickness}px`,
     '--_slider-active-outer-radius': `${sizeTokens.activeOuterRadius}px`,
     '--_slider-inactive-outer-radius': `${sizeTokens.inactiveOuterRadius}px`,
     '--_slider-inner-radius': `${sliderRuntime.trackInnerRadius}px`,
-    '--_slider-track-gap': `${sliderRuntime.baselineTrackGap}px`,
     '--_slider-min-target': `${sliderRuntime.minimumInteractiveTarget}px`,
     '--_slider-min-inline-size': `${sliderRuntime.webMinimumInlineSize}px`,
     '--_slider-handle-color': sliderTokens.handleColor,
