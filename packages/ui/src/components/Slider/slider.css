@@ -11,14 +11,8 @@
 }
 
 .m3-slider__track {
-  --_slider-start-current-handle-width: var(--_slider-handle-width);
-  --_slider-end-current-handle-width: var(--_slider-handle-width);
-  --_slider-start-track-gap: calc(
-    var(--_slider-start-current-handle-width) / 2 + var(--_slider-track-gap)
-  );
-  --_slider-end-track-gap: calc(
-    var(--_slider-end-current-handle-width) / 2 + var(--_slider-track-gap)
-  );
+  --_slider-start-track-gap: var(--_slider-default-thumb-track-gap);
+  --_slider-end-track-gap: var(--_slider-default-thumb-track-gap);
   position: relative;
   box-sizing: border-box;
   touch-action: none;
@@ -26,27 +20,27 @@
 }
 
 .m3-slider:not(.m3-slider--range) .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-focused]) {
-  --_slider-end-current-handle-width: var(--_slider-focus-handle-width);
+  --_slider-end-track-gap: var(--_slider-focus-thumb-track-gap);
 }
 
 .m3-slider:not(.m3-slider--range) .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-dragging]) {
-  --_slider-end-current-handle-width: var(--_slider-pressed-handle-width);
+  --_slider-end-track-gap: var(--_slider-pressed-thumb-track-gap);
 }
 
 .m3-slider--range .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-focused]) {
-  --_slider-start-current-handle-width: var(--_slider-focus-handle-width);
+  --_slider-start-track-gap: var(--_slider-focus-thumb-track-gap);
 }
 
 .m3-slider--range .m3-slider__track:has(.m3-slider__thumb:first-of-type[data-dragging]) {
-  --_slider-start-current-handle-width: var(--_slider-pressed-handle-width);
+  --_slider-start-track-gap: var(--_slider-pressed-thumb-track-gap);
 }
 
 .m3-slider--range .m3-slider__track:has(.m3-slider__thumb:last-of-type[data-focused]) {
-  --_slider-end-current-handle-width: var(--_slider-focus-handle-width);
+  --_slider-end-track-gap: var(--_slider-focus-thumb-track-gap);
 }
 
 .m3-slider--range .m3-slider__track:has(.m3-slider__thumb:last-of-type[data-dragging]) {
-  --_slider-end-current-handle-width: var(--_slider-pressed-handle-width);
+  --_slider-end-track-gap: var(--_slider-pressed-thumb-track-gap);
 }
 
 .m3-slider[data-orientation='horizontal'] .m3-slider__track {
