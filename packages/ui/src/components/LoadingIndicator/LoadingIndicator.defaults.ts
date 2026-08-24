@@ -5,16 +5,24 @@ import { pxNumber } from '../../internal/tokenValues';
 export type LoadingIndicatorStyle = CSSProperties &
   Record<`--${string}`, string | number>;
 
+const shapeRadius = {
+  full: token.ShapeFull,
+} as const;
+
+type ShapeName = keyof typeof shapeRadius;
+
 export const loadingIndicatorTokens = {
   activeColor: token.ComponentLoadingIndicatorActiveIndicatorColor,
   activeSize: pxNumber(token.ComponentLoadingIndicatorActiveSize),
   containedActiveColor: token.ComponentLoadingIndicatorContainedActiveColor,
   containedContainerColor: token.ComponentLoadingIndicatorContainedContainerColor,
   containerHeight: pxNumber(token.ComponentLoadingIndicatorContainerHeight),
-  containerShape: token.ComponentLoadingIndicatorContainerShape,
+  containerShape: token.ComponentLoadingIndicatorContainerShape as ShapeName,
   containerWidth: pxNumber(token.ComponentLoadingIndicatorContainerWidth),
 } as const;
 
+// Renderer mechanics from pinned AndroidX Compose. They deliberately remain
+// beside the consumer instead of becoming fabricated canonical DTCG tokens.
 export const loadingIndicatorRuntime = {
   globalRotationDurationMs: 4666,
   morphIntervalMs: 650,
@@ -44,7 +52,7 @@ export function getLoadingIndicatorStyle(
     '--_loading-width': `${loadingIndicatorTokens.containerWidth}px`,
     '--_loading-height': `${loadingIndicatorTokens.containerHeight}px`,
     '--_loading-active-size': `${loadingIndicatorTokens.activeSize}px`,
-    '--_loading-container-radius': token.ShapeFull,
+    '--_loading-container-radius': shapeRadius[loadingIndicatorTokens.containerShape],
     '--_loading-indicator-color': indicatorColor,
     '--_loading-container-color': containerColor,
   };
