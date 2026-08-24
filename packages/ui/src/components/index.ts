@@ -10,6 +10,7 @@ export * from './IconButton';
 export * from './LoadingIndicator';
 export * from './ProgressIndicator';
 export * from './RadioButton';
+export * from './Scrim';
 export * from './Slider';
 export * from './Snackbar';
 export * from './Switch';

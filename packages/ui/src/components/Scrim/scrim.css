@@ -1,0 +1,17 @@
+.scrim {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--_scrim-container-color);
+  opacity: var(--_scrim-container-opacity);
+}
+
+button.scrim {
+  cursor: default;
+}
