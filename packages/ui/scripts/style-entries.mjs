@@ -19,6 +19,10 @@ export const styleEntries = {
     'src/components/Chip/chip.css',
   ],
   divider: ['src/components/Divider/divider.css'],
+  'drag-handle': [
+    'src/internal/ripple/ripple.css',
+    'src/components/DragHandle/drag-handle.css',
+  ],
   fab: [
     'src/internal/ripple/ripple.css',
     'src/internal/elevation/elevation.css',
@@ -52,6 +56,7 @@ export const publicComponentStyleSources = {
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
   divider: 'src/components/Divider/divider.css',
+  'drag-handle': 'src/components/DragHandle/drag-handle.css',
   fab: 'src/components/Fab/fab.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
   'loading-indicator': 'src/components/LoadingIndicator/loading-indicator.css',
@@ -69,6 +74,7 @@ export const publicComponentModules = {
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
   divider: 'src/components/Divider/Divider.tsx',
+  'drag-handle': 'src/components/DragHandle/DragHandle.tsx',
   fab: 'src/components/Fab/Fab.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
   'loading-indicator': 'src/components/LoadingIndicator/LoadingIndicator.tsx',
