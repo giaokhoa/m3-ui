@@ -1,17 +1,31 @@
 import * as token from '@m3/tokens';
 import type { CSSProperties } from 'react';
+import {
+  getElevationBoxShadow,
+  type ElevationLevel,
+} from '../../internal/elevation';
+import { getScrimStyle } from '../Scrim';
 
 export type BottomSheetStyle = CSSProperties &
   Record<`--${string}`, string | number>;
 
 type CssLength = NonNullable<CSSProperties['maxWidth']>;
+export type BottomSheetElevation = 'standard' | 'modal';
 
 export interface BottomSheetStyleOptions {
   containerColor?: CSSProperties['backgroundColor'];
   contentColor?: CSSProperties['color'];
   dragHandleColor?: CSSProperties['backgroundColor'];
   focusIndicatorColor?: CSSProperties['outlineColor'];
+  shadowColor?: CSSProperties['color'];
+  elevation?: BottomSheetElevation;
   maxWidth?: CSSProperties['maxWidth'];
+}
+
+export interface ModalBottomSheetOverlayStyleOptions {
+  scrimColor?: CSSProperties['backgroundColor'];
+  scrimOpacity?: number;
+  scrimAlpha?: number;
 }
 
 export const bottomSheetTokens = {
@@ -23,9 +37,9 @@ export const bottomSheetTokens = {
   minimizedContainerShape:
     token.ComponentSheetBottomDockedMinimizedContainerShape,
   modalContainerElevation:
-    token.ComponentSheetBottomDockedModalContainerElevation,
+    token.ComponentSheetBottomDockedModalContainerElevation as ElevationLevel,
   standardContainerElevation:
-    token.ComponentSheetBottomDockedStandardContainerElevation,
+    token.ComponentSheetBottomDockedStandardContainerElevation as ElevationLevel,
   focusIndicatorColor: token.ComponentSheetBottomFocusIndicatorColor,
 } as const;
 
@@ -51,6 +65,10 @@ export const bottomSheetRuntime = {
       duration: token.MotionSpringFastEffectsDuration,
       easing: token.MotionSpringFastEffectsEasing,
     },
+    scrim: {
+      duration: token.MotionSpringDefaultEffectsDuration,
+      easing: token.MotionSpringDefaultEffectsEasing,
+    },
   },
 } as const;
 
@@ -61,6 +79,12 @@ function cssLength(value: CssLength): string {
 export function getBottomSheetStyle(
   options: BottomSheetStyleOptions = {},
 ): BottomSheetStyle {
+  const elevation = options.elevation ?? 'standard';
+  const elevationLevel =
+    elevation === 'modal'
+      ? bottomSheetTokens.modalContainerElevation
+      : bottomSheetTokens.standardContainerElevation;
+
   return {
     '--_bottom-sheet-container-color':
       options.containerColor ?? bottomSheetTokens.containerColor,
@@ -86,6 +110,10 @@ export function getBottomSheetStyle(
       options.focusIndicatorColor ?? bottomSheetTokens.focusIndicatorColor,
     '--_bottom-sheet-focus-indicator-width':
       token.RippleFocusRingOuterStrokeWidth,
+    '--_bottom-sheet-box-shadow': getElevationBoxShadow(
+      elevationLevel,
+      (options.shadowColor ?? 'var(--shadow)') as string,
+    ),
     '--_bottom-sheet-max-width': cssLength(
       (options.maxWidth ?? bottomSheetRuntime.maximumWidth) as CssLength,
     ),
@@ -101,5 +129,21 @@ export function getBottomSheetStyle(
       bottomSheetRuntime.motion.hide.duration,
     '--_bottom-sheet-hide-easing':
       bottomSheetRuntime.motion.hide.easing,
+  };
+}
+
+export function getModalBottomSheetOverlayStyle(
+  options: ModalBottomSheetOverlayStyleOptions = {},
+): BottomSheetStyle {
+  return {
+    ...getScrimStyle({
+      containerColor: options.scrimColor,
+      containerOpacity: options.scrimOpacity,
+      alpha: options.scrimAlpha,
+    }),
+    '--_modal-bottom-sheet-scrim-duration':
+      bottomSheetRuntime.motion.scrim.duration,
+    '--_modal-bottom-sheet-scrim-easing':
+      bottomSheetRuntime.motion.scrim.easing,
   };
 }

@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
   BottomSheet,
   Button,
+  ModalBottomSheet,
   SheetValue,
   ThemeProvider,
   useSheetState,
@@ -144,6 +145,51 @@ function StateControlsDemo() {
 
 export const StateControls: Story = {
   render: () => <StateControlsDemo />,
+};
+
+function ModalDemo({
+  shouldDismissOnClickOutside = true,
+}: {
+  shouldDismissOnClickOutside?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [dismissCount, setDismissCount] = useState(0);
+  const state = useSheetState();
+
+  return (
+    <Stage testId="modal-bottom-sheet-stage">
+      <div style={{ padding: 24 }}>
+        <Button data-testid="modal-bottom-sheet-trigger" onPress={() => setOpen(true)}>
+          Open modal sheet
+        </Button>
+        <span data-testid="modal-bottom-sheet-dismiss-count" style={{ marginInlineStart: 12 }}>
+          {dismissCount}
+        </span>
+      </div>
+      {open ? (
+        <ModalBottomSheet
+          data-testid="modal-bottom-sheet"
+          aria-label="Modal places"
+          state={state}
+          shouldDismissOnClickOutside={shouldDismissOnClickOutside}
+          onDismissRequest={() => {
+            setDismissCount((count) => count + 1);
+            setOpen(false);
+          }}
+        >
+          <SheetBody label="Modal places" />
+        </ModalBottomSheet>
+      ) : null}
+    </Stage>
+  );
+}
+
+export const Modal: Story = {
+  render: () => <ModalDemo />,
+};
+
+export const ModalNoOutsideDismiss: Story = {
+  render: () => <ModalDemo shouldDismissOnClickOutside={false} />,
 };
 
 function ThemeSheet({

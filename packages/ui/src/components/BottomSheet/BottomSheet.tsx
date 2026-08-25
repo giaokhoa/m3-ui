@@ -1,14 +1,25 @@
 import {
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type HTMLAttributes,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type TransitionEvent as ReactTransitionEvent,
 } from 'react';
 import {
+  Modal as AriaModal,
+  ModalOverlay as AriaModalOverlay,
+} from 'react-aria-components';
+import { useThemePortalContainer } from '../../theme/ThemePortalContext';
+import {
+  bottomSheetRuntime,
   getBottomSheetStyle,
+  getModalBottomSheetOverlayStyle,
+  type BottomSheetElevation,
   type BottomSheetStyle,
   type BottomSheetStyleOptions,
 } from './BottomSheet.defaults';
@@ -51,6 +62,27 @@ export interface BottomSheetProps
   dragHandle?: ReactNode | null;
   /** Called when a user gesture or handle action settles to Hidden. */
   onDismissRequest?: () => void;
+}
+
+export interface ModalBottomSheetProps
+  extends Omit<
+    BottomSheetProps,
+    'elevation' | 'onDismissRequest' | 'role' | 'state'
+  > {
+  /** Executes after the sheet has completed its Material hide transition. */
+  onDismissRequest: () => void;
+  /** Compose-like state controller. Hidden must be enabled. */
+  state?: SheetState;
+  /** Material scrim color. */
+  scrimColor?: CSSProperties['backgroundColor'];
+  /** Material scrim opacity before animated alpha is applied. */
+  scrimOpacity?: number;
+  /** Whether pointer interaction on the scrim requests dismissal. */
+  shouldDismissOnClickOutside?: boolean;
+  /** Whether Escape requests dismissal. */
+  shouldDismissOnEscape?: boolean;
+  /** Overrides ThemeProvider's portal host when a custom host is required. */
+  UNSTABLE_portalContainer?: Element;
 }
 
 function closeEnough(a: number, b: number) {
@@ -111,6 +143,15 @@ function handleActionLabel(state: SheetState): string {
   return 'Show bottom sheet';
 }
 
+function durationToMilliseconds(duration: string): number {
+  const normalized = duration.trim();
+  const value = Number.parseFloat(normalized);
+  if (!Number.isFinite(value)) return 0;
+  if (normalized.endsWith('ms')) return value;
+  if (normalized.endsWith('s')) return value * 1000;
+  return 0;
+}
+
 export function BottomSheet({
   state,
   gesturesEnabled = true,
@@ -120,6 +161,8 @@ export function BottomSheet({
   contentColor,
   dragHandleColor,
   focusIndicatorColor,
+  shadowColor,
+  elevation = 'standard',
   maxWidth,
   className,
   style,
@@ -329,6 +372,8 @@ export function BottomSheet({
       contentColor,
       dragHandleColor,
       focusIndicatorColor,
+      shadowColor,
+      elevation,
       maxWidth,
     }),
     '--_bottom-sheet-offset':
@@ -372,5 +417,163 @@ export function BottomSheet({
       )}
       <div className="bottom-sheet__content">{children}</div>
     </div>
+  );
+}
+
+/**
+ * Material modal sheet composition. RAC owns portal, modal focus containment,
+ * outside interaction, Escape handling, scroll locking and focus restoration.
+ * SheetState remains the single owner of Material anchors and drag settling.
+ */
+export function ModalBottomSheet({
+  state,
+  onDismissRequest,
+  scrimColor,
+  scrimOpacity,
+  shouldDismissOnClickOutside = true,
+  shouldDismissOnEscape = true,
+  UNSTABLE_portalContainer,
+  onTransitionEnd,
+  ...sheetProps
+}: ModalBottomSheetProps) {
+  const internalState = useSheetState();
+  const sheetState = state ?? internalState;
+  useSyncExternalStore(
+    sheetState.subscribe,
+    sheetState.getSnapshot,
+    sheetState.getSnapshot,
+  );
+
+  if (!sheetState.enabledValues.has(SheetValue.Hidden)) {
+    throw new Error('ModalBottomSheet requires Hidden to be an enabled sheet value.');
+  }
+
+  const themePortalContainer = useThemePortalContainer();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [overlayOpen, setOverlayOpen] = useState(true);
+  const pendingDismissRef = useRef(false);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dismissCallbackRef = useRef(onDismissRequest);
+  dismissCallbackRef.current = onDismissRequest;
+
+  const clearDismissTimer = () => {
+    if (dismissTimerRef.current !== null) {
+      clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = null;
+    }
+  };
+
+  const finishDismiss = () => {
+    if (!pendingDismissRef.current) return;
+    pendingDismissRef.current = false;
+    clearDismissTimer();
+    setOverlayOpen(false);
+    dismissCallbackRef.current();
+  };
+
+  const armDismissFallback = () => {
+    clearDismissTimer();
+    const reducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const duration = reducedMotion
+      ? 0
+      : durationToMilliseconds(bottomSheetRuntime.motion.hide.duration) + 32;
+    dismissTimerRef.current = setTimeout(finishDismiss, duration);
+  };
+
+  const requestDismiss = () => {
+    if (pendingDismissRef.current || !overlayOpen) return;
+    pendingDismissRef.current = true;
+    const accepted = sheetState.hide();
+    if (!accepted) {
+      pendingDismissRef.current = false;
+      return;
+    }
+    armDismissFallback();
+  };
+
+  useLayoutEffect(() => {
+    if (sheetState.currentValue === SheetValue.Hidden) {
+      sheetState.show();
+    }
+    if (typeof window === 'undefined') return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const dialog =
+        modalRef.current?.querySelector<HTMLElement>('[role="dialog"]');
+      if (!dialog) return;
+
+      const activeElement = document.activeElement;
+      if (!activeElement || !dialog.contains(activeElement)) {
+        dialog.focus({ preventScroll: true });
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [sheetState]);
+
+  useEffect(
+    () => () => {
+      clearDismissTimer();
+    },
+    [],
+  );
+
+  const handleTransitionEnd = (
+    event: ReactTransitionEvent<HTMLDivElement>,
+  ) => {
+    onTransitionEnd?.(event);
+    if (
+      pendingDismissRef.current &&
+      sheetState.currentValue === SheetValue.Hidden &&
+      event.target === event.currentTarget &&
+      event.propertyName === 'transform'
+    ) {
+      finishDismiss();
+    }
+  };
+
+  const scrimVisible = sheetState.currentValue !== SheetValue.Hidden;
+
+  return (
+    <AriaModalOverlay
+      isOpen={overlayOpen}
+      isDismissable={shouldDismissOnClickOutside}
+      isKeyboardDismissDisabled={!shouldDismissOnEscape}
+      onMouseDown={(event) => {
+        if (
+          !shouldDismissOnClickOutside &&
+          event.target === event.currentTarget
+        ) {
+          event.preventDefault();
+        }
+      }}
+      onOpenChange={(open) => {
+        if (!open) requestDismiss();
+      }}
+      UNSTABLE_portalContainer={
+        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
+      }
+      className="modal-bottom-sheet-overlay"
+      style={getModalBottomSheetOverlayStyle({
+        scrimColor,
+        scrimOpacity,
+        scrimAlpha: scrimVisible ? 1 : 0,
+      })}
+    >
+      <AriaModal ref={modalRef} className="modal-bottom-sheet-modal">
+        <BottomSheet
+          {...sheetProps}
+          state={sheetState}
+          elevation={'modal' satisfies BottomSheetElevation}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={sheetProps.tabIndex ?? -1}
+          onDismissRequest={requestDismiss}
+          onTransitionEnd={handleTransitionEnd}
+        />
+      </AriaModal>
+    </AriaModalOverlay>
   );
 }
