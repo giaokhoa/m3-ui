@@ -11,17 +11,25 @@
   min-block-size: 0;
 }
 
-.permanent-drawer-sheet {
+.navigation-drawer-sheet {
   box-sizing: border-box;
-  flex: 0 0 var(--_navigation-drawer-width);
   inline-size: var(--_navigation-drawer-width);
   min-inline-size: var(--_navigation-drawer-min-width);
   max-inline-size: var(--_navigation-drawer-width);
   block-size: 100%;
   overflow: auto;
-  border-radius: var(--_navigation-drawer-container-radius);
+  overscroll-behavior: contain;
+  border-start-start-radius: var(--_navigation-drawer-radius-start-start);
+  border-start-end-radius: var(--_navigation-drawer-radius-start-end);
+  border-end-end-radius: var(--_navigation-drawer-radius-end-end);
+  border-end-start-radius: var(--_navigation-drawer-radius-end-start);
   background: var(--_navigation-drawer-container-color);
+  color: var(--_navigation-drawer-content-color);
   box-shadow: var(--_navigation-drawer-box-shadow);
+}
+
+.permanent-drawer-sheet {
+  flex: 0 0 var(--_navigation-drawer-width);
 }
 
 .navigation-drawer-item {
@@ -89,4 +97,119 @@
 
 .navigation-drawer-item:disabled {
   cursor: default;
+}
+
+.modal-navigation-drawer,
+.dismissible-navigation-drawer {
+  position: relative;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.modal-navigation-drawer__content,
+.dismissible-navigation-drawer__content {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.modal-navigation-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.modal-navigation-drawer-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--_scrim-container-color);
+  opacity: var(--_scrim-container-opacity);
+  pointer-events: none;
+  transition-property: opacity;
+  transition-duration: var(--_navigation-drawer-open-duration);
+  transition-timing-function: var(--_navigation-drawer-open-easing);
+}
+
+.modal-navigation-drawer-overlay[data-state='closed']::before {
+  transition-duration: var(--_navigation-drawer-close-duration);
+  transition-timing-function: var(--_navigation-drawer-close-easing);
+}
+
+.modal-navigation-drawer__modal {
+  display: contents;
+}
+
+.modal-navigation-drawer__sheet-frame,
+.dismissible-navigation-drawer__sheet-frame {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  transform: translate3d(var(--_navigation-drawer-offset), 0, 0);
+  will-change: transform;
+}
+
+:dir(rtl) .modal-navigation-drawer__sheet-frame,
+:dir(rtl) .dismissible-navigation-drawer__sheet-frame {
+  transform: translate3d(calc(-1 * var(--_navigation-drawer-offset)), 0, 0);
+}
+
+.modal-navigation-drawer-overlay:not([data-dragging]) .modal-navigation-drawer__sheet-frame,
+.dismissible-navigation-drawer[data-ready]:not([data-dragging]) .dismissible-navigation-drawer__sheet-frame,
+.dismissible-navigation-drawer[data-ready]:not([data-dragging]) .dismissible-navigation-drawer__content {
+  transition-property: transform;
+  transition-duration: var(--_navigation-drawer-settle-duration);
+  transition-timing-function: var(--_navigation-drawer-settle-easing);
+}
+
+.modal-navigation-drawer-overlay[data-state='open']:not([data-dragging]) .modal-navigation-drawer__sheet-frame {
+  transition-duration: var(--_navigation-drawer-open-duration);
+  transition-timing-function: var(--_navigation-drawer-open-easing);
+}
+
+.modal-navigation-drawer-overlay[data-state='closed']:not([data-dragging]) .modal-navigation-drawer__sheet-frame,
+.dismissible-navigation-drawer[data-ready][data-state='closed']:not([data-dragging]) .dismissible-navigation-drawer__sheet-frame,
+.dismissible-navigation-drawer[data-ready][data-state='closed']:not([data-dragging]) .dismissible-navigation-drawer__content {
+  transition-duration: var(--_navigation-drawer-close-duration);
+  transition-timing-function: var(--_navigation-drawer-close-easing);
+}
+
+.modal-navigation-drawer-overlay[data-entering]:not([data-dragging]) .modal-navigation-drawer__sheet-frame {
+  transform: translate3d(var(--_navigation-drawer-closed-offset), 0, 0);
+}
+
+:dir(rtl) .modal-navigation-drawer-overlay[data-entering]:not([data-dragging]) .modal-navigation-drawer__sheet-frame {
+  transform: translate3d(calc(-1 * var(--_navigation-drawer-closed-offset)), 0, 0);
+}
+
+.dismissible-navigation-drawer__content {
+  transform: translate3d(var(--_navigation-drawer-content-offset), 0, 0);
+  will-change: transform;
+}
+
+:dir(rtl) .dismissible-navigation-drawer__content {
+  transform: translate3d(calc(-1 * var(--_navigation-drawer-content-offset)), 0, 0);
+}
+
+.dismissible-navigation-drawer[data-state='closed']:not([data-dragging]) .dismissible-navigation-drawer__sheet-frame {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-navigation-drawer-overlay::before,
+  .modal-navigation-drawer__sheet-frame,
+  .dismissible-navigation-drawer__sheet-frame,
+  .dismissible-navigation-drawer__content {
+    transition: none;
+  }
 }
