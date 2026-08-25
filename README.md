@@ -44,9 +44,11 @@ import '@m3/ui/styles/button.css';
 import '@m3/ui/styles/text-field.css';
 ```
 
-Available modular entries are `badge.css`, `bottom-sheet.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
+Available modular entries are `badge.css`, `bottom-sheet.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `navigation-drawer.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
 
 `BottomSheet` is the direct-hierarchy Material surface. Place it in a bounded positioning context (for example a `position: relative` screen container); `SheetState` owns Hidden/PartiallyExpanded/Expanded anchors and drag settling while the parent owns stacking and clipping. `ModalBottomSheet` composes the same state/gesture engine with a React Aria modal portal, Material scrim, focus containment, Escape/outside dismissal and focus restoration. Modal dismissal first animates the sheet to Hidden and only then invokes `onDismissRequest`, matching the pinned AndroidX lifecycle.
+
+`PermanentNavigationDrawer` lays out a standard Material drawer beside application content. `PermanentDrawerSheet` projects the canonical 360px/level0 surface, while `NavigationDrawerItem` uses the pinned 56px item geometry and real React Aria hover/focus/press state. Modal/dismissible drawer state and horizontal drag behavior are intentionally layered separately from this static backbone.
 
 ## Dev Container
 
