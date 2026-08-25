@@ -1,0 +1,97 @@
+.bottom-sheet {
+  box-sizing: border-box;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  margin-inline: auto;
+  inline-size: min(100%, var(--_bottom-sheet-max-width));
+  max-inline-size: var(--_bottom-sheet-max-width);
+  max-block-size: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--_bottom-sheet-container-color);
+  color: var(--_bottom-sheet-content-color);
+  border-start-start-radius: var(--_bottom-sheet-radius-top-start);
+  border-start-end-radius: var(--_bottom-sheet-radius-top-end);
+  border-end-end-radius: var(--_bottom-sheet-radius-bottom-end);
+  border-end-start-radius: var(--_bottom-sheet-radius-bottom-start);
+  transform: translate3d(0, var(--_bottom-sheet-offset), 0);
+  transition: none;
+  will-change: transform;
+}
+
+.bottom-sheet[data-ready]:not([data-dragging]) {
+  transition-property: transform;
+  transition-duration: var(--_bottom-sheet-settle-duration);
+  transition-timing-function: var(--_bottom-sheet-settle-easing);
+}
+
+.bottom-sheet[data-state='hidden'] {
+  pointer-events: none;
+}
+
+.bottom-sheet[data-ready][data-state='hidden']:not([data-dragging]) {
+  transition-duration: var(--_bottom-sheet-hide-duration);
+  transition-timing-function: var(--_bottom-sheet-hide-easing);
+}
+
+.bottom-sheet[data-dragging] {
+  transition: none;
+}
+
+.bottom-sheet__drag-handle {
+  box-sizing: border-box;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 100%;
+  min-block-size: calc(
+    var(--_bottom-sheet-drag-handle-height) +
+      2 * var(--_bottom-sheet-drag-handle-padding-block)
+  );
+  padding-block: var(--_bottom-sheet-drag-handle-padding-block);
+  padding-inline: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.bottom-sheet__drag-handle:active {
+  cursor: grabbing;
+}
+
+.bottom-sheet__drag-handle:disabled {
+  cursor: default;
+}
+
+.bottom-sheet__drag-handle:focus-visible {
+  outline: var(--_bottom-sheet-focus-indicator-width) solid
+    var(--_bottom-sheet-focus-indicator-color);
+  outline-offset: calc(-1 * var(--_bottom-sheet-focus-indicator-width));
+}
+
+.bottom-sheet__drag-handle-bar {
+  display: block;
+  inline-size: var(--_bottom-sheet-drag-handle-width);
+  block-size: var(--_bottom-sheet-drag-handle-height);
+  border-radius: 9999px;
+  background: var(--_bottom-sheet-drag-handle-color);
+  pointer-events: none;
+}
+
+.bottom-sheet__content {
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding-block-end: max(env(safe-area-inset-bottom), 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-sheet {
+    transition: none;
+  }
+}

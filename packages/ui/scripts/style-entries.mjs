@@ -1,5 +1,6 @@
 export const styleEntries = {
   badge: ['src/components/Badge/badge.css'],
+  'bottom-sheet': ['src/components/BottomSheet/bottom-sheet.css'],
   button: [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -64,6 +65,7 @@ export const styleEntries = {
 
 export const publicComponentStyleSources = {
   badge: 'src/components/Badge/badge.css',
+  'bottom-sheet': 'src/components/BottomSheet/bottom-sheet.css',
   button: 'src/components/Button/button.css',
   card: 'src/components/Card/card.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
@@ -86,6 +88,7 @@ export const publicComponentStyleSources = {
 
 export const publicComponentModules = {
   badge: 'src/components/Badge/Badge.tsx',
+  'bottom-sheet': 'src/components/BottomSheet/BottomSheet.tsx',
   button: 'src/components/Button/Button.tsx',
   card: 'src/components/Card/Card.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
