@@ -2,13 +2,16 @@ import {
   createContext,
   useContext,
   useMemo,
+  useState,
   type CSSProperties,
   type HTMLAttributes,
   type PropsWithChildren,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
+import { ThemePortalContainerContext } from './ThemePortalContext';
 import { defaultTypographyThemeStyle } from './typography/cssVariables';
 import type { ColorScheme, ThemeMode } from './types';
 
@@ -77,17 +80,31 @@ export function ThemeProvider({
     () => ({ mode, sourceColor, contrastLevel, rippleFocus, scheme }),
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
 
   return (
     <ThemeContext.Provider value={value}>
-      <link
-        href={defaultFontStylesheet}
-        precedence="m3-font"
-        rel="stylesheet"
-      />
-      <div {...props} data-theme={mode} style={themeStyle}>
-        {children}
-      </div>
+      <ThemePortalContainerContext.Provider value={portalContainer}>
+        <link
+          href={defaultFontStylesheet}
+          precedence="m3-font"
+          rel="stylesheet"
+        />
+        <div {...props} data-theme={mode} style={themeStyle}>
+          {children}
+        </div>
+        {typeof document === 'undefined'
+          ? null
+          : createPortal(
+              <div
+                ref={setPortalContainer}
+                data-m3-theme-portal=""
+                data-theme={mode}
+                style={themeStyle}
+              />,
+              document.body,
+            )}
+      </ThemePortalContainerContext.Provider>
     </ThemeContext.Provider>
   );
 }
