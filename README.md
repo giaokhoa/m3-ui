@@ -44,7 +44,9 @@ import '@m3/ui/styles/button.css';
 import '@m3/ui/styles/text-field.css';
 ```
 
-Available modular entries are `badge.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
+Available modular entries are `badge.css`, `bottom-sheet.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
+
+`BottomSheet` is the direct-hierarchy Material surface rather than a modal overlay. Place it in a bounded positioning context (for example a `position: relative` screen container); `SheetState` owns Hidden/PartiallyExpanded/Expanded anchors and drag settling while the parent owns stacking and clipping. Modal focus, scrim and portal behavior belong to the separate modal-sheet layer rather than this primitive.
 
 ## Dev Container
 
