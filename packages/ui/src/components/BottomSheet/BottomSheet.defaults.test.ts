@@ -1,9 +1,12 @@
 import * as token from '@m3/tokens';
 import { describe, expect, it } from 'vitest';
+import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
+import { scrimTokens } from '../Scrim';
 import {
   bottomSheetRuntime,
   bottomSheetTokens,
   getBottomSheetStyle,
+  getModalBottomSheetOverlayStyle,
 } from './BottomSheet.defaults';
 
 describe('BottomSheet defaults', () => {
@@ -44,11 +47,15 @@ describe('BottomSheet defaults', () => {
           duration: token.MotionSpringFastEffectsDuration,
           easing: token.MotionSpringFastEffectsEasing,
         },
+        scrim: {
+          duration: token.MotionSpringDefaultEffectsDuration,
+          easing: token.MotionSpringDefaultEffectsEasing,
+        },
       },
     });
   });
 
-  it('emits canonical surface, handle and top-only shape variables', () => {
+  it('emits canonical surface, handle, elevation and top-only shape variables', () => {
     expect(getBottomSheetStyle()).toMatchObject({
       '--_bottom-sheet-container-color':
         token.ComponentSheetBottomDockedContainerColor,
@@ -70,7 +77,32 @@ describe('BottomSheet defaults', () => {
       '--_bottom-sheet-drag-handle-padding-block': '22px',
       '--_bottom-sheet-focus-indicator-color':
         token.ComponentSheetBottomFocusIndicatorColor,
+      '--_bottom-sheet-box-shadow': getElevationBoxShadow(
+        token.ComponentSheetBottomDockedStandardContainerElevation as ElevationLevel,
+      ),
       '--_bottom-sheet-max-width': '640px',
+    });
+  });
+
+  it('switches to the canonical modal elevation without duplicating a shadow recipe', () => {
+    expect(getBottomSheetStyle({ elevation: 'modal' })).toMatchObject({
+      '--_bottom-sheet-box-shadow': getElevationBoxShadow(
+        token.ComponentSheetBottomDockedModalContainerElevation as ElevationLevel,
+      ),
+    });
+  });
+
+  it('projects canonical scrim values with DefaultEffects motion', () => {
+    expect(getModalBottomSheetOverlayStyle()).toMatchObject({
+      '--_scrim-container-color': scrimTokens.containerColor,
+      '--_scrim-container-opacity': scrimTokens.containerOpacity,
+      '--_modal-bottom-sheet-scrim-duration':
+        token.MotionSpringDefaultEffectsDuration,
+      '--_modal-bottom-sheet-scrim-easing':
+        token.MotionSpringDefaultEffectsEasing,
+    });
+    expect(getModalBottomSheetOverlayStyle({ scrimAlpha: 0 })).toMatchObject({
+      '--_scrim-container-opacity': 0,
     });
   });
 
@@ -81,6 +113,7 @@ describe('BottomSheet defaults', () => {
         contentColor: 'white',
         dragHandleColor: 'gold',
         focusIndicatorColor: 'cyan',
+        shadowColor: 'black',
         maxWidth: 720,
       }),
     ).toMatchObject({

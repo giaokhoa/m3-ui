@@ -15,6 +15,7 @@
   border-start-end-radius: var(--_bottom-sheet-radius-top-end);
   border-end-end-radius: var(--_bottom-sheet-radius-bottom-end);
   border-end-start-radius: var(--_bottom-sheet-radius-bottom-start);
+  box-shadow: var(--_bottom-sheet-box-shadow);
   transform: translate3d(0, var(--_bottom-sheet-offset), 0);
   transition: none;
   will-change: transform;
@@ -90,8 +91,33 @@
   padding-block-end: max(env(safe-area-inset-bottom), 0px);
 }
 
+.modal-bottom-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.modal-bottom-sheet-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--_scrim-container-color);
+  opacity: var(--_scrim-container-opacity);
+  pointer-events: none;
+  transition-property: opacity;
+  transition-duration: var(--_modal-bottom-sheet-scrim-duration);
+  transition-timing-function: var(--_modal-bottom-sheet-scrim-easing);
+}
+
+/* The RAC modal node owns focus scope while the positioned overlay remains the
+ * sheet containing block and the only interactive outside-dismiss target. */
+.modal-bottom-sheet-modal {
+  display: contents;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .bottom-sheet {
+  .bottom-sheet,
+  .modal-bottom-sheet-overlay::before {
     transition: none;
   }
 }

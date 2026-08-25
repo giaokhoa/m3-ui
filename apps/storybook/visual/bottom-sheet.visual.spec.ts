@@ -12,8 +12,16 @@ function expectClose(actual: number | undefined, expected: number) {
   expect(Math.abs((actual ?? 0) - expected)).toBeLessThan(0.8);
 }
 
+async function openModalSheet(page: Page) {
+  const trigger = page.getByTestId('modal-bottom-sheet-trigger');
+  await trigger.click();
+  const sheet = page.getByTestId('modal-bottom-sheet');
+  await expect(sheet).toHaveAttribute('data-state', 'partially-expanded');
+  return { trigger, sheet };
+}
+
 test.describe('Material 3 BottomSheet browser contract', () => {
-  test('uses the 640px surface, top-only 28px shape and canonical 32x4 handle', async ({
+  test('uses the 640px surface, top-only 28px shape, elevation and canonical 32x4 handle', async ({
     page,
   }) => {
     await openStory(page, 'components-bottomsheet--default');
@@ -34,6 +42,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
         borderStartEndRadius: computed.borderStartEndRadius,
         borderEndStartRadius: computed.borderEndStartRadius,
         borderEndEndRadius: computed.borderEndEndRadius,
+        boxShadow: computed.boxShadow,
         maxWidth: computed.maxWidth,
       };
     });
@@ -46,6 +55,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     expect(surface.borderStartEndRadius).toBe('28px');
     expect(surface.borderEndStartRadius).toBe('0px');
     expect(surface.borderEndEndRadius).toBe('0px');
+    expect(surface.boxShadow).not.toBe('none');
     expectClose(handleBox?.height, 48);
     expectClose(barBox?.width, 32);
     expectClose(barBox?.height, 4);
@@ -158,5 +168,76 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     });
     expect(hide.duration).toBe('0.108s');
     expect(hide.timing).toContain('linear(');
+  });
+
+  test('modal sheet uses dialog semantics, canonical scrim motion and modal elevation', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-bottomsheet--modal');
+    const { sheet } = await openModalSheet(page);
+    await expect(page.getByRole('dialog', { name: 'Modal places' })).toBeVisible();
+
+    const overlay = page.locator('.modal-bottom-sheet-overlay');
+    await page.waitForTimeout(200);
+    const visual = await overlay.evaluate((element) => {
+      const scrim = getComputedStyle(element, '::before');
+      const sheet = element.querySelector('[data-testid="modal-bottom-sheet"]');
+      return {
+        scrimOpacity: scrim.opacity,
+        scrimDuration: scrim.transitionDuration,
+        scrimTiming: scrim.transitionTimingFunction,
+        boxShadow: sheet ? getComputedStyle(sheet).boxShadow : 'none',
+        activeInsideDialog: document.activeElement?.closest('[role="dialog"]') !== null,
+      };
+    });
+
+    expect(visual.scrimOpacity).toBe('0.32');
+    expect(visual.scrimDuration).toBe('0.166s');
+    expect(visual.scrimTiming).toContain('linear(');
+    expect(visual.boxShadow).not.toBe('none');
+    expect(visual.activeInsideDialog).toBe(true);
+    await expect(sheet).toHaveAttribute('aria-modal', 'true');
+  });
+
+  test('outside dismiss hides first, then calls back and restores trigger focus', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-bottomsheet--modal');
+    const { trigger, sheet } = await openModalSheet(page);
+    const count = page.getByTestId('modal-bottom-sheet-dismiss-count');
+    const overlay = page.locator('.modal-bottom-sheet-overlay');
+
+    await overlay.click({ position: { x: 12, y: 12 } });
+    await expect(sheet).toHaveAttribute('data-state', 'hidden');
+    await expect(count).toHaveText('0');
+    await expect(count).toHaveText('1');
+    await expect(sheet).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+  });
+
+  test('Escape follows the same hide-before-dismiss lifecycle', async ({ page }) => {
+    await openStory(page, 'components-bottomsheet--modal');
+    const { trigger, sheet } = await openModalSheet(page);
+    const count = page.getByTestId('modal-bottom-sheet-dismiss-count');
+
+    await page.keyboard.press('Escape');
+    await expect(sheet).toHaveAttribute('data-state', 'hidden');
+    await expect(count).toHaveText('1');
+    await expect(sheet).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+  });
+
+  test('outside dismissal can be disabled without disabling Escape', async ({ page }) => {
+    await openStory(page, 'components-bottomsheet--modal-no-outside-dismiss');
+    const { sheet } = await openModalSheet(page);
+    const count = page.getByTestId('modal-bottom-sheet-dismiss-count');
+    const overlay = page.locator('.modal-bottom-sheet-overlay');
+
+    await overlay.click({ position: { x: 12, y: 12 } });
+    await expect(sheet).toHaveAttribute('data-state', 'partially-expanded');
+    await expect(count).toHaveText('0');
+
+    await page.keyboard.press('Escape');
+    await expect(count).toHaveText('1');
   });
 });
