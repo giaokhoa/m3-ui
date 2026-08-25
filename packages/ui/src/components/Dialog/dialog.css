@@ -1,0 +1,107 @@
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: var(--_dialog-viewport-margin);
+  overflow: auto;
+}
+
+.dialog-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--_scrim-container-color);
+  opacity: var(--_scrim-container-opacity);
+  pointer-events: none;
+}
+
+.dialog-modal {
+  position: relative;
+  box-sizing: border-box;
+  inline-size: max-content;
+  min-inline-size: min(
+    var(--_dialog-min-width),
+    calc(100vw - var(--_dialog-viewport-margin) - var(--_dialog-viewport-margin))
+  );
+  max-inline-size: min(
+    var(--_dialog-max-width),
+    calc(100vw - var(--_dialog-viewport-margin) - var(--_dialog-viewport-margin))
+  );
+  max-block-size: calc(
+    100vh - var(--_dialog-viewport-margin) - var(--_dialog-viewport-margin)
+  );
+  outline: none;
+}
+
+.dialog {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  max-block-size: calc(
+    100vh - var(--_dialog-viewport-margin) - var(--_dialog-viewport-margin)
+  );
+  padding: var(--_dialog-content-padding);
+  overflow: auto;
+  border-radius: var(--_dialog-radius);
+  outline: none;
+  background-color: var(--_dialog-container-color);
+  box-shadow: var(--_dialog-box-shadow);
+}
+
+.dialog__icon {
+  display: inline-grid;
+  place-items: center;
+  align-self: center;
+  inline-size: var(--_dialog-icon-size);
+  block-size: var(--_dialog-icon-size);
+  margin-block-end: var(--_dialog-icon-bottom-spacing);
+  color: var(--_dialog-icon-color);
+}
+
+.dialog__icon > :where(svg, img) {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.dialog__title {
+  margin: 0 0 var(--_dialog-title-bottom-spacing);
+  color: var(--_dialog-headline-color);
+  font-family: var(--_dialog-headline-font-family);
+  font-size: var(--_dialog-headline-font-size);
+  line-height: var(--_dialog-headline-line-height);
+  font-weight: var(--_dialog-headline-font-weight);
+  letter-spacing: var(--_dialog-headline-letter-spacing);
+}
+
+.dialog__icon + .dialog__title {
+  align-self: center;
+  text-align: center;
+}
+
+.dialog__description {
+  margin: 0 0 var(--_dialog-supporting-text-bottom-spacing);
+  color: var(--_dialog-supporting-text-color);
+  font-family: var(--_dialog-supporting-text-font-family);
+  font-size: var(--_dialog-supporting-text-font-size);
+  line-height: var(--_dialog-supporting-text-line-height);
+  font-weight: var(--_dialog-supporting-text-font-weight);
+  letter-spacing: var(--_dialog-supporting-text-letter-spacing);
+  white-space: normal;
+}
+
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--_dialog-action-spacing);
+  color: var(--_dialog-action-color);
+  font-family: var(--_dialog-action-font-family);
+  font-size: var(--_dialog-action-font-size);
+  line-height: var(--_dialog-action-line-height);
+  font-weight: var(--_dialog-action-font-weight);
+  letter-spacing: var(--_dialog-action-letter-spacing);
+}
