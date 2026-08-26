@@ -1,0 +1,174 @@
+.button-group {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-block-size: var(--_button-group-height);
+  vertical-align: top;
+}
+
+.button-group__row,
+.button-group__measure {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  gap: var(--_button-group-gap);
+}
+
+.button-group__row {
+  max-inline-size: 100%;
+  min-block-size: var(--_button-group-height);
+}
+
+.button-group__measure {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  inline-size: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.button-group__measure-item,
+.button-group__measure-overflow,
+.button-group__item,
+.button-group__overflow {
+  display: inline-flex;
+  flex: none;
+  min-inline-size: 0;
+}
+
+.button-group__item {
+  overflow: visible;
+  transition: inline-size var(--_button-group-motion-duration) var(--_button-group-motion-easing);
+}
+
+.button-group__item > .button {
+  inline-size: 100%;
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+.button-group__overflow {
+  position: relative;
+  z-index: 2;
+}
+
+.button-group__overflow svg,
+.button-group__measure-overflow svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentColor;
+}
+
+.button-group__menu {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: 100%;
+  inset-inline-end: 0;
+  display: grid;
+  inline-size: max-content;
+  overflow: hidden;
+  border-radius: var(--_button-group-menu-container-radius);
+  background: var(--_button-group-menu-container-color);
+  color: var(--_button-group-menu-item-color);
+  box-shadow: var(--_button-group-menu-container-shadow);
+}
+
+.button-group__menu-item {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: var(--_button-group-menu-item-gap);
+  min-block-size: var(--_button-group-menu-item-height);
+  padding-inline-start: var(--_button-group-menu-item-padding-start);
+  padding-inline-end: var(--_button-group-menu-item-padding-end);
+  border: 0;
+  outline: 0;
+  background: var(--_button-group-menu-item-container-color);
+  color: var(--_button-group-menu-item-color);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.button-group__menu-item:hover,
+.button-group__menu-item:focus-visible {
+  background: color-mix(in srgb, var(--_button-group-menu-item-color) var(--_button-group-menu-item-hover-opacity), var(--_button-group-menu-item-container-color));
+}
+
+.button-group__menu-item:disabled {
+  color: color-mix(in srgb, var(--_button-group-menu-item-disabled-color) var(--_button-group-menu-item-disabled-opacity), transparent);
+  cursor: default;
+}
+
+.button-group__menu-icon {
+  display: inline-flex;
+  inline-size: var(--_button-group-menu-item-icon-size);
+  block-size: var(--_button-group-menu-item-icon-size);
+  flex: none;
+}
+
+.button-group--connected .button-group__row {
+  align-items: center;
+}
+
+.button-group__connected-item {
+  min-block-size: var(--_button-group-height);
+  overflow: hidden;
+  border-radius: var(--_button-group-inner-corner);
+  transition:
+    border-radius var(--_button-group-motion-duration) var(--_button-group-motion-easing),
+    box-shadow var(--_button-group-motion-duration) var(--_button-group-motion-easing);
+  --ripple-color: var(--_button-content-color);
+}
+
+.button-group__connected-item[data-position='leading'] {
+  border-start-start-radius: var(--_button-group-full-corner);
+  border-end-start-radius: var(--_button-group-full-corner);
+}
+
+.button-group__connected-item[data-position='trailing'] {
+  border-start-end-radius: var(--_button-group-full-corner);
+  border-end-end-radius: var(--_button-group-full-corner);
+}
+
+.button-group__connected-item[data-position='only'] {
+  border-radius: var(--_button-group-full-corner);
+}
+
+.button-group__connected-item[data-pressed]:not([data-selected]) {
+  border-radius: var(--_button-group-pressed-inner-corner);
+}
+
+.button-group__connected-item[data-pressed][data-position='leading']:not([data-selected]) {
+  border-start-start-radius: var(--_button-group-full-corner);
+  border-end-start-radius: var(--_button-group-full-corner);
+}
+
+.button-group__connected-item[data-pressed][data-position='trailing']:not([data-selected]) {
+  border-start-end-radius: var(--_button-group-full-corner);
+  border-end-end-radius: var(--_button-group-full-corner);
+}
+
+.button-group__connected-item[data-selected] {
+  border-radius: var(--_button-group-full-corner);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-group__item,
+  .button-group__connected-item {
+    transition-duration: 0s;
+  }
+}
+
+@media (forced-colors: active) {
+  .button-group__menu {
+    border: 1px solid CanvasText;
+  }
+
+  .button-group__menu-item:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
