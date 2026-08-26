@@ -51,6 +51,10 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/NavigationRail/navigation-rail.css',
   ],
+  'wide-navigation-rail': [
+    'src/internal/ripple/ripple.css',
+    'src/components/WideNavigationRail/wide-navigation-rail.css',
+  ],
   'progress-indicator': ['src/components/ProgressIndicator/progress-indicator.css'],
   'radio-button': [
     'src/internal/ripple/ripple.css',
@@ -91,6 +95,7 @@ export const publicComponentStyleSources = {
   'navigation-bar': 'src/components/NavigationBar/navigation-bar.css',
   'navigation-drawer': 'src/components/NavigationDrawer/navigation-drawer.css',
   'navigation-rail': 'src/components/NavigationRail/navigation-rail.css',
+  'wide-navigation-rail': 'src/components/WideNavigationRail/wide-navigation-rail.css',
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   scrim: 'src/components/Scrim/scrim.css',
@@ -117,6 +122,7 @@ export const publicComponentModules = {
   'navigation-bar': 'src/components/NavigationBar/NavigationBar.tsx',
   'navigation-drawer': 'src/components/NavigationDrawer/NavigationDrawer.tsx',
   'navigation-rail': 'src/components/NavigationRail/NavigationRail.tsx',
+  'wide-navigation-rail': 'src/components/WideNavigationRail/WideNavigationRail.tsx',
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',

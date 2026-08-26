@@ -13,6 +13,7 @@ export * from './LoadingIndicator';
 export * from './NavigationBar';
 export * from './NavigationDrawer';
 export * from './NavigationRail';
+export * from './WideNavigationRail';
 export * from './ProgressIndicator';
 export * from './RadioButton';
 export * from './Scrim';
