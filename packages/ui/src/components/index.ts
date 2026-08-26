@@ -18,6 +18,7 @@ export * from './WideNavigationRail';
 export * from './ProgressIndicator';
 export * from './RadioButton';
 export * from './Scrim';
+export * from './SegmentedButton';
 export * from './Slider';
 export * from './Snackbar';
 export * from './Switch';
