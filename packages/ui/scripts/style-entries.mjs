@@ -72,6 +72,10 @@ export const styleEntries = {
     'src/components/RadioButton/radio-button.css',
   ],
   scrim: ['src/components/Scrim/scrim.css'],
+  'search-bar': [
+    'src/internal/elevation/elevation.css',
+    'src/components/SearchBar/search-bar.css',
+  ],
   'segmented-button': [
     'src/internal/ripple/ripple.css',
     'src/components/SegmentedButton/segmented-button.css',
@@ -123,6 +127,7 @@ export const publicComponentStyleSources = {
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   scrim: 'src/components/Scrim/scrim.css',
+  'search-bar': 'src/components/SearchBar/search-bar.css',
   'segmented-button': 'src/components/SegmentedButton/segmented-button.css',
   slider: 'src/components/Slider/slider.css',
   snackbar: 'src/components/Snackbar/snackbar.css',
@@ -156,6 +161,7 @@ export const publicComponentModules = {
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',
+  'search-bar': 'src/components/SearchBar/SearchBar.tsx',
   'segmented-button': 'src/components/SegmentedButton/SegmentedButton.tsx',
   slider: 'src/components/Slider/Slider.tsx',
   snackbar: 'src/components/Snackbar/Snackbar.tsx',
