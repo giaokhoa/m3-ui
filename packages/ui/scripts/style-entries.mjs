@@ -35,6 +35,7 @@ export const styleEntries = {
     'src/internal/elevation/elevation.css',
     'src/components/Fab/fab.css',
   ],
+  'floating-toolbar': ['src/components/FloatingToolbar/floating-toolbar.css'],
   'icon-button': [
     'src/internal/ripple/ripple.css',
     'src/components/IconButton/icon-button.css',
@@ -117,6 +118,7 @@ export const publicComponentStyleSources = {
   divider: 'src/components/Divider/divider.css',
   'drag-handle': 'src/components/DragHandle/drag-handle.css',
   fab: 'src/components/Fab/fab.css',
+  'floating-toolbar': 'src/components/FloatingToolbar/floating-toolbar.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
   'list-item': 'src/components/ListItem/list-item.css',
   'loading-indicator': 'src/components/LoadingIndicator/loading-indicator.css',
@@ -152,6 +154,7 @@ export const publicComponentModules = {
   divider: 'src/components/Divider/Divider.tsx',
   'drag-handle': 'src/components/DragHandle/DragHandle.tsx',
   fab: 'src/components/Fab/Fab.tsx',
+  'floating-toolbar': 'src/components/FloatingToolbar/FloatingToolbar.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
   'list-item': 'src/components/ListItem/ListItem.tsx',
   'loading-indicator': 'src/components/LoadingIndicator/LoadingIndicator.tsx',
