@@ -75,6 +75,11 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/Switch/switch.css',
   ],
+  tabs: [
+    'src/internal/ripple/ripple.css',
+    'src/components/Divider/divider.css',
+    'src/components/Tabs/tabs.css',
+  ],
   'text-field': ['src/components/TextField/text-field.css'],
   tooltip: ['src/components/Tooltip/tooltip.css'],
 };
@@ -102,6 +107,7 @@ export const publicComponentStyleSources = {
   slider: 'src/components/Slider/slider.css',
   snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
+  tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
   tooltip: 'src/components/Tooltip/tooltip.css',
 };
@@ -129,6 +135,7 @@ export const publicComponentModules = {
   slider: 'src/components/Slider/Slider.tsx',
   snackbar: 'src/components/Snackbar/Snackbar.tsx',
   switch: 'src/components/Switch/Switch.tsx',
+  tabs: 'src/components/Tabs/Tabs.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
   tooltip: 'src/components/Tooltip/Tooltip.tsx',
 };
