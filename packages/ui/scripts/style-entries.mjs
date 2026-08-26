@@ -38,6 +38,11 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/IconButton/icon-button.css',
   ],
+  'list-item': [
+    'src/internal/ripple/ripple.css',
+    'src/internal/elevation/elevation.css',
+    'src/components/ListItem/list-item.css',
+  ],
   'loading-indicator': ['src/components/LoadingIndicator/loading-indicator.css'],
   'navigation-bar': [
     'src/internal/ripple/ripple.css',
@@ -96,6 +101,7 @@ export const publicComponentStyleSources = {
   'drag-handle': 'src/components/DragHandle/drag-handle.css',
   fab: 'src/components/Fab/fab.css',
   'icon-button': 'src/components/IconButton/icon-button.css',
+  'list-item': 'src/components/ListItem/list-item.css',
   'loading-indicator': 'src/components/LoadingIndicator/loading-indicator.css',
   'navigation-bar': 'src/components/NavigationBar/navigation-bar.css',
   'navigation-drawer': 'src/components/NavigationDrawer/navigation-drawer.css',
@@ -124,6 +130,7 @@ export const publicComponentModules = {
   'drag-handle': 'src/components/DragHandle/DragHandle.tsx',
   fab: 'src/components/Fab/Fab.tsx',
   'icon-button': 'src/components/IconButton/IconButton.tsx',
+  'list-item': 'src/components/ListItem/ListItem.tsx',
   'loading-indicator': 'src/components/LoadingIndicator/LoadingIndicator.tsx',
   'navigation-bar': 'src/components/NavigationBar/NavigationBar.tsx',
   'navigation-drawer': 'src/components/NavigationDrawer/NavigationDrawer.tsx',

@@ -1,0 +1,148 @@
+.list-item-selection-group {
+  display: block;
+}
+
+.list-item {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--_list-item-min-height);
+  padding-block-start: var(--_list-item-padding-block-start);
+  padding-block-end: var(--_list-item-padding-block-end);
+  padding-inline-start: var(--_list-item-padding-inline-start);
+  padding-inline-end: var(--_list-item-padding-inline-end);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--_list-item-shape);
+  background: transparent;
+  box-shadow: var(--_list-item-box-shadow);
+  text-align: start;
+  transition:
+    border-radius var(--_list-item-shape-duration) var(--_list-item-shape-easing),
+    box-shadow var(--_list-item-shape-duration) var(--_list-item-shape-easing);
+}
+
+.list-item::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--_list-item-container-color);
+  content: '';
+  opacity: var(--_list-item-container-opacity);
+}
+
+.list-item--interactive {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.list-item--interactive:disabled {
+  cursor: default;
+}
+
+.list-item[data-lines='3'] {
+  align-items: start;
+}
+
+.list-item__leading,
+.list-item__trailing,
+.list-item__text,
+.list-item__overline,
+.list-item__headline,
+.list-item__supporting {
+  position: relative;
+  z-index: 1;
+}
+
+.list-item__leading,
+.list-item__trailing {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+.list-item__leading {
+  margin-inline-end: var(--_list-item-padding-inline-start);
+  color: var(--_list-item-leading-color);
+  opacity: var(--_list-item-leading-opacity);
+}
+
+.list-item__trailing {
+  justify-self: end;
+  margin-inline-start: var(--_list-item-padding-inline-end);
+  color: var(--_list-item-trailing-color);
+  opacity: var(--_list-item-trailing-opacity);
+  font-family: var(--_list-item-meta-font-family);
+  font-size: var(--_list-item-meta-font-size);
+  font-weight: var(--_list-item-meta-font-weight);
+  line-height: var(--_list-item-meta-line-height);
+  letter-spacing: var(--_list-item-meta-letter-spacing);
+}
+
+.list-item__leading > svg,
+.list-item__trailing > svg {
+  inline-size: 24px;
+  block-size: 24px;
+  fill: currentColor;
+}
+
+.list-item__text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.list-item__headline {
+  color: var(--_list-item-label-color);
+  opacity: var(--_list-item-label-opacity);
+  font-family: var(--_list-item-headline-font-family);
+  font-size: var(--_list-item-headline-font-size);
+  font-weight: var(--_list-item-headline-font-weight);
+  line-height: var(--_list-item-headline-line-height);
+  letter-spacing: var(--_list-item-headline-letter-spacing);
+}
+
+.list-item__supporting {
+  color: var(--_list-item-supporting-color);
+  opacity: var(--_list-item-supporting-opacity);
+  font-family: var(--_list-item-supporting-font-family);
+  font-size: var(--_list-item-supporting-font-size);
+  font-weight: var(--_list-item-supporting-font-weight);
+  line-height: var(--_list-item-supporting-line-height);
+  letter-spacing: var(--_list-item-supporting-letter-spacing);
+}
+
+.list-item__overline {
+  color: var(--_list-item-overline-color);
+  opacity: var(--_list-item-overline-opacity);
+  font-family: var(--_list-item-meta-font-family);
+  font-size: var(--_list-item-meta-font-size);
+  font-weight: var(--_list-item-meta-font-weight);
+  line-height: var(--_list-item-meta-line-height);
+  letter-spacing: var(--_list-item-meta-letter-spacing);
+}
+
+.list-item[data-lines='3'] .list-item__leading,
+.list-item[data-lines='3'] .list-item__trailing {
+  margin-block-start: calc(
+    (var(--_list-item-headline-line-height) - 24px) / 2
+  );
+}
+
+.list-item--interactive:focus-visible {
+  outline: var(--_list-item-focus-indicator-thickness) solid var(--secondary);
+  outline-offset: var(--_list-item-focus-indicator-outline-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-item {
+    transition: none;
+  }
+}
