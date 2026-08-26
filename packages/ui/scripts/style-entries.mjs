@@ -1,5 +1,6 @@
 export const styleEntries = {
   badge: ['src/components/Badge/badge.css'],
+  'bottom-app-bar': ['src/components/BottomAppBar/bottom-app-bar.css'],
   'bottom-sheet': ['src/components/BottomSheet/bottom-sheet.css'],
   button: [
     'src/internal/ripple/ripple.css',
@@ -106,6 +107,7 @@ export const styleEntries = {
 
 export const publicComponentStyleSources = {
   badge: 'src/components/Badge/badge.css',
+  'bottom-app-bar': 'src/components/BottomAppBar/bottom-app-bar.css',
   'bottom-sheet': 'src/components/BottomSheet/bottom-sheet.css',
   button: 'src/components/Button/button.css',
   card: 'src/components/Card/card.css',
@@ -140,6 +142,7 @@ export const publicComponentStyleSources = {
 
 export const publicComponentModules = {
   badge: 'src/components/Badge/Badge.tsx',
+  'bottom-app-bar': 'src/components/BottomAppBar/BottomAppBar.tsx',
   'bottom-sheet': 'src/components/BottomSheet/BottomSheet.tsx',
   button: 'src/components/Button/Button.tsx',
   card: 'src/components/Card/Card.tsx',
