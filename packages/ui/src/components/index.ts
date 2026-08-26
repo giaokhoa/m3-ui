@@ -9,6 +9,7 @@ export * from './Divider';
 export * from './DragHandle';
 export * from './Fab';
 export * from './IconButton';
+export * from './ListItem';
 export * from './LoadingIndicator';
 export * from './NavigationBar';
 export * from './NavigationDrawer';
