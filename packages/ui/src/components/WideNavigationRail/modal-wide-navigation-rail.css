@@ -1,0 +1,90 @@
+.modal-wide-navigation-rail-host {
+  display: contents;
+}
+
+.modal-wide-navigation-rail-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.modal-wide-navigation-rail__scrim {
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity var(--_modal-wide-navigation-rail-effects-duration)
+    var(--_modal-wide-navigation-rail-effects-easing);
+}
+
+/*
+ * React Aria's ModalOverlay is the structural underlay. The Modal is the
+ * interaction surface kept live by useModalOverlay, so make it the full-screen
+ * hit target. Pointer capture handlers on the overlay still receive these
+ * events during capture/bubble, while the passive Scrim remains visual only.
+ */
+.modal-wide-navigation-rail__modal {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+
+.modal-wide-navigation-rail__frame {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: max-content;
+  block-size: 100%;
+  max-inline-size: 100vw;
+  touch-action: pan-y;
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse] {
+  transform: translateX(-100%);
+  transition: transform var(--_modal-wide-navigation-rail-slide-duration)
+    var(--_modal-wide-navigation-rail-slide-easing);
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse][data-expanded] {
+  transform: translateX(0);
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse][data-dragging] {
+  transform: translateX(var(--_modal-wide-navigation-rail-drag-offset));
+  transition: none;
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse]:dir(rtl) {
+  transform: translateX(100%);
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse][data-expanded]:dir(rtl) {
+  transform: translateX(0);
+}
+
+.modal-wide-navigation-rail__frame[data-hide-on-collapse][data-dragging]:dir(rtl) {
+  transform: translateX(calc(-1 * var(--_modal-wide-navigation-rail-drag-offset)));
+}
+
+.modal-wide-navigation-rail__rail {
+  block-size: 100%;
+  overflow: hidden;
+  background: var(--_modal-wide-navigation-rail-container-color);
+  color: var(--_modal-wide-navigation-rail-content-color);
+  box-shadow: var(--_modal-wide-navigation-rail-box-shadow);
+  border-radius: var(--_modal-wide-navigation-rail-radius);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-wide-navigation-rail__scrim,
+  .modal-wide-navigation-rail__frame,
+  .modal-wide-navigation-rail__rail {
+    transition-duration: 0ms;
+  }
+}
