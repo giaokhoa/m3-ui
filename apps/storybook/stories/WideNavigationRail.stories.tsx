@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
+  ModalWideNavigationRail,
   ThemeProvider,
   WideNavigationRail,
   WideNavigationRailItem,
@@ -108,6 +109,86 @@ export const LongLabel: Story = {
 };
 export const WithHeader: Story = {
   render: () => <WideRailDemo withHeader />,
+};
+
+function ModalRailDemo({
+  hideOnCollapse = false,
+  initialValue = WideNavigationRailValue.Collapsed,
+}: {
+  hideOnCollapse?: boolean;
+  initialValue?: WideNavigationRailValue;
+}) {
+  const railState = useWideNavigationRailState(initialValue);
+  const [selected, setSelected] = useState<(typeof destinations)[number]['id']>('home');
+  const header = (
+    <button
+      aria-label="Toggle navigation rail"
+      onClick={() => railState.toggle()}
+      style={{ width: 48, height: 48, borderRadius: 24 }}
+    >
+      ☰
+    </button>
+  );
+
+  return (
+    <div
+      data-testid="modal-wide-navigation-rail-stage"
+      style={{
+        display: 'flex',
+        minHeight: 520,
+        height: '100vh',
+        background: 'var(--surface)',
+        color: 'var(--on-surface)',
+      }}
+    >
+      <ModalWideNavigationRail
+        data-testid="modal-wide-navigation-rail-host"
+        aria-label="Modal primary destinations"
+        state={railState}
+        hideOnCollapse={hideOnCollapse}
+        header={header}
+      >
+        {destinations.map((destination) => (
+          <WideNavigationRailItem
+            key={destination.id}
+            data-testid={`modal-wide-navigation-rail-item-${destination.id}`}
+            selected={selected === destination.id}
+            icon={destination.icon}
+            label={destination.label}
+            onPress={() => setSelected(destination.id)}
+          />
+        ))}
+      </ModalWideNavigationRail>
+      <main data-testid="modal-wide-navigation-rail-main" style={{ flex: 1, padding: 32 }}>
+        <h1 style={{ marginTop: 0 }}>Modal wide navigation rail</h1>
+        <button
+          data-testid="modal-wide-navigation-rail-toggle"
+          onClick={() => railState.toggle()}
+        >
+          Toggle modal rail
+        </button>
+        <p data-testid="modal-wide-navigation-rail-selection">Selected: {selected}</p>
+      </main>
+    </div>
+  );
+}
+
+export const Modal: Story = { render: () => <ModalRailDemo /> };
+export const ModalExpanded: Story = {
+  render: () => (
+    <ModalRailDemo initialValue={WideNavigationRailValue.Expanded} />
+  ),
+};
+export const ModalDismissible: Story = {
+  render: () => <ModalRailDemo hideOnCollapse />,
+};
+export const ModalDismissibleExpanded: Story = {
+  render: () => (
+    <ModalRailDemo
+      hideOnCollapse
+      initialValue={WideNavigationRailValue.Expanded}
+    />
+  ),
 };
 
 function ThemeRail({
