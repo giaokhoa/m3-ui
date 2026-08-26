@@ -17,6 +17,7 @@ export const styleEntries = {
     'src/internal/elevation/elevation.css',
     'src/components/Card/card.css',
   ],
+  carousel: ['src/components/Carousel/carousel.css'],
   checkbox: [
     'src/internal/ripple/ripple.css',
     'src/components/Checkbox/checkbox.css',
@@ -129,6 +130,7 @@ export const publicComponentStyleSources = {
   button: 'src/components/Button/button.css',
   'button-group': 'src/components/ButtonGroup/button-group.css',
   card: 'src/components/Card/card.css',
+  carousel: 'src/components/Carousel/carousel.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
   dialog: 'src/components/Dialog/dialog.css',
@@ -168,6 +170,7 @@ export const publicComponentModules = {
   button: 'src/components/Button/Button.tsx',
   'button-group': 'src/components/ButtonGroup/ButtonGroup.tsx',
   card: 'src/components/Card/Card.tsx',
+  carousel: 'src/components/Carousel/Carousel.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
   dialog: 'src/components/Dialog/Dialog.tsx',
