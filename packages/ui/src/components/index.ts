@@ -23,4 +23,5 @@ export * from './Snackbar';
 export * from './Switch';
 export * from './Tabs';
 export * from './TextField';
+export * from './TopAppBar';
 export * from './Tooltip';

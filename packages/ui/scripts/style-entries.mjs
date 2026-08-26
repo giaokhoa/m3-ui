@@ -86,6 +86,7 @@ export const styleEntries = {
     'src/components/Tabs/tabs.css',
   ],
   'text-field': ['src/components/TextField/text-field.css'],
+  'top-app-bar': ['src/components/TopAppBar/top-app-bar.css'],
   tooltip: ['src/components/Tooltip/tooltip.css'],
 };
 
@@ -115,6 +116,7 @@ export const publicComponentStyleSources = {
   switch: 'src/components/Switch/switch.css',
   tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
+  'top-app-bar': 'src/components/TopAppBar/top-app-bar.css',
   tooltip: 'src/components/Tooltip/tooltip.css',
 };
 
@@ -144,5 +146,6 @@ export const publicComponentModules = {
   switch: 'src/components/Switch/Switch.tsx',
   tabs: 'src/components/Tabs/Tabs.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
+  'top-app-bar': 'src/components/TopAppBar/TopAppBar.tsx',
   tooltip: 'src/components/Tooltip/Tooltip.tsx',
 };
