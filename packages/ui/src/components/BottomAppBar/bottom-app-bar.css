@@ -1,0 +1,77 @@
+.bottom-app-bar {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  inline-size: 100%;
+  block-size: var(--_bottom-app-bar-height);
+  background: var(--_bottom-app-bar-container-color);
+  color: var(--_bottom-app-bar-content-color);
+  box-shadow: var(--_bottom-app-bar-box-shadow);
+  border-radius: 0;
+  transition: block-size var(--_bottom-app-bar-motion-duration)
+    var(--_bottom-app-bar-motion-easing);
+}
+
+.bottom-app-bar__content {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+  block-size: var(--_bottom-app-bar-expanded-height);
+  min-inline-size: 0;
+}
+
+.bottom-app-bar[data-variant='regular'] .bottom-app-bar__content {
+  padding-block-start: var(--_bottom-app-bar-content-top-padding);
+  padding-inline: var(--_bottom-app-bar-content-horizontal-padding);
+}
+
+.bottom-app-bar__actions {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  min-inline-size: 0;
+  block-size: 100%;
+}
+
+.bottom-app-bar__fab {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  block-size: 100%;
+  padding-block-start: var(--_bottom-app-bar-fab-vertical-padding);
+  padding-inline-end: var(--_bottom-app-bar-fab-horizontal-padding);
+}
+
+.bottom-app-bar__flexible-content {
+  padding-inline-start: var(--_bottom-app-bar-flexible-leading-space);
+  padding-inline-end: var(--_bottom-app-bar-flexible-trailing-space);
+  gap: var(--_bottom-app-bar-flexible-min-spacing);
+  justify-content: space-between;
+}
+
+.bottom-app-bar[data-arrangement='fixed'] .bottom-app-bar__flexible-content {
+  gap: var(--_bottom-app-bar-flexible-max-spacing);
+  justify-content: center;
+}
+
+.bottom-app-bar[data-arrangement='start'] .bottom-app-bar__flexible-content {
+  justify-content: flex-start;
+}
+
+.bottom-app-bar[data-arrangement='center'] .bottom-app-bar__flexible-content {
+  justify-content: center;
+}
+
+.bottom-app-bar[data-arrangement='end'] .bottom-app-bar__flexible-content {
+  justify-content: flex-end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-app-bar {
+    transition-duration: 0ms;
+  }
+}
