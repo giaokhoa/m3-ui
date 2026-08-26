@@ -6,6 +6,12 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
   ],
+  'button-group': [
+    'src/internal/ripple/ripple.css',
+    'src/components/Button/button.css',
+    'src/components/IconButton/icon-button.css',
+    'src/components/ButtonGroup/button-group.css',
+  ],
   card: [
     'src/internal/ripple/ripple.css',
     'src/internal/elevation/elevation.css',
@@ -116,6 +122,7 @@ export const publicComponentStyleSources = {
   'bottom-app-bar': 'src/components/BottomAppBar/bottom-app-bar.css',
   'bottom-sheet': 'src/components/BottomSheet/bottom-sheet.css',
   button: 'src/components/Button/button.css',
+  'button-group': 'src/components/ButtonGroup/button-group.css',
   card: 'src/components/Card/card.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
@@ -153,6 +160,7 @@ export const publicComponentModules = {
   'bottom-app-bar': 'src/components/BottomAppBar/BottomAppBar.tsx',
   'bottom-sheet': 'src/components/BottomSheet/BottomSheet.tsx',
   button: 'src/components/Button/Button.tsx',
+  'button-group': 'src/components/ButtonGroup/ButtonGroup.tsx',
   card: 'src/components/Card/Card.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
