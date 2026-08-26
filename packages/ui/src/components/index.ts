@@ -10,6 +10,7 @@ export * from './DragHandle';
 export * from './Fab';
 export * from './IconButton';
 export * from './LoadingIndicator';
+export * from './NavigationBar';
 export * from './NavigationDrawer';
 export * from './ProgressIndicator';
 export * from './RadioButton';

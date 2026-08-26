@@ -1,0 +1,160 @@
+.navigation-bar {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  block-size: var(--_navigation-bar-height);
+  background: var(--_navigation-bar-container-color);
+  color: var(--_navigation-bar-content-color);
+  box-shadow: var(--_navigation-bar-box-shadow);
+}
+
+.navigation-bar__items {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  gap: var(--_navigation-bar-item-spacing);
+}
+
+.navigation-bar-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  min-block-size: var(--_navigation-bar-item-height);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navigation-bar-item:disabled {
+  cursor: default;
+}
+
+.navigation-bar-item__layout {
+  position: relative;
+  display: block;
+  min-inline-size: min(100%, var(--_navigation-bar-item-min-width));
+  block-size: var(--_navigation-bar-item-height);
+}
+
+.navigation-bar-item__indicator-ripple {
+  position: absolute;
+  isolation: isolate;
+  inset-block-start: var(--_navigation-bar-indicator-top);
+  inset-inline-start: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_navigation-bar-indicator-width);
+  block-size: var(--_navigation-bar-indicator-height);
+  border-radius: var(--_navigation-bar-indicator-radius);
+  transform: translateX(-50%);
+  transition: inset-block-start var(--_navigation-bar-indicator-size-duration)
+    var(--_navigation-bar-indicator-size-easing);
+  --ripple-color: var(--_ripple-color);
+}
+
+.navigation-bar-item__indicator {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--_navigation-bar-indicator-color);
+  opacity: 0;
+  transform: scaleX(0);
+  transition-property: transform, opacity;
+  transition-duration:
+    var(--_navigation-bar-indicator-size-duration),
+    var(--_navigation-bar-indicator-opacity-duration);
+  transition-timing-function:
+    var(--_navigation-bar-indicator-size-easing),
+    var(--_navigation-bar-indicator-opacity-easing);
+}
+
+.navigation-bar-item[data-selected] .navigation-bar-item__indicator {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.navigation-bar-item__indicator-ripple > .ripple {
+  z-index: 1;
+}
+
+.navigation-bar-item__icon {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_navigation-bar-icon-size);
+  block-size: var(--_navigation-bar-icon-size);
+  color: var(--_navigation-bar-icon-color);
+  opacity: var(--_navigation-bar-content-opacity);
+  transition: color var(--_navigation-bar-indicator-opacity-duration)
+    var(--_navigation-bar-indicator-opacity-easing);
+}
+
+.navigation-bar-item__icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentColor;
+}
+
+.navigation-bar-item__label {
+  position: absolute;
+  inset-block-start: calc(
+    var(--_navigation-bar-indicator-top) +
+    var(--_navigation-bar-indicator-height) +
+    var(--_navigation-bar-icon-label-space)
+  );
+  inset-inline-start: 50%;
+  display: block;
+  max-inline-size: 100%;
+  overflow: hidden;
+  color: var(--_navigation-bar-label-color);
+  opacity: var(--_navigation-bar-content-opacity);
+  font-family: var(--_navigation-bar-label-font-family);
+  font-size: var(--_navigation-bar-label-font-size);
+  font-weight: var(--_navigation-bar-label-font-weight);
+  line-height: var(--_navigation-bar-label-line-height);
+  letter-spacing: var(--_navigation-bar-label-letter-spacing);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transition-property: color, opacity;
+  transition-duration: var(--_navigation-bar-indicator-opacity-duration);
+  transition-timing-function: var(--_navigation-bar-indicator-opacity-easing);
+}
+
+.navigation-bar-item[data-label-hidden] .navigation-bar-item__label {
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.navigation-bar-item[data-label-hidden] .navigation-bar-item__indicator-ripple {
+  inset-block-start: var(--_navigation-bar-indicator-centered-top);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-bar-item__indicator-ripple,
+  .navigation-bar-item__indicator,
+  .navigation-bar-item__icon,
+  .navigation-bar-item__label {
+    transition-duration: 0ms;
+  }
+}
