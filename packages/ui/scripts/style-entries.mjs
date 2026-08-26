@@ -86,6 +86,11 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/Slider/slider.css',
   ],
+  'split-button': [
+    'src/internal/ripple/ripple.css',
+    'src/components/Button/button.css',
+    'src/components/SplitButton/split-button.css',
+  ],
   snackbar: [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -134,6 +139,7 @@ export const publicComponentStyleSources = {
   'search-bar': 'src/components/SearchBar/search-bar.css',
   'segmented-button': 'src/components/SegmentedButton/segmented-button.css',
   slider: 'src/components/Slider/slider.css',
+  'split-button': 'src/components/SplitButton/split-button.css',
   snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
   tabs: 'src/components/Tabs/tabs.css',
@@ -170,6 +176,7 @@ export const publicComponentModules = {
   'search-bar': 'src/components/SearchBar/SearchBar.tsx',
   'segmented-button': 'src/components/SegmentedButton/SegmentedButton.tsx',
   slider: 'src/components/Slider/Slider.tsx',
+  'split-button': 'src/components/SplitButton/SplitButton.tsx',
   snackbar: 'src/components/Snackbar/Snackbar.tsx',
   switch: 'src/components/Switch/Switch.tsx',
   tabs: 'src/components/Tabs/Tabs.tsx',

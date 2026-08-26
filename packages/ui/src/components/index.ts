@@ -23,6 +23,7 @@ export * from './Scrim';
 export * from './SearchBar';
 export * from './SegmentedButton';
 export * from './Slider';
+export * from './SplitButton';
 export * from './Snackbar';
 export * from './Switch';
 export * from './Tabs';
