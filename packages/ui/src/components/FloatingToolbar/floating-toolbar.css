@@ -1,0 +1,140 @@
+.floating-toolbar {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: var(--_floating-toolbar-fab-gap);
+  max-inline-size: 100%;
+  transition:
+    transform var(--_floating-toolbar-snap-duration) var(--_floating-toolbar-snap-easing),
+    gap var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing);
+  will-change: transform;
+}
+
+.floating-toolbar[data-orientation='horizontal'][data-with-fab] {
+  min-block-size: var(--_floating-toolbar-fab-max-size);
+}
+
+.floating-toolbar[data-orientation='vertical'] {
+  flex-direction: column;
+}
+
+.floating-toolbar[data-orientation='vertical'][data-with-fab] {
+  min-inline-size: var(--_floating-toolbar-fab-max-size);
+}
+
+.floating-toolbar:not([data-expanded])[data-with-fab] {
+  gap: 0;
+}
+
+.floating-toolbar__surface {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  min-block-size: var(--_floating-toolbar-container-size);
+  max-inline-size: 100%;
+  overflow: hidden;
+  padding: var(--_floating-toolbar-content-padding);
+  border-radius: var(--_floating-toolbar-container-radius);
+  background: var(--_floating-toolbar-container-color);
+  color: var(--_floating-toolbar-content-color);
+  box-shadow: var(--_floating-toolbar-box-shadow);
+  transition:
+    max-inline-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    max-block-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    opacity var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    padding var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    box-shadow var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing);
+}
+
+.floating-toolbar[data-orientation='vertical'] .floating-toolbar__surface {
+  flex-direction: column;
+  min-inline-size: var(--_floating-toolbar-container-size);
+  min-block-size: 0;
+}
+
+.floating-toolbar__content,
+.floating-toolbar__conditional {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.floating-toolbar[data-orientation='vertical'] .floating-toolbar__content,
+.floating-toolbar[data-orientation='vertical'] .floating-toolbar__conditional {
+  flex-direction: column;
+}
+
+.floating-toolbar__conditional {
+  max-inline-size: 50rem;
+  opacity: 1;
+  overflow: hidden;
+  visibility: visible;
+  transition:
+    max-inline-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    max-block-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    opacity var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing);
+}
+
+.floating-toolbar[data-orientation='horizontal']:not([data-expanded]) .floating-toolbar__conditional {
+  max-inline-size: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.floating-toolbar[data-orientation='vertical']:not([data-expanded]) .floating-toolbar__conditional {
+  max-block-size: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.floating-toolbar[data-with-fab]:not([data-expanded]) .floating-toolbar__surface {
+  max-inline-size: 0;
+  min-inline-size: 0;
+  min-block-size: 0;
+  max-block-size: 0;
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.floating-toolbar__fab {
+  display: grid;
+  box-sizing: border-box;
+  place-items: center;
+  inline-size: var(--_floating-toolbar-fab-size);
+  block-size: var(--_floating-toolbar-fab-size);
+  flex: 0 0 var(--_floating-toolbar-fab-size);
+  transition:
+    inline-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    block-size var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing),
+    flex-basis var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing);
+}
+
+.floating-toolbar__fab > * {
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+
+/* AndroidX measures the FAB slot with exact constraints. Library FABs keep
+   their own color, shape, icon and elevation semantics while their actual
+   target/container box follows the parent-controlled slot size. */
+.floating-toolbar__fab > .fab,
+.floating-toolbar__fab > .fab .fab__visual {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-toolbar,
+  .floating-toolbar__surface,
+  .floating-toolbar__conditional,
+  .floating-toolbar__fab {
+    transition-duration: 0s !important;
+  }
+}
