@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { OutlinedTextField, TextField, ThemeProvider } from '@m3/ui';
+import { OutlinedTextField, TextField, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/TextField',

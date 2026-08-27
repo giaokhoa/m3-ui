@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TimeInput, TimePicker, type TimeOfDay } from '@m3/ui';
+import { TimeInput, TimePicker, type TimeOfDay } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/TimePicker',

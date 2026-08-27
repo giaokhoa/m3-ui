@@ -6,7 +6,7 @@ import {
   ElevatedCard,
   OutlinedCard,
   ThemeProvider,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Card',

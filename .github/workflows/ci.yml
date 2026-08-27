@@ -32,91 +32,91 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Inventory pinned Compose token source
-        run: pnpm --filter @m3/tokens inventory:compose
+        run: pnpm --filter @m3-ui/tokens inventory:compose
       - name: Inventory pinned Material Web generated source
-        run: pnpm --filter @m3/tokens inventory:material-web
+        run: pnpm --filter @m3-ui/tokens inventory:material-web
       - name: Require complete Compose token coverage
-        run: pnpm --filter @m3/tokens coverage:compose:complete
+        run: pnpm --filter @m3-ui/tokens coverage:compose:complete
       - name: Require complete Material Web token coverage
-        run: pnpm --filter @m3/tokens coverage:material-web:complete
+        run: pnpm --filter @m3-ui/tokens coverage:material-web:complete
       - name: Require complete Material 3 union token coverage
-        run: pnpm --filter @m3/tokens coverage:union:complete
+        run: pnpm --filter @m3-ui/tokens coverage:union:complete
       - name: Require complete Material Web declaration coverage
-        run: pnpm --filter @m3/tokens audit:material-web-declarations:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-declarations:complete
       - name: Require complete Material Web Button size overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-button-sizes:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-button-sizes:complete
       - name: Require complete Material Web Button variant overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-button-variants:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-button-variants:complete
       - name: Require complete Material Web generic Button overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-button-generic:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-button-generic:complete
       - name: Require complete Material Web Icon Button size overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-icon-button-sizes:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-icon-button-sizes:complete
       - name: Require complete Material Web Icon Button variant overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-icon-button-variants:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-icon-button-variants:complete
       - name: Require complete Material Web generic Icon Button overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-icon-button-generic:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-icon-button-generic:complete
       - name: Require complete Material Web FAB size overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-fab-sizes:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-fab-sizes:complete
       - name: Require complete Material Web FAB role overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-fab-roles:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-fab-roles:complete
       - name: Require complete Material Web FAB surface overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-fab-surface:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-fab-surface:complete
       - name: Require complete remaining Material Web FAB overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-fab-remaining:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-fab-remaining:complete
       - name: Require complete Material Web App Bar overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-app-bar:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-app-bar:complete
       - name: Require complete Material Web Progress Indicator overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-progress-indicator:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-progress-indicator:complete
       - name: Require complete Material Web Split Button overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-split-button:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-split-button:complete
       - name: Require complete Material Web Button Group overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-button-group:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-button-group:complete
       - name: Require complete expressive Material Web Navigation overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-navigation-expressive:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-navigation-expressive:complete
       - name: Require complete baseline Material Web Navigation overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-navigation-baseline:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-navigation-baseline:complete
       - name: Require complete Material Web Toolbar overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-toolbar:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-toolbar:complete
       - name: Require complete small Material Web overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-small-overlap:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-small-overlap:complete
       - name: Require complete Material Web Card overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-card:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-card:complete
       - name: Require complete Material Web Dialog and Sheet overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-dialog-sheet:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-dialog-sheet:complete
       - name: Require complete Material Web Search overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-search:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-search:complete
       - name: Require complete Material Web Tooltip Snackbar Scrim overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-tooltip-snackbar-scrim:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-tooltip-snackbar-scrim:complete
       - name: Require complete Material Web Chip overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-chip:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-chip:complete
       - name: Require complete small Material Web control overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-small-controls:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-small-controls:complete
       - name: Require complete Material Web FAB Menu overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-fab-menu:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-fab-menu:complete
       - name: Require complete Material Web Switch overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-switch:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-switch:complete
       - name: Require complete Material Web Picker overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-pickers:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-pickers:complete
       - name: Require complete Material Web Autocomplete overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-autocomplete:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-autocomplete:complete
       - name: Require complete Material Web Menu Button overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-menu-button:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-menu-button:complete
       - name: Require complete Material Web Text Field overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-text-field:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-text-field:complete
       - name: Require complete Material Web List overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-list:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-list:complete
       - name: Require complete Material Web Menu overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-menu:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-menu:complete
       - name: Require complete Material Web Slider overlap coverage
-        run: pnpm --filter @m3/tokens audit:material-web-slider:complete
+        run: pnpm --filter @m3-ui/tokens audit:material-web-slider:complete
       - name: Require strict declaration audit module union
-        run: pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete
+        run: pnpm --filter @m3-ui/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete
       - name: Audit cross-source drift registry
-        run: pnpm --filter @m3/tokens exec node scripts/audit-drift-registry.mjs --require-complete
+        run: pnpm --filter @m3-ui/tokens exec node scripts/audit-drift-registry.mjs --require-complete
       - name: Audit pinned Figma reference evidence
-        run: pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete
+        run: pnpm --filter @m3-ui/tokens exec node scripts/audit-figma-reference.mjs --require-complete
       - name: Audit canonical tokens against AndroidX
-        run: pnpm --filter @m3/tokens audit:androidx
+        run: pnpm --filter @m3-ui/tokens audit:androidx
       - name: Test
         run: pnpm test
       - name: Typecheck
@@ -124,6 +124,6 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Install Chromium headless shell
-        run: pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium
+        run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
       - name: Visual regression
-        run: pnpm --filter @m3/storybook test:visual
+        run: pnpm --filter @m3-ui/storybook test:visual

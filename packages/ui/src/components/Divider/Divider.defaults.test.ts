@@ -1,4 +1,4 @@
-import * as token from '@m3/tokens';
+import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
 import { dividerTokens, getDividerStyle } from './Divider.defaults';
 

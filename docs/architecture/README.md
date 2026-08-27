@@ -13,7 +13,7 @@ These rules are intentionally strict. They exist to prevent the token pipeline f
 5. Do not recreate `scripts/compose-sync`, `packages/tokens/src/generated/androidx`, or any equivalent upstream-to-runtime snapshot generator.
 6. Dynamic Material colors belong to `ThemeProvider`; canonical component color tokens contain runtime strings such as `var(--primary)`, not static hex fallbacks.
 7. Non-color design tokens are generated static values, not global CSS variables. An explicit runtime theme override such as font-family is a theme concern, not token transport.
-8. `packages/tokens` has no handwritten runtime `src/` layer. UI-local projections may reshape generated values for arithmetic or behavior, but may only consume the package-root `@m3/tokens` API and may not own immutable design values.
+8. `packages/tokens` has no handwritten runtime `src/` layer. UI-local projections may reshape generated values for arithmetic or behavior, but may only consume the package-root `@m3-ui/tokens` API and may not own immutable design values.
 9. Component code may contain runtime behavior and derived calculations, but must not duplicate canonical token constants.
 10. A new upstream revision is adopted by reviewing canonical changes and audit drift; never by regenerating canonical files from upstream.
 
@@ -43,7 +43,7 @@ Material Web ─────┘                ▲
                     tokens.js          tokens.d.ts
                          │
                          ▼
-                @m3/tokens package root
+                @m3-ui/tokens package root
                          │
                          ▼
             UI-local projections / consumers
@@ -56,7 +56,7 @@ AndroidX revision and file mappings live only in audit code under `packages/toke
 ```text
 canonical DTCG
     ↓
-Style Dictionary generated @m3/tokens root
+Style Dictionary generated @m3-ui/tokens root
     ↓
 UI-local projections / theme foundations / internal primitives
     ↓
@@ -67,7 +67,7 @@ public components
 apps / consumers
 ```
 
-Lower layers must not depend on public components. Production code must never import from test fixtures. UI source must not import `@m3/tokens/*` subpaths.
+Lower layers must not depend on public components. Production code must never import from test fixtures. UI source must not import `@m3-ui/tokens/*` subpaths.
 
 ## Dynamic colors and CSS variables
 
@@ -114,7 +114,7 @@ Before implementing a new component family:
 3. Add or update canonical DTCG manually under `packages/tokens/tokens/`; alias shared core tokens when semantic identity is genuinely shared.
 4. Extend read-only AndroidX/Figma audit mappings where a meaningful upstream counterpart exists. Compare semantic color/elevation/shape/typography identity rather than unrelated serialized representations.
 5. Let Style Dictionary generate JS and `.d.ts`; do not write a parallel TypeScript generator.
-6. Import generated values from `@m3/tokens` root. If arithmetic or component ergonomics require projection, keep that projection local to the actual `@m3/ui` consumer and free of design literals.
+6. Import generated values from `@m3-ui/tokens` root. If arithmetic or component ergonomics require projection, keep that projection local to the actual `@m3-ui/ui` consumer and free of design literals.
 7. Implement behavior with React Aria/native HTML and CSS-first visual states.
 8. Add token/default/behavior/layout tests and Storybook visual regression coverage.
 9. Document intentional web differences.
@@ -131,7 +131,7 @@ A component/token change is not ready until reviewers can answer yes to all rele
 
 - Is every immutable design value canonical DTCG or a deliberate runtime-derived value?
 - Does Style Dictionary remain the sole token build engine?
-- Does `@m3/tokens` expose only its generated package-root API?
+- Does `@m3-ui/tokens` expose only its generated package-root API?
 - Are upstream sources read-only and pinned?
 - Are dynamic colors runtime CSS-role references rather than static hex fallbacks?
 - Are non-color design tokens kept out of generic global CSS variables?

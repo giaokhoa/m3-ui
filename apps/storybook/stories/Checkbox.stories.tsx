@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Checkbox, ThemeProvider } from '@m3/ui';
+import { Checkbox, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Checkbox',

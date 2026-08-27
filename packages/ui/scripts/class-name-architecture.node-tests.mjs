@@ -50,14 +50,14 @@ test('brand-prefixed CSS classes are forbidden', async () => {
   const violations = [];
 
   // Only CSS class selectors are forbidden here. Source identities and animation
-  // names such as @m3/ui, md-comp-*, or m3-progress-* keyframes remain valid.
+  // names such as @m3-ui/ui, md-comp-*, or m3-progress-* keyframes remain valid.
   for (const file of cssFiles) {
     const source = await readFile(file, 'utf8');
     collectMatches(file, source, /\.m3-[A-Za-z0-9_-]+/g, violations);
   }
 
   // Runtime, stories and browser contracts must not emit or depend on m3-* class
-  // tokens. Package scopes use @m3/* and therefore do not match this pattern.
+  // tokens. Package scopes use @m3-ui/* and therefore do not match this pattern.
   for (const file of codeFiles) {
     const source = await readFile(file, 'utf8');
     collectMatches(file, source, /\bm3-[a-z0-9][a-z0-9_-]*\b/g, violations);

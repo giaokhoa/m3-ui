@@ -8,7 +8,7 @@ const outputRoot = resolve(packageRoot, 'dist/styles');
 
 function header(name, sources) {
   return [
-    `/* @m3/ui modular styles: ${name}`,
+    `/* @m3-ui/ui modular styles: ${name}`,
     ' * Self-contained entry generated from source CSS.',
     ` * Sources: ${sources.join(', ')}`,
     ' */',

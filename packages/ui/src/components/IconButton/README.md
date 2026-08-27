@@ -20,7 +20,7 @@ Generated component geometry and colors are projected from the canonical DTCG gr
 - `LargeIconButtonTokens.kt`
 - `XLargeIconButtonTokens.kt`
 
-The React implementation consumes only the generated `@m3/tokens` root API. It does not read the reference corpora directly and does not add handwritten canonical tokens.
+The React implementation consumes only the generated `@m3-ui/tokens` root API. It does not read the reference corpora directly and does not add handwritten canonical tokens.
 
 ## Public variants
 
@@ -78,7 +78,7 @@ Pressed/selected shape morphing is opt-in through the `shapes` prop, matching th
 - `iconToggleButtonShapesForSize(size, shape)` provides normal + pressed + selected shapes for toggle buttons.
 - press takes precedence over selected shape while the press interaction is active.
 
-The CSS approximation uses the canonical FastSpatial motion projection already emitted by `@m3/tokens`; no new motion constants are hardcoded in the component.
+The CSS approximation uses the canonical FastSpatial motion projection already emitted by `@m3-ui/tokens`; no new motion constants are hardcoded in the component.
 
 ## Intentional web differences / remaining gaps
 

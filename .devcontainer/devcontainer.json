@@ -14,7 +14,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "sudo corepack enable && sudo corepack prepare pnpm@10.0.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @m3/storybook exec playwright install --with-deps --only-shell chromium",
+  "postCreateCommand": "sudo corepack enable && sudo corepack prepare pnpm@10.0.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium",
   "customizations": {
     "vscode": {
       "settings": {

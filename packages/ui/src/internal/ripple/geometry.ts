@@ -1,7 +1,7 @@
 import {
   RippleBoundedExtraRadius,
   RippleStartRadiusLargestDimensionFactor,
-} from '@m3/tokens';
+} from '@m3-ui/tokens';
 import { pxNumber } from '../tokenValues';
 import type { RippleOrigin, RipplePressEvent } from './types';
 

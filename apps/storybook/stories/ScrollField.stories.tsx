@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ScrollField } from '@m3/ui';
+import { ScrollField } from '@m3-ui/ui';
 
 const meta = { title: 'Components/ScrollField', component: ScrollField } satisfies Meta<typeof ScrollField>;
 export default meta;

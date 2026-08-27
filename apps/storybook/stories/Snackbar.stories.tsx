@@ -5,7 +5,7 @@ import {
   SnackbarAction,
   SnackbarDismissAction,
   ThemeProvider,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Snackbar',

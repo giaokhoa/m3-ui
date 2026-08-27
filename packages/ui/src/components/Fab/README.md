@@ -1,6 +1,6 @@
 # FAB
 
-Material 3 floating action button family mapped to the canonical `@m3/tokens` Style Dictionary graph, pinned AndroidX Compose runtime behavior, and current Material Web public FAB adaptations.
+Material 3 floating action button family mapped to the canonical `@m3-ui/tokens` Style Dictionary graph, pinned AndroidX Compose runtime behavior, and current Material Web public FAB adaptations.
 
 ## Runtime contract
 

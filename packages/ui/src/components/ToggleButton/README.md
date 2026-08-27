@@ -20,7 +20,7 @@ Runtime behavior and defaults are mapped from:
 - `ButtonXLargeTokens.kt`
 - `MotionSchemeKeyTokens.FastSpatial`
 
-The canonical repo token build input remains `packages/tokens/tokens/**/*.json` through Style Dictionary. This component consumes generated `@m3/tokens` values and does not add or edit canonical tokens merely to match AndroidX visually.
+The canonical repo token build input remains `packages/tokens/tokens/**/*.json` through Style Dictionary. This component consumes generated `@m3-ui/tokens` values and does not add or edit canonical tokens merely to match AndroidX visually.
 
 ## Public API and variants
 

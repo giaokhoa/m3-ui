@@ -11,7 +11,7 @@ import {
   PermanentNavigationDrawer,
   ThemeProvider,
   useDrawerState,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/NavigationDrawer',

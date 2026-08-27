@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
   type PlainTooltipProps,
   type RichTooltipProps,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Tooltip',

@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ThemeProvider, VerticalDragHandle } from '@m3/ui';
+import { ThemeProvider, VerticalDragHandle } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/DragHandle',

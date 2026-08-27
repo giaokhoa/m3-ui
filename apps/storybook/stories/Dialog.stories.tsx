@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
   ThemeProvider,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Dialog',

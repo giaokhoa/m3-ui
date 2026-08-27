@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { NonInteractiveScrollbar } from '@m3/ui';
+import { NonInteractiveScrollbar } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/NonInteractiveScrollbar',

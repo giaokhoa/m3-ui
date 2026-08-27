@@ -1,4 +1,4 @@
-import * as token from '@m3/tokens';
+import * as token from '@m3-ui/tokens';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { useTheme } from '../../theme/ThemeProvider';
 import type { RippleController } from './useRipple';
