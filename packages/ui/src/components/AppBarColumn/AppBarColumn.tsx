@@ -17,34 +17,35 @@ import {
   buildAppBarOverflowActionMap,
   getAppBarItemKey,
 } from '../../internal/appBar/AppBarItems';
+import { normalizeAppBarMaxItemCount } from '../../internal/appBar/appBarLayout';
 import {
-  normalizeMaxItemCount,
-  resolveAppBarRowLayout,
-  type AppBarRowLayout,
-} from './AppBarRow.layout';
-import type { AppBarAction, AppBarRowProps } from './AppBarRow.types';
-import './app-bar-row.css';
+  resolveAppBarColumnLayout,
+  type AppBarColumnLayout,
+} from './AppBarColumn.layout';
+import type { AppBarAction } from '../AppBarRow/AppBarRow.types';
+import type { AppBarColumnProps } from './AppBarColumn.types';
+import './app-bar-column.css';
 
-const defaultOverflowWidth = 48;
+const defaultOverflowHeight = 48;
 
 function initialLayout(items: readonly AppBarAction[], maxItemCount?: number) {
-  const maxCount = normalizeMaxItemCount(maxItemCount);
+  const maxCount = normalizeAppBarMaxItemCount(maxItemCount);
   if (items.length > maxCount) {
     const inlineCount = Math.max(0, maxCount - 1);
     return {
       inlineCount,
       overflowCount: items.length - inlineCount,
       hasOverflow: true,
-    } satisfies AppBarRowLayout;
+    } satisfies AppBarColumnLayout;
   }
   return {
     inlineCount: items.length,
     overflowCount: 0,
     hasOverflow: false,
-  } satisfies AppBarRowLayout;
+  } satisfies AppBarColumnLayout;
 }
 
-function sameLayout(a: AppBarRowLayout, b: AppBarRowLayout) {
+function sameLayout(a: AppBarColumnLayout, b: AppBarColumnLayout) {
   return (
     a.inlineCount === b.inlineCount &&
     a.overflowCount === b.overflowCount &&
@@ -52,18 +53,18 @@ function sameLayout(a: AppBarRowLayout, b: AppBarRowLayout) {
   );
 }
 
-export function AppBarRow({
+export function AppBarColumn({
   items,
   maxItemCount,
   overflowLabel = 'More actions',
   overflowTrigger,
   className,
   ...props
-}: AppBarRowProps) {
+}: AppBarColumnProps) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const itemWidthsRef = useRef(new Map<string, number>());
-  const overflowWidthRef = useRef<number | null>(null);
-  const [layout, setLayout] = useState<AppBarRowLayout>(() =>
+  const itemHeightsRef = useRef(new Map<string, number>());
+  const overflowHeightRef = useRef<number | null>(null);
+  const [layout, setLayout] = useState<AppBarColumnLayout>(() =>
     initialLayout(items, maxItemCount),
   );
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -88,33 +89,34 @@ export function AppBarRow({
     const update = () => {
       frame = 0;
       root
-        .querySelectorAll<HTMLElement>('[data-app-bar-row-item-index]')
+        .querySelectorAll<HTMLElement>('[data-app-bar-column-item-index]')
         .forEach((node) => {
-          const index = Number(node.dataset.appBarRowItemIndex);
+          const index = Number(node.dataset.appBarColumnItemIndex);
           const key = keys[index];
           if (!key) return;
-          itemWidthsRef.current.set(key, node.getBoundingClientRect().width);
+          itemHeightsRef.current.set(key, node.getBoundingClientRect().height);
         });
 
       const overflowNode = root.querySelector<HTMLElement>(
-        '[data-app-bar-row-overflow-trigger]',
+        '[data-app-bar-column-overflow-trigger]',
       );
       if (overflowNode) {
-        overflowWidthRef.current = overflowNode.getBoundingClientRect().width;
+        overflowHeightRef.current = overflowNode.getBoundingClientRect().height;
       }
 
-      const widths = keys.map((key) => itemWidthsRef.current.get(key));
-      const allMeasured = widths.every(
-        (width): width is number => width !== undefined && Number.isFinite(width),
+      const heights = keys.map((key) => itemHeightsRef.current.get(key));
+      const allMeasured = heights.every(
+        (height): height is number =>
+          height !== undefined && Number.isFinite(height),
       );
-      const maxCount = normalizeMaxItemCount(maxItemCount);
+      const maxCount = normalizeAppBarMaxItemCount(maxItemCount);
       const countOverflows = items.length > maxCount;
 
       const next = allMeasured
-        ? resolveAppBarRowLayout({
-            availableWidth: root.clientWidth,
-            itemWidths: widths,
-            overflowWidth: overflowWidthRef.current ?? defaultOverflowWidth,
+        ? resolveAppBarColumnLayout({
+            availableHeight: root.clientHeight,
+            itemHeights: heights,
+            overflowHeight: overflowHeightRef.current ?? defaultOverflowHeight,
             maxItemCount,
           })
         : countOverflows
@@ -123,7 +125,7 @@ export function AppBarRow({
               inlineCount: items.length,
               overflowCount: 0,
               hasOverflow: false,
-            } satisfies AppBarRowLayout);
+            } satisfies AppBarColumnLayout);
 
       setLayout((current) => (sameLayout(current, next) ? current : next));
     };
@@ -138,7 +140,7 @@ export function AppBarRow({
     observer.observe(root);
     root
       .querySelectorAll<HTMLElement>(
-        '[data-app-bar-row-item-index], [data-app-bar-row-overflow-trigger]',
+        '[data-app-bar-column-item-index], [data-app-bar-column-overflow-trigger]',
       )
       .forEach((node) => observer.observe(node));
 
@@ -159,12 +161,12 @@ export function AppBarRow({
     items,
     keys,
     layout.inlineCount,
-    'app-bar-row',
+    'app-bar-column',
   );
 
   const trigger = overflowTrigger?.({ isOpen: isMenuOpen }) ?? (
     <IconButton aria-label={overflowLabel}>
-      <AppBarOverflowIcon className="app-bar-row__overflow-icon" />
+      <AppBarOverflowIcon className="app-bar-column__overflow-icon" />
     </IconButton>
   );
 
@@ -172,8 +174,8 @@ export function AppBarRow({
   if (layout.hasOverflow) {
     overflowContent = (
       <span
-        className="app-bar-row__overflow"
-        data-app-bar-row-overflow-trigger="true"
+        className="app-bar-column__overflow"
+        data-app-bar-column-overflow-trigger="true"
       >
         <Menu
           aria-label={overflowLabel}
@@ -194,9 +196,9 @@ export function AppBarRow({
             return (
               <AppBarBuiltInOverflowItem
                 key={key}
-                id={`app-bar-row:${key}`}
+                id={`app-bar-column:${key}`}
                 item={item}
-                toggleStateClassName="app-bar-row__toggle-state"
+                toggleStateClassName="app-bar-column__toggle-state"
               />
             );
           })}
@@ -209,7 +211,7 @@ export function AppBarRow({
     <div
       {...props}
       ref={rootRef}
-      className={className ? `app-bar-row ${className}` : 'app-bar-row'}
+      className={className ? `app-bar-column ${className}` : 'app-bar-column'}
       data-inline-count={layout.inlineCount}
       data-overflow-count={layout.overflowCount}
       data-overflow={layout.hasOverflow || undefined}
@@ -219,8 +221,8 @@ export function AppBarRow({
         return (
           <span
             key={key}
-            className="app-bar-row__item"
-            data-app-bar-row-item-index={index}
+            className="app-bar-column__item"
+            data-app-bar-column-item-index={index}
           >
             {item.type === 'custom' ? (
               item.renderInline()

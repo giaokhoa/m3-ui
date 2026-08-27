@@ -1,0 +1,31 @@
+.app-bar-column {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  min-block-size: 0;
+  block-size: 100%;
+  max-block-size: 100%;
+  overflow: hidden;
+}
+
+.app-bar-column__item,
+.app-bar-column__overflow {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.app-bar-column__overflow-icon {
+  display: block;
+  inline-size: 24px;
+  block-size: 24px;
+  fill: currentColor;
+}
+
+.app-bar-column__toggle-state {
+  font-size: 16px;
+  line-height: 1;
+}
