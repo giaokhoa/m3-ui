@@ -15,6 +15,7 @@ export * from './FloatingToolbar';
 export * from './IconButton';
 export * from './ListItem';
 export * from './LoadingIndicator';
+export * from './Menu';
 export * from './NavigationBar';
 export * from './NavigationDrawer';
 export * from './NavigationRail';
