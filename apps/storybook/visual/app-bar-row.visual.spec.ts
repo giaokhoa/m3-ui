@@ -110,7 +110,7 @@ test.describe('Material 3 AppBarRow browser contract', () => {
     });
     const box = await share.boundingBox();
     expect(box?.width ?? 0).toBeLessThan(64);
-    await share.hover();
+    await share.focus();
     await expect(page.getByRole('tooltip')).toContainText('Share this document');
   });
 
