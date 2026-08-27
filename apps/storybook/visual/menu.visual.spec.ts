@@ -103,6 +103,7 @@ test.describe('Material 3 Menu browser contract', () => {
     const popover = page.locator('.exposed-menu__popover');
     await expect(menu).toBeVisible();
     await expect(popover).not.toHaveAttribute('data-entering');
+    await expect(popover).toHaveCSS('transform', 'none');
     const fieldBox = await field
       .locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " text-field ")][1]')
       .boundingBox();
