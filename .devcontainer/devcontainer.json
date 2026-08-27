@@ -1,17 +1,12 @@
 {
-  "name": "m3-ui",
-  "image": "mcr.microsoft.com/devcontainers/base:trixie",
-  "features": {
-    "ghcr.io/devcontainers/features/node:2.1.0": {
-      "version": "22",
-      "pnpmVersion": "10.0.0"
-    }
-  },
-  "remoteUser": "vscode",
+  "name": "m3-ui Node 22",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:3-22",
+  "remoteUser": "node",
+  "updateRemoteUserUID": true,
   "forwardPorts": [5173, 6006],
   "portsAttributes": {
     "5173": {
-      "label": "Playground",
+      "label": "Vite playground",
       "onAutoForward": "notify"
     },
     "6006": {
@@ -19,5 +14,12 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium"
+  "postCreateCommand": "sudo corepack enable && sudo corepack prepare pnpm@10.0.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  }
 }
