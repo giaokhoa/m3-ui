@@ -92,7 +92,7 @@ export const styleEntries = {
   ],
   slider: [
     'src/internal/ripple/ripple.css',
-    'src/components/Slider/Slider.css',
+    'src/components/Slider/slider.css',
   ],
   'split-button': [
     'src/internal/ripple/ripple.css',
@@ -159,7 +159,7 @@ export const publicComponentStyleSources = {
   snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
   tabs: 'src/components/Tabs/tabs.css',
-  'text-field': 'src/components/TextField/text-field.css',
+  'text-field': 'src/components/TextField/TextField.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
   'top-app-bar': 'src/components/TopAppBar/top-app-bar.css',
   tooltip: 'src/components/Tooltip/tooltip.css',
