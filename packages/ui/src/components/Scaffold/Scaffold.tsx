@@ -24,7 +24,7 @@ export interface ScaffoldProps
  * implementation intentionally maps that contract to CSS grid, logical
  * properties and env(safe-area-inset-*), so resize and RTL do not require JS
  * measurement. Bars are expected to own their safe-area edge when present;
- * otherwise the main content receives that edge inset.
+ * otherwise the content receives that edge inset.
  */
 export function Scaffold({
   topBar,
@@ -62,16 +62,16 @@ export function Scaffold({
       } as CSSProperties}
     >
       {hasTopBar ? <div className="scaffold__top-bar">{topBar}</div> : null}
-      <main
+      <div
         className={contentClassName ? `scaffold__content ${contentClassName}` : 'scaffold__content'}
         style={contentStyle}
       >
         {children}
-      </main>
+      </div>
       {hasBottomBar ? <div className="scaffold__bottom-bar">{bottomBar}</div> : null}
 
       {hasSnackbar || hasFab ? (
-        <div className="scaffold__floating-layer" aria-hidden={!hasSnackbar && !hasFab || undefined}>
+        <div className="scaffold__floating-layer">
           <div className="scaffold__floating-stack">
             {hasSnackbar ? (
               <div className="scaffold__snackbar">{snackbarHost}</div>
