@@ -10,7 +10,8 @@
   block-size: 100%;
 }
 
-.bottom-sheet-scaffold__body {
+.bottom-sheet-scaffold__scaffold.scaffold:not([data-has-bottom-bar])
+  .bottom-sheet-scaffold__body {
   box-sizing: border-box;
   padding-block-end: calc(
     var(--scaffold-safe-bottom) + var(--_bottom-sheet-scaffold-peek-height)
