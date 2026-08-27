@@ -3,15 +3,8 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "build": "turbo build",
     "dev": "turbo dev",
-    "storybook": "pnpm --filter @m3-ui/storybook^... build && pnpm --filter @m3-ui/storybook dev",
-    "build:storybook": "pnpm --filter @m3-ui/storybook... build",
-    "test:visual": "pnpm build:storybook && pnpm --filter @m3-ui/storybook test:visual",
-    "test:visual:update": "pnpm build:storybook && pnpm --filter @m3-ui/storybook test:visual:update",
-    "test": "turbo test",
-    "typecheck": "turbo typecheck",
-    "clean": "turbo clean"
+    "build": "turbo build"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
