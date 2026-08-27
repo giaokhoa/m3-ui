@@ -50,7 +50,6 @@
 
 .scaffold__floating-layer {
   position: relative;
-  z-index: 4;
   grid-column: 1;
   grid-row: 2;
   align-self: end;
@@ -85,6 +84,7 @@
 }
 
 .scaffold__snackbar {
+  position: relative;
   z-index: 2;
   grid-row: 1;
   justify-self: center;
@@ -93,6 +93,7 @@
 }
 
 .scaffold__fab {
+  position: relative;
   z-index: 4;
   grid-row: 2;
   inline-size: max-content;
