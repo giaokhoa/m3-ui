@@ -76,6 +76,10 @@ export const styleEntries = {
     'src/components/WideNavigationRail/modal-wide-navigation-rail.css',
   ],
   'progress-indicator': ['src/components/ProgressIndicator/progress-indicator.css'],
+  'pull-to-refresh': [
+    'src/components/ProgressIndicator/progress-indicator.css',
+    'src/components/PullToRefresh/pull-to-refresh.css',
+  ],
   'radio-button': [
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
@@ -148,6 +152,7 @@ export const publicComponentStyleSources = {
   'modal-wide-navigation-rail':
     'src/components/WideNavigationRail/modal-wide-navigation-rail.css',
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
+  'pull-to-refresh': 'src/components/PullToRefresh/pull-to-refresh.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
   scrim: 'src/components/Scrim/scrim.css',
   'search-bar': 'src/components/SearchBar/search-bar.css',
@@ -188,6 +193,7 @@ export const publicComponentModules = {
   'modal-wide-navigation-rail':
     'src/components/WideNavigationRail/ModalWideNavigationRail.tsx',
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
+  'pull-to-refresh': 'src/components/PullToRefresh/PullToRefresh.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',
   'search-bar': 'src/components/SearchBar/SearchBar.tsx',
