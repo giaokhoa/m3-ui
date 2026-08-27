@@ -366,6 +366,7 @@ export function ExposedDropdownMenu<T = unknown>({
           })
         : defaultAnchor}
       <AriaPopover
+        isNonModal
         isOpen={effectiveOpen}
         onOpenChange={(next) => {
           if (next) open();
@@ -379,7 +380,7 @@ export function ExposedDropdownMenu<T = unknown>({
         className="menu-popover exposed-dropdown-menu__popover"
         style={{
           ...getMenuStyle(),
-          ...(matchAnchorWidth ? { width: 'var(--trigger-width)' } : null),
+          ...(matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : null),
           ...(maxHeight != null ? { maxHeight } : null),
         }}
       >
