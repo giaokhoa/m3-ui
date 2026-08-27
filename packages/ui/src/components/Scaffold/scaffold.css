@@ -53,6 +53,7 @@
   grid-column: 1;
   grid-row: 2;
   align-self: end;
+  inline-size: 100%;
   block-size: 0;
   min-inline-size: 0;
   pointer-events: none;
@@ -66,8 +67,12 @@
 
 .scaffold__floating-stack {
   position: absolute;
-  inset-inline: var(--scaffold-safe-left) var(--scaffold-safe-right);
+  inset-inline-start: var(--scaffold-safe-left);
   inset-block-end: var(--scaffold-fab-spacing);
+  box-sizing: border-box;
+  inline-size: calc(
+    100% - var(--scaffold-safe-left) - var(--scaffold-safe-right)
+  );
   display: grid;
   grid-template-rows: auto auto;
   row-gap: 0;
@@ -103,6 +108,7 @@
 
 .scaffold[data-fab-position='start'] .scaffold__fab {
   justify-self: start;
+  margin-inline-start: var(--scaffold-fab-spacing);
 }
 
 .scaffold[data-fab-position='center'] .scaffold__fab {
@@ -112,6 +118,7 @@
 .scaffold[data-fab-position='end'] .scaffold__fab,
 .scaffold[data-fab-position='end-overlay'] .scaffold__fab {
   justify-self: end;
+  margin-inline-end: var(--scaffold-fab-spacing);
 }
 
 .scaffold:not([data-has-fab]) .scaffold__floating-stack {
