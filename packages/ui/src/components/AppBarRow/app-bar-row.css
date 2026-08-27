@@ -1,0 +1,29 @@
+.app-bar-row {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+.app-bar-row__item,
+.app-bar-row__overflow {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.app-bar-row__overflow-icon {
+  display: block;
+  inline-size: 24px;
+  block-size: 24px;
+  fill: currentColor;
+}
+
+.app-bar-row__toggle-state {
+  font-size: 16px;
+  line-height: 1;
+}

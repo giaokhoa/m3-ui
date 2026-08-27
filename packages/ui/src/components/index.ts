@@ -1,3 +1,4 @@
+export * from './AppBarRow';
 export * from './Badge';
 export * from './BottomAppBar';
 export * from './BottomSheet';
