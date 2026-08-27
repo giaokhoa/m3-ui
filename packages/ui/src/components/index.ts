@@ -22,6 +22,7 @@ export * from './WideNavigationRail';
 export * from './ProgressIndicator';
 export * from './PullToRefresh';
 export * from './RadioButton';
+export * from './Scaffold';
 export * from './Scrim';
 export * from './SearchBar';
 export * from './SegmentedButton';

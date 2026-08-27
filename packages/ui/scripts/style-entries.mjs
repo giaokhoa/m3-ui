@@ -84,6 +84,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
   ],
+  scaffold: ['src/components/Scaffold/scaffold.css'],
   scrim: ['src/components/Scrim/scrim.css'],
   'search-bar': [
     'src/internal/elevation/elevation.css',
@@ -154,6 +155,7 @@ export const publicComponentStyleSources = {
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'pull-to-refresh': 'src/components/PullToRefresh/pull-to-refresh.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
+  scaffold: 'src/components/Scaffold/scaffold.css',
   scrim: 'src/components/Scrim/scrim.css',
   'search-bar': 'src/components/SearchBar/search-bar.css',
   'segmented-button': 'src/components/SegmentedButton/segmented-button.css',
@@ -195,6 +197,7 @@ export const publicComponentModules = {
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'pull-to-refresh': 'src/components/PullToRefresh/PullToRefresh.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
+  scaffold: 'src/components/Scaffold/Scaffold.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',
   'search-bar': 'src/components/SearchBar/SearchBar.tsx',
   'segmented-button': 'src/components/SegmentedButton/SegmentedButton.tsx',
