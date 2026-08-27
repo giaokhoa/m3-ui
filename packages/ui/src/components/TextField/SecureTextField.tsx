@@ -1,15 +1,12 @@
 import { useRef, useState } from 'react';
-import type { MouseEvent, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { TextFieldImpl, type TextFieldProps } from './TextField';
 
 export interface SecureTextFieldProps
   extends Omit<TextFieldProps, 'isMultiline' | 'rows' | 'trailingIcon'> {
   trailingIcon?: ReactNode;
-  /** Shows a keyboard-accessible reveal control after any custom trailing icon. */
   isRevealable?: boolean;
-  /** Controlled reveal state. */
   isRevealed?: boolean;
-  /** Initial reveal state when uncontrolled. */
   defaultRevealed?: boolean;
   onRevealChange?: (isRevealed: boolean) => void;
   revealLabel?: string;
@@ -17,12 +14,31 @@ export interface SecureTextFieldProps
 }
 
 export type OutlinedSecureTextFieldProps = SecureTextFieldProps;
-
 type Variant = 'filled' | 'outlined';
+
+const trailingStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 2,
+};
+
+const revealStyle: CSSProperties = {
+  display: 'grid',
+  width: 40,
+  height: 40,
+  placeItems: 'center',
+  border: 0,
+  padding: 0,
+  borderRadius: 999,
+  background: 'transparent',
+  color: 'inherit',
+  cursor: 'pointer',
+};
 
 function EyeIcon({ crossed }: { crossed: boolean }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
       {crossed ? (
         <path
           d="m3.3 2 18.7 18.7-1.3 1.3-3.1-3.1A11.5 11.5 0 0 1 12 20C5 20 1.7 13.8 1.6 13.5L1.3 13l.3-.5a18 18 0 0 1 4.2-4.8L2 3.3 3.3 2Zm4 7.2A14.7 14.7 0 0 0 3.7 13c.9 1.3 3.7 5 8.3 5 1.5 0 2.8-.4 4-.9l-1.7-1.7A4 4 0 0 1 8.6 9.7L7.3 9.2Zm4.9-.2a4 4 0 0 1 2.8 2.8l-2.8-2.8ZM12 6c-1 0-2 .2-2.9.5L7.6 5A12 12 0 0 1 12 4c7 0 10.3 6.2 10.4 6.5l.3.5-.3.5a17 17 0 0 1-2.9 3.7L18 13.8c1.1-1 1.8-2 2.3-2.8-.9-1.3-3.7-5-8.3-5Z"
@@ -66,7 +82,7 @@ function SecureTextFieldImpl({
   const toggleReveal = () => {
     const input = inputRef.current;
     const selection = input
-      ? [input.selectionStart, input.selectionEnd, input.selectionDirection] as const
+      ? ([input.selectionStart, input.selectionEnd, input.selectionDirection] as const)
       : null;
     setRevealed(!revealed);
 
@@ -78,7 +94,7 @@ function SecureTextFieldImpl({
         try {
           current.setSelectionRange(selection[0], selection[1], selection[2] ?? undefined);
         } catch {
-          // Some browsers/input modes do not expose selection APIs. Focus/value remain intact.
+          // Selection APIs vary by browser/input mode; value and focus remain intact.
         }
       }
     });
@@ -86,12 +102,13 @@ function SecureTextFieldImpl({
 
   const secureTrailing =
     trailingIcon || isRevealable ? (
-      <span className="secure-text-field__trailing">
+      <span className="secure-text-field__trailing" style={trailingStyle}>
         {trailingIcon}
         {isRevealable ? (
           <button
             type="button"
             className="secure-text-field__reveal"
+            style={revealStyle}
             aria-label={revealed ? hideLabel : revealLabel}
             aria-pressed={revealed}
             disabled={isDisabled}
