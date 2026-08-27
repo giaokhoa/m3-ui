@@ -1,0 +1,67 @@
+.pull-to-refresh {
+  --_pull-to-refresh-threshold: 80px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  touch-action: pan-y;
+}
+
+.pull-to-refresh[data-at-top='true'][data-enabled='true'] {
+  /* Preserve horizontal/native upward panning while reserving a downward pull at the top edge. */
+  touch-action: pan-x pan-up;
+}
+
+.pull-to-refresh__content {
+  min-height: 100%;
+  position: relative;
+}
+
+.pull-to-refresh__indicator {
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  opacity: var(--_pull-to-refresh-visibility, 0);
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, calc(var(--_pull-to-refresh-offset, 0px) - 40px));
+  transition:
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 120ms linear;
+  z-index: 1;
+}
+
+.pull-to-refresh__indicator-surface {
+  align-items: center;
+  background: var(--surface-container-high, Canvas);
+  border-radius: 999px;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--shadow, #000) 30%, transparent),
+    0 2px 6px color-mix(in srgb, var(--shadow, #000) 15%, transparent);
+  box-sizing: border-box;
+  color: var(--primary, currentColor);
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.pull-to-refresh__progress {
+  height: 24px;
+  width: 24px;
+}
+
+.pull-to-refresh__sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-to-refresh__indicator {
+    transition-duration: 0s;
+  }
+}

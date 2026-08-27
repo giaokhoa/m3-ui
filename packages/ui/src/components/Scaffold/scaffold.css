@@ -1,0 +1,133 @@
+.scaffold {
+  --scaffold-fab-spacing: 16px;
+  --scaffold-safe-top: env(safe-area-inset-top, 0px);
+  --scaffold-safe-right: env(safe-area-inset-right, 0px);
+  --scaffold-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --scaffold-safe-left: env(safe-area-inset-left, 0px);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-inline-size: 0;
+  overflow-x: clip;
+  background: var(--scaffold-container-color, var(--background, transparent));
+  color: var(--scaffold-content-color, inherit);
+}
+
+.scaffold__top-bar {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+  min-inline-size: 0;
+}
+
+.scaffold__content {
+  grid-column: 1;
+  grid-row: 2;
+  min-inline-size: 0;
+  min-block-size: 0;
+  box-sizing: border-box;
+  padding-left: var(--scaffold-safe-left);
+  padding-right: var(--scaffold-safe-right);
+  padding-block-start: 0;
+  padding-block-end: 0;
+}
+
+.scaffold:not([data-has-top-bar]) .scaffold__content {
+  padding-block-start: var(--scaffold-safe-top);
+}
+
+.scaffold:not([data-has-bottom-bar]) .scaffold__content {
+  padding-block-end: var(--scaffold-safe-bottom);
+}
+
+.scaffold__bottom-bar {
+  position: relative;
+  z-index: 3;
+  grid-column: 1;
+  grid-row: 3;
+  min-inline-size: 0;
+}
+
+.scaffold__floating-layer {
+  position: relative;
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  inline-size: 100%;
+  block-size: 0;
+  min-inline-size: 0;
+  pointer-events: none;
+}
+
+.scaffold[data-fab-position='end-overlay'] .scaffold__floating-layer {
+  grid-row: 1 / -1;
+  align-self: stretch;
+  block-size: auto;
+}
+
+.scaffold__floating-stack {
+  position: absolute;
+  left: var(--scaffold-safe-left);
+  right: var(--scaffold-safe-right);
+  inset-block-end: var(--scaffold-fab-spacing);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: 0;
+  align-items: end;
+  pointer-events: none;
+}
+
+.scaffold:not([data-has-bottom-bar]) .scaffold__floating-stack {
+  inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
+}
+
+.scaffold[data-fab-position='end-overlay'] .scaffold__floating-stack {
+  inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
+}
+
+.scaffold__snackbar {
+  position: relative;
+  z-index: 2;
+  grid-row: 1;
+  justify-self: center;
+  max-inline-size: 100%;
+  pointer-events: auto;
+}
+
+.scaffold__fab {
+  position: relative;
+  z-index: 4;
+  grid-row: 2;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  pointer-events: auto;
+}
+
+.scaffold[data-fab-position='start'] .scaffold__fab {
+  justify-self: start;
+  margin-inline-start: var(--scaffold-fab-spacing);
+}
+
+.scaffold[data-fab-position='center'] .scaffold__fab {
+  justify-self: center;
+}
+
+.scaffold[data-fab-position='end'] .scaffold__fab,
+.scaffold[data-fab-position='end-overlay'] .scaffold__fab {
+  justify-self: end;
+  margin-inline-end: var(--scaffold-fab-spacing);
+}
+
+.scaffold:not([data-has-fab]) .scaffold__floating-stack {
+  inset-block-end: 0;
+}
+
+.scaffold:not([data-has-fab]):not([data-has-bottom-bar]) .scaffold__floating-stack,
+.scaffold[data-fab-position='end-overlay']:not([data-has-fab]) .scaffold__floating-stack {
+  inset-block-end: var(--scaffold-safe-bottom);
+}
