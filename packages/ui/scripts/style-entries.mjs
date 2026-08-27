@@ -2,6 +2,11 @@ export const styleEntries = {
   badge: ['src/components/Badge/badge.css'],
   'bottom-app-bar': ['src/components/BottomAppBar/bottom-app-bar.css'],
   'bottom-sheet': ['src/components/BottomSheet/bottom-sheet.css'],
+  'bottom-sheet-scaffold': [
+    'src/components/Scaffold/scaffold.css',
+    'src/components/BottomSheet/bottom-sheet.css',
+    'src/components/BottomSheetScaffold/bottom-sheet-scaffold.css',
+  ],
   button: [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -149,6 +154,8 @@ export const publicComponentStyleSources = {
   badge: 'src/components/Badge/badge.css',
   'bottom-app-bar': 'src/components/BottomAppBar/bottom-app-bar.css',
   'bottom-sheet': 'src/components/BottomSheet/bottom-sheet.css',
+  'bottom-sheet-scaffold':
+    'src/components/BottomSheetScaffold/bottom-sheet-scaffold.css',
   button: 'src/components/Button/button.css',
   'button-group': 'src/components/ButtonGroup/button-group.css',
   card: 'src/components/Card/card.css',
@@ -182,7 +189,7 @@ export const publicComponentStyleSources = {
   'split-button': 'src/components/SplitButton/split-button.css',
   snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
-  tabs: 'src/components/Tabs/tabs.css',
+  tabs: 'src/components/Tabs/Tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
   'toggle-button': 'src/components/ToggleButton/toggle-button.css',
@@ -194,6 +201,8 @@ export const publicComponentModules = {
   badge: 'src/components/Badge/Badge.tsx',
   'bottom-app-bar': 'src/components/BottomAppBar/BottomAppBar.tsx',
   'bottom-sheet': 'src/components/BottomSheet/BottomSheet.tsx',
+  'bottom-sheet-scaffold':
+    'src/components/BottomSheetScaffold/BottomSheetScaffold.tsx',
   button: 'src/components/Button/Button.tsx',
   'button-group': 'src/components/ButtonGroup/ButtonGroup.tsx',
   card: 'src/components/Card/Card.tsx',
