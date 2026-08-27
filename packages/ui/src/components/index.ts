@@ -27,6 +27,7 @@ export * from './SegmentedButton';
 export * from './Slider';
 export * from './SplitButton';
 export * from './Snackbar';
+export * from './SwipeToDismissBox';
 export * from './Switch';
 export * from './Tabs';
 export * from './TextField';
