@@ -4,6 +4,7 @@ import {
   OutlinedSecureTextField,
   SecureTextField,
   ThemeProvider,
+  type SecureTextFieldProps,
 } from '@m3/ui';
 
 const meta = {
@@ -21,83 +22,48 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+function ControlledExample(args: SecureTextFieldProps) {
+  const [value, setValue] = useState('controlled password');
+  return <SecureTextField {...args} value={value} onChange={setValue} />;
+}
+
 export const Default: Story = {
-  render: (args) => (
-    <div className="storybook-center">
-      <SecureTextField {...args} />
-    </div>
-  ),
+  render: (args) => <div className="storybook-center"><SecureTextField {...args} /></div>,
 };
 
 export const WithValue: Story = {
   args: { defaultValue: 'correct horse battery staple' },
-  render: (args) => (
-    <div className="storybook-center">
-      <SecureTextField {...args} />
-    </div>
-  ),
+  render: (args) => <div className="storybook-center"><SecureTextField {...args} /></div>,
 };
 
 export const Outlined: Story = {
-  render: (args) => (
-    <div className="storybook-center">
-      <OutlinedSecureTextField {...args} />
-    </div>
-  ),
+  render: (args) => <div className="storybook-center"><OutlinedSecureTextField {...args} /></div>,
 };
 
 export const Invalid: Story = {
-  args: {
-    defaultValue: 'short',
-    isInvalid: true,
-    errorMessage: 'Password is too short',
-  },
-  render: (args) => (
-    <div className="storybook-center">
-      <SecureTextField {...args} />
-    </div>
-  ),
+  args: { defaultValue: 'short', isInvalid: true, errorMessage: 'Password is too short' },
+  render: (args) => <div className="storybook-center"><SecureTextField {...args} /></div>,
 };
 
 export const Disabled: Story = {
   args: { defaultValue: 'disabled password', isDisabled: true },
-  render: (args) => (
-    <div className="storybook-center">
-      <SecureTextField {...args} />
-    </div>
-  ),
+  render: (args) => <div className="storybook-center"><SecureTextField {...args} /></div>,
 };
 
 export const ReadOnly: Story = {
   args: { defaultValue: 'read only password', isReadOnly: true },
-  render: (args) => (
-    <div className="storybook-center">
-      <SecureTextField {...args} />
-    </div>
-  ),
+  render: (args) => <div className="storybook-center"><SecureTextField {...args} /></div>,
 };
 
 export const Controlled: Story = {
-  render: (args) => {
-    const [value, setValue] = useState('controlled password');
-    return (
-      <div className="storybook-center">
-        <SecureTextField {...args} value={value} onChange={setValue} />
-      </div>
-    );
-  },
+  render: (args) => <div className="storybook-center"><ControlledExample {...args} /></div>,
 };
 
 export const FormContract: Story = {
   render: (args) => (
     <div className="storybook-center">
       <form data-testid="secure-form">
-        <SecureTextField
-          {...args}
-          name="password"
-          defaultValue="submitted-secret"
-          autoComplete="new-password"
-        />
+        <SecureTextField {...args} name="password" defaultValue="submitted-secret" autoComplete="new-password" />
         <button type="submit">Submit</button>
       </form>
     </div>
