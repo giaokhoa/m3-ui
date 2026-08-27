@@ -176,10 +176,12 @@ export function ExposedMenu<T extends object>({
   ...menuProps
 }: ExposedMenuProps<T>) {
   const anchorRef = useRef<HTMLDivElement>(null);
-  const triggerInputRef = useRef<HTMLInputElement | null>(null);
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = controlledOpen ?? uncontrolledOpen;
 
+  const focusAnchor = useCallback(() => {
+    anchorRef.current?.querySelector<HTMLInputElement>('input')?.focus();
+  }, []);
   const setOpen = useCallback(
     (next: boolean) => {
       if (controlledOpen === undefined) setUncontrolledOpen(next);
@@ -216,12 +218,11 @@ export function ExposedMenu<T extends object>({
         if (event.key === 'Escape' && isOpen) {
           event.preventDefault();
           setOpen(false);
-          triggerInputRef.current?.focus();
+          focusAnchor();
         }
       }}
     >
       <TextField
-        ref={triggerInputRef as never}
         label={label}
         value={value}
         isReadOnly
@@ -235,7 +236,7 @@ export function ExposedMenu<T extends object>({
         isOpen={isOpen}
         onOpenChange={(next) => {
           setOpen(next);
-          if (!next) requestAnimationFrame(() => triggerInputRef.current?.focus());
+          if (!next) requestAnimationFrame(focusAnchor);
         }}
         triggerRef={anchorRef}
         placement="bottom start"
