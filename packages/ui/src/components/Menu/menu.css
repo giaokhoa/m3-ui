@@ -133,7 +133,6 @@
 
 .exposed-menu {
   display: inline-block;
-  inline-size: 100%;
 }
 
 .exposed-menu > .text-field {
