@@ -1,5 +1,5 @@
 import * as token from '@m3-ui/tokens';
-import { pxNumber } from '../internal/tokenValues';
+import { pxNumber } from '../../internal/tokenValues';
 
 export interface WindowSize {
   /** Available layout-viewport width in CSS pixels. */
