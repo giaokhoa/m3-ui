@@ -1,0 +1,53 @@
+# ToggleButton parity notes
+
+Pinned AndroidX revision: `ff9a7111302243197384c499d5e3461c1804cd6e`.
+Material Web reference/audit pin: `cac97678831d48d4eb4a606ca50f92673a1dc20c`.
+
+## Upstream sources
+
+Runtime behavior and defaults are mapped from:
+
+- `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ToggleButton.kt`
+- shared `Button` defaults/helpers used by that source
+- `FilledButtonTokens.kt`
+- `ElevatedButtonTokens.kt`
+- `TonalButtonTokens.kt`
+- `OutlinedButtonTokens.kt`
+- `ButtonXSmallTokens.kt`
+- `ButtonSmallTokens.kt`
+- `ButtonMediumTokens.kt`
+- `ButtonLargeTokens.kt`
+- `ButtonXLargeTokens.kt`
+- `MotionSchemeKeyTokens.FastSpatial`
+
+The canonical repo token build input remains `packages/tokens/tokens/**/*.json` through Style Dictionary. This component consumes generated `@m3/tokens` values and does not add or edit canonical tokens merely to match AndroidX visually.
+
+## Public API and variants
+
+The family is intentionally separate from static `Button` and icon-only `IconToggleButton`:
+
+- `ToggleButton`
+- `ElevatedToggleButton`
+- `FilledTonalToggleButton`
+- `OutlinedToggleButton`
+
+All variants are controlled through `isSelected` and `onChange`, support an optional `startIcon`, and expose the five expressive size buckets: `extraSmall`, `small`, `medium`, `large`, and `extraLarge`.
+
+## Web semantics
+
+AndroidX currently adds checkbox role semantics to its toggleable `Surface`. On the web this implementation intentionally uses React Aria `ToggleButton`, which renders button semantics with `aria-pressed`. This matches the native pressable-toggle model, gives Space/Enter activation, focus management, disabled behavior, and controlled state without recreating those behaviors locally.
+
+## State, shape, and motion
+
+Unchecked buttons use the round container shape. Checked buttons use the AndroidX selected-square shape bucket, while active press takes priority over checked state and uses the pressed shape. The selected square shape is a renderer-level projection from existing generated shape tokens because the repo's canonical Button size token table currently carries the pressed shape but not the selected shape.
+
+Selected/unselected color mappings follow the pinned AndroidX token families. Outlined buttons drop the outline while selected and use 1px/1px/1px/2px/3px outlines for extra-small through extra-large when unselected. Elevated state shadows reuse the existing Button elevation resolver.
+
+Shape, color, border, and elevation transitions reuse the generated Material motion projection. `prefers-reduced-motion: reduce` disables transitions so the final controlled state is applied immediately. There is no local selected-animation state, so rapid controlled toggles cannot leave an animation state machine stuck between values.
+
+## Canonical token boundary and web adaptations
+
+- The canonical Button size tokens currently project extra-small icon spacing as 4px while pinned AndroidX `ButtonXSmallTokens.IconLabelSpace` is 8px. ToggleButton adapts only that renderer value to 8px; the canonical token source is not changed.
+- Selected square shapes are resolved from generated global shape tokens rather than adding a second component token table.
+- CSS `border-radius` represents AndroidX rounded/corner-based shape morphing; arbitrary Compose `Shape` path geometry is not exposed.
+- React Aria owns interaction semantics; Kotlin `Modifier`, `InteractionSource`, `Dp`, and companion/default objects are not part of the public API.
