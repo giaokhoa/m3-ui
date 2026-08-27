@@ -1,14 +1,16 @@
 export {
   CircularProgressIndicator,
-  CircularWavyProgressIndicator,
   LinearProgressIndicator,
-  LinearWavyProgressIndicator,
   type CircularProgressIndicatorProps,
-  type CircularWavyProgressIndicatorProps,
   type LinearProgressIndicatorProps,
+} from './ProgressIndicator';
+export {
+  CircularWavyProgressIndicator,
+  LinearWavyProgressIndicator,
+  type CircularWavyProgressIndicatorProps,
   type LinearWavyProgressIndicatorProps,
   type WavyProgressIndicatorProps,
-} from './ProgressIndicator';
+} from './WavyProgressIndicator';
 export {
   getProgressIndicatorStyle,
   progressIndicatorFourColors,

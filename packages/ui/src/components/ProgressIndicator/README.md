@@ -11,11 +11,11 @@ Material 3 progress indicators mapped to the canonical `@m3/tokens` Style Dictio
 
 All four use React Aria Components `ProgressBar` as the semantic owner. The Material wrapper defaults to the Material/Compose/Web 0..1 value range (`minValue=0`, `maxValue=1`) while still accepting custom React Aria ranges. Indeterminate mode is selected with `isIndeterminate`; RAC then omits `aria-valuenow` and exposes the correct progressbar semantics.
 
-Progress indicators have no visible label in the Material component itself. Supply `aria-label` or `aria-labelledby` for a useful accessible name.
+Progress indicators have no visible label in the Material component itself. Supply `aria-label` or `aria-labelledby` for a useful accessible name. Wavy drawing SVGs are `aria-hidden`; animation never mutates the semantic owner.
 
 ## Canonical geometry
 
-The checked-in Style Dictionary source owns the current component geometry and colors:
+The checked-in Style Dictionary source `packages/tokens/tokens/component/progress-indicator.json` owns the current component geometry and colors:
 
 - standard linear: 4px height / active / track thickness, 4px track-active gap, 4px stop indicator.
 - standard circular: 40px container and 4px active/track thickness.
@@ -27,25 +27,27 @@ The 240px default linear width is deliberately a runtime projection because Andr
 
 ## Runtime behavior
 
-Pinned AndroidX Compose revision `ff9a7111302243197384c499d5e3461c1804cd6e` is used for current standard/wavy geometry, wavy amplitude behavior, semantic ranges, and current circular indeterminate motion. Compose's default determinate wavy amplitude is flat through 10%, wavy from >10% through <95%, then flat again.
+Pinned AndroidX Compose revision `ff9a7111302243197384c499d5e3461c1804cd6e` is used for `WavyProgressIndicator.kt`, `ProgressIndicator.kt`, the component drawing helpers, `ProgressIndicatorTokens`, `LinearProgressIndicatorTokens`, `CircularProgressIndicatorTokens`, and `MotionTokens`. Compose supplies current wavy geometry, progress coercion, determinate amplitude lifecycle, zero-speed behavior, circular continuity, and indeterminate motion.
 
-Current Material Web revision `cac97678831d48d4eb4a606ca50f92673a1dc20c` is used for web-specific behavior that React consumers need:
-
-- linear determinate 250ms transform motion and indeterminate primary/secondary bar animation;
-- circular determinate 500ms decelerating stroke motion and the current 5332ms four-color cycle;
-- optional `fourColor` indeterminate rendering;
-- optional linear `bufferValue` rendering;
-- the sourced 250ms determinate renderer transition and 80px minimum web width.
-
-`fourColor` uses Material Web's documented default role sequence: primary, primary-container, tertiary, tertiary-container. These are existing canonical core color roles; no extra component tokens are invented.
+Current Material Web revision `cac97678831d48d4eb4a606ca50f92673a1dc20c` remains the audit pin for web renderer behavior. Standard progress keeps its existing Web adaptations; this wavy hardening does not rewrite standard indicators or canonical tokens.
 
 ## Wavy controls
 
-Wavy indicators accept `amplitude`, `wavelength`, and `waveSpeed`. `amplitude` may be a 0..1 number or a function of normalized progress. `wavelength` and `waveSpeed` are CSS-pixel runtime controls matching the Compose API model; defaults come from canonical component tokens and one wavelength per second.
+Wavy indicators expose React/TypeScript-idiomatic runtime controls:
+
+- `value`, `minValue`, `maxValue`, and `isIndeterminate` through React Aria progress semantics;
+- `amplitude` as a numeric 0..1 multiplier (no Compose progress getter or amplitude lambda leaks into the public API);
+- `wavelength` and `waveSpeed` in CSS pixels / CSS pixels per second;
+- `color` and `trackColor` visual overrides;
+- `thickness` and `trackThickness` numeric stroke-width overrides.
+
+Determinate indicators use the Material default amplitude lifecycle when `amplitude` is omitted: flat through 10%, full wave above 10% through below 95%, then flat again. Indeterminate indicators default to full amplitude. Invalid numeric inputs are normalized; progress is clamped to its semantic range, NaN resolves safely to the minimum, amplitude is clamped to 0..1, and negative/invalid wavelength, speed, or thickness values cannot create invalid SVG geometry. `waveSpeed={0}` intentionally freezes wave phase in a valid state.
+
+Circular wave generation selects an integral number of waves around the circumference, so full-circle paths meet without a visible phase seam. SVG view boxes plus non-scaling linear strokes preserve geometry when resized. `prefers-reduced-motion: reduce` disables CSS motion and SVG path interpolation while preserving a static valid indicator.
 
 ## Intentional boundaries
 
 - No canonical token file is generated or mutated by this component.
-- Buffer is a Web-only visual adaptation and is not assigned synthetic progress semantics beyond the primary value owned by RAC.
-- Four-color is an indeterminate Web adaptation and does not alter the progressbar accessibility model.
-- Runtime animation constants that are not Material tokens remain local renderer constants with their pinned source documented above.
+- Buffer and four-color remain standard-progress Web adaptations; the wavy public APIs do not inherit those unrelated controls.
+- Renderer-only dimensions and animation mechanics stay local rather than becoming synthetic tokens.
+- No general-purpose chart/path library or new dependency is introduced.
