@@ -249,7 +249,7 @@ export function SwipeToDismissBox({
         } as CSSProperties
       }
     >
-      <div aria-hidden="true" className="swipe-to-dismiss-box__background">
+      <div className="swipe-to-dismiss-box__background">
         {backgroundContent}
       </div>
       <div
