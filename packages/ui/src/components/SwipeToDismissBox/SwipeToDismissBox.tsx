@@ -17,6 +17,8 @@ import {
 } from './SwipeToDismissBox.logic';
 import './swipe-to-dismiss-box.css';
 
+const SETTLING_DURATION_MS = 220;
+
 interface ActiveGesture {
   pointerId: number;
   startX: number;
@@ -35,7 +37,7 @@ export interface SwipeToDismissBoxProps
   defaultValue?: SwipeToDismissBoxValue;
   /** Called whenever a gesture resolves to a new logical value. */
   onValueChange?: (value: SwipeToDismissBoxValue) => void;
-  /** Called exactly once when a gesture settles in a dismissed direction. */
+  /** Called exactly once after a gesture settles in a dismissed direction. */
   onDismiss?: (direction: Exclude<SwipeToDismissBoxValue, 'settled'>) => void;
   /** Content revealed underneath the foreground while swiping. */
   backgroundContent: ReactNode;
@@ -87,11 +89,32 @@ export function SwipeToDismissBox({
   const value = controlledValue ?? uncontrolledValue;
   const rootRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef<ActiveGesture | null>(null);
+  const pendingDismissRef = useRef<Exclude<SwipeToDismissBoxValue, 'settled'> | null>(null);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dismissFiredForRef = useRef<SwipeToDismissBoxValue>('settled');
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
   const [width, setWidth] = useState(0);
   const [dragOffset, setDragOffset] = useState<number | null>(null);
   const [settling, setSettling] = useState(false);
   const [renderedValue, setRenderedValue] = useState<SwipeToDismissBoxValue>(value);
-  const dismissFiredForRef = useRef<SwipeToDismissBoxValue>('settled');
+
+  const clearDismissTimer = () => {
+    if (dismissTimerRef.current !== null) {
+      clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = null;
+    }
+  };
+
+  const finishPendingDismiss = () => {
+    const target = pendingDismissRef.current;
+    if (!target) return;
+    pendingDismissRef.current = null;
+    clearDismissTimer();
+    if (dismissFiredForRef.current === target) return;
+    dismissFiredForRef.current = target;
+    onDismissRef.current?.(target);
+  };
 
   useLayoutEffect(() => {
     const element = rootRef.current;
@@ -106,8 +129,14 @@ export function SwipeToDismissBox({
 
   useEffect(() => {
     setRenderedValue(value);
-    if (value === 'settled') dismissFiredForRef.current = 'settled';
+    if (value === 'settled') {
+      pendingDismissRef.current = null;
+      clearDismissTimer();
+      dismissFiredForRef.current = 'settled';
+    }
   }, [value]);
+
+  useEffect(() => () => clearDismissTimer(), []);
 
   const rtl = dir === 'rtl';
   const logicalSign = rtl ? -1 : 1;
@@ -127,13 +156,22 @@ export function SwipeToDismissBox({
     if (target !== value) onValueChange?.(target);
 
     if (target === 'settled') {
+      pendingDismissRef.current = null;
+      clearDismissTimer();
       dismissFiredForRef.current = 'settled';
-    } else if (dismissFiredForRef.current !== target) {
-      dismissFiredForRef.current = target;
-      onDismiss?.(target);
+    } else {
+      pendingDismissRef.current = target;
+      clearDismissTimer();
+      if (prefersReducedMotion()) {
+        setSettling(false);
+        finishPendingDismiss();
+      } else {
+        dismissTimerRef.current = setTimeout(() => {
+          setSettling(false);
+          finishPendingDismiss();
+        }, SETTLING_DURATION_MS + 32);
+      }
     }
-
-    if (prefersReducedMotion()) setSettling(false);
   };
 
   const beginGesture = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -221,6 +259,8 @@ export function SwipeToDismissBox({
     const gesture = gestureRef.current;
     if (!gesture || gesture.pointerId !== event.pointerId) return;
     gestureRef.current = null;
+    pendingDismissRef.current = null;
+    clearDismissTimer();
     setDragOffset(null);
     setSettling(true);
     setRenderedValue(value);
@@ -244,7 +284,9 @@ export function SwipeToDismissBox({
       style={
         {
           '--_swipe-to-dismiss-offset': `${physicalOffset}px`,
-          '--_swipe-to-dismiss-transition': settling ? 'transform 220ms cubic-bezier(0.2, 0, 0, 1)' : 'none',
+          '--_swipe-to-dismiss-transition': settling
+            ? `transform ${SETTLING_DURATION_MS}ms cubic-bezier(0.2, 0, 0, 1)`
+            : 'none',
           ...style,
         } as CSSProperties
       }
@@ -261,7 +303,9 @@ export function SwipeToDismissBox({
         onPointerMove={moveGesture}
         onPointerUp={finishGesture}
         onTransitionEnd={(event) => {
-          if (event.propertyName === 'transform') setSettling(false);
+          if (event.propertyName !== 'transform') return;
+          setSettling(false);
+          finishPendingDismiss();
         }}
       >
         {children}
