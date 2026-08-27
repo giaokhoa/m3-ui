@@ -120,9 +120,9 @@ jobs:
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3-ui/tokens audit:androidx
       - name: Test
-        run: pnpm test
+        run: pnpm -r --if-present test
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm -r --if-present typecheck
       - name: Build
         run: pnpm build
       - name: Install Chromium headless shell
