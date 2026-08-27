@@ -80,6 +80,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
   ],
+  scaffold: ['src/components/Scaffold/scaffold.css'],
   scrim: ['src/components/Scrim/scrim.css'],
   'search-bar': [
     'src/internal/elevation/elevation.css',
@@ -91,7 +92,7 @@ export const styleEntries = {
   ],
   slider: [
     'src/internal/ripple/ripple.css',
-    'src/components/Slider/slider.css',
+    'src/components/Slider/Slider.css',
   ],
   'split-button': [
     'src/internal/ripple/ripple.css',
@@ -149,6 +150,7 @@ export const publicComponentStyleSources = {
     'src/components/WideNavigationRail/modal-wide-navigation-rail.css',
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
+  scaffold: 'src/components/Scaffold/scaffold.css',
   scrim: 'src/components/Scrim/scrim.css',
   'search-bar': 'src/components/SearchBar/search-bar.css',
   'segmented-button': 'src/components/SegmentedButton/segmented-button.css',
@@ -189,6 +191,7 @@ export const publicComponentModules = {
     'src/components/WideNavigationRail/ModalWideNavigationRail.tsx',
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
+  scaffold: 'src/components/Scaffold/Scaffold.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',
   'search-bar': 'src/components/SearchBar/SearchBar.tsx',
   'segmented-button': 'src/components/SegmentedButton/SegmentedButton.tsx',
