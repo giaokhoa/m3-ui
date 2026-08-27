@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   verify:
-    name: Test, typecheck, build and visual regression
+    name: Dev smoke, test, typecheck, build and visual regression
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
@@ -119,6 +119,38 @@ jobs:
         run: pnpm --filter @m3-ui/tokens exec node scripts/audit-figma-reference.mjs --require-complete
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3-ui/tokens audit:androidx
+      - name: Dev smoke from clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf packages/ui/dist packages/tokens/dist
+          pnpm dev > /tmp/m3-ui-dev.log 2>&1 &
+          dev_pid=$!
+          cleanup() {
+            kill "$dev_pid" 2>/dev/null || true
+            wait "$dev_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          for _ in {1..90}; do
+            if curl --fail --silent http://127.0.0.1:5173/ >/dev/null \
+              && curl --fail --silent http://127.0.0.1:6006/ >/dev/null; then
+              sleep 5
+              if grep -Fq 'Failed to resolve entry for package "@m3-ui/ui"' /tmp/m3-ui-dev.log; then
+                cat /tmp/m3-ui-dev.log
+                exit 1
+              fi
+              exit 0
+            fi
+            if ! kill -0 "$dev_pid" 2>/dev/null; then
+              cat /tmp/m3-ui-dev.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          cat /tmp/m3-ui-dev.log
+          exit 1
       - name: Test
         run: pnpm -r --if-present test
       - name: Build
