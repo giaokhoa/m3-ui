@@ -25,6 +25,8 @@ export interface SheetAnchorOptions {
   viewportHeight: number;
   sheetHeight: number;
   enabledValues?: Iterable<SheetValue>;
+  /** Visible height at the PartiallyExpanded anchor. Defaults to half the viewport. */
+  partialExpandedHeight?: number;
 }
 
 export interface ResolveSheetTargetOptions {
@@ -87,21 +89,29 @@ function canonicalAnchorEntries(anchors: SheetAnchors) {
 }
 
 /**
- * Mirrors the deterministic AndroidX anchor calculation:
- * Hidden = full height, Expanded = full height - sheet height, and Partial
- * keeps at most half of the viewport visible. Short sheets therefore converge
- * Partial with Expanded instead of lifting away from the bottom edge.
+ * Mirrors AndroidX deterministic anchors. Generic BottomSheet defaults Partial
+ * to at most half the viewport; compositions such as BottomSheetScaffold can
+ * supply their explicit peek height without introducing a second state model.
  */
 export function calculateSheetAnchors({
   viewportHeight,
   sheetHeight,
   enabledValues,
+  partialExpandedHeight,
 }: SheetAnchorOptions): SheetAnchors {
   if (!(Number.isFinite(viewportHeight) && viewportHeight >= 0)) {
     throw new RangeError('viewportHeight must be a finite non-negative number.');
   }
   if (!(Number.isFinite(sheetHeight) && sheetHeight >= 0)) {
     throw new RangeError('sheetHeight must be a finite non-negative number.');
+  }
+  if (
+    partialExpandedHeight !== undefined &&
+    !(Number.isFinite(partialExpandedHeight) && partialExpandedHeight >= 0)
+  ) {
+    throw new RangeError(
+      'partialExpandedHeight must be a finite non-negative number.',
+    );
   }
 
   const enabled = valueSet(enabledValues);
@@ -114,9 +124,12 @@ export function calculateSheetAnchors({
     anchors[SheetValue.Hidden] = viewportHeight;
   }
   if (enabled.has(SheetValue.PartiallyExpanded)) {
-    const visibleHeight = Math.min(viewportHeight / 2, sheetHeight);
-    anchors[SheetValue.PartiallyExpanded] =
-      viewportHeight - visibleHeight;
+    const visibleHeight = Math.min(
+      partialExpandedHeight ?? viewportHeight / 2,
+      sheetHeight,
+      viewportHeight,
+    );
+    anchors[SheetValue.PartiallyExpanded] = viewportHeight - visibleHeight;
   }
   if (sheetHeight > 0) {
     anchors[SheetValue.Expanded] = Math.max(
