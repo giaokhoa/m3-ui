@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ExposedDropdownMenu } from '@m3/ui';
+import { ExposedDropdownMenu } from '@m3-ui/ui';
 
 const baseItems = [
   { value: 'compact', label: 'Compact' },

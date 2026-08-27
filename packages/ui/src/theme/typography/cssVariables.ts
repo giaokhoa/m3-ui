@@ -1,4 +1,4 @@
-import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3/tokens';
+import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
 
 type TypographyThemeStyle = CSSProperties &

@@ -1,4 +1,4 @@
-import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3/tokens';
+import { TypefaceBrand, TypefaceFallback, TypefacePlain } from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
 import { defaultTypographyThemeStyle } from './cssVariables';
 

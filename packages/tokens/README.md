@@ -1,6 +1,6 @@
 # Tokens
 
-Target publish scope: `@m3-ui/tokens`. The workspace keeps `@m3/tokens` until the repository-wide namespace migration is done atomically.
+Target publish scope: `@m3-ui/tokens`. The workspace keeps `@m3-ui/tokens` until the repository-wide namespace migration is done atomically.
 
 ## Source of truth
 
@@ -52,9 +52,9 @@ A runtime theme override such as the global font family may still use CSS inheri
 
 Style Dictionary 5.5.2 is the sole build engine. `style-dictionary.config.mjs` reads only `tokens/**/*.json` and emits `dist/generated/tokens.js` plus `tokens.d.ts` using built-in formats.
 
-The package root is the **only runtime API**. There is no handwritten `src/` layer, no `./generated` alias, and no component/elevation convenience subpaths. UI code imports `@m3/tokens` directly. Ergonomic projections needed for arithmetic or component behavior live beside their consumers in `@m3/ui` and may only derive from generated values.
+The package root is the **only runtime API**. There is no handwritten `src/` layer, no `./generated` alias, and no component/elevation convenience subpaths. UI code imports `@m3-ui/tokens` directly. Ergonomic projections needed for arithmetic or component behavior live beside their consumers in `@m3-ui/ui` and may only derive from generated values.
 
-This boundary is intentional: `@m3/tokens` publishes the canonical generated vocabulary; it does not maintain a second object-shaped token API.
+This boundary is intentional: `@m3-ui/tokens` publishes the canonical generated vocabulary; it does not maintain a second object-shaped token API.
 
 ## Upstream audit
 
@@ -88,15 +88,15 @@ If a future requirement appears to need one of these, treat it as an architectur
 
 ## Validation and audit commands
 
-- `pnpm --filter @m3/tokens validate` validates the canonical graph.
-- `pnpm --filter @m3/tokens test` cleans generated output, runs Style Dictionary, generated-output tests, AndroidX-parser tests, architecture guards, complete Figma typography/color parity tests, and the pinned first-party typography tracking consensus guard.
-- `pnpm --filter @m3/tokens audit:androidx` performs the pinned read-only AndroidX audit.
-- `pnpm --filter @m3/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete` proves that strict declaration audits cover the entire reconciled Material Web module set.
-- `pnpm --filter @m3/tokens exec node scripts/audit-drift-registry.mjs --require-complete` validates and summarizes all documented cross-source drift and the pinned corroborating implementation references used by drift evidence.
-- `pnpm --filter @m3/tokens exec node scripts/audit-figma-reference.mjs --require-complete` validates the pinned, read-only Figma Shape/Typescale evidence without contacting Figma.
-- `pnpm --filter @m3/tokens exec node --test scripts/figma-color-scheme.test.mjs` validates the complete pinned Figma Light/Dark color sweep and its documented cross-source divergence.
-- `pnpm --filter @m3/tokens exec node --test scripts/figma-color-contrast.test.mjs` validates all four Figma contrast modes against the pinned Material Web contrast models while keeping them audit-only.
-- `pnpm --filter @m3/tokens exec node --test scripts/motion-reference-evidence.test.mjs` validates pinned Compose/Web/Figma motion evidence while keeping every external source audit-only.
-- `pnpm --filter @m3/tokens exec node --test scripts/elevation-reference-evidence.test.mjs` validates semantic elevation parity, the ten Figma effect styles, Material Web renderer parity, and the unresolved canonical shadow-recipe drift without making any external reference a build input.
+- `pnpm --filter @m3-ui/tokens validate` validates the canonical graph.
+- `pnpm --filter @m3-ui/tokens test` cleans generated output, runs Style Dictionary, generated-output tests, AndroidX-parser tests, architecture guards, complete Figma typography/color parity tests, and the pinned first-party typography tracking consensus guard.
+- `pnpm --filter @m3-ui/tokens audit:androidx` performs the pinned read-only AndroidX audit.
+- `pnpm --filter @m3-ui/tokens exec node scripts/audit-material-web-declaration-module-coverage.mjs --require-complete` proves that strict declaration audits cover the entire reconciled Material Web module set.
+- `pnpm --filter @m3-ui/tokens exec node scripts/audit-drift-registry.mjs --require-complete` validates and summarizes all documented cross-source drift and the pinned corroborating implementation references used by drift evidence.
+- `pnpm --filter @m3-ui/tokens exec node scripts/audit-figma-reference.mjs --require-complete` validates the pinned, read-only Figma Shape/Typescale evidence without contacting Figma.
+- `pnpm --filter @m3-ui/tokens exec node --test scripts/figma-color-scheme.test.mjs` validates the complete pinned Figma Light/Dark color sweep and its documented cross-source divergence.
+- `pnpm --filter @m3-ui/tokens exec node --test scripts/figma-color-contrast.test.mjs` validates all four Figma contrast modes against the pinned Material Web contrast models while keeping them audit-only.
+- `pnpm --filter @m3-ui/tokens exec node --test scripts/motion-reference-evidence.test.mjs` validates pinned Compose/Web/Figma motion evidence while keeping every external source audit-only.
+- `pnpm --filter @m3-ui/tokens exec node --test scripts/elevation-reference-evidence.test.mjs` validates semantic elevation parity, the ten Figma effect styles, Material Web renderer parity, and the unresolved canonical shadow-recipe drift without making any external reference a build input.
 
 See `/.agents/skills/style-dictionary/SKILL.md` and `/docs/architecture/README.md` before changing the token pipeline.

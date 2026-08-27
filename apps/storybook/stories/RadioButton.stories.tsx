@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { RadioButton, RadioGroup, ThemeProvider } from '@m3/ui';
+import { RadioButton, RadioGroup, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/RadioButton',

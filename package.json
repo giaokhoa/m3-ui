@@ -5,10 +5,10 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "storybook": "pnpm --filter @m3/storybook dev",
-    "build:storybook": "pnpm --filter @m3/storybook... build",
-    "test:visual": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual",
-    "test:visual:update": "pnpm build:storybook && pnpm --filter @m3/storybook test:visual:update",
+    "storybook": "pnpm --filter @m3-ui/storybook^... build && pnpm --filter @m3-ui/storybook dev",
+    "build:storybook": "pnpm --filter @m3-ui/storybook... build",
+    "test:visual": "pnpm build:storybook && pnpm --filter @m3-ui/storybook test:visual",
+    "test:visual:update": "pnpm build:storybook && pnpm --filter @m3-ui/storybook test:visual:update",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean"
@@ -18,6 +18,8 @@
     "typescript": "^5.0.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

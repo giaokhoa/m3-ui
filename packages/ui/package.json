@@ -1,5 +1,5 @@
 {
-  "name": "@m3/ui",
+  "name": "@m3-ui/ui",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -27,7 +27,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@m3/tokens": "workspace:*",
+    "@m3-ui/tokens": "workspace:*",
     "@material/material-color-utilities": "0.3.0",
     "react-aria-components": "^1.0.0"
   },

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { RangeSlider, Slider, ThemeProvider, type SliderSize } from '@m3/ui';
+import { RangeSlider, Slider, ThemeProvider, type SliderSize } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Slider',

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Button, Checkbox, TextField, ThemeProvider } from '@m3/ui';
-import '@m3/ui/styles.css';
+import { Button, Checkbox, TextField, ThemeProvider } from '@m3-ui/ui';
+import '@m3-ui/ui/styles.css';
 import './playground.css';
 
 function App() {

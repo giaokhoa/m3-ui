@@ -17,7 +17,7 @@ importers:
 
   apps/playground:
     dependencies:
-      '@m3/ui':
+      '@m3-ui/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       react:
@@ -42,7 +42,7 @@ importers:
 
   apps/storybook:
     dependencies:
-      '@m3/ui':
+      '@m3-ui/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       react:
@@ -85,7 +85,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@m3/tokens':
+      '@m3-ui/tokens':
         specifier: workspace:*
         version: link:../tokens
       '@material/material-color-utilities':

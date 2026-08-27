@@ -1,6 +1,6 @@
 # Progress Indicator
 
-Material 3 progress indicators mapped to the canonical `@m3/tokens` Style Dictionary graph, React Aria `ProgressBar` semantics, pinned AndroidX Compose runtime behavior, and current Material Web web adaptations.
+Material 3 progress indicators mapped to the canonical `@m3-ui/tokens` Style Dictionary graph, React Aria `ProgressBar` semantics, pinned AndroidX Compose runtime behavior, and current Material Web web adaptations.
 
 ## Public family
 

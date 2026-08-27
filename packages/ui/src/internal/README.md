@@ -4,7 +4,7 @@ This directory contains reusable implementation details shared by public compone
 
 ## Token boundary
 
-Immutable Material values come from the generated `@m3/tokens` package root. Internal primitives consume generated values directly unless a local projection is genuinely needed for runtime behavior.
+Immutable Material values come from the generated `@m3-ui/tokens` package root. Internal primitives consume generated values directly unless a local projection is genuinely needed for runtime behavior.
 
 `ThemeProvider` owns runtime/theme-dependent values such as dynamic color roles. Generated component color values resolve to those theme CSS variables, while dimensions, motion, elevation geometry, opacity, and other immutable values remain generated static values.
 
@@ -18,7 +18,7 @@ A conversion such as CSS `px`/`ms` → number is allowed only at a JavaScript ar
 - Use native HTML and React Aria semantics before inventing interaction infrastructure.
 - React Aria remains the source of press/hover/focus behavior; primitives consume its state/events rather than attaching competing interaction hooks.
 - Keep visual state in CSS when possible.
-- Internal modules may consume generated `@m3/tokens` values and theme CSS variables but must not import a public component merely to reuse behavior.
+- Internal modules may consume generated `@m3-ui/tokens` values and theme CSS variables but must not import a public component merely to reuse behavior.
 - Do not reintroduce token-package compatibility facades just to recover ergonomic object shapes; project generated values where they are actually consumed.
 
 ## Extraction threshold

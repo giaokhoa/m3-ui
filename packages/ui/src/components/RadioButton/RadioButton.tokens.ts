@@ -1,4 +1,4 @@
-import * as token from '@m3/tokens';
+import * as token from '@m3-ui/tokens';
 import { msNumber, pxNumber } from '../../internal/tokenValues';
 
 export const radioButtonTokens = {

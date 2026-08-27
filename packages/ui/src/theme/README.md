@@ -6,7 +6,7 @@ Existing color theming already lives here. Compose parity work should extend thi
 
 ## Current color contract
 
-`@m3/ui` exposes Material 3 color roles as short, scoped CSS custom properties.
+`@m3-ui/ui` exposes Material 3 color roles as short, scoped CSS custom properties.
 
 Examples:
 

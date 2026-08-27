@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Scrim, ThemeProvider } from '@m3/ui';
+import { Scrim, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Scrim',

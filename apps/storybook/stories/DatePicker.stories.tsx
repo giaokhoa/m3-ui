@@ -13,7 +13,7 @@ import {
   DialogTrigger,
   type DatePickerDate,
   type DatePickerRangeValue,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/DatePicker',

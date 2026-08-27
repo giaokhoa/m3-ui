@@ -1,5 +1,5 @@
 {
-  "name": "@m3/playground",
+  "name": "@m3-ui/playground",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@m3/ui": "workspace:*",
+    "@m3-ui/ui": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

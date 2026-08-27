@@ -80,18 +80,21 @@ test('Style Dictionary skill describes the enforced token ownership boundary', a
 
   assert.match(skill, /no handwritten runtime `src\/` layer/i);
   assert.match(skill, /Do not create `packages\/tokens\/src\/`/);
-  assert.match(skill, /runtime projections\/types belong beside their consumers in `@m3\/ui`/i);
+  assert.match(
+    skill,
+    /runtime projections\/types belong beside their consumers in `@m3-ui\/ui`/i,
+  );
   assert.match(skill, /If an upstream source does not own a web-only token/i);
   assert.doesNotMatch(skill, /src\/.*optional handwritten API\/types/i);
 });
 
-test('UI consumes @m3/tokens through the package root only', async () => {
+test('UI consumes @m3-ui/tokens through the package root only', async () => {
   for (const file of await sourceFiles(uiSourceRoot)) {
     const source = await readFile(file, 'utf8');
     assert.doesNotMatch(
       source,
-      /['"]@m3\/tokens\//,
-      `${file.pathname} must import @m3/tokens through the package root`,
+      /['"]@m3-ui\/tokens\//,
+      `${file.pathname} must import @m3-ui/tokens through the package root`,
     );
   }
 });

@@ -6,7 +6,7 @@ import {
   SearchBar,
   SearchBarInput,
   useSearchBarState,
-} from '@m3/ui';
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/SearchBar',

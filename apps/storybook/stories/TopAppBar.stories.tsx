@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { IconButton, TopAppBar, ThemeProvider } from '@m3/ui';
+import { IconButton, TopAppBar, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/TopAppBar',

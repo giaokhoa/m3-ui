@@ -20,7 +20,7 @@ pnpm test
 pnpm test:visual
 pnpm build
 pnpm typecheck
-pnpm --filter @m3/tokens audit:androidx
+pnpm --filter @m3-ui/tokens audit:androidx
 ```
 
 `pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` builds Storybook and its workspace dependencies, then creates the static preview under `apps/storybook/dist`.
@@ -34,14 +34,14 @@ Playwright provides the committed visual-regression layer on top of Storybook. `
 For applications that use many Material components, import the complete stylesheet once:
 
 ```ts
-import '@m3/ui/styles.css';
+import '@m3-ui/ui/styles.css';
 ```
 
 For smaller bundles, each public component family also has a self-contained CSS entry. For example:
 
 ```ts
-import '@m3/ui/styles/button.css';
-import '@m3/ui/styles/text-field.css';
+import '@m3-ui/ui/styles/button.css';
+import '@m3-ui/ui/styles/text-field.css';
 ```
 
 Available modular entries are `badge.css`, `bottom-sheet.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `navigation-drawer.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.

@@ -1,7 +1,7 @@
 import {
   RippleFadeOutDuration,
   RippleMinimumPressDuration,
-} from '@m3/tokens';
+} from '@m3-ui/tokens';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { msNumber } from '../tokenValues';
 import { getRippleWaveGeometry } from './geometry';

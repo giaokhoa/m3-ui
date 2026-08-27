@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AppBarRow, IconButton, MenuItem, type AppBarAction } from '@m3/ui';
+import { AppBarRow, IconButton, MenuItem, type AppBarAction } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/AppBarRow',

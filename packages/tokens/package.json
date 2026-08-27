@@ -1,5 +1,5 @@
 {
-  "name": "@m3/tokens",
+  "name": "@m3-ui/tokens",
   "version": "0.0.0",
   "private": true,
   "type": "module",

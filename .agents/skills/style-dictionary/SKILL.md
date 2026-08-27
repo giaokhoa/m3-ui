@@ -24,17 +24,17 @@ canonical DTCG in packages/tokens/tokens/**/*.json
        dist/generated/tokens.d.ts
                     │
                     ▼
-              @m3/tokens
+              @m3-ui/tokens
                     │
                     ▼
-               @m3/ui
+               @m3-ui/ui
 ```
 
 AndroidX Compose, Material 3 Figma, Material Web and other upstreams are **read-only audit references**. They never generate or rewrite canonical DTCG or runtime package files.
 
-`@m3/tokens` has **no handwritten runtime `src/` layer**. The package root is the generated Style Dictionary API. Do not recreate compatibility facades, component subpaths, a `./generated` alias, or a second TypeScript build.
+`@m3-ui/tokens` has **no handwritten runtime `src/` layer**. The package root is the generated Style Dictionary API. Do not recreate compatibility facades, component subpaths, a `./generated` alias, or a second TypeScript build.
 
-The future publish scope is `@m3-ui/tokens`; the workspace keeps `@m3/tokens` until the repository-wide namespace migration is performed atomically.
+The future publish scope is `@m3-ui/tokens`; the workspace keeps `@m3-ui/tokens` until the repository-wide namespace migration is performed atomically.
 
 ## Style Dictionary mental model
 
@@ -108,7 +108,7 @@ Repository rules:
 - Never create `tokens/web`, `tokens/react`, `tokens/android`, `tokens/compose`, or upstream snapshot trees.
 - A token path has exactly one canonical definition. Never depend on deep-merge overwrite order.
 - `dist/**` is disposable generated output. Never hand-edit it or treat it as source.
-- **Do not create `packages/tokens/src/`.** Runtime projections/types belong beside their consumers in `@m3/ui`; the token package itself publishes generated values and declarations only.
+- **Do not create `packages/tokens/src/`.** Runtime projections/types belong beside their consumers in `@m3-ui/ui`; the token package itself publishes generated values and declarations only.
 
 Token path changes rename generated symbols. Once consumers use those exports, treat path renames as public-API changes.
 
@@ -122,7 +122,7 @@ Use this decision order:
 2. **Same semantic value reused by multiple components** → canonical `core` token; components alias it.
 3. **Immutable component-specific design value** → canonical `component` token.
 4. **Theme-dependent Material color role** → use an existing canonical runtime role or a Material-owned component color string such as `var(--primary)`; ThemeProvider supplies the runtime role value.
-5. **Value derived arithmetically from canonical tokens at runtime** → derive it in `@m3/ui`; do not store the derived result as another token unless it has independent semantic identity.
+5. **Value derived arithmetically from canonical tokens at runtime** → derive it in `@m3-ui/ui`; do not store the derived result as another token unless it has independent semantic identity.
 6. **Web-only visual contract deliberately owned by this library** → canonical component token only if it is a stable design choice with genuine semantic identity.
 7. **Pure platform mechanics/accessibility fallback/algorithm scaffolding** → keep local to UI code and document why it is not a Material token. Examples include forced-colors system-color outlines, percentages used to center transforms, array indices, counters, transient animation state, and wrapper layout that upstream component tokens do not own.
 
@@ -176,7 +176,7 @@ The generated expression must flow through unchanged:
 ```text
 DTCG var(--primary)
   -> Style Dictionary
-  -> @m3/tokens
+  -> @m3-ui/tokens
   -> UI projection/defaults
   -> CSS
 ```
@@ -290,7 +290,7 @@ Repository rules:
 - if transform ordering becomes important, define and review an explicit group instead of relying on accidental append order;
 - never write a transform merely to recreate an ergonomic handwritten token facade.
 
-A consumer that needs numeric `px`/`ms` values for arithmetic/timers may parse the generated string in narrow `@m3/ui` helpers. That conversion is a runtime boundary, not another token table.
+A consumer that needs numeric `px`/`ms` values for arithmetic/timers may parse the generated string in narrow `@m3-ui/ui` helpers. That conversion is a runtime boundary, not another token table.
 
 ## Platforms, files, filters, formats
 
@@ -319,10 +319,10 @@ Use an extension hook only at the lifecycle stage that actually owns the require
 
 ## Generated package API
 
-`@m3/tokens` exposes only the generated root API:
+`@m3-ui/tokens` exposes only the generated root API:
 
 ```text
-@m3/tokens package root
+@m3-ui/tokens package root
   -> dist/generated/tokens.js
   -> dist/generated/tokens.d.ts
 ```
@@ -335,7 +335,7 @@ Rules:
 - no separate token-package `tsc` build;
 - no handwritten type/value facades;
 - never copy generated values into TypeScript modules;
-- ergonomic projection objects/types needed by a component live beside that component in `@m3/ui` and derive from the package-root generated exports.
+- ergonomic projection objects/types needed by a component live beside that component in `@m3-ui/ui` and derive from the package-root generated exports.
 
 Generated files are disposable build artifacts, but generated export names become API once consumed. Build JS and declarations from the same naming pipeline and test the real generated artifacts.
 

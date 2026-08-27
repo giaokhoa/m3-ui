@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, ThemeProvider, type MaterialTab } from '@m3/ui';
+import { Tabs, ThemeProvider, type MaterialTab } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Tabs',

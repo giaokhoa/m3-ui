@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PullToRefresh, type PullToRefreshIndicatorState } from '@m3/ui';
+import { PullToRefresh, type PullToRefreshIndicatorState } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/PullToRefresh',

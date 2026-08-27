@@ -6,10 +6,12 @@ const snapshot = JSON.parse(
   await readFile(new URL('../audit/compose-token-files.json', import.meta.url), 'utf8'),
 );
 const url = `https://api.github.com/repos/${source.repository}/contents/${source.tokenRoot}?ref=${source.revision}`;
+const githubToken = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
 const response = await fetch(url, {
   headers: {
     accept: 'application/vnd.github+json',
     'user-agent': 'm3-ui-token-inventory',
+    ...(githubToken ? { authorization: `Bearer ${githubToken}` } : {}),
   },
 });
 if (!response.ok) throw new Error(`Failed to inventory Compose tokens: ${response.status}`);
