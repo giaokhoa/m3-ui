@@ -68,11 +68,9 @@
 .scaffold__floating-stack {
   position: absolute;
   left: var(--scaffold-safe-left);
+  right: var(--scaffold-safe-right);
   inset-block-end: var(--scaffold-fab-spacing);
   box-sizing: border-box;
-  inline-size: calc(
-    100% - var(--scaffold-safe-left) - var(--scaffold-safe-right)
-  );
   display: grid;
   grid-template-rows: auto auto;
   row-gap: 0;
