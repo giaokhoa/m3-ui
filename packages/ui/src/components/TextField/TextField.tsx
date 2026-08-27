@@ -1,4 +1,9 @@
-import type { HTMLInputTypeAttribute, ReactNode, Ref } from 'react';
+import type {
+  ComponentProps,
+  HTMLInputTypeAttribute,
+  ReactNode,
+  Ref,
+} from 'react';
 import {
   FieldError,
   Input,
@@ -27,6 +32,10 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
   suffix?: ReactNode;
   isMultiline?: boolean;
   rows?: number;
+  /** Props forwarded to the native input when `isMultiline` is false. */
+  inputProps?: Omit<ComponentProps<typeof Input>, 'className'>;
+  /** Ref to the native input when `isMultiline` is false. */
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 export type OutlinedTextFieldProps = TextFieldProps;
@@ -39,7 +48,6 @@ function joinClassNames(...values: Array<string | false | null | undefined>) {
 export interface TextFieldImplProps extends TextFieldProps {
   variant: TextFieldVariant;
   inputType?: HTMLInputTypeAttribute;
-  inputRef?: Ref<HTMLInputElement>;
 }
 
 export function TextFieldImpl({
@@ -58,6 +66,7 @@ export function TextFieldImpl({
   className,
   style,
   inputType,
+  inputProps,
   inputRef,
   ...props
 }: TextFieldImplProps) {
@@ -84,10 +93,11 @@ export function TextFieldImpl({
         />
       ) : (
         <Input
+          {...inputProps}
           ref={inputRef}
           className="text-field__control text-field__input"
-          placeholder={controlPlaceholder}
-          type={inputType}
+          placeholder={inputProps?.placeholder ?? controlPlaceholder}
+          type={inputProps?.type ?? inputType}
         />
       )}
       {suffix ? <span className="text-field__suffix">{suffix}</span> : null}
