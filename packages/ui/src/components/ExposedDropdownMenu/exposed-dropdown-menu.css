@@ -13,6 +13,11 @@
   max-inline-size: calc(100vw - 16px);
 }
 
+.exposed-dropdown-menu__popover[data-entering],
+.exposed-dropdown-menu__popover[data-exiting] {
+  transform: none;
+}
+
 .exposed-dropdown-menu__listbox {
   max-block-size: inherit;
   overflow: auto;
