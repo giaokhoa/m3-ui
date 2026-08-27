@@ -27,8 +27,8 @@
   min-inline-size: 0;
   min-block-size: 0;
   box-sizing: border-box;
-  padding-inline-start: var(--scaffold-safe-left);
-  padding-inline-end: var(--scaffold-safe-right);
+  padding-left: var(--scaffold-safe-left);
+  padding-right: var(--scaffold-safe-right);
   padding-block-start: 0;
   padding-block-end: 0;
 }
@@ -67,7 +67,7 @@
 
 .scaffold__floating-stack {
   position: absolute;
-  inset-inline-start: var(--scaffold-safe-left);
+  left: var(--scaffold-safe-left);
   inset-block-end: var(--scaffold-fab-spacing);
   box-sizing: border-box;
   inline-size: calc(
