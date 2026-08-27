@@ -14,6 +14,7 @@ import {
 const meta = {
   title: 'Components/BottomSheetScaffold',
   component: BottomSheetScaffold,
+  args: { sheetContent: null },
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof BottomSheetScaffold>;
 
