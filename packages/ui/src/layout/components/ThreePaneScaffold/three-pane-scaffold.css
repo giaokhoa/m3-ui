@@ -1,0 +1,14 @@
+.three-pane-scaffold {
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.three-pane-scaffold__pane {
+  position: absolute;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
