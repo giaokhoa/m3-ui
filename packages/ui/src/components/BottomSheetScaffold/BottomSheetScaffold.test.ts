@@ -11,7 +11,7 @@ describe('BottomSheetScaffold metrics', () => {
     initialValue: SheetValue.PartiallyExpanded,
   });
 
-  it('reserves the default 56px peek and adapts BottomSheet half-height anchor', () => {
+  it('reserves the default 56px peek and uses it as the partial anchor', () => {
     expect(bottomSheetScaffoldDefaults.peekHeight).toBe(56);
     expect(
       getBottomSheetScaffoldMetrics({
@@ -21,13 +21,12 @@ describe('BottomSheetScaffold metrics', () => {
         state,
       }),
     ).toEqual({
-      externalOffset: 344,
       visibleHeight: 56,
       reserveHeight: 56,
     });
   });
 
-  it('uses the full sheet height when expanded', () => {
+  it('uses the full sheet height when expanded while keeping peek reservation', () => {
     state.expand();
     expect(
       getBottomSheetScaffoldMetrics({
@@ -37,13 +36,12 @@ describe('BottomSheetScaffold metrics', () => {
         state,
       }),
     ).toEqual({
-      externalOffset: 0,
       visibleHeight: 600,
       reserveHeight: 80,
     });
   });
 
-  it('removes reservation and visible height when Hidden is enabled and selected', () => {
+  it('keeps body peek reservation when Hidden is enabled and selected', () => {
     const hiddenState = new SheetState({
       enabledValues: [
         SheetValue.Hidden,
@@ -61,28 +59,26 @@ describe('BottomSheetScaffold metrics', () => {
         state: hiddenState,
       }),
     ).toEqual({
-      externalOffset: 0,
       visibleHeight: 0,
-      reserveHeight: 0,
+      reserveHeight: 72,
     });
   });
 
-  it('clamps an oversized peek to the available sheet height', () => {
+  it('clamps an oversized peek to the scaffold height', () => {
     const partial = new SheetState({
       enabledValues: [SheetValue.PartiallyExpanded, SheetValue.Expanded],
       initialValue: SheetValue.PartiallyExpanded,
     });
     expect(
       getBottomSheetScaffoldMetrics({
-        rootHeight: 800,
-        sheetHeight: 40,
+        rootHeight: 80,
+        sheetHeight: 120,
         peekHeight: 96,
         state: partial,
       }),
     ).toEqual({
-      externalOffset: 0,
-      visibleHeight: 40,
-      reserveHeight: 40,
+      visibleHeight: 80,
+      reserveHeight: 80,
     });
   });
 });
