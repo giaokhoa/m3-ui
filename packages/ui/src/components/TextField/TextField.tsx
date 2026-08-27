@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { HTMLInputTypeAttribute, ReactNode, Ref } from 'react';
 import {
   FieldError,
   Input,
@@ -16,9 +16,7 @@ import {
 import './text-field.css';
 
 export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
-  /** Material label slot. */
   label?: ReactNode;
-  /** Existing API alias for Material supporting text. */
   description?: ReactNode;
   supportingText?: ReactNode;
   errorMessage?: FieldErrorProps['children'];
@@ -27,28 +25,24 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
   trailingIcon?: ReactNode;
   prefix?: ReactNode;
   suffix?: ReactNode;
-  /**
-   * Compose text fields default to MultiLine(minHeightInLines = 1). Set false
-   * to opt into single-line input semantics.
-   */
   isMultiline?: boolean;
-  /** Native textarea fallback row count. Modern browsers auto-size to content. */
   rows?: number;
 }
 
 export type OutlinedTextFieldProps = TextFieldProps;
-
 type TextFieldVariant = 'filled' | 'outlined';
 
 function joinClassNames(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
 }
 
-interface TextFieldImplProps extends TextFieldProps {
+export interface TextFieldImplProps extends TextFieldProps {
   variant: TextFieldVariant;
+  inputType?: HTMLInputTypeAttribute;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
-function TextFieldImpl({
+export function TextFieldImpl({
   variant,
   label,
   description,
@@ -63,12 +57,11 @@ function TextFieldImpl({
   rows,
   className,
   style,
+  inputType,
+  inputRef,
   ...props
 }: TextFieldImplProps) {
   const resolvedSupportingText = supportingText ?? description;
-  // :placeholder-shown gives us the browser's actual controlled/uncontrolled empty
-  // state without duplicating RAC value state in React. A blank placeholder keeps
-  // that state observable when a floating label exists but no visible placeholder does.
   const controlPlaceholder = placeholder ?? (label ? ' ' : undefined);
 
   const staticClasses = joinClassNames(
@@ -83,7 +76,6 @@ function TextFieldImpl({
   const inputRow = (
     <div className="text-field__input-row">
       {prefix ? <span className="text-field__prefix">{prefix}</span> : null}
-
       {isMultiline ? (
         <TextArea
           className="text-field__control text-field__textarea"
@@ -92,25 +84,21 @@ function TextFieldImpl({
         />
       ) : (
         <Input
+          ref={inputRef}
           className="text-field__control text-field__input"
           placeholder={controlPlaceholder}
+          type={inputType}
         />
       )}
-
       {suffix ? <span className="text-field__suffix">{suffix}</span> : null}
     </div>
   );
 
   const leading = leadingIcon ? (
-    <span className="text-field__icon text-field__icon--leading">
-      {leadingIcon}
-    </span>
+    <span className="text-field__icon text-field__icon--leading">{leadingIcon}</span>
   ) : null;
-
   const trailing = trailingIcon ? (
-    <span className="text-field__icon text-field__icon--trailing">
-      {trailingIcon}
-    </span>
+    <span className="text-field__icon text-field__icon--trailing">{trailingIcon}</span>
   ) : null;
 
   return (
@@ -124,35 +112,27 @@ function TextFieldImpl({
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         const baseStyle =
-          variant === 'filled'
-            ? filledTextFieldBaseStyle
-            : outlinedTextFieldBaseStyle;
+          variant === 'filled' ? filledTextFieldBaseStyle : outlinedTextFieldBaseStyle;
         return { ...baseStyle, ...userStyle };
       }}
     >
       {variant === 'filled' ? (
         <div className="text-field__container">
           {leading}
-
           <div className="text-field__content">
             {label ? <Label className="text-field__label">{label}</Label> : null}
             {inputRow}
           </div>
-
           {trailing}
           <span className="text-field__indicator" aria-hidden="true" />
         </div>
       ) : (
-        <fieldset
-          className="text-field__container text-field__outlined-container"
-          role="presentation"
-        >
+        <fieldset className="text-field__container text-field__outlined-container" role="presentation">
           {label ? (
             <legend className="text-field__outline-legend" role="presentation">
               <Label className="text-field__label">{label}</Label>
             </legend>
           ) : null}
-
           <div className="text-field__outlined-body">
             {leading}
             <div className="text-field__content">{inputRow}</div>
@@ -160,13 +140,11 @@ function TextFieldImpl({
           </div>
         </fieldset>
       )}
-
       {resolvedSupportingText != null ? (
         <Text slot="description" className="text-field__supporting">
           {resolvedSupportingText}
         </Text>
       ) : null}
-
       <FieldError className="text-field__error">{errorMessage}</FieldError>
     </AriaTextField>
   );
