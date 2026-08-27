@@ -73,7 +73,6 @@ function FabMenuDemo({
           expanded={expanded}
           horizontalAlignment="end"
           maxMenuHeight={maxMenuHeight}
-          onExpandedChange={setExpanded}
           trigger={
             <ToggleFloatingActionButton
               aria-label="More actions"
@@ -113,7 +112,6 @@ function OverflowDemo() {
         <FloatingActionButtonMenu
           expanded={expanded}
           maxMenuHeight={180}
-          onExpandedChange={setExpanded}
           trigger={
             <ToggleFloatingActionButton
               aria-label="Overflow actions"
