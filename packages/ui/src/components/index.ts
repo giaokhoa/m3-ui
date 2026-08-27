@@ -1,3 +1,4 @@
+export * from './AppBarColumn';
 export * from './AppBarRow';
 export * from './Badge';
 export * from './BottomAppBar';
