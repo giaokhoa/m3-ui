@@ -8,6 +8,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-inline-size: 0;
   overflow-x: clip;
@@ -18,11 +19,13 @@
 .scaffold__top-bar {
   position: relative;
   z-index: 1;
+  grid-column: 1;
   grid-row: 1;
   min-inline-size: 0;
 }
 
 .scaffold__content {
+  grid-column: 1;
   grid-row: 2;
   min-inline-size: 0;
   min-block-size: 0;
@@ -44,6 +47,7 @@
 .scaffold__bottom-bar {
   position: relative;
   z-index: 3;
+  grid-column: 1;
   grid-row: 3;
   min-inline-size: 0;
 }
