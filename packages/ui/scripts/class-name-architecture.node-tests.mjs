@@ -57,10 +57,15 @@ test('brand-prefixed CSS classes are forbidden', async () => {
   }
 
   // Runtime, stories and browser contracts must not emit or depend on m3-* class
-  // tokens. Package scopes use @m3-ui/* and therefore do not match this pattern.
+  // tokens. Exclude the @m3-ui/* package scope from this class-token guard.
   for (const file of codeFiles) {
     const source = await readFile(file, 'utf8');
-    collectMatches(file, source, /\bm3-[a-z0-9][a-z0-9_-]*\b/g, violations);
+    collectMatches(
+      file,
+      source,
+      /(?<!@)\bm3-[a-z0-9][a-z0-9_-]*\b/g,
+      violations,
+    );
   }
 
   assert.deepEqual(
