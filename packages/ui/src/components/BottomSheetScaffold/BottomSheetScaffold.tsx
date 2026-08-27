@@ -41,7 +41,7 @@ export interface BottomSheetScaffoldProps
   peekHeight?: number;
   /** Maximum inline size of the sheet. */
   maxSheetWidth?: CSSProperties['maxWidth'];
-  /** Disables pointer swiping without disabling imperative SheetState changes. */
+  /** Disables pointer swiping without disabling handle/programmatic state changes. */
   isSwipeEnabled?: boolean;
   /** Replace the standard drag handle; pass null to remove it. */
   dragHandle?: ReactNode | null;
@@ -74,47 +74,36 @@ export function getBottomSheetScaffoldMetrics({
   peekHeight,
   state,
 }: Geometry & { peekHeight: number; state: SheetState }) {
+  const clampedPeek = Math.min(Math.max(0, peekHeight), rootHeight);
   const anchors = calculateSheetAnchors({
     viewportHeight: rootHeight,
     sheetHeight,
     enabledValues: state.enabledValues,
+    partialExpandedHeight: clampedPeek,
   });
-  const expandedAnchor =
-    anchors[SheetValue.Expanded] ?? Math.max(0, rootHeight - sheetHeight);
-  const internalAnchor = anchors[state.currentValue] ?? expandedAnchor;
-  const internalOffset = Math.max(0, internalAnchor - expandedAnchor);
-
-  const clampedPeek = Math.min(Math.max(0, peekHeight), sheetHeight, rootHeight);
-  const desiredOffset =
-    state.currentValue === SheetValue.Hidden
-      ? Math.min(sheetHeight, rootHeight)
-      : state.currentValue === SheetValue.PartiallyExpanded
-        ? Math.max(0, sheetHeight - clampedPeek)
-        : 0;
-
+  const anchor =
+    anchors[state.currentValue] ??
+    anchors[SheetValue.Expanded] ??
+    rootHeight;
   const visibleHeight =
     state.currentValue === SheetValue.Hidden
       ? 0
-      : state.currentValue === SheetValue.PartiallyExpanded
-        ? clampedPeek
-        : Math.min(sheetHeight, rootHeight);
+      : Math.max(0, Math.min(rootHeight, rootHeight - anchor));
 
   return {
-    externalOffset: desiredOffset - internalOffset,
     visibleHeight,
-    reserveHeight:
-      state.currentValue === SheetValue.Hidden ? 0 : clampedPeek,
+    reserveHeight: clampedPeek,
   };
 }
 
 /**
  * Material 3 standard/persistent bottom-sheet scaffold.
  *
- * The existing BottomSheet remains the owner of drag settling, anchors and
- * accessibility semantics. This composition only adapts its partially-expanded
- * anchor to the scaffold peek height and positions Scaffold content/snackbars
- * around the persistent sheet. It intentionally does not create modal focus
- * containment or a second state model.
+ * BottomSheet and SheetState remain the owners of drag settling, anchors and
+ * accessibility semantics. This composition supplies AndroidX's explicit
+ * peek-height anchor and positions Scaffold content/snackbars around the
+ * persistent sheet. It intentionally does not create modal focus containment
+ * or a second state model.
  */
 export function BottomSheetScaffold({
   sheetContent,
@@ -197,7 +186,6 @@ export function BottomSheetScaffold({
   const rootStyle: BottomSheetScaffoldStyle = {
     '--_bottom-sheet-scaffold-peek-height': `${metrics.reserveHeight}px`,
     '--_bottom-sheet-scaffold-visible-height': `${metrics.visibleHeight}px`,
-    '--_bottom-sheet-scaffold-external-offset': `${metrics.externalOffset}px`,
     ...style,
   };
 
@@ -230,12 +218,14 @@ export function BottomSheetScaffold({
         <BottomSheet
           state={sheetState}
           gesturesEnabled={isSwipeEnabled}
+          handleActionEnabled
+          partialExpandedHeight={peekHeight}
           dragHandle={dragHandle}
           maxWidth={maxSheetWidth}
           containerColor={sheetContainerColor}
           contentColor={sheetContentColor}
           className={sheetClassName}
-          style={sheetStyle}
+          style={{ minBlockSize: `${peekHeight}px`, ...sheetStyle }}
         >
           {sheetContent}
         </BottomSheet>
