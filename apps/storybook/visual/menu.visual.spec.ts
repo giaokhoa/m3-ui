@@ -101,7 +101,9 @@ test.describe('Material 3 Menu browser contract', () => {
     await field.click();
     const menu = page.getByRole('menu');
     await expect(menu).toBeVisible();
-    const fieldBox = await field.locator('xpath=ancestor::*[contains(@class,"text-field")]').boundingBox();
+    const fieldBox = await field
+      .locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " text-field ")][1]')
+      .boundingBox();
     const popoverBox = await page.locator('.exposed-menu__popover').boundingBox();
     expect(Math.abs((fieldBox?.width ?? 0) - (popoverBox?.width ?? 0))).toBeLessThan(2);
     await page.getByRole('menuitem', { name: 'Comfortable' }).click();
