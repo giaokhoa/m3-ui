@@ -76,6 +76,10 @@
   pointer-events: none;
 }
 
+.scaffold:not([data-has-bottom-bar]) .scaffold__floating-stack {
+  inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
+}
+
 .scaffold[data-fab-position='end-overlay'] .scaffold__floating-stack {
   inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
 }
@@ -113,10 +117,7 @@
   inset-block-end: 0;
 }
 
-.scaffold:not([data-has-fab]):not([data-has-bottom-bar]) .scaffold__floating-stack {
-  inset-block-end: var(--scaffold-safe-bottom);
-}
-
+.scaffold:not([data-has-fab]):not([data-has-bottom-bar]) .scaffold__floating-stack,
 .scaffold[data-fab-position='end-overlay']:not([data-has-fab]) .scaffold__floating-stack {
   inset-block-end: var(--scaffold-safe-bottom);
 }
