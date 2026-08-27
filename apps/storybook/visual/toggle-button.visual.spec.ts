@@ -34,7 +34,7 @@ test.describe('Material 3 ToggleButton browser parity', () => {
       ['extraLarge', 136],
     ] as const;
     for (const [size, height] of sizes) {
-      const button = page.getByRole('button', { name: `${size} toggle` });
+      const button = page.getByRole('button', { name: `${size} toggle`, exact: true });
       expect((await button.boundingBox())?.height).toBe(height);
     }
   });
