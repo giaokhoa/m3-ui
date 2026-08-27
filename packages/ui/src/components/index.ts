@@ -28,6 +28,7 @@ export * from './PullToRefresh';
 export * from './RadioButton';
 export * from './Scaffold';
 export * from './Scrim';
+export * from './ScrollField';
 export * from './SearchBar';
 export * from './SegmentedButton';
 export * from './ShortNavigationBar';
