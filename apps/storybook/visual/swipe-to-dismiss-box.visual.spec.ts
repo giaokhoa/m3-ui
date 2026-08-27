@@ -14,11 +14,13 @@ async function drag(page: Page, deltaX: number, deltaY = 0, slow = false) {
   await page.mouse.move(x, y);
   await page.mouse.down();
   if (slow) {
-    await page.mouse.move(x + deltaX / 2, y + deltaY / 2, { steps: 6 });
+    await page.mouse.move(x + deltaX * 0.9, y + deltaY * 0.9, { steps: 6 });
     await page.waitForTimeout(180);
+    await page.mouse.move(x + deltaX, y + deltaY);
+    await page.waitForTimeout(40);
+  } else {
+    await page.mouse.move(x + deltaX, y + deltaY, { steps: 8 });
   }
-  await page.mouse.move(x + deltaX, y + deltaY, { steps: 8 });
-  if (slow) await page.waitForTimeout(180);
   await page.mouse.up();
 }
 
@@ -101,9 +103,19 @@ test.describe('Material 3 SwipeToDismissBox browser contract', () => {
     const foreground = page.locator('[data-swipe-foreground]');
     const box = await foreground.boundingBox();
     if (!box) throw new Error('foreground missing');
-    await foreground.dispatchEvent('pointerdown', { pointerId: 7, isPrimary: true, button: 0, clientX: box.x + 100, clientY: box.y + 30 });
-    await foreground.dispatchEvent('pointermove', { pointerId: 7, isPrimary: true, button: 0, clientX: box.x + 190, clientY: box.y + 30 });
-    await foreground.dispatchEvent('pointercancel', { pointerId: 7, isPrimary: true, button: 0, clientX: box.x + 190, clientY: box.y + 30 });
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 90, y, { steps: 5 });
+    await foreground.dispatchEvent('pointercancel', {
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      clientX: x + 90,
+      clientY: y,
+    });
+    await page.mouse.up();
     await expect(page.getByTestId('swipe-box')).toHaveAttribute('data-state', 'settled');
     await expect(page.getByTestId('dismiss-count')).toHaveText('0');
     await expect.poll(() => transformX(page)).toBeCloseTo(0, 0);
