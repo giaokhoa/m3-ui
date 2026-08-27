@@ -82,6 +82,9 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/NavigationRail/navigation-rail.css',
   ],
+  'non-interactive-scrollbar': [
+    'src/components/NonInteractiveScrollbar/non-interactive-scrollbar.css',
+  ],
   'wide-navigation-rail': [
     'src/internal/ripple/ripple.css',
     'src/components/WideNavigationRail/wide-navigation-rail.css',
@@ -175,6 +178,8 @@ export const publicComponentStyleSources = {
   'navigation-bar': 'src/components/NavigationBar/navigation-bar.css',
   'navigation-drawer': 'src/components/NavigationDrawer/navigation-drawer.css',
   'navigation-rail': 'src/components/NavigationRail/navigation-rail.css',
+  'non-interactive-scrollbar':
+    'src/components/NonInteractiveScrollbar/non-interactive-scrollbar.css',
   'wide-navigation-rail': 'src/components/WideNavigationRail/wide-navigation-rail.css',
   'modal-wide-navigation-rail':
     'src/components/WideNavigationRail/modal-wide-navigation-rail.css',
@@ -222,6 +227,8 @@ export const publicComponentModules = {
   'navigation-bar': 'src/components/NavigationBar/NavigationBar.tsx',
   'navigation-drawer': 'src/components/NavigationDrawer/NavigationDrawer.tsx',
   'navigation-rail': 'src/components/NavigationRail/NavigationRail.tsx',
+  'non-interactive-scrollbar':
+    'src/components/NonInteractiveScrollbar/NonInteractiveScrollbar.tsx',
   'wide-navigation-rail': 'src/components/WideNavigationRail/WideNavigationRail.tsx',
   'modal-wide-navigation-rail':
     'src/components/WideNavigationRail/ModalWideNavigationRail.tsx',

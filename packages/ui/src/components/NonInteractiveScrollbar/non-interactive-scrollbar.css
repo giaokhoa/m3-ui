@@ -1,0 +1,79 @@
+.non-interactive-scrollbar {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.non-interactive-scrollbar__fade-layer,
+.non-interactive-scrollbar__track,
+.non-interactive-scrollbar__thumb {
+  pointer-events: none;
+}
+
+.non-interactive-scrollbar__fade-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: var(--_non-interactive-scrollbar-fade-duration);
+  transition-timing-function: linear;
+}
+
+/* Scrollbars appear immediately on activity, then animate only the fade-out. */
+.non-interactive-scrollbar[data-scroll-active='true']
+  .non-interactive-scrollbar__fade-layer,
+.non-interactive-scrollbar:not([data-fade-enabled])
+  .non-interactive-scrollbar__fade-layer {
+  transition-duration: 0ms;
+}
+
+.non-interactive-scrollbar__track,
+.non-interactive-scrollbar__thumb {
+  position: absolute;
+  border-radius: calc(var(--_non-interactive-scrollbar-thickness) / 2);
+}
+
+.non-interactive-scrollbar__track {
+  background: transparent;
+}
+
+.non-interactive-scrollbar__thumb {
+  background: color-mix(
+    in srgb,
+    var(--outline) 70%,
+    transparent
+  );
+}
+
+.non-interactive-scrollbar[data-orientation='vertical']
+  .non-interactive-scrollbar__track {
+  inset-block: var(--_non-interactive-scrollbar-main-axis-inset);
+  inset-inline-end: var(--_non-interactive-scrollbar-cross-axis-inset);
+  inline-size: var(--_non-interactive-scrollbar-thickness);
+}
+
+.non-interactive-scrollbar[data-orientation='vertical']
+  .non-interactive-scrollbar__thumb {
+  inset-inline-end: var(--_non-interactive-scrollbar-cross-axis-inset);
+  inline-size: var(--_non-interactive-scrollbar-thickness);
+}
+
+.non-interactive-scrollbar[data-orientation='horizontal']
+  .non-interactive-scrollbar__track {
+  inset-inline: var(--_non-interactive-scrollbar-main-axis-inset);
+  inset-block-end: var(--_non-interactive-scrollbar-cross-axis-inset);
+  block-size: var(--_non-interactive-scrollbar-thickness);
+}
+
+.non-interactive-scrollbar[data-orientation='horizontal']
+  .non-interactive-scrollbar__thumb {
+  inset-block-end: var(--_non-interactive-scrollbar-cross-axis-inset);
+  block-size: var(--_non-interactive-scrollbar-thickness);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .non-interactive-scrollbar__fade-layer {
+    transition-duration: 0ms;
+  }
+}
