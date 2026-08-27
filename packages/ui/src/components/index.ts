@@ -20,6 +20,7 @@ export * from './NavigationDrawer';
 export * from './NavigationRail';
 export * from './WideNavigationRail';
 export * from './ProgressIndicator';
+export * from './PullToRefresh';
 export * from './RadioButton';
 export * from './Scrim';
 export * from './SearchBar';
