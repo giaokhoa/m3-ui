@@ -16,6 +16,8 @@ jobs:
   verify:
     name: Test, typecheck, build and visual regression
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
