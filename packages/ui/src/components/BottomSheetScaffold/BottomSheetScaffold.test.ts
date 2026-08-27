@@ -5,12 +5,14 @@ import {
   getBottomSheetScaffoldMetrics,
 } from './BottomSheetScaffold';
 
-describe('BottomSheetScaffold metrics', () => {
-  const state = new SheetState({
+function createPartialState() {
+  return new SheetState({
     enabledValues: [SheetValue.PartiallyExpanded, SheetValue.Expanded],
     initialValue: SheetValue.PartiallyExpanded,
   });
+}
 
+describe('BottomSheetScaffold metrics', () => {
   it('reserves the default 56px peek and uses it as the partial anchor', () => {
     expect(bottomSheetScaffoldDefaults.peekHeight).toBe(56);
     expect(
@@ -18,7 +20,7 @@ describe('BottomSheetScaffold metrics', () => {
         rootHeight: 800,
         sheetHeight: 600,
         peekHeight: 56,
-        state,
+        state: createPartialState(),
       }),
     ).toEqual({
       visibleHeight: 56,
@@ -27,6 +29,7 @@ describe('BottomSheetScaffold metrics', () => {
   });
 
   it('uses the full sheet height when expanded while keeping peek reservation', () => {
+    const state = createPartialState();
     state.expand();
     expect(
       getBottomSheetScaffoldMetrics({
@@ -65,16 +68,12 @@ describe('BottomSheetScaffold metrics', () => {
   });
 
   it('clamps an oversized peek to the scaffold height', () => {
-    const partial = new SheetState({
-      enabledValues: [SheetValue.PartiallyExpanded, SheetValue.Expanded],
-      initialValue: SheetValue.PartiallyExpanded,
-    });
     expect(
       getBottomSheetScaffoldMetrics({
         rootHeight: 80,
         sheetHeight: 120,
         peekHeight: 96,
-        state: partial,
+        state: createPartialState(),
       }),
     ).toEqual({
       visibleHeight: 80,
