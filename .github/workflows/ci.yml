@@ -120,11 +120,11 @@ jobs:
       - name: Audit canonical tokens against AndroidX
         run: pnpm --filter @m3-ui/tokens audit:androidx
       - name: Test
-        run: pnpm test
-      - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm -r --if-present test
       - name: Build
         run: pnpm build
+      - name: Typecheck
+        run: pnpm -r --if-present typecheck
       - name: Install Chromium headless shell
         run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
       - name: Visual regression
