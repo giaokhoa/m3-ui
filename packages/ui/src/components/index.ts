@@ -24,6 +24,7 @@ export * from './Menu';
 export * from './NavigationBar';
 export * from './NavigationDrawer';
 export * from './NavigationRail';
+export * from './NonInteractiveScrollbar';
 export * from './WideNavigationRail';
 export * from './ProgressIndicator';
 export * from './PullToRefresh';
