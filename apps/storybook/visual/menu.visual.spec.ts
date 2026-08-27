@@ -100,11 +100,13 @@ test.describe('Material 3 Menu browser contract', () => {
     const field = page.getByRole('textbox', { name: 'Density' });
     await field.click();
     const menu = page.getByRole('menu');
+    const popover = page.locator('.exposed-menu__popover');
     await expect(menu).toBeVisible();
+    await expect(popover).not.toHaveAttribute('data-entering');
     const fieldBox = await field
       .locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " text-field ")][1]')
       .boundingBox();
-    const popoverBox = await page.locator('.exposed-menu__popover').boundingBox();
+    const popoverBox = await popover.boundingBox();
     expect(Math.abs((fieldBox?.width ?? 0) - (popoverBox?.width ?? 0))).toBeLessThan(2);
     await page.getByRole('menuitem', { name: 'Comfortable' }).click();
     await expect(field).toHaveValue('Comfortable');
