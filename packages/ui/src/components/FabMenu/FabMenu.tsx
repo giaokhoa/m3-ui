@@ -64,12 +64,14 @@ export function FloatingActionButtonMenu({
   className,
   style,
   onKeyDownCapture,
+  onKeyUpCapture,
   ...props
 }: FloatingActionButtonMenuProps) {
   const actionsId = useId();
   const actionsRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const wasExpanded = useRef(expanded);
+  const pendingActionKey = useRef<string | null>(null);
   const childArray = Children.toArray(children);
 
   const focusTrigger = () => {
@@ -79,14 +81,26 @@ export function FloatingActionButtonMenu({
   };
 
   useEffect(() => {
-    if (wasExpanded.current && !expanded && actionsRef.current?.contains(document.activeElement)) {
+    if (
+      wasExpanded.current &&
+      !expanded &&
+      actionsRef.current?.contains(document.activeElement) &&
+      pendingActionKey.current == null
+    ) {
       focusTrigger();
     }
     wasExpanded.current = expanded;
   }, [expanded]);
 
   const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
-    const fromTrigger = triggerRef.current?.contains(event.target as Node);
+    const target = event.target as Node;
+    const fromTrigger = triggerRef.current?.contains(target);
+    const fromActions = actionsRef.current?.contains(target);
+
+    if (fromActions && (event.key === 'Enter' || event.key === ' ')) {
+      pendingActionKey.current = event.key;
+    }
+
     if (
       fromTrigger &&
       expanded &&
@@ -101,6 +115,17 @@ export function FloatingActionButtonMenu({
       }
     }
     onKeyDownCapture?.(event);
+  };
+
+  const handleKeyUpCapture = (event: KeyboardEvent<HTMLDivElement>) => {
+    const fromActions = actionsRef.current?.contains(event.target as Node);
+    if (fromActions && pendingActionKey.current === event.key) {
+      pendingActionKey.current = null;
+      if (!expanded) {
+        focusTrigger();
+      }
+    }
+    onKeyUpCapture?.(event);
   };
 
   const triggerWithSemantics = isValidElement(trigger)
@@ -119,6 +144,7 @@ export function FloatingActionButtonMenu({
         data-alignment={horizontalAlignment}
         data-expanded={expanded ? '' : undefined}
         onKeyDownCapture={handleKeyDownCapture}
+        onKeyUpCapture={handleKeyUpCapture}
         style={{ ...getFabMenuStyle(maxMenuHeight), ...style }}
       >
         <div
