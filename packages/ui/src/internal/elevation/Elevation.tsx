@@ -1,6 +1,6 @@
 import type { CSSProperties, HTMLAttributes } from 'react';
 import type { ElevationLevel } from './tokens';
-import { getElevationBoxShadow } from './elevation';
+import { getElevationBoxShadow } from './shadow';
 import './elevation.css';
 
 export interface ElevationProps extends HTMLAttributes<HTMLSpanElement> {
