@@ -12,6 +12,7 @@ export * from './Dialog';
 export * from './Divider';
 export * from './DragHandle';
 export * from './Fab';
+export * from './FabMenu';
 export * from './FloatingToolbar';
 export * from './IconButton';
 export * from './ListItem';
