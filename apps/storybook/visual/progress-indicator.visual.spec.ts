@@ -35,8 +35,8 @@ test.describe('Material 3 ProgressIndicator browser contract', () => {
   test('wavy determinate locks 0/25/50/100 linear and circular ARIA + paths', async ({ page }) => {
     await openStory(page, 'components-progressindicator--wavy-determinate-matrix');
     for (const value of [0, 0.25, 0.5, 1]) {
-      const linear = page.getByRole('progressbar', { name: `Linear wavy ${value}` });
-      const circular = page.getByRole('progressbar', { name: `Circular wavy ${value}` });
+      const linear = page.getByRole('progressbar', { name: `Linear wavy ${value}`, exact: true });
+      const circular = page.getByRole('progressbar', { name: `Circular wavy ${value}`, exact: true });
       await expect(linear).toHaveAttribute('aria-valuenow', String(value));
       await expect(circular).toHaveAttribute('aria-valuenow', String(value));
       await expect(linear.locator('svg')).toHaveAttribute('aria-hidden', 'true');
