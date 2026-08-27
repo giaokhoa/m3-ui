@@ -105,6 +105,8 @@ describe('calculateThreePaneScaffoldLayout', () => {
     });
 
     expect(layout.secondary).toEqual({ left: 0, top: 0, width: 490, height: 800 });
-    expect(layout.primary).toEqual({ left: 510, top: 0, width: 490, height: 800 });
+    // AndroidX starts the next partition at max(hinge.right, hinge.left + spacer).
+    // A 20px hinge with a 24px partition spacer therefore reserves 4 extra pixels.
+    expect(layout.primary).toEqual({ left: 514, top: 0, width: 486, height: 800 });
   });
 });
