@@ -27,6 +27,11 @@ export const styleEntries = {
     'src/internal/elevation/elevation.css',
     'src/components/Chip/chip.css',
   ],
+  'date-picker': [
+    'src/internal/ripple/ripple.css',
+    'src/components/IconButton/icon-button.css',
+    'src/components/DatePicker/date-picker.css',
+  ],
   dialog: [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -138,6 +143,7 @@ export const publicComponentStyleSources = {
   carousel: 'src/components/Carousel/carousel.css',
   checkbox: 'src/components/Checkbox/checkbox.css',
   chip: 'src/components/Chip/chip.css',
+  'date-picker': 'src/components/DatePicker/date-picker.css',
   dialog: 'src/components/Dialog/dialog.css',
   divider: 'src/components/Divider/divider.css',
   'drag-handle': 'src/components/DragHandle/drag-handle.css',
@@ -180,6 +186,7 @@ export const publicComponentModules = {
   carousel: 'src/components/Carousel/Carousel.tsx',
   checkbox: 'src/components/Checkbox/Checkbox.tsx',
   chip: 'src/components/Chip/Chip.tsx',
+  'date-picker': 'src/components/DatePicker/DatePicker.tsx',
   dialog: 'src/components/Dialog/Dialog.tsx',
   divider: 'src/components/Divider/Divider.tsx',
   'drag-handle': 'src/components/DragHandle/DragHandle.tsx',
