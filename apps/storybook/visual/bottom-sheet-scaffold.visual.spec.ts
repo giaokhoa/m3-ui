@@ -17,6 +17,8 @@ test.describe('Material 3 BottomSheetScaffold browser contract', () => {
     const sheet = page.locator('.bottom-sheet');
     const [rootBox, sheetBox] = await Promise.all([scaffold.boundingBox(), sheet.boundingBox()]);
     expectClose((rootBox?.y ?? 0) + (rootBox?.height ?? 0) - (sheetBox?.y ?? 0), 56);
+    await expect(page.getByTestId('top-bar')).toBeVisible();
+    await expect(page.getByTestId('body')).toBeVisible();
     await page.getByTestId('body-button').click();
     await expect(scaffold).toHaveAttribute('data-sheet-state', SheetValue.PartiallyExpanded);
   });
@@ -30,12 +32,50 @@ test.describe('Material 3 BottomSheetScaffold browser contract', () => {
     await expect(scaffold).toHaveAttribute('data-sheet-state', 'partially-expanded');
   });
 
-  test('swipe disabled does not block programmatic state changes', async ({ page }) => {
+  test('swipe disabled blocks pointer drag but not handle or programmatic actions', async ({ page }) => {
     await openStory(page, 'components-bottomsheetscaffold--swipe-disabled');
+    const scaffold = page.getByTestId('bottom-sheet-scaffold');
     const handle = page.locator('.bottom-sheet__drag-handle');
-    await expect(handle).toBeDisabled();
+    await expect(handle).toBeEnabled();
+    await handle.dispatchEvent('pointerdown', {
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      clientY: 500,
+    });
+    await handle.dispatchEvent('pointermove', {
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      clientY: 300,
+    });
+    await handle.dispatchEvent('pointerup', {
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      clientY: 300,
+    });
+    await expect(scaffold).toHaveAttribute('data-sheet-state', 'partially-expanded');
+    await expect(page.locator('.bottom-sheet')).not.toHaveAttribute('data-dragging');
+
+    await handle.click();
+    await expect(scaffold).toHaveAttribute('data-sheet-state', 'expanded');
+    await page.getByTestId('collapse').click();
     await page.getByTestId('expand').click();
+    await expect(scaffold).toHaveAttribute('data-sheet-state', 'expanded');
+  });
+
+  test('drag handle exposes keyboard expand/collapse semantics', async ({ page }) => {
+    await openStory(page, 'components-bottomsheetscaffold--default-partial');
+    const handle = page.locator('.bottom-sheet__drag-handle');
+    await expect(handle).toHaveAttribute('aria-label', 'Expand bottom sheet');
+    await handle.focus();
+    await expect(handle).toBeFocused();
+    await page.keyboard.press('Enter');
     await expect(page.getByTestId('bottom-sheet-scaffold')).toHaveAttribute('data-sheet-state', 'expanded');
+    await expect(handle).toHaveAttribute('aria-label', 'Collapse bottom sheet');
+    await page.keyboard.press('Space');
+    await expect(page.getByTestId('bottom-sheet-scaffold')).toHaveAttribute('data-sheet-state', 'partially-expanded');
   });
 
   test('custom peek height and max width are reflected in geometry', async ({ page }) => {
@@ -92,19 +132,24 @@ test.describe('Material 3 BottomSheetScaffold browser contract', () => {
     await openStory(page, 'components-bottomsheetscaffold--default-partial');
     await page.setViewportSize({ width: 360, height: 640 });
     await page.waitForTimeout(50);
-    const overflow = await page.getByTestId('bottom-sheet-scaffold').evaluate(
-      (element) => element.scrollWidth - element.clientWidth,
-    );
+    const root = page.getByTestId('bottom-sheet-scaffold');
+    const overflow = await root.evaluate((element) => element.scrollWidth - element.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
+    const [rootBox, sheetBox] = await Promise.all([
+      root.boundingBox(),
+      page.locator('.bottom-sheet').boundingBox(),
+    ]);
+    expectClose((rootBox?.y ?? 0) + (rootBox?.height ?? 0) - (sheetBox?.y ?? 0), 56);
   });
 
-  test('reduced motion removes scaffold offset transitions', async ({ page }) => {
+  test('reduced motion removes sheet and snackbar transitions', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await openStory(page, 'components-bottomsheetscaffold--reduced-motion');
-    const duration = await page.locator('.bottom-sheet-scaffold__sheet-layer').evaluate(
-      (element) => getComputedStyle(element).transitionDuration,
-    );
-    expect(duration).toBe('0s');
+    const durations = await page.evaluate(() => ({
+      sheet: getComputedStyle(document.querySelector('.bottom-sheet')!).transitionDuration,
+      snackbar: getComputedStyle(document.querySelector('.bottom-sheet-scaffold__snackbar-host')!).transitionDuration,
+    }));
+    expect(durations).toEqual({ sheet: '0s', snackbar: '0s' });
   });
 });
 
