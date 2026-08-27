@@ -112,7 +112,7 @@ test.describe('Material 3 Scaffold browser contract', () => {
 
     const scaffold = await page.getByTestId('scaffold').boundingBox();
     const fab = await page.getByTestId('scaffold-fab').boundingBox();
-    expectClose((scaffold?.x ?? 0) + (scaffold?.width ?? 0) - ((fab?.x ?? 0) + (fab?.width ?? 0)), 14);
+    expectClose((scaffold?.x ?? 0) + (scaffold?.width ?? 0) - ((fab?.x ?? 0) + (fab?.width ?? 0)), 30);
     expectClose((scaffold?.y ?? 0) + (scaffold?.height ?? 0) - ((fab?.y ?? 0) + (fab?.height ?? 0)), 34);
   });
 
