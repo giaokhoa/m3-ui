@@ -129,6 +129,11 @@ export const styleEntries = {
     'src/components/Button/button.css',
     'src/components/TimePicker/time-picker.css',
   ],
+  'toggle-button': [
+    'src/internal/ripple/ripple.css',
+    'src/components/Button/button.css',
+    'src/components/ToggleButton/toggle-button.css',
+  ],
   'top-app-bar': ['src/components/TopAppBar/top-app-bar.css'],
   tooltip: ['src/components/Tooltip/tooltip.css'],
 };
@@ -172,6 +177,7 @@ export const publicComponentStyleSources = {
   tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
+  'toggle-button': 'src/components/ToggleButton/toggle-button.css',
   'top-app-bar': 'src/components/TopAppBar/top-app-bar.css',
   tooltip: 'src/components/Tooltip/tooltip.css',
 };
@@ -215,6 +221,7 @@ export const publicComponentModules = {
   tabs: 'src/components/Tabs/Tabs.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
   'time-picker': 'src/components/TimePicker/TimePicker.tsx',
+  'toggle-button': 'src/components/ToggleButton/ToggleButton.tsx',
   'top-app-bar': 'src/components/TopAppBar/TopAppBar.tsx',
   tooltip: 'src/components/Tooltip/Tooltip.tsx',
 };
