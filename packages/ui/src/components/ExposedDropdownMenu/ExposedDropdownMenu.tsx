@@ -366,7 +366,6 @@ export function ExposedDropdownMenu<T = unknown>({
           })
         : defaultAnchor}
       <AriaPopover
-        id={popupId}
         isOpen={effectiveOpen}
         onOpenChange={(next) => {
           if (next) open();
