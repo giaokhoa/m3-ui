@@ -15,7 +15,7 @@ export default defineConfig({
         'react',
         'react-dom',
         'react-aria-components',
-        /^@m3\/tokens(?:\/.*)?$/,
+        /^@m3-ui\/tokens(?:\/.*)?$/,
       ],
     },
   },
