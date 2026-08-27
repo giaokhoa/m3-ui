@@ -28,6 +28,7 @@ export * from './Scaffold';
 export * from './Scrim';
 export * from './SearchBar';
 export * from './SegmentedButton';
+export * from './ShortNavigationBar';
 export * from './Slider';
 export * from './SplitButton';
 export * from './Snackbar';
