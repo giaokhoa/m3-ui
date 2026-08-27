@@ -1,7 +1,13 @@
 {
   "name": "m3-ui Node 22",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:3-22",
-  "remoteUser": "node",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "22",
+      "pnpmVersion": "10.0.0"
+    }
+  },
+  "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "forwardPorts": [5173, 6006],
   "portsAttributes": {
@@ -14,7 +20,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "sudo corepack enable && sudo corepack prepare pnpm@10.0.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium",
+  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium",
   "customizations": {
     "vscode": {
       "settings": {
