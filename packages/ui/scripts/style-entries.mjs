@@ -139,6 +139,9 @@ export const styleEntries = {
     'src/components/Tabs/tabs.css',
   ],
   'text-field': ['src/components/TextField/text-field.css'],
+  'three-pane-scaffold': [
+    'src/layout/components/ThreePaneScaffold/three-pane-scaffold.css',
+  ],
   'time-picker': [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -196,6 +199,8 @@ export const publicComponentStyleSources = {
   switch: 'src/components/Switch/switch.css',
   tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
+  'three-pane-scaffold':
+    'src/layout/components/ThreePaneScaffold/three-pane-scaffold.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
   'toggle-button': 'src/components/ToggleButton/toggle-button.css',
   'top-app-bar': 'src/components/TopAppBar/top-app-bar.css',
@@ -245,6 +250,8 @@ export const publicComponentModules = {
   switch: 'src/components/Switch/Switch.tsx',
   tabs: 'src/components/Tabs/Tabs.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
+  'three-pane-scaffold':
+    'src/layout/components/ThreePaneScaffold/ThreePaneScaffold.tsx',
   'time-picker': 'src/components/TimePicker/TimePicker.tsx',
   'toggle-button': 'src/components/ToggleButton/ToggleButton.tsx',
   'top-app-bar': 'src/components/TopAppBar/TopAppBar.tsx',
