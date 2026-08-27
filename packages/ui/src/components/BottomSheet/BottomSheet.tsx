@@ -56,8 +56,12 @@ export interface BottomSheetProps
     BottomSheetStyleOptions {
   /** Compose-like state controller. An internal hidden state is used when omitted. */
   state?: SheetState;
-  /** Enables pointer drag and the built-in handle action. */
+  /** Enables pointer dragging. */
   gesturesEnabled?: boolean;
+  /** Enables the built-in handle button action independently from pointer dragging. */
+  handleActionEnabled?: boolean;
+  /** Overrides the visible height of the PartiallyExpanded anchor. */
+  partialExpandedHeight?: number;
   /** Replace the canonical handle bar; pass null to remove the drag affordance. */
   dragHandle?: ReactNode | null;
   /** Called when a user gesture or handle action settles to Hidden. */
@@ -155,6 +159,8 @@ function durationToMilliseconds(duration: string): number {
 export function BottomSheet({
   state,
   gesturesEnabled = true,
+  handleActionEnabled,
+  partialExpandedHeight,
   dragHandle,
   onDismissRequest,
   containerColor,
@@ -180,6 +186,7 @@ export function BottomSheet({
     sheetState.getSnapshot,
     sheetState.getSnapshot,
   );
+  const isHandleActionEnabled = handleActionEnabled ?? gesturesEnabled;
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<ActiveDrag | null>(null);
@@ -206,6 +213,7 @@ export function BottomSheet({
         viewportHeight,
         sheetHeight,
         enabledValues: sheetState.enabledValues,
+        partialExpandedHeight,
       });
       const expandedAnchor =
         anchors[SheetValue.Expanded] ??
@@ -235,7 +243,7 @@ export function BottomSheet({
       observer.observe(sheet.offsetParent);
     }
     return () => observer.disconnect();
-  }, [sheetState]);
+  }, [partialExpandedHeight, sheetState]);
 
   const beginDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (
@@ -342,7 +350,7 @@ export function BottomSheet({
       suppressClickRef.current = false;
       return;
     }
-    if (!gesturesEnabled) return;
+    if (!isHandleActionEnabled) return;
 
     if (sheetState.currentValue === SheetValue.PartiallyExpanded) {
       sheetState.expand();
@@ -400,7 +408,7 @@ export function BottomSheet({
           type="button"
           className="bottom-sheet__drag-handle"
           aria-label={handleActionLabel(sheetState)}
-          disabled={!gesturesEnabled}
+          disabled={!isHandleActionEnabled}
           onClick={activateHandle}
           onLostPointerCapture={cancelDrag}
           onPointerCancel={cancelDrag}
