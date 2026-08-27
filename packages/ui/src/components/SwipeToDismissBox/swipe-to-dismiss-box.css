@@ -1,0 +1,37 @@
+.swipe-to-dismiss-box {
+  box-sizing: border-box;
+  display: grid;
+  inline-size: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.swipe-to-dismiss-box__background,
+.swipe-to-dismiss-box__foreground {
+  box-sizing: border-box;
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+
+.swipe-to-dismiss-box__background {
+  block-size: 100%;
+  inline-size: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.swipe-to-dismiss-box__foreground {
+  min-block-size: 100%;
+  position: relative;
+  touch-action: pan-y;
+  transform: translate3d(var(--_swipe-to-dismiss-offset, 0px), 0, 0);
+  transition: var(--_swipe-to-dismiss-transition, none);
+  will-change: transform;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-to-dismiss-box__foreground {
+    transition-duration: 0s !important;
+  }
+}
