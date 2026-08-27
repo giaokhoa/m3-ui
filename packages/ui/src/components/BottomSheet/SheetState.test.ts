@@ -32,6 +32,20 @@ describe('BottomSheet SheetState', () => {
     });
   });
 
+  it('accepts an explicit partially-expanded visible height for scaffold peek anchors', () => {
+    expect(
+      calculateSheetAnchors({
+        viewportHeight: 800,
+        sheetHeight: 600,
+        partialExpandedHeight: 56,
+      }),
+    ).toEqual({
+      [SheetValue.Hidden]: 800,
+      [SheetValue.PartiallyExpanded]: 744,
+      [SheetValue.Expanded]: 200,
+    });
+  });
+
   it('uses the 56px positional threshold and advances one enabled anchor', () => {
     const anchors = calculateSheetAnchors({
       viewportHeight: 800,

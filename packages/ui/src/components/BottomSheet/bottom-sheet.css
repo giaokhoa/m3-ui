@@ -117,6 +117,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bottom-sheet,
+  .bottom-sheet[data-ready]:not([data-dragging]),
+  .bottom-sheet[data-ready][data-state='hidden']:not([data-dragging]),
   .modal-bottom-sheet-overlay::before {
     transition: none;
   }

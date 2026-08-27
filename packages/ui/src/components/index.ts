@@ -2,6 +2,7 @@ export * from './AppBarRow';
 export * from './Badge';
 export * from './BottomAppBar';
 export * from './BottomSheet';
+export * from './BottomSheetScaffold';
 export * from './Button';
 export * from './ButtonGroup';
 export * from './Card';
