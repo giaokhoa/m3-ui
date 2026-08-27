@@ -10,7 +10,6 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent,
-  type MouseEvent,
   type ReactElement,
   type ReactNode,
 } from 'react';
@@ -43,7 +42,6 @@ function useFabMenuContext(): FabMenuContextValue {
 export interface FloatingActionButtonMenuProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   expanded: boolean;
-  onExpandedChange: (expanded: boolean) => void;
   trigger: ReactElement;
   children: ReactNode;
   horizontalAlignment?: HorizontalAlignment;
@@ -51,19 +49,20 @@ export interface FloatingActionButtonMenuProps
 }
 
 /**
- * Material 3 action group paired with a FAB trigger. This intentionally keeps
- * native/button semantics rather than mapping the family to an ARIA menu.
+ * Material 3 action group paired with a controlled FAB trigger. The trigger
+ * owns the state-change callback; this container projects expanded semantics,
+ * stagger/layout behavior, and keyboard focus transfer without duplicating the
+ * trigger interaction. This intentionally keeps native/button semantics rather
+ * than mapping the family to an ARIA menu.
  */
 export function FloatingActionButtonMenu({
   expanded,
-  onExpandedChange,
   trigger,
   children,
   horizontalAlignment = 'end',
   maxMenuHeight,
   className,
   style,
-  onClickCapture,
   onKeyDownCapture,
   ...props
 }: FloatingActionButtonMenuProps) {
@@ -85,13 +84,6 @@ export function FloatingActionButtonMenu({
     }
     wasExpanded.current = expanded;
   }, [expanded]);
-
-  const handleClickCapture = (event: MouseEvent<HTMLDivElement>) => {
-    if (triggerRef.current?.contains(event.target as Node)) {
-      onExpandedChange(!expanded);
-    }
-    onClickCapture?.(event);
-  };
 
   const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
     const fromTrigger = triggerRef.current?.contains(event.target as Node);
@@ -126,7 +118,6 @@ export function FloatingActionButtonMenu({
         className={['fab-menu', className].filter(Boolean).join(' ')}
         data-alignment={horizontalAlignment}
         data-expanded={expanded ? '' : undefined}
-        onClickCapture={handleClickCapture}
         onKeyDownCapture={handleKeyDownCapture}
         style={{ ...getFabMenuStyle(maxMenuHeight), ...style }}
       >
