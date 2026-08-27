@@ -264,6 +264,19 @@ export function ExposedDropdownMenu<T = unknown>({
   }, [effectiveOpen]);
 
   useEffect(() => {
+    if (!effectiveOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const path = event.composedPath();
+      const anchor = anchorRef.current;
+      const popup = document.getElementById(popupId);
+      if ((anchor && path.includes(anchor)) || (popup && path.includes(popup))) return;
+      close();
+    };
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [close, effectiveOpen, popupId]);
+
+  useEffect(() => {
     if (!isReadOnly && inputValue === undefined && internalInputValue === '' && selectedItem) {
       setInternalInputValue(selectedItem.label);
     }
