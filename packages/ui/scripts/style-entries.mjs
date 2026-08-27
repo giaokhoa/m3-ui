@@ -189,7 +189,7 @@ export const publicComponentStyleSources = {
   'split-button': 'src/components/SplitButton/split-button.css',
   snackbar: 'src/components/Snackbar/snackbar.css',
   switch: 'src/components/Switch/switch.css',
-  tabs: 'src/components/Tabs/Tabs.css',
+  tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
   'toggle-button': 'src/components/ToggleButton/toggle-button.css',
