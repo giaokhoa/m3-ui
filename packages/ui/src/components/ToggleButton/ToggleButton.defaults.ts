@@ -4,7 +4,6 @@ import {
   buttonShapesForSize,
   getButtonStyle,
 } from '../Button/Button.defaults';
-import type { ButtonInteraction } from '../Button/Button.interactions';
 import type { ToggleButtonSize, ToggleButtonVariant } from './ToggleButton.types';
 
 export type ToggleButtonStyle = CSSProperties & Record<`--${string}`, string | number>;
@@ -52,11 +51,17 @@ const variantColors = {
   },
 } as const;
 
-function interactionFor(state: ToggleButtonState): ButtonInteraction | null {
+function interactionFor(state: ToggleButtonState): 'press' | 'hover' | 'focus' | null {
   if (state.isPressed) return 'press';
   if (state.isHovered) return 'hover';
   if (state.isFocused) return 'focus';
   return null;
+}
+
+function outlineWidthForSize(size: ToggleButtonSize): string {
+  if (size === 'large') return '2px';
+  if (size === 'extraLarge') return '3px';
+  return '1px';
 }
 
 export function toggleButtonShapesForSize(size: ToggleButtonSize) {
@@ -75,20 +80,28 @@ export function getToggleButtonStyle(
 ): ToggleButtonStyle {
   const interaction = interactionFor(state);
   const shapes = buttonShapesForSize(size);
-  const baseVariant = variant === 'filledTonal' ? 'filledTonal' : variant;
   const colors = variantColors[variant];
   const activeShape = state.isPressed
     ? shapes.pressedShape
     : state.isSelected
       ? selectedShape[size]
       : shapes.shape;
+  const base = getButtonStyle(
+    variant,
+    { isDisabled: state.isDisabled, interaction },
+    { size, shapes },
+  );
+  const transition = state.isDisabled
+    ? 'none'
+    : [
+        base.transition === 'none' ? null : base.transition,
+        `background-color ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`,
+        `color ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`,
+        `border-color ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`,
+      ].filter((value): value is string => value !== null).join(', ');
 
   return {
-    ...getButtonStyle(
-      baseVariant,
-      { isDisabled: state.isDisabled, interaction },
-      { size, shapes },
-    ),
+    ...base,
     '--_button-container-radius': activeShape,
     '--_button-container-color': state.isSelected
       ? colors.selectedContainer
@@ -98,18 +111,18 @@ export function getToggleButtonStyle(
       : colors.unselectedContent,
     '--_button-outline-color': 'var(--outline-variant)',
     '--_button-outline-width': variant === 'outlined' && !state.isSelected
-      ? size === 'large'
-        ? '2px'
-        : size === 'extraLarge'
-          ? '3px'
-          : '1px'
+      ? outlineWidthForSize(size)
       : '0px',
     '--_button-disabled-container-color': variant === 'outlined'
-      ? 'transparent'
+      ? 'var(--outline-variant)'
       : 'var(--on-surface)',
-    '--_button-disabled-container-opacity': variant === 'outlined' ? '0%' : '10%',
+    '--_button-disabled-container-opacity': '10%',
     '--_button-disabled-content-color': 'var(--on-surface-variant)',
     '--_button-disabled-content-opacity': '38%',
     '--_button-disabled-outline-opacity': '10%',
+    // AndroidX XSmall currently specifies 8px while the repo's canonical web Button
+    // projection intentionally remains 4px; adapt only this ToggleButton renderer.
+    ...(size === 'extraSmall' ? { '--_button-icon-spacing': '8px' } : {}),
+    transition,
   };
 }
