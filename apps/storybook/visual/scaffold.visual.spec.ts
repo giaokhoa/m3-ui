@@ -89,11 +89,25 @@ test.describe('Material 3 Scaffold browser contract', () => {
     expectClose((bottom?.y ?? 0) - ((fab?.y ?? 0) + (fab?.height ?? 0)), 16);
   });
 
-  test('RTL mirrors logical start placement', async ({ page }) => {
+  test('RTL mirrors logical start while safe-area edges stay physical', async ({ page }) => {
     await openStory(page, 'components-scaffold--rtl');
-    const scaffold = await page.getByTestId('scaffold').boundingBox();
-    const fab = await page.getByTestId('scaffold-fab').boundingBox();
-    expectClose((scaffold?.x ?? 0) + (scaffold?.width ?? 0) - ((fab?.x ?? 0) + (fab?.width ?? 0)), 16);
+    const root = page.getByTestId('scaffold');
+    await root.evaluate((element) => {
+      element.style.setProperty('--scaffold-safe-left', '12px');
+      element.style.setProperty('--scaffold-safe-right', '14px');
+    });
+
+    const [scaffold, fab] = await Promise.all([
+      root.boundingBox(),
+      page.getByTestId('scaffold-fab').boundingBox(),
+    ]);
+    const contentPadding = await page.locator('.scaffold__content').evaluate((element) => ({
+      left: getComputedStyle(element).paddingLeft,
+      right: getComputedStyle(element).paddingRight,
+    }));
+
+    expect(contentPadding).toEqual({ left: '12px', right: '14px' });
+    expectClose((scaffold?.x ?? 0) + (scaffold?.width ?? 0) - ((fab?.x ?? 0) + (fab?.width ?? 0)), 30);
   });
 
   test('safe-area fixture applies content and floating insets when bars are absent', async ({ page }) => {
