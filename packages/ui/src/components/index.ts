@@ -7,6 +7,7 @@ export * from './Card';
 export * from './Carousel';
 export * from './Checkbox';
 export * from './Chip';
+export * from './DatePicker';
 export * from './Dialog';
 export * from './Divider';
 export * from './DragHandle';
