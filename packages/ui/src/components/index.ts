@@ -11,6 +11,7 @@ export * from './DatePicker';
 export * from './Dialog';
 export * from './Divider';
 export * from './DragHandle';
+export * from './ExposedDropdownMenu';
 export * from './Fab';
 export * from './FabMenu';
 export * from './FloatingToolbar';
