@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DockedEdge, DragToResizeState } from './dragToResizeState';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
 import {
   PaneAdaptStrategy,
@@ -166,6 +167,24 @@ describe('calculateThreePaneScaffoldValue', () => {
     expect(isPaneInteractable(withScrim, ThreePaneScaffoldRole.Primary)).toBe(false);
     expect(isPaneInteractable(withScrim, ThreePaneScaffoldRole.Tertiary)).toBe(true);
     expect(isPaneInteractable(withoutScrim, ThreePaneScaffoldRole.Primary)).toBe(true);
+  });
+
+  it('carries the drag-to-resize state into the levitated adapted value', () => {
+    const dragToResizeState = new DragToResizeState({ dockedEdge: DockedEdge.Bottom });
+    const value = calculateThreePaneScaffoldValue({
+      maxHorizontalPartitions: 1,
+      adaptStrategies: {
+        primary: PaneAdaptStrategy.Hide,
+        secondary: PaneAdaptStrategy.Hide,
+        tertiary: PaneAdaptStrategy.Levitate({ dragToResizeState }),
+      },
+      destinationHistory: [{ pane: ThreePaneScaffoldRole.Tertiary }],
+    });
+
+    expect(value.tertiary.type).toBe('levitated');
+    if (value.tertiary.type === 'levitated') {
+      expect(value.tertiary.dragToResizeState).toBe(dragToResizeState);
+    }
   });
 
   it('rejects invalid partition counts', () => {
