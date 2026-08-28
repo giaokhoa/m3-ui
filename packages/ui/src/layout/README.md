@@ -48,6 +48,7 @@ The foundation currently ports pinned AndroidX behavior for:
 - Seekable `ThreePaneScaffoldState`, raw transition progress, pinned spring sampling, bounds interpolation, modal/scrim motion and mid-transition retarget continuity.
 - Predictive-back graphics scaling with the pinned AndroidX decay curve while layout measurement remains in unscaled scaffold coordinates.
 - `AnimatedPane` visual wrapping: pane-local shape clipping plus levitated-only shadow behavior. CSS border radius is the browser shape equivalent; the AndroidX 15dp platform shadow is represented by a semantic-color CSS shadow because the browser has no platform elevation primitive.
+- Pane-local state retention across Hidden ↔ visible changes. AndroidX uses a pane-role `SaveableStateProvider`; React keeps the role-keyed subtree mounted and removes static hidden panes from layout, interaction and accessibility with `display: none` plus `inert`.
 - Material `Scaffold`, implemented with CSS Grid, logical properties and safe-area environment variables.
 
 Immutable layout metrics live in canonical DTCG under `packages/tokens/tokens/core/layout.json`; adaptive code only projects generated `@m3-ui/tokens` values.
@@ -64,12 +65,14 @@ Levitated panes are still pane-scaffold state, not generic dialogs. They render 
 
 Motion is split at the same conceptual boundary: `adaptive/paneMotion.ts` owns which motion should happen and the geometry needed by it. `ThreePaneScaffold` consumes that contract as the browser renderer; `AnimatedPane` remains a pane-local visual/content wrapper instead of recreating Compose animation scopes in React.
 
+Pane-local state follows the same ownership rule. AndroidX saves pane content by pane role when visibility changes; React already has a stable state container when the keyed subtree remains mounted. Static Hidden panes therefore stay mounted but are `display: none` and inert, while transition frames reuse the same subtree for exit and re-entry. A separate Compose-style saveable-state runtime would duplicate React rather than improve parity.
+
 Predictive-back progress is an explicit state input. The browser renderer applies the active AndroidX scale curve to the scaffold graphics layer and removes that known scale from DOM measurement so layout does not feed back into itself. A dedicated cancellation return spring is intentionally not fabricated unless a browser navigation integration exposes a real cancellation lifecycle that needs it.
 
 Layout components should prefer CSS Grid/Flexbox and logical properties over JavaScript measurement whenever the browser can express the Material contract natively. JavaScript measurement is used only where AndroidX itself applies a measurement algorithm that CSS cannot reproduce exactly from static declarations.
 
 ## Deliberate next slices
 
-The major adaptive pane-layout, motion, predictive-back and `AnimatedPane` visual contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
+The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual and pane-state-retention contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
 
 Generic `Box`/`Row`/`Column` wrappers remain deferred until they demonstrate semantic/API value beyond native CSS Flexbox/Grid.
