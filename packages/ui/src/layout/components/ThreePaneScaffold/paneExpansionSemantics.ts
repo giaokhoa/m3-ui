@@ -17,11 +17,11 @@ export interface PaneExpansionHandleAriaStrings {
  */
 export const defaultPaneExpansionHandleAriaStrings: PaneExpansionHandleAriaStrings =
   Object.freeze({
-    proportionAnchor: (percent) => `${percent} percent`,
-    startOffsetAnchor: (offset) => `${offset} DPs from start`,
-    endOffsetAnchor: (offset) => `${offset} DPs from end`,
-    currentSplit: (anchorDescription) => `Current pane split, ${anchorDescription}`,
-    changeSplit: (anchorDescription) => `Change pane split to ${anchorDescription}`,
+    proportionAnchor: (percent: number) => `${percent} percent`,
+    startOffsetAnchor: (offset: number) => `${offset} DPs from start`,
+    endOffsetAnchor: (offset: number) => `${offset} DPs from end`,
+    currentSplit: (anchorDescription: string) => `Current pane split, ${anchorDescription}`,
+    changeSplit: (anchorDescription: string) => `Change pane split to ${anchorDescription}`,
   });
 
 export function describePaneExpansionAnchor(
