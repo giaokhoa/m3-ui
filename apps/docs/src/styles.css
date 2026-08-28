@@ -1,0 +1,106 @@
+html,
+body,
+#root {
+  min-block-size: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.docs-theme {
+  min-block-size: 100vh;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+.docs-main {
+  inline-size: min(100%, 80ch);
+  margin-inline: auto;
+  padding: 48px 24px 80px;
+}
+
+.docs-page-header {
+  margin-block-end: 40px;
+}
+
+.docs-page-title {
+  margin: 0;
+}
+
+.docs-page-description {
+  margin: 12px 0 0;
+  color: var(--on-surface-variant);
+}
+
+.docs-heading {
+  margin: 40px 0 16px;
+  scroll-margin-block-start: 24px;
+}
+
+.docs-heading--3,
+.docs-heading--4 {
+  margin-block-start: 32px;
+}
+
+.docs-paragraph {
+  margin: 16px 0;
+}
+
+.docs-article ul,
+.docs-article ol {
+  margin: 16px 0;
+  padding-inline-start: 28px;
+}
+
+.docs-article li + li {
+  margin-block-start: 8px;
+}
+
+.docs-link {
+  color: var(--primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.docs-inline-code,
+.docs-code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+.docs-inline-code {
+  padding-inline: 0.25em;
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+}
+
+.docs-code-surface,
+.docs-quote-surface,
+.docs-preview {
+  margin-block: 24px;
+  overflow: hidden;
+}
+
+.docs-code-block {
+  margin: 0;
+  padding: 20px 24px;
+  overflow: auto;
+}
+
+.docs-blockquote {
+  margin: 0;
+  padding: 20px 24px;
+}
+
+.docs-preview__content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 24px;
+}
