@@ -94,6 +94,23 @@ describe('calculateThreePaneScaffoldTransitionFrame', () => {
     expect(result.secondary?.placement.left ?? Infinity).toBeLessThan(450);
   });
 
+  it('keeps bounds duration private instead of extending the state timeline', () => {
+    const current = value(true, false, false);
+    const target: ThreePaneScaffoldValue = {
+      ...current,
+      primary: PaneAdaptedValue.Levitated('center'),
+    };
+    const timing = calculateThreePaneScaffoldTransitionTiming(options(current, target));
+    const halfway = frame(current, target, 0.5);
+
+    expect(halfway.primary?.motion).toBe(PaneMotion.AnimateBounds);
+    expect(timing.visibilityDurationMs).toBe(0);
+    expect(timing.boundsDurationMs).toBeGreaterThan(0);
+    expect(timing.durationMs).toBe(0);
+    expect(calculateThreePaneScaffoldTransitionDuration(options(current, target))).toBe(0);
+    expect(halfway.primary?.placement.width ?? 1000).toBeLessThan(1000);
+  });
+
   it('uses spring-sampled size and offset for expand/shrink', () => {
     const entering = frame(value(true, false, true), value(true, true, true), 0.5);
     expect(entering.secondary?.motion).toBe(PaneMotion.EnterWithExpand);
