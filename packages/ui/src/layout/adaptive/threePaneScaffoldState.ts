@@ -38,7 +38,9 @@ export interface MutableThreePaneScaffoldStateOptions {
   transitionDurationResolver?: ThreePaneScaffoldTransitionDurationResolver;
 }
 
-const DefaultUnboundTransitionDurationMs = 300;
+// AndroidX SeekableTransitionState has no timeline until it is attached to a Transition.
+// The web state snaps by default while unbound; the mounted scaffold supplies the real duration.
+const DefaultUnboundTransitionDurationMs = 0;
 
 function clampFraction(fraction: number) {
   if (!Number.isFinite(fraction) || fraction < 0 || fraction > 1) {
