@@ -8,8 +8,15 @@ import {
 import {
   PaneMotion,
   PaneMotionDefaults,
+  calculateHiddenPaneCurrentLeft,
+  calculateHidingPaneTargetLeft,
   calculatePaneMotionType,
+  calculateSlideInFromLeftOffset,
+  calculateSlideInFromRightOffset,
+  calculateSlideOutToLeftOffset,
+  calculateSlideOutToRightOffset,
   calculateThreePaneMotion,
+  type PaneMotionData,
   type ThreePaneMotion,
 } from './paneMotion';
 
@@ -53,12 +60,12 @@ const scaffoldValues = [
   value('V', 'V', 'V'),
 ] as const;
 
-function motion(primary: string, secondary: string, tertiary: string): ThreePaneMotion {
-  return {
-    primary: primary as ThreePaneMotion['primary'],
-    secondary: secondary as ThreePaneMotion['secondary'],
-    tertiary: tertiary as ThreePaneMotion['tertiary'],
-  };
+function motion(
+  primary: ThreePaneMotion['primary'],
+  secondary: ThreePaneMotion['secondary'],
+  tertiary: ThreePaneMotion['tertiary'],
+): ThreePaneMotion {
+  return { primary, secondary, tertiary };
 }
 
 // Exact 8 x 8 matrix from AndroidX PaneMotionTest.ExpectedThreePaneMotions.
@@ -202,5 +209,70 @@ describe('calculateThreePaneMotion', () => {
       stiffness: 380,
       delayedRatio: 0.1,
     });
+  });
+});
+
+function motionData(motions: readonly [string, string, string]): PaneMotionData[] {
+  const geometry = [
+    {
+      originSize: { width: 1, height: 2 },
+      originPosition: { x: 3, y: 4 },
+      targetSize: { width: 3, height: 4 },
+      targetPosition: { x: 5, y: 6 },
+    },
+    {
+      originSize: { width: 3, height: 4 },
+      originPosition: { x: 5, y: 6 },
+      targetSize: { width: 5, height: 6 },
+      targetPosition: { x: 7, y: 8 },
+    },
+    {
+      originSize: { width: 5, height: 6 },
+      originPosition: { x: 7, y: 8 },
+      targetSize: { width: 7, height: 8 },
+      targetPosition: { x: 9, y: 0 },
+    },
+  ] as const;
+
+  return geometry.map((item, index) => ({
+    ...item,
+    motion: motions[index] as PaneMotionData['motion'],
+  }));
+}
+
+describe('pane motion geometry', () => {
+  it('matches AndroidX slide-in-from-left offsets', () => {
+    expect(calculateSlideInFromLeftOffset(motionData([ER, ER, ER]))).toBe(0);
+    expect(calculateSlideInFromLeftOffset(motionData([EL, EL, ER]))).toBe(-9);
+    expect(calculateSlideInFromLeftOffset(motionData([EL, B, B]))).toBe(-7);
+    expect(calculateSlideInFromLeftOffset(motionData([EL, EL, XR]))).toBe(-12);
+    expect(calculateSlideInFromLeftOffset(motionData([EL, ELD, ER]))).toBe(-9);
+  });
+
+  it('matches AndroidX slide-in-from-right offsets', () => {
+    expect(calculateSlideInFromRightOffset(motionData([EL, EL, EL]), 1000)).toBe(0);
+    expect(calculateSlideInFromRightOffset(motionData([EL, ER, ER]), 1000)).toBe(992);
+    expect(calculateSlideInFromRightOffset(motionData([B, B, ER]), 1000)).toBe(988);
+    expect(calculateSlideInFromRightOffset(motionData([XL, XL, ER]), 1000)).toBe(991);
+    expect(calculateSlideInFromRightOffset(motionData([EL, ERD, ER]), 1000)).toBe(992);
+  });
+
+  it('matches AndroidX slide-out-to-left offsets', () => {
+    expect(calculateSlideOutToLeftOffset(motionData([ER, ER, ER]))).toBe(0);
+    expect(calculateSlideOutToLeftOffset(motionData([XL, XL, XR]))).toBe(-7);
+    expect(calculateSlideOutToLeftOffset(motionData([XL, B, B]))).toBe(-5);
+    expect(calculateSlideOutToLeftOffset(motionData([XL, XL, ER]))).toBe(-8);
+  });
+
+  it('matches AndroidX slide-out-to-right offsets', () => {
+    expect(calculateSlideOutToRightOffset(motionData([ER, ER, ER]), 1000)).toBe(0);
+    expect(calculateSlideOutToRightOffset(motionData([XL, XR, XR]), 1000)).toBe(996);
+    expect(calculateSlideOutToRightOffset(motionData([B, B, XR]), 1000)).toBe(992);
+    expect(calculateSlideOutToRightOffset(motionData([EL, XR, XR]), 1000)).toBe(995);
+  });
+
+  it('matches AndroidX hidden and hiding pane anchor edges', () => {
+    expect(calculateHiddenPaneCurrentLeft(motionData([XL, ER, EE]), 2)).toBe(4);
+    expect(calculateHidingPaneTargetLeft(motionData([EL, XR, XS]), 2)).toBe(8);
   });
 });
