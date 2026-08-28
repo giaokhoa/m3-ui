@@ -1,5 +1,9 @@
 import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
+  PaneExpansionUnspecified,
+  type PaneExpansionState,
+} from '../../adaptive/paneExpansionState';
+import {
   getPaneAdaptedValue,
   type ThreePaneScaffoldHorizontalOrder,
   type ThreePaneScaffoldRole,
@@ -30,6 +34,7 @@ export interface ThreePaneScaffoldLayoutOptions {
   excludedBounds?: readonly LayoutBounds[];
   preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  paneExpansionState?: PaneExpansionState | null;
 }
 
 const panePriority: Record<ThreePaneScaffoldRole, number> = {
@@ -73,7 +78,7 @@ function clipBounds(bounds: LayoutBounds, width: number, height: number): Layout
 
 /**
  * Static measurement/placement port of AndroidX ThreePaneScaffold.
- * Pane expansion drag state, animation lookahead and levitated overlays are separate concerns.
+ * Pane animation lookahead and levitated overlays are separate concerns.
  */
 export function calculateThreePaneScaffoldLayout({
   width,
@@ -85,6 +90,7 @@ export function calculateThreePaneScaffoldLayout({
   excludedBounds = directive.excludedBounds,
   preferredWidths = {},
   preferredHeights = {},
+  paneExpansionState = null,
 }: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayout {
   assertDimension(width, 'width');
   assertDimension(height, 'height');
@@ -191,6 +197,65 @@ export function calculateThreePaneScaffoldLayout({
   };
 
   const outerBounds: LayoutBounds = { left: 0, top: 0, right: width, bottom: height };
+
+  if (paneExpansionState !== null && expanded.length === 2) {
+    const expansion = paneExpansionState.getLayoutState(width, direction);
+    const expansionUnspecified =
+      expansion.firstPaneWidth === PaneExpansionUnspecified &&
+      Number.isNaN(expansion.firstPaneProportion) &&
+      expansion.currentDraggingOffset === PaneExpansionUnspecified;
+
+    if (!expansionUnspecified) {
+      const firstPane = expanded[0]!;
+      const secondPane = expanded[1]!;
+      if (expansion.currentDraggingOffset !== PaneExpansionUnspecified) {
+        const halfGap = horizontalGap / 2;
+        if (expansion.currentDraggingOffset <= halfGap) {
+          const bounds = expansion.isDraggingOrSettling
+            ? { ...outerBounds, left: expansion.currentDraggingOffset * 2 }
+            : outerBounds;
+          placePartition(bounds, secondPane);
+        } else if (expansion.currentDraggingOffset >= width - halfGap) {
+          const bounds = expansion.isDraggingOrSettling
+            ? { ...outerBounds, right: expansion.currentDraggingOffset * 2 - width }
+            : outerBounds;
+          placePartition(bounds, firstPane);
+        } else {
+          placePartition(
+            { ...outerBounds, right: expansion.currentDraggingOffset - halfGap },
+            firstPane,
+          );
+          placePartition(
+            { ...outerBounds, left: expansion.currentDraggingOffset + halfGap },
+            secondPane,
+          );
+        }
+      } else if (
+        expansion.firstPaneWidth === 0 ||
+        expansion.firstPaneProportion === 0
+      ) {
+        placePartition(outerBounds, secondPane);
+      } else if (
+        expansion.firstPaneWidth >= width - horizontalGap ||
+        expansion.firstPaneProportion >= 1
+      ) {
+        placePartition(outerBounds, firstPane);
+      } else {
+        const firstPaneWidth =
+          expansion.firstPaneWidth !== PaneExpansionUnspecified
+            ? expansion.firstPaneWidth
+            : Math.trunc(expansion.firstPaneProportion * (width - horizontalGap));
+        const firstPaneRight = outerBounds.left + firstPaneWidth;
+        placePartition({ ...outerBounds, right: firstPaneRight }, firstPane);
+        placePartition(
+          { ...outerBounds, left: firstPaneRight + horizontalGap },
+          secondPane,
+        );
+      }
+      return result;
+    }
+  }
+
   const localExcluded = excludedBounds
     .map((bound) => clipBounds(bound, width, height))
     .filter((bound): bound is LayoutBounds => bound !== null)
