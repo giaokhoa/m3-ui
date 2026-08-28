@@ -71,11 +71,11 @@ export type ThreePaneScaffoldTransitionLayoutOptions = Omit<
 >;
 
 export interface ThreePaneScaffoldTransitionTiming {
-  /** Transition playtime used by AnimatedVisibility enter/exit children. */
+  /** Transition.totalDuration analogue from AnimatedVisibility child animations. */
   visibilityDurationMs: number;
-  /** Longest custom AnimateBounds TargetBasedAnimation duration. */
+  /** Longest private AnimateBounds TargetBasedAnimation duration. */
   boundsDurationMs: number;
-  /** Default state timeline duration. */
+  /** Default SeekableTransitionState timeline duration. */
   durationMs: number;
 }
 
@@ -461,11 +461,12 @@ function prepareTransition({
     }
   }
 
-  // AndroidX's normal transition timeline is driven by Transition children.
-  // Bounds morphing samples its own TargetBasedAnimation from motionProgress;
-  // when there are no visibility children, use that bounds duration so the web
-  // state still has a meaningful linear timeline to traverse.
-  const durationMs = visibilityDurationMs > 0 ? visibilityDurationMs : boundsDurationMs;
+  // AndroidX SeekableTransitionState.animateTo(null) traverses Transition.totalDuration.
+  // AnimatedPane's private AnimateBounds TargetBasedAnimation only consumes motionProgress;
+  // it does not register its duration as a Transition child. Therefore a bounds-only
+  // state change has a zero default timeline duration even though seekTo(fraction) can
+  // still sample the private bounds spring at that fraction.
+  const durationMs = visibilityDurationMs;
   return {
     physicalOrder,
     motion,
