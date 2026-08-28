@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { DragToResizeState } from './dragToResizeState';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
 
 export type ThreePaneScaffoldRole = 'primary' | 'secondary' | 'tertiary';
@@ -55,6 +56,7 @@ export interface LevitatePaneAdaptStrategy {
   type: 'levitate';
   alignment: LevitatedPaneAlignment;
   scrim?: LevitatedPaneScrimContent;
+  dragToResizeState?: DragToResizeState;
   /** Equivalent of AndroidX AdaptStrategy.Levitate.onlyIf. */
   onlyIf(condition: boolean): PaneAdaptStrategy;
   /** AndroidX single-pane means maxHorizontalPartitions == 1. */
@@ -64,6 +66,7 @@ export interface LevitatePaneAdaptStrategy {
 export interface LevitatePaneAdaptStrategyOptions {
   alignment?: LevitatedPaneAlignment;
   scrim?: LevitatedPaneScrimContent;
+  dragToResizeState?: DragToResizeState;
 }
 
 export type PaneAdaptStrategy =
@@ -76,11 +79,13 @@ const hidePaneAdaptStrategy: HidePaneAdaptStrategy = Object.freeze({ type: 'hide
 function createLevitatePaneAdaptStrategy({
   alignment = PaneAlignment.Center,
   scrim,
+  dragToResizeState,
 }: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
   const strategy: LevitatePaneAdaptStrategy = {
     type: 'levitate',
     alignment,
     ...(scrim === undefined ? {} : { scrim }),
+    ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
     onlyIf(condition) {
       return condition ? strategy : hidePaneAdaptStrategy;
     },
@@ -115,6 +120,7 @@ export type PaneAdaptedValue =
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
       scrim?: LevitatedPaneScrimContent;
+      dragToResizeState?: DragToResizeState;
     };
 
 const expandedPaneAdaptedValue = Object.freeze({ type: 'expanded' } as const);
@@ -129,11 +135,13 @@ export const PaneAdaptedValue = {
   Levitated(
     alignment: LevitatedPaneAlignment,
     scrim?: LevitatedPaneScrimContent,
+    dragToResizeState?: DragToResizeState,
   ): PaneAdaptedValue {
     return {
       type: 'levitated',
       alignment,
       ...(scrim === undefined ? {} : { scrim }),
+      ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
     };
   },
 } as const;
@@ -252,6 +260,7 @@ export function calculateThreePaneScaffoldValue({
       adapted[currentDestination] = PaneAdaptedValue.Levitated(
         strategy.alignment,
         strategy.scrim,
+        strategy.dragToResizeState,
       );
     }
   }
