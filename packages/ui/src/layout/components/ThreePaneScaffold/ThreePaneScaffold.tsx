@@ -16,10 +16,14 @@ import {
 import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   getPaneAdaptedValue,
+  hasLevitatedPaneWithScrim,
+  isPaneInteractable,
+  type LevitatedPaneScrimContent,
   type ThreePaneScaffoldHorizontalOrder,
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
@@ -185,6 +189,7 @@ export function ThreePaneScaffold({
   );
   const showDragHandle = paneExpansionDragHandle != null && expandedRoles.length === 2;
   const expansionLayout = expansionState.getLayoutState(geometry.width, geometry.direction);
+  const hasBlockingScrim = hasLevitatedPaneWithScrim(value);
 
   let dragHandleOffset = PaneExpansionUnspecified;
   if (showDragHandle) {
@@ -216,6 +221,7 @@ export function ThreePaneScaffold({
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (
+      hasBlockingScrim ||
       !event.isPrimary ||
       event.button !== 0 ||
       dragHandleOffset === PaneExpansionUnspecified
@@ -257,6 +263,7 @@ export function ThreePaneScaffold({
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (
+      hasBlockingScrim ||
       (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') ||
       dragHandleOffset === PaneExpansionUnspecified
     ) {
@@ -269,11 +276,22 @@ export function ThreePaneScaffold({
     expansionState.endDrag(0);
   };
 
-  const panes: Array<[ThreePaneScaffoldRole, ReactNode, PanePlacement | undefined]> = [
-    ['primary', primaryPane, layout.primary],
-    ['secondary', secondaryPane, layout.secondary],
-    ['tertiary', tertiaryPane, layout.tertiary],
+  const panes: Array<[ThreePaneScaffoldRole, ReactNode]> = [
+    ['primary', primaryPane],
+    ['secondary', secondaryPane],
+    ['tertiary', tertiaryPane],
   ];
+
+  let levitatedScrim: LevitatedPaneScrimContent | undefined;
+  for (const [role] of panes) {
+    const adaptedValue = getPaneAdaptedValue(value, role);
+    if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
+      levitatedScrim = adaptedValue.scrim;
+      break;
+    }
+  }
+  const renderedScrim =
+    typeof levitatedScrim === 'function' ? levitatedScrim() : levitatedScrim;
 
   const dragHandle =
     typeof paneExpansionDragHandle === 'function'
@@ -291,9 +309,25 @@ export function ThreePaneScaffold({
       className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
       style={style}
     >
-      {panes.map(([role, content, placement]) => {
+      {panes.map(([role, content]) => {
         const adaptedValue = getPaneAdaptedValue(value, role);
-        if (content == null || adaptedValue.type === 'hidden' || placement === undefined) return null;
+        if (content == null || adaptedValue.type === 'hidden') return null;
+
+        const placement =
+          adaptedValue.type === 'levitated'
+            ? calculateLevitatedPanePlacement({
+                width: geometry.width,
+                height: geometry.height,
+                directive,
+                alignment: adaptedValue.alignment,
+                direction: geometry.direction,
+                preferredWidth: preferredWidths?.[role],
+                preferredHeight: preferredHeights?.[role],
+              })
+            : getPlacement(layout, role);
+        if (placement === undefined) return null;
+
+        const interactable = isPaneInteractable(value, role);
         return (
           <div
             key={role}
@@ -301,9 +335,16 @@ export function ThreePaneScaffold({
               if (node === null) delete paneRefs.current[role];
               else paneRefs.current[role] = node;
             }}
-            className="three-pane-scaffold__pane"
+            className={[
+              'three-pane-scaffold__pane',
+              adaptedValue.type === 'levitated' && 'three-pane-scaffold__pane--levitated',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             data-pane-role={role}
             data-pane-adapted-value={adaptedValue.type}
+            data-pane-interactable={interactable}
+            inert={!interactable || undefined}
             tabIndex={-1}
             style={paneStyle(placement)}
           >
@@ -320,7 +361,8 @@ export function ThreePaneScaffold({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={dragHandlePercent}
-          tabIndex={0}
+          inert={hasBlockingScrim || undefined}
+          tabIndex={hasBlockingScrim ? -1 : 0}
           style={{ left: dragHandleOffset }}
           onKeyDown={handleKeyDown}
           onPointerCancel={(event) => finishPointerDrag(event, 0)}
@@ -331,6 +373,9 @@ export function ThreePaneScaffold({
         >
           {dragHandle}
         </div>
+      ) : null}
+      {levitatedScrim != null ? (
+        <div className="three-pane-scaffold__scrim">{renderedScrim}</div>
       ) : null}
     </div>
   );
