@@ -105,4 +105,37 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
       browserGeometryTolerance,
     );
   });
+
+  test('levitated AnimatedPane applies the requested shape and shadow only as a modal pane', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--levitated-dialog');
+
+    const root = page.locator('#storybook-root');
+    const scaffold = root.locator('.three-pane-scaffold');
+    const extraPane = scaffold.locator('[data-pane-role="tertiary"]');
+    const animatedPane = extraPane.locator('.animated-pane');
+
+    await expect(extraPane).toHaveAttribute('data-pane-adapted-value', 'levitated');
+    await expect(animatedPane).toBeVisible();
+
+    const levitatedStyle = await animatedPane.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        borderRadius: style.borderRadius,
+        boxShadow: style.boxShadow,
+        overflow: style.overflow,
+      };
+    });
+    expect(levitatedStyle.borderRadius).toBe('16px');
+    expect(levitatedStyle.boxShadow).not.toBe('none');
+    expect(levitatedStyle.overflow).toBe('hidden');
+
+    await openStory(page, 'layout-listdetailpanescaffold--expanded');
+    const expandedAnimatedPane = page
+      .locator('#storybook-root')
+      .locator('[data-pane-role="primary"] .animated-pane');
+    const expandedShadow = await expandedAnimatedPane.evaluate(
+      (element) => getComputedStyle(element).boxShadow,
+    );
+    expect(expandedShadow).toBe('none');
+  });
 });
