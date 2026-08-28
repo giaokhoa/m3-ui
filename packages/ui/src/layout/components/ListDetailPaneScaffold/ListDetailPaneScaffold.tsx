@@ -1,15 +1,15 @@
-import type { HTMLAttributes, ReactNode } from 'react';
-import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
+import type { ReactNode } from 'react';
+import { listDetailPaneScaffoldOrder } from '../../adaptive/threePaneScaffold';
 import {
-  listDetailPaneScaffoldOrder,
-  type ThreePaneScaffoldValue,
-} from '../../adaptive/threePaneScaffold';
-import { ThreePaneScaffold } from '../ThreePaneScaffold';
+  ThreePaneScaffold,
+  type ThreePaneScaffoldProps,
+} from '../ThreePaneScaffold';
 
 export interface ListDetailPaneScaffoldProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  directive: PaneScaffoldDirective;
-  value: ThreePaneScaffoldValue;
+  extends Omit<
+    ThreePaneScaffoldProps,
+    'paneOrder' | 'primaryPane' | 'secondaryPane' | 'tertiaryPane'
+  > {
   listPane: ReactNode;
   detailPane: ReactNode;
   extraPane?: ReactNode;
@@ -17,8 +17,6 @@ export interface ListDetailPaneScaffoldProps
 
 /** Material canonical list-detail layout: List, Detail, Extra from start to end. */
 export function ListDetailPaneScaffold({
-  directive,
-  value,
   listPane,
   detailPane,
   extraPane,
@@ -27,8 +25,6 @@ export function ListDetailPaneScaffold({
   return (
     <ThreePaneScaffold
       {...props}
-      directive={directive}
-      value={value}
       paneOrder={listDetailPaneScaffoldOrder}
       primaryPane={detailPane}
       secondaryPane={listPane}
