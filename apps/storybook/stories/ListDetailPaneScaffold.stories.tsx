@@ -2,8 +2,11 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Surface, VerticalDragHandle } from '@m3-ui/ui';
 import {
+  LevitatedPaneScrim,
   ListDetailPaneScaffold,
   ListDetailPaneScaffoldRole,
+  PaneAdaptStrategy,
+  PaneAlignment,
   PaneExpansionAnchor,
   PaneExpansionState,
   calculatePaneScaffoldDirective,
@@ -93,6 +96,37 @@ function Fixture({
   );
 }
 
+function LevitatedDialogFixture() {
+  const width = 720;
+  const height = 640;
+  const directive = calculatePaneScaffoldDirective(
+    calculateWindowAdaptiveInfo({ width, height }),
+  );
+  const extraPaneStrategy = PaneAdaptStrategy.Levitate({
+    alignment: PaneAlignment.Center,
+    scrim: <LevitatedPaneScrim aria-label="Scrim" />,
+  }).onlyIfSinglePane(directive);
+  const value = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: {
+      ...listDetailPaneScaffoldAdaptStrategies,
+      tertiary: extraPaneStrategy,
+    },
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Extra }],
+  });
+
+  return (
+    <div style={{ width, maxWidth: '100%', height, margin: '0 auto' }}>
+      <ListDetailPaneScaffold
+        directive={directive}
+        value={value}
+        listPane={<Pane title="List">Inbox conversations</Pane>}
+        detailPane={<Pane title="Detail">Selected conversation</Pane>}
+        extraPane={<Pane title="Extra dialog">Context and metadata</Pane>}
+      />
+    </div>
+  );
+}
+
 export const Compact: Story = {
   render: () => <Fixture width={480} />,
 };
@@ -103,6 +137,10 @@ export const Expanded: Story = {
 
 export const Resizable: Story = {
   render: () => <Fixture width={1000} resizable />,
+};
+
+export const LevitatedDialog: Story = {
+  render: () => <LevitatedDialogFixture />,
 };
 
 export const ExtraLarge: Story = {
