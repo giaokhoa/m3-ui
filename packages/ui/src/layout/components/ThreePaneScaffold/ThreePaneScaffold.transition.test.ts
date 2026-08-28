@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import { PaneMotion } from '../../adaptive/paneMotion';
+import { samplePaneMotionVectorSpringAtPlayTime } from '../../adaptive/paneMotionSpring';
+import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   PaneAdaptedValue,
   ThreePaneScaffoldRole,
@@ -8,7 +9,9 @@ import {
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
 import {
+  calculateThreePaneScaffoldTransitionDuration,
   calculateThreePaneScaffoldTransitionFrame,
+  calculateThreePaneScaffoldTransitionTiming,
   captureThreePaneScaffoldTransitionOrigin,
   interpolateThreePaneScaffoldTransitionFrames,
 } from './ThreePaneScaffold.transition';
@@ -38,71 +41,92 @@ function value(primary: boolean, secondary: boolean, tertiary: boolean): ThreePa
   };
 }
 
+function options(currentValue: ThreePaneScaffoldValue, targetValue: ThreePaneScaffoldValue) {
+  return {
+    width: 1000,
+    height: 800,
+    directive,
+    currentValue,
+    targetValue,
+    paneOrder: order,
+  } as const;
+}
+
 function frame(
   currentValue: ThreePaneScaffoldValue,
   targetValue: ThreePaneScaffoldValue,
   progressFraction: number,
 ) {
   return calculateThreePaneScaffoldTransitionFrame({
-    width: 1000,
-    height: 800,
-    directive,
-    currentValue,
-    targetValue,
+    ...options(currentValue, targetValue),
     progressFraction,
-    paneOrder: order,
   });
 }
 
 describe('calculateThreePaneScaffoldTransitionFrame', () => {
-  it('slides edge panes out and in using AndroidX motion offsets', () => {
-    const result = frame(value(true, false, false), value(false, true, false), 0.5);
+  it('samples edge slide springs at the global transition playtime', () => {
+    const current = value(true, false, false);
+    const target = value(false, true, false);
+    const duration = calculateThreePaneScaffoldTransitionDuration(options(current, target));
+    const result = frame(current, target, 0.5);
+    const playTime = duration * 0.5;
 
+    expect(duration).toBe(475);
     expect(result.primary?.motion).toBe(PaneMotion.ExitToLeft);
-    expect(result.primary?.translateX).toBe(-500);
+    expect(result.primary?.translateX).toBeCloseTo(
+      samplePaneMotionVectorSpringAtPlayTime([0, 0], [-1000, 0], playTime)[0]!,
+    );
     expect(result.secondary?.motion).toBe(PaneMotion.EnterFromRight);
-    expect(result.secondary?.translateX).toBe(500);
+    expect(result.secondary?.translateX).toBeCloseTo(
+      samplePaneMotionVectorSpringAtPlayTime([1000, 0], [0, 0], playTime)[0]!,
+    );
+    expect(Math.abs(result.primary?.translateX ?? 0)).toBeGreaterThan(900);
   });
 
-  it('interpolates bounds for panes that remain shown', () => {
+  it('samples AnimateBounds on its own TargetBasedAnimation progress', () => {
     const result = frame(value(true, true, false), value(true, true, true), 0.5);
 
     expect(result.primary?.motion).toBe(PaneMotion.AnimateBounds);
     expect(result.primary?.placement.left).toBeCloseTo(0);
-    expect(result.primary?.placement.width).toBeCloseTo((616 + 317.3333333333) / 2);
-    expect(result.secondary?.placement.left).toBeCloseTo((640 + 341.3333333333) / 2);
+    // A spring at half of its own duration is already much closer to target
+    // than a linear midpoint between 616 and 317.33.
+    expect(result.primary?.placement.width ?? Infinity).toBeLessThan(400);
+    expect(result.secondary?.placement.left ?? Infinity).toBeLessThan(450);
   });
 
-  it('uses center clipping for EnterWithExpand and ExitWithShrink', () => {
+  it('uses spring-sampled size and offset for expand/shrink', () => {
     const entering = frame(value(true, false, true), value(true, true, true), 0.5);
     expect(entering.secondary?.motion).toBe(PaneMotion.EnterWithExpand);
-    expect(entering.secondary?.inlineClipFraction).toBe(0.5);
+    expect(entering.secondary?.inlineClipFraction ?? 0).toBeGreaterThan(0.8);
 
     const exiting = frame(value(true, true, true), value(true, false, true), 0.5);
     expect(exiting.secondary?.motion).toBe(PaneMotion.ExitWithShrink);
-    expect(exiting.secondary?.inlineClipFraction).toBe(0.5);
+    expect(exiting.secondary?.inlineClipFraction ?? 1).toBeLessThan(0.2);
   });
 
-  it('fades levitated panes and scrims for modal enter/exit', () => {
+  it('uses the Float visibility spring for modal pane and scrim', () => {
     const current = value(true, false, false);
     const target: ThreePaneScaffoldValue = {
       ...current,
       tertiary: PaneAdaptedValue.Levitated('center', 'scrim'),
     };
 
+    const timing = calculateThreePaneScaffoldTransitionTiming(options(current, target));
+    expect(timing.visibilityDurationMs).toBe(328);
+
     const entering = frame(current, target, 0.4);
     expect(entering.tertiary?.motion).toBe(PaneMotion.EnterAsModal);
-    expect(entering.tertiary?.opacity).toBe(0.4);
+    expect(entering.tertiary?.opacity).toBeCloseTo(0.82226083, 5);
     expect(entering.scrim).toBe('scrim');
-    expect(entering.scrimOpacity).toBe(0.4);
+    expect(entering.scrimOpacity).toBeCloseTo(entering.tertiary?.opacity ?? 0, 7);
 
     const exiting = frame(target, current, 0.4);
     expect(exiting.tertiary?.motion).toBe(PaneMotion.ExitAsModal);
-    expect(exiting.tertiary?.opacity).toBe(0.6);
-    expect(exiting.scrimOpacity).toBe(0.6);
+    expect(exiting.tertiary?.opacity).toBeCloseTo(0.17773917, 5);
+    expect(exiting.scrimOpacity).toBeCloseTo(exiting.tertiary?.opacity ?? 0, 7);
   });
 
-  it('holds delayed enters during the configured delayed ratio', () => {
+  it('holds delayed enters for 10% of the original spring duration', () => {
     const current = value(false, true, false);
     const target = value(true, false, true);
 
@@ -114,13 +138,8 @@ describe('calculateThreePaneScaffoldTransitionFrame', () => {
 
   it('reverses physical motion direction in RTL', () => {
     const result = calculateThreePaneScaffoldTransitionFrame({
-      width: 1000,
-      height: 800,
-      directive,
-      currentValue: value(true, false, false),
-      targetValue: value(false, true, false),
+      ...options(value(true, false, false), value(false, true, false)),
       progressFraction: 0.5,
-      paneOrder: order,
       direction: 'rtl',
     });
 
