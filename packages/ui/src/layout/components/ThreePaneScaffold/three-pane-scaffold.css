@@ -30,11 +30,20 @@
 /*
  * AndroidX AnimatedPane uses Modifier.shadow(15.dp, shape) only while the
  * pane is Levitated. CSS has no platform elevation primitive, so the browser
- * renderer maps that runtime elevation to a single semantic-color shadow
- * while the AnimatedPane border radius provides the matching shadow shape.
+ * renderer maps that runtime elevation to a single semantic-color shadow.
  */
 .three-pane-scaffold__pane--levitated > .animated-pane {
   box-shadow: 0 15px 30px color-mix(in srgb, var(--shadow) 24%, transparent);
+}
+
+/*
+ * With an explicit drag handle the scaffold owns a small wrapper above the
+ * AnimatedPane content. AndroidX applies the same 15dp shadow around that
+ * complete levitated surface, whose default shape is RectangleShape.
+ */
+.three-pane-scaffold__pane--levitated.three-pane-scaffold__pane--has-resize-handle {
+  box-shadow: 0 15px 30px color-mix(in srgb, var(--shadow) 24%, transparent);
+  overflow: hidden;
 }
 
 .three-pane-scaffold__pane--has-resize-handle {
