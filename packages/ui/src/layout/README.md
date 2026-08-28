@@ -48,7 +48,7 @@ The foundation currently ports pinned AndroidX behavior for:
 - Seekable `ThreePaneScaffoldState`, raw transition progress, pinned spring sampling, bounds interpolation, modal/scrim motion and mid-transition retarget continuity.
 - Predictive-back graphics scaling with the pinned AndroidX decay curve while layout measurement remains in unscaled scaffold coordinates.
 - `AnimatedPane` visual wrapping: pane-local shape clipping plus levitated-only shadow behavior. CSS border radius is the browser shape equivalent; the AndroidX 15dp platform shadow is represented by a semantic-color CSS shadow because the browser has no platform elevation primitive.
-- Pane-local state retention across Hidden ↔ visible changes. AndroidX uses a pane-role `SaveableStateProvider`; React keeps the role-keyed subtree mounted and removes static hidden panes from layout, interaction and accessibility with `display: none` plus `inert`.
+- Pane-local state retention across Hidden ↔ visible changes. AndroidX uses a pane-role `SaveableStateProvider`; the current React 19.2 runtime uses a role-keyed `Activity`, which hides the pane with `display: none`, restores its React/DOM state when visible again, and cleans up Effects while hidden.
 - Material `Scaffold`, implemented with CSS Grid, logical properties and safe-area environment variables.
 
 Immutable layout metrics live in canonical DTCG under `packages/tokens/tokens/core/layout.json`; adaptive code only projects generated `@m3-ui/tokens` values.
@@ -65,7 +65,7 @@ Levitated panes are still pane-scaffold state, not generic dialogs. They render 
 
 Motion is split at the same conceptual boundary: `adaptive/paneMotion.ts` owns which motion should happen and the geometry needed by it. `ThreePaneScaffold` consumes that contract as the browser renderer; `AnimatedPane` remains a pane-local visual/content wrapper instead of recreating Compose animation scopes in React.
 
-Pane-local state follows the same ownership rule. AndroidX saves pane content by pane role when visibility changes; React already has a stable state container when the keyed subtree remains mounted. Static Hidden panes therefore stay mounted but are `display: none` and inert, while transition frames reuse the same subtree for exit and re-entry. A separate Compose-style saveable-state runtime would duplicate React rather than improve parity.
+Pane-local state follows the same ownership rule. AndroidX disposes hidden pane composition while `SaveableStateProvider(paneRole)` preserves saveable state. React 19.2 `Activity` is the browser-native analogue used by the current workspace: a static Hidden pane keeps role-keyed UI/internal state and DOM identity, drops out of layout with `display: none`, and has its Effects cleaned up until the pane becomes visible again. Transition frames switch the same Activity back to visible so exit and re-entry reuse the retained subtree instead of mounting a replacement.
 
 Predictive-back progress is an explicit state input. The browser renderer applies the active AndroidX scale curve to the scaffold graphics layer and removes that known scale from DOM measurement so layout does not feed back into itself. A dedicated cancellation return spring is intentionally not fabricated unless a browser navigation integration exposes a real cancellation lifecycle that needs it.
 
