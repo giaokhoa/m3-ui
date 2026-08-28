@@ -24,6 +24,7 @@ import {
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
 import {
+  MutableThreePaneScaffoldState,
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldState,
 } from '../../adaptive/threePaneScaffoldState';
@@ -34,6 +35,7 @@ import {
   type ThreePaneScaffoldLayout,
 } from './ThreePaneScaffold.layout';
 import {
+  calculateThreePaneScaffoldTransitionDuration,
   calculateThreePaneScaffoldTransitionFrame,
   captureThreePaneScaffoldTransitionOrigin,
   interpolateThreePaneScaffoldTransitionFrames,
@@ -259,6 +261,45 @@ export function ThreePaneScaffold({
     }
     paneRefs.current[targetValue.currentDestination]?.focus({ preventScroll: true });
   }, [directive.shouldAutoFocusCurrentDestination, targetValue.currentDestination]);
+
+  useLayoutEffect(() => {
+    if (!(scaffoldState instanceof MutableThreePaneScaffoldState) || geometry.width <= 0) {
+      return;
+    }
+    return scaffoldState.setTransitionDurationResolver((from, to) => {
+      const localExcludedBounds: LayoutBounds[] = directive.excludedBounds.map((bound) => ({
+        left: bound.left - geometry.viewportLeft,
+        top: bound.top - geometry.viewportTop,
+        right: bound.right - geometry.viewportLeft,
+        bottom: bound.bottom - geometry.viewportTop,
+      }));
+      return calculateThreePaneScaffoldTransitionDuration({
+        width: geometry.width,
+        height: geometry.height,
+        directive,
+        currentValue: from,
+        targetValue: to,
+        paneOrder,
+        direction: geometry.direction,
+        excludedBounds: localExcludedBounds,
+        preferredWidths,
+        preferredHeights,
+        paneExpansionState: expansionState,
+      });
+    });
+  }, [
+    scaffoldState,
+    geometry.width,
+    geometry.height,
+    geometry.viewportLeft,
+    geometry.viewportTop,
+    geometry.direction,
+    directive,
+    paneOrder,
+    preferredWidths,
+    preferredHeights,
+    expansionState,
+  ]);
 
   const excludedBounds: LayoutBounds[] = directive.excludedBounds.map((bound) => ({
     left: bound.left - geometry.viewportLeft,
