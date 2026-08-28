@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Surface } from '@m3-ui/ui';
+import { Surface, VerticalDragHandle } from '@m3-ui/ui';
 import {
   ListDetailPaneScaffold,
   ListDetailPaneScaffoldRole,
+  PaneExpansionAnchor,
+  PaneExpansionState,
   calculatePaneScaffoldDirective,
   calculateThreePaneScaffoldValueFromDirective,
   calculateWindowAdaptiveInfo,
@@ -43,7 +46,26 @@ function Pane({ title, children }: { title: string; children: string }) {
   );
 }
 
-function Fixture({ width, height = 640 }: { width: number; height?: number }) {
+function Fixture({
+  width,
+  height = 640,
+  resizable = false,
+}: {
+  width: number;
+  height?: number;
+  resizable?: boolean;
+}) {
+  const [paneExpansionState] = useState(
+    () =>
+      new PaneExpansionState({
+        anchors: [
+          PaneExpansionAnchor.proportion(0.3),
+          PaneExpansionAnchor.proportion(0.5),
+          PaneExpansionAnchor.proportion(0.7),
+        ],
+        initialAnchoredIndex: 1,
+      }),
+  );
   const directive = calculatePaneScaffoldDirective(
     calculateWindowAdaptiveInfo({ width, height }),
   );
@@ -60,6 +82,12 @@ function Fixture({ width, height = 640 }: { width: number; height?: number }) {
         listPane={<Pane title="List">Inbox conversations</Pane>}
         detailPane={<Pane title="Detail">Selected conversation</Pane>}
         extraPane={<Pane title="Extra">Context and metadata</Pane>}
+        paneExpansionState={resizable ? paneExpansionState : undefined}
+        paneExpansionDragHandle={
+          resizable
+            ? (state) => <VerticalDragHandle isDragged={state.isDragging} />
+            : undefined
+        }
       />
     </div>
   );
@@ -71,6 +99,10 @@ export const Compact: Story = {
 
 export const Expanded: Story = {
   render: () => <Fixture width={1000} />,
+};
+
+export const Resizable: Story = {
+  render: () => <Fixture width={1000} resizable />,
 };
 
 export const ExtraLarge: Story = {
