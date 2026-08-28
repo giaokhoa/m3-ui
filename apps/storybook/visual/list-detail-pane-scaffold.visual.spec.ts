@@ -23,10 +23,10 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
 
     await expect(scaffold).toBeVisible();
     await expect(detailPane).toHaveAttribute('data-pane-adapted-value', 'hidden');
-    await expect(detailPane).toHaveAttribute('data-pane-motion', 'exit-to-left');
+    await expect(detailPane).toHaveAttribute('data-pane-motion', 'exit-to-right');
     await expect(detailPane).toContainText('Detail');
     await expect(listPane).toHaveAttribute('data-pane-adapted-value', 'expanded');
-    await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-right');
+    await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-left');
     await expect(listPane).toContainText('List');
 
     // Temporary baseline bootstrap. Removed once the Linux CI image is committed.
