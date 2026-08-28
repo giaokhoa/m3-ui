@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
+import type { DragToResizeState } from '../../adaptive/dragToResizeState';
 import {
   PaneExpansionState,
   PaneExpansionUnspecified,
@@ -31,6 +32,10 @@ import {
 } from './ThreePaneScaffold.layout';
 import './three-pane-scaffold.css';
 
+export type LevitatedPaneDragHandle =
+  | ReactNode
+  | ((state: DragToResizeState) => ReactNode);
+
 export interface ThreePaneScaffoldProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   directive: PaneScaffoldDirective;
@@ -44,6 +49,13 @@ export interface ThreePaneScaffoldProps
   paneExpansionState?: PaneExpansionState;
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
   paneExpansionHandleAriaLabel?: string;
+  /**
+   * Web equivalent of AnimatedPane.dragToResizeHandle, keyed by pane role.
+   * When omitted for a resizable levitated pane, the whole pane is the pointer
+   * drag target like AndroidX AnimatedPane.
+   */
+  levitatedPaneDragHandles?: Partial<Record<ThreePaneScaffoldRole, LevitatedPaneDragHandle>>;
+  levitatedPaneDragHandleAriaLabel?: string;
 }
 
 interface ScaffoldGeometry {
@@ -61,6 +73,15 @@ interface PointerDrag {
   velocity: number;
 }
 
+interface ResizePointerDrag {
+  pointerId: number;
+  state: DragToResizeState;
+  lastX: number;
+  lastY: number;
+  accumulated: number;
+  dragging: boolean;
+}
+
 const emptyGeometry: ScaffoldGeometry = {
   width: 0,
   height: 0,
@@ -68,6 +89,10 @@ const emptyGeometry: ScaffoldGeometry = {
   viewportTop: 0,
   direction: 'ltr',
 };
+
+const noStoreSubscribe = () => () => {};
+const noStoreSnapshot = () => 0;
+const ResizePointerSlop = 4;
 
 function sameGeometry(a: ScaffoldGeometry, b: ScaffoldGeometry) {
   return (
@@ -105,6 +130,8 @@ export function ThreePaneScaffold({
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionHandleAriaLabel = 'Resize panes',
+  levitatedPaneDragHandles,
+  levitatedPaneDragHandleAriaLabel = 'Resize pane',
   className,
   style,
   ...props
@@ -112,14 +139,31 @@ export function ThreePaneScaffold({
   const rootRef = useRef<HTMLDivElement>(null);
   const paneRefs = useRef<Partial<Record<ThreePaneScaffoldRole, HTMLDivElement>>>({});
   const pointerDragRef = useRef<PointerDrag | null>(null);
+  const resizePointerDragRef = useRef<ResizePointerDrag | null>(null);
   const [geometry, setGeometry] = useState<ScaffoldGeometry>(emptyGeometry);
   const [defaultExpansionState] = useState(() => new PaneExpansionState());
   const expansionState = paneExpansionState ?? defaultExpansionState;
+
+  const paneEntries: Array<[ThreePaneScaffoldRole, ReactNode]> = [
+    ['primary', primaryPane],
+    ['secondary', secondaryPane],
+    ['tertiary', tertiaryPane],
+  ];
+  const activeResizeState = paneEntries
+    .map(([role]) => getPaneAdaptedValue(value, role))
+    .find((paneValue) => paneValue.type === 'levitated' && paneValue.dragToResizeState != null);
+  const resizeState =
+    activeResizeState?.type === 'levitated' ? activeResizeState.dragToResizeState : undefined;
 
   useSyncExternalStore(
     expansionState.subscribe,
     expansionState.getSnapshot,
     expansionState.getSnapshot,
+  );
+  useSyncExternalStore(
+    resizeState?.subscribe ?? noStoreSubscribe,
+    resizeState?.getSnapshot ?? noStoreSnapshot,
+    resizeState?.getSnapshot ?? noStoreSnapshot,
   );
 
   useLayoutEffect(() => {
@@ -276,14 +320,67 @@ export function ThreePaneScaffold({
     expansionState.endDrag(0);
   };
 
-  const panes: Array<[ThreePaneScaffoldRole, ReactNode]> = [
-    ['primary', primaryPane],
-    ['secondary', secondaryPane],
-    ['tertiary', tertiaryPane],
-  ];
+  const beginResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+    state: DragToResizeState,
+  ) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    resizePointerDragRef.current = {
+      pointerId: event.pointerId,
+      state,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      accumulated: 0,
+      dragging: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveResize = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = resizePointerDragRef.current;
+    if (drag === null || drag.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - drag.lastX;
+    const deltaY = event.clientY - drag.lastY;
+    drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
+    const axisDelta = drag.state.orientation === 'horizontal' ? deltaX : deltaY;
+
+    if (!drag.dragging) {
+      drag.accumulated += axisDelta;
+      if (Math.abs(drag.accumulated) < ResizePointerSlop) return;
+      drag.dragging = true;
+      drag.state.dispatchRawDelta(drag.accumulated, geometry.direction);
+      drag.accumulated = 0;
+      event.preventDefault();
+      return;
+    }
+
+    drag.state.dispatchRawDelta(axisDelta, geometry.direction);
+    event.preventDefault();
+  };
+
+  const finishResize = (event: ReactPointerEvent<HTMLDivElement>, cancelled = false) => {
+    const drag = resizePointerDragRef.current;
+    if (drag === null || drag.pointerId !== event.pointerId) return;
+    resizePointerDragRef.current = null;
+    if (!cancelled && !drag.dragging) drag.state.moveToNextState();
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const resizeKeyDown = (
+    event: ReactKeyboardEvent<HTMLDivElement>,
+    state: DragToResizeState,
+  ) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    state.moveToNextState();
+  };
 
   let levitatedScrim: LevitatedPaneScrimContent | undefined;
-  for (const [role] of panes) {
+  for (const [role] of paneEntries) {
     const adaptedValue = getPaneAdaptedValue(value, role);
     if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
       levitatedScrim = adaptedValue.scrim;
@@ -309,27 +406,75 @@ export function ThreePaneScaffold({
       className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
       style={style}
     >
-      {panes.map(([role, content]) => {
+      {paneEntries.map(([role, content]) => {
         const adaptedValue = getPaneAdaptedValue(value, role);
         if (content == null || adaptedValue.type === 'hidden') return null;
 
-        const placement =
-          adaptedValue.type === 'levitated'
-            ? calculateLevitatedPanePlacement({
-                width: geometry.width,
-                height: geometry.height,
-                directive,
-                alignment: adaptedValue.alignment,
-                direction: geometry.direction,
-                preferredWidth: preferredWidths?.[role],
-                preferredHeight: preferredHeights?.[role],
-              })
-            : getPlacement(layout, role);
+        let placement: PanePlacement | undefined;
+        if (adaptedValue.type === 'levitated') {
+          const basePlacement = calculateLevitatedPanePlacement({
+            width: geometry.width,
+            height: geometry.height,
+            directive,
+            alignment: adaptedValue.alignment,
+            direction: geometry.direction,
+            preferredWidth: preferredWidths?.[role],
+            preferredHeight: preferredHeights?.[role],
+          });
+          const resized = adaptedValue.dragToResizeState?.measure({
+            measuringWidth: basePlacement.width,
+            measuringHeight: basePlacement.height,
+            scaffoldWidth: geometry.width,
+            scaffoldHeight: geometry.height,
+            direction: geometry.direction,
+          });
+          placement =
+            resized === undefined
+              ? basePlacement
+              : calculateLevitatedPanePlacement({
+                  width: geometry.width,
+                  height: geometry.height,
+                  directive,
+                  alignment: adaptedValue.alignment,
+                  direction: geometry.direction,
+                  preferredWidth: resized.width,
+                  preferredHeight: resized.height,
+                });
+        } else {
+          placement = getPlacement(layout, role);
+        }
         if (placement === undefined) return null;
 
         const interactable = isPaneInteractable(value, role);
+        const paneResizeState =
+          adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
+        const resizeHandleSpec = levitatedPaneDragHandles?.[role];
+        const resizeHandle =
+          paneResizeState === undefined
+            ? undefined
+            : typeof resizeHandleSpec === 'function'
+              ? resizeHandleSpec(paneResizeState)
+              : resizeHandleSpec;
+        const hasResizeHandle = paneResizeState !== undefined && resizeHandle != null;
+        const paneResizeHandlers =
+          paneResizeState !== undefined && !hasResizeHandle
+            ? {
+                onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) =>
+                  resizeKeyDown(event, paneResizeState),
+                onLostPointerCapture: (event: ReactPointerEvent<HTMLDivElement>) =>
+                  finishResize(event, true),
+                onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) =>
+                  finishResize(event, true),
+                onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) =>
+                  beginResize(event, paneResizeState),
+                onPointerMove: moveResize,
+                onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => finishResize(event),
+              }
+            : {};
+
         return (
           <div
+            {...paneResizeHandlers}
             key={role}
             ref={(node) => {
               if (node === null) delete paneRefs.current[role];
@@ -338,17 +483,42 @@ export function ThreePaneScaffold({
             className={[
               'three-pane-scaffold__pane',
               adaptedValue.type === 'levitated' && 'three-pane-scaffold__pane--levitated',
+              hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
+              paneResizeState !== undefined && !hasResizeHandle &&
+                'three-pane-scaffold__pane--resize-target',
             ]
               .filter(Boolean)
               .join(' ')}
             data-pane-role={role}
             data-pane-adapted-value={adaptedValue.type}
             data-pane-interactable={interactable}
+            data-resize-state={paneResizeState?.value}
             inert={!interactable || undefined}
             tabIndex={-1}
             style={paneStyle(placement)}
           >
-            {content}
+            {hasResizeHandle ? (
+              <div
+                className="three-pane-scaffold__levitated-resize-handle"
+                data-orientation={paneResizeState.orientation}
+                role="button"
+                aria-label={levitatedPaneDragHandleAriaLabel}
+                tabIndex={0}
+                onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
+                onLostPointerCapture={(event) => finishResize(event, true)}
+                onPointerCancel={(event) => finishResize(event, true)}
+                onPointerDown={(event) => beginResize(event, paneResizeState)}
+                onPointerMove={moveResize}
+                onPointerUp={(event) => finishResize(event)}
+              >
+                {resizeHandle}
+              </div>
+            ) : null}
+            {hasResizeHandle ? (
+              <div className="three-pane-scaffold__levitated-content">{content}</div>
+            ) : (
+              content
+            )}
           </div>
         );
       })}
