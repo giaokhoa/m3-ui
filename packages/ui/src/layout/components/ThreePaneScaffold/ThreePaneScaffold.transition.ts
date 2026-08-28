@@ -205,7 +205,8 @@ export function calculateThreePaneScaffoldTransitionFrame({
   paneExpansionState = null,
 }: ThreePaneScaffoldTransitionOptions): ThreePaneScaffoldTransitionFrame {
   const progress = clampFraction(progressFraction);
-  const physicalOrder = direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
+  const physicalOrder: ThreePaneScaffoldHorizontalOrder =
+    direction === 'rtl' ? [paneOrder[2], paneOrder[1], paneOrder[0]] : paneOrder;
   const motion = calculateThreePaneMotion(currentValue, targetValue, physicalOrder);
 
   const common = {
