@@ -37,6 +37,32 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     await expect(count).toHaveText('Count: 1');
   });
 
+  test('exposes named pane regions only while they are interactable', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--expanded');
+
+    const root = page.locator('#storybook-root');
+    const primaryRegion = root.getByRole('region', { name: 'Primary pane' });
+    const secondaryRegion = root.getByRole('region', { name: 'Secondary pane' });
+
+    await expect(primaryRegion).toBeVisible();
+    await expect(primaryRegion).toHaveAttribute('data-pane-role', 'primary');
+    await expect(secondaryRegion).toBeVisible();
+    await expect(secondaryRegion).toHaveAttribute('data-pane-role', 'secondary');
+    await expect(primaryRegion).toBeFocused();
+
+    await openStory(page, 'layout-listdetailpanescaffold--levitated-dialog');
+    const modalRoot = page.locator('#storybook-root');
+    const modalScaffold = modalRoot.locator('.three-pane-scaffold');
+    const extraRegion = modalRoot.getByRole('region', { name: 'Tertiary pane' });
+    const underlyingPrimary = modalScaffold.locator('[data-pane-role="primary"]');
+
+    await expect(extraRegion).toBeVisible();
+    await expect(extraRegion).toHaveAttribute('data-pane-adapted-value', 'levitated');
+    await expect(extraRegion).toBeFocused();
+    await expect(underlyingPrimary).toHaveAttribute('inert', '');
+    await expect(modalRoot.getByRole('region', { name: 'Primary pane' })).toHaveCount(0);
+  });
+
   test('seekable motion halfway', async ({ page }) => {
     await openStory(page, 'layout-listdetailpanescaffold--motion-halfway');
 
