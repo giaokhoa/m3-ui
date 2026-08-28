@@ -22,14 +22,6 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     const listPane = scaffold.locator('[data-pane-role="secondary"]');
 
     await expect(scaffold).toBeVisible();
-
-    // Temporary Linux baseline bootstrap. Removed in the final baseline commit.
-    const baseline = await root.screenshot({ animations: 'disabled' });
-    console.log(`M3_MOTION_HALFWAY_BASELINE:${baseline.toString('base64')}`);
-    console.log(
-      `M3_MOTION_HALFWAY_ATTRS:${await detailPane.getAttribute('data-pane-motion')}:${await listPane.getAttribute('data-pane-motion')}`,
-    );
-
     await expect(detailPane).toHaveAttribute('data-pane-adapted-value', 'hidden');
     await expect(detailPane).toHaveAttribute('data-pane-motion', 'exit-to-right');
     await expect(detailPane).toContainText('Detail');
