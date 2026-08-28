@@ -29,20 +29,32 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-left');
     await expect(listPane).toContainText('List');
 
-    const bounds = await scaffold.boundingBox();
-    if (!bounds) {
-      throw new Error('ThreePaneScaffold has no visual bounds');
+    const [scaffoldBounds, detailBounds, listBounds] = await Promise.all([
+      scaffold.boundingBox(),
+      detailPane.boundingBox(),
+      listPane.boundingBox(),
+    ]);
+    if (!scaffoldBounds || !detailBounds || !listBounds) {
+      throw new Error('ThreePaneScaffold transition panes have no visual bounds');
     }
 
-    const screenshot = await page.screenshot({
-      clip: {
-        x: bounds.x,
-        y: bounds.y,
-        width: bounds.width,
-        height: Math.min(160, bounds.height),
-      },
-    });
+    expect(scaffoldBounds.width).toBeCloseTo(480, 5);
+    expect(scaffoldBounds.height).toBeCloseTo(640, 5);
+    expect(detailBounds.width).toBeCloseTo(scaffoldBounds.width, 5);
+    expect(listBounds.width).toBeCloseTo(scaffoldBounds.width, 5);
+    expect(detailBounds.height).toBeCloseTo(scaffoldBounds.height, 5);
+    expect(listBounds.height).toBeCloseTo(scaffoldBounds.height, 5);
 
-    expect(screenshot).toMatchSnapshot('list-detail-pane-scaffold-motion-halfway.png');
+    const detailOffsetX = detailBounds.x - scaffoldBounds.x;
+    const listOffsetX = listBounds.x - scaffoldBounds.x;
+
+    // At progress=0.5 the pinned 0.8 / 380 spring has just overshot the
+    // compact-pane target: List is ~0.14px past x=0 and Detail is ~0.14px
+    // past the 480px trailing edge. Keep this as a browser geometry contract
+    // instead of snapshotting font rasterization.
+    expect(listOffsetX).toBeGreaterThanOrEqual(0);
+    expect(listOffsetX).toBeLessThan(1);
+    expect(detailOffsetX).toBeGreaterThan(480);
+    expect(detailOffsetX).toBeLessThan(481);
   });
 });
