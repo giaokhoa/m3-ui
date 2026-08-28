@@ -63,6 +63,21 @@ function Pane({
   );
 }
 
+function StatefulDetailPane() {
+  const [count, setCount] = useState(0);
+  return (
+    <AnimatedPane>
+      <Surface style={{ height: '100%', padding: 24, boxSizing: 'border-box' }}>
+        <h2 style={{ marginTop: 0 }}>Detail state</h2>
+        <p data-testid="detail-count">Count: {count}</p>
+        <button type="button" onClick={() => setCount((current) => current + 1)}>
+          Increment detail
+        </button>
+      </Surface>
+    </AnimatedPane>
+  );
+}
+
 function Fixture({
   width,
   height = 640,
@@ -106,6 +121,44 @@ function Fixture({
             : undefined
         }
       />
+    </div>
+  );
+}
+
+function StateRetentionFixture() {
+  const width = 480;
+  const height = 560;
+  const directive = calculatePaneScaffoldDirective(
+    calculateWindowAdaptiveInfo({ width, height }),
+  );
+  const detailValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Detail }],
+  });
+  const listValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.List }],
+  });
+  const [value, setValue] = useState(detailValue);
+
+  return (
+    <div style={{ width, maxWidth: '100%', margin: '0 auto' }}>
+      <div style={{ display: 'flex', gap: 8, padding: 8 }}>
+        <button type="button" onClick={() => setValue(detailValue)}>
+          Show detail
+        </button>
+        <button type="button" onClick={() => setValue(listValue)}>
+          Show list
+        </button>
+      </div>
+      <div style={{ height }}>
+        <ListDetailPaneScaffold
+          directive={directive}
+          value={value}
+          listPane={<Pane title="List">Inbox conversations</Pane>}
+          detailPane={<StatefulDetailPane />}
+        />
+      </div>
     </div>
   );
 }
@@ -241,6 +294,10 @@ export const Expanded: Story = {
 
 export const Resizable: Story = {
   render: () => <Fixture width={1000} resizable />,
+};
+
+export const StateRetention: Story = {
+  render: () => <StateRetentionFixture />,
 };
 
 export const MotionHalfway: Story = {

@@ -13,6 +13,30 @@ async function openStory(page: Page, id: string) {
 }
 
 test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
+  test('retains pane-local React state while the pane is hidden', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--state-retention');
+
+    const root = page.locator('#storybook-root');
+    const scaffold = root.locator('.three-pane-scaffold');
+    const detailPane = scaffold.locator('[data-pane-role="primary"]');
+    const count = detailPane.locator('[data-testid="detail-count"]');
+
+    await expect(detailPane).toHaveAttribute('data-pane-adapted-value', 'expanded');
+    await expect(count).toHaveText('Count: 0');
+    await detailPane.getByRole('button', { name: 'Increment detail' }).click();
+    await expect(count).toHaveText('Count: 1');
+
+    await root.getByRole('button', { name: 'Show list' }).click();
+    await expect(detailPane).toHaveAttribute('data-pane-adapted-value', 'hidden');
+    await expect(detailPane).toHaveCSS('display', 'none');
+    await expect(count).toHaveText('Count: 1');
+
+    await root.getByRole('button', { name: 'Show detail' }).click();
+    await expect(detailPane).toHaveAttribute('data-pane-adapted-value', 'expanded');
+    await expect(detailPane).not.toHaveCSS('display', 'none');
+    await expect(count).toHaveText('Count: 1');
+  });
+
   test('seekable motion halfway', async ({ page }) => {
     await openStory(page, 'layout-listdetailpanescaffold--motion-halfway');
 
