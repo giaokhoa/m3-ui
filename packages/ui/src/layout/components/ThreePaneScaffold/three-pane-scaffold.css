@@ -12,3 +12,14 @@
   min-inline-size: 0;
   min-block-size: 0;
 }
+
+.three-pane-scaffold__drag-handle {
+  position: absolute;
+  inset-block-start: 50%;
+  z-index: 1;
+  display: inline-flex;
+  transform: translate(-50%, -50%);
+  touch-action: none;
+  user-select: none;
+  cursor: col-resize;
+}
