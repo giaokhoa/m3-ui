@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PaneExpansionState } from '../../adaptive/paneExpansionState';
 import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   PaneAdaptedValue,
@@ -105,8 +106,73 @@ describe('calculateThreePaneScaffoldLayout', () => {
     });
 
     expect(layout.secondary).toEqual({ left: 0, top: 0, width: 490, height: 800 });
-    // AndroidX starts the next partition at max(hinge.right, hinge.left + spacer).
-    // A 20px hinge with a 24px partition spacer therefore reserves 4 extra pixels.
     expect(layout.primary).toEqual({ left: 514, top: 0, width: 486, height: 800 });
+  });
+
+  it('lets an explicit first-pane width override preferred widths', () => {
+    const paneExpansionState = new PaneExpansionState();
+    paneExpansionState.setFirstPaneWidth(300);
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      paneExpansionState,
+    });
+
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 300, height: 800 });
+    expect(layout.primary).toEqual({ left: 324, top: 0, width: 676, height: 800 });
+  });
+
+  it('calculates proportions from width excluding the partition spacer', () => {
+    const paneExpansionState = new PaneExpansionState();
+    paneExpansionState.setFirstPaneProportion(0.4);
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      paneExpansionState,
+    });
+
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 390, height: 800 });
+    expect(layout.primary).toEqual({ left: 414, top: 0, width: 586, height: 800 });
+  });
+
+  it('treats drag offset as the center of the partition spacer', () => {
+    const paneExpansionState = new PaneExpansionState();
+    paneExpansionState.onMeasured(1000);
+    paneExpansionState.onExpansionOffsetMeasured(500);
+    paneExpansionState.dispatchRawDelta(-100);
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      paneExpansionState,
+    });
+
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 388, height: 800 });
+    expect(layout.primary).toEqual({ left: 412, top: 0, width: 588, height: 800 });
+  });
+
+  it('pane expansion overrides physical hinge partitioning like AndroidX', () => {
+    const paneExpansionState = new PaneExpansionState();
+    paneExpansionState.setFirstPaneWidth(300);
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      excludedBounds: [{ left: 490, top: 0, right: 510, bottom: 800 }],
+      paneExpansionState,
+    });
+
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 300, height: 800 });
+    expect(layout.primary).toEqual({ left: 324, top: 0, width: 676, height: 800 });
   });
 });
