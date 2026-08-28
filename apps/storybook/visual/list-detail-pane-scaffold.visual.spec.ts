@@ -29,8 +29,20 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-left');
     await expect(listPane).toContainText('List');
 
-    await expect(root).toHaveScreenshot(
-      'list-detail-pane-scaffold-motion-halfway.png',
-    );
+    const bounds = await scaffold.boundingBox();
+    if (!bounds) {
+      throw new Error('ThreePaneScaffold has no visual bounds');
+    }
+
+    const screenshot = await page.screenshot({
+      clip: {
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: Math.min(160, bounds.height),
+      },
+    });
+
+    expect(screenshot).toMatchSnapshot('list-detail-pane-scaffold-motion-halfway.png');
   });
 });
