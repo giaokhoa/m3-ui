@@ -186,6 +186,83 @@ function levitatedScrim(value: ThreePaneScaffoldValue): ReactNode | undefined {
 }
 
 /**
+ * Combines the last rendered frame with the next transition's logical start.
+ * Existing rendered panes win so a retarget begins at the exact visual frame
+ * already on screen; newly entering panes come from the next motion's start.
+ */
+export function captureThreePaneScaffoldTransitionOrigin(
+  renderedFrame: ThreePaneScaffoldTransitionFrame,
+  nextInitialFrame: ThreePaneScaffoldTransitionFrame,
+): ThreePaneScaffoldTransitionFrame {
+  const result: ThreePaneScaffoldTransitionFrame = {
+    scrim: renderedFrame.scrim ?? nextInitialFrame.scrim,
+    scrimOpacity:
+      renderedFrame.scrim === undefined
+        ? nextInitialFrame.scrimOpacity
+        : renderedFrame.scrimOpacity,
+  };
+  for (const role of roles) {
+    result[role] = renderedFrame[role] ?? nextInitialFrame[role];
+  }
+  return result;
+}
+
+function interpolatePaneTransitionFrame(
+  from: PaneTransitionFrame | undefined,
+  to: PaneTransitionFrame | undefined,
+  fraction: number,
+): PaneTransitionFrame | undefined {
+  if (from === undefined && to === undefined) return undefined;
+  if (from === undefined) {
+    return {
+      ...to!,
+      opacity: to!.opacity * fraction,
+      inlineClipFraction: to!.inlineClipFraction * fraction,
+    };
+  }
+  if (to === undefined) {
+    return {
+      ...from,
+      opacity: from.opacity * (1 - fraction),
+      inlineClipFraction: from.inlineClipFraction * (1 - fraction),
+    };
+  }
+  return {
+    placement: interpolatePlacement(from.placement, to.placement, fraction),
+    translateX: interpolate(from.translateX, to.translateX, fraction),
+    opacity: interpolate(from.opacity, to.opacity, fraction),
+    inlineClipFraction: interpolate(
+      from.inlineClipFraction,
+      to.inlineClipFraction,
+      fraction,
+    ),
+    motion: to.motion,
+    levitated: from.levitated || to.levitated,
+  };
+}
+
+/**
+ * Interpolates from a captured browser frame to a new transition endpoint.
+ * This is the web counterpart of Compose SeekableTransitionState preserving
+ * in-flight animated values when a target is replaced mid-transition.
+ */
+export function interpolateThreePaneScaffoldTransitionFrames(
+  from: ThreePaneScaffoldTransitionFrame,
+  to: ThreePaneScaffoldTransitionFrame,
+  progressFraction: number,
+): ThreePaneScaffoldTransitionFrame {
+  const progress = clampFraction(progressFraction);
+  const result: ThreePaneScaffoldTransitionFrame = {
+    scrim: to.scrim ?? from.scrim,
+    scrimOpacity: interpolate(from.scrimOpacity, to.scrimOpacity, progress),
+  };
+  for (const role of roles) {
+    result[role] = interpolatePaneTransitionFrame(from[role], to[role], progress);
+  }
+  return result;
+}
+
+/**
  * Produces a browser-renderable frame from AndroidX pane-motion decisions.
  * Layout measurement is performed for the discrete current/target states, then
  * the frame applies translation, bounds interpolation, clipping and opacity.
@@ -299,7 +376,7 @@ export function calculateThreePaneScaffoldTransitionFrame({
         opacity = 1 - progress;
         break;
       case PaneMotion.NoMotion:
-        opacity = targetPlacement === undefined ? 1 - progress : progress === 0 ? 1 : 1;
+        opacity = targetPlacement === undefined ? 1 - progress : 1;
         break;
     }
 
