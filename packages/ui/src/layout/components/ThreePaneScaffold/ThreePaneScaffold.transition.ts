@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
 import type { PaneExpansionState } from '../../adaptive/paneExpansionState';
-import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   PaneMotion,
-  PaneMotionDefaults,
   calculateHiddenPaneCurrentLeft,
   calculateHidingPaneTargetLeft,
   calculateSlideInFromLeftOffset,
@@ -13,6 +11,15 @@ import {
   calculateThreePaneMotion,
   type PaneMotionData,
 } from '../../adaptive/paneMotion';
+import {
+  PaneMotionDefaultDisplacementThreshold,
+  calculatePaneMotionDelayedSpringDurationMs,
+  calculatePaneMotionVectorSpringDurationMs,
+  samplePaneMotionDelayedVectorSpringAtPlayTime,
+  samplePaneMotionVectorSpringAtPlayTime,
+  samplePaneMotionVectorSpringAtProgress,
+} from '../../adaptive/paneMotionSpring';
+import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   getPaneAdaptedValue,
   type ThreePaneScaffoldHorizontalOrder,
@@ -58,14 +65,33 @@ export interface ThreePaneScaffoldTransitionOptions {
   paneExpansionState?: PaneExpansionState | null;
 }
 
+export type ThreePaneScaffoldTransitionLayoutOptions = Omit<
+  ThreePaneScaffoldTransitionOptions,
+  'progressFraction'
+>;
+
+export interface ThreePaneScaffoldTransitionTiming {
+  /** Transition playtime used by AnimatedVisibility enter/exit children. */
+  visibilityDurationMs: number;
+  /** Longest custom AnimateBounds TargetBasedAnimation duration. */
+  boundsDurationMs: number;
+  /** Default state timeline duration. */
+  durationMs: number;
+}
+
 const roles: readonly ThreePaneScaffoldRole[] = ['primary', 'secondary', 'tertiary'];
 const zeroPlacement: PanePlacement = { left: 0, top: 0, width: 0, height: 0 };
+const intVectorThreshold = 1;
 
 function clampFraction(value: number) {
   if (!Number.isFinite(value) || value < 0 || value > 1) {
     throw new RangeError(`progressFraction must be in [0, 1], received ${value}`);
   }
   return value;
+}
+
+function clampUnit(value: number) {
+  return Math.max(0, Math.min(1, value));
 }
 
 function interpolate(from: number, to: number, fraction: number) {
@@ -85,10 +111,22 @@ function interpolatePlacement(
   };
 }
 
-function delayedProgress(fraction: number) {
-  const delayedRatio = PaneMotionDefaults.delayedRatio;
-  if (fraction <= delayedRatio) return 0;
-  return Math.min(1, (fraction - delayedRatio) / (1 - delayedRatio));
+function placementToRect(placement: PanePlacement): [number, number, number, number] {
+  return [
+    placement.left,
+    placement.top,
+    placement.left + placement.width,
+    placement.top + placement.height,
+  ];
+}
+
+function rectToPlacement(rect: readonly number[]): PanePlacement {
+  return {
+    left: rect[0]!,
+    top: rect[1]!,
+    width: rect[2]! - rect[0]!,
+    height: rect[3]! - rect[1]!,
+  };
 }
 
 function calculateValuePlacements({
@@ -185,6 +223,282 @@ function levitatedScrim(value: ThreePaneScaffoldValue): ReactNode | undefined {
   return undefined;
 }
 
+interface PreparedTransition {
+  physicalOrder: ThreePaneScaffoldHorizontalOrder;
+  motion: ReturnType<typeof calculateThreePaneMotion>;
+  currentPlacements: Partial<Record<ThreePaneScaffoldRole, PanePlacement>>;
+  targetPlacements: Partial<Record<ThreePaneScaffoldRole, PanePlacement>>;
+  motionData: PaneMotionData[];
+  slideInLeft: number;
+  slideInRight: number;
+  slideOutLeft: number;
+  slideOutRight: number;
+  visibilityDurationMs: number;
+  boundsDurationMs: number;
+  durationMs: number;
+}
+
+function calculateRegularOffsetDuration(initialX: number, targetX: number) {
+  return calculatePaneMotionVectorSpringDurationMs(
+    [initialX, 0],
+    [targetX, 0],
+    intVectorThreshold,
+  );
+}
+
+function calculateDelayedOffsetDuration(initialX: number, targetX: number) {
+  return calculatePaneMotionDelayedSpringDurationMs(
+    [initialX, 0],
+    [targetX, 0],
+    intVectorThreshold,
+  );
+}
+
+function sampleRegularOffset(initialX: number, targetX: number, playTimeMs: number) {
+  return samplePaneMotionVectorSpringAtPlayTime(
+    [initialX, 0],
+    [targetX, 0],
+    playTimeMs,
+    intVectorThreshold,
+  )[0]!;
+}
+
+function sampleDelayedOffset(initialX: number, targetX: number, playTimeMs: number) {
+  return samplePaneMotionDelayedVectorSpringAtPlayTime(
+    [initialX, 0],
+    [targetX, 0],
+    playTimeMs,
+    intVectorThreshold,
+  )[0]!;
+}
+
+function calculateHorizontalSizeDuration(initial: PanePlacement, targetWidth: number) {
+  return calculatePaneMotionVectorSpringDurationMs(
+    [initial.width, initial.height],
+    [targetWidth, initial.height],
+    intVectorThreshold,
+  );
+}
+
+function sampleHorizontalSize(
+  initial: PanePlacement,
+  targetWidth: number,
+  playTimeMs: number,
+) {
+  return samplePaneMotionVectorSpringAtPlayTime(
+    [initial.width, initial.height],
+    [targetWidth, initial.height],
+    playTimeMs,
+    intVectorThreshold,
+  )[0]!;
+}
+
+function calculateBoundsDuration(
+  currentPlacement: PanePlacement | undefined,
+  targetPlacement: PanePlacement | undefined,
+) {
+  if (currentPlacement === undefined || targetPlacement === undefined) return 0;
+  return calculatePaneMotionVectorSpringDurationMs(
+    placementToRect(currentPlacement),
+    placementToRect(targetPlacement),
+    intVectorThreshold,
+  );
+}
+
+function sampleBoundsAtProgress(
+  currentPlacement: PanePlacement,
+  targetPlacement: PanePlacement,
+  progressFraction: number,
+) {
+  return rectToPlacement(
+    samplePaneMotionVectorSpringAtProgress(
+      placementToRect(currentPlacement),
+      placementToRect(targetPlacement),
+      progressFraction,
+      intVectorThreshold,
+    ),
+  );
+}
+
+function calculateVisibilityDuration() {
+  return calculatePaneMotionVectorSpringDurationMs(
+    [0],
+    [1],
+    PaneMotionDefaultDisplacementThreshold,
+  );
+}
+
+function sampleVisibility(initial: number, target: number, playTimeMs: number) {
+  return clampUnit(
+    samplePaneMotionVectorSpringAtPlayTime(
+      [initial],
+      [target],
+      playTimeMs,
+      PaneMotionDefaultDisplacementThreshold,
+    )[0]!,
+  );
+}
+
+function prepareTransition({
+  width,
+  height,
+  directive,
+  currentValue,
+  targetValue,
+  paneOrder,
+  direction = 'ltr',
+  excludedBounds = directive.excludedBounds,
+  preferredWidths,
+  preferredHeights,
+  paneExpansionState = null,
+}: ThreePaneScaffoldTransitionLayoutOptions): PreparedTransition {
+  const physicalOrder: ThreePaneScaffoldHorizontalOrder =
+    direction === 'rtl' ? [paneOrder[2], paneOrder[1], paneOrder[0]] : paneOrder;
+  const motion = calculateThreePaneMotion(currentValue, targetValue, physicalOrder);
+  const common = {
+    width,
+    height,
+    directive,
+    paneOrder,
+    direction,
+    excludedBounds,
+    preferredWidths,
+    preferredHeights,
+    paneExpansionState,
+  };
+  const currentPlacements = calculateValuePlacements({ ...common, value: currentValue });
+  const targetPlacements = calculateValuePlacements({ ...common, value: targetValue });
+  const motionData = toMotionData(
+    physicalOrder,
+    motion,
+    currentPlacements,
+    targetPlacements,
+  );
+  const slideInLeft = calculateSlideInFromLeftOffset(motionData);
+  const slideInRight = calculateSlideInFromRightOffset(motionData, width);
+  const slideOutLeft = calculateSlideOutToLeftOffset(motionData);
+  const slideOutRight = calculateSlideOutToRightOffset(motionData, width);
+
+  let visibilityDurationMs = 0;
+  let boundsDurationMs = 0;
+  for (const role of roles) {
+    const paneMotion = motion[role];
+    const currentPlacement = currentPlacements[role];
+    const targetPlacement = targetPlacements[role];
+    const paneIndex = physicalOrder.indexOf(role);
+    switch (paneMotion) {
+      case PaneMotion.AnimateBounds:
+        boundsDurationMs = Math.max(
+          boundsDurationMs,
+          calculateBoundsDuration(currentPlacement, targetPlacement),
+        );
+        break;
+      case PaneMotion.EnterFromLeft:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateRegularOffsetDuration(slideInLeft, 0),
+        );
+        break;
+      case PaneMotion.EnterFromLeftDelayed:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateDelayedOffsetDuration(slideInLeft, 0),
+        );
+        break;
+      case PaneMotion.EnterFromRight:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateRegularOffsetDuration(slideInRight, 0),
+        );
+        break;
+      case PaneMotion.EnterFromRightDelayed:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateDelayedOffsetDuration(slideInRight, 0),
+        );
+        break;
+      case PaneMotion.ExitToLeft:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateRegularOffsetDuration(0, slideOutLeft),
+        );
+        break;
+      case PaneMotion.ExitToRight:
+        visibilityDurationMs = Math.max(
+          visibilityDurationMs,
+          calculateRegularOffsetDuration(0, slideOutRight),
+        );
+        break;
+      case PaneMotion.EnterWithExpand:
+        if (targetPlacement !== undefined) {
+          const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
+          const initialOffset = hiddenLeft - targetPlacement.left;
+          const collapsedPlacement = { ...targetPlacement, width: 0 };
+          visibilityDurationMs = Math.max(
+            visibilityDurationMs,
+            calculateRegularOffsetDuration(initialOffset, 0),
+            calculateHorizontalSizeDuration(collapsedPlacement, targetPlacement.width),
+          );
+        }
+        break;
+      case PaneMotion.ExitWithShrink:
+        if (currentPlacement !== undefined) {
+          const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
+          const targetOffset = hidingLeft - currentPlacement.left;
+          visibilityDurationMs = Math.max(
+            visibilityDurationMs,
+            calculateRegularOffsetDuration(0, targetOffset),
+            calculateHorizontalSizeDuration(currentPlacement, 0),
+          );
+        }
+        break;
+      case PaneMotion.EnterAsModal:
+      case PaneMotion.ExitAsModal:
+        visibilityDurationMs = Math.max(visibilityDurationMs, calculateVisibilityDuration());
+        break;
+      case PaneMotion.NoMotion:
+        break;
+    }
+  }
+
+  // AndroidX's normal transition timeline is driven by Transition children.
+  // Bounds morphing samples its own TargetBasedAnimation from motionProgress;
+  // when there are no visibility children, use that bounds duration so the web
+  // state still has a meaningful linear timeline to traverse.
+  const durationMs = visibilityDurationMs > 0 ? visibilityDurationMs : boundsDurationMs;
+  return {
+    physicalOrder,
+    motion,
+    currentPlacements,
+    targetPlacements,
+    motionData,
+    slideInLeft,
+    slideInRight,
+    slideOutLeft,
+    slideOutRight,
+    visibilityDurationMs,
+    boundsDurationMs,
+    durationMs,
+  };
+}
+
+export function calculateThreePaneScaffoldTransitionTiming(
+  options: ThreePaneScaffoldTransitionLayoutOptions,
+): ThreePaneScaffoldTransitionTiming {
+  const prepared = prepareTransition(options);
+  return {
+    visibilityDurationMs: prepared.visibilityDurationMs,
+    boundsDurationMs: prepared.boundsDurationMs,
+    durationMs: prepared.durationMs,
+  };
+}
+
+export function calculateThreePaneScaffoldTransitionDuration(
+  options: ThreePaneScaffoldTransitionLayoutOptions,
+): number {
+  return prepareTransition(options).durationMs;
+}
+
 /**
  * Combines the last rendered frame with the next transition's logical start.
  * Existing rendered panes win so a retarget begins at the exact visual frame
@@ -243,8 +557,8 @@ function interpolatePaneTransitionFrame(
 
 /**
  * Interpolates from a captured browser frame to a new transition endpoint.
- * This is the web counterpart of Compose SeekableTransitionState preserving
- * in-flight animated values when a target is replaced mid-transition.
+ * This preserves visual continuity on target replacement. AndroidX likewise
+ * captures current animated values before retargeting its Transition children.
  */
 export function interpolateThreePaneScaffoldTransitionFrames(
   from: ThreePaneScaffoldTransitionFrame,
@@ -264,52 +578,29 @@ export function interpolateThreePaneScaffoldTransitionFrames(
 
 /**
  * Produces a browser-renderable frame from AndroidX pane-motion decisions.
- * Layout measurement is performed for the discrete current/target states, then
- * the frame applies translation, bounds interpolation, clipping and opacity.
+ * The scaffold state's fraction is a raw transition timeline fraction. Bounds
+ * use their own TargetBasedAnimation duration, while AnimatedVisibility
+ * properties sample the global transition playtime, matching Compose.
  */
 export function calculateThreePaneScaffoldTransitionFrame({
-  width,
-  height,
-  directive,
-  currentValue,
-  targetValue,
   progressFraction,
-  paneOrder,
-  direction = 'ltr',
-  excludedBounds = directive.excludedBounds,
-  preferredWidths,
-  preferredHeights,
-  paneExpansionState = null,
+  ...layoutOptions
 }: ThreePaneScaffoldTransitionOptions): ThreePaneScaffoldTransitionFrame {
   const progress = clampFraction(progressFraction);
-  const physicalOrder: ThreePaneScaffoldHorizontalOrder =
-    direction === 'rtl' ? [paneOrder[2], paneOrder[1], paneOrder[0]] : paneOrder;
-  const motion = calculateThreePaneMotion(currentValue, targetValue, physicalOrder);
-
-  const common = {
-    width,
-    height,
-    directive,
-    paneOrder,
-    direction,
-    excludedBounds,
-    preferredWidths,
-    preferredHeights,
-    paneExpansionState,
-  };
-  const currentPlacements = calculateValuePlacements({ ...common, value: currentValue });
-  const targetPlacements = calculateValuePlacements({ ...common, value: targetValue });
-  const motionData = toMotionData(
+  const prepared = prepareTransition(layoutOptions);
+  const {
     physicalOrder,
     motion,
     currentPlacements,
     targetPlacements,
-  );
-
-  const slideInLeft = calculateSlideInFromLeftOffset(motionData);
-  const slideInRight = calculateSlideInFromRightOffset(motionData, width);
-  const slideOutLeft = calculateSlideOutToLeftOffset(motionData);
-  const slideOutRight = calculateSlideOutToRightOffset(motionData, width);
+    motionData,
+    slideInLeft,
+    slideInRight,
+    slideOutLeft,
+    slideOutRight,
+    visibilityDurationMs,
+  } = prepared;
+  const visibilityPlayTimeMs = visibilityDurationMs * progress;
   const result: ThreePaneScaffoldTransitionFrame = { scrimOpacity: 0 };
 
   roles.forEach((role) => {
@@ -326,54 +617,61 @@ export function calculateThreePaneScaffoldTransitionFrame({
     switch (paneMotion) {
       case PaneMotion.AnimateBounds:
         if (currentPlacement !== undefined && targetPlacement !== undefined) {
-          placement = interpolatePlacement(currentPlacement, targetPlacement, progress);
+          placement = sampleBoundsAtProgress(currentPlacement, targetPlacement, progress);
         }
         break;
       case PaneMotion.EnterFromLeft:
-        translateX = slideInLeft * (1 - progress);
+        translateX = sampleRegularOffset(slideInLeft, 0, visibilityPlayTimeMs);
         break;
-      case PaneMotion.EnterFromLeftDelayed: {
-        const delayed = delayedProgress(progress);
-        translateX = slideInLeft * (1 - delayed);
+      case PaneMotion.EnterFromLeftDelayed:
+        translateX = sampleDelayedOffset(slideInLeft, 0, visibilityPlayTimeMs);
         break;
-      }
       case PaneMotion.EnterFromRight:
-        translateX = slideInRight * (1 - progress);
+        translateX = sampleRegularOffset(slideInRight, 0, visibilityPlayTimeMs);
         break;
-      case PaneMotion.EnterFromRightDelayed: {
-        const delayed = delayedProgress(progress);
-        translateX = slideInRight * (1 - delayed);
+      case PaneMotion.EnterFromRightDelayed:
+        translateX = sampleDelayedOffset(slideInRight, 0, visibilityPlayTimeMs);
         break;
-      }
       case PaneMotion.ExitToLeft:
         placement = currentPlacement!;
-        translateX = slideOutLeft * progress;
+        translateX = sampleRegularOffset(0, slideOutLeft, visibilityPlayTimeMs);
         break;
       case PaneMotion.ExitToRight:
         placement = currentPlacement!;
-        translateX = slideOutRight * progress;
+        translateX = sampleRegularOffset(0, slideOutRight, visibilityPlayTimeMs);
         break;
       case PaneMotion.EnterWithExpand: {
         const paneIndex = physicalOrder.indexOf(role);
         const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
-        translateX = (hiddenLeft - placement.left) * (1 - progress);
-        inlineClipFraction = progress;
+        const initialOffset = hiddenLeft - placement.left;
+        translateX = sampleRegularOffset(initialOffset, 0, visibilityPlayTimeMs);
+        const collapsedPlacement = { ...placement, width: 0 };
+        const animatedWidth = sampleHorizontalSize(
+          collapsedPlacement,
+          placement.width,
+          visibilityPlayTimeMs,
+        );
+        inlineClipFraction =
+          placement.width <= 0 ? 1 : clampUnit(animatedWidth / placement.width);
         break;
       }
       case PaneMotion.ExitWithShrink: {
         placement = currentPlacement!;
         const paneIndex = physicalOrder.indexOf(role);
         const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
-        translateX = (hidingLeft - placement.left) * progress;
-        inlineClipFraction = 1 - progress;
+        const targetOffset = hidingLeft - placement.left;
+        translateX = sampleRegularOffset(0, targetOffset, visibilityPlayTimeMs);
+        const animatedWidth = sampleHorizontalSize(placement, 0, visibilityPlayTimeMs);
+        inlineClipFraction =
+          placement.width <= 0 ? 0 : clampUnit(animatedWidth / placement.width);
         break;
       }
       case PaneMotion.EnterAsModal:
-        opacity = progress;
+        opacity = sampleVisibility(0, 1, visibilityPlayTimeMs);
         break;
       case PaneMotion.ExitAsModal:
         placement = currentPlacement!;
-        opacity = 1 - progress;
+        opacity = sampleVisibility(1, 0, visibilityPlayTimeMs);
         break;
       case PaneMotion.NoMotion:
         opacity = targetPlacement === undefined ? 1 - progress : 1;
@@ -387,21 +685,26 @@ export function calculateThreePaneScaffoldTransitionFrame({
       inlineClipFraction,
       motion: paneMotion,
       levitated:
-        getPaneAdaptedValue(targetValue, role).type === 'levitated' ||
-        (targetPlacement === undefined && getPaneAdaptedValue(currentValue, role).type === 'levitated'),
+        getPaneAdaptedValue(layoutOptions.targetValue, role).type === 'levitated' ||
+        (targetPlacement === undefined &&
+          getPaneAdaptedValue(layoutOptions.currentValue, role).type === 'levitated'),
     };
   });
 
-  const currentScrim = levitatedScrim(currentValue);
-  const targetScrim = levitatedScrim(targetValue);
+  const currentScrim = levitatedScrim(layoutOptions.currentValue);
+  const targetScrim = levitatedScrim(layoutOptions.targetValue);
   if (targetScrim !== undefined) {
     result.scrim = targetScrim;
     const enteringModal = roles.some((role) => motion[role] === PaneMotion.EnterAsModal);
-    result.scrimOpacity = enteringModal ? progress : 1;
+    result.scrimOpacity = enteringModal
+      ? sampleVisibility(0, 1, visibilityPlayTimeMs)
+      : 1;
   } else if (currentScrim !== undefined) {
     result.scrim = currentScrim;
     const exitingModal = roles.some((role) => motion[role] === PaneMotion.ExitAsModal);
-    result.scrimOpacity = exitingModal ? 1 - progress : 0;
+    result.scrimOpacity = exitingModal
+      ? sampleVisibility(1, 0, visibilityPlayTimeMs)
+      : 0;
   }
 
   return result;
