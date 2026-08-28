@@ -1,4 +1,5 @@
 import {
+  Activity,
   useLayoutEffect,
   useRef,
   useState,
@@ -574,10 +575,9 @@ export function ThreePaneScaffold({
         const frame = transitionFrame?.[role];
         if (content == null) return null;
 
-        // AndroidX keeps pane-local saveable state across Hidden/visible changes.
-        // Keep the keyed React subtree mounted as the browser equivalent; a
-        // static Hidden pane is removed from layout/a11y with display:none and
-        // the same node is reused if a transition later makes it visible.
+        // AndroidX disposes Hidden pane composition while SaveableStateProvider
+        // retains pane-local state. React 19.2 Activity is the native analogue:
+        // hidden children keep state/DOM identity but their Effects are cleaned up.
         const staticallyHidden = frame === undefined && adaptedValue.type === 'hidden';
 
         let placement: PanePlacement | undefined;
@@ -650,60 +650,55 @@ export function ThreePaneScaffold({
             : {};
 
         return (
-          <div
-            {...paneResizeHandlers}
-            key={role}
-            ref={(node) => {
-              if (node === null) delete paneRefs.current[role];
-              else paneRefs.current[role] = node;
-            }}
-            className={[
-              'three-pane-scaffold__pane',
-              frameLevitated && 'three-pane-scaffold__pane--levitated',
-              hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-              !transitionActive && paneResizeState !== undefined && !hasResizeHandle &&
-                'three-pane-scaffold__pane--resize-target',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            data-pane-role={role}
-            data-pane-adapted-value={adaptedValue.type}
-            data-pane-interactable={interactable}
-            data-pane-motion={frame?.motion}
-            data-resize-state={paneResizeState?.value}
-            inert={!interactable || undefined}
-            tabIndex={-1}
-            style={
-              staticallyHidden
-                ? { display: 'none' }
-                : frame === undefined
-                  ? paneStyle(placement)
-                  : transitionPaneStyle(frame)
-            }
-          >
-            {hasResizeHandle ? (
-              <div
-                className="three-pane-scaffold__levitated-resize-handle"
-                data-orientation={paneResizeState.orientation}
-                role="button"
-                aria-label={levitatedPaneDragHandleAriaLabel}
-                tabIndex={0}
-                onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
-                onLostPointerCapture={(event) => finishResize(event, true)}
-                onPointerCancel={(event) => finishResize(event, true)}
-                onPointerDown={(event) => beginResize(event, paneResizeState)}
-                onPointerMove={moveResize}
-                onPointerUp={(event) => finishResize(event)}
-              >
-                {resizeHandle}
-              </div>
-            ) : null}
-            {hasResizeHandle ? (
-              <div className="three-pane-scaffold__levitated-content">{content}</div>
-            ) : (
-              content
-            )}
-          </div>
+          <Activity key={role} mode={staticallyHidden ? 'hidden' : 'visible'}>
+            <div
+              {...paneResizeHandlers}
+              ref={(node) => {
+                if (node === null) delete paneRefs.current[role];
+                else paneRefs.current[role] = node;
+              }}
+              className={[
+                'three-pane-scaffold__pane',
+                frameLevitated && 'three-pane-scaffold__pane--levitated',
+                hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
+                !transitionActive && paneResizeState !== undefined && !hasResizeHandle &&
+                  'three-pane-scaffold__pane--resize-target',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              data-pane-role={role}
+              data-pane-adapted-value={adaptedValue.type}
+              data-pane-interactable={interactable}
+              data-pane-motion={frame?.motion}
+              data-resize-state={paneResizeState?.value}
+              inert={!interactable || undefined}
+              tabIndex={-1}
+              style={frame === undefined ? paneStyle(placement) : transitionPaneStyle(frame)}
+            >
+              {hasResizeHandle ? (
+                <div
+                  className="three-pane-scaffold__levitated-resize-handle"
+                  data-orientation={paneResizeState.orientation}
+                  role="button"
+                  aria-label={levitatedPaneDragHandleAriaLabel}
+                  tabIndex={0}
+                  onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
+                  onLostPointerCapture={(event) => finishResize(event, true)}
+                  onPointerCancel={(event) => finishResize(event, true)}
+                  onPointerDown={(event) => beginResize(event, paneResizeState)}
+                  onPointerMove={moveResize}
+                  onPointerUp={(event) => finishResize(event)}
+                >
+                  {resizeHandle}
+                </div>
+              ) : null}
+              {hasResizeHandle ? (
+                <div className="three-pane-scaffold__levitated-content">{content}</div>
+              ) : (
+                content
+              )}
+            </div>
+          </Activity>
         );
       })}
       {showDragHandle && dragHandleOffset !== PaneExpansionUnspecified ? (
