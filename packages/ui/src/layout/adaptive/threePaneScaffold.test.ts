@@ -1,11 +1,25 @@
 import { describe, expect, it } from 'vitest';
+import type { PaneScaffoldDirective } from './paneScaffoldDirective';
 import {
   PaneAdaptStrategy,
   PaneAdaptedValue,
+  PaneAlignment,
   ThreePaneScaffoldRole,
   calculateThreePaneScaffoldValue,
+  isPaneInteractable,
   supportingPaneScaffoldAdaptStrategies,
 } from './threePaneScaffold';
+
+const singlePaneDirective: PaneScaffoldDirective = {
+  maxHorizontalPartitions: 1,
+  horizontalPartitionSpacerSize: '0px',
+  maxVerticalPartitions: 1,
+  verticalPartitionSpacerSize: '0px',
+  defaultPanePreferredWidth: '360px',
+  defaultPanePreferredHeight: '420px',
+  excludedBounds: [],
+  shouldAutoFocusCurrentDestination: true,
+};
 
 describe('calculateThreePaneScaffoldValue', () => {
   it('uses primary, secondary, tertiary priority without a destination', () => {
@@ -84,6 +98,74 @@ describe('calculateThreePaneScaffoldValue', () => {
       PaneAdaptedValue.Reflowed(ThreePaneScaffoldRole.Primary),
     );
     expect(value.tertiary).toEqual(PaneAdaptedValue.Hidden);
+  });
+
+  it('levitates only the current destination and does not consume a partition', () => {
+    const scrim = 'scrim';
+    const value = calculateThreePaneScaffoldValue({
+      maxHorizontalPartitions: 1,
+      adaptStrategies: {
+        primary: PaneAdaptStrategy.Hide,
+        secondary: PaneAdaptStrategy.Hide,
+        tertiary: PaneAdaptStrategy.Levitate({
+          alignment: PaneAlignment.BottomCenter,
+          scrim,
+        }),
+      },
+      destinationHistory: [{ pane: ThreePaneScaffoldRole.Tertiary }],
+    });
+
+    expect(value.primary).toEqual(PaneAdaptedValue.Expanded);
+    expect(value.secondary).toEqual(PaneAdaptedValue.Hidden);
+    expect(value.tertiary).toEqual(
+      PaneAdaptedValue.Levitated(PaneAlignment.BottomCenter, scrim),
+    );
+  });
+
+  it('keeps a non-current levitate-only pane hidden', () => {
+    const value = calculateThreePaneScaffoldValue({
+      maxHorizontalPartitions: 1,
+      adaptStrategies: {
+        primary: PaneAdaptStrategy.Hide,
+        secondary: PaneAdaptStrategy.Hide,
+        tertiary: PaneAdaptStrategy.Levitate(),
+      },
+      destinationHistory: [
+        { pane: ThreePaneScaffoldRole.Tertiary },
+        { pane: ThreePaneScaffoldRole.Primary },
+      ],
+    });
+
+    expect(value.primary).toEqual(PaneAdaptedValue.Expanded);
+    expect(value.secondary).toEqual(PaneAdaptedValue.Hidden);
+    expect(value.tertiary).toEqual(PaneAdaptedValue.Hidden);
+  });
+
+  it('implements Levitate.onlyIf and onlyIfSinglePane like AndroidX', () => {
+    const levitate = PaneAdaptStrategy.Levitate();
+
+    expect(levitate.onlyIf(true)).toBe(levitate);
+    expect(levitate.onlyIf(false)).toBe(PaneAdaptStrategy.Hide);
+    expect(levitate.onlyIfSinglePane(singlePaneDirective)).toBe(levitate);
+    expect(
+      levitate.onlyIfSinglePane({ ...singlePaneDirective, maxHorizontalPartitions: 2 }),
+    ).toBe(PaneAdaptStrategy.Hide);
+  });
+
+  it('blocks underlying pane interaction only when a levitated pane has a scrim', () => {
+    const withScrim = {
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Levitated(PaneAlignment.Center, 'scrim'),
+    };
+    const withoutScrim = {
+      ...withScrim,
+      tertiary: PaneAdaptedValue.Levitated(PaneAlignment.Center),
+    };
+
+    expect(isPaneInteractable(withScrim, ThreePaneScaffoldRole.Primary)).toBe(false);
+    expect(isPaneInteractable(withScrim, ThreePaneScaffoldRole.Tertiary)).toBe(true);
+    expect(isPaneInteractable(withoutScrim, ThreePaneScaffoldRole.Primary)).toBe(true);
   });
 
   it('rejects invalid partition counts', () => {
