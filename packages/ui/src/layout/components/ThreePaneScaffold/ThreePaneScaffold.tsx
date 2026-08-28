@@ -70,6 +70,12 @@ export interface ThreePaneScaffoldProps
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
   paneExpansionHandleAriaLabel?: string;
   /**
+   * Accessible pane names keyed by scaffold role. Defaults mirror the pinned
+   * AndroidX pane-title strings; override these when the application localizes
+   * accessibility copy.
+   */
+  paneAriaLabels?: Partial<Record<ThreePaneScaffoldRole, string>>;
+  /**
    * Web equivalent of AnimatedPane.dragToResizeHandle, keyed by pane role.
    * When omitted for a resizable levitated pane, the whole pane is the pointer
    * drag target like AndroidX AnimatedPane.
@@ -113,6 +119,11 @@ const emptyGeometry: ScaffoldGeometry = {
 const noStoreSubscribe = () => () => {};
 const noStoreSnapshot = () => 0;
 const ResizePointerSlop = 4;
+const defaultPaneAriaLabels: Record<ThreePaneScaffoldRole, string> = {
+  primary: 'Primary pane',
+  secondary: 'Secondary pane',
+  tertiary: 'Tertiary pane',
+};
 
 function sameGeometry(a: ScaffoldGeometry, b: ScaffoldGeometry) {
   return (
@@ -165,6 +176,7 @@ export function ThreePaneScaffold({
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionHandleAriaLabel = 'Resize panes',
+  paneAriaLabels,
   levitatedPaneDragHandles,
   levitatedPaneDragHandleAriaLabel = 'Resize pane',
   className,
@@ -622,6 +634,7 @@ export function ThreePaneScaffold({
           !staticallyHidden &&
           isPaneInteractable(targetValue, role) &&
           !(transitionScrimBlocks && adaptedValue.type !== 'levitated');
+        const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
         const paneResizeState =
           adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
         const resizeHandleSpec = levitatedPaneDragHandles?.[role];
@@ -666,6 +679,8 @@ export function ThreePaneScaffold({
               ]
                 .filter(Boolean)
                 .join(' ')}
+              role={interactable ? 'region' : undefined}
+              aria-label={interactable ? paneAriaLabel : undefined}
               data-pane-role={role}
               data-pane-adapted-value={adaptedValue.type}
               data-pane-interactable={interactable}
