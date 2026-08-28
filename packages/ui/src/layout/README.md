@@ -43,6 +43,7 @@ The foundation currently ports pinned AndroidX behavior for:
 - `SupportingPaneScaffold` with Main → Supporting → Extra order and Supporting → Main reflow strategy.
 - `PaneExpansionState`: width/proportion overrides, anchors, pointer resize and separator semantics.
 - Default pane-expansion state persistence keyed by the active two-pane combination whenever a drag handle is provided, matching AndroidX `PaneExpansionStateKeyProvider` behavior without changing caller-owned explicit state.
+- Anchored pane-expansion accessibility semantics: pinned anchor descriptions, current split state, next-anchor action text and semantic activation while preserving the browser separator/drag contract.
 - `DragToResizeState`: levitated Top/Bottom/Start/End resizing, RTL direction, min/max constraints and AndroidX state cycling.
 - Levitated pane alignment, scrim behavior, interaction blocking and resizable dialog/sheet placement.
 - Pane-motion decision logic, including the complete AndroidX 8 × 8 visibility matrix, modal enter/exit and pure slide/expand/shrink geometry helpers.
@@ -65,6 +66,8 @@ Android `dp` layout thresholds map to CSS pixels because both are logical, densi
 
 Default pane-expansion state follows AndroidX ownership rather than treating every two-pane layout as one global split. Without a drag handle the renderer keeps one cheap stub state. When a drag handle is present and the caller has not supplied `paneExpansionState`, the renderer caches independent default states for Primary + Secondary, Primary + Tertiary, and Secondary + Tertiary so a user-adjusted split is restored when that pair returns. A caller-provided `paneExpansionState` always bypasses this cache and remains explicitly shared/owned by the caller.
 
+Pane-expansion accessibility stays on the browser-native `separator` role. AndroidX exposes the current anchor as state description and an accessibility `onClick` action for the next anchor. The web maps the current anchored split to `aria-valuetext`, the next-anchor action label to `aria-description`, and semantic activation to Enter/Space plus synthetic assistive-tech clicks. Real pointer clicks remain part of the drag interaction and do not cycle anchors. `paneExpansionHandleAriaStrings` can override the pinned English anchor/state/action formatters for localization while `paneExpansionHandleAriaLabel` remains the existing accessible-name override.
+
 Levitated panes are still pane-scaffold state, not generic dialogs. They render inside the scaffold stacking context; a scrim makes underlying pane trees non-interactable, while the current levitated destination remains interactable. This preserves the AndroidX distinction between pane adaptation and modal semantics.
 
 Motion is split at the same conceptual boundary: `adaptive/paneMotion.ts` owns which motion should happen and the geometry needed by it. `ThreePaneScaffold` consumes that contract as the browser renderer; `AnimatedPane` remains a pane-local visual/content wrapper instead of recreating Compose animation scopes in React.
@@ -79,6 +82,6 @@ Layout components should prefer CSS Grid/Flexbox and logical properties over Jav
 
 ## Deliberate next slices
 
-The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence and pane-semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
+The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence/semantics and pane-boundary semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
 
 Generic `Box`/`Row`/`Column` wrappers remain deferred until they demonstrate semantic/API value beyond native CSS Flexbox/Grid.
