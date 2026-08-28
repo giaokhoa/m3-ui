@@ -35,7 +35,10 @@ import {
 } from './ThreePaneScaffold.layout';
 import {
   calculateThreePaneScaffoldTransitionFrame,
+  captureThreePaneScaffoldTransitionOrigin,
+  interpolateThreePaneScaffoldTransitionFrames,
   type PaneTransitionFrame,
+  type ThreePaneScaffoldTransitionFrame,
 } from './ThreePaneScaffold.transition';
 import './three-pane-scaffold.css';
 
@@ -169,6 +172,12 @@ export function ThreePaneScaffold({
   const paneRefs = useRef<Partial<Record<ThreePaneScaffoldRole, HTMLDivElement>>>({});
   const pointerDragRef = useRef<PointerDrag | null>(null);
   const resizePointerDragRef = useRef<ResizePointerDrag | null>(null);
+  const previousTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
+  const renderedTransitionFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(
+    undefined,
+  );
+  const retargetOriginFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(undefined);
+  const retargetTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
   const [geometry, setGeometry] = useState<ScaffoldGeometry>(emptyGeometry);
   const [defaultExpansionState] = useState(() => new PaneExpansionState());
   const expansionState = paneExpansionState ?? defaultExpansionState;
@@ -271,22 +280,60 @@ export function ThreePaneScaffold({
     paneExpansionState: expansionState,
   });
 
-  const transitionFrame = transitionActive
-    ? calculateThreePaneScaffoldTransitionFrame({
-        width: geometry.width,
-        height: geometry.height,
-        directive,
-        currentValue,
-        targetValue,
-        progressFraction: scaffoldState!.progressFraction,
-        paneOrder,
-        direction: geometry.direction,
-        excludedBounds,
-        preferredWidths,
-        preferredHeights,
-        paneExpansionState: expansionState,
-      })
-    : undefined;
+  const calculateTransitionFrameAt = (progressFraction: number) =>
+    calculateThreePaneScaffoldTransitionFrame({
+      width: geometry.width,
+      height: geometry.height,
+      directive,
+      currentValue,
+      targetValue,
+      progressFraction,
+      paneOrder,
+      direction: geometry.direction,
+      excludedBounds,
+      preferredWidths,
+      preferredHeights,
+      paneExpansionState: expansionState,
+    });
+
+  const rawTransitionFrame =
+    transitionActive && scaffoldState !== undefined
+      ? calculateTransitionFrameAt(scaffoldState.progressFraction)
+      : undefined;
+  let transitionFrame = rawTransitionFrame;
+
+  if (transitionActive && scaffoldState !== undefined && rawTransitionFrame !== undefined) {
+    const previousTargetValue = previousTargetValueRef.current;
+    if (
+      previousTargetValue !== null &&
+      !threePaneScaffoldValuesEqual(previousTargetValue, targetValue) &&
+      renderedTransitionFrameRef.current !== undefined
+    ) {
+      retargetOriginFrameRef.current = captureThreePaneScaffoldTransitionOrigin(
+        renderedTransitionFrameRef.current,
+        calculateTransitionFrameAt(0),
+      );
+      retargetTargetValueRef.current = targetValue;
+    }
+
+    if (
+      retargetOriginFrameRef.current !== undefined &&
+      retargetTargetValueRef.current !== null &&
+      threePaneScaffoldValuesEqual(retargetTargetValueRef.current, targetValue)
+    ) {
+      transitionFrame = interpolateThreePaneScaffoldTransitionFrames(
+        retargetOriginFrameRef.current,
+        calculateTransitionFrameAt(1),
+        scaffoldState.progressFraction,
+      );
+    }
+  } else {
+    retargetOriginFrameRef.current = undefined;
+    retargetTargetValueRef.current = null;
+  }
+
+  previousTargetValueRef.current = targetValue;
+  renderedTransitionFrameRef.current = transitionFrame;
 
   const physicalOrder = geometry.direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
   const expandedRoles = physicalOrder.filter(
