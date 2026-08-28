@@ -57,4 +57,52 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     expect(detailOffsetX).toBeGreaterThan(480);
     expect(detailOffsetX).toBeLessThan(481);
   });
+
+  test('predictive back scales graphics without feeding back into layout', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--motion-halfway-predictive-back');
+
+    const root = page.locator('#storybook-root');
+    const scaffold = root.locator('.three-pane-scaffold');
+    const listPane = scaffold.locator('[data-pane-role="secondary"]');
+
+    await expect(scaffold).toBeVisible();
+    await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-left');
+
+    const metrics = await scaffold.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      clientHeight: element.clientHeight,
+      scale: Number.parseFloat(getComputedStyle(element).scale),
+    }));
+    const listLayoutWidth = await listPane.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).width),
+    );
+    const [scaffoldBounds, listBounds] = await Promise.all([
+      scaffold.boundingBox(),
+      listPane.boundingBox(),
+    ]);
+    if (!scaffoldBounds || !listBounds) {
+      throw new Error('Predictive-back scaffold has no visual bounds');
+    }
+
+    const browserGeometryTolerance = 1 / 32;
+    expect(metrics.clientWidth).toBe(480);
+    expect(metrics.clientHeight).toBe(640);
+    expect(metrics.scale).toBeCloseTo(0.9523809524, 5);
+    // Chromium quantizes computed/bounding-box geometry to a 1/64px-ish grid.
+    // The layout contract is that predictive graphics scaling does not feed
+    // back into pane geometry; one extra quantum keeps this deterministic
+    // without weakening the regression signal in any meaningful way.
+    expect(Math.abs(listLayoutWidth - metrics.clientWidth)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(scaffoldBounds.width - 480 * metrics.scale)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(scaffoldBounds.height - 640 * metrics.scale)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(listBounds.width - scaffoldBounds.width)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+  });
 });

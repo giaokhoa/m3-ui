@@ -99,7 +99,7 @@ function Fixture({
   );
 }
 
-function MotionHalfwayFixture() {
+function MotionHalfwayFixture({ predictiveBack = false }: { predictiveBack?: boolean }) {
   const width = 480;
   const height = 640;
   const directive = calculatePaneScaffoldDirective(
@@ -115,7 +115,7 @@ function MotionHalfwayFixture() {
   });
   const [scaffoldState] = useState(() => {
     const state = new MutableThreePaneScaffoldState(detailValue);
-    state.seekTo(0.5, listValue);
+    state.seekTo(0.5, listValue, predictiveBack);
     return state;
   });
 
@@ -230,6 +230,10 @@ export const Resizable: Story = {
 
 export const MotionHalfway: Story = {
   render: () => <MotionHalfwayFixture />,
+};
+
+export const MotionHalfwayPredictiveBack: Story = {
+  render: () => <MotionHalfwayFixture predictiveBack />,
 };
 
 export const LevitatedDialog: Story = {

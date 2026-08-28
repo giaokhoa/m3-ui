@@ -30,6 +30,10 @@ import {
 } from '../../adaptive/threePaneScaffoldState';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import {
+  getPredictiveBackScale,
+  getPredictiveBackScaffoldStyle,
+} from './ThreePaneScaffold.predictiveBack';
+import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
   type ThreePaneScaffoldLayout,
@@ -224,11 +228,14 @@ export function ThreePaneScaffold({
 
     const measure = () => {
       const rect = root.getBoundingClientRect();
+      const predictiveScale = Number(root.dataset.predictiveBackScale ?? 1);
+      const width = rect.width / predictiveScale;
+      const height = rect.height / predictiveScale;
       const next: ScaffoldGeometry = {
-        width: rect.width,
-        height: rect.height,
-        viewportLeft: rect.left,
-        viewportTop: rect.top,
+        width,
+        height,
+        viewportLeft: rect.left - (width - rect.width) / 2,
+        viewportTop: rect.top - (height - rect.height) / 2,
         direction: getComputedStyle(root).direction === 'rtl' ? 'rtl' : 'ltr',
       };
       setGeometry((current) => (sameGeometry(current, next) ? current : next));
@@ -552,13 +559,15 @@ export function ThreePaneScaffold({
     dragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
       ? 0
       : Math.round((dragHandleOffset / geometry.width) * 100);
+  const predictiveBackScale = getPredictiveBackScale(scaffoldState);
 
   return (
     <div
       {...props}
       ref={rootRef}
       className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
-      style={style}
+      data-predictive-back-scale={predictiveBackScale}
+      style={getPredictiveBackScaffoldStyle(style, scaffoldState)}
     >
       {paneEntries.map(([role, content]) => {
         const adaptedValue = getPaneAdaptedValue(targetValue, role);
