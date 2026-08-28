@@ -85,6 +85,20 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(listener).toHaveBeenCalled();
   });
 
+  it('uses zero duration while no renderer transition is attached', async () => {
+    let observedDuration = -1;
+    const animation: ThreePaneScaffoldProgressAnimation = async ({ durationMs, update }) => {
+      observedDuration = durationMs;
+      update(1);
+    };
+    const state = new MutableThreePaneScaffoldState(hidden, { animation });
+
+    await state.animateTo(primary);
+
+    expect(observedDuration).toBe(0);
+    expect(state.currentState).toBe(primary);
+  });
+
   it('passes the renderer-resolved full transition duration to animationSpec', async () => {
     let observedDuration = -1;
     const animation: ThreePaneScaffoldProgressAnimation = async ({ durationMs, update }) => {
