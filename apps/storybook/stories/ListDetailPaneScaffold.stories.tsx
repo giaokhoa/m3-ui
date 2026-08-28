@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Surface, VerticalDragHandle } from '@m3-ui/ui';
 import {
+  AnimatedPane,
   DockedEdge,
   DragToResizeState,
   LevitatedPaneScrim,
@@ -43,12 +44,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Pane({ title, children }: { title: string; children: string }) {
+function Pane({
+  title,
+  children,
+  shape,
+}: {
+  title: string;
+  children: string;
+  shape?: CSSProperties['borderRadius'];
+}) {
   return (
-    <Surface style={{ height: '100%', padding: 24, boxSizing: 'border-box' }}>
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
-      <p>{children}</p>
-    </Surface>
+    <AnimatedPane shape={shape}>
+      <Surface style={{ height: '100%', padding: 24, boxSizing: 'border-box' }}>
+        <h2 style={{ marginTop: 0 }}>{title}</h2>
+        <p>{children}</p>
+      </Surface>
+    </AnimatedPane>
   );
 }
 
@@ -157,7 +168,11 @@ function LevitatedDialogFixture() {
         value={value}
         listPane={<Pane title="List">Inbox conversations</Pane>}
         detailPane={<Pane title="Detail">Selected conversation</Pane>}
-        extraPane={<Pane title="Extra dialog">Context and metadata</Pane>}
+        extraPane={
+          <Pane title="Extra dialog" shape={16}>
+            Context and metadata
+          </Pane>
+        }
       />
     </div>
   );
