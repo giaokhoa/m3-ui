@@ -49,6 +49,25 @@ export interface ThreePaneMotion {
   tertiary: PaneMotion;
 }
 
+export interface PaneMotionPoint {
+  x: number;
+  y: number;
+}
+
+export interface PaneMotionSize {
+  width: number;
+  height: number;
+}
+
+/** Motion-relevant pane geometry, matching AndroidX PaneMotionData. */
+export interface PaneMotionData {
+  motion: PaneMotion;
+  originSize: PaneMotionSize;
+  originPosition: PaneMotionPoint;
+  targetSize: PaneMotionSize;
+  targetPosition: PaneMotionPoint;
+}
+
 export const ThreePaneMotion = {
   NoMotion: Object.freeze({
     primary: PaneMotion.NoMotion,
@@ -191,4 +210,164 @@ export function calculateThreePaneMotion(
     secondary: byRole.secondary ?? PaneMotion.NoMotion,
     tertiary: byRole.tertiary ?? PaneMotion.NoMotion,
   };
+}
+
+function currentLeft(data: PaneMotionData) {
+  return data.originPosition.x;
+}
+
+function currentRight(data: PaneMotionData) {
+  return data.originPosition.x + data.originSize.width;
+}
+
+function targetLeft(data: PaneMotionData) {
+  return data.targetPosition.x;
+}
+
+function targetRight(data: PaneMotionData) {
+  return data.targetPosition.x + data.targetSize.width;
+}
+
+/** Port of AndroidX PaneScaffoldMotionDataProvider.slideInFromLeftOffset. */
+export function calculateSlideInFromLeftOffset(
+  paneData: readonly PaneMotionData[],
+): number {
+  let previousPane: PaneMotionData | undefined;
+  for (let index = paneData.length - 1; index >= 0; index -= 1) {
+    const data = paneData[index]!;
+    if (
+      data.motion === PaneMotion.EnterFromLeft ||
+      data.motion === PaneMotion.EnterFromLeftDelayed
+    ) {
+      return -(previousPane === undefined ? targetRight(data) : targetLeft(previousPane));
+    }
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.EnterFromLeft ||
+      data.motion === PaneMotion.EnterFromRight ||
+      data.motion === PaneMotion.EnterFromLeftDelayed ||
+      data.motion === PaneMotion.EnterFromRightDelayed ||
+      data.motion === PaneMotion.EnterWithExpand
+    ) {
+      previousPane = data;
+    }
+  }
+  return 0;
+}
+
+/** Port of AndroidX PaneScaffoldMotionDataProvider.slideInFromRightOffset. */
+export function calculateSlideInFromRightOffset(
+  paneData: readonly PaneMotionData[],
+  scaffoldWidth: number,
+): number {
+  let previousPane: PaneMotionData | undefined;
+  for (const data of paneData) {
+    if (
+      data.motion === PaneMotion.EnterFromRight ||
+      data.motion === PaneMotion.EnterFromRightDelayed
+    ) {
+      return scaffoldWidth -
+        (previousPane === undefined ? targetLeft(data) : targetRight(previousPane));
+    }
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.EnterFromLeft ||
+      data.motion === PaneMotion.EnterFromRight ||
+      data.motion === PaneMotion.EnterFromLeftDelayed ||
+      data.motion === PaneMotion.EnterFromRightDelayed ||
+      data.motion === PaneMotion.EnterWithExpand
+    ) {
+      previousPane = data;
+    }
+  }
+  return 0;
+}
+
+/** Port of AndroidX PaneScaffoldMotionDataProvider.slideOutToLeftOffset. */
+export function calculateSlideOutToLeftOffset(
+  paneData: readonly PaneMotionData[],
+): number {
+  let previousPane: PaneMotionData | undefined;
+  for (let index = paneData.length - 1; index >= 0; index -= 1) {
+    const data = paneData[index]!;
+    if (data.motion === PaneMotion.ExitToLeft) {
+      return -(previousPane === undefined ? currentRight(data) : currentLeft(previousPane));
+    }
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.ExitToLeft ||
+      data.motion === PaneMotion.ExitToRight ||
+      data.motion === PaneMotion.ExitWithShrink
+    ) {
+      previousPane = data;
+    }
+  }
+  return 0;
+}
+
+/** Port of AndroidX PaneScaffoldMotionDataProvider.slideOutToRightOffset. */
+export function calculateSlideOutToRightOffset(
+  paneData: readonly PaneMotionData[],
+  scaffoldWidth: number,
+): number {
+  let previousPane: PaneMotionData | undefined;
+  for (const data of paneData) {
+    if (data.motion === PaneMotion.ExitToRight) {
+      return scaffoldWidth -
+        (previousPane === undefined ? currentLeft(data) : currentRight(previousPane));
+    }
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.ExitToLeft ||
+      data.motion === PaneMotion.ExitToRight ||
+      data.motion === PaneMotion.ExitWithShrink
+    ) {
+      previousPane = data;
+    }
+  }
+  return 0;
+}
+
+/** Finds the current left edge for a hidden/entering pane from the nearest shown pane on its left. */
+export function calculateHiddenPaneCurrentLeft(
+  paneData: readonly PaneMotionData[],
+  paneIndex: number,
+): number {
+  let left = 0;
+  for (let index = 0; index < paneData.length; index += 1) {
+    if (index === paneIndex) return left;
+    const data = paneData[index]!;
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.ExitToLeft ||
+      data.motion === PaneMotion.ExitToRight ||
+      data.motion === PaneMotion.ExitWithShrink
+    ) {
+      left = currentRight(data);
+    }
+  }
+  return left;
+}
+
+/** Finds the target left edge for a hiding pane from the nearest pane remaining shown on its left. */
+export function calculateHidingPaneTargetLeft(
+  paneData: readonly PaneMotionData[],
+  paneIndex: number,
+): number {
+  let left = 0;
+  for (let index = 0; index < paneData.length; index += 1) {
+    if (index === paneIndex) return left;
+    const data = paneData[index]!;
+    if (
+      data.motion === PaneMotion.AnimateBounds ||
+      data.motion === PaneMotion.EnterFromLeft ||
+      data.motion === PaneMotion.EnterFromRight ||
+      data.motion === PaneMotion.EnterFromLeftDelayed ||
+      data.motion === PaneMotion.EnterFromRightDelayed ||
+      data.motion === PaneMotion.EnterWithExpand
+    ) {
+      left = targetRight(data);
+    }
+  }
+  return left;
 }
