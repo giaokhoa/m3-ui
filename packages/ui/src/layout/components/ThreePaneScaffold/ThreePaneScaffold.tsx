@@ -573,11 +573,12 @@ export function ThreePaneScaffold({
         const adaptedValue = getPaneAdaptedValue(targetValue, role);
         const frame = transitionFrame?.[role];
         if (content == null) return null;
-        if (transitionActive) {
-          if (frame === undefined) return null;
-        } else if (adaptedValue.type === 'hidden') {
-          return null;
-        }
+
+        // AndroidX keeps pane-local saveable state across Hidden/visible changes.
+        // Keep the keyed React subtree mounted as the browser equivalent; a
+        // static Hidden pane is removed from layout/a11y with display:none and
+        // the same node is reused if a transition later makes it visible.
+        const staticallyHidden = frame === undefined && adaptedValue.type === 'hidden';
 
         let placement: PanePlacement | undefined;
         if (frame !== undefined) {
@@ -611,13 +612,14 @@ export function ThreePaneScaffold({
                   preferredWidth: resized.width,
                   preferredHeight: resized.height,
                 });
-        } else {
+        } else if (!staticallyHidden) {
           placement = getPlacement(layout, role);
         }
-        if (placement === undefined) return null;
+        if (placement === undefined && !staticallyHidden) return null;
 
         const frameLevitated = frame?.levitated ?? adaptedValue.type === 'levitated';
         const interactable =
+          !staticallyHidden &&
           isPaneInteractable(targetValue, role) &&
           !(transitionScrimBlocks && adaptedValue.type !== 'levitated');
         const paneResizeState =
@@ -671,7 +673,13 @@ export function ThreePaneScaffold({
             data-resize-state={paneResizeState?.value}
             inert={!interactable || undefined}
             tabIndex={-1}
-            style={frame === undefined ? paneStyle(placement) : transitionPaneStyle(frame)}
+            style={
+              staticallyHidden
+                ? { display: 'none' }
+                : frame === undefined
+                  ? paneStyle(placement)
+                  : transitionPaneStyle(frame)
+            }
           >
             {hasResizeHandle ? (
               <div
