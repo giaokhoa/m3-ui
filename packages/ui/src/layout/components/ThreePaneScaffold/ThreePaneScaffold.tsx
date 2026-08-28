@@ -29,6 +29,7 @@ import {
   type ThreePaneScaffoldState,
 } from '../../adaptive/threePaneScaffoldState';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
+import { getPredictiveBackScaffoldStyle } from './ThreePaneScaffold.predictiveBack';
 import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
@@ -558,7 +559,7 @@ export function ThreePaneScaffold({
       {...props}
       ref={rootRef}
       className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
-      style={style}
+      style={getPredictiveBackScaffoldStyle(style, scaffoldState)}
     >
       {paneEntries.map(([role, content]) => {
         const adaptedValue = getPaneAdaptedValue(targetValue, role);
