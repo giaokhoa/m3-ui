@@ -5,7 +5,7 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 ## Workspace
 
 - `packages/tokens`: canonical DTCG tokens, Style Dictionary build output, validation and read-only upstream audits
-- `packages/ui`: React component library
+- `packages/ui`: React component library, including Material widgets and the separate layout subsystem
 - `apps/storybook`: component preview and visual review workspace
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
@@ -29,6 +29,30 @@ Storybook is the primary visual review surface for components. New public compon
 
 Playwright provides the committed visual-regression layer on top of Storybook. `pnpm test:visual` builds the static Storybook and compares Chromium screenshots with the committed Linux baselines. When an intentional visual change has been reviewed, run `pnpm test:visual:update` inside the devcontainer and commit the changed files under `apps/storybook/visual/__screenshots__/`.
 
+## Layout subsystem
+
+Material layout is a separate public subsystem from Material widget components:
+
+```ts
+import {
+  ListDetailPaneScaffold,
+  SupportingPaneScaffold,
+  ThreePaneScaffold,
+  calculatePaneScaffoldDirective,
+  calculateWindowAdaptiveInfo,
+} from '@m3-ui/ui/layout';
+```
+
+Source ownership mirrors that boundary:
+
+- `packages/ui/src/components/`: Material UI widget families.
+- `packages/ui/src/layout/adaptive/`: window-size classes, posture, pane directives and pane adaptation algorithms.
+- `packages/ui/src/layout/components/`: Material screen and pane composition components such as `Scaffold` and the canonical multi-pane scaffolds.
+
+The root `@m3-ui/ui` entry still re-exports layout APIs for convenience and compatibility. `@m3-ui/ui/layout` is the dedicated runtime/type entry when an application wants the layout subsystem explicitly.
+
+Generic Compose runtime primitives are not translated mechanically. Browser Flexbox/Grid/logical properties remain the native layout mechanics; Material-specific breakpoints, pane partitioning, preferred sizes, hinge avoidance, RTL placement and canonical layouts are the parity contract. See `packages/ui/src/layout/README.md` for the detailed mapping rules.
+
 ## CSS consumption
 
 For applications that use many Material components, import the complete stylesheet once:
@@ -37,14 +61,15 @@ For applications that use many Material components, import the complete styleshe
 import '@m3-ui/ui/styles.css';
 ```
 
-For smaller bundles, each public component family also has a self-contained CSS entry. For example:
+For smaller bundles, each public CSS-bearing family also has a self-contained CSS entry. For example:
 
 ```ts
 import '@m3-ui/ui/styles/button.css';
 import '@m3-ui/ui/styles/text-field.css';
+import '@m3-ui/ui/styles/three-pane-scaffold.css';
 ```
 
-Available modular entries are `badge.css`, `bottom-sheet.css`, `button.css`, `card.css`, `checkbox.css`, `chip.css`, `dialog.css`, `divider.css`, `drag-handle.css`, `fab.css`, `icon-button.css`, `loading-indicator.css`, `navigation-drawer.css`, `progress-indicator.css`, `radio-button.css`, `scrim.css`, `slider.css`, `snackbar.css`, `switch.css`, `text-field.css`, and `tooltip.css`. Each entry includes the internal Ripple/Elevation CSS and component styles that its public family needs, so a consumer does not need to know internal style dependencies. If an application uses many component families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
+Each modular entry includes the internal styles its public family needs, so a consumer does not need to know internal style dependencies. `ThreePaneScaffold`, `ListDetailPaneScaffold` and `SupportingPaneScaffold` share the `three-pane-scaffold.css` layout entry. If an application uses many families, prefer the single full stylesheet to avoid duplicate shared primitive CSS.
 
 `BottomSheet` is the direct-hierarchy Material surface. Place it in a bounded positioning context (for example a `position: relative` screen container); `SheetState` owns Hidden/PartiallyExpanded/Expanded anchors and drag settling while the parent owns stacking and clipping. `ModalBottomSheet` composes the same state/gesture engine with a React Aria modal portal, Material scrim, focus containment, Escape/outside dismissal and focus restoration. Modal dismissal first animates the sheet to Hidden and only then invokes `onDismissRequest`, matching the pinned AndroidX lifecycle.
 
@@ -65,7 +90,7 @@ Storybook is forwarded to `http://localhost:6006` and opens automatically when s
 
 ## Architecture before implementation
 
-Read [`docs/architecture/README.md`](docs/architecture/README.md) and [`packages/tokens/README.md`](packages/tokens/README.md) before porting a Material 3 component.
+Read [`docs/architecture/README.md`](docs/architecture/README.md), [`packages/ui/src/layout/README.md`](packages/ui/src/layout/README.md), and [`packages/tokens/README.md`](packages/tokens/README.md) before porting Material 3 layout or components.
 
 Key rules:
 
@@ -76,6 +101,6 @@ Key rules:
 - Native HTML and React Aria Components provide web semantics and interaction state.
 - Parity is proven by independent token/default/behavior/layout tests plus Chromium visual regression for covered stories.
 
-## Component convention
+## Source convention
 
-Each public component family lives in its own folder under `packages/ui/src/components/`. Keep public files small, prefer React Aria/native semantics, and do not duplicate canonical token values in component code.
+Each public Material widget family lives in its own folder under `packages/ui/src/components/`. Material layout contracts and layout components live under `packages/ui/src/layout/`. Keep public files small, prefer browser-native layout/semantics where they express the contract, and do not duplicate canonical token values in implementation code.

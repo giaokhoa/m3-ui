@@ -3,7 +3,7 @@ export const styleEntries = {
   'bottom-app-bar': ['src/components/BottomAppBar/bottom-app-bar.css'],
   'bottom-sheet': ['src/components/BottomSheet/bottom-sheet.css'],
   'bottom-sheet-scaffold': [
-    'src/components/Scaffold/scaffold.css',
+    'src/layout/components/Scaffold/scaffold.css',
     'src/components/BottomSheet/bottom-sheet.css',
     'src/components/BottomSheetScaffold/bottom-sheet-scaffold.css',
   ],
@@ -104,7 +104,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/RadioButton/radio-button.css',
   ],
-  scaffold: ['src/components/Scaffold/scaffold.css'],
+  scaffold: ['src/layout/components/Scaffold/scaffold.css'],
   scrim: ['src/components/Scrim/scrim.css'],
   'search-bar': [
     'src/internal/elevation/elevation.css',
@@ -139,6 +139,9 @@ export const styleEntries = {
     'src/components/Tabs/tabs.css',
   ],
   'text-field': ['src/components/TextField/text-field.css'],
+  'three-pane-scaffold': [
+    'src/layout/components/ThreePaneScaffold/three-pane-scaffold.css',
+  ],
   'time-picker': [
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
@@ -186,7 +189,7 @@ export const publicComponentStyleSources = {
   'progress-indicator': 'src/components/ProgressIndicator/progress-indicator.css',
   'pull-to-refresh': 'src/components/PullToRefresh/pull-to-refresh.css',
   'radio-button': 'src/components/RadioButton/radio-button.css',
-  scaffold: 'src/components/Scaffold/scaffold.css',
+  scaffold: 'src/layout/components/Scaffold/scaffold.css',
   scrim: 'src/components/Scrim/scrim.css',
   'search-bar': 'src/components/SearchBar/search-bar.css',
   'segmented-button': 'src/components/SegmentedButton/segmented-button.css',
@@ -196,6 +199,8 @@ export const publicComponentStyleSources = {
   switch: 'src/components/Switch/switch.css',
   tabs: 'src/components/Tabs/tabs.css',
   'text-field': 'src/components/TextField/text-field.css',
+  'three-pane-scaffold':
+    'src/layout/components/ThreePaneScaffold/three-pane-scaffold.css',
   'time-picker': 'src/components/TimePicker/time-picker.css',
   'toggle-button': 'src/components/ToggleButton/toggle-button.css',
   'top-app-bar': 'src/components/TopAppBar/top-app-bar.css',
@@ -235,7 +240,7 @@ export const publicComponentModules = {
   'progress-indicator': 'src/components/ProgressIndicator/ProgressIndicator.tsx',
   'pull-to-refresh': 'src/components/PullToRefresh/PullToRefresh.tsx',
   'radio-button': 'src/components/RadioButton/RadioButton.tsx',
-  scaffold: 'src/components/Scaffold/Scaffold.tsx',
+  scaffold: 'src/layout/components/Scaffold/Scaffold.tsx',
   scrim: 'src/components/Scrim/Scrim.tsx',
   'search-bar': 'src/components/SearchBar/SearchBar.tsx',
   'segmented-button': 'src/components/SegmentedButton/SegmentedButton.tsx',
@@ -245,6 +250,8 @@ export const publicComponentModules = {
   switch: 'src/components/Switch/Switch.tsx',
   tabs: 'src/components/Tabs/Tabs.tsx',
   'text-field': 'src/components/TextField/TextField.tsx',
+  'three-pane-scaffold':
+    'src/layout/components/ThreePaneScaffold/ThreePaneScaffold.tsx',
   'time-picker': 'src/components/TimePicker/TimePicker.tsx',
   'toggle-button': 'src/components/ToggleButton/ToggleButton.tsx',
   'top-app-bar': 'src/components/TopAppBar/TopAppBar.tsx',

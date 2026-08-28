@@ -14,7 +14,7 @@ import {
   calculateSheetAnchors,
   useSheetState,
 } from '../BottomSheet';
-import { Scaffold } from '../Scaffold';
+import { Scaffold } from '../../layout/components/Scaffold';
 import './bottom-sheet-scaffold.css';
 
 export const bottomSheetScaffoldDefaults = {
