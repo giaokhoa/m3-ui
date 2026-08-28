@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Surface, VerticalDragHandle } from '@m3-ui/ui';
 import {
+  DockedEdge,
+  DragToResizeState,
   LevitatedPaneScrim,
   ListDetailPaneScaffold,
   ListDetailPaneScaffoldRole,
@@ -127,6 +129,59 @@ function LevitatedDialogFixture() {
   );
 }
 
+function LevitatedBottomSheetFixture() {
+  const width = 720;
+  const height = 640;
+  const [dragToResizeState] = useState(
+    () => new DragToResizeState({ dockedEdge: DockedEdge.Bottom }),
+  );
+  const directive = calculatePaneScaffoldDirective(
+    calculateWindowAdaptiveInfo({ width, height }),
+  );
+  const extraPaneStrategy = PaneAdaptStrategy.Levitate({
+    alignment: PaneAlignment.BottomCenter,
+    scrim: <LevitatedPaneScrim aria-label="Scrim" />,
+    dragToResizeState,
+  }).onlyIfSinglePane(directive);
+  const value = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: {
+      ...listDetailPaneScaffoldAdaptStrategies,
+      tertiary: extraPaneStrategy,
+    },
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Extra }],
+  });
+
+  return (
+    <div style={{ width, maxWidth: '100%', height, margin: '0 auto' }}>
+      <ListDetailPaneScaffold
+        directive={directive}
+        value={value}
+        preferredWidths={{ tertiary: width }}
+        preferredHeights={{ tertiary: height / 2 }}
+        listPane={<Pane title="List">Inbox conversations</Pane>}
+        detailPane={<Pane title="Detail">Selected conversation</Pane>}
+        extraPane={<Pane title="Extra sheet">Drag or click the handle to resize</Pane>}
+        levitatedPaneDragHandles={{
+          tertiary: (
+            <span
+              aria-hidden="true"
+              style={{
+                display: 'block',
+                width: 32,
+                height: 4,
+                margin: 8,
+                borderRadius: 999,
+                background: 'currentColor',
+                opacity: 0.6,
+              }}
+            />
+          ),
+        }}
+      />
+    </div>
+  );
+}
+
 export const Compact: Story = {
   render: () => <Fixture width={480} />,
 };
@@ -141,6 +196,10 @@ export const Resizable: Story = {
 
 export const LevitatedDialog: Story = {
   render: () => <LevitatedDialogFixture />,
+};
+
+export const LevitatedBottomSheet: Story = {
+  render: () => <LevitatedBottomSheetFixture />,
 };
 
 export const ExtraLarge: Story = {
