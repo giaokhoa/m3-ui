@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
 
 export type ThreePaneScaffoldRole = 'primary' | 'secondary' | 'tertiary';
@@ -14,6 +15,33 @@ export type ThreePaneScaffoldHorizontalOrder = readonly [
   ThreePaneScaffoldRole,
 ];
 
+export type LevitatedPaneAlignment =
+  | 'top-start'
+  | 'top-center'
+  | 'top-end'
+  | 'center-start'
+  | 'center'
+  | 'center-end'
+  | 'bottom-start'
+  | 'bottom-center'
+  | 'bottom-end';
+
+/** Web equivalents of Compose Alignment presets used by levitated panes. */
+export const PaneAlignment = {
+  TopStart: 'top-start',
+  TopCenter: 'top-center',
+  TopEnd: 'top-end',
+  CenterStart: 'center-start',
+  Center: 'center',
+  CenterEnd: 'center-end',
+  BottomStart: 'bottom-start',
+  BottomCenter: 'bottom-center',
+  BottomEnd: 'bottom-end',
+} as const satisfies Record<string, LevitatedPaneAlignment>;
+
+/** React equivalent of the @Composable scrim carried by AndroidX Levitate. */
+export type LevitatedPaneScrimContent = ReactNode | (() => ReactNode);
+
 export interface HidePaneAdaptStrategy {
   type: 'hide';
 }
@@ -23,21 +51,53 @@ export interface ReflowPaneAdaptStrategy {
   reflowUnder: ThreePaneScaffoldRole;
 }
 
-/**
- * Static adaptation strategies currently used by Material canonical layouts.
- *
- * AndroidX also supports Levitate. That strategy changes a pane into a popup/sheet
- * surface and therefore needs a separate web overlay/focus contract; it is
- * intentionally not modeled as static pane placement here.
- */
-export type PaneAdaptStrategy = HidePaneAdaptStrategy | ReflowPaneAdaptStrategy;
+export interface LevitatePaneAdaptStrategy {
+  type: 'levitate';
+  alignment: LevitatedPaneAlignment;
+  scrim?: LevitatedPaneScrimContent;
+  /** Equivalent of AndroidX AdaptStrategy.Levitate.onlyIf. */
+  onlyIf(condition: boolean): PaneAdaptStrategy;
+  /** AndroidX single-pane means maxHorizontalPartitions == 1. */
+  onlyIfSinglePane(directive: PaneScaffoldDirective): PaneAdaptStrategy;
+}
+
+export interface LevitatePaneAdaptStrategyOptions {
+  alignment?: LevitatedPaneAlignment;
+  scrim?: LevitatedPaneScrimContent;
+}
+
+export type PaneAdaptStrategy =
+  | HidePaneAdaptStrategy
+  | ReflowPaneAdaptStrategy
+  | LevitatePaneAdaptStrategy;
 
 const hidePaneAdaptStrategy: HidePaneAdaptStrategy = Object.freeze({ type: 'hide' });
+
+function createLevitatePaneAdaptStrategy({
+  alignment = PaneAlignment.Center,
+  scrim,
+}: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
+  const strategy: LevitatePaneAdaptStrategy = {
+    type: 'levitate',
+    alignment,
+    ...(scrim === undefined ? {} : { scrim }),
+    onlyIf(condition) {
+      return condition ? strategy : hidePaneAdaptStrategy;
+    },
+    onlyIfSinglePane(directive) {
+      return directive.maxHorizontalPartitions === 1 ? strategy : hidePaneAdaptStrategy;
+    },
+  };
+  return strategy;
+}
 
 export const PaneAdaptStrategy = {
   Hide: hidePaneAdaptStrategy,
   Reflow(reflowUnder: ThreePaneScaffoldRole): ReflowPaneAdaptStrategy {
     return { type: 'reflow', reflowUnder };
+  },
+  Levitate(options: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
+    return createLevitatePaneAdaptStrategy(options);
   },
 } as const;
 
@@ -50,7 +110,12 @@ export interface ThreePaneScaffoldAdaptStrategies {
 export type PaneAdaptedValue =
   | { type: 'expanded' }
   | { type: 'hidden' }
-  | { type: 'reflowed'; reflowUnder: ThreePaneScaffoldRole };
+  | { type: 'reflowed'; reflowUnder: ThreePaneScaffoldRole }
+  | {
+      type: 'levitated';
+      alignment: LevitatedPaneAlignment;
+      scrim?: LevitatedPaneScrimContent;
+    };
 
 const expandedPaneAdaptedValue = Object.freeze({ type: 'expanded' } as const);
 const hiddenPaneAdaptedValue = Object.freeze({ type: 'hidden' } as const);
@@ -60,6 +125,16 @@ export const PaneAdaptedValue = {
   Hidden: hiddenPaneAdaptedValue,
   Reflowed(reflowUnder: ThreePaneScaffoldRole): PaneAdaptedValue {
     return { type: 'reflowed', reflowUnder };
+  },
+  Levitated(
+    alignment: LevitatedPaneAlignment,
+    scrim?: LevitatedPaneScrimContent,
+  ): PaneAdaptedValue {
+    return {
+      type: 'levitated',
+      alignment,
+      ...(scrim === undefined ? {} : { scrim }),
+    };
   },
 } as const;
 
@@ -144,10 +219,9 @@ function valueForRole(
 }
 
 /**
- * Port of AndroidX calculateThreePaneScaffoldValue for the static Hide/Reflow
- * strategy subset used by Material list-detail and supporting-pane defaults.
- * Destination history is ordered oldest -> newest; the newest destination has
- * highest layout priority, followed by Primary, Secondary and Tertiary.
+ * Port of AndroidX calculateThreePaneScaffoldValue including Hide, Reflow and
+ * Levitate. Destination history is ordered oldest -> newest; only the newest
+ * destination may levitate, and a levitated pane does not consume a partition.
  */
 export function calculateThreePaneScaffoldValue({
   maxHorizontalPartitions,
@@ -170,6 +244,17 @@ export function calculateThreePaneScaffoldValue({
     maxHorizontalPartitions === 1 &&
     maxVerticalPartitions > 1 &&
     rolesByPriority.some((role) => strategyForRole(adaptStrategies, role).type === 'reflow');
+
+  const currentDestination = destinationHistory.at(-1)?.pane;
+  if (currentDestination !== undefined) {
+    const strategy = strategyForRole(adaptStrategies, currentDestination);
+    if (strategy.type === 'levitate') {
+      adapted[currentDestination] = PaneAdaptedValue.Levitated(
+        strategy.alignment,
+        strategy.scrim,
+      );
+    }
+  }
 
   const priorityOrder: ThreePaneScaffoldRole[] = [
     ...destinationHistory.map(({ pane }) => pane).reverse(),
@@ -195,6 +280,9 @@ export function calculateThreePaneScaffoldValue({
     }
 
     if (anchorPaneValue === undefined) {
+      if (strategyForRole(adaptStrategies, anchorPane).type === 'levitate') {
+        continue;
+      }
       if (hasAvailablePartition) {
         adapted[anchorPane] = PaneAdaptedValue.Expanded;
         expandedCount += 1;
@@ -211,7 +299,6 @@ export function calculateThreePaneScaffoldValue({
     }
   }
 
-  const currentDestination = destinationHistory.at(-1)?.pane;
   return {
     primary: adapted.primary ?? PaneAdaptedValue.Hidden,
     secondary: adapted.secondary ?? PaneAdaptedValue.Hidden,
@@ -239,4 +326,22 @@ export function getPaneAdaptedValue(
   role: ThreePaneScaffoldRole,
 ): PaneAdaptedValue {
   return value[role];
+}
+
+export function hasLevitatedPaneWithScrim(value: ThreePaneScaffoldValue): boolean {
+  return rolesByPriority.some((role) => {
+    const paneValue = getPaneAdaptedValue(value, role);
+    return paneValue.type === 'levitated' && paneValue.scrim != null;
+  });
+}
+
+/** Mirrors AndroidX ThreePaneScaffoldValue.isInteractable. */
+export function isPaneInteractable(
+  value: ThreePaneScaffoldValue,
+  role: ThreePaneScaffoldRole,
+): boolean {
+  const paneValue = getPaneAdaptedValue(value, role);
+  if (paneValue.type === 'hidden') return false;
+  if (paneValue.type === 'levitated') return true;
+  return !hasLevitatedPaneWithScrim(value);
 }
