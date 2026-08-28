@@ -7,7 +7,11 @@ import {
   type ThreePaneScaffoldHorizontalOrder,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
-import { calculateThreePaneScaffoldTransitionFrame } from './ThreePaneScaffold.transition';
+import {
+  calculateThreePaneScaffoldTransitionFrame,
+  captureThreePaneScaffoldTransitionOrigin,
+  interpolateThreePaneScaffoldTransitionFrames,
+} from './ThreePaneScaffold.transition';
 
 const directive: PaneScaffoldDirective = {
   maxHorizontalPartitions: 3,
@@ -122,6 +126,25 @@ describe('calculateThreePaneScaffoldTransitionFrame', () => {
 
     expect(result.primary?.motion).toBe(PaneMotion.ExitToRight);
     expect(result.secondary?.motion).toBe(PaneMotion.EnterFromLeft);
+  });
+
+  it('preserves the rendered frame when a transition is retargeted', () => {
+    const primary = value(true, false, false);
+    const secondary = value(false, true, false);
+    const tertiary = value(false, false, true);
+    const rendered = frame(primary, secondary, 0.4);
+    const nextInitial = frame(secondary, tertiary, 0);
+    const nextEnd = frame(secondary, tertiary, 1);
+    const origin = captureThreePaneScaffoldTransitionOrigin(rendered, nextInitial);
+
+    const retargetStart = interpolateThreePaneScaffoldTransitionFrames(origin, nextEnd, 0);
+    expect(retargetStart.primary?.translateX).toBe(rendered.primary?.translateX);
+    expect(retargetStart.secondary?.translateX).toBe(rendered.secondary?.translateX);
+    expect(retargetStart.tertiary?.translateX).toBe(nextInitial.tertiary?.translateX);
+
+    const retargetHalf = interpolateThreePaneScaffoldTransitionFrames(origin, nextEnd, 0.5);
+    expect(retargetHalf.primary?.opacity).toBeCloseTo(0.5);
+    expect(retargetHalf.tertiary?.translateX).not.toBe(nextInitial.tertiary?.translateX);
   });
 
   it('validates progress fractions', () => {
