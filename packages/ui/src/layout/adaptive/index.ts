@@ -1,3 +1,4 @@
+export * from './dragToResizeState';
 export * from './paneExpansionState';
 export * from './paneScaffoldDirective';
 export * from './threePaneScaffold';
