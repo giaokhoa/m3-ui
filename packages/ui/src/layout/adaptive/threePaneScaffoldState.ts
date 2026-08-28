@@ -159,13 +159,13 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     initialScaffoldValue: ThreePaneScaffoldValue,
     {
       animation = defaultThreePaneScaffoldProgressAnimation,
-      transitionDurationResolver = null,
+      transitionDurationResolver,
     }: MutableThreePaneScaffoldStateOptions = {},
   ) {
     this.currentStateValue = initialScaffoldValue;
     this.targetStateValue = initialScaffoldValue;
     this.defaultAnimation = animation;
-    this.transitionDurationResolver = transitionDurationResolver;
+    this.transitionDurationResolver = transitionDurationResolver ?? null;
   }
 
   readonly subscribe = (listener: () => void) => {
