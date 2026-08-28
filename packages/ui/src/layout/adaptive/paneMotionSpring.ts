@@ -20,6 +20,15 @@ function clampProgress(value: number) {
   return value;
 }
 
+function thresholdAt(
+  visibilityThresholds: number | readonly number[],
+  index: number,
+) {
+  return typeof visibilityThresholds === 'number'
+    ? visibilityThresholds
+    : (visibilityThresholds[index] ?? 1);
+}
+
 /**
  * Port of the under-damped branch of AndroidX SpringSimulation.updateValues.
  * PaneMotionDefaults uses dampingRatio=0.8, so this is the exact branch used by
@@ -103,10 +112,6 @@ export function calculatePaneMotionVectorSpringDurationMs(
   if (initialValues.length !== targetValues.length) {
     throw new RangeError('initialValues and targetValues must have the same length');
   }
-  const thresholdAt = (index: number) =>
-    typeof visibilityThresholds === 'number'
-      ? visibilityThresholds
-      : (visibilityThresholds[index] ?? 1);
   return initialValues.reduce(
     (duration, initialValue, index) =>
       Math.max(
@@ -114,10 +119,35 @@ export function calculatePaneMotionVectorSpringDurationMs(
         calculatePaneMotionSpringDurationMs(
           initialValue,
           targetValues[index]!,
-          thresholdAt(index),
+          thresholdAt(visibilityThresholds, index),
         ),
       ),
     0,
+  );
+}
+
+/**
+ * Samples a vectorized TargetBasedAnimation at a shared playtime. AndroidX
+ * snaps the whole vector to target once the slowest dimension reaches duration.
+ */
+export function samplePaneMotionVectorSpringAtPlayTime(
+  initialValues: readonly number[],
+  targetValues: readonly number[],
+  playTimeMs: number,
+  visibilityThresholds: number | readonly number[] = 1,
+): number[] {
+  if (initialValues.length !== targetValues.length) {
+    throw new RangeError('initialValues and targetValues must have the same length');
+  }
+  const duration = calculatePaneMotionVectorSpringDurationMs(
+    initialValues,
+    targetValues,
+    visibilityThresholds,
+  );
+  if (duration === 0 || playTimeMs >= duration) return [...targetValues];
+  if (playTimeMs <= 0) return [...initialValues];
+  return initialValues.map((initialValue, index) =>
+    samplePaneMotionSpring(initialValue, targetValues[index]!, playTimeMs),
   );
 }
 
@@ -134,9 +164,11 @@ export function samplePaneMotionVectorSpringAtProgress(
     targetValues,
     visibilityThresholds,
   );
-  const playTimeMs = duration * progress;
-  return initialValues.map((initialValue, index) =>
-    samplePaneMotionSpring(initialValue, targetValues[index]!, playTimeMs),
+  return samplePaneMotionVectorSpringAtPlayTime(
+    initialValues,
+    targetValues,
+    duration * progress,
+    visibilityThresholds,
   );
 }
 
@@ -157,6 +189,34 @@ export function calculatePaneMotionDelayedSpringDurationMs(
  * Samples AndroidX DelayedSpringSpec at an external/global transition playtime.
  * The delay is based on the original spring duration, not on the global one.
  */
+export function samplePaneMotionDelayedVectorSpringAtPlayTime(
+  initialValues: readonly number[],
+  targetValues: readonly number[],
+  playTimeMs: number,
+  visibilityThresholds: number | readonly number[] = 1,
+): number[] {
+  if (initialValues.length !== targetValues.length) {
+    throw new RangeError('initialValues and targetValues must have the same length');
+  }
+  const originalDuration = calculatePaneMotionVectorSpringDurationMs(
+    initialValues,
+    targetValues,
+    visibilityThresholds,
+  );
+  const delayedTimeMs = Math.trunc(originalDuration * PaneMotionDefaults.delayedRatio);
+  const totalDuration = originalDuration + delayedTimeMs;
+  if (totalDuration === 0 || playTimeMs >= totalDuration) return [...targetValues];
+  if (playTimeMs <= delayedTimeMs) return [...initialValues];
+  return initialValues.map((initialValue, index) =>
+    samplePaneMotionSpring(
+      initialValue,
+      targetValues[index]!,
+      playTimeMs - delayedTimeMs,
+    ),
+  );
+}
+
+/** Scalar compatibility helper for the common single-axis delayed offset case. */
 export function samplePaneMotionDelayedSpringAtPlayTime(
   initialValue: number,
   targetValue: number,
@@ -166,6 +226,8 @@ export function samplePaneMotionDelayedSpringAtPlayTime(
   const delayedTimeMs = Math.trunc(
     vectorOriginalDurationMs * PaneMotionDefaults.delayedRatio,
   );
+  const totalDuration = vectorOriginalDurationMs + delayedTimeMs;
+  if (totalDuration === 0 || playTimeMs >= totalDuration) return targetValue;
   if (playTimeMs <= delayedTimeMs) return initialValue;
   return samplePaneMotionSpring(
     initialValue,
