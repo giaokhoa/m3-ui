@@ -12,8 +12,8 @@ import {
 } from 'react';
 import type { DragToResizeState } from '../../adaptive/dragToResizeState';
 import {
-  PaneExpansionState,
   PaneExpansionUnspecified,
+  type PaneExpansionState,
 } from '../../adaptive/paneExpansionState';
 import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
@@ -47,6 +47,7 @@ import {
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
 } from './ThreePaneScaffold.transition';
+import { useDefaultPaneExpansionState } from './useDefaultPaneExpansionState';
 import './three-pane-scaffold.css';
 
 export type LevitatedPaneDragHandle =
@@ -198,8 +199,6 @@ export function ThreePaneScaffold({
   const retargetOriginFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(undefined);
   const retargetTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
   const [geometry, setGeometry] = useState<ScaffoldGeometry>(emptyGeometry);
-  const [defaultExpansionState] = useState(() => new PaneExpansionState());
-  const expansionState = paneExpansionState ?? defaultExpansionState;
 
   useSyncExternalStore(
     scaffoldState?.subscribe ?? noStoreSubscribe,
@@ -208,6 +207,11 @@ export function ThreePaneScaffold({
   );
 
   const targetValue = scaffoldState?.targetState ?? value!;
+  const defaultExpansionState = useDefaultPaneExpansionState(
+    targetValue,
+    paneExpansionDragHandle != null,
+  );
+  const expansionState = paneExpansionState ?? defaultExpansionState;
   const currentValue = scaffoldState?.currentState ?? targetValue;
   const transitionActive =
     scaffoldState !== undefined &&
