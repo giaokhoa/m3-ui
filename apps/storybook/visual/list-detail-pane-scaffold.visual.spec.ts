@@ -84,16 +84,25 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
       throw new Error('Predictive-back scaffold has no visual bounds');
     }
 
+    const browserGeometryTolerance = 1 / 32;
     expect(metrics.clientWidth).toBe(480);
     expect(metrics.clientHeight).toBe(640);
     expect(metrics.scale).toBeCloseTo(0.9523809524, 5);
-    // Chromium quantizes computed layout dimensions to a 1/64px-ish grid.
+    // Chromium quantizes computed/bounding-box geometry to a 1/64px-ish grid.
     // The layout contract is that predictive graphics scaling does not feed
-    // back into pane width; tolerate one extra quantum rather than requiring
-    // impossible sub-millipixel equality from getComputedStyle().
-    expect(Math.abs(listLayoutWidth - metrics.clientWidth)).toBeLessThan(1 / 32);
-    expect(scaffoldBounds.width).toBeCloseTo(480 * metrics.scale, 2);
-    expect(scaffoldBounds.height).toBeCloseTo(640 * metrics.scale, 2);
-    expect(listBounds.width).toBeCloseTo(scaffoldBounds.width, 2);
+    // back into pane geometry; one extra quantum keeps this deterministic
+    // without weakening the regression signal in any meaningful way.
+    expect(Math.abs(listLayoutWidth - metrics.clientWidth)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(scaffoldBounds.width - 480 * metrics.scale)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(scaffoldBounds.height - 640 * metrics.scale)).toBeLessThan(
+      browserGeometryTolerance,
+    );
+    expect(Math.abs(listBounds.width - scaffoldBounds.width)).toBeLessThan(
+      browserGeometryTolerance,
+    );
   });
 });
