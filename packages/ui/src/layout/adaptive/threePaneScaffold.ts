@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { createElement, type ReactNode } from 'react';
 import type { DragToResizeState } from './dragToResizeState';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
 
@@ -40,8 +40,18 @@ export const PaneAlignment = {
   BottomEnd: 'bottom-end',
 } as const satisfies Record<string, LevitatedPaneAlignment>;
 
-/** React equivalent of the @Composable scrim carried by AndroidX Levitate. */
+/**
+ * React input equivalent of the @Composable scrim carried by AndroidX
+ * Levitate. Functions are normalized to React elements before entering the
+ * adapted value so hooks execute in a real component render boundary.
+ */
 export type LevitatedPaneScrimContent = ReactNode | (() => ReactNode);
+
+function normalizeLevitatedPaneScrim(
+  scrim: LevitatedPaneScrimContent | undefined,
+): ReactNode | undefined {
+  return typeof scrim === 'function' ? createElement(scrim) : scrim;
+}
 
 export interface HidePaneAdaptStrategy {
   type: 'hide';
@@ -55,7 +65,7 @@ export interface ReflowPaneAdaptStrategy {
 export interface LevitatePaneAdaptStrategy {
   type: 'levitate';
   alignment: LevitatedPaneAlignment;
-  scrim?: LevitatedPaneScrimContent;
+  scrim?: ReactNode;
   dragToResizeState?: DragToResizeState;
   /** Equivalent of AndroidX AdaptStrategy.Levitate.onlyIf. */
   onlyIf(condition: boolean): PaneAdaptStrategy;
@@ -81,10 +91,11 @@ function createLevitatePaneAdaptStrategy({
   scrim,
   dragToResizeState,
 }: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
+  const normalizedScrim = normalizeLevitatedPaneScrim(scrim);
   const strategy: LevitatePaneAdaptStrategy = {
     type: 'levitate',
     alignment,
-    ...(scrim === undefined ? {} : { scrim }),
+    ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
     ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
     onlyIf(condition) {
       return condition ? strategy : hidePaneAdaptStrategy;
@@ -119,7 +130,7 @@ export type PaneAdaptedValue =
   | {
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
-      scrim?: LevitatedPaneScrimContent;
+      scrim?: ReactNode;
       dragToResizeState?: DragToResizeState;
     };
 
@@ -137,10 +148,11 @@ export const PaneAdaptedValue = {
     scrim?: LevitatedPaneScrimContent,
     dragToResizeState?: DragToResizeState,
   ): PaneAdaptedValue {
+    const normalizedScrim = normalizeLevitatedPaneScrim(scrim);
     return {
       type: 'levitated',
       alignment,
-      ...(scrim === undefined ? {} : { scrim }),
+      ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
       ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
     };
   },
