@@ -1,4 +1,3 @@
-import { PaneMotionDefaults } from './paneMotion';
 import type { PaneAdaptedValue, ThreePaneScaffoldValue } from './threePaneScaffold';
 
 export interface ThreePaneScaffoldState {
@@ -13,6 +12,8 @@ export interface ThreePaneScaffoldState {
 export interface ThreePaneScaffoldProgressAnimationContext {
   from: number;
   to: number;
+  /** Full transition duration before accounting for an already-seeked fraction. */
+  durationMs: number;
   signal: AbortSignal;
   update: (fraction: number) => void;
 }
@@ -22,13 +23,22 @@ export type ThreePaneScaffoldProgressAnimation = (
 ) => Promise<void>;
 
 export interface ThreePaneScaffoldAnimateOptions {
+  /** Equivalent of AndroidX animateTo(animationSpec = ...). */
   animation?: ThreePaneScaffoldProgressAnimation;
   isPredictiveBackInProgress?: boolean;
 }
 
+export type ThreePaneScaffoldTransitionDurationResolver = (
+  currentState: ThreePaneScaffoldValue,
+  targetState: ThreePaneScaffoldValue,
+) => number;
+
 export interface MutableThreePaneScaffoldStateOptions {
   animation?: ThreePaneScaffoldProgressAnimation;
+  transitionDurationResolver?: ThreePaneScaffoldTransitionDurationResolver;
 }
+
+const DefaultUnboundTransitionDurationMs = 300;
 
 function clampFraction(fraction: number) {
   if (!Number.isFinite(fraction) || fraction < 0 || fraction > 1) {
@@ -82,34 +92,16 @@ function cancelFrame(id: number) {
 }
 
 /**
- * Normalized underdamped spring response using the pinned AndroidX pane-motion
- * damping ratio and stiffness. The returned value may overshoot 1, matching a
- * physical spring; callers clamp only the exposed transition fraction.
+ * AndroidX SeekableTransitionState.animateTo(animationSpec = null) linearly
+ * traverses the transition playtime. Spring/easing belongs to the Transition's
+ * child animation specs, not to this normalized state fraction.
  */
-export function calculatePaneMotionSpringProgress(elapsedSeconds: number): number {
-  if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) return 0;
-  const dampingRatio = PaneMotionDefaults.dampingRatio;
-  const stiffness = PaneMotionDefaults.stiffness;
-  const omega0 = Math.sqrt(stiffness);
-  const damping = Math.sqrt(Math.max(0, 1 - dampingRatio * dampingRatio));
-  if (damping === 0) {
-    return 1 - Math.exp(-omega0 * elapsedSeconds) * (1 + omega0 * elapsedSeconds);
-  }
-  const omegaD = omega0 * damping;
-  const envelope = Math.exp(-dampingRatio * omega0 * elapsedSeconds);
-  return (
-    1 -
-    envelope *
-      (Math.cos(omegaD * elapsedSeconds) +
-        (dampingRatio / damping) * Math.sin(omegaD * elapsedSeconds))
-  );
-}
-
-/** Default browser progress driver for Material pane transitions. */
 export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgressAnimation =
-  ({ from, to, signal, update }) =>
+  ({ from, to, durationMs, signal, update }) =>
     new Promise<void>((resolve) => {
-      if (signal.aborted || from === to) {
+      const delta = to - from;
+      const remainingDurationMs = Math.max(0, durationMs * Math.abs(delta));
+      if (signal.aborted || delta === 0 || remainingDurationMs === 0) {
         update(to);
         resolve();
         return;
@@ -117,29 +109,29 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
 
       let frame = 0;
       let startTime: number | undefined;
-      const delta = to - from;
+      const finish = () => {
+        signal.removeEventListener('abort', abort);
+        resolve();
+      };
       const tick = (time: number) => {
         if (signal.aborted) {
-          resolve();
+          finish();
           return;
         }
         startTime ??= time;
-        const elapsedSeconds = Math.max(0, time - startTime) / 1000;
-        const spring = calculatePaneMotionSpringProgress(elapsedSeconds);
-        const value = from + delta * spring;
-        update(Math.min(1, Math.max(0, value)));
-
-        if (elapsedSeconds >= 1.2 || Math.abs(to - value) <= 0.001) {
+        const elapsed = Math.max(0, time - startTime);
+        const timelineFraction = Math.min(1, elapsed / remainingDurationMs);
+        update(from + delta * timelineFraction);
+        if (timelineFraction >= 1) {
           update(to);
-          resolve();
+          finish();
           return;
         }
         frame = requestFrame(tick);
       };
-
       const abort = () => {
         cancelFrame(frame);
-        resolve();
+        finish();
       };
       signal.addEventListener('abort', abort, { once: true });
       frame = requestFrame(tick);
@@ -148,9 +140,9 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
 /**
  * Seekable transition state equivalent of AndroidX MutableThreePaneScaffoldState.
  *
- * The state itself only owns discrete scaffold values and a normalized progress
- * fraction. Geometry interpolation stays in the React renderer so layout
- * measurement and animation remain separate concerns.
+ * The state owns discrete scaffold values and a normalized transition timeline
+ * fraction. The attached renderer resolves the actual transition duration from
+ * pane geometry/motion; pane spring sampling remains outside this state.
  */
 export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private currentStateValue: ThreePaneScaffoldValue;
@@ -161,14 +153,19 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private readonly listeners = new Set<() => void>();
   private animationController: AbortController | null = null;
   private readonly defaultAnimation: ThreePaneScaffoldProgressAnimation;
+  private transitionDurationResolver: ThreePaneScaffoldTransitionDurationResolver | null;
 
   constructor(
     initialScaffoldValue: ThreePaneScaffoldValue,
-    { animation = defaultThreePaneScaffoldProgressAnimation }: MutableThreePaneScaffoldStateOptions = {},
+    {
+      animation = defaultThreePaneScaffoldProgressAnimation,
+      transitionDurationResolver = null,
+    }: MutableThreePaneScaffoldStateOptions = {},
   ) {
     this.currentStateValue = initialScaffoldValue;
     this.targetStateValue = initialScaffoldValue;
     this.defaultAnimation = animation;
+    this.transitionDurationResolver = transitionDurationResolver;
   }
 
   readonly subscribe = (listener: () => void) => {
@@ -210,6 +207,22 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     return !threePaneScaffoldValuesEqual(this.currentStateValue, this.targetStateValue);
   }
 
+  /**
+   * Attach the Transition duration resolver owned by the rendering scaffold.
+   * AndroidX SeekableTransitionState similarly binds to exactly one Transition.
+   */
+  setTransitionDurationResolver(resolver: ThreePaneScaffoldTransitionDurationResolver) {
+    if (this.transitionDurationResolver !== null && this.transitionDurationResolver !== resolver) {
+      throw new Error('MutableThreePaneScaffoldState can only be attached to one transition');
+    }
+    this.transitionDurationResolver = resolver;
+    return () => {
+      if (this.transitionDurationResolver === resolver) {
+        this.transitionDurationResolver = null;
+      }
+    };
+  }
+
   /** Snap current and target to the same value and cancel any active transition. */
   snapTo(targetState: ThreePaneScaffoldValue) {
     this.cancelAnimation();
@@ -221,8 +234,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   }
 
   /**
-   * Seek directly to a fraction between currentState and targetState. Changing
-   * target preserves currentState, matching SeekableTransitionState.seekTo.
+   * Seek directly to a raw timeline fraction between currentState and targetState.
+   * Changing target preserves currentState, matching SeekableTransitionState.seekTo.
    */
   seekTo(
     fraction: number,
@@ -243,9 +256,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   }
 
   /**
-   * Animate the normalized transition fraction to 1 and commit targetState.
-   * A new snap/seek/animate call aborts the prior animation, mirroring
-   * AndroidX's MutatorMutex single-mutator behavior.
+   * Animate the raw transition timeline fraction to 1 and commit targetState.
+   * A new snap/seek/animate call aborts the prior animation, mirroring AndroidX
+   * MutatorMutex behavior. The default driver is linear; a custom animation is
+   * the web equivalent of providing animateTo(animationSpec = ...).
    */
   async animateTo(
     targetState: ThreePaneScaffoldValue = this.targetStateValue,
@@ -275,6 +289,13 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       this.progressFractionValue = 0;
     }
 
+    const durationMs =
+      this.transitionDurationResolver?.(this.currentStateValue, targetState) ??
+      DefaultUnboundTransitionDurationMs;
+    if (!Number.isFinite(durationMs) || durationMs < 0) {
+      throw new RangeError(`Transition duration must be finite and non-negative. Got ${durationMs}`);
+    }
+
     this.predictiveBack = isPredictiveBackInProgress;
     const controller = new AbortController();
     this.animationController = controller;
@@ -285,6 +306,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       await animation({
         from: startingFraction,
         to: 1,
+        durationMs,
         signal: controller.signal,
         update: (fraction) => {
           if (controller.signal.aborted) return;
