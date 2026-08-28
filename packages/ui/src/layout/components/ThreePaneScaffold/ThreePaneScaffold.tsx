@@ -228,14 +228,14 @@ export function ThreePaneScaffold({
 
     const measure = () => {
       const rect = root.getBoundingClientRect();
-      const width = root.clientWidth;
-      const height = root.clientHeight;
       const predictiveScale = Number(root.dataset.predictiveBackScale ?? 1);
+      const width = rect.width / predictiveScale;
+      const height = rect.height / predictiveScale;
       const next: ScaffoldGeometry = {
         width,
         height,
-        viewportLeft: rect.left - (width * (1 - predictiveScale)) / 2,
-        viewportTop: rect.top - (height * (1 - predictiveScale)) / 2,
+        viewportLeft: rect.left - (width - rect.width) / 2,
+        viewportTop: rect.top - (height - rect.height) / 2,
         direction: getComputedStyle(root).direction === 'rtl' ? 'rtl' : 'ltr',
       };
       setGeometry((current) => (sameGeometry(current, next) ? current : next));
