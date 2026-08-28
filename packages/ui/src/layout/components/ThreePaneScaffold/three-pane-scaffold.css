@@ -18,6 +18,25 @@
   z-index: 3;
 }
 
+.animated-pane {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+/*
+ * AndroidX AnimatedPane uses Modifier.shadow(15.dp, shape) only while the
+ * pane is Levitated. CSS has no platform elevation primitive, so the browser
+ * renderer maps that runtime elevation to a single semantic-color shadow
+ * while the AnimatedPane border radius provides the matching shadow shape.
+ */
+.three-pane-scaffold__pane--levitated > .animated-pane {
+  box-shadow: 0 15px 30px color-mix(in srgb, var(--shadow) 24%, transparent);
+}
+
 .three-pane-scaffold__pane--has-resize-handle {
   display: flex;
   flex-direction: column;
