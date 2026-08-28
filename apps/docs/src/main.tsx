@@ -7,7 +7,7 @@ import {
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
-import { source } from './lib/source';
+import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
 import './styles.css';
 
@@ -53,7 +53,7 @@ function ThemeGlyph({ preference }: { preference: 'system' | 'light' | 'dark' })
 
 function DocsPage() {
   const { preference, cyclePreference } = useDocsTheme();
-  const page = source.getPage(currentSlugs());
+  const page = getDocsPage(currentSlugs());
 
   if (!page) {
     return (
@@ -66,7 +66,7 @@ function DocsPage() {
     );
   }
 
-  const MDX = page.data.body;
+  const MDX = page.body;
 
   return (
     <>
@@ -88,14 +88,14 @@ function DocsPage() {
               className="docs-page-title"
               style={getMaterialTypeCssProperties('headlineLarge')}
             >
-              {page.data.title}
+              {page.title}
             </h1>
-            {page.data.description ? (
+            {page.description ? (
               <p
                 className="docs-page-description"
                 style={getMaterialTypeCssProperties('bodyLarge')}
               >
-                {page.data.description}
+                {page.description}
               </p>
             ) : null}
           </header>
