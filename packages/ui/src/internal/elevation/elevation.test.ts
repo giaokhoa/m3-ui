@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { elevationLevels } from './tokens';
-import { getElevationBoxShadow } from './elevation';
+import { getElevationBoxShadow } from './shadow';
 
 describe('elevation', () => {
   it('matches Compose elevation levels', () => {

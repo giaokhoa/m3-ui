@@ -1,5 +1,5 @@
 export { Elevation, type ElevationProps } from './Elevation';
-export { getElevationBoxShadow } from './elevation';
+export { getElevationBoxShadow } from './shadow';
 export {
   elevationLevels,
   elevationMotionTokens,
