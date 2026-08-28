@@ -1,3 +1,3 @@
 export * from './components';
-export * from './layout';
+export * from './layout/index';
 export * from './theme';
