@@ -111,16 +111,16 @@ export function calculateThreePaneMotion(
   currentValue: ThreePaneScaffoldValue,
   paneOrder: ThreePaneScaffoldHorizontalOrder,
 ): ThreePaneMotion {
-  const numOfPanes = paneOrder.length;
+  const numOfPanes: number = paneOrder.length;
   const paneMotionTypes: PaneMotionType[] = Array.from({ length: numOfPanes }, () => 'hidden');
   const paneMotions: PaneMotion[] = Array.from(
     { length: numOfPanes },
     () => PaneMotion.NoMotion,
   );
-  let firstShownPaneIndex = numOfPanes;
-  let firstEnteringPaneIndex = numOfPanes;
-  let lastShownPaneIndex = -1;
-  let lastEnteringPaneIndex = -1;
+  let firstShownPaneIndex: number = numOfPanes;
+  let firstEnteringPaneIndex: number = numOfPanes;
+  let lastShownPaneIndex: number = -1;
+  let lastEnteringPaneIndex: number = -1;
 
   paneOrder.forEach((role, index) => {
     const type = calculatePaneMotionType(
@@ -140,8 +140,8 @@ export function calculateThreePaneMotion(
 
   let hasPanesExitToRight = false;
   let hasPanesExitToLeft = false;
-  let firstPaneExitToRightIndex = numOfPanes;
-  let lastPaneExitToLeftIndex = -1;
+  let firstPaneExitToRightIndex: number = numOfPanes;
+  let lastPaneExitToLeftIndex: number = -1;
 
   paneOrder.forEach((_, index) => {
     const hasShownPanesOnLeft = firstShownPaneIndex < index;
@@ -243,9 +243,7 @@ export function calculateSlideInFromLeftOffset(
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
-      data.motion === PaneMotion.EnterFromLeft ||
       data.motion === PaneMotion.EnterFromRight ||
-      data.motion === PaneMotion.EnterFromLeftDelayed ||
       data.motion === PaneMotion.EnterFromRightDelayed ||
       data.motion === PaneMotion.EnterWithExpand
     ) {
@@ -272,9 +270,7 @@ export function calculateSlideInFromRightOffset(
     if (
       data.motion === PaneMotion.AnimateBounds ||
       data.motion === PaneMotion.EnterFromLeft ||
-      data.motion === PaneMotion.EnterFromRight ||
       data.motion === PaneMotion.EnterFromLeftDelayed ||
-      data.motion === PaneMotion.EnterFromRightDelayed ||
       data.motion === PaneMotion.EnterWithExpand
     ) {
       previousPane = data;
@@ -295,7 +291,6 @@ export function calculateSlideOutToLeftOffset(
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
-      data.motion === PaneMotion.ExitToLeft ||
       data.motion === PaneMotion.ExitToRight ||
       data.motion === PaneMotion.ExitWithShrink
     ) {
@@ -319,7 +314,6 @@ export function calculateSlideOutToRightOffset(
     if (
       data.motion === PaneMotion.AnimateBounds ||
       data.motion === PaneMotion.ExitToLeft ||
-      data.motion === PaneMotion.ExitToRight ||
       data.motion === PaneMotion.ExitWithShrink
     ) {
       previousPane = data;
