@@ -1,15 +1,15 @@
-import type { HTMLAttributes, ReactNode } from 'react';
-import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
+import type { ReactNode } from 'react';
+import { supportingPaneScaffoldOrder } from '../../adaptive/threePaneScaffold';
 import {
-  supportingPaneScaffoldOrder,
-  type ThreePaneScaffoldValue,
-} from '../../adaptive/threePaneScaffold';
-import { ThreePaneScaffold } from '../ThreePaneScaffold';
+  ThreePaneScaffold,
+  type ThreePaneScaffoldProps,
+} from '../ThreePaneScaffold';
 
 export interface SupportingPaneScaffoldProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  directive: PaneScaffoldDirective;
-  value: ThreePaneScaffoldValue;
+  extends Omit<
+    ThreePaneScaffoldProps,
+    'paneOrder' | 'primaryPane' | 'secondaryPane' | 'tertiaryPane'
+  > {
   mainPane: ReactNode;
   supportingPane: ReactNode;
   extraPane?: ReactNode;
@@ -17,8 +17,6 @@ export interface SupportingPaneScaffoldProps
 
 /** Material canonical supporting-pane layout: Main, Supporting, Extra from start to end. */
 export function SupportingPaneScaffold({
-  directive,
-  value,
   mainPane,
   supportingPane,
   extraPane,
@@ -27,8 +25,6 @@ export function SupportingPaneScaffold({
   return (
     <ThreePaneScaffold
       {...props}
-      directive={directive}
-      value={value}
       paneOrder={supportingPaneScaffoldOrder}
       primaryPane={mainPane}
       secondaryPane={supportingPane}
