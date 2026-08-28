@@ -6,7 +6,6 @@ import {
 } from './threePaneScaffold';
 import {
   MutableThreePaneScaffoldState,
-  calculatePaneMotionSpringProgress,
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldProgressAnimation,
 } from './threePaneScaffoldState';
@@ -47,7 +46,7 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
-  it('seeks without replacing currentState when target changes', () => {
+  it('seeks raw timeline progress without replacing currentState when target changes', () => {
     const state = new MutableThreePaneScaffoldState(hidden);
     state.seekTo(0.4, primary, true);
 
@@ -86,6 +85,21 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(listener).toHaveBeenCalled();
   });
 
+  it('passes the renderer-resolved full transition duration to animationSpec', async () => {
+    let observedDuration = -1;
+    const animation: ThreePaneScaffoldProgressAnimation = async ({ durationMs, update }) => {
+      observedDuration = durationMs;
+      update(1);
+    };
+    const state = new MutableThreePaneScaffoldState(hidden, { animation });
+    const detach = state.setTransitionDurationResolver(() => 475);
+
+    await state.animateTo(primary);
+    expect(observedDuration).toBe(475);
+
+    detach();
+  });
+
   it('continues an existing seek when animating to the same target', async () => {
     const seen: number[] = [];
     const animation: ThreePaneScaffoldProgressAnimation = async ({ from, update }) => {
@@ -118,6 +132,15 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.currentState).toBe(primarySecondary);
   });
 
+  it('allows only one attached transition duration resolver', () => {
+    const state = new MutableThreePaneScaffoldState(hidden);
+    const first = () => 300;
+    const detach = state.setTransitionDurationResolver(first);
+    expect(() => state.setTransitionDurationResolver(() => 400)).toThrow();
+    detach();
+    expect(() => state.setTransitionDurationResolver(() => 400)).not.toThrow();
+  });
+
   it('validates seek fractions', () => {
     const state = new MutableThreePaneScaffoldState(hidden);
     expect(() => state.seekTo(-0.01, primary)).toThrow(RangeError);
@@ -148,13 +171,5 @@ describe('threePaneScaffoldValuesEqual', () => {
       secondary: PaneAdaptedValue.Reflowed(ThreePaneScaffoldRole.Tertiary),
     };
     expect(threePaneScaffoldValuesEqual(first, second)).toBe(false);
-  });
-});
-
-describe('calculatePaneMotionSpringProgress', () => {
-  it('uses a normalized Material spring response', () => {
-    expect(calculatePaneMotionSpringProgress(0)).toBe(0);
-    expect(calculatePaneMotionSpringProgress(0.1)).toBeGreaterThan(0);
-    expect(calculatePaneMotionSpringProgress(0.5)).toBeCloseTo(1, 2);
   });
 });
