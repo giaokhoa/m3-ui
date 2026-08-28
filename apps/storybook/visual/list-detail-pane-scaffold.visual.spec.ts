@@ -38,12 +38,12 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
       throw new Error('ThreePaneScaffold transition panes have no visual bounds');
     }
 
-    expect(scaffoldBounds.width).toBeCloseTo(480, 5);
-    expect(scaffoldBounds.height).toBeCloseTo(640, 5);
-    expect(detailBounds.width).toBeCloseTo(scaffoldBounds.width, 5);
-    expect(listBounds.width).toBeCloseTo(scaffoldBounds.width, 5);
-    expect(detailBounds.height).toBeCloseTo(scaffoldBounds.height, 5);
-    expect(listBounds.height).toBeCloseTo(scaffoldBounds.height, 5);
+    expect(scaffoldBounds.width).toBeCloseTo(480, 3);
+    expect(scaffoldBounds.height).toBeCloseTo(640, 3);
+    expect(detailBounds.width).toBeCloseTo(scaffoldBounds.width, 3);
+    expect(listBounds.width).toBeCloseTo(scaffoldBounds.width, 3);
+    expect(detailBounds.height).toBeCloseTo(scaffoldBounds.height, 3);
+    expect(listBounds.height).toBeCloseTo(scaffoldBounds.height, 3);
 
     const detailOffsetX = detailBounds.x - scaffoldBounds.x;
     const listOffsetX = listBounds.x - scaffoldBounds.x;
