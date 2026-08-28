@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PredictiveBackMinScale,
   calculatePredictiveBackScale,
+  getPredictiveBackScale,
   getPredictiveBackScaffoldStyle,
 } from './ThreePaneScaffold.predictiveBack';
 
@@ -22,6 +23,16 @@ describe('predictive-back scaffold scale', () => {
     }
   });
 
+  it('exposes no scale outside predictive back', () => {
+    expect(getPredictiveBackScale(undefined)).toBeUndefined();
+    expect(
+      getPredictiveBackScale({
+        progressFraction: 0.5,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toBeUndefined();
+  });
+
   it('leaves static scaffold styles untouched', () => {
     const style = { width: 480 } as const;
     expect(
@@ -33,14 +44,15 @@ describe('predictive-back scaffold scale', () => {
     expect(getPredictiveBackScaffoldStyle(style, undefined)).toBe(style);
   });
 
-  it('scales around the center while preserving an existing transform', () => {
+  it('preserves caller transform while applying individual scale around center', () => {
     expect(
       getPredictiveBackScaffoldStyle(
         { transform: 'translateX(8px)' },
         { progressFraction: 0.5, isPredictiveBackInProgress: true },
       ),
     ).toEqual({
-      transform: 'translateX(8px) scale(0.9523809523809523)',
+      transform: 'translateX(8px)',
+      scale: 0.9523809523809523,
       transformOrigin: 'center center',
     });
   });

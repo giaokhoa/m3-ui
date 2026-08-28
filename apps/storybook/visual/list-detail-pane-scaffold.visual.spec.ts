@@ -57,4 +57,39 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     expect(detailOffsetX).toBeGreaterThan(480);
     expect(detailOffsetX).toBeLessThan(481);
   });
+
+  test('predictive back scales graphics without feeding back into layout', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--motion-halfway-predictive-back');
+
+    const root = page.locator('#storybook-root');
+    const scaffold = root.locator('.three-pane-scaffold');
+    const listPane = scaffold.locator('[data-pane-role="secondary"]');
+
+    await expect(scaffold).toBeVisible();
+    await expect(listPane).toHaveAttribute('data-pane-motion', 'enter-from-left');
+
+    const metrics = await scaffold.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      clientHeight: element.clientHeight,
+      scale: Number.parseFloat(getComputedStyle(element).scale),
+    }));
+    const listLayoutWidth = await listPane.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).width),
+    );
+    const [scaffoldBounds, listBounds] = await Promise.all([
+      scaffold.boundingBox(),
+      listPane.boundingBox(),
+    ]);
+    if (!scaffoldBounds || !listBounds) {
+      throw new Error('Predictive-back scaffold has no visual bounds');
+    }
+
+    expect(metrics.clientWidth).toBe(480);
+    expect(metrics.clientHeight).toBe(640);
+    expect(metrics.scale).toBeCloseTo(0.9523809524, 5);
+    expect(listLayoutWidth).toBeCloseTo(480, 3);
+    expect(scaffoldBounds.width).toBeCloseTo(480 * metrics.scale, 2);
+    expect(scaffoldBounds.height).toBeCloseTo(640 * metrics.scale, 2);
+    expect(listBounds.width).toBeCloseTo(scaffoldBounds.width, 2);
+  });
 });

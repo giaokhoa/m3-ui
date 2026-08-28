@@ -20,21 +20,25 @@ export function calculatePredictiveBackScale(fraction: number): number {
   return curveScale / (fraction + shift) + PredictiveBackMinScale;
 }
 
-/** Apply predictive-back scale without changing static scaffold rendering. */
+export function getPredictiveBackScale(
+  state: PredictiveBackScaffoldState | undefined,
+): number | undefined {
+  return state?.isPredictiveBackInProgress
+    ? calculatePredictiveBackScale(state.progressFraction)
+    : undefined;
+}
+
+/** Apply predictive-back graphics-layer scale without replacing caller transforms. */
 export function getPredictiveBackScaffoldStyle(
   style: CSSProperties | undefined,
   state: PredictiveBackScaffoldState | undefined,
 ): CSSProperties | undefined {
-  if (!state?.isPredictiveBackInProgress) return style;
+  const scale = getPredictiveBackScale(state);
+  if (scale === undefined) return style;
 
-  const scale = calculatePredictiveBackScale(state.progressFraction);
-  const predictiveTransform = `scale(${scale})`;
   return {
     ...style,
-    transform:
-      style?.transform == null || style.transform === ''
-        ? predictiveTransform
-        : `${style.transform} ${predictiveTransform}`,
+    scale,
     transformOrigin: style?.transformOrigin ?? 'center center',
   };
 }
