@@ -7,6 +7,7 @@ import {
   LevitatedPaneScrim,
   ListDetailPaneScaffold,
   ListDetailPaneScaffoldRole,
+  MutableThreePaneScaffoldState,
   PaneAdaptStrategy,
   PaneAlignment,
   PaneExpansionAnchor,
@@ -93,6 +94,39 @@ function Fixture({
             ? (state) => <VerticalDragHandle isDragged={state.isDragging} />
             : undefined
         }
+      />
+    </div>
+  );
+}
+
+function MotionHalfwayFixture() {
+  const width = 480;
+  const height = 640;
+  const directive = calculatePaneScaffoldDirective(
+    calculateWindowAdaptiveInfo({ width, height }),
+  );
+  const detailValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Detail }],
+  });
+  const listValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.List }],
+  });
+  const [scaffoldState] = useState(() => {
+    const state = new MutableThreePaneScaffoldState(detailValue);
+    state.seekTo(0.5, listValue);
+    return state;
+  });
+
+  return (
+    <div style={{ width, maxWidth: '100%', height, margin: '0 auto' }}>
+      <ListDetailPaneScaffold
+        directive={directive}
+        scaffoldState={scaffoldState}
+        listPane={<Pane title="List">Inbox conversations</Pane>}
+        detailPane={<Pane title="Detail">Selected conversation</Pane>}
+        extraPane={<Pane title="Extra">Context and metadata</Pane>}
       />
     </div>
   );
@@ -192,6 +226,10 @@ export const Expanded: Story = {
 
 export const Resizable: Story = {
   render: () => <Fixture width={1000} resizable />,
+};
+
+export const MotionHalfway: Story = {
+  render: () => <MotionHalfwayFixture />,
 };
 
 export const LevitatedDialog: Story = {
