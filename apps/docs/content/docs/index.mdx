@@ -1,0 +1,37 @@
+---
+title: m3-ui documentation
+description: Material 3 React components with canonical tokens, web semantics, and audited Compose parity.
+---
+
+## Material 3 is the contract
+
+The documentation surface uses the same `@m3-ui/ui` components, theme roles, and generated typography tokens as consumer applications. Fumadocs provides the content pipeline; it does not define the visual language.
+
+<ComponentPreview>
+  <Button>Continue</Button>
+  <ElevatedButton>Elevated</ElevatedButton>
+  <FilledTonalButton>Learn more</FilledTonalButton>
+  <OutlinedButton>Details</OutlinedButton>
+  <TextButton>Cancel</TextButton>
+</ComponentPreview>
+
+## Headless documentation engine
+
+`fumadocs-mdx` compiles the MDX source and `fumadocs-core` provides the source and page-tree APIs. This app intentionally does not import `fumadocs-ui`, its preset CSS, or a parallel design system.
+
+```tsx
+const page = source.getPage(slugs);
+const MDX = page.data.body;
+
+<MDX components={getMdxComponents()} />;
+```
+
+## Layout boundary
+
+> Documentation owns content composition, not Material adaptive-layout policy.
+
+The docs app does not define its own compact, medium, or expanded breakpoints; pane directives; navigation rail switching; or scaffold algorithms. Those concerns must compose the existing `@m3-ui/ui/layout` subsystem as that work lands.
+
+## Typography boundary
+
+Semantic Markdown remains semantic HTML. Headings and body content are mapped to Material type roles at the MDX boundary instead of introducing documentation-only typography components into the core library.

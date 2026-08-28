@@ -6,6 +6,7 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 - `packages/tokens`: canonical DTCG tokens, Style Dictionary build output, validation and read-only upstream audits
 - `packages/ui`: React component library, including Material widgets and the separate layout subsystem
+- `apps/docs`: public documentation powered headlessly by Fumadocs and rendered with `m3-ui`
 - `apps/storybook`: component preview and visual review workspace
 - `apps/playground`: small Vite app for manual testing
 - `docs/architecture`: Compose-to-TypeScript parity architecture and porting rules
@@ -14,20 +15,21 @@ React component library monorepo built with Turborepo, TypeScript, plain CSS and
 
 ```bash
 pnpm install
-pnpm storybook
 pnpm dev
-pnpm test
-pnpm test:visual
 pnpm build
-pnpm typecheck
+pnpm --filter @m3-ui/docs dev
+pnpm --filter @m3-ui/storybook dev
+pnpm --filter @m3-ui/storybook test:visual
 pnpm --filter @m3-ui/tokens audit:androidx
 ```
 
-`pnpm storybook` starts Storybook on port 6006. `pnpm build:storybook` builds Storybook and its workspace dependencies, then creates the static preview under `apps/storybook/dist`.
+`pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port 4173, the playground on 5173, and Storybook on 6006.
 
-Storybook is the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
+The public docs use `fumadocs-mdx` and `fumadocs-core` as a headless content pipeline. They intentionally do not use `fumadocs-ui`, its visual presets, or a second Material-like design system. Interactive documentation UI is composed from `@m3-ui/ui`; semantic Markdown typography uses the same canonical Material type scale as the component library.
 
-Playwright provides the committed visual-regression layer on top of Storybook. `pnpm test:visual` builds the static Storybook and compares Chromium screenshots with the committed Linux baselines. When an intentional visual change has been reviewed, run `pnpm test:visual:update` inside the devcontainer and commit the changed files under `apps/storybook/visual/__screenshots__/`.
+Storybook remains the primary visual review surface for components. New public components should add stories for their baseline, disabled/error states when applicable, and theme-sensitive rendering. Interaction states such as hover, press, and focus should continue to come from the real React Aria component instead of fake CSS classes.
+
+Playwright provides the committed visual-regression layer on top of Storybook. `pnpm --filter @m3-ui/storybook test:visual` builds the static Storybook and compares Chromium screenshots with the committed Linux baselines. When an intentional visual change has been reviewed, run `pnpm --filter @m3-ui/storybook test:visual:update` inside the devcontainer and commit the changed files under `apps/storybook/visual/__screenshots__/`.
 
 ## Layout subsystem
 
@@ -52,6 +54,8 @@ Source ownership mirrors that boundary:
 The root `@m3-ui/ui` entry still re-exports layout APIs for convenience and compatibility. `@m3-ui/ui/layout` is the dedicated runtime/type entry when an application wants the layout subsystem explicitly.
 
 Generic Compose runtime primitives are not translated mechanically. Browser Flexbox/Grid/logical properties remain the native layout mechanics; Material-specific breakpoints, pane partitioning, preferred sizes, hinge avoidance, RTL placement and canonical layouts are the parity contract. See `packages/ui/src/layout/README.md` for the detailed mapping rules.
+
+The docs app must compose this subsystem rather than own a parallel responsive model. Until the desired Material adaptive composition lands here, `apps/docs` deliberately stays a single-content surface instead of inventing its own compact/medium/expanded breakpoints or pane behavior.
 
 ## CSS consumption
 
@@ -84,9 +88,9 @@ With VS Code and the Dev Containers extension:
 1. Clone and open the repository.
 2. Run **Dev Containers: Reopen in Container** from the command palette.
 3. Wait for the post-create dependency and Chromium install to finish.
-4. Start the visual preview with `pnpm storybook`.
+4. Run `pnpm dev` for the workspace or start an individual app with its package-level `dev` script.
 
-Storybook is forwarded to `http://localhost:6006` and opens automatically when supported by the Dev Containers client. The Vite playground is forwarded to `http://localhost:5173`.
+The docs app is forwarded on `http://localhost:4173`, the Vite playground on `http://localhost:5173`, and Storybook on `http://localhost:6006`.
 
 ## Architecture before implementation
 
