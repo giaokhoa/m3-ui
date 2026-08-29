@@ -1,8 +1,10 @@
+import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import type { ElevationLevel } from './tokens';
-import { getElevationBoxShadow } from './shadow';
 import './elevation.css';
+
+type ElevationStyle = CSSProperties & Record<`--${string}`, string | number>;
 
 export interface ElevationProps extends HTMLAttributes<HTMLSpanElement> {
   level?: ElevationLevel;
@@ -16,8 +18,10 @@ export function Elevation({
   style,
   ...props
 }: ElevationProps) {
-  const elevationStyle: CSSProperties = {
-    boxShadow: getElevationBoxShadow(level, shadowColor),
+  const elevationStyle: ElevationStyle = {
+    ...(shadowColor === undefined
+      ? {}
+      : { '--_elevation-shadow-color': shadowColor }),
     ...style,
   };
 
