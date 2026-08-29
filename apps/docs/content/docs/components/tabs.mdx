@@ -1,0 +1,48 @@
+---
+title: Tabs
+description: Primary and secondary Material tab lists with fixed or scrollable presentation and React Aria keyboard semantics.
+---
+
+<MaterialParity component="tabs" />
+
+## Overview
+
+`Tabs` renders the Material tab-list surface: primary or secondary tabs, fixed or horizontally scrollable, with optional icons, disabled items, indicator motion, and divider.
+
+The component intentionally does not render tab panels. The selected key is application state; route/content rendering stays outside the visual tab list.
+
+## Live example
+
+<ComponentPreview>
+  <TabsPreview />
+</ComponentPreview>
+
+## Items and selection
+
+```tsx
+<Tabs
+  aria-label="Project sections"
+  defaultSelectedKey="overview"
+  items={[
+    { id: 'overview', label: 'Overview' },
+    { id: 'activity', label: 'Activity' },
+    { id: 'settings', label: 'Settings' },
+  ]}
+/>
+```
+
+Use `selectedKey` + `onSelectionChange` for controlled routing or content state. `defaultSelectedKey` is the uncontrolled form.
+
+`iconPlacement="start"` maps the AndroidX leading-icon tab form. The default icon-plus-label arrangement places the icon above the label.
+
+## Primary and secondary
+
+`variant="primary"` is the default and sizes its indicator to the selected tab content. `variant="secondary"` uses the secondary Material tab geometry and selected-item indicator contract.
+
+`mode="fixed"` distributes the available row according to the audited Material tokens. `mode="scrollable"` keeps intrinsic tab widths and scrolls the selected tab into view. Smooth scrolling is disabled when `prefers-reduced-motion` requests reduced motion.
+
+## Accessibility
+
+React Aria `Tabs`, `TabList`, and `Tab` own tab semantics, roving keyboard focus, disabled state, and automatic keyboard activation. Supply an accessible label for every tab list.
+
+Because this package stops at the tab-list surface, applications must connect selection to their own panel, route, or content semantics rather than assuming hidden panels exist inside `Tabs`.
