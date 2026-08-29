@@ -3,7 +3,9 @@ import {
   useEffect,
   useRef,
   useState,
+  type KeyboardEvent,
   type ReactNode,
+  type RefObject,
 } from 'react';
 import { parseDate, type CalendarDate } from '@internationalized/date';
 import {
@@ -408,7 +410,7 @@ function RangeCalendarBody(props: CalendarBodyBase & { value: DatePickerRangeVal
   );
 }
 
-function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled, focusOnMount, label = 'Date' }: {
+function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled, focusOnMount, label = 'Date', inputRef, onKeyDown }: {
   value: DatePickerDate | null;
   onChange: (value: DatePickerDate | null, valid: boolean) => void;
   onCommit?: (value: DatePickerDate | null, valid: boolean) => void;
@@ -417,6 +419,8 @@ function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled
   disabled: boolean;
   focusOnMount?: boolean;
   label?: string;
+  inputRef?: React.RefObject<HTMLDivElement | null>;
+  onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
 }) {
   const [draft, setDraft] = useState<CalendarDate | null>(() => dateFieldValue(value));
   const bounds = dateFieldBounds(yearRange);
@@ -432,6 +436,8 @@ function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled
 
   return (
     <AriaDateField
+      ref={inputRef}
+      onKeyDown={onKeyDown}
       aria-label={label}
       className="date-picker__input-field"
       value={draft}
@@ -464,6 +470,13 @@ function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled
 
 function classes(className: string | undefined, range: boolean) {
   return ['date-picker', range && 'date-picker--range', className].filter(Boolean).join(' ');
+}
+
+function focusNextOnTab(event: KeyboardEvent<HTMLElement>, nextRef: RefObject<HTMLElement | null>) {
+  if (event.key === 'Tab' && !event.shiftKey) {
+    event.preventDefault();
+    nextRef.current?.focus();
+  }
 }
 
 export function DatePicker({
@@ -517,6 +530,8 @@ export function DateRangePicker({
   const [mode, setMode] = useControllable(controlledMode, defaultDisplayMode, onDisplayModeChange);
   const effectiveMode = variant === 'docked' ? 'calendar' : mode;
   const [displayedMonth, setDisplayedMonth] = useDisplayedMonth(controlledMonth, defaultDisplayedMonth, value?.start, onDisplayedMonthChange);
+  const startInputRef = useRef<HTMLDivElement>(null);
+  const endInputRef = useRef<HTMLDivElement>(null);
   const [startDraft, setStartDraft] = useState<DatePickerDate | null>(value?.start ?? null);
   const [endDraft, setEndDraft] = useState<DatePickerDate | null>(value?.end ?? null);
   const [rangeError, setRangeError] = useState(false);
@@ -558,6 +573,8 @@ export function DateRangePicker({
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
                 focusOnMount
+                inputRef={startInputRef}
+                onKeyDown={(event) => focusNextOnTab(event, endInputRef)}
               />
               <DateInput
                 label="End date"
@@ -567,6 +584,7 @@ export function DateRangePicker({
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
+                inputRef={endInputRef}
               />
               {(rangeError || errorMessage) && <div className="date-picker__error" role="alert">{rangeError ? 'End date must be on or after start date.' : errorMessage}</div>}
             </div>
