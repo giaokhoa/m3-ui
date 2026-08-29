@@ -23,6 +23,7 @@ if (!response.ok) {
 }
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const outputPath = resolve(scriptDir, '../dist/search-index.json');
+const appDir = resolve(scriptDir, '..');
+const outputPath = resolve(appDir, process.argv[2] ?? 'dist/search-index.json');
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, await response.text(), 'utf8');
