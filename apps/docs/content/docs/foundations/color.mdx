@@ -1,0 +1,76 @@
+---
+title: Color
+description: Material 3 semantic color roles, baseline schemes, dynamic source color, and CSS variable projection.
+---
+
+## Semantic roles
+
+Material color is consumed through semantic roles instead of fixed palette values. Components read roles such as primary, surface, error, outline, and their corresponding content roles from the active theme.
+
+[Material 3 color overview](https://m3.material.io/styles/color/overview)
+
+<ColorRoleGrid />
+
+The current theme exposes these roles as scoped CSS variables. Variable names are intentionally concise rather than using an `--md-sys-` prefix.
+
+```css
+.example {
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+}
+```
+
+`colorRoleToCssVariable()` is the public projection when JavaScript needs the CSS variable name for a typed `ColorRole`.
+
+## Baseline scheme
+
+When `ThemeProvider` has no `sourceColor`, `m3-ui` uses its Material 3 baseline light or dark scheme.
+
+```tsx
+<ThemeProvider mode="light">
+  <App />
+</ThemeProvider>
+```
+
+The mode contract is deliberately `light | dark`. Resolving a browser or operating-system preference is an application concern rather than a third Material color scheme.
+
+## Dynamic color
+
+Provide `sourceColor` to derive a Material dynamic scheme. The implementation converts the source to HCT and uses Material Color Utilities `SchemeTonalSpot` for both light and dark schemes.
+
+```tsx
+<ThemeProvider
+  mode="light"
+  sourceColor="#0061a4"
+  contrastLevel={0}
+>
+  <App />
+</ThemeProvider>
+```
+
+The hex value above is only an example application source color; it is not a canonical m3-ui design token.
+
+<DynamicColorPreview sourceColor="#0061a4" />
+
+## Contrast level
+
+`contrastLevel` is forwarded to the Material dynamic scheme and accepts values from `-1` through `1`. The default is `0`.
+
+```tsx
+<ThemeProvider sourceColor="#0061a4" contrastLevel={0.5}>
+  <App />
+</ThemeProvider>
+```
+
+Passing a value outside the supported range throws rather than silently clamping it.
+
+## ColorScheme
+
+The public `ColorScheme` includes Material surface, inverse, outline, primary, secondary, tertiary, fixed, and error roles. `ThemeProvider` projects every role to a CSS variable on both the themed application wrapper and its portal theme container.
+
+This keeps portaled Material components such as dialogs on the same color contract as content rendered inside the normal React subtree.
+
+## Web adaptation
+
+CSS custom properties are the browser projection of the Material color scheme. They keep normal CSS inheritance and author styling available while the semantic role set stays aligned with Material rather than introducing a second docs-only palette.
