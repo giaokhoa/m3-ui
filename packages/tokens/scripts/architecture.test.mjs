@@ -153,11 +153,15 @@ test('foundation docs lock change-local interaction-effect contracts', async () 
   assert.match(elevation, /must not rebuild canonical shadow geometry in TypeScript/i);
   assert.match(elevation, /cross-source drift/i);
   assert.match(elevation, /New code must not add new callers/i);
+  assert.match(elevation, /Browser\/visual contract tests.*actual paint layer/is);
+  assert.match(elevation, /must not require the interactive\/root element itself to own `box-shadow`/i);
 
   assert.match(ripple, /useRipple\(\).*wave geometry/is);
   assert.match(ripple, /generated `ripple\.css` owns immutable/i);
   assert.match(ripple, /must not be copied.*React `style`/is);
   assert.match(ripple, /React Aria\/native host semantics own normalized interaction events/i);
+  assert.match(ripple, /Browser\/visual tests must instead validate the \*\*computed semantic value\*\*/i);
+  assert.match(ripple, /bundler\/minifier.*0\.08.*\.08/is);
 });
 
 test('UI token subpath imports are limited to reviewed generated platform adapters', async () => {
