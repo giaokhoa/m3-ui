@@ -1,0 +1,59 @@
+---
+title: Bottom app bar
+description: Regular and flexible Material bottom app bars with actions, optional FAB composition, and explicit exit-always scroll state.
+---
+
+<ParitySummary component="bottom-app-bar" />
+
+## Overview
+
+`BottomAppBar` places important actions at the bottom edge of a composition and can include an adjacent floating action button. `FlexibleBottomAppBar` exposes the expressive flexible arrangement separately.
+
+<ComponentPreview>
+  <BottomAppBarPreview />
+</ComponentPreview>
+
+## Regular app bar
+
+Use `actions` or children for independently interactive controls. `floatingActionButton` composes a FAB into the Material bar geometry without changing the FAB's own semantics.
+
+```tsx
+<BottomAppBar
+  actions={
+    <>
+      <IconButton aria-label="Search">...</IconButton>
+      <IconButton aria-label="Edit">...</IconButton>
+    </>
+  }
+  floatingActionButton={<FloatingActionButton aria-label="Create">...</FloatingActionButton>}
+/>
+```
+
+## Flexible app bar
+
+`FlexibleBottomAppBar` accepts arbitrary child actions and an explicit `horizontalArrangement`: `space-between`, `fixed`, `start`, `center`, or `end`.
+
+This arrangement is local row composition. It does not choose a different navigation component or respond to window-size classes.
+
+## Scroll state
+
+The public state mirrors Compose's exit-always model:
+
+```tsx
+const state = BottomAppBarDefaults.createState(collapsedFraction, contentOffset);
+const behavior = BottomAppBarDefaults.exitAlwaysScrollBehavior(state);
+
+<BottomAppBar actions={actions} scrollBehavior={behavior} />
+```
+
+`collapsedFraction` can also be supplied directly. `BottomAppBarDefaults.settleState` resolves a partial fraction to a shown or collapsed endpoint.
+
+The component never decides which page or nested scroller drives the state. Applications own scroll integration and feed the resulting state into the bar.
+
+## Accessibility
+
+The bar is a grouping surface; each action and FAB keeps its own button semantics and accessible name. Do not make the entire bar a single click target when it contains multiple independent actions.
+
+## Responsive boundary
+
+Android describes bottom app bars as a small-screen pattern, but `BottomAppBar` itself does not implement responsive switching. If an application changes from a bottom app bar to another navigation/action surface at larger sizes, that policy belongs to the adaptive layout/navigation owner rather than this component.
