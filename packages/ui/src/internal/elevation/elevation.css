@@ -2,5 +2,6 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  box-shadow: var(--_elevation-box-shadow);
   pointer-events: none;
 }
