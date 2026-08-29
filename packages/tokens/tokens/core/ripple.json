@@ -16,8 +16,8 @@
       "outerStrokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
       "innerStrokeInset": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
       "innerStrokeWidth": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
-      "outerStrokeColor": { "$type": "string", "$value": "var(--secondary)" },
-      "innerStrokeColor": { "$type": "string", "$value": "var(--on-secondary)" },
+      "outerStrokeColor": { "$type": "string", "$value": "{color.role.secondary}" },
+      "innerStrokeColor": { "$type": "string", "$value": "{color.role.onSecondary}" },
       "focusIn": {
         "duration": { "$type": "string", "$value": "{motion.spring.fastSpatial.duration}" },
         "easing": { "$type": "string", "$value": "{motion.spring.fastSpatial.easing}" }
