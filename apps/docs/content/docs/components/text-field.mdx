@@ -1,0 +1,88 @@
+---
+title: Text field
+description: Filled and outlined Material 3 text fields with labels, supporting content, validation, and multiline input.
+---
+
+<MaterialParity component="text-field" />
+
+## Overview
+
+Text fields let users enter and edit text. `m3-ui` provides the two Material container variants while preserving native form behavior through React Aria.
+
+<ComponentPreview>
+  <TextField label="Name" isMultiline={false} />
+  <OutlinedTextField label="Email" isMultiline={false} />
+</ComponentPreview>
+
+## Variants
+
+| React component | Material role |
+| --- | --- |
+| `TextField` | Filled text field |
+| `OutlinedTextField` | Outlined text field |
+
+Choose the variant as part of a consistent form language rather than mixing filled and outlined fields without a hierarchy reason.
+
+## Labels and supporting text
+
+A persistent label gives the field a stable identity. Supporting text can provide concise guidance without replacing the label.
+
+<ComponentPreview>
+  <TextField
+    label="Username"
+    supportingText="Use 3–20 characters"
+    isMultiline={false}
+  />
+  <OutlinedTextField
+    label="Website"
+    placeholder="https://example.com"
+    isMultiline={false}
+  />
+</ComponentPreview>
+
+`description` is accepted as an alias for supporting text. When both are supplied, `supportingText` takes precedence.
+
+## Validation
+
+Validation state is semantic, not only visual. Use `isInvalid` together with `errorMessage` so the browser accessibility relationship and the Material error treatment stay aligned.
+
+<ComponentPreview>
+  <OutlinedTextField
+    label="Email"
+    defaultValue="not-an-email"
+    isInvalid
+    errorMessage="Enter a valid email address"
+    isMultiline={false}
+  />
+</ComponentPreview>
+
+## Prefixes, suffixes, and icons
+
+The field supports leading and trailing icons plus prefix and suffix content. These slots are part of the Material field composition; avoid using them as a substitute for a clear label.
+
+```tsx
+<TextField
+  label="Amount"
+  prefix="$"
+  suffix="USD"
+  isMultiline={false}
+/>
+```
+
+## Single-line and multiline input
+
+Set `isMultiline={false}` for a native single-line input. Multiline fields render a textarea and accept `rows`.
+
+<ComponentPreview>
+  <TextField label="Message" rows={3} />
+</ComponentPreview>
+
+For single-line fields, `inputProps` and `inputRef` target the native input. This keeps browser input types, autocomplete, input modes, and other platform capabilities available instead of recreating them in a Material abstraction.
+
+## Accessibility
+
+React Aria owns the field, label, description, error, input, and textarea relationships. Material styling does not replace those semantics. Keep labels meaningful, expose errors as text, and use native input attributes for browser-specific requirements.
+
+## Web adaptation
+
+Compose text editing internals are not translated mechanically. The web implementation keeps native input and textarea elements and layers Material tokens, state styling, labels, indicators, outlines, supporting content, and error presentation on top.
