@@ -38,7 +38,7 @@ test('handwritten token runtime and upstream-sync layers stay deleted', async ()
   }
 });
 
-test('Style Dictionary reads only canonical DTCG and emits only typed JS artifacts', async () => {
+test('Style Dictionary reads only canonical DTCG and emits reviewed platform artifacts', async () => {
   const configUrl = new URL('style-dictionary.config.mjs', packageRoot);
   const { default: config } = await import(
     `${configUrl.href}?architecture=${Date.now()}`
@@ -50,14 +50,15 @@ test('Style Dictionary reads only canonical DTCG and emits only typed JS artifac
     false,
     'upstream references must never be Style Dictionary includes',
   );
+  assert.deepEqual(Object.keys(config.platforms), ['js', 'css']);
   assert.deepEqual(
-    Object.keys(config.platforms),
-    ['js'],
-    'generic CSS-variable platforms are forbidden',
+    config.platforms.css.files.map((file) => file.destination),
+    ['button.css'],
+    'CSS output must stay explicit and consumer-driven rather than becoming a generic token dump',
   );
 });
 
-test('package exposes only the Style Dictionary generated root API', async () => {
+test('package exposes generated JS root plus reviewed CSS adapters', async () => {
   const manifest = JSON.parse(
     await readFile(new URL('package.json', packageRoot), 'utf8'),
   );
@@ -65,36 +66,39 @@ test('package exposes only the Style Dictionary generated root API', async () =>
   assert.equal(manifest.main, './dist/generated/tokens.js');
   assert.equal(manifest.module, './dist/generated/tokens.js');
   assert.equal(manifest.types, './dist/generated/tokens.d.ts');
-  assert.deepEqual(Object.keys(manifest.exports), ['.']);
+  assert.deepEqual(Object.keys(manifest.exports), ['.', './button.css']);
   assert.equal(manifest.exports['.'].import, './dist/generated/tokens.js');
   assert.equal(manifest.exports['.'].types, './dist/generated/tokens.d.ts');
+  assert.equal(manifest.exports['./button.css'], './dist/generated/button.css');
   assert.doesNotMatch(manifest.scripts.build, /\btsc\b/);
   assert.equal(Object.hasOwn(manifest.scripts, 'typecheck'), false);
 });
 
-test('Style Dictionary skill describes the enforced token ownership boundary', async () => {
+test('Style Dictionary skill describes runtime color ownership and generated adapters', async () => {
   const skill = await readFile(
     new URL('.agents/skills/style-dictionary/SKILL.md', repoRoot),
     'utf8',
   );
 
   assert.match(skill, /no handwritten runtime `src\/` layer/i);
-  assert.match(skill, /Do not create `packages\/tokens\/src\/`/);
-  assert.match(
-    skill,
-    /runtime projections\/types belong beside their consumers in `@m3-ui\/ui`/i,
-  );
-  assert.match(skill, /If an upstream source does not own a web-only token/i);
-  assert.doesNotMatch(skill, /src\/.*optional handwritten API\/types/i);
+  assert.match(skill, /ThemeProvider.*owns the actual runtime Material colors/is);
+  assert.match(skill, /component.*reference.*role/is);
+  assert.match(skill, /platform adapter/i);
+  assert.match(skill, /Do not decode `var\(--role\)`/i);
 });
 
-test('UI consumes @m3-ui/tokens through the package root only', async () => {
+test('UI token subpath imports are limited to generated platform adapters', async () => {
   for (const file of await sourceFiles(uiSourceRoot)) {
     const source = await readFile(file, 'utf8');
-    assert.doesNotMatch(
-      source,
-      /['"]@m3-ui\/tokens\//,
-      `${file.pathname} must import @m3-ui/tokens through the package root`,
+    const imports = [...source.matchAll(/['"](@m3-ui\/tokens\/[^'"]+)['"]/g)].map(
+      (match) => match[1],
     );
+    for (const specifier of imports) {
+      assert.equal(
+        specifier,
+        '@m3-ui/tokens/button.css',
+        `${file.pathname} imports unsupported token subpath ${specifier}`,
+      );
+    }
   }
 });
