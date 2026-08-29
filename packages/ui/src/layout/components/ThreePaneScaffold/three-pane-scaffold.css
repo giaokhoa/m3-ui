@@ -92,6 +92,37 @@
   cursor: row-resize;
 }
 
+/*
+ * AndroidX exposes clickToResize semantics on the whole levitated pane when
+ * no visual drag handle is supplied. The browser keeps the pane as a named
+ * region and delegates that semantic action to a native button. It stays out
+ * of pointer hit-testing and visual layout until keyboard focus reaches it.
+ */
+.three-pane-scaffold__levitated-resize-action {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  z-index: 4;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.three-pane-scaffold__levitated-resize-action:focus-visible {
+  inline-size: auto;
+  block-size: auto;
+  margin: 0;
+  padding: 8px 12px;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}
+
 .three-pane-scaffold__levitated-content {
   flex: 1 1 auto;
   min-inline-size: 0;
