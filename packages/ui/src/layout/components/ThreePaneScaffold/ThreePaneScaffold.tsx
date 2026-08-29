@@ -11,6 +11,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
+import { clsx } from 'clsx';
 import type { DragToResizeState } from '../../adaptive/dragToResizeState';
 import {
   PaneExpansionUnspecified,
@@ -722,7 +723,7 @@ export function ThreePaneScaffold({
     <div
       {...props}
       ref={rootRef}
-      className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
+      className={clsx('three-pane-scaffold', className)}
       data-predictive-back-scale={predictiveBackScale}
       style={style}
     >
@@ -832,14 +833,12 @@ export function ThreePaneScaffold({
                   if (node === null) delete paneRefs.current[role];
                   else paneRefs.current[role] = node;
                 }}
-                className={[
+                className={clsx(
                   'three-pane-scaffold__pane',
                   frameLevitated && 'three-pane-scaffold__pane--levitated',
                   hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
                   hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
+                )}
                 role={interactable ? 'region' : undefined}
                 aria-label={interactable ? paneAriaLabel : undefined}
                 data-pane-role={role}
