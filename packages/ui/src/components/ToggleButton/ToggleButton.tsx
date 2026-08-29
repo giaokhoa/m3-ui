@@ -3,6 +3,7 @@ import {
   ToggleButton as AriaToggleButton,
   type ToggleButtonProps as AriaToggleButtonProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/button.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { getToggleButtonStyle } from './ToggleButton.defaults';
 import type { ToggleButtonSize, ToggleButtonVariant } from './ToggleButton.types';
