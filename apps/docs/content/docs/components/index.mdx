@@ -1,0 +1,20 @@
+---
+title: Components
+description: Material 3 component guides backed by the same m3-ui implementation and canonical token graph.
+---
+
+## Component guides
+
+These pages document the public React API through the Material contract: family, variants, states, accessibility, Compose mapping, and intentional web adaptations.
+
+- [Button](/docs/components/button) — five Material button variants plus expressive sizes and interaction states.
+- [Text field](/docs/components/text-field) — filled and outlined fields, supporting content, validation, and native input behavior.
+- [Dialog](/docs/components/dialog) — Material modal composition, scrim, actions, theme portals, and focus semantics.
+
+## Documentation rule
+
+A component page should describe behavior that exists in `@m3-ui/ui`; it must not become a second implementation of the component. Live previews use the public package, and Material measurements remain sourced from canonical generated tokens rather than documentation CSS literals.
+
+## Layout boundary
+
+Component documentation does not define adaptive window classes, pane directives, navigation switching, or scaffold behavior. Layout documentation will consume the dedicated `@m3-ui/ui/layout` subsystem instead of creating a docs-only responsive model.
