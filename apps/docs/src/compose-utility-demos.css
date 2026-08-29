@@ -1,0 +1,58 @@
+.docs-compose-utility-demo {
+  display: grid;
+  gap: 16px;
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.docs-compose-utility-demo__controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.docs-pull-to-refresh-demo {
+  block-size: 320px;
+  inline-size: 100%;
+}
+
+.docs-pull-to-refresh-demo__content {
+  display: grid;
+  gap: 8px;
+  min-block-size: 520px;
+  padding: 12px;
+}
+
+.docs-pull-to-refresh-demo__item {
+  align-items: center;
+  display: flex;
+  min-block-size: 72px;
+  padding: 0 20px;
+}
+
+.docs-swipe-demo__background,
+.docs-swipe-demo__foreground {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  min-block-size: 88px;
+  padding: 0 20px;
+}
+
+.docs-swipe-demo__background {
+  inline-size: 100%;
+  justify-content: space-between;
+}
+
+.docs-swipe-demo__foreground {
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.docs-scroll-field-demo {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
