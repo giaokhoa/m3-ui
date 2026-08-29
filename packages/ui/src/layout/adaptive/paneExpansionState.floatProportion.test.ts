@@ -22,6 +22,20 @@ describe('PaneExpansionState Compose Float proportions', () => {
     expect(state.currentAnchor).toBe(equivalent);
   });
 
+  it('validates the Float value seen by the AndroidX API', () => {
+    const roundsToOne = 1 + Number.EPSILON;
+    const anchor = PaneExpansionAnchor.proportion(roundsToOne);
+    if (anchor.type !== 'proportion') throw new Error('Expected proportion anchor');
+    expect(anchor.proportion).toBe(1);
+
+    const state = new PaneExpansionState();
+    state.setFirstPaneProportion(roundsToOne);
+    expect(state.getLayoutState(100).firstPaneProportion).toBe(1);
+
+    expect(() => PaneExpansionAnchor.proportion(1.0001)).toThrow(RangeError);
+    expect(() => state.setFirstPaneProportion(1.0001)).toThrow(RangeError);
+  });
+
   it('uses Float multiplication before roundToInt for anchor positions', () => {
     const anchor = PaneExpansionAnchor.proportion(0.7);
     const state = new PaneExpansionState({
