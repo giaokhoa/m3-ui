@@ -8,7 +8,7 @@ Read this file before changing Snackbar token ownership, elevation rendering, ac
 - The Snackbar container keeps its canonical `level3` as a semantic elevation level. The shared `<Elevation>` primitive paints the static shadow recipe through generated `@m3-ui/tokens/elevation.css`.
 - The public `shadowColor` prop remains a real runtime override and is passed to `<Elevation>`; when absent, the canonical `containerShadowColor` role is used.
 - `getSnackbarStyle()` owns renderer geometry and runtime surface overrides, but it must not serialize canonical elevation geometry.
-- SnackbarAction and SnackbarDismissAction continue to map React Aria hover/focus/press state to Snackbar-specific label/icon and Ripple variables at runtime. Those interaction-dependent mappings are behavior, not immutable CSS-token projection debt.
+- SnackbarAction and SnackbarDismissAction continue to map React Aria hover/focus/press state to Snackbar-specific label/icon and Ripple variables at runtime. Those interaction-dependent action/icon mappings are behavior, not immutable CSS-token projection debt.
 
 ## Rendering contract
 
