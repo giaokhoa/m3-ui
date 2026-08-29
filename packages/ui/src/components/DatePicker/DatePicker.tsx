@@ -485,6 +485,12 @@ export function DateRangePicker({
   const [rangeError, setRangeError] = useState(false);
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
+  const createTabFocusHandler = (targetRef: RefObject<HTMLInputElement | null>, requireShift: boolean) => (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Tab' && event.shiftKey === requireShift) {
+      event.preventDefault();
+      targetRef.current?.focus();
+    }
+  };
   useEffect(() => { setStartDraft(value?.start ?? null); setEndDraft(value?.end ?? null); }, [value?.start, value?.end]);
   const commitDraft = (start: DatePickerDate | null, end: DatePickerDate | null) => {
     if (!start && !end) { setRangeError(false); setValue(null); return; }
@@ -519,12 +525,7 @@ export function DateRangePicker({
                 disabled={isDisabled}
                 focusOnMount
                 inputRef={startInputRef}
-                onKeyDown={(event) => {
-                  if (event.key === 'Tab' && !event.shiftKey) {
-                    event.preventDefault();
-                    endInputRef.current?.focus();
-                  }
-                }}
+                onKeyDown={createTabFocusHandler(endInputRef, false)}
               />
               <DateInput
                 label="End date"
@@ -534,12 +535,7 @@ export function DateRangePicker({
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
                 inputRef={endInputRef}
-                onKeyDown={(event) => {
-                  if (event.key === 'Tab' && event.shiftKey) {
-                    event.preventDefault();
-                    startInputRef.current?.focus();
-                  }
-                }}
+                onKeyDown={createTabFocusHandler(startInputRef, true)}
               />
               {(rangeError || errorMessage) && <div className="date-picker__error" role="alert">{rangeError ? 'End date must be on or after start date.' : errorMessage}</div>}
             </div>
