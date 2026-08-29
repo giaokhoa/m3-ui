@@ -1,0 +1,59 @@
+---
+title: Floating action button menu
+description: Controlled Material 3 FAB menus with toggle-FAB geometry, staggered action reveal, focus transfer, and ordinary button-action semantics.
+---
+
+<ParitySummary component="fab-menu" />
+
+## Overview
+
+`FloatingActionButtonMenu` composes a controlled FAB trigger with a vertical collection of labeled actions. `FloatingActionButtonMenuItem` renders each action, while `ToggleFloatingActionButton` provides the checked/unchecked trigger geometry.
+
+<ComponentPreview>
+  <FabMenuPreview />
+</ComponentPreview>
+
+## Controlled expansion
+
+The owner controls expansion through the trigger:
+
+```tsx
+const [expanded, setExpanded] = useState(false);
+
+<FloatingActionButtonMenu
+  expanded={expanded}
+  trigger={
+    <ToggleFloatingActionButton
+      aria-label="Create actions"
+      checked={expanded}
+      icon={<AddIcon />}
+      checkedIcon={<CloseIcon />}
+      onCheckedChange={setExpanded}
+    />
+  }
+>
+  <FloatingActionButtonMenuItem icon={<EditIcon />} onPress={edit}>
+    Edit
+  </FloatingActionButtonMenuItem>
+</FloatingActionButtonMenu>
+```
+
+The container projects `aria-expanded` and `aria-controls` onto the supplied trigger. It does not duplicate the trigger's press behavior or own the application state.
+
+## Actions and focus
+
+When expanded, keyboard navigation can move from the trigger into the first available action. When the menu collapses while focus is inside its action collection, focus is restored to the trigger.
+
+Disabled items retain disabled interaction semantics. `maxMenuHeight` bounds long action collections without changing expansion ownership.
+
+## Web semantics
+
+FAB-menu items are ordinary actions, not application-menu commands. The collection therefore uses a labeled `role="group"` of button-like actions instead of mapping the family to ARIA `menu` / `menuitem` semantics.
+
+This is intentional: each action activates immediately like a button, while the FAB trigger communicates only the expanded/collapsed relationship.
+
+## Toggle FAB geometry
+
+`ToggleFloatingActionButton` supports `baseline`, `medium`, and `large` starting sizes. Checked state morphs the visual container toward the audited close-button geometry while preserving the original interaction box.
+
+Reduced-motion preference removes stagger and morph durations/delays without changing expansion, checked state, focus transfer, or focus restoration.
