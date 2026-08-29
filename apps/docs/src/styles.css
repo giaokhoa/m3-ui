@@ -195,7 +195,6 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 16px;
-  border-radius: 16px;
 }
 
 .docs-color-swatch__role {
@@ -215,7 +214,6 @@ body {
   min-inline-size: 0;
   padding: 20px;
   border: 1px solid var(--outline-variant);
-  border-radius: 28px;
   background: var(--surface);
   color: var(--on-surface);
 }
@@ -227,7 +225,6 @@ body {
 .docs-type-scale {
   overflow: hidden;
   border: 1px solid var(--outline-variant);
-  border-radius: 20px;
   background: var(--surface-container-low);
 }
 
