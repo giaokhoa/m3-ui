@@ -1,0 +1,26 @@
+.docs-picker-demo {
+  display: grid;
+  gap: 24px;
+  inline-size: 100%;
+}
+
+.docs-picker-demo__section {
+  display: grid;
+  gap: 12px;
+  min-inline-size: 0;
+}
+
+.docs-picker-demo__label {
+  color: var(--on-surface-variant);
+}
+
+.docs-picker-demo__scroll {
+  max-inline-size: 100%;
+  overflow-x: auto;
+  padding-block: 4px;
+}
+
+.docs-picker-demo__output {
+  color: var(--on-surface-variant);
+  overflow-wrap: anywhere;
+}
