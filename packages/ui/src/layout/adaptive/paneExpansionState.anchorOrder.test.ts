@@ -36,6 +36,19 @@ describe('PaneExpansionState physical anchor ordering', () => {
     expect(state.nextAnchor).toBe(anchors[2]);
   });
 
+  it('wraps nextAnchor to the first input anchor after the last physical anchor', () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.75),
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.5),
+    ];
+    const state = new PaneExpansionState({ anchors, animation: instantAnimation });
+    state.onMeasured(1000);
+    state.onExpansionOffsetMeasured(900);
+
+    expect(state.nextAnchor).toBe(anchors[0]);
+  });
+
   it('uses sorted physical order to break equidistant settling ties', async () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0.75),
