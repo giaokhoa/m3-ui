@@ -36,8 +36,10 @@ import {
 } from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import {
+  calculatePaneExpansionDragHandleFadeFrame,
   calculatePaneExpansionDragHandlePlacement,
   calculatePaneExpansionSpacerMiddleOffset,
+  updatePaneExpansionDragHandleFadeOffsets,
 } from './paneExpansionDragHandle.layout';
 import {
   getPaneExpansionHandleAriaState,
@@ -256,6 +258,10 @@ export function ThreePaneScaffold({
   const paneRefs = useRef<Partial<Record<ThreePaneScaffoldRole, HTMLDivElement>>>({});
   const pointerDragRef = useRef<PointerDrag | null>(null);
   const resizePointerDragRef = useRef<ResizePointerDrag | null>(null);
+  const dragHandleFadeOffsetsRef = useRef({
+    originalOffsetX: PaneExpansionUnspecified,
+    targetOffsetX: PaneExpansionUnspecified,
+  });
   const previousTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
   const renderedTransitionFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(
     undefined,
@@ -468,23 +474,20 @@ export function ThreePaneScaffold({
   previousTargetValueRef.current = targetValue;
   renderedTransitionFrameRef.current = transitionFrame;
 
-  const physicalOrder = geometry.direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
-  const expandedRoles = physicalOrder.filter(
-    (role) => getPaneAdaptedValue(targetValue, role).type === 'expanded',
-  );
-  const showDragHandle =
-    !transitionActive && paneExpansionDragHandle != null && expandedRoles.length === 2;
   const expansionLayout = expansionState.getLayoutState(geometry.width, geometry.direction);
   const transitionScrimBlocks =
     transitionFrame?.scrim != null && transitionFrame.scrimOpacity > 0;
   const hasBlockingScrim = transitionScrimBlocks || hasLevitatedPaneWithScrim(targetValue);
 
-  let dragHandleOffset = PaneExpansionUnspecified;
-  if (showDragHandle) {
-    if (expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified) {
-      dragHandleOffset = expansionLayout.currentDraggingOffset;
+  let targetDragHandleOffset = PaneExpansionUnspecified;
+  if (paneExpansionDragHandle != null) {
+    if (
+      expansionState.isDraggingOrSettling &&
+      expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified
+    ) {
+      targetDragHandleOffset = expansionLayout.currentDraggingOffset;
     } else {
-      dragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
+      targetDragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
         layout,
         layoutOptions: {
           width: geometry.width,
@@ -503,6 +506,34 @@ export function ThreePaneScaffold({
     }
   }
 
+  dragHandleFadeOffsetsRef.current = updatePaneExpansionDragHandleFadeOffsets(
+    dragHandleFadeOffsetsRef.current,
+    targetDragHandleOffset,
+  );
+  const {
+    originalOffsetX: dragHandleOriginalOffset,
+    targetOffsetX: trackedDragHandleTargetOffset,
+  } = dragHandleFadeOffsetsRef.current;
+  const showDragHandle =
+    paneExpansionDragHandle != null &&
+    trackedDragHandleTargetOffset !== PaneExpansionUnspecified;
+  const dragHandleFadeFrame =
+    transitionActive &&
+    scaffoldState !== undefined &&
+    dragHandleOriginalOffset !== PaneExpansionUnspecified &&
+    trackedDragHandleTargetOffset !== PaneExpansionUnspecified
+      ? calculatePaneExpansionDragHandleFadeFrame({
+          currentOffsetX: dragHandleOriginalOffset,
+          targetOffsetX: trackedDragHandleTargetOffset,
+          progressFraction: scaffoldState.progressFraction,
+        })
+      : undefined;
+  const dragHandleOffset =
+    dragHandleFadeFrame?.offsetX ?? trackedDragHandleTargetOffset;
+  const dragHandleOpacity = dragHandleFadeFrame?.opacity ?? 1;
+  const measuredDragHandleOffset = trackedDragHandleTargetOffset;
+  const dragHandleInteractionBlocked = hasBlockingScrim;
+
   const dragHandlePlacement =
     showDragHandle &&
     dragHandleOffset !== PaneExpansionUnspecified &&
@@ -516,14 +547,9 @@ export function ThreePaneScaffold({
       : undefined;
 
   useLayoutEffect(() => {
-    if (
-      showDragHandle &&
-      dragHandleOffset !== PaneExpansionUnspecified &&
-      !expansionState.isDraggingOrSettling
-    ) {
-      expansionState.onExpansionOffsetMeasured(dragHandleOffset);
-    }
-  }, [dragHandleOffset, expansionState, showDragHandle]);
+    if (expansionState.isDraggingOrSettling) return;
+    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
+  }, [expansionState, measuredDragHandleOffset]);
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (
@@ -535,7 +561,7 @@ export function ThreePaneScaffold({
       return;
     }
     event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(dragHandleOffset);
+    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
     expansionState.beginDrag();
     pointerDragRef.current = {
       pointerId: event.pointerId,
@@ -579,7 +605,7 @@ export function ThreePaneScaffold({
 
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(dragHandleOffset);
+    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
     expansionState.beginDrag();
     expansionState.dispatchRawDelta(event.key === 'ArrowLeft' ? -16 : 16);
     expansionState.endDrag(0);
@@ -686,9 +712,9 @@ export function ThreePaneScaffold({
       ? paneExpansionDragHandle(expansionState)
       : paneExpansionDragHandle;
   const dragHandlePercent =
-    dragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
+    measuredDragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
       ? 0
-      : Math.round((dragHandleOffset / geometry.width) * 100);
+      : Math.round((measuredDragHandleOffset / geometry.width) * 100);
   const dragHandleAriaState = getPaneExpansionHandleAriaState(
     expansionState,
     paneExpansionHandleAriaStrings,
@@ -881,11 +907,12 @@ export function ThreePaneScaffold({
           aria-valuemax={100}
           aria-valuenow={dragHandlePercent}
           aria-valuetext={dragHandleAriaState.valueText}
-          inert={hasBlockingScrim || undefined}
-          tabIndex={hasBlockingScrim ? -1 : 0}
+          inert={dragHandleInteractionBlocked || undefined}
+          tabIndex={dragHandleInteractionBlocked ? -1 : 0}
           style={{
             left: dragHandlePlacement?.centerX ?? dragHandleOffset,
             minWidth: dragHandlePlacement?.minWidth,
+            opacity: dragHandleOpacity,
           }}
           onClick={handleClick}
           onKeyDown={handleKeyDown}

@@ -26,6 +26,22 @@ export interface PaneExpansionSpacerMiddleOffsetInput {
   layoutOptions: ThreePaneScaffoldLayoutOptions;
 }
 
+export interface PaneExpansionDragHandleFadeInput {
+  currentOffsetX: number;
+  targetOffsetX: number;
+  progressFraction: number;
+}
+
+export interface PaneExpansionDragHandleFadeFrame {
+  offsetX: number;
+  opacity: number;
+}
+
+export interface PaneExpansionDragHandleFadeOffsets {
+  originalOffsetX: number;
+  targetOffsetX: number;
+}
+
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
@@ -34,6 +50,86 @@ function finiteNonNegative(value: number, name: string) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+function cubicBezierCoordinate(t: number, firstControl: number, secondControl: number) {
+  const oneMinusT = 1 - t;
+  return (
+    3 * oneMinusT * oneMinusT * t * firstControl +
+    3 * oneMinusT * t * t * secondControl +
+    t * t * t
+  );
+}
+
+/** Compose FastOutSlowInEasing = CubicBezierEasing(0.4, 0, 0.2, 1). */
+function fastOutSlowInEasing(fraction: number) {
+  if (fraction <= 0) return 0;
+  if (fraction >= 1) return 1;
+
+  // The x component is monotonic, so fixed bisection closely mirrors
+  // CubicBezierEasing's "solve x, return y" contract without DOM/CSS timing.
+  let low = 0;
+  let high = 1;
+  for (let index = 0; index < 30; index += 1) {
+    const t = (low + high) / 2;
+    const x = cubicBezierCoordinate(t, 0.4, 0.2);
+    if (x < fraction) low = t;
+    else high = t;
+  }
+  return cubicBezierCoordinate((low + high) / 2, 0, 1);
+}
+
+/**
+ * Mirrors AnimateWithFadingNode.updateTargetOffset: a newly observed lookahead
+ * offset becomes the target, while the previous target becomes the fade origin.
+ * The first target therefore has an unspecified origin and does not fade.
+ */
+export function updatePaneExpansionDragHandleFadeOffsets(
+  current: PaneExpansionDragHandleFadeOffsets,
+  targetOffsetX: number,
+): PaneExpansionDragHandleFadeOffsets {
+  if (targetOffsetX !== PaneExpansionUnspecified) {
+    finiteNonNegative(targetOffsetX, 'targetOffsetX');
+  }
+  if (current.targetOffsetX === targetOffsetX) return current;
+  return {
+    originalOffsetX: current.targetOffsetX,
+    targetOffsetX,
+  };
+}
+
+/**
+ * Browser port of AndroidX AnimateWithFadingModifier for pane-expansion handles.
+ *
+ * AndroidX samples a TargetBasedAnimation from -1f to 1f with the default
+ * tween() spec (FastOutSlowInEasing). While the sampled value is <= 0 the
+ * handle remains at its original offset and fades toward zero alpha. Once the
+ * value becomes positive it jumps to the lookahead target offset and fades
+ * back in. If the offset did not move, ApproachLayout does not run and the
+ * handle stays fully opaque.
+ */
+export function calculatePaneExpansionDragHandleFadeFrame({
+  currentOffsetX,
+  targetOffsetX,
+  progressFraction,
+}: PaneExpansionDragHandleFadeInput): PaneExpansionDragHandleFadeFrame {
+  finiteNonNegative(currentOffsetX, 'currentOffsetX');
+  finiteNonNegative(targetOffsetX, 'targetOffsetX');
+  if (!Number.isFinite(progressFraction) || progressFraction < 0 || progressFraction > 1) {
+    throw new RangeError(
+      `progressFraction must be in [0, 1], received ${progressFraction}`,
+    );
+  }
+  if (currentOffsetX === targetOffsetX) {
+    return { offsetX: targetOffsetX, opacity: 1 };
+  }
+
+  const rawValue = -1 + 2 * fastOutSlowInEasing(progressFraction);
+  const animatedValue = Math.abs(rawValue) < 1e-7 ? 0 : rawValue;
+  return {
+    offsetX: animatedValue > 0 ? targetOffsetX : currentOffsetX,
+    opacity: Math.abs(animatedValue),
+  };
 }
 
 /**
