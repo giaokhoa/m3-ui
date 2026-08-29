@@ -24,10 +24,6 @@ async function primePointerModality(page: Page) {
 }
 
 async function waitForTooltipSettled(tooltip: Locator) {
-  // RAC removes data-entering to start the CSS transition from the Material
-  // hidden state to the resting state. The attribute can therefore be absent
-  // while the browser is still interpolating scale/opacity. Measure geometry
-  // only after the rendered visual state has actually reached its resting value.
   await expect
     .poll(async () =>
       tooltip.evaluate((element) => {
