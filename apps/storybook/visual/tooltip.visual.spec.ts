@@ -187,9 +187,12 @@ test.describe('Material 3 RichTooltip browser contract', () => {
         minHeight: computed.minHeight,
         maxWidth: computed.maxWidth,
         borderRadius: computed.borderRadius,
-        boxShadow: computed.boxShadow,
       };
     });
+    const elevation = tooltip.locator('.rich-tooltip__elevation');
+    const elevationShadow = await elevation.evaluate(
+      (element) => getComputedStyle(element).boxShadow,
+    );
     const content = tooltip.locator('.rich-tooltip__content');
     const contentPadding = await content.evaluate((element) => getComputedStyle(element).paddingInline);
     const title = tooltip.locator('.rich-tooltip__title');
@@ -219,7 +222,8 @@ test.describe('Material 3 RichTooltip browser contract', () => {
     expect(surface.minHeight).toBe('24px');
     expect(surface.maxWidth).toBe('320px');
     expect(surface.borderRadius).toBe('12px');
-    expect(surface.boxShadow).not.toBe('none');
+    await expect(elevation).toHaveAttribute('data-elevation', 'level2');
+    expect(elevationShadow).not.toBe('none');
     expect(contentPadding).toBe('16px');
     expect(titleType).toEqual({
       fontSize: '14px',

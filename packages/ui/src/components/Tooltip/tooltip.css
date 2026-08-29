@@ -37,13 +37,13 @@
 }
 
 .rich-tooltip {
+  position: relative;
   min-inline-size: var(--_rich-tooltip-min-width);
   min-block-size: var(--_rich-tooltip-min-height);
   max-inline-size: var(--_rich-tooltip-max-width);
   border-radius: var(--_rich-tooltip-radius);
   background: var(--_rich-tooltip-container-color);
   color: var(--_rich-tooltip-content-color);
-  box-shadow: var(--_rich-tooltip-box-shadow);
   transition-property: opacity, scale;
   transition-duration:
     var(--_rich-tooltip-opacity-duration),
@@ -51,6 +51,10 @@
   transition-timing-function:
     var(--_rich-tooltip-opacity-easing),
     var(--_rich-tooltip-scale-easing);
+}
+
+.rich-tooltip__elevation {
+  border-radius: inherit;
 }
 
 .rich-tooltip__dialog {

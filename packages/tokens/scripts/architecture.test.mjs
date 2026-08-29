@@ -29,7 +29,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
   'components/Snackbar/Snackbar.defaults.ts',
-  'components/Tooltip/Tooltip.defaults.ts',
   'components/TopAppBar/TopAppBar.defaults.ts',
   'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
   'components/WideNavigationRail/WideNavigationRail.defaults.ts',
@@ -159,6 +158,26 @@ test('TextField immutable defaults are compiler-owned with no React token projec
   await assert.rejects(access(new URL('../ui/src/components/TextField/TextField.defaults.ts', packageRoot)));
   assert.match(contract, /no immutable design-token projection layer in React/i);
   assert.match(contract, /complete immutable base-style projection/i);
+});
+
+test('Tooltip colors stay semantic and RichTooltip elevation paints through the shared primitive', async () => {
+  const tooltipTokens = JSON.parse(await readFile(new URL('tokens/component/tooltip.json', packageRoot), 'utf8'));
+  const sharedStates = JSON.parse(await readFile(new URL('tokens/component/tooltip-snackbar-web-states.json', packageRoot), 'utf8'));
+  const tooltip = await readFile(new URL('../ui/src/components/Tooltip/Tooltip.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/Tooltip/Tooltip.defaults.ts', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/Tooltip/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+
+  assert.equal(tooltipTokens.component.tooltip.plain.containerColor.$value, '{color.role.inverseSurface}');
+  assert.equal(tooltipTokens.component.tooltip.rich.containerColor.$value, '{color.role.surfaceContainer}');
+  assert.equal(tooltipTokens.component.tooltip.rich.actionLabelTextColor.$value, '{color.role.primary}');
+  assert.equal(sharedStates.component.tooltip.rich.containerShadowColor.$value, '{color.role.shadow}');
+  assert.match(tooltip, /<Elevation/);
+  assert.match(tooltip, /shadowColor=\{shadowColor \?\? richTooltipTokens\.containerShadowColor\}/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_rich-tooltip-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/Tooltip\/tooltip\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /Browser tests must inspect `\.rich-tooltip__elevation`/i);
+  assert.match(contract, /must not call `getElevationBoxShadow\(\)`/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {

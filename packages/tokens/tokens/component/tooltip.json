@@ -2,23 +2,23 @@
   "component": {
     "tooltip": {
       "plain": {
-        "containerColor": { "$type": "string", "$value": "var(--inverse-surface)" },
+        "containerColor": { "$type": "string", "$value": "{color.role.inverseSurface}" },
         "containerShape": { "$type": "string", "$value": "extraSmall" },
-        "supportingTextColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "supportingTextColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
         "supportingTextTypography": { "$type": "string", "$value": "bodySmall" }
       },
       "rich": {
-        "actionFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
-        "actionHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
-        "actionLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionFocusLabelTextColor": { "$type": "string", "$value": "{color.role.primary}" },
+        "actionHoverLabelTextColor": { "$type": "string", "$value": "{color.role.primary}" },
+        "actionLabelTextColor": { "$type": "string", "$value": "{color.role.primary}" },
         "actionLabelTextTypography": { "$type": "string", "$value": "labelLarge" },
-        "actionPressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
-        "containerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "actionPressedLabelTextColor": { "$type": "string", "$value": "{color.role.primary}" },
+        "containerColor": { "$type": "string", "$value": "{color.role.surfaceContainer}" },
         "containerElevation": { "$type": "string", "$value": "level2" },
         "containerShape": { "$type": "string", "$value": "medium" },
-        "subheadColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "subheadColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
         "subheadTypography": { "$type": "string", "$value": "titleSmall" },
-        "supportingTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "supportingTextColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
         "supportingTextTypography": { "$type": "string", "$value": "bodyMedium" }
       }
     }

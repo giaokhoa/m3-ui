@@ -12,6 +12,10 @@ export const generatedStyleDependencies = {
   'src/components/TextField/text-field.css': [
     '../tokens/dist/generated/text-field.css',
   ],
+  'src/components/Tooltip/tooltip.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+  ],
 };
 
 export function expandStyleSources(sources) {

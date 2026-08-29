@@ -24,11 +24,13 @@ import {
   type PopoverProps as AriaPopoverProps,
   type TooltipProps as AriaTooltipProps,
 } from 'react-aria-components';
+import { Elevation } from '../../internal/elevation';
 import {
   getPlainTooltipStyle,
   getRichTooltipStyle,
   plainTooltipRuntime,
   richTooltipRuntime,
+  richTooltipTokens,
   type PlainTooltipStyleOptions,
   type RichTooltipStyleOptions,
 } from './Tooltip.defaults';
@@ -380,7 +382,6 @@ export function RichTooltip({
             contentColor,
             titleColor,
             actionColor,
-            shadowColor,
             shape,
             maxWidth,
           }),
@@ -388,6 +389,11 @@ export function RichTooltip({
         };
       }}
     >
+      <Elevation
+        className="rich-tooltip__elevation"
+        level={richTooltipTokens.containerElevation}
+        shadowColor={shadowColor ?? richTooltipTokens.containerShadowColor}
+      />
       {/*
        * RAC Dialog intentionally auto-focuses itself and enables focus containment.
        * Rich tooltips must remain non-modal and keep keyboard focus on their anchor
