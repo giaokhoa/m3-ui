@@ -3,10 +3,10 @@
     "button": {
       "variant": {
         "filled": {
-          "containerColor": { "$type": "string", "$value": "var(--primary)" },
-          "contentColor": { "$type": "string", "$value": "var(--on-primary)" },
-          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
-          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "containerColor": { "$type": "string", "$value": "{color.role.primary}" },
+          "contentColor": { "$type": "string", "$value": "{color.role.onPrimary}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "disabledContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
           "defaultElevation": { "$type": "string", "$value": "level0" },
           "hoveredElevation": { "$type": "string", "$value": "level1" },
           "focusedElevation": { "$type": "string", "$value": "level0" },
@@ -14,10 +14,10 @@
           "disabledElevation": { "$type": "string", "$value": "level0" }
         },
         "elevated": {
-          "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
-          "contentColor": { "$type": "string", "$value": "var(--primary)" },
-          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
-          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "containerColor": { "$type": "string", "$value": "{color.role.surfaceContainerLow}" },
+          "contentColor": { "$type": "string", "$value": "{color.role.primary}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "disabledContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
           "defaultElevation": { "$type": "string", "$value": "level1" },
           "hoveredElevation": { "$type": "string", "$value": "level2" },
           "focusedElevation": { "$type": "string", "$value": "level1" },
@@ -25,10 +25,10 @@
           "disabledElevation": { "$type": "string", "$value": "level0" }
         },
         "filledTonal": {
-          "containerColor": { "$type": "string", "$value": "var(--secondary-container)" },
-          "contentColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
-          "disabledContainerColor": { "$type": "string", "$value": "var(--on-surface)" },
-          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "containerColor": { "$type": "string", "$value": "{color.role.secondaryContainer}" },
+          "contentColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "disabledContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
           "defaultElevation": { "$type": "string", "$value": "level0" },
           "hoveredElevation": { "$type": "string", "$value": "level1" },
           "focusedElevation": { "$type": "string", "$value": "level0" },
@@ -37,10 +37,10 @@
         },
         "outlined": {
           "containerColor": { "$type": "string", "$value": "transparent" },
-          "contentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "contentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
           "disabledContainerColor": { "$type": "string", "$value": "transparent" },
-          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
-          "outlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
+          "disabledContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+          "outlineColor": { "$type": "string", "$value": "{color.role.outlineVariant}" },
           "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
           "disabledOutlineOpacity": { "$type": "number", "$value": 0.1 },
           "defaultElevation": { "$type": "string", "$value": "level0" },
@@ -51,9 +51,9 @@
         },
         "text": {
           "containerColor": { "$type": "string", "$value": "transparent" },
-          "contentColor": { "$type": "string", "$value": "var(--primary)" },
+          "contentColor": { "$type": "string", "$value": "{color.role.primary}" },
           "disabledContainerColor": { "$type": "string", "$value": "transparent" },
-          "disabledContentColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
           "padding": {
             "block": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
             "inlineStart": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },

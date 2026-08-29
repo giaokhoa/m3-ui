@@ -1,469 +1,176 @@
 ---
 name: style-dictionary
-description: Use when editing @m3-ui/tokens canonical DTCG files, Style Dictionary configuration, generated token output, token ownership, filters, transforms, formats, audits, or token package structure.
+description: Use when editing @m3-ui/tokens canonical DTCG files, Style Dictionary configuration, generated token output, token ownership, formats, audits, or token package structure.
 ---
 
 # Style Dictionary
 
-This skill defines how this repository uses Style Dictionary. It combines verified Style Dictionary v5 behavior with repository-specific architecture rules.
+This repository uses Style Dictionary 5.5.2 as the compiler for one canonical DTCG graph. AndroidX Compose, Material Web, Figma, Material Components Android, Flutter, and other upstreams are read-only audit references.
 
-Validated against Style Dictionary **5.5.2**. Re-check the official docs and changelog before changing the pinned version or introducing a DTCG type/feature not already covered by generated-output tests.
-
-## Non-negotiable repository invariant
-
-The token flow is one-way:
+## Core invariant
 
 ```text
-canonical DTCG in packages/tokens/tokens/**/*.json
-                    │
-                    ▼
-             Style Dictionary
-                    │
-                    ▼
-       dist/generated/tokens.js
-       dist/generated/tokens.d.ts
-                    │
-                    ▼
-              @m3-ui/tokens
-                    │
-                    ▼
-               @m3-ui/ui
+canonical DTCG
+    |
+    v
+Style Dictionary
+    |
+    +--> typed JS/TS values for JavaScript consumers
+    |
+    +--> platform adapters for static component styling when useful
+
+ThemeProvider
+    |
+    +--> runtime Material color roles such as --primary / --surface / --on-surface
 ```
 
-AndroidX Compose, Material 3 Figma, Material Web and other upstreams are **read-only audit references**. They never generate or rewrite canonical DTCG or runtime package files.
+The two flows meet in component styling, but they do not replace each other. Style Dictionary owns semantic relationships and immutable design values. `ThemeProvider` owns the concrete runtime value of Material color roles.
 
-`@m3-ui/tokens` has **no handwritten runtime `src/` layer**. The package root is the generated Style Dictionary API. Do not recreate compatibility facades, component subpaths, a `./generated` alias, or a second TypeScript build.
+`@m3-ui/tokens` has no handwritten runtime `src/` layer. Do not recreate compatibility facades, upstream-generated source trees, or a second handwritten token graph.
 
-The future publish scope is `@m3-ui/tokens`; the workspace keeps `@m3-ui/tokens` until the repository-wide namespace migration is performed atomically.
-
-## Style Dictionary mental model
-
-Style Dictionary is configuration-driven. Its relevant lifecycle is:
-
-1. parse config;
-2. find `source` / `include` files;
-3. parse token files;
-4. deep-merge them into one dictionary;
-5. run preprocessors;
-6. run platform transforms;
-7. resolve references;
-8. filter + format output files;
-9. run actions.
-
-Folder boundaries disappear after deep merge. Cross-file aliases work because reference resolution operates on the merged dictionary.
-
-## Official behavior vs repository convention
-
-Style Dictionary does **not** prescribe a canonical folder taxonomy. It accepts files matched by configuration and deep-merges them.
-
-Always distinguish:
-
-- **Style Dictionary behavior**: upstream functionality documented by Style Dictionary;
-- **Repository rule**: architecture deliberately chosen for this repository.
-
-Never describe `core/` / `component/` or other repository conventions as requirements of Style Dictionary itself.
-
-## Repository folder structure
-
-Representative package shape; the complete component corpus is broader than this abbreviated tree:
-
-```text
-packages/tokens/
-├── tokens/                         # only canonical immutable token source
-│   ├── core/                       # reusable foundations + runtime roles
-│   │   ├── color.json
-│   │   ├── state.json
-│   │   ├── elevation.json
-│   │   ├── shape.json
-│   │   ├── typography.json
-│   │   ├── motion.json
-│   │   └── ripple.json
-│   └── component/                  # full canonical Material 3 component corpus
-│       ├── button/
-│       ├── checkbox.json
-│       ├── radio-button.json
-│       ├── switch.json
-│       ├── text-field/
-│       └── ...
-├── audit/                          # checked-in read-only evidence + drift
-├── spec/                           # captured normative textual evidence
-├── scripts/                        # validation + read-only upstream audits
-├── style-dictionary.config.mjs
-├── dist/                           # generated/disposable build output
-│   └── generated/
-│       ├── tokens.js
-│       └── tokens.d.ts
-├── package.json
-└── README.md
-```
-
-Repository rules:
+## Token graph rules
 
 - `tokens/**/*.json` is the only canonical token source.
-- `core/` owns reusable semantic values.
+- `core/` owns reusable foundations and runtime role endpoints.
 - `component/` owns component-specific values and aliases.
-- `audit/` and `spec/` are evidence, not Style Dictionary build inputs.
-- Large component families may use subfolders; small families may use one file.
-- Split source files by semantic ownership, never by target platform.
-- Never create `tokens/web`, `tokens/react`, `tokens/android`, `tokens/compose`, or upstream snapshot trees.
-- A token path has exactly one canonical definition. Never depend on deep-merge overwrite order.
-- `dist/**` is disposable generated output. Never hand-edit it or treat it as source.
-- **Do not create `packages/tokens/src/`.** Runtime projections/types belong beside their consumers in `@m3-ui/ui`; the token package itself publishes generated values and declarations only.
+- aliases express semantic identity, not numeric deduplication.
+- upstream evidence stays under audit/spec/scripts and never enters Style Dictionary `source` or `include`.
+- generated output is disposable and must never be hand-edited.
 
-Token path changes rename generated symbols. Once consumers use those exports, treat path renames as public-API changes.
+## Runtime color model
 
-## Deciding what is a token
-
-Do not tokenise every numeric literal, and do not leave actual design values in UI code.
-
-Use this decision order:
-
-1. **Immutable Material value with stable semantic identity** → canonical DTCG.
-2. **Same semantic value reused by multiple components** → canonical `core` token; components alias it.
-3. **Immutable component-specific design value** → canonical `component` token.
-4. **Theme-dependent Material color role** → use an existing canonical runtime role or a Material-owned component color string such as `var(--primary)`; ThemeProvider supplies the runtime role value.
-5. **Value derived arithmetically from canonical tokens at runtime** → derive it in `@m3-ui/ui`; do not store the derived result as another token unless it has independent semantic identity.
-6. **Web-only visual contract deliberately owned by this library** → canonical component token only if it is a stable design choice with genuine semantic identity.
-7. **Pure platform mechanics/accessibility fallback/algorithm scaffolding** → keep local to UI code and document why it is not a Material token. Examples include forced-colors system-color outlines, percentages used to center transforms, array indices, counters, transient animation state, and wrapper layout that upstream component tokens do not own.
-
-Never alias values merely because their numbers happen to match. Aliases express shared semantic identity, not numeric deduplication.
-
-If an upstream source does not own a web-only token, do not invent an AndroidX/Figma/Material Web audit mapping for it. Cover that value with consumer/parity tests instead.
-
-## Canonical DTCG format
-
-Use plain DTCG `$type` / `$value` syntax.
+`ThemeProvider` owns actual Material colors. Core color-role tokens are runtime CSS expressions such as:
 
 ```json
 {
-  "shape": {
-    "small": {
-      "$type": "dimension",
-      "$value": { "value": 8, "unit": "px" }
+  "color": {
+    "role": {
+      "primary": {
+        "$type": "string",
+        "$value": "var(--primary)"
+      }
     }
   }
 }
 ```
 
-Rules:
-
-- use `$value`, never legacy `value`;
-- use `$type` on a token or inherit it only from an unambiguous group;
-- use native DTCG primitive types supported by the pinned Style Dictionary version;
-- dimensions use explicit DTCG objects such as `{ "value": 8, "unit": "px" }`;
-- never encode dimensions as bare numbers;
-- aliases use references such as `{shape.small}` and may cross files;
-- upstream revision/provenance belongs in audit code, not canonical token JSON;
-- do not add project-specific `$extensions` unless a concrete cross-tool requirement is separately reviewed.
-
-### Dynamic Material colors
-
-ThemeProvider owns actual runtime Material colors. Canonical Material-owned color tokens are ordinary DTCG strings containing the runtime CSS expression:
+A component that semantically uses Primary must reference that role instead of copying the CSS expression:
 
 ```json
 {
   "containerColor": {
     "$type": "string",
-    "$value": "var(--primary)"
+    "$value": "{color.role.primary}"
   }
 }
 ```
 
-Do not replace these with static hex placeholders and do not mark them as DTCG `color` values. `var(--primary)` is a runtime expression, not static color data.
-
-The generated expression must flow through unchanged:
+This preserves the intended chain:
 
 ```text
-DTCG var(--primary)
-  -> Style Dictionary
-  -> @m3-ui/tokens
-  -> UI projection/defaults
-  -> CSS
+component.button.*.containerColor
+    -> color.role.primary
+    -> var(--primary)
+    -> ThemeProvider runtime value
 ```
 
-UI code must not decode it into `primary`, camel-case it, or reconstruct `var(--primary)` later. Wrapper semantics that only need a global runtime role should consume exports such as `ColorRoleOnSurface` rather than inventing fake component tokens.
+Do not replace runtime roles with static hex placeholders. Do not duplicate `var(--primary)` in component tokens when a canonical role exists. Do not decode `var(--role)` into a camel-cased role and reconstruct it later in UI code.
 
-## DTCG compatibility
+When JavaScript needs the actual current color, use the theme runtime contract (`useTheme().scheme` or another explicit runtime API), not CSS-string parsing.
 
-Style Dictionary has first-class DTCG support and normally auto-detects DTCG input. Do not set `usesDtcg` unless a demonstrated auto-detection problem exists.
+## Platform output policy
 
-Style Dictionary support for the newest DTCG specification evolves over time. Before adding a new composite/type, verify support against the exact pinned version and add generated-output tests for the serialized value and declaration type.
+A CSS platform is allowed when it is a real platform adapter, not a second theme source.
 
-## `source`, `include`, and inline `tokens`
+Good:
 
-### Style Dictionary behavior
+- generate component-scoped/static CSS mappings from canonical tokens;
+- generate selectors for component variants/sizes so React does not reconstruct immutable defaults every render;
+- let generated component colors resolve to `var(--primary)`, `var(--surface)`, etc.;
+- keep `ThemeProvider` responsible for assigning those runtime variables.
 
-- `source` matches token files that are parsed and deep-merged.
-- `include` acts as a base collection that `source` can override.
-- config may also provide inline `tokens`.
+Avoid:
 
-### Repository rule
+- dumping every immutable token into generic global `:root` variables without a consumer need;
+- generating static theme colors that compete with `ThemeProvider`;
+- handwritten component token tables that merely reshape generated constants;
+- custom generators when a Style Dictionary format/platform is the correct compiler stage.
 
-Use only canonical source:
+A component CSS adapter may be exported as a package subpath when it is generated by Style Dictionary and consumed directly by the matching UI component. Such an export is a generated platform artifact, not a handwritten token API facade.
 
-```js
-source: ['tokens/**/*.json']
-```
+## UI boundary
 
-Do not use `include` for AndroidX, Figma, Material Web, or another upstream. Do not place canonical values inline in config. Upstreams are audit oracles only.
-
-## Configuration
-
-Use the package-local ESM config:
+Static visual defaults should reach CSS as early as practical:
 
 ```text
-packages/tokens/style-dictionary.config.mjs
+DTCG -> Style Dictionary -> generated component CSS -> component stylesheet
 ```
 
-Use official enums for built-in names and strict logging:
+Keep JavaScript only for behavior that genuinely requires runtime state, for example:
 
-```js
-import {
-  formats,
-  logBrokenReferenceLevels,
-  logWarningLevels,
-  transformGroups,
-} from 'style-dictionary/enums';
+- interaction precedence/history;
+- dynamic elevation transition selection;
+- geometry or DOM measurements;
+- user-supplied runtime shape overrides;
+- calculations that cannot be represented faithfully in static CSS.
 
-export default {
-  source: ['tokens/**/*.json'],
+Do not keep large `*.defaults.ts` projection tables solely to move immutable token values into inline CSS custom properties.
 
-  log: {
-    warnings: logWarningLevels.error,
-    errors: {
-      brokenReferences: logBrokenReferenceLevels.throw,
-    },
-  },
+## DTCG rules
 
-  platforms: {
-    js: {
-      transformGroup: transformGroups.js,
-      buildPath: 'dist/generated/',
-      options: {
-        showFileHeader: false,
-      },
-      files: [
-        {
-          destination: 'tokens.js',
-          format: formats.javascriptEs6,
-        },
-        {
-          destination: 'tokens.d.ts',
-          format: formats.typescriptEs6Declarations,
-          options: {
-            outputStringLiterals: true,
-          },
-        },
-      ],
-    },
-  },
-};
-```
+- use `$value`, never legacy `value`;
+- use `$type` on a token or inherit it only from an unambiguous group;
+- dimensions use explicit `{ "value": n, "unit": "px" }`-style objects;
+- aliases use `{path.to.token}` and may cross files;
+- provenance/revisions belong in audit code, not canonical token JSON;
+- add custom `$extensions` only for a reviewed cross-tool requirement.
 
-Why:
+## Style Dictionary configuration
 
-- canonical DTCG is the only source;
-- warnings/collisions fail CI instead of being silently tolerated;
+Use `packages/tokens/style-dictionary.config.mjs`.
+
+Required properties:
+
+- source remains `['tokens/**/*.json']`;
+- warnings/collisions fail CI;
 - broken references throw;
-- built-in `js` transforms and formats are the actual build engine;
-- JS and declarations share one naming pipeline;
-- literal string declarations preserve values such as `var(--primary)`;
-- generated headers have no timestamp, keeping output deterministic.
+- generated headers remain deterministic;
+- JS/TS output stays generated from the same graph;
+- extra platforms/formats must have a concrete consumer and tests.
 
-The build script invokes this config explicitly:
+Custom formats are appropriate when platform serialization needs component selectors or other output that built-in formats cannot express cleanly. Prefer deriving output from token paths/semantics rather than copying design values into formatter code.
 
-```json
-{
-  "tokens:build": "style-dictionary build --config style-dictionary.config.mjs"
-}
-```
+When a custom formatter receives a DTCG dictionary, read the transformed token value from `token.$value`, not `token.value`. If a formatter is deliberately shared with non-DTCG dictionaries, branch on the formatter option explicitly, for example `options.usesDtcg ? token.$value : token.value`. Treat an unexpected `undefined` as a formatter bug rather than serializing it into CSS.
 
-## Transforms
+## Validation
 
-A transform group is ordered behavior, not a neutral label. The built-in JS group applies naming/value transforms before formatting.
+Every token-pipeline change should verify:
 
-Repository rules:
-
-- use built-ins before registering custom transforms;
-- do not assume `transformGroup: js` leaves every value untouched;
-- keep runtime CSS color references typed as strings so color transforms cannot reinterpret them;
-- if transform ordering becomes important, define and review an explicit group instead of relying on accidental append order;
-- never write a transform merely to recreate an ergonomic handwritten token facade.
-
-A consumer that needs numeric `px`/`ms` values for arithmetic/timers may parse the generated string in narrow `@m3-ui/ui` helpers. That conversion is a runtime boundary, not another token table.
-
-## Platforms, files, filters, formats
-
-A Style Dictionary platform is an output target, not a canonical token layer.
-
-Current repository rule: there is only the typed JS platform. Do **not** add a generic `css/variables` platform: ThemeProvider owns runtime color variables, while non-color immutable values stay generated JS values.
-
-Add another platform only for a real consumer with different output semantics and explicit review.
-
-Use built-in formats first:
-
-- `formats.javascriptEs6` -> `tokens.js`;
-- `formats.typescriptEs6Declarations` -> `tokens.d.ts`.
-
-If output later needs to be split per component, keep one canonical graph and use multiple `files` plus filters. Do not create platform-specific canonical source trees or independent dictionaries by default.
-
-Style Dictionary resolves aliases before formatting. The literal `var(--primary)` value is not a Style Dictionary alias and does not need `outputReferences`.
-
-Do not enable `outputReferences` or `expand` mechanically. Verify exact support and consumer need before using either.
-
-## Custom hooks
-
-Prefer zero custom parsers, preprocessors, transforms, formats, or actions.
-
-Use an extension hook only at the lifecycle stage that actually owns the requirement. Never write a custom generator simply to reshape data that should be modeled in canonical DTCG or emitted by a built-in format.
-
-## Generated package API
-
-`@m3-ui/tokens` exposes only the generated root API:
-
-```text
-@m3-ui/tokens package root
-  -> dist/generated/tokens.js
-  -> dist/generated/tokens.d.ts
-```
-
-Rules:
-
-- no handwritten runtime `src/` layer;
-- no `./generated` alias;
-- no component/core convenience subpaths;
-- no separate token-package `tsc` build;
-- no handwritten type/value facades;
-- never copy generated values into TypeScript modules;
-- ergonomic projection objects/types needed by a component live beside that component in `@m3-ui/ui` and derive from the package-root generated exports.
-
-Generated files are disposable build artifacts, but generated export names become API once consumed. Build JS and declarations from the same naming pipeline and test the real generated artifacts.
-
-## Upstream audit
-
-Audit is intentionally asymmetric:
-
-```text
-AndroidX / Figma / Material Web / other references
-                  │
-                  ▼
-          normalize/read in memory
-                  │
-                  ▼
-          compare against canonical DTCG
-```
-
-Never reverse this arrow.
-
-Audit code may contain pinned revisions, captured evidence, and mapping tables. It must not contain a renderer/write path into `tokens/`.
-
-For dynamic colors compare semantic role identity, e.g. AndroidX `Primary` ↔ canonical `var(--primary)`, rather than static hex values.
-
-Only audit a web-only/library-owned value against an upstream when that upstream actually owns the same semantic value. Otherwise verify it in consumer/parity tests and document the adaptation.
-
-## Validation and tests
-
-Every token/config change should pass:
-
-1. **Canonical validation**
-   - parse all `tokens/**/*.json`;
-   - merge one graph;
-   - reject duplicate paths;
-   - reject unsupported/legacy fields;
-   - reject missing aliases and cycles.
-
-2. **Real Style Dictionary build**
-   - run pinned Style Dictionary;
-   - import actual generated JS;
-   - assert representative dimensions, numbers, aliases, runtime CSS strings and symbol names;
-   - inspect generated `.d.ts` declarations.
-
-3. **Architecture guards**
-   - token package has no handwritten `src/`;
-   - package exports only `.`;
-   - UI imports only package root;
-   - no upstream source enters Style Dictionary;
-   - no generic CSS platform appears;
-   - runtime color expressions are not decoded/re-encoded.
-
-4. **Read-only upstream audit**
-   - compare canonical mappings against pinned upstream sources;
-   - preserve explicit drift/evidence rather than rewriting canonical;
-   - zero write path.
-
-5. **Consumer verification**
-   - unit tests;
-   - typecheck;
-   - build;
-   - visual regression when rendering can change.
-
-## Determinism
-
-- pin Style Dictionary and the lockfile;
-- fail warnings/collisions;
-- disable generated timestamps;
-- never require upstream network access during package build;
-- keep upstream network access in explicit audit commands only;
-- never hand-edit or time-vary generated output.
+1. canonical validation catches missing/cyclic references;
+2. the real Style Dictionary build succeeds;
+3. generated JS declarations still match the package API;
+4. generated CSS adapters contain the expected runtime-role expressions and static values;
+5. ThemeProvider remains the only owner of concrete runtime Material colors;
+6. UI code does not decode/re-encode CSS role expressions;
+7. consumer unit/type/build tests pass;
+8. visual regression passes when rendering changes.
 
 ## Forbidden regressions
 
 Do not:
 
-- recreate `packages/tokens/src/`;
-- recreate token compatibility facades/subpath aliases;
-- recreate `scripts/compose-sync` or `src/generated/androidx`;
-- treat AndroidX/Figma/Material Web as Style Dictionary `source` or `include`;
-- generate canonical DTCG from upstream;
-- organize canonical tokens by target platform;
-- maintain one giant canonical JSON merely because Style Dictionary can merge it;
-- rely on duplicate source paths being overwritten;
-- use static hex placeholders for ThemeProvider-owned color roles;
-- decode `var(--role)` into a semantic name and reconstruct it later;
-- add generic CSS-variable output for immutable non-color tokens;
-- handwrite a TypeScript generator when built-in formats work;
-- hand-edit `dist/generated`;
-- copy generated values back into UI or token-package constant tables;
-- alias unrelated tokens only because their numeric values match;
-- tokenise pure CSS/DOM mechanics or wrapper-only defaults as if they were Material design tokens.
+- create `packages/tokens/src/`;
+- add AndroidX/Figma/Material Web data to Style Dictionary `source` or `include`;
+- generate canonical DTCG from upstream snapshots;
+- use static hex placeholders for ThemeProvider-owned roles;
+- copy `var(--role)` into component tokens instead of aliasing the canonical role;
+- decode `var(--role)` and reconstruct it in UI code;
+- create handwritten token facades that duplicate generated output;
+- hand-edit `dist/**`;
+- move actual runtime color ownership out of `ThemeProvider` merely because CSS output exists.
 
-If a future requirement appears to need one of these, treat it as an architecture change requiring explicit review rather than silently reviving an old direction.
+## Research basis
 
-## Change checklist
+The architecture intentionally follows the responsibility split seen in Material 3 implementations: component tokens point at semantic/system roles, while the active theme resolves those roles at runtime. Material Web likewise maps component tokens to system tokens and can populate system colors dynamically; Fluent providers inject runtime CSS variables while components consume semantic token variables. Style Dictionary is therefore used here as a semantic/platform compiler, not as the runtime color engine.
 
-When changing tokens/config:
-
-- [ ] value has stable semantic identity and belongs in the token graph;
-- [ ] canonical file is under `tokens/core` or `tokens/component`;
-- [ ] path is defined once;
-- [ ] DTCG `$type` / `$value` is used;
-- [ ] dimensions have explicit units;
-- [ ] reusable semantic value aliases a core token instead of being copied;
-- [ ] runtime Material color is a direct `var(--role)` string or an existing runtime role export;
-- [ ] no upstream reference entered `source` / `include`;
-- [ ] no compatibility facade or token-package `src/` was added;
-- [ ] no unnecessary custom hook/platform was added;
-- [ ] real generated-output tests pass;
-- [ ] JS and declaration names still match;
-- [ ] upstream audit passes for mapped Material-owned values;
-- [ ] consumer unit/type/build tests pass;
-- [ ] visual regression passes when rendering is affected.
-
-## Official references
-
-Reviewed 2026-08-22:
-
-- https://styledictionary.com/info/package_structure/
-- https://styledictionary.com/info/architecture/
-- https://styledictionary.com/info/dtcg/
-- https://styledictionary.com/reference/config/
-- https://styledictionary.com/reference/logging/
-- https://styledictionary.com/reference/enums/
-- https://styledictionary.com/reference/hooks/transforms/predefined/
-- https://styledictionary.com/reference/hooks/transform-groups/
-- https://styledictionary.com/reference/hooks/transform-groups/predefined/
-- https://styledictionary.com/reference/hooks/formats/
-- https://styledictionary.com/reference/hooks/formats/predefined/
-- https://styledictionary.com/examples/basic/
-- https://styledictionary.com/examples/splitting-output-files/
-- https://github.com/style-dictionary/style-dictionary/blob/main/CHANGELOG.md
+Reviewed 2026-08-29 against current Style Dictionary v5 format/config documentation and the repository's pinned Material/Compose audit corpus.

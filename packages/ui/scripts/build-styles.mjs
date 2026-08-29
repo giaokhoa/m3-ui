@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { expandStyleSources } from './generated-style-dependencies.mjs';
 import { styleEntries } from './style-entries.mjs';
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -19,13 +20,14 @@ function header(name, sources) {
 await mkdir(outputRoot, { recursive: true });
 
 for (const [name, sources] of Object.entries(styleEntries)) {
+  const expandedSources = expandStyleSources(sources);
   const chunks = [];
-  for (const source of sources) {
+  for (const source of expandedSources) {
     const content = await readFile(resolve(packageRoot, source), 'utf8');
     chunks.push(`/* ${source} */\n${content.trim()}\n`);
   }
 
-  const output = `${header(name, sources)}${chunks.join('\n')}`;
+  const output = `${header(name, expandedSources)}${chunks.join('\n')}`;
   await writeFile(resolve(outputRoot, `${name}.css`), output, 'utf8');
 }
 

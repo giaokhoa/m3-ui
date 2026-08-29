@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { expandStyleSources } from './generated-style-dependencies.mjs';
 import {
   publicComponentModules,
   publicComponentStyleSources,
@@ -12,6 +13,8 @@ import {
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const rippleCss = 'src/internal/ripple/ripple.css';
 const elevationCss = 'src/internal/elevation/elevation.css';
+const buttonCss = 'src/components/Button/button.css';
+const buttonTokenCss = '../tokens/dist/generated/button.css';
 
 test('every public CSS-bearing component has exactly one modular entry', () => {
   assert.deepEqual(
@@ -52,8 +55,24 @@ test('modular entries include shared primitive CSS used by component source', as
   }
 });
 
-test('all declared style sources exist', async () => {
-  const sources = new Set(Object.values(styleEntries).flat());
+test('Button CSS consumers inline the generated token adapter first', () => {
+  for (const [name, sources] of Object.entries(styleEntries)) {
+    if (!sources.includes(buttonCss)) continue;
+    const expanded = expandStyleSources(sources);
+    const tokenIndex = expanded.indexOf(buttonTokenCss);
+    const buttonIndex = expanded.indexOf(buttonCss);
+    assert.notEqual(tokenIndex, -1, `${name} is missing the generated Button token adapter`);
+    assert.ok(
+      tokenIndex < buttonIndex,
+      `${name} must load the generated Button token adapter before button.css`,
+    );
+  }
+});
+
+test('all expanded style sources exist', async () => {
+  const sources = new Set(
+    Object.values(styleEntries).flatMap((sources) => expandStyleSources(sources)),
+  );
   await Promise.all(
     [...sources].map((source) => readFile(resolve(packageRoot, source), 'utf8')),
   );
