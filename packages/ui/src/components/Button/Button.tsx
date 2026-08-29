@@ -119,7 +119,7 @@ function ButtonImpl({
               interaction,
               previousInteraction,
             },
-            shapes,
+            { size, shapes },
           ),
           ...userStyle,
         };
