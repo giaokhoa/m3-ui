@@ -56,6 +56,11 @@ function convertProgressIndicatorClasses(source) {
     `className={clsx(\n        'progress-indicator__linear-indeterminate',\n        fourColor && 'progress-indicator__linear-indeterminate--four-color',\n      )}`,
   );
 
+  next = next.replace(
+    `className={\`progress-indicator__svg progress-indicator__circular-svg progress-indicator__circular-indeterminate\${\n        fourColor\n          ? ' progress-indicator__circular-indeterminate--four-color'\n          : ''\n      }\`}`,
+    `className={clsx(\n        'progress-indicator__svg',\n        'progress-indicator__circular-svg',\n        'progress-indicator__circular-indeterminate',\n        fourColor && 'progress-indicator__circular-indeterminate--four-color',\n      )}`,
+  );
+
   return next;
 }
 
