@@ -1,0 +1,62 @@
+---
+title: App bar row
+description: Material 3 app-bar action rows that keep fitting actions inline and move only the non-fitting suffix into an accessible overflow menu.
+---
+
+<ParitySummary component="app-bar-row" />
+
+## Overview
+
+`AppBarRow` lays out app-bar actions on the inline axis and measures only its own available width. When the current items no longer fit, the non-fitting suffix moves into an overflow menu.
+
+<ComponentPreview>
+  <AppBarOverflowPreview />
+</ComponentPreview>
+
+## Item model
+
+`items` accepts three public action shapes:
+
+- `type: "action"` for a regular action button
+- `type: "toggle"` for a controlled selected/unselected action
+- `type: "custom"` when the application must provide both inline and overflow renderers
+
+```tsx
+const items: AppBarAction[] = [
+  {
+    type: 'action',
+    id: 'share',
+    label: 'Share',
+    icon: <ShareIcon />,
+    onPress: share,
+  },
+  {
+    type: 'toggle',
+    id: 'pin',
+    label: 'Pin',
+    icon: <PinIcon />,
+    isSelected: pinned,
+    onChange: setPinned,
+  },
+];
+
+<AppBarRow aria-label="Document actions" items={items} />
+```
+
+Built-in action labels become the accessible names for their inline and overflow representations.
+
+## Overflow resolution
+
+The row observes its own container and item widths with `ResizeObserver`. `maxItemCount` can impose an additional slot limit; the overflow trigger counts as one slot whenever overflow exists.
+
+A custom `overflowTrigger` may replace the default More actions icon button. React Aria Menu owns popup positioning, keyboard interaction, dismissal, and focus restoration.
+
+## Custom items
+
+Custom items require stable `id`, `renderInline`, and `renderOverflow`. The overflow renderer receives `dismiss()` so an application-owned menu item can close the popup after activation.
+
+## Layout boundary
+
+`AppBarRow` is not a viewport or adaptive-navigation system. A narrower local action container can overflow even on a wide screen, and a wider local container can keep actions inline on a smaller screen.
+
+Window-size classes, navigation switching, pane directives, and scaffold policy remain the responsibility of `@m3-ui/ui/layout` and the surrounding application composition.

@@ -1,0 +1,54 @@
+---
+title: Toggle button
+description: Controlled Material 3 toggle buttons across filled, elevated, tonal, and outlined variants with expressive sizes and native web pressed semantics.
+---
+
+<ParitySummary component="toggle-button" />
+
+## Overview
+
+Toggle buttons represent persistent on/off selection while retaining button interaction. `m3-ui` exposes four controlled variants:
+
+- `ToggleButton`
+- `ElevatedToggleButton`
+- `FilledTonalToggleButton`
+- `OutlinedToggleButton`
+
+<ComponentPreview>
+  <ToggleButtonPreview />
+</ComponentPreview>
+
+## Controlled selection
+
+Selection is always explicit application state:
+
+```tsx
+const [selected, setSelected] = useState(false);
+
+<FilledTonalToggleButton
+  isSelected={selected}
+  onChange={setSelected}
+>
+  Pin
+</FilledTonalToggleButton>
+```
+
+The component does not keep a second selected-state machine internally. Rapid updates therefore resolve directly to the supplied `isSelected` value.
+
+## Variants and sizes
+
+All four variants support the same expressive size buckets used by the button family: `extraSmall`, `small`, `medium`, `large`, and `extraLarge`. An optional `startIcon` participates in the audited Material spacing and icon geometry.
+
+Checked, unchecked, pressed, hovered, focused, and disabled presentation come from the component token/runtime mapping rather than documentation CSS.
+
+## Web semantics
+
+Compose currently projects toggle buttons through checkbox-role semantics on a toggleable surface. On the web, `m3-ui` intentionally uses React Aria `ToggleButton`, producing native button interaction with `aria-pressed`.
+
+That gives browser-standard Enter/Space activation, focus-visible behavior, disabled handling, and a familiar accessibility model for pressable toggles without recreating those behaviors locally.
+
+## Motion and shape
+
+Selected and pressed shapes follow the audited renderer mapping. Reduced-motion preference removes transition timing while preserving the final controlled state.
+
+CSS border radius represents the web projection of Material rounded/corner-based shapes; arbitrary Compose `Shape` path geometry is not exposed as a separate public shape runtime.

@@ -1,0 +1,46 @@
+---
+title: App bar column
+description: Material 3 app-bar action columns that keep fitting actions inline on the block axis and move the non-fitting suffix into an accessible overflow menu.
+---
+
+<ParitySummary component="app-bar-column" />
+
+## Overview
+
+`AppBarColumn` is the block-axis counterpart to `AppBarRow`. It measures only its own available height and moves the non-fitting suffix into an overflow menu.
+
+<ComponentPreview>
+  <AppBarOverflowPreview />
+</ComponentPreview>
+
+## Shared item model
+
+`AppBarColumn` consumes the same `AppBarAction` union as `AppBarRow`, so action, toggle, and custom items can be shared between horizontal and vertical app-bar compositions.
+
+```tsx
+<AppBarColumn
+  aria-label="Document actions"
+  items={items}
+  maxItemCount={4}
+/>
+```
+
+Controlled toggle state remains application-owned regardless of whether the item is currently rendered inline or inside overflow.
+
+## Height-driven overflow
+
+The column observes its own container and rendered item heights with `ResizeObserver`. When available block size shrinks, only the suffix that no longer fits moves into overflow.
+
+`maxItemCount` provides an additional count constraint. If overflow exists, the overflow trigger itself consumes one slot.
+
+## Overflow menu
+
+The default trigger exposes an accessible More actions control. A custom `overflowTrigger` can replace it while React Aria Menu continues to own popup positioning, keyboard interaction, dismissal, and focus restoration.
+
+Custom items provide separate inline and overflow renderers; the overflow renderer receives `dismiss()` for explicit popup closing after activation.
+
+## Layout boundary
+
+The measured height is local component geometry, not a Material adaptive window-size class. `AppBarColumn` never decides when an application should switch to a navigation rail, drawer, different pane arrangement, or other responsive scaffold.
+
+Those decisions remain outside this component and belong to the surrounding composition or `@m3-ui/ui/layout`.
