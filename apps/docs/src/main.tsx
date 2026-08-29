@@ -9,6 +9,7 @@ import '@m3-ui/ui/styles.css';
 import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
 import { feedbackSearchMdxComponents } from './feedbackSearchMdxComponents';
+import { groupedControlMdxComponents } from './groupedControlMdxComponents';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
 import './styles.css';
@@ -69,6 +70,10 @@ function DocsPage() {
   }
 
   const MDX = page.body;
+  const docsMdxComponents = {
+    ...feedbackSearchMdxComponents,
+    ...groupedControlMdxComponents,
+  };
 
   return (
     <>
@@ -104,7 +109,7 @@ function DocsPage() {
               </p>
             ) : null}
           </header>
-          <MDX components={getMdxComponents(feedbackSearchMdxComponents)} />
+          <MDX components={getMdxComponents(docsMdxComponents)} />
         </article>
       </main>
     </>
