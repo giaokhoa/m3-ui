@@ -1,4 +1,11 @@
 import { pxNumber } from '../../../internal/tokenValues';
+import { PaneExpansionUnspecified } from '../../adaptive/paneExpansionState';
+import { getPaneAdaptedValue } from '../../adaptive/threePaneScaffold';
+import {
+  calculateThreePaneScaffoldLayout,
+  type ThreePaneScaffoldLayout,
+  type ThreePaneScaffoldLayoutOptions,
+} from './ThreePaneScaffold.layout';
 
 export interface PaneExpansionDragHandlePlacementInput {
   offsetX: number;
@@ -12,6 +19,13 @@ export interface PaneExpansionDragHandlePlacement {
   minWidth: number;
 }
 
+export interface PaneExpansionSpacerMiddleOffsetInput {
+  /** Already-calculated visible pane layout, including pane margins. */
+  layout: ThreePaneScaffoldLayout;
+  /** Options used for the visible pane layout. */
+  layoutOptions: ThreePaneScaffoldLayoutOptions;
+}
+
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
@@ -20,6 +34,47 @@ function finiteNonNegative(value: number, name: string) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+/**
+ * Returns the measured partition-spacer midpoint used by AndroidX before
+ * PaneMargins are applied to the actual pane bounds.
+ *
+ * Most calls can reuse the already-calculated visible layout. When pane
+ * margins are present we intentionally recalculate the tiny three-pane layout
+ * without margins, because AndroidX calls getSpacerMiddleOffsetX before
+ * PaneMeasurable.doMeasureAndPlace applies PaneMargins. This matters for
+ * ruler/inset margins that can clip an internal pane edge.
+ */
+export function calculatePaneExpansionSpacerMiddleOffset({
+  layout,
+  layoutOptions,
+}: PaneExpansionSpacerMiddleOffsetInput): number {
+  const { paneMargins, direction = 'ltr', paneOrder, value } = layoutOptions;
+  const hasPaneMargins = paneMargins !== undefined && Object.keys(paneMargins).length > 0;
+  const measuredLayout = hasPaneMargins
+    ? calculateThreePaneScaffoldLayout({ ...layoutOptions, paneMargins: {} })
+    : layout;
+  const physicalOrder = direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
+  const expandedRoles = physicalOrder.filter(
+    (role) => getPaneAdaptedValue(value, role).type === 'expanded',
+  );
+  if (expandedRoles.length !== 2) return PaneExpansionUnspecified;
+
+  const firstPlacement = measuredLayout[expandedRoles[0]!];
+  const secondPlacement = measuredLayout[expandedRoles[1]!];
+  if (firstPlacement !== undefined && secondPlacement !== undefined) {
+    return (
+      firstPlacement.left +
+      firstPlacement.width +
+      secondPlacement.left
+    ) / 2;
+  }
+  if (firstPlacement !== undefined) {
+    return firstPlacement.left + firstPlacement.width;
+  }
+  if (secondPlacement !== undefined) return 0;
+  return PaneExpansionUnspecified;
 }
 
 /**
