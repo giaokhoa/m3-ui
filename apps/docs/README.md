@@ -7,7 +7,7 @@ This app is the public documentation host for `m3-ui`.
 Fumadocs is used headlessly:
 
 - `fumadocs-mdx` compiles local Markdown/MDX content;
-- `fumadocs-core` remains available for headless Fumadocs integrations;
+- `fumadocs-core` provides source, page-tree, and search APIs;
 - `fumadocs-ui`, its CSS presets, and Tailwind are intentionally not dependencies.
 
 The visible product surface is owned by `m3-ui`:
@@ -45,6 +45,23 @@ Each page should cover, where applicable:
 6. Intentional web adaptations where a literal Compose runtime mapping would be wrong.
 
 Shared parity metadata lives in `src/componentDocs.ts` and is rendered through the docs-only `MaterialParity` MDX primitive. Keep canonical measurements, typography, colors, elevations and component shapes in the token/component layers; do not duplicate them in MDX prose or docs CSS.
+
+## Static search
+
+Documentation search uses the Fumadocs search pipeline rather than a docs-local title filter:
+
+- `scripts/build-search-index.mjs` loads the Macro collection through the official `fumadocs-mdx/node` loader;
+- `fumadocs-core/source` turns the collection into the same source/page model used by Fumadocs;
+- `createFromSource(source).staticGET()` exports the built-in ZBSearch database;
+- development writes the generated database to `public/search-index.json`, which Vite serves as a static asset;
+- production writes `dist/search-index.json` after `vite build`;
+- `DocsSearch` queries that file with `useDocsSearch()` and `staticClient()` from `fumadocs-core`.
+
+The visible search experience is still Material UI: the top-app-bar action uses `IconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
+
+Do not add a second client-side search implementation for titles or manually parsed MDX. If the Fumadocs static index cannot be generated, fix the source/index pipeline instead.
+
+The generated development index is ignored by Git and is refreshed when the docs dev command starts. Restart the docs dev server after content changes when search results need to be re-indexed.
 
 ## Adaptive layout boundary
 
