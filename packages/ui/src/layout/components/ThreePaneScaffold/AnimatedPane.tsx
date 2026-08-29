@@ -1,4 +1,10 @@
-import type { CSSProperties, HTMLAttributes } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+} from 'react';
+import { syncAnimatedPaneSurfaceShape } from './AnimatedPane.surface';
 
 export interface AnimatedPaneProps extends HTMLAttributes<HTMLDivElement> {
   /**
@@ -21,9 +27,18 @@ export function AnimatedPane({
   style,
   ...props
 }: AnimatedPaneProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // AndroidX applies AnimatedPane.shape to the outer AnimatedVisibility so a
+  // levitated drag handle and pane content share one shaped shadow surface.
+  // The web scaffold only needs an extra wrapper when an explicit resize
+  // handle is present, so mirror the root pane radius onto that wrapper.
+  useLayoutEffect(() => syncAnimatedPaneSurfaceShape(rootRef.current));
+
   return (
     <div
       {...props}
+      ref={rootRef}
       className={['animated-pane', className].filter(Boolean).join(' ')}
       style={{ ...style, borderRadius: shape }}
     />

@@ -38,8 +38,8 @@
 
 /*
  * With an explicit drag handle the scaffold owns a small wrapper above the
- * AnimatedPane content. AndroidX applies the same 15dp shadow around that
- * complete levitated surface, whose default shape is RectangleShape.
+ * AnimatedPane content. AnimatedPane mirrors its root radius onto this
+ * wrapper so the handle and content share AndroidX's shaped 15dp shadow.
  */
 .three-pane-scaffold__pane--levitated.three-pane-scaffold__pane--has-resize-handle {
   box-shadow: 0 15px 30px color-mix(in srgb, var(--shadow) 24%, transparent);
