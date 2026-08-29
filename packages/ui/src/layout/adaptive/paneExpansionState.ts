@@ -101,6 +101,26 @@ function anchorPosition(
   return direction === 'rtl' ? totalSize - coerced : coerced;
 }
 
+interface IndexedAnchorPosition {
+  readonly anchor: PaneExpansionAnchor;
+  readonly index: number;
+  readonly position: number;
+}
+
+function indexedAnchorPositions(
+  anchors: readonly PaneExpansionAnchor[],
+  totalSize: number,
+  direction: 'ltr' | 'rtl',
+): IndexedAnchorPosition[] {
+  return anchors
+    .map((anchor, index) => ({
+      anchor,
+      index,
+      position: anchorPosition(anchor, totalSize, direction),
+    }))
+    .sort((a, b) => a.position - b.position || a.index - b.index);
+}
+
 function requestFrame(callback: FrameRequestCallback): number {
   if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
   return setTimeout(
@@ -237,6 +257,11 @@ export class PaneExpansionState {
     return this.anchors.find((candidate) => anchorEquals(candidate, anchor));
   }
 
+  private getIndexedAnchorPositions() {
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) return [];
+    return indexedAnchorPositions(this.anchors, this.maxExpansionWidth, this.measuredDirection);
+  }
+
   private setAnimatedOffset(value: number) {
     if (this.maxExpansionWidth === PaneExpansionUnspecified) return;
     const offset = clamp(Math.trunc(value), 0, this.maxExpansionWidth);
@@ -261,18 +286,15 @@ export class PaneExpansionState {
   }
 
   get nextAnchor(): PaneExpansionAnchor | null {
-    if (this.maxExpansionWidth === PaneExpansionUnspecified || this.anchors.length === 0) {
-      return null;
-    }
+    const positions = this.getIndexedAnchorPositions();
+    if (positions.length === 0) return null;
     const currentOffset =
       this.currentDraggingOffsetState === PaneExpansionUnspecified
         ? this.currentMeasuredDraggingOffset
         : this.currentDraggingOffsetState;
-    if (currentOffset === PaneExpansionUnspecified) return this.anchors[0] ?? null;
-    for (const anchor of this.anchors) {
-      if (currentOffset < anchorPosition(anchor, this.maxExpansionWidth, this.measuredDirection)) {
-        return anchor;
-      }
+    if (currentOffset === PaneExpansionUnspecified) return positions[0]!.anchor;
+    for (const anchorPosition of positions) {
+      if (currentOffset < anchorPosition.position) return anchorPosition.anchor;
     }
     return this.anchors[0] ?? null;
   }
@@ -480,39 +502,36 @@ export class PaneExpansionState {
 
   async settleToAnchorIfNeeded(velocity: number) {
     finite(velocity, 'velocity');
+    const positions = this.getIndexedAnchorPositions();
     if (
-      this.anchors.length === 0 ||
-      this.maxExpansionWidth === PaneExpansionUnspecified ||
+      positions.length === 0 ||
       this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
     ) {
       return;
     }
 
     const currentPosition = this.currentMeasuredDraggingOffset;
-    let bestAnchor = this.anchors[0];
+    let bestAnchorPosition = positions[0]!;
     let bestScore = Number.POSITIVE_INFINITY;
 
-    for (const anchor of this.anchors) {
-      const position = anchorPosition(anchor, this.maxExpansionWidth, this.measuredDirection);
+    for (const anchorPosition of positions) {
       let score: number;
       if (velocity >= AnchoringVelocityThreshold) {
-        const delta = position - currentPosition;
+        const delta = anchorPosition.position - currentPosition;
         score = delta < 0 ? this.maxExpansionWidth - delta : delta;
       } else if (velocity <= -AnchoringVelocityThreshold) {
-        const delta = currentPosition - position;
+        const delta = currentPosition - anchorPosition.position;
         score = delta < 0 ? this.maxExpansionWidth - delta : delta;
       } else {
-        score = Math.abs(currentPosition - position);
+        score = Math.abs(currentPosition - anchorPosition.position);
       }
       if (score < bestScore) {
         bestScore = score;
-        bestAnchor = anchor;
+        bestAnchorPosition = anchorPosition;
       }
     }
 
-    if (bestAnchor !== undefined) {
-      await this.animateTo(bestAnchor, velocity);
-    }
+    await this.animateTo(bestAnchorPosition.anchor, velocity);
   }
 
   getLayoutState(
