@@ -3,6 +3,7 @@ import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/button.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { getButtonStyle, type ButtonShapes } from './Button.defaults';
 import {
@@ -118,7 +119,7 @@ function ButtonImpl({
               interaction,
               previousInteraction,
             },
-            { size, shapes },
+            shapes,
           ),
           ...userStyle,
         };
