@@ -3,9 +3,13 @@ import {
   PaneExpansionAnchor,
   PaneExpansionState,
   PaneExpansionUnspecified,
+  type PaneExpansionAnimation,
 } from './paneExpansionState';
 
 const scaffoldWidth = 2000;
+const instantAnimation: PaneExpansionAnimation = async ({ to, update }) => {
+  update(to);
+};
 
 describe('PaneExpansionState', () => {
   it('drags positively within bounds', () => {
@@ -87,17 +91,118 @@ describe('PaneExpansionState', () => {
     expect(state.getLayoutState(1000, 'rtl').currentDraggingOffset).toBe(700);
   });
 
-  it('settles toward the fling direction when velocity crosses the AndroidX threshold', () => {
+  it('animates to an anchor, updates semantics immediately and truncates animation frames', async () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.75),
+    ];
+    let updateAnimation: ((offset: number) => void) | undefined;
+    let finishAnimation: (() => void) | undefined;
+    let receivedVelocity = Number.NaN;
+    const animation: PaneExpansionAnimation = ({ initialVelocity, update }) => {
+      receivedVelocity = initialVelocity;
+      updateAnimation = update;
+      return new Promise<void>((resolve) => {
+        finishAnimation = resolve;
+      });
+    };
+    const state = new PaneExpansionState({
+      anchors,
+      initialAnchoredIndex: 0,
+      animation,
+    });
+    state.onMeasured(1000);
+
+    const transition = state.animateTo(anchors[1]!, 125);
+
+    expect(state.currentAnchor).toBe(anchors[1]);
+    expect(state.isSettling).toBe(true);
+    expect(receivedVelocity).toBe(125);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(250);
+
+    updateAnimation!(600.9);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(600);
+
+    finishAnimation!();
+    await transition;
+    expect(state.isSettling).toBe(false);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+  });
+
+  it('settles toward the release direction and forwards leftover velocity to the anchor spring', async () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0.25),
       PaneExpansionAnchor.proportion(0.5),
       PaneExpansionAnchor.proportion(0.75),
     ];
-    const state = new PaneExpansionState({ anchors });
+    let receivedVelocity = Number.NaN;
+    const animation: PaneExpansionAnimation = async ({ initialVelocity, to, update }) => {
+      receivedVelocity = initialVelocity;
+      update(to);
+    };
+    const state = new PaneExpansionState({ anchors, animation });
     state.onMeasured(1000);
     state.onExpansionOffsetMeasured(500);
     state.dispatchRawDelta(10);
-    state.settleToAnchorIfNeeded(250);
-    expect(state.currentAnchor).toEqual(anchors[2]);
+
+    await state.settleToAnchorIfNeeded(250);
+
+    expect(state.currentAnchor).toBe(anchors[2]);
+    expect(receivedVelocity).toBe(250);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+  });
+
+  it('uses animated anchor changes for semantic next-anchor activation', async () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.75),
+    ];
+    const animation = vi.fn(instantAnimation);
+    const state = new PaneExpansionState({
+      anchors,
+      initialAnchoredIndex: 0,
+      animation,
+    });
+    state.onMeasured(1000);
+
+    state.moveToNextAnchor();
+    await Promise.resolve();
+
+    expect(animation).toHaveBeenCalledTimes(1);
+    expect(state.currentAnchor).toBe(anchors[1]);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+  });
+
+  it('cancels active anchor settling when direct dragging resumes', async () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.75),
+    ];
+    let updateAnimation: ((offset: number) => void) | undefined;
+    const animation: PaneExpansionAnimation = ({ signal, update }) => {
+      updateAnimation = update;
+      return new Promise<void>((resolve) => {
+        signal.addEventListener('abort', () => resolve(), { once: true });
+      });
+    };
+    const state = new PaneExpansionState({
+      anchors,
+      initialAnchoredIndex: 0,
+      animation,
+    });
+    state.onMeasured(1000);
+
+    const transition = state.animateTo(anchors[1]!);
+    updateAnimation!(500);
+    expect(state.isSettling).toBe(true);
+
+    state.beginDrag();
+    await transition;
+    expect(state.isSettling).toBe(false);
+    expect(state.isDragging).toBe(true);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(500);
+
+    updateAnimation!(700);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(500);
   });
 });

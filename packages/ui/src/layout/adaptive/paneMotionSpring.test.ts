@@ -28,6 +28,18 @@ describe('pane motion spring parity', () => {
     expect(samplePaneMotionSpring(0, 1, 328)).toBeCloseTo(1.00973937, 7);
   });
 
+  it('preserves initial velocity for pane-expansion anchor settling', () => {
+    expect(samplePaneMotionSpring(510, 750, 50, 250)).toBeCloseTo(582.65297362, 7);
+    expect(samplePaneMotionSpring(510, 750, 100, 250)).toBeCloseTo(672.49651081, 7);
+    expect(calculatePaneMotionSpringDurationMs(510, 750, 1, 250)).toBe(381);
+  });
+
+  it('keeps spring motion when position already equals target but velocity remains', () => {
+    expect(samplePaneMotionSpring(500, 500, 50, 250)).toBeCloseTo(505.41038803, 7);
+    expect(samplePaneMotionSpring(500, 500, 100, 250)).toBeCloseTo(504.13705697, 7);
+    expect(calculatePaneMotionSpringDurationMs(500, 500, 1, 250)).toBe(196);
+  });
+
   it('uses the slowest vector dimension as TargetBasedAnimation duration', () => {
     expect(calculatePaneMotionVectorSpringDurationMs([0, 0], [500, 100])).toBe(431);
     const halfway = samplePaneMotionVectorSpringAtProgress(

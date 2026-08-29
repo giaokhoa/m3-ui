@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import {
   PaneExpansionAnchor,
   PaneExpansionState,
+  type PaneExpansionAnimation,
 } from '../../adaptive/paneExpansionState';
 import {
   describePaneExpansionAnchor,
   getPaneExpansionHandleAriaState,
 } from './paneExpansionSemantics';
+
+const instantAnimation: PaneExpansionAnimation = async ({ to, update }) => {
+  update(to);
+};
 
 describe('pane expansion semantics', () => {
   it('mirrors the pinned AndroidX anchor descriptions', () => {
@@ -32,6 +37,7 @@ describe('pane expansion semantics', () => {
         PaneExpansionAnchor.proportion(0.7),
       ],
       initialAnchoredIndex: 1,
+      animation: instantAnimation,
     });
     state.onMeasured(1000);
 

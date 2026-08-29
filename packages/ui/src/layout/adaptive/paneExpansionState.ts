@@ -1,13 +1,37 @@
+import {
+  calculatePaneMotionSpringDurationMs,
+  samplePaneMotionSpring,
+} from './paneMotionSpring';
+
 export const PaneExpansionUnspecified = -1;
 const AnchoringVelocityThreshold = 200;
+const AnchoringVisibilityThreshold = 1;
 
 export type PaneExpansionAnchor =
   | { readonly type: 'proportion'; readonly proportion: number }
   | { readonly type: 'offset'; readonly direction: 'start' | 'end'; readonly offset: number };
 
+export interface PaneExpansionAnimationContext {
+  from: number;
+  to: number;
+  initialVelocity: number;
+  signal: AbortSignal;
+  update: (offset: number) => void;
+}
+
+export type PaneExpansionAnimation = (
+  context: PaneExpansionAnimationContext,
+) => Promise<void>;
+
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
+  }
+}
+
+function finite(value: number, name: string) {
+  if (!Number.isFinite(value)) {
+    throw new RangeError(`${name} must be finite`);
   }
 }
 
@@ -39,6 +63,8 @@ export interface PaneExpansionStateOptions {
   anchors?: readonly PaneExpansionAnchor[];
   initialAnchoredIndex?: number;
   consumeDragDelta?: (delta: number) => number;
+  /** Web animation driver for AndroidX anchoringAnimationSpec. */
+  animation?: PaneExpansionAnimation;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -75,12 +101,82 @@ function anchorPosition(
   return direction === 'rtl' ? totalSize - coerced : coerced;
 }
 
+function requestFrame(callback: FrameRequestCallback): number {
+  if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
+  return setTimeout(
+    () => callback(globalThis.performance?.now() ?? Date.now()),
+    16,
+  ) as unknown as number;
+}
+
+function cancelFrame(id: number) {
+  if (typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(id);
+  } else {
+    clearTimeout(id);
+  }
+}
+
+/**
+ * Browser driver for AndroidX PaneExpansionState.DefaultAnchoringAnimationSpec:
+ * spring(dampingRatio = 0.8, stiffness = 380, visibilityThreshold = 1f).
+ */
+export const defaultPaneExpansionAnimation: PaneExpansionAnimation = ({
+  from,
+  to,
+  initialVelocity,
+  signal,
+  update,
+}) =>
+  new Promise<void>((resolve) => {
+    const durationMs = calculatePaneMotionSpringDurationMs(
+      from,
+      to,
+      AnchoringVisibilityThreshold,
+      initialVelocity,
+    );
+    if (signal.aborted || durationMs === 0) {
+      update(to);
+      resolve();
+      return;
+    }
+
+    let frame = 0;
+    let startTime: number | undefined;
+    const finish = () => {
+      signal.removeEventListener('abort', abort);
+      resolve();
+    };
+    const tick = (time: number) => {
+      if (signal.aborted) {
+        finish();
+        return;
+      }
+      startTime ??= time;
+      const elapsed = Math.max(0, time - startTime);
+      if (elapsed >= durationMs) {
+        update(to);
+        finish();
+        return;
+      }
+      update(samplePaneMotionSpring(from, to, elapsed, initialVelocity));
+      frame = requestFrame(tick);
+    };
+    const abort = () => {
+      cancelFrame(frame);
+      finish();
+    };
+    signal.addEventListener('abort', abort, { once: true });
+    frame = requestFrame(tick);
+  });
+
 /**
  * Mutable pane-expansion state ported from AndroidX PaneExpansionState.
  *
  * The state owns explicit width/proportion settings, drag offset and anchors.
- * React rendering is notified through subscribe/getSnapshot; animation is kept
- * separate so settling snaps synchronously to the selected AndroidX anchor.
+ * Anchor changes use the pinned Material anchoring spring; pointer release
+ * velocity is treated as the browser analogue of AndroidX's leftover fling
+ * velocity instead of porting the platform-specific scrolling spline.
  */
 export class PaneExpansionState {
   private firstPaneWidthState = PaneExpansionUnspecified;
@@ -96,11 +192,14 @@ export class PaneExpansionState {
   private settling = false;
   private revision = 0;
   private readonly listeners = new Set<() => void>();
+  private readonly defaultAnimation: PaneExpansionAnimation;
+  private animationController: AbortController | null = null;
 
   constructor({
     anchors = [],
     initialAnchoredIndex = -1,
     consumeDragDelta = (delta) => delta,
+    animation = defaultPaneExpansionAnimation,
   }: PaneExpansionStateOptions = {}) {
     if (initialAnchoredIndex < -1 || initialAnchoredIndex >= anchors.length) {
       throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
@@ -109,6 +208,7 @@ export class PaneExpansionState {
     this.currentAnchorState =
       initialAnchoredIndex === -1 ? null : this.anchors[initialAnchoredIndex] ?? null;
     this.consumeDragDelta = consumeDragDelta;
+    this.defaultAnimation = animation;
   }
 
   readonly subscribe = (listener: () => void) => {
@@ -121,6 +221,27 @@ export class PaneExpansionState {
   private notify() {
     this.revision += 1;
     this.listeners.forEach((listener) => listener());
+  }
+
+  private cancelAnimation() {
+    const controller = this.animationController;
+    if (controller === null) return false;
+    this.animationController = null;
+    controller.abort();
+    const wasSettling = this.settling;
+    this.settling = false;
+    return wasSettling;
+  }
+
+  private findAnchor(anchor: PaneExpansionAnchor) {
+    return this.anchors.find((candidate) => anchorEquals(candidate, anchor));
+  }
+
+  private setAnimatedOffset(value: number) {
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) return;
+    const offset = clamp(Math.trunc(value), 0, this.maxExpansionWidth);
+    this.currentDraggingOffsetState = offset;
+    this.currentMeasuredDraggingOffset = offset;
   }
 
   get currentAnchor() {
@@ -241,7 +362,8 @@ export class PaneExpansionState {
   }
 
   beginDrag() {
-    if (this.dragging) return;
+    const cancelledSettling = this.cancelAnimation();
+    if (this.dragging && !cancelledSettling) return;
     this.dragging = true;
     this.notify();
   }
@@ -253,31 +375,37 @@ export class PaneExpansionState {
     ) {
       return;
     }
+    const cancelledSettling = this.cancelAnimation();
     const remainingDelta = this.consumeDragDelta(delta);
     const nextOffset = clamp(
       Math.trunc(this.currentMeasuredDraggingOffset + remainingDelta),
       0,
       this.maxExpansionWidth,
     );
-    if (nextOffset === this.currentDraggingOffsetState) return;
+    if (nextOffset === this.currentDraggingOffsetState) {
+      if (cancelledSettling) this.notify();
+      return;
+    }
     this.currentDraggingOffsetState = nextOffset;
     this.currentMeasuredDraggingOffset = nextOffset;
     this.notify();
   }
 
   endDrag(velocity = 0) {
+    finite(velocity, 'velocity');
     if (this.dragging) {
       this.dragging = false;
       this.notify();
     }
-    this.settleToAnchorIfNeeded(velocity);
+    void this.settleToAnchorIfNeeded(velocity);
   }
 
   snapToAnchor(anchor: PaneExpansionAnchor) {
-    const matched = this.anchors.find((candidate) => anchorEquals(candidate, anchor));
+    const matched = this.findAnchor(anchor);
     if (matched === undefined) {
       throw new RangeError('The provided anchor is not in the anchor list');
     }
+    this.cancelAnimation();
     this.currentAnchorState = matched;
     if (this.maxExpansionWidth !== PaneExpansionUnspecified) {
       const offset = anchorPosition(matched, this.maxExpansionWidth, this.measuredDirection);
@@ -287,12 +415,71 @@ export class PaneExpansionState {
     this.notify();
   }
 
-  moveToNextAnchor() {
-    const anchor = this.nextAnchor;
-    if (anchor !== null) this.snapToAnchor(anchor);
+  /** AndroidX PaneExpansionState.animateTo analogue. */
+  async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
+    finite(initialVelocity, 'initialVelocity');
+    const matched = this.findAnchor(anchor);
+    if (matched === undefined) {
+      throw new RangeError('The provided anchor is not in the anchor list');
+    }
+
+    this.cancelAnimation();
+    this.currentAnchorState = matched;
+    if (
+      this.maxExpansionWidth === PaneExpansionUnspecified ||
+      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
+    ) {
+      this.notify();
+      return;
+    }
+
+    const targetOffset = anchorPosition(
+      matched,
+      this.maxExpansionWidth,
+      this.measuredDirection,
+    );
+    const from = this.currentMeasuredDraggingOffset;
+    if (from === targetOffset && initialVelocity === 0) {
+      this.setAnimatedOffset(targetOffset);
+      this.notify();
+      return;
+    }
+
+    const controller = new AbortController();
+    this.animationController = controller;
+    this.settling = true;
+    this.notify();
+
+    try {
+      await this.defaultAnimation({
+        from,
+        to: targetOffset,
+        initialVelocity,
+        signal: controller.signal,
+        update: (offset) => {
+          if (controller.signal.aborted) return;
+          this.setAnimatedOffset(offset);
+          this.notify();
+        },
+      });
+      if (controller.signal.aborted) return;
+      this.setAnimatedOffset(targetOffset);
+    } finally {
+      if (this.animationController === controller) {
+        this.animationController = null;
+        this.settling = false;
+        this.notify();
+      }
+    }
   }
 
-  settleToAnchorIfNeeded(velocity: number) {
+  moveToNextAnchor() {
+    const anchor = this.nextAnchor;
+    if (anchor !== null) void this.animateTo(anchor);
+  }
+
+  async settleToAnchorIfNeeded(velocity: number) {
+    finite(velocity, 'velocity');
     if (
       this.anchors.length === 0 ||
       this.maxExpansionWidth === PaneExpansionUnspecified ||
@@ -301,7 +488,6 @@ export class PaneExpansionState {
       return;
     }
 
-    this.settling = true;
     const currentPosition = this.currentMeasuredDraggingOffset;
     let bestAnchor = this.anchors[0];
     let bestScore = Number.POSITIVE_INFINITY;
@@ -324,14 +510,9 @@ export class PaneExpansionState {
       }
     }
 
-    this.currentAnchorState = bestAnchor ?? null;
     if (bestAnchor !== undefined) {
-      const offset = anchorPosition(bestAnchor, this.maxExpansionWidth, this.measuredDirection);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
+      await this.animateTo(bestAnchor, velocity);
     }
-    this.settling = false;
-    this.notify();
   }
 
   getLayoutState(
