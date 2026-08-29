@@ -14,7 +14,11 @@ export type ComponentDocId =
   | 'progress-indicator'
   | 'loading-indicator'
   | 'snackbar'
-  | 'tooltip';
+  | 'tooltip'
+  | 'tabs'
+  | 'segmented-button'
+  | 'split-button'
+  | 'button-group';
 
 export interface ComponentDocMetadata {
   family: string;
@@ -174,5 +178,41 @@ export const componentDocs = {
       'Implements plain and rich Material tooltip surfaces with canonical visual roles, placement spacing, portal inheritance, hover/focus invocation, persistent rich-tooltip behavior, actions, and theme-aware visual propagation.',
     webAdaptation:
       'Plain tooltips use the React Aria tooltip pattern and accessible description wiring. Rich tooltips can contain actions, so they intentionally use non-modal dialog semantics with aria-haspopup/expanded/controls relationships instead of misusing the non-interactive ARIA tooltip role.',
+  },
+  tabs: {
+    family: 'Tabs',
+    materialUrl: 'https://m3.material.io/components/tabs/overview',
+    composeMapping: ['PrimaryTabRow', 'SecondaryTabRow', 'PrimaryScrollableTabRow', 'SecondaryScrollableTabRow', 'Tab', 'LeadingIconTab'],
+    implementation:
+      'Implements primary and secondary Material tab-list surfaces in fixed and scrollable modes, with labels, icons, disabled states, leading-icon mapping, canonical indicator geometry, divider composition, and reduced-motion-aware selected-item scrolling.',
+    webAdaptation:
+      'React Aria Tabs, TabList, and Tab own tab semantics, roving keyboard focus, disabled state, and automatic keyboard activation. This component intentionally stops at the tab list; applications connect the selected key to their own route or panel content instead of receiving hidden tab panels from the visual primitive.',
+  },
+  'segmented-button': {
+    family: 'Segmented buttons',
+    materialUrl: 'https://m3.material.io/components/segmented-buttons/overview',
+    composeMapping: ['SingleChoiceSegmentedButtonRow', 'MultiChoiceSegmentedButtonRow', 'SegmentedButton'],
+    implementation:
+      'Implements the Material outlined segmented-button geometry, selected/unselected color and state layers, default selected check mark, optional inactive/selected icon slots, and separate single-choice and multi-choice row primitives.',
+    webAdaptation:
+      'Single-choice rows use React Aria RadioGroup/Radio semantics while multi-choice segments use independent React Aria Checkbox semantics inside a grouped container. The separate APIs preserve the accessibility model instead of collapsing radio and multi-toggle state into one generic selection contract.',
+  },
+  'split-button': {
+    family: 'Split buttons',
+    materialUrl: 'https://m3.material.io/components/split-button/overview',
+    composeMapping: ['SplitButton visual/action contract'],
+    implementation:
+      'Implements filled, tonal, elevated, and outlined split buttons across the public Material button size family, with audited leading/trailing shape geometry, press morphing, independent disabled states, and trailing expanded or checked state exposure.',
+    webAdaptation:
+      'Both halves reuse the React Aria-backed Material button engine. The trailing button can expose aria-expanded for an externally composed disclosure or aria-pressed for a true toggle, but SplitButton deliberately does not create or own a menu/popover; applications own that secondary surface and focus lifecycle.',
+  },
+  'button-group': {
+    family: 'Button groups',
+    materialUrl: 'https://m3.material.io/components/button-groups/overview',
+    composeMapping: ['ButtonGroup', 'ConnectedButtonGroup'],
+    implementation:
+      'Implements standard action groups with AndroidX-style pressed-width redistribution and a tokenized local overflow menu, plus connected single/multiple selection groups across the audited extra-small through extra-large size family.',
+    webAdaptation:
+      'Standard groups contain independent React Aria-backed actions and use ResizeObserver to move a suffix into a component-local menu when the row cannot fit; that is local overflow, not adaptive window layout. Connected single selection uses React Aria RadioGroup/Radio semantics, while connected multiple selection uses ToggleButton semantics.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;
