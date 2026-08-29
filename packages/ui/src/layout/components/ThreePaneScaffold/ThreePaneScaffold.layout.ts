@@ -197,7 +197,10 @@ export function calculateThreePaneScaffoldLayout({
     const widths = new Map<ThreePaneScaffoldRole, number>(
       roles.map((role) => [role, preferredWidth(role)]),
     );
-    const totalPreferredWidth = roles.reduce((sum, role) => sum + preferredWidth(role), 0);
+    const totalPreferredWidth = roles.reduce(
+      (sum, role) => sum + (widths.get(role) ?? 0),
+      0,
+    );
 
     if (allocatableWidth > totalPreferredWidth) {
       const highestPriorityRole = roles.reduce((best, role) =>
@@ -209,7 +212,9 @@ export function calculateThreePaneScaffoldLayout({
       );
     } else if (allocatableWidth < totalPreferredWidth && totalPreferredWidth > 0) {
       const scale = allocatableWidth / totalPreferredWidth;
-      roles.forEach((role) => widths.set(role, preferredWidth(role) * scale));
+      roles.forEach((role) =>
+        widths.set(role, Math.trunc((widths.get(role) ?? 0) * scale)),
+      );
     }
 
     let left = bounds.left;
