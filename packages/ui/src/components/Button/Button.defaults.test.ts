@@ -8,6 +8,7 @@ import {
 } from './Button.defaults';
 
 const idleState = { isDisabled: false, interaction: null } as const;
+const primitiveElevation = { legacyInlineElevation: false } as const;
 
 describe('Button runtime defaults', () => {
   it('keeps expressive shape resolution in runtime because shapes may be supplied by props', () => {
@@ -16,22 +17,31 @@ describe('Button runtime defaults', () => {
     expect(buttonShapesForSize('extraLarge')).toEqual({ shape: '9999px', pressedShape: '16px' });
   });
 
-  it('only emits a radius override when runtime shapes are supplied', () => {
-    const baseline = getButtonStyle('filled', idleState, { size: 'medium' });
+  it('only emits runtime shape overrides when shapes are supplied', () => {
+    const baseline = getButtonStyle('filled', idleState, {
+      size: 'medium',
+      ...primitiveElevation,
+    });
     expect(baseline['--_button-container-radius']).toBeUndefined();
     expect(baseline['--_button-container-color']).toBeUndefined();
     expect(baseline['--_button-min-height']).toBeUndefined();
+    expect(baseline.boxShadow).toBeUndefined();
 
     const shapes = buttonShapesForSize('medium');
-    const idle = getButtonStyle('filled', idleState, { size: 'medium', shapes });
+    const idle = getButtonStyle('filled', idleState, {
+      size: 'medium',
+      shapes,
+      ...primitiveElevation,
+    });
     const pressed = getButtonStyle(
       'filled',
       { ...idleState, interaction: 'press' },
-      { size: 'medium', shapes },
+      { size: 'medium', shapes, ...primitiveElevation },
     );
     expect(idle['--_button-container-radius']).toBe('9999px');
     expect(pressed['--_button-container-radius']).toBe('12px');
     expect(pressed.transition).toContain('border-radius 166ms linear(');
+    expect(pressed.transition).not.toContain('box-shadow');
   });
 
   it('resolves elevation from canonical variant tokens and runtime interaction state', () => {
@@ -54,8 +64,19 @@ describe('Button runtime defaults', () => {
     expect(resolveButtonElevationTransition({ ...idleState, previousInteraction: 'press' })).toBe('box-shadow 150ms cubic-bezier(0.4, 0, 0.6, 1)');
   });
 
-  it('uses the ThemeProvider shadow role for elevated runtime elevation', () => {
-    const style = getButtonStyle('elevated', { ...idleState, interaction: 'hover' });
-    expect(style.boxShadow).toContain('var(--shadow)');
+  it('keeps inline shadow serialization only as transitional compatibility', () => {
+    const legacy = getButtonStyle('elevated', {
+      ...idleState,
+      interaction: 'hover',
+    });
+    expect(legacy.boxShadow).toContain('var(--shadow)');
+
+    const migrated = getButtonStyle(
+      'elevated',
+      { ...idleState, interaction: 'hover' },
+      primitiveElevation,
+    );
+    expect(migrated.boxShadow).toBeUndefined();
+    expect(migrated.transition).toBe('none');
   });
 });
