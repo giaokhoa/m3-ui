@@ -1,0 +1,51 @@
+---
+title: Non-interactive scrollbar
+description: Visual-only Material scroll-position feedback for native or adapted scroll containers, including RTL-aware horizontal metrics and optional fading.
+---
+
+<ParitySummary component="non-interactive-scrollbar" />
+
+## Overview
+
+`NonInteractiveScrollbar` is a visual scroll-position indicator. The scroll container remains the only scrolling control; the overlay observes its metrics and never accepts pointer input.
+
+<ComponentPreview>
+  <NonInteractiveScrollbarPreview />
+</ComponentPreview>
+
+## Native scroll containers
+
+Pass a ref to the element that owns scrolling:
+
+```tsx
+const scrollRef = useRef<HTMLDivElement>(null);
+
+<div className="scroll-host">
+  <div ref={scrollRef} className="scroll-content">...</div>
+  <NonInteractiveScrollbar scrollRef={scrollRef} />
+</div>
+```
+
+The component reads viewport size, content size, and scroll offset, and recomputes geometry when scrolling, resizing, or content mutations change those values.
+
+## Visual-only semantics
+
+The root is `aria-hidden="true"`, and the root, track, fade layer, and thumb all use `pointer-events: none`. Do not add click, drag, or keyboard behavior to this primitive; doing so would create a second scrolling control with a different interaction contract.
+
+Use the browser's native scrolling semantics, keyboard behavior, touch scrolling, and assistive-technology interaction on the underlying container.
+
+## Orientation and RTL
+
+`orientation` supports `vertical` and `horizontal`. Horizontal metrics normalize RTL browser scroll offsets so logical scroll progress produces the same thumb movement across direction modes.
+
+The vertical indicator is drawn on the logical end edge by the component styles; horizontal presentation occupies the bottom edge.
+
+## Geometry and fading
+
+The scrollbar appears only when content overflows the viewport and the available track can represent a valid thumb. Public geometry controls include `thumbMinLength`, `thumbMaxLengthFraction`, `thickness`, and track insets.
+
+With `isFadeEnabled`, scrolling reveals the indicator and the configured delay/duration controls its fade. Disable fading when a continuously visible visual indicator is appropriate.
+
+## Custom metrics
+
+`metricsAdapter` supports virtualized or custom scrollers whose useful metrics do not come directly from a native element. The adapter supplies the same viewport/content/offset model and can expose a subscription hook; interaction ownership still stays with the original scroller.
