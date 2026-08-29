@@ -1,6 +1,6 @@
 ---
 title: Date pickers
-description: Material single-date and date-range pickers with calendar and segmented date-input modes, date-only state, and explicit dialog composition.
+description: Material single-date and date-range pickers with calendar and native date-input modes, date-only state, and explicit dialog composition.
 ---
 
 <MaterialParity component="date-picker" />
@@ -31,15 +31,13 @@ Helpers such as `isDatePickerDate`, `compareDatePickerDates`, `monthStart`, and 
 
 ## Single and range selection
 
-Use `DatePicker` for one date and `DateRangePicker` for `{ start, end }` state. Range input rejects an end date before its start date. `isDateUnavailable` keeps a calendar date focusable while preventing selection, and `yearRange` constrains both calendar and segmented input modes.
+Use `DatePicker` for one date and `DateRangePicker` for `{ start, end }` state. Range input rejects an end date before its start date. `isDateUnavailable` keeps a calendar date focusable while preventing selection, and `yearRange` constrains both calendar and native date-input modes.
 
 ## Calendar and input modes
 
-The default `calendar` mode uses React Aria `Calendar` or `RangeCalendar` semantics. The optional `input` mode uses React Aria `DateField`, `DateInput`, and `DateSegment` primitives while preserving the same ISO date-only application state.
+The default `calendar` mode uses React Aria Calendar or RangeCalendar semantics. The optional `input` mode uses native `input type="date"` controls while preserving the same ISO date-only application state.
 
-React Aria owns segment ordering, keyboard editing, focus movement, placeholder state, and field validation. Material styling is applied to the field surface and segment interaction states instead of relying on the browser-specific UI of native `input type="date"` controls.
-
-`locale` controls month, weekday, headline, and date-segment presentation. `firstDayOfWeek` can override the locale default when the product has an explicit calendar convention.
+`locale` controls month, weekday, and headline formatting. `firstDayOfWeek` can override the locale default when the product has an explicit calendar convention.
 
 ## Modal versus docked
 
@@ -60,4 +58,4 @@ React Aria owns segment ordering, keyboard editing, focus movement, placeholder 
 
 ## Validation and errors
 
-Manual input uses React Aria field validation for year bounds and unavailable dates. In range mode, incomplete or reversed drafts are kept local and do not publish a corrupt public range value. Pass `errorMessage` for application-facing validation copy.
+Manual input exposes native date fields with `aria-invalid` when a value falls outside the year range, fails the ISO calendar-date contract, or is unavailable. Pass `errorMessage` for application-facing validation copy.
