@@ -32,10 +32,10 @@ import {
   IconButtonPreview,
 } from './actionSurfaceDemos';
 import {
-  componentDocs,
-  type ComponentDocId,
-  type ComponentDocMetadata,
-} from './componentDocs';
+  allComponentDocs,
+  type AllComponentDocId,
+} from './allComponentDocs';
+import type { ComponentDocMetadata } from './componentDocs';
 import {
   ColorRoleGrid,
   DynamicColorPreview,
@@ -198,8 +198,8 @@ function ComponentPreview({ children }: PropsWithChildren) {
   );
 }
 
-function MaterialParity({ component }: { component: ComponentDocId }) {
-  const metadata: ComponentDocMetadata = componentDocs[component];
+function MaterialParity({ component }: { component: AllComponentDocId }) {
+  const metadata: ComponentDocMetadata = allComponentDocs[component];
   const referenceUrl = metadata.referenceUrl ?? metadata.materialUrl;
 
   return (

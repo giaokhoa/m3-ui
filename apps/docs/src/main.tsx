@@ -16,6 +16,7 @@ import { groupedControlMdxComponents } from './groupedControlMdxComponents';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
 import { pickerMdxComponents } from './pickerMdxComponents';
+import { smallPrimitiveMdxComponents } from './smallPrimitiveMdxComponents';
 import './styles.css';
 
 function currentSlugs(): string[] {
@@ -81,6 +82,7 @@ function DocsPage() {
     ...pickerMdxComponents,
     ...carouselSheetMdxComponents,
     ...composeUtilityMdxComponents,
+    ...smallPrimitiveMdxComponents,
   };
 
   return (

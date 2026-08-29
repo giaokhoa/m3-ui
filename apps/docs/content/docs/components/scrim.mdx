@@ -1,0 +1,45 @@
+---
+title: Scrim
+description: Material scrim presentation with passive and dismissible forms while modal state, focus, portals, and stacking remain composition-owned.
+---
+
+<ParitySummary component="scrim" />
+
+## Overview
+
+`Scrim` is the Material obscuring layer used behind modal or elevated content. It deliberately stops at the scrim contract: color, opacity, animation alpha, and an optional dismissal action.
+
+<ComponentPreview>
+  <ScrimPreview />
+</ComponentPreview>
+
+## Passive form
+
+Without `onDismiss`, the scrim is decorative and renders `aria-hidden="true"`. Use this when another control owns dismissal or when the layer only provides visual emphasis.
+
+```tsx
+<Scrim />
+```
+
+## Dismissible form
+
+Supplying `onDismiss` requires an accessible name and changes the primitive to a native button removed from the tab sequence.
+
+```tsx
+<Scrim
+  aria-label="Dismiss dialog"
+  onDismiss={closeDialog}
+/>
+```
+
+The button semantics expose the dismissal action to assistive technology without inserting the full-screen layer into normal keyboard tab order.
+
+## Ownership boundary
+
+`Scrim` does **not** create a portal, trap focus, lock document scroll, respond to Escape, restore focus, or decide z-index. A real modal composition must own those concerns. Components such as `Dialog` and `ModalBottomSheet` already compose the appropriate browser modal behavior around their Material surfaces.
+
+For custom overlays, keep modal lifecycle and stacking in the overlay owner and use `Scrim` only as the visual/dismiss layer.
+
+## Styling
+
+`containerColor`, `containerOpacity`, and `alpha` override the token-backed presentation. `alpha` is useful for animation progress; it does not change the semantic state of the surrounding modal surface.
