@@ -6,6 +6,7 @@ import {
   Slider,
   Switch,
 } from '@m3-ui/ui';
+import './selection-control-demos.css';
 
 export function CheckboxPreview() {
   return (
