@@ -1,0 +1,50 @@
+---
+title: Segmented buttons
+description: Single-choice and multi-choice Material segmented controls with radio and checkbox semantics kept distinct.
+---
+
+<MaterialParity component="segmented-button" />
+
+## Overview
+
+The segmented-button family intentionally exposes separate single-choice and multi-choice primitives:
+
+- `SingleChoiceSegmentedButtonRow` + `SingleChoiceSegmentedButton`
+- `MultiChoiceSegmentedButtonRow` + `MultiChoiceSegmentedButton`
+
+This preserves the Material visual family without flattening radio selection and independent toggle selection into one ambiguous state API.
+
+## Live example
+
+<ComponentPreview>
+  <SegmentedButtonPreview />
+</ComponentPreview>
+
+## Single choice
+
+Single-choice rows use React Aria radio-group and radio semantics. Each segment needs a `value`, and exactly one current value represents the group selection.
+
+```tsx
+<SingleChoiceSegmentedButtonRow aria-label="Density" defaultValue="standard">
+  <SingleChoiceSegmentedButton value="compact">Compact</SingleChoiceSegmentedButton>
+  <SingleChoiceSegmentedButton value="standard">Standard</SingleChoiceSegmentedButton>
+  <SingleChoiceSegmentedButton value="comfortable">Comfortable</SingleChoiceSegmentedButton>
+</SingleChoiceSegmentedButtonRow>
+```
+
+## Multiple choice
+
+Multi-choice segments are independent React Aria checkboxes inside a semantic group. Use them when more than one option can be active.
+
+```tsx
+<MultiChoiceSegmentedButtonRow aria-label="Text formatting">
+  <MultiChoiceSegmentedButton defaultSelected>Bold</MultiChoiceSegmentedButton>
+  <MultiChoiceSegmentedButton>Italic</MultiChoiceSegmentedButton>
+</MultiChoiceSegmentedButtonRow>
+```
+
+## Icons and selected state
+
+Segments may provide an inactive `icon` and a `selectedIcon`. If no selected icon is supplied, the Material check mark is used. The icon slot is presentation-only; the segment label and React Aria control semantics remain the accessible source of meaning.
+
+Canonical outline, shape, spacing, state layers, typography, and selected/unselected colors come from the component token layer rather than docs CSS.
