@@ -125,20 +125,26 @@ body {
 }
 
 .docs-parity__list > div {
-  display: grid;
-  grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px 24px;
   padding-block: 12px;
   border-block-start: 1px solid var(--outline-variant);
 }
 
-.docs-parity__list dt,
-.docs-parity__list dd {
-  margin: 0;
+.docs-parity__list dt {
+  flex: 0 0 120px;
 }
 
 .docs-parity__list dd {
+  flex: 1 1 240px;
+  min-inline-size: 0;
   color: var(--on-surface-variant);
+}
+
+.docs-parity__list dt,
+.docs-parity__list dd {
+  margin: 0;
 }
 
 .docs-table-scroll {
@@ -167,10 +173,4 @@ body {
 
 .docs-table td {
   color: var(--on-surface-variant);
-}
-
-@media (max-width: 520px) {
-  .docs-parity__list > div {
-    grid-template-columns: 1fr;
-  }
 }
