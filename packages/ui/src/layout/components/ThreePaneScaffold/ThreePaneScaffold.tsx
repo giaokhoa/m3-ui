@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
@@ -47,6 +48,10 @@ import {
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
 } from './ThreePaneScaffold.transition';
+import {
+  getPaneExpansionHandleAriaState,
+  type PaneExpansionHandleAriaStrings,
+} from './paneExpansionSemantics';
 import { useDefaultPaneExpansionState } from './useDefaultPaneExpansionState';
 import './three-pane-scaffold.css';
 
@@ -70,6 +75,8 @@ export interface ThreePaneScaffoldProps
   paneExpansionState?: PaneExpansionState;
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
   paneExpansionHandleAriaLabel?: string;
+  /** Localized formatters for anchored pane-expansion state and next-anchor action text. */
+  paneExpansionHandleAriaStrings?: Partial<PaneExpansionHandleAriaStrings>;
   /**
    * Accessible pane names keyed by scaffold role. Defaults mirror the pinned
    * AndroidX pane-title strings; override these when the application localizes
@@ -177,6 +184,7 @@ export function ThreePaneScaffold({
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionHandleAriaLabel = 'Resize panes',
+  paneExpansionHandleAriaStrings,
   paneAriaLabels,
   levitatedPaneDragHandles,
   levitatedPaneDragHandleAriaLabel = 'Resize pane',
@@ -482,18 +490,29 @@ export function ThreePaneScaffold({
   };
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (
-      hasBlockingScrim ||
-      (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') ||
-      dragHandleOffset === PaneExpansionUnspecified
-    ) {
+    if (hasBlockingScrim || dragHandleOffset === PaneExpansionUnspecified) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      if (expansionState.nextAnchor === null) return;
+      event.preventDefault();
+      expansionState.moveToNextAnchor();
       return;
     }
+
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
     expansionState.onExpansionOffsetMeasured(dragHandleOffset);
     expansionState.beginDrag();
     expansionState.dispatchRawDelta(event.key === 'ArrowLeft' ? -16 : 16);
     expansionState.endDrag(0);
+  };
+
+  const handleClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    // Pointer clicks keep their drag behavior. Assistive technologies commonly
+    // synthesize a detail=0 click for the semantic activation action.
+    if (hasBlockingScrim || event.detail !== 0 || expansionState.nextAnchor === null) return;
+    event.preventDefault();
+    expansionState.moveToNextAnchor();
   };
 
   const beginResize = (
@@ -576,6 +595,10 @@ export function ThreePaneScaffold({
     dragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
       ? 0
       : Math.round((dragHandleOffset / geometry.width) * 100);
+  const dragHandleAriaState = getPaneExpansionHandleAriaState(
+    expansionState,
+    paneExpansionHandleAriaStrings,
+  );
   const predictiveBackScale = getPredictiveBackScale(scaffoldState);
 
   return (
@@ -725,13 +748,16 @@ export function ThreePaneScaffold({
           className="three-pane-scaffold__drag-handle"
           role="separator"
           aria-label={paneExpansionHandleAriaLabel}
+          aria-description={dragHandleAriaState.description}
           aria-orientation="vertical"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={dragHandlePercent}
+          aria-valuetext={dragHandleAriaState.valueText}
           inert={hasBlockingScrim || undefined}
           tabIndex={hasBlockingScrim ? -1 : 0}
           style={{ left: dragHandleOffset }}
+          onClick={handleClick}
           onKeyDown={handleKeyDown}
           onPointerCancel={(event) => finishPointerDrag(event, 0)}
           onPointerDown={handlePointerDown}

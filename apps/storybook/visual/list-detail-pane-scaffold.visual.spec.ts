@@ -63,6 +63,36 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     await expect(modalRoot.getByRole('region', { name: 'Primary pane' })).toHaveCount(0);
   });
 
+  test('announces anchored pane splits and exposes the next anchor activation', async ({ page }) => {
+    await openStory(page, 'layout-listdetailpanescaffold--resizable');
+
+    const handle = page
+      .locator('#storybook-root')
+      .getByRole('separator', { name: 'Resize panes' });
+
+    await expect(handle).toHaveAttribute('aria-valuenow', '50');
+    await expect(handle).toHaveAttribute('aria-valuetext', 'Current pane split, 50 percent');
+    await expect(handle).toHaveAttribute('aria-description', 'Change pane split to 70 percent');
+
+    await handle.focus();
+    await page.keyboard.press('Enter');
+    await expect(handle).toHaveAttribute('aria-valuenow', '70');
+    await expect(handle).toHaveAttribute('aria-valuetext', 'Current pane split, 70 percent');
+    await expect(handle).toHaveAttribute('aria-description', 'Change pane split to 30 percent');
+
+    // A real pointer click remains part of the drag interaction and must not
+    // activate the accessibility-only next-anchor action.
+    await handle.click();
+    await expect(handle).toHaveAttribute('aria-valuenow', '70');
+
+    // Assistive technologies commonly invoke semantic actions as a synthetic
+    // click without pointer detail. That follows AndroidX's onClick semantics.
+    await handle.dispatchEvent('click');
+    await expect(handle).toHaveAttribute('aria-valuenow', '30');
+    await expect(handle).toHaveAttribute('aria-valuetext', 'Current pane split, 30 percent');
+    await expect(handle).toHaveAttribute('aria-description', 'Change pane split to 50 percent');
+  });
+
   test('seekable motion halfway', async ({ page }) => {
     await openStory(page, 'layout-listdetailpanescaffold--motion-halfway');
 
