@@ -10,7 +10,9 @@
   "types": "./dist/generated/tokens.d.ts",
   "exports": {
     ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
-    "./button.css": "./dist/generated/button.css"
+    "./button.css": "./dist/generated/button.css",
+    "./elevation.css": "./dist/generated/elevation.css",
+    "./ripple.css": "./dist/generated/ripple.css"
   },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
