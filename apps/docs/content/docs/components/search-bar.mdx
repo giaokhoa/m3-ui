@@ -1,0 +1,53 @@
+---
+title: Search bar
+description: Material search input and docked or full-screen search surfaces with explicit shared state and browser-native search semantics.
+---
+
+<MaterialParity component="search-bar" />
+
+## Overview
+
+`SearchBar` is the collapsed Material search surface. Pair it with `SearchBarInput` and either `ExpandedDockedSearchBar` or `ExpandedFullScreenSearchBar`, all sharing the same `SearchBarState` from `useSearchBarState()`.
+
+The component owns Material presentation and expansion behavior. It does **not** own indexing, ranking, network requests, or application navigation.
+
+## Live example
+
+<ComponentPreview>
+  <SearchBarPreview />
+</ComponentPreview>
+
+Focus the field to expand the docked search view. The preview results are static application content; the public docs search itself uses Fumadocs' full-text index outside this component.
+
+## Composition
+
+```tsx
+const state = useSearchBarState();
+
+<SearchBar state={state}>
+  <SearchBarInput
+    state={state}
+    aria-label="Search"
+    value={query}
+    onValueChange={setQuery}
+  />
+</SearchBar>
+
+<ExpandedDockedSearchBar state={state} inputField={input}>
+  {results}
+</ExpandedDockedSearchBar>
+```
+
+Use `ExpandedFullScreenSearchBar` when the result surface should be modal. Use the docked form when results should stay bounded near the input.
+
+## Input semantics
+
+`SearchBarInput` renders a native `form` with `role="search"` and a search input. Submitting the form calls `onSearch`, while `onValueChange` handles text changes. `clearable` adds an explicit clear action and returns focus to the input.
+
+The full-screen surface uses React Aria modal/dialog behavior for focus management, outside dismissal, and Escape. The docked surface remains non-modal and closes on outside pointer interaction or Escape.
+
+## Data boundary
+
+Search data is deliberately application-owned. In this documentation app, Fumadocs builds a static full-text ZBSearch index and feeds results into the Material search surface. A product can replace that backend without changing `SearchBar`.
+
+No adaptive breakpoint or pane rule lives in the search component; choosing docked versus full-screen presentation is a composition decision.

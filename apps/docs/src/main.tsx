@@ -8,6 +8,7 @@ import {
 import '@m3-ui/ui/styles.css';
 import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
+import { feedbackSearchMdxComponents } from './feedbackSearchMdxComponents';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
 import './styles.css';
@@ -103,7 +104,7 @@ function DocsPage() {
               </p>
             ) : null}
           </header>
-          <MDX components={getMdxComponents()} />
+          <MDX components={getMdxComponents(feedbackSearchMdxComponents)} />
         </article>
       </main>
     </>

@@ -1,0 +1,56 @@
+---
+title: Tooltips
+description: Plain and rich Material tooltips with correct non-interactive tooltip versus interactive dialog semantics.
+---
+
+<MaterialParity component="tooltip" />
+
+## Overview
+
+The public family separates plain and rich Material tooltips because their browser semantics are different:
+
+- `TooltipTrigger` + `PlainTooltip` for short, non-interactive supporting text.
+- `RichTooltipTrigger` + `RichTooltip` for richer content that can include a title and action.
+
+## Live example
+
+<ComponentPreview>
+  <TooltipPreview />
+</ComponentPreview>
+
+Hover or keyboard-focus the triggers. Rich tooltip actions remain keyboard reachable without turning the overlay into a modal dialog.
+
+## Plain tooltip
+
+Plain tooltips use React Aria's tooltip pattern, including trigger relationship, hover/focus timing, placement, portal behavior, and accessible description wiring.
+
+```tsx
+<TooltipTrigger>
+  <Button>Info</Button>
+  <PlainTooltip>Short supporting context</PlainTooltip>
+</TooltipTrigger>
+```
+
+Keep plain tooltip content non-interactive.
+
+## Rich tooltip
+
+Rich tooltips may contain an action, so using the ARIA `tooltip` role would be incorrect. `RichTooltipTrigger` instead exposes `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` on the real trigger, while `RichTooltip` renders a non-modal dialog surface.
+
+```tsx
+<RichTooltipTrigger>
+  <Button>Shortcuts</Button>
+  <RichTooltip
+    title="Keyboard shortcuts"
+    action={(close) => <TextButton onPress={close}>Got it</TextButton>}
+  >
+    Press Command K to open search.
+  </RichTooltip>
+</RichTooltipTrigger>
+```
+
+Actionable rich tooltips are persistent by default and can dismiss through their action, Escape, or outside interaction. Focus is allowed to travel into the action without enabling modal focus containment.
+
+## Theme portals
+
+Tooltip surfaces are portalled. The implementation propagates public theme CSS variables from the anchor context into the portal while excluding component-private `--_` variables, so nested themes remain visually correct without leaking internal token implementation details.
