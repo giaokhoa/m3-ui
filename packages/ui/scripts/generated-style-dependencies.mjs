@@ -3,7 +3,11 @@ export const generatedStyleDependencies = {
     '../tokens/dist/generated/elevation.css',
   ],
   'src/internal/ripple/ripple.css': ['../tokens/dist/generated/ripple.css'],
-  'src/components/Button/button.css': ['../tokens/dist/generated/button.css'],
+  'src/components/Button/button.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+    '../tokens/dist/generated/button.css',
+  ],
 };
 
 export function expandStyleSources(sources) {
