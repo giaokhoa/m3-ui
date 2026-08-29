@@ -41,7 +41,7 @@ export const actionOverflowDocs = {
     implementation:
       'Lays out action, toggle, and custom app-bar items on the inline axis, observes the local container and item widths, preserves maxItemCount, and moves only the suffix that no longer fits into a Material overflow menu.',
     webAdaptation:
-      'Overflow is resolved from this component own measured available width, not from viewport classes or responsive navigation policy. Built-in actions retain button/toggle semantics and React Aria Menu owns overflow positioning, keyboard interaction, and focus restoration.',
+      "Overflow is resolved from the component's own measured available width, not from viewport classes or responsive navigation policy. Built-in actions retain button/toggle semantics and React Aria Menu owns overflow positioning, keyboard interaction, and focus restoration.",
   },
   'app-bar-column': {
     family: 'App bar action columns',
