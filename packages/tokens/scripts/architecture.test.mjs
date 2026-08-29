@@ -81,7 +81,9 @@ test('Style Dictionary skill describes runtime color ownership and generated ada
   );
 
   assert.match(skill, /no handwritten runtime `src\/` layer/i);
-  assert.match(skill, /ThemeProvider.*owns the actual runtime Material colors/is);
+  assert.match(skill, /## Runtime color model/i);
+  assert.match(skill, /ThemeProvider/i);
+  assert.match(skill, /owns (?:the concrete runtime value of|actual) Material color/i);
   assert.match(skill, /component.*reference.*role/is);
   assert.match(skill, /platform adapter/i);
   assert.match(skill, /Do not decode `var\(--role\)`/i);
