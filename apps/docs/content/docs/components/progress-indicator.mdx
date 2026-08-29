@@ -1,0 +1,47 @@
+---
+title: Progress indicators
+description: Standard and M3 Expressive linear or circular progress indicators with React Aria progress semantics.
+---
+
+import { ProgressIndicatorPreview } from '../../../src/feedbackSearchDemos';
+
+<MaterialParity component="progress-indicator" />
+
+## Overview
+
+The public family contains four Material progress indicators:
+
+- `LinearProgressIndicator`
+- `CircularProgressIndicator`
+- `LinearWavyProgressIndicator`
+- `CircularWavyProgressIndicator`
+
+The standard pair covers baseline Material progress. The wavy pair implements the current M3 Expressive waveform behavior audited against Compose.
+
+## Live example
+
+<ComponentPreview>
+  <ProgressIndicatorPreview />
+</ComponentPreview>
+
+## Determinate and indeterminate
+
+Pass `value` for known progress, or `isIndeterminate` when completion cannot be estimated. Material defaults to a `0..1` range, while the underlying React Aria progress semantics can also represent an explicit custom range.
+
+```tsx
+<LinearProgressIndicator aria-label="Upload progress" value={0.64} />
+<CircularProgressIndicator aria-label="Loading" isIndeterminate />
+<LinearWavyProgressIndicator aria-label="Import progress" value={0.42} />
+```
+
+The visual drawing is accessibility-hidden. Always provide `aria-label` or `aria-labelledby` because Material progress indicators do not render a visible label themselves.
+
+## Expressive waveform
+
+Wavy indicators preserve the Compose-derived amplitude lifecycle, canonical waveform geometry, circular continuity, and reduced-motion behavior. `amplitude`, `wavelength`, and `waveSpeed` are renderer controls rather than new Material design tokens.
+
+## Web compatibility surface
+
+`bufferValue` on standard linear progress and `fourColor` on standard indeterminate indicators are audited Material Web adaptations. They remain intentionally separate from the Compose-aligned wavy API instead of being promoted to universal Material behavior.
+
+`prefers-reduced-motion: reduce` removes motion while preserving a valid progress visual and unchanged progressbar semantics.
