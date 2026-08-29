@@ -215,6 +215,8 @@ export class PaneExpansionState {
   private readonly listeners = new Set<() => void>();
   private readonly defaultAnimation: PaneExpansionAnimation;
   private animationController: AbortController | null = null;
+  private restoreInterruptibleAnimationController: AbortController | null = null;
+  private animationTargetOffset = PaneExpansionUnspecified;
 
   constructor({
     anchors = [],
@@ -248,8 +250,28 @@ export class PaneExpansionState {
   private cancelAnimation() {
     const controller = this.animationController;
     if (controller === null) return false;
+    if (this.restoreInterruptibleAnimationController === controller) {
+      this.restoreInterruptibleAnimationController = null;
+    }
     this.animationController = null;
+    this.animationTargetOffset = PaneExpansionUnspecified;
     controller.abort();
+    const wasSettling = this.settling;
+    this.settling = false;
+    return wasSettling;
+  }
+
+  private cancelRestoreInterruptibleAnimation() {
+    const controller = this.restoreInterruptibleAnimationController;
+    if (controller === null || this.animationController !== controller) return false;
+    const targetOffset = this.animationTargetOffset;
+    this.restoreInterruptibleAnimationController = null;
+    this.animationController = null;
+    this.animationTargetOffset = PaneExpansionUnspecified;
+    controller.abort();
+    if (targetOffset !== PaneExpansionUnspecified) {
+      this.setAnimatedOffset(targetOffset);
+    }
     const wasSettling = this.settling;
     this.settling = false;
     return wasSettling;
@@ -347,6 +369,7 @@ export class PaneExpansionState {
       throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
     }
 
+    this.cancelRestoreInterruptibleAnimation();
     const nextAnchors = [...anchors];
     const matchedCurrentAnchor =
       this.currentAnchorState === null
@@ -443,14 +466,11 @@ export class PaneExpansionState {
     this.notify();
   }
 
-  /** AndroidX PaneExpansionState.animateTo analogue. */
-  async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
-    finite(initialVelocity, 'initialVelocity');
-    const matched = this.findAnchor(anchor);
-    if (matched === undefined) {
-      throw new RangeError('The provided anchor is not in the anchor list');
-    }
-
+  private async animateToMatchedAnchor(
+    matched: PaneExpansionAnchor,
+    initialVelocity: number,
+    restoreInterruptible: boolean,
+  ) {
     this.cancelAnimation();
     this.currentAnchorState = matched;
     if (
@@ -475,6 +495,10 @@ export class PaneExpansionState {
 
     const controller = new AbortController();
     this.animationController = controller;
+    this.animationTargetOffset = targetOffset;
+    if (restoreInterruptible) {
+      this.restoreInterruptibleAnimationController = controller;
+    }
     this.settling = true;
     this.notify();
 
@@ -495,10 +519,24 @@ export class PaneExpansionState {
     } finally {
       if (this.animationController === controller) {
         this.animationController = null;
+        if (this.restoreInterruptibleAnimationController === controller) {
+          this.restoreInterruptibleAnimationController = null;
+        }
+        this.animationTargetOffset = PaneExpansionUnspecified;
         this.settling = false;
         this.notify();
       }
     }
+  }
+
+  /** AndroidX PaneExpansionState.animateTo analogue. */
+  async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
+    finite(initialVelocity, 'initialVelocity');
+    const matched = this.findAnchor(anchor);
+    if (matched === undefined) {
+      throw new RangeError('The provided anchor is not in the anchor list');
+    }
+    await this.animateToMatchedAnchor(matched, initialVelocity, false);
   }
 
   moveToNextAnchor() {
@@ -537,7 +575,7 @@ export class PaneExpansionState {
       }
     }
 
-    await this.animateTo(bestAnchorPosition.anchor, velocity);
+    await this.animateToMatchedAnchor(bestAnchorPosition.anchor, velocity, true);
   }
 
   getLayoutState(
