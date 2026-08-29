@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import type { ElevationLevel } from './tokens';
 import { getElevationBoxShadow } from './shadow';
@@ -24,7 +25,7 @@ export function Elevation({
     <span
       {...props}
       aria-hidden="true"
-      className={className ? `elevation ${className}` : 'elevation'}
+      className={clsx('elevation', className)}
       data-elevation={level}
       style={elevationStyle}
     />
