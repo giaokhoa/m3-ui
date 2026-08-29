@@ -38,6 +38,27 @@ function convertClassNameTernary(source) {
   );
 }
 
+function convertCardClassName(source) {
+  return source.replace(
+    "  const baseClassName = `card ${variantClassName(variant)}`;\n  const resolvedClassName = className ? `${baseClassName} ${className}` : baseClassName;",
+    "  const resolvedClassName = clsx('card', variantClassName(variant), className);",
+  );
+}
+
+function convertProgressIndicatorClasses(source) {
+  let next = source.replace(
+    `function classes(\n  kind: 'linear' | 'circular',\n  wavy: boolean,\n  userClassName: string | undefined,\n): string {\n  const names = [\n    'progress-indicator',\n    \`progress-indicator--\${kind}\`,\n    wavy ? 'progress-indicator--wavy' : 'progress-indicator--standard',\n  ];\n  if (userClassName) names.push(userClassName);\n  return names.join(' ');\n}`,
+    `function classes(\n  kind: 'linear' | 'circular',\n  wavy: boolean,\n  userClassName: string | undefined,\n): string {\n  return clsx(\n    'progress-indicator',\n    \`progress-indicator--\${kind}\`,\n    wavy ? 'progress-indicator--wavy' : 'progress-indicator--standard',\n    userClassName,\n  );\n}`,
+  );
+
+  next = next.replace(
+    `className={\`progress-indicator__linear-indeterminate\${\n        fourColor\n          ? ' progress-indicator__linear-indeterminate--four-color'\n          : ''\n      }\`}`,
+    `className={clsx(\n        'progress-indicator__linear-indeterminate',\n        fourColor && 'progress-indicator__linear-indeterminate--four-color',\n      )}`,
+  );
+
+  return next;
+}
+
 function convertSimpleInterpolatedClassName(source) {
   return source.replace(/className=\{`([^`]+)`\}/g, (match, template) => {
     if (!template.includes(' ') || !/\$\{[A-Za-z_$][\w$.]*\}/.test(template)) return match;
@@ -70,6 +91,8 @@ for (const file of sourceFiles) {
   const before = await readFile(file, 'utf8');
   let after = convertArrayJoin(before);
   after = convertClassNameTernary(after);
+  after = convertCardClassName(after);
+  after = convertProgressIndicatorClasses(after);
   after = convertSimpleInterpolatedClassName(after);
   after = ensureClsxImport(after);
   if (after !== before) {
@@ -87,7 +110,7 @@ if (!testSource.includes("path.join(uiRoot, 'src/layout'),")) {
 }
 
 if (!testSource.includes("test('dynamic CSS class composition uses clsx'")) {
-  testSource += `\n\ntest('dynamic CSS class composition uses clsx', async () => {\n  const codeRoots = [\n    path.join(uiRoot, 'src/components'),\n    path.join(uiRoot, 'src/internal'),\n    path.join(uiRoot, 'src/layout'),\n  ];\n  const codeFiles = (await Promise.all(codeRoots.map((root) => walk(root))))\n    .flat()\n    .filter((file) => ['.js', '.jsx', '.ts', '.tsx'].includes(path.extname(file)));\n  const violations = [];\n\n  for (const file of codeFiles) {\n    const source = await readFile(file, 'utf8');\n    collectMatches(\n      file,\n      source,\n      /\\[[^\\]]*?\\]\\s*\\.filter\\(Boolean\\)\\s*\\.join\\((['\\"]) \\1\\)/gs,\n      violations,\n    );\n    collectMatches(\n      file,\n      source,\n      /className\\s*\\?\\s*\\\`[^\\\`]*\\$\\{className\\}[^\\\`]*\\\`/g,\n      violations,\n    );\n    collectMatches(\n      file,\n      source,\n      /className=\\{\\\`(?=[^\\\`]*\\s)[^\\\`]*\\$\\{[^}]+\\}[^\\\`]*\\\`\\}/g,\n      violations,\n    );\n  }\n\n  assert.deepEqual(\n    violations,\n    [],\n    'Found manual dynamic CSS class composition; use clsx instead:\\n' + violations.join('\\n'),\n  );\n});\n`;
+  testSource += `\n\ntest('dynamic CSS class composition uses clsx', async () => {\n  const codeRoots = [\n    path.join(uiRoot, 'src/components'),\n    path.join(uiRoot, 'src/internal'),\n    path.join(uiRoot, 'src/layout'),\n  ];\n  const codeFiles = (await Promise.all(codeRoots.map((root) => walk(root))))\n    .flat()\n    .filter((file) => ['.js', '.jsx', '.ts', '.tsx'].includes(path.extname(file)));\n  const violations = [];\n\n  for (const file of codeFiles) {\n    const source = await readFile(file, 'utf8');\n    collectMatches(\n      file,\n      source,\n      /\\[[^\\]]*?\\]\\s*\\.filter\\(Boolean\\)\\s*\\.join\\((['\\"]) \\1\\)/gs,\n      violations,\n    );\n    collectMatches(\n      file,\n      source,\n      /className\\s*\\?\\s*\\\`[^\\\`]*\\$\\{className\\}[^\\\`]*\\\`/g,\n      violations,\n    );\n    collectMatches(\n      file,\n      source,\n      /className=\\{\\\`(?=[^\\\`]*\\s)[^\\\`]*\\$\\{[^}]+\\}[^\\\`]*\\\`\\}/g,\n      violations,\n    );\n    collectMatches(\n      file,\n      source,\n      /const\\s+(?:names|classes|classNames)\\s*=\\s*\\[[\\s\\S]*?\\];[\\s\\S]*?\\.join\\((['\\"]) \\1\\)/g,\n      violations,\n    );\n  }\n\n  assert.deepEqual(\n    violations,\n    [],\n    'Found manual dynamic CSS class composition; use clsx instead:\\n' + violations.join('\\n'),\n  );\n});\n`;
   await writeFile(architectureTest, testSource);
 }
 
@@ -102,6 +125,9 @@ for (const file of sourceFiles) {
   }
   if (/className=\{`(?=[^`]*\s)[^`]*\$\{[^}]+\}[^`]*`\}/.test(source)) {
     remaining.push(`${path.relative(uiRoot, file)}: interpolated multi-class template`);
+  }
+  if (/const\s+(?:names|classes|classNames)\s*=\s*\[[\s\S]*?\];[\s\S]*?\.join\((['"]) \1\)/.test(source)) {
+    remaining.push(`${path.relative(uiRoot, file)}: class-name array join`);
   }
 }
 
