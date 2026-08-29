@@ -21,6 +21,25 @@ describe('DragToResizeState', () => {
     expect(state.measure(measurement)).toEqual({ width: 360, height: 48 });
   });
 
+  it('ignores transient zero-size scaffold measurements before real layout', () => {
+    const state = new DragToResizeState({ dockedEdge: DockedEdge.Bottom });
+
+    expect(
+      state.measure({
+        measuringWidth: 0,
+        measuringHeight: 0,
+        scaffoldWidth: 0,
+        scaffoldHeight: 0,
+      }),
+    ).toEqual({ width: 0, height: 0 });
+    expect(state.value).toBe(DragToResizeValue.Default);
+    expect(Number.isNaN(state.size)).toBe(true);
+
+    expect(state.measure(measurement)).toEqual({ width: 360, height: 420 });
+    expect(state.value).toBe(DragToResizeValue.Default);
+    expect(state.size).toBe(420);
+  });
+
   it('clamps expanded size to the scaffold and explicit max size', () => {
     const state = new DragToResizeState({
       dockedEdge: DockedEdge.Bottom,

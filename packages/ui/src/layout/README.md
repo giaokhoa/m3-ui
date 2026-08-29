@@ -45,6 +45,7 @@ The foundation currently ports pinned AndroidX behavior for:
 - Default pane-expansion state persistence keyed by the active two-pane combination whenever a drag handle is provided, matching AndroidX `PaneExpansionStateKeyProvider` behavior without changing caller-owned explicit state.
 - Anchored pane-expansion accessibility semantics: pinned anchor descriptions, current split state, next-anchor action text and semantic activation while preserving the browser separator/drag contract.
 - `DragToResizeState`: levitated Top/Bottom/Start/End resizing, RTL direction, min/max constraints and AndroidX state cycling.
+- Levitated drag-to-resize accessibility semantics: current expanded/collapsed/partially-expanded state, next resize action text and assistive activation while preserving pointer and keyboard resize behavior.
 - Levitated pane alignment, scrim behavior, interaction blocking and resizable dialog/sheet placement.
 - Pane-motion decision logic, including the complete AndroidX 8 × 8 visibility matrix, modal enter/exit and pure slide/expand/shrink geometry helpers.
 - Seekable `ThreePaneScaffoldState`, raw transition progress, pinned spring sampling, bounds interpolation, modal/scrim motion and mid-transition retarget continuity.
@@ -68,6 +69,8 @@ Default pane-expansion state follows AndroidX ownership rather than treating eve
 
 Pane-expansion accessibility stays on the browser-native `separator` role. AndroidX exposes the current anchor as state description and an accessibility `onClick` action for the next anchor. The web maps the current anchored split to `aria-valuetext`, the next-anchor action label to `aria-description`, and semantic activation to Enter/Space plus synthetic assistive-tech clicks. Real pointer clicks remain part of the drag interaction and do not cycle anchors. `paneExpansionHandleAriaStrings` can override the pinned English anchor/state/action formatters for localization while `paneExpansionHandleAriaLabel` remains the existing accessible-name override.
 
+Levitated drag-to-resize accessibility remains on the existing browser `button` handle. AndroidX exposes a state description (`expanded`, `collapsed`, or `partially expanded`) plus an `onClick` label for the next transition (`collapse`, `partially expand`, or `expand`). The browser combines those two pieces in `aria-description` because a button has no direct equivalent of Compose's separate state-description channel. Pointer tap, Enter/Space and synthetic assistive-tech activation all reuse the existing `DragToResizeState` cycle; real pointer dragging still resizes continuously. `levitatedPaneDragHandleAriaStrings` localizes the state/action wording without changing the accessible-name override.
+
 Levitated panes are still pane-scaffold state, not generic dialogs. They render inside the scaffold stacking context; a scrim makes underlying pane trees non-interactable, while the current levitated destination remains interactable. This preserves the AndroidX distinction between pane adaptation and modal semantics.
 
 Motion is split at the same conceptual boundary: `adaptive/paneMotion.ts` owns which motion should happen and the geometry needed by it. `ThreePaneScaffold` consumes that contract as the browser renderer; `AnimatedPane` remains a pane-local visual/content wrapper instead of recreating Compose animation scopes in React.
@@ -82,6 +85,6 @@ Layout components should prefer CSS Grid/Flexbox and logical properties over Jav
 
 ## Deliberate next slices
 
-The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence/semantics and pane-boundary semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
+The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence/semantics, pane-boundary semantics and levitated resize semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
 
 Generic `Box`/`Row`/`Column` wrappers remain deferred until they demonstrate semantic/API value beyond native CSS Flexbox/Grid.

@@ -191,6 +191,14 @@ export class DragToResizeState {
     const horizontal = this.orientation === 'horizontal';
     const measuringSize = horizontal ? measuringWidth : measuringHeight;
     const scaffoldSize = horizontal ? scaffoldWidth : scaffoldHeight;
+
+    // React can render once before the scaffold has measurable geometry. Do not
+    // let that transient zero constraint initialize or coerce persistent resize
+    // state; AndroidX receives real layout constraints when this state measures.
+    if (scaffoldSize === 0) {
+      return { width: measuringWidth, height: measuringHeight };
+    }
+
     const minimum = this.minSize ?? DefaultMinPaneSize;
     const maximum = Math.min(this.maxSize ?? Number.POSITIVE_INFINITY, scaffoldSize);
 
