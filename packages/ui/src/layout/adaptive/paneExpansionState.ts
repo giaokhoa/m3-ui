@@ -518,10 +518,10 @@ export class PaneExpansionState {
       let score: number;
       if (velocity >= AnchoringVelocityThreshold) {
         const delta = anchorPosition.position - currentPosition;
-        score = delta < 0 ? Number.POSITIVE_INFINITY : delta;
+        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
       } else if (velocity <= -AnchoringVelocityThreshold) {
         const delta = currentPosition - anchorPosition.position;
-        score = delta < 0 ? Number.POSITIVE_INFINITY : delta;
+        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
       } else {
         score = Math.abs(currentPosition - anchorPosition.position);
       }
