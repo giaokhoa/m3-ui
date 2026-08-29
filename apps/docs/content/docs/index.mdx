@@ -15,13 +15,24 @@ The documentation surface uses the same `@m3-ui/ui` components, theme roles, and
   <TextButton>Cancel</TextButton>
 </ComponentPreview>
 
+## Component guides
+
+Start with the first Material component pages:
+
+- [Button](/docs/components/button)
+- [Text field](/docs/components/text-field)
+- [Dialog](/docs/components/dialog)
+- [All component guides](/docs/components)
+
+Each guide records the Material family, Compose mapping, implementation boundary, accessibility behavior, and intentional browser adaptation before documenting examples and API details.
+
 ## Headless documentation engine
 
-`fumadocs-mdx` compiles the MDX source and `fumadocs-core` provides the source and page-tree APIs. This app intentionally does not import `fumadocs-ui`, its preset CSS, or a parallel design system.
+`fumadocs-mdx` compiles the MDX source and provides browser-safe Macro collections. This app intentionally does not import `fumadocs-ui`, its preset CSS, or a parallel design system.
 
 ```tsx
-const page = source.getPage(slugs);
-const MDX = page.data.body;
+const page = getDocsPage(slugs);
+const MDX = page.body;
 
 <MDX components={getMdxComponents()} />;
 ```

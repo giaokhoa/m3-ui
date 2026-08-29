@@ -1,0 +1,72 @@
+---
+title: Button
+description: Material 3 button variants, expressive sizes, interaction states, and web semantics.
+---
+
+<MaterialParity component="button" />
+
+## Overview
+
+Buttons let a user trigger an action. Use the Material variant to express emphasis rather than inventing a one-off visual treatment.
+
+<ComponentPreview>
+  <Button>Filled</Button>
+  <ElevatedButton>Elevated</ElevatedButton>
+  <FilledTonalButton>Filled tonal</FilledTonalButton>
+  <OutlinedButton>Outlined</OutlinedButton>
+  <TextButton>Text</TextButton>
+</ComponentPreview>
+
+## Variants
+
+| React component | Material role | Typical emphasis |
+| --- | --- | --- |
+| `Button` | Filled | Highest emphasis for a primary action |
+| `ElevatedButton` | Elevated | High emphasis when separation from the surrounding surface is useful |
+| `FilledTonalButton` | Filled tonal | Medium emphasis with a softer container |
+| `OutlinedButton` | Outlined | Medium emphasis without a filled container |
+| `TextButton` | Text | Lowest emphasis for supplementary actions |
+
+Keep hierarchy intentional. Multiple equally prominent buttons compete for attention and weaken the Material action hierarchy.
+
+## Expressive sizes
+
+The expressive API exposes the five Material size helpers represented by the canonical token set.
+
+<ComponentPreview>
+  <Button size="extraSmall">Extra small</Button>
+  <Button size="small">Small</Button>
+  <Button size="medium">Medium</Button>
+  <Button size="large">Large</Button>
+  <Button size="extraLarge">Extra large</Button>
+</ComponentPreview>
+
+`size` accepts `extraSmall`, `small`, `medium`, `large`, or `extraLarge`. Omitting it keeps the common non-expressive baseline defaults.
+
+## Icons
+
+Use `startIcon` and `endIcon` for decorative action icons. The component keeps these icon slots out of the accessibility tree so the button text remains the accessible label.
+
+```tsx
+<Button startIcon={<SaveIcon />}>Save</Button>
+```
+
+## States
+
+Material visual states are driven by real browser interaction state rather than documentation-only classes.
+
+<ComponentPreview>
+  <Button>Enabled</Button>
+  <Button isDisabled>Disabled</Button>
+  <OutlinedButton>Keyboard focusable</OutlinedButton>
+</ComponentPreview>
+
+Hover, focus, press, and disabled behavior comes from React Aria state while Material tokens control state layers, ripple, colors, elevation, and shape.
+
+## Accessibility
+
+`Button` forwards the React Aria button contract. Prefer visible action text. When an icon-only action is required, use the dedicated Material `IconButton` family and provide an accessible label instead of removing text from a normal button.
+
+## Web adaptation
+
+The browser has pointer hover, keyboard focus-visible behavior, native button activation semantics, and React event lifecycles that do not map literally to Compose runtime primitives. `m3-ui` preserves those browser semantics while keeping the Material visual contract token-driven.
