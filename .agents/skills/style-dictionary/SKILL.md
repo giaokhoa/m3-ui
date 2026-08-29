@@ -140,6 +140,8 @@ Required properties:
 
 Custom formats are appropriate when platform serialization needs component selectors or other output that built-in formats cannot express cleanly. Prefer deriving output from token paths/semantics rather than copying design values into formatter code.
 
+When a custom formatter receives a DTCG dictionary, read the transformed token value from `token.$value`, not `token.value`. If a formatter is deliberately shared with non-DTCG dictionaries, branch on the formatter option explicitly, for example `options.usesDtcg ? token.$value : token.value`. Treat an unexpected `undefined` as a formatter bug rather than serializing it into CSS.
+
 ## Validation
 
 Every token-pipeline change should verify:
