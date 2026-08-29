@@ -1,0 +1,64 @@
+---
+title: Top app bar
+description: Material top app bars across small, centered, medium, large, and flexible variants with explicit scroll-state ownership.
+---
+
+<ParitySummary component="top-app-bar" />
+
+## Overview
+
+`TopAppBar` renders the Material top app bar family through one React component with explicit variant and scroll-state inputs.
+
+<ComponentPreview>
+  <TopAppBarPreview />
+</ComponentPreview>
+
+## Variants
+
+The public `variant` values are:
+
+- `small`
+- `center-aligned`
+- `medium`
+- `medium-flexible`
+- `large`
+- `large-flexible`
+
+Flexible medium and large variants accept `subtitle`. Medium and large families render an expanded title row that collapses toward the top row as the supplied fraction approaches 1.
+
+```tsx
+<TopAppBar
+  variant="large-flexible"
+  title="Inbox"
+  subtitle="12 unread"
+  navigationIcon={<IconButton aria-label="Open navigation">...</IconButton>}
+  actions={<IconButton aria-label="Search">...</IconButton>}
+/>
+```
+
+## Scroll state
+
+`scrollFraction`, `overlappedFraction`, `state`, and `scrollBehavior` are explicit inputs. The component does not install a document scroll listener or infer which scroller should drive it.
+
+Helpers mirror Compose vocabulary:
+
+```tsx
+const state = createTopAppBarState(collapsedFraction, contentOffset, overlappedFraction);
+const behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state);
+
+<TopAppBar title="Inbox" variant="large" scrollBehavior={behavior} />
+```
+
+The surrounding scroll composition owns how offsets become fractions. This keeps page routing, nested scroll containers, virtualized lists, and framework scroll restoration outside the visual primitive.
+
+## Center-aligned measurement
+
+The center-aligned variant measures only its own navigation slot, action slot, title group, and container. `ResizeObserver` keeps the title visually centered without allowing it to overlap asymmetric leading/trailing actions.
+
+This measurement is component-local geometry, not Material window-size-class or adaptive-layout behavior.
+
+## Accessibility
+
+The root is a semantic `header`. Navigation and action slots should contain independently named controls such as `IconButton`; the app bar does not merge those actions into one composite widget.
+
+Expanded duplicate title content is marked hidden once fully collapsed so the visible collapsed title remains the meaningful representation.

@@ -1,0 +1,75 @@
+---
+title: Floating toolbar
+description: Horizontal and vertical Material 3 Expressive floating toolbars with standard/vibrant color roles, optional FAB composition, and explicit expanded/exit state.
+---
+
+<ParitySummary component="floating-toolbar" />
+
+## Overview
+
+`HorizontalFloatingToolbar` and `VerticalFloatingToolbar` expose the Material 3 Expressive floating-toolbar family as semantic web toolbars.
+
+<ComponentPreview>
+  <FloatingToolbarPreview />
+</ComponentPreview>
+
+## Orientation and variants
+
+Use the orientation-specific components when possible:
+
+```tsx
+<HorizontalFloatingToolbar aria-label="Editor tools" expanded>
+  <IconButton aria-label="Search">...</IconButton>
+  <IconButton aria-label="Edit">...</IconButton>
+</HorizontalFloatingToolbar>
+```
+
+Both support `variant="standard" | "vibrant"`. The root renders `role="toolbar"` and publishes the corresponding `aria-orientation`.
+
+## Expanded content
+
+`expanded` controls whether `leadingContent` and `trailingContent` participate visually. Core `children` remain the toolbar's central content.
+
+When a FAB is supplied, `floatingActionButtonPosition` is logical to the orientation: start/end for horizontal toolbars and top/bottom for vertical toolbars.
+
+```tsx
+<HorizontalFloatingToolbar
+  aria-label="Creation tools"
+  expanded={expanded}
+  floatingActionButton={<FloatingActionButton aria-label="Create">...</FloatingActionButton>}
+  floatingActionButtonPosition="end"
+>
+  {actions}
+</HorizontalFloatingToolbar>
+```
+
+## Exit state
+
+Floating toolbar scroll translation is explicit state:
+
+```tsx
+const state = createFloatingToolbarState(-64, offset, contentOffset);
+
+<HorizontalFloatingToolbar
+  aria-label="Scrolling tools"
+  expanded={expanded}
+  exitDirection="bottom"
+  state={state}
+>
+  {actions}
+</HorizontalFloatingToolbar>
+```
+
+`offsetLimit`, `offset`, and `contentOffset` mirror the Compose state vocabulary. Helpers clamp, settle, and calculate collapsed fraction, but the React component does not subscribe to document scrolling on its own.
+
+`exitDirection` supports `top`, `bottom`, `start`, and `end`. Logical start/end translation follows RTL direction.
+
+## Accessibility
+
+Each toolbar needs an accessible name that describes the action collection. Toolbar children remain independent controls with their own names and pressed/selected state where applicable.
+
+When a toolbar with a FAB is collapsed, the hidden toolbar surface is removed from the accessibility tree while the adjacent FAB remains the meaningful action.
+
+## Layout boundary
+
+A floating toolbar may be positioned over content, but positioning, viewport anchoring, and adaptive choice between navigation/action patterns are composition concerns. This component owns only its Material toolbar geometry, expanded state, FAB relation, and exit translation.

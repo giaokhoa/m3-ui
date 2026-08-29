@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { appBarToolbarMdxComponents } from './appBarToolbarMdxComponents';
 import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
 import { composeUtilityMdxComponents } from './composeUtilityMdxComponents';
 import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
@@ -83,6 +84,7 @@ function DocsPage() {
     ...carouselSheetMdxComponents,
     ...composeUtilityMdxComponents,
     ...smallPrimitiveMdxComponents,
+    ...appBarToolbarMdxComponents,
   };
 
   return (
