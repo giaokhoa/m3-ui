@@ -12,7 +12,9 @@ import {
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const rippleCss = 'src/internal/ripple/ripple.css';
+const rippleTokenCss = '../tokens/dist/generated/ripple.css';
 const elevationCss = 'src/internal/elevation/elevation.css';
+const elevationTokenCss = '../tokens/dist/generated/elevation.css';
 const buttonCss = 'src/components/Button/button.css';
 const buttonTokenCss = '../tokens/dist/generated/button.css';
 
@@ -44,7 +46,7 @@ test('every public CSS-bearing component has exactly one modular entry', () => {
 test('modular entries include shared primitive CSS used by component source', async () => {
   for (const [name, modulePath] of Object.entries(publicComponentModules)) {
     const source = await readFile(resolve(packageRoot, modulePath), 'utf8');
-    const styles = styleEntries[name];
+    const styles = expandStyleSources(styleEntries[name]);
 
     if (source.includes("../../internal/ripple")) {
       assert.ok(styles.includes(rippleCss), `${name} is missing ripple.css`);
@@ -55,16 +57,62 @@ test('modular entries include shared primitive CSS used by component source', as
   }
 });
 
-test('Button CSS consumers inline the generated token adapter first', () => {
+function assertAdapterBefore(
+  name,
+  expanded,
+  adapter,
+  consumer,
+  label,
+) {
+  const adapterIndex = expanded.indexOf(adapter);
+  const consumerIndex = expanded.indexOf(consumer);
+  assert.notEqual(adapterIndex, -1, `${name} is missing ${label} adapter`);
+  assert.notEqual(consumerIndex, -1, `${name} is missing ${consumer}`);
+  assert.ok(
+    adapterIndex < consumerIndex,
+    `${name} must load ${label} adapter before ${consumer}`,
+  );
+}
+
+test('shared primitive CSS consumers inline generated adapters first', () => {
+  for (const [name, sources] of Object.entries(styleEntries)) {
+    const expanded = expandStyleSources(sources);
+    if (sources.includes(rippleCss)) {
+      assertAdapterBefore(name, expanded, rippleTokenCss, rippleCss, 'generated Ripple');
+    }
+    if (sources.includes(elevationCss)) {
+      assertAdapterBefore(
+        name,
+        expanded,
+        elevationTokenCss,
+        elevationCss,
+        'generated Elevation',
+      );
+    }
+  }
+});
+
+test('Button CSS consumers inline Elevation and Button adapters before button.css', () => {
   for (const [name, sources] of Object.entries(styleEntries)) {
     if (!sources.includes(buttonCss)) continue;
     const expanded = expandStyleSources(sources);
-    const tokenIndex = expanded.indexOf(buttonTokenCss);
-    const buttonIndex = expanded.indexOf(buttonCss);
-    assert.notEqual(tokenIndex, -1, `${name} is missing the generated Button token adapter`);
+    assertAdapterBefore(
+      name,
+      expanded,
+      elevationTokenCss,
+      elevationCss,
+      'generated Elevation',
+    );
     assert.ok(
-      tokenIndex < buttonIndex,
-      `${name} must load the generated Button token adapter before button.css`,
+      expanded.indexOf(elevationCss) < expanded.indexOf(buttonCss),
+      `${name} must load elevation.css before button.css`,
+    );
+    assertAdapterBefore(
+      name,
+      expanded,
+      buttonTokenCss,
+      buttonCss,
+      'generated Button',
     );
   }
 });
