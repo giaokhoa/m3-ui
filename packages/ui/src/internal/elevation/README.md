@@ -90,6 +90,12 @@ packages/tokens/dist/generated/elevation.css
 
 The UI primitive imports it through the reviewed token-package CSS subpath. Modular `@m3-ui/ui/styles/*.css` builds that include handwritten `internal/elevation/elevation.css` must inline the generated adapter before that handwritten CSS so the public style artifact stays self-contained.
 
+## Browser test boundary
+
+Browser/visual contract tests for a component migrated to `<Elevation>` must assert the actual paint layer, normally the descendant `.elevation`, when checking `box-shadow`. They must not require the interactive/root element itself to own `box-shadow`; moving paint off that root is an intentional part of this architecture.
+
+Root-level tests may still verify container background, border, geometry, semantics, and interaction attributes. Elevation tests should verify the semantic level/state on the component and the computed shadow on the painting primitive.
+
 ## Forbidden regressions
 
 Do not:
@@ -99,6 +105,7 @@ Do not:
 - hardcode a shadow color instead of resolving through `--shadow` by default;
 - make generated elevation CSS define the concrete `--shadow` theme role;
 - switch the canonical 3-layer recipe to Material Web's 2-layer renderer recipe without resolving the tracked provenance drift;
+- restore root `box-shadow` merely to satisfy a browser test written before the `<Elevation>` paint-layer migration;
 - hand-edit `packages/tokens/dist/**`;
 - create a second elevation event state machine inside the painting primitive.
 
@@ -111,4 +118,4 @@ Changes to this subsystem should cover:
 3. architecture guards that reject static shadow serialization returning to `<Elevation>`/migrated components;
 4. UI unit/type/build tests;
 5. modular style self-containment tests;
-6. visual regression for affected elevated components.
+6. visual regression for affected elevated components, asserting shadow on the actual `.elevation` paint layer after migration.
