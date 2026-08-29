@@ -207,6 +207,7 @@ export class PaneExpansionState {
   private measuredDirection: 'ltr' | 'rtl' = 'ltr';
   private anchors: readonly PaneExpansionAnchor[];
   private currentAnchorState: PaneExpansionAnchor | null;
+  private initialAnchoredIndexState: number;
   private consumeDragDelta: (delta: number) => number;
   private dragging = false;
   private settling = false;
@@ -225,6 +226,7 @@ export class PaneExpansionState {
       throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
     }
     this.anchors = [...anchors];
+    this.initialAnchoredIndexState = initialAnchoredIndex;
     this.currentAnchorState =
       initialAnchoredIndex === -1 ? null : this.anchors[initialAnchoredIndex] ?? null;
     this.consumeDragDelta = consumeDragDelta;
@@ -337,21 +339,25 @@ export class PaneExpansionState {
     this.notify();
   }
 
-  setAnchors(anchors: readonly PaneExpansionAnchor[]) {
-    this.anchors = [...anchors];
-    if (this.currentAnchorState !== null) {
-      this.currentAnchorState =
-        this.anchors.find((anchor) => anchorEquals(anchor, this.currentAnchorState!)) ?? null;
+  setAnchors(
+    anchors: readonly PaneExpansionAnchor[],
+    initialAnchoredIndex = this.initialAnchoredIndexState,
+  ) {
+    if (initialAnchoredIndex < -1 || initialAnchoredIndex >= anchors.length) {
+      throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
     }
-    if (this.maxExpansionWidth !== PaneExpansionUnspecified && this.currentAnchorState !== null) {
-      const offset = anchorPosition(
-        this.currentAnchorState,
-        this.maxExpansionWidth,
-        this.measuredDirection,
-      );
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
-    }
+
+    const nextAnchors = [...anchors];
+    const matchedCurrentAnchor =
+      this.currentAnchorState === null
+        ? undefined
+        : nextAnchors.find((anchor) => anchorEquals(anchor, this.currentAnchorState!));
+    const initialAnchorForCurrentAnchors =
+      initialAnchoredIndex === -1 ? null : nextAnchors[initialAnchoredIndex] ?? null;
+
+    this.anchors = nextAnchors;
+    this.initialAnchoredIndexState = initialAnchoredIndex;
+    this.currentAnchorState = matchedCurrentAnchor ?? initialAnchorForCurrentAnchors;
     this.notify();
   }
 
