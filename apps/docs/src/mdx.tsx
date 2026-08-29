@@ -29,6 +29,11 @@ import {
   componentDocs,
   type ComponentDocId,
 } from './componentDocs';
+import {
+  ColorRoleGrid,
+  DynamicColorPreview,
+  TypeScaleSamples,
+} from './foundationDemos';
 
 function Heading1({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
   return (
@@ -245,6 +250,9 @@ export const materialMdxComponents = {
   td: TableCell,
   ComponentPreview,
   MaterialParity,
+  ColorRoleGrid,
+  DynamicColorPreview,
+  TypeScaleSamples,
   Button,
   ElevatedButton,
   FilledTonalButton,
