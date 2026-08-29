@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   Children,
   cloneElement,
@@ -140,7 +141,7 @@ export function FloatingActionButtonMenu({
     <FabMenuContext.Provider value={{ expanded }}>
       <div
         {...props}
-        className={['fab-menu', className].filter(Boolean).join(' ')}
+        className={clsx('fab-menu', className)}
         data-alignment={horizontalAlignment}
         data-expanded={expanded ? '' : undefined}
         onKeyDownCapture={handleKeyDownCapture}
@@ -210,7 +211,7 @@ export function FloatingActionButtonMenuItem({
     <Surface
       {...props}
       aria-hidden={expanded ? undefined : true}
-      className={['fab-menu-item', className].filter(Boolean).join(' ')}
+      className={clsx('fab-menu-item', className)}
       color={containerColor}
       contentColor={contentColor}
       data-fab-menu-item=""
@@ -276,7 +277,7 @@ export function ToggleFloatingActionButton({
     <FloatingActionButton
       {...props}
       aria-pressed={checked}
-      className={['fab-menu-toggle', className].filter(Boolean).join(' ')}
+      className={clsx('fab-menu-toggle', className)}
       data-checked={checked ? '' : undefined}
       onPress={() => onCheckedChange(!checked)}
       style={{ ...toggleStyle, ...style }}
