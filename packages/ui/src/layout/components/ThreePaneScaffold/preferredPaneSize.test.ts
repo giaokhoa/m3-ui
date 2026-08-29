@@ -5,7 +5,7 @@ import {
 } from './preferredPaneSize';
 
 describe('preferred pane size', () => {
-  it('keeps absolute CSS-pixel sizes unchanged', () => {
+  it('keeps positive absolute CSS-pixel sizes unchanged', () => {
     expect(resolvePanePreferredSize(320, 1000, 360, 'preferredWidth')).toBe(320);
   });
 
@@ -48,12 +48,13 @@ describe('preferred pane size', () => {
     expect(resolvePanePreferredSize({ proportion: 1 }, 1000, 360, 'preferredWidth')).toBe(1000);
   });
 
-  it('rejects invalid proportions and absolute sizes', () => {
+  it('rejects invalid proportions and non-positive absolute sizes', () => {
     expect(() => preferredPaneSizeProportion(-0.01)).toThrow(RangeError);
     expect(() => preferredPaneSizeProportion(1.01)).toThrow(RangeError);
     expect(() =>
       resolvePanePreferredSize({ proportion: Number.NaN }, 1000, 360, 'preferredWidth'),
     ).toThrow(RangeError);
+    expect(() => resolvePanePreferredSize(0, 1000, 360, 'preferredWidth')).toThrow(RangeError);
     expect(() => resolvePanePreferredSize(-1, 1000, 360, 'preferredWidth')).toThrow(RangeError);
   });
 });

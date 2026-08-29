@@ -55,6 +55,31 @@ describe('preferred pane size proportions in scaffold geometry', () => {
     expect(layout.secondary?.left).toBe(600);
   });
 
+  it('keeps zero available only through the proportion overload', () => {
+    expect(() =>
+      calculateThreePaneScaffoldLayout({
+        width: 1000,
+        height: 800,
+        directive,
+        value: twoExpanded,
+        paneOrder: order,
+        preferredWidths: { secondary: 0 },
+      }),
+    ).toThrow(RangeError);
+
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoExpanded,
+      paneOrder: order,
+      preferredWidths: { secondary: preferredPaneSizeProportion(0) },
+    });
+
+    expect(layout.primary).toEqual({ left: 0, top: 0, width: 976, height: 800 });
+    expect(layout.secondary).toEqual({ left: 1000, top: 0, width: 0, height: 800 });
+  });
+
   it('truncates each scaled proportional width when the scaffold is constrained', () => {
     const layout = calculateThreePaneScaffoldLayout({
       width: 1000,
