@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
@@ -73,12 +74,15 @@ function DocsPage() {
       <TopAppBar
         title="m3-ui"
         actions={
-          <IconButton
-            aria-label={`Theme preference: ${preference}. Activate to change.`}
-            onPress={cyclePreference}
-          >
-            <ThemeGlyph preference={preference} />
-          </IconButton>
+          <>
+            <DocsSearch />
+            <IconButton
+              aria-label={`Theme preference: ${preference}. Activate to change.`}
+              onPress={cyclePreference}
+            >
+              <ThemeGlyph preference={preference} />
+            </IconButton>
+          </>
         }
       />
       <main className="docs-main">
