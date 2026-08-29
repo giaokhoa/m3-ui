@@ -11,7 +11,6 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
-import { clsx } from 'clsx';
 import type { DragToResizeState } from '../../adaptive/dragToResizeState';
 import {
   PaneExpansionUnspecified,
@@ -54,8 +53,8 @@ import {
   type ThreePaneScaffoldLayout,
 } from './ThreePaneScaffold.layout';
 import {
-  getPredictiveBackScale,
-  getPredictiveBackScaffoldStyle,
+  getPredictiveBackLayerStyle,
+  usePredictiveBackScale,
 } from './ThreePaneScaffold.predictiveBack';
 import {
   calculateThreePaneScaffoldTransitionDuration,
@@ -316,14 +315,11 @@ export function ThreePaneScaffold({
 
     const measure = () => {
       const rect = root.getBoundingClientRect();
-      const predictiveScale = Number(root.dataset.predictiveBackScale ?? 1);
-      const width = rect.width / predictiveScale;
-      const height = rect.height / predictiveScale;
       const next: ScaffoldGeometry = {
-        width,
-        height,
-        viewportLeft: rect.left - (width - rect.width) / 2,
-        viewportTop: rect.top - (height - rect.height) / 2,
+        width: rect.width,
+        height: rect.height,
+        viewportLeft: rect.left,
+        viewportTop: rect.top,
         direction: getComputedStyle(root).direction === 'rtl' ? 'rtl' : 'ltr',
       };
       setGeometry((current) => (sameGeometry(current, next) ? current : next));
@@ -720,221 +716,225 @@ export function ThreePaneScaffold({
     expansionState,
     paneExpansionHandleAriaStrings,
   );
-  const predictiveBackScale = getPredictiveBackScale(scaffoldState);
-  const scaffoldClassName = clsx('three-pane-scaffold', className);
+  const predictiveBackScale = usePredictiveBackScale(scaffoldState);
 
   return (
     <div
       {...props}
       ref={rootRef}
-      className={scaffoldClassName}
+      className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
       data-predictive-back-scale={predictiveBackScale}
-      style={getPredictiveBackScaffoldStyle(style, scaffoldState)}
+      style={style}
     >
-      {paneEntries.map(([role, content]) => {
-        const adaptedValue = getPaneAdaptedValue(targetValue, role);
-        const frame = transitionFrame?.[role];
-        if (content == null) return null;
+      <div
+        className="three-pane-scaffold__predictive-back-layer"
+        style={getPredictiveBackLayerStyle(predictiveBackScale)}
+      >
+        {paneEntries.map(([role, content]) => {
+          const adaptedValue = getPaneAdaptedValue(targetValue, role);
+          const frame = transitionFrame?.[role];
+          if (content == null) return null;
 
-        // AndroidX disposes Hidden pane composition while SaveableStateProvider
-        // retains pane-local state. React 19.2 Activity is the native analogue:
-        // hidden children keep state/DOM identity but their Effects are cleaned up.
-        const staticallyHidden = frame === undefined && adaptedValue.type === 'hidden';
+          // AndroidX disposes Hidden pane composition while SaveableStateProvider
+          // retains pane-local state. React 19.2 Activity is the native analogue:
+          // hidden children keep state/DOM identity but their Effects are cleaned up.
+          const staticallyHidden = frame === undefined && adaptedValue.type === 'hidden';
 
-        let placement: PanePlacement | undefined;
-        if (frame !== undefined) {
-          placement = frame.placement;
-        } else if (adaptedValue.type === 'levitated') {
-          const basePlacement = calculateLevitatedPanePlacement({
-            width: geometry.width,
-            height: geometry.height,
-            directive,
-            alignment: adaptedValue.alignment,
-            direction: geometry.direction,
-            preferredWidth: preferredWidths?.[role],
-            preferredHeight: preferredHeights?.[role],
-          });
-          const resized = adaptedValue.dragToResizeState?.measure({
-            measuringWidth: basePlacement.width,
-            measuringHeight: basePlacement.height,
-            scaffoldWidth: geometry.width,
-            scaffoldHeight: geometry.height,
-            direction: geometry.direction,
-          });
-          const unmarginedPlacement =
-            resized === undefined
-              ? basePlacement
-              : calculateLevitatedPanePlacement({
-                  width: geometry.width,
-                  height: geometry.height,
-                  directive,
-                  alignment: adaptedValue.alignment,
-                  direction: geometry.direction,
-                  preferredWidth: resized.width,
-                  preferredHeight: resized.height,
-                });
-          placement = applyPaneMargins(
-            unmarginedPlacement,
-            paneMargins?.[role],
-            geometry.width,
-            geometry.height,
-            geometry.direction,
+          let placement: PanePlacement | undefined;
+          if (frame !== undefined) {
+            placement = frame.placement;
+          } else if (adaptedValue.type === 'levitated') {
+            const basePlacement = calculateLevitatedPanePlacement({
+              width: geometry.width,
+              height: geometry.height,
+              directive,
+              alignment: adaptedValue.alignment,
+              direction: geometry.direction,
+              preferredWidth: preferredWidths?.[role],
+              preferredHeight: preferredHeights?.[role],
+            });
+            const resized = adaptedValue.dragToResizeState?.measure({
+              measuringWidth: basePlacement.width,
+              measuringHeight: basePlacement.height,
+              scaffoldWidth: geometry.width,
+              scaffoldHeight: geometry.height,
+              direction: geometry.direction,
+            });
+            const unmarginedPlacement =
+              resized === undefined
+                ? basePlacement
+                : calculateLevitatedPanePlacement({
+                    width: geometry.width,
+                    height: geometry.height,
+                    directive,
+                    alignment: adaptedValue.alignment,
+                    direction: geometry.direction,
+                    preferredWidth: resized.width,
+                    preferredHeight: resized.height,
+                  });
+            placement = applyPaneMargins(
+              unmarginedPlacement,
+              paneMargins?.[role],
+              geometry.width,
+              geometry.height,
+              geometry.direction,
+            );
+          } else if (!staticallyHidden) {
+            placement = getPlacement(layout, role);
+          }
+          if (placement === undefined && !staticallyHidden) return null;
+
+          const frameLevitated = frame?.levitated ?? adaptedValue.type === 'levitated';
+          const interactable =
+            !staticallyHidden &&
+            isPaneInteractable(targetValue, role) &&
+            !(transitionScrimBlocks && adaptedValue.type !== 'levitated');
+          const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
+          const paneResizeState =
+            adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
+          const paneResizeAriaState =
+            paneResizeState === undefined
+              ? undefined
+              : getDragToResizeHandleAriaState(
+                  paneResizeState,
+                  levitatedPaneDragHandleAriaStrings,
+                );
+          const resizeHandleSpec = levitatedPaneDragHandles?.[role];
+          const resizeHandle =
+            paneResizeState === undefined
+              ? undefined
+              : typeof resizeHandleSpec === 'function'
+                ? resizeHandleSpec(paneResizeState)
+                : resizeHandleSpec;
+          const hasResizeHandle =
+            !transitionActive && paneResizeState !== undefined && resizeHandle != null;
+          const hasPaneResizeAction =
+            !transitionActive && paneResizeState !== undefined && !hasResizeHandle;
+          const paneResizeHandlers =
+            hasPaneResizeAction && paneResizeState !== undefined
+              ? {
+                  onLostPointerCapture: (event: ReactPointerEvent<HTMLDivElement>) =>
+                    finishResize(event, true),
+                  onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) =>
+                    finishResize(event, true),
+                  onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) =>
+                    beginResize(event, paneResizeState),
+                  onPointerMove: moveResize,
+                  onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => finishResize(event),
+                }
+              : {};
+
+          return (
+            <Activity key={role} mode={staticallyHidden ? 'hidden' : 'visible'}>
+              <div
+                {...paneResizeHandlers}
+                ref={(node) => {
+                  if (node === null) delete paneRefs.current[role];
+                  else paneRefs.current[role] = node;
+                }}
+                className={[
+                  'three-pane-scaffold__pane',
+                  frameLevitated && 'three-pane-scaffold__pane--levitated',
+                  hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
+                  hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                role={interactable ? 'region' : undefined}
+                aria-label={interactable ? paneAriaLabel : undefined}
+                data-pane-role={role}
+                data-pane-adapted-value={adaptedValue.type}
+                data-pane-interactable={interactable}
+                data-pane-motion={frame?.motion}
+                data-resize-state={paneResizeState?.value}
+                inert={!interactable || undefined}
+                tabIndex={-1}
+                style={frame === undefined ? paneStyle(placement) : transitionPaneStyle(frame)}
+              >
+                {hasResizeHandle ? (
+                  <div
+                    className="three-pane-scaffold__levitated-resize-handle"
+                    data-orientation={paneResizeState.orientation}
+                    data-resize-state={paneResizeState.value}
+                    role="button"
+                    aria-label={levitatedPaneDragHandleAriaLabel}
+                    aria-description={paneResizeAriaState?.description}
+                    tabIndex={0}
+                    onClick={(event) => resizeClick(event, paneResizeState)}
+                    onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
+                    onLostPointerCapture={(event) => finishResize(event, true)}
+                    onPointerCancel={(event) => finishResize(event, true)}
+                    onPointerDown={(event) => beginResize(event, paneResizeState)}
+                    onPointerMove={moveResize}
+                    onPointerUp={(event) => finishResize(event)}
+                  >
+                    {resizeHandle}
+                  </div>
+                ) : null}
+                {hasPaneResizeAction && paneResizeState !== undefined ? (
+                  <button
+                    type="button"
+                    className="three-pane-scaffold__levitated-resize-action"
+                    data-orientation={paneResizeState.orientation}
+                    data-resize-state={paneResizeState.value}
+                    aria-label={levitatedPaneDragHandleAriaLabel}
+                    aria-description={paneResizeAriaState?.description}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      paneResizeState.moveToNextState();
+                    }}
+                    onPointerDown={(event) => event.stopPropagation()}
+                  >
+                    {levitatedPaneDragHandleAriaLabel}
+                  </button>
+                ) : null}
+                {hasResizeHandle ? (
+                  <div className="three-pane-scaffold__levitated-content">{content}</div>
+                ) : (
+                  content
+                )}
+              </div>
+            </Activity>
           );
-        } else if (!staticallyHidden) {
-          placement = getPlacement(layout, role);
-        }
-        if (placement === undefined && !staticallyHidden) return null;
-
-        const frameLevitated = frame?.levitated ?? adaptedValue.type === 'levitated';
-        const interactable =
-          !staticallyHidden &&
-          isPaneInteractable(targetValue, role) &&
-          !(transitionScrimBlocks && adaptedValue.type !== 'levitated');
-        const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
-        const paneResizeState =
-          adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
-        const paneResizeAriaState =
-          paneResizeState === undefined
-            ? undefined
-            : getDragToResizeHandleAriaState(
-                paneResizeState,
-                levitatedPaneDragHandleAriaStrings,
-              );
-        const resizeHandleSpec = levitatedPaneDragHandles?.[role];
-        const resizeHandle =
-          paneResizeState === undefined
-            ? undefined
-            : typeof resizeHandleSpec === 'function'
-              ? resizeHandleSpec(paneResizeState)
-              : resizeHandleSpec;
-        const hasResizeHandle =
-          !transitionActive && paneResizeState !== undefined && resizeHandle != null;
-        const hasPaneResizeAction =
-          !transitionActive && paneResizeState !== undefined && !hasResizeHandle;
-        const paneResizeHandlers =
-          hasPaneResizeAction && paneResizeState !== undefined
-            ? {
-                onLostPointerCapture: (event: ReactPointerEvent<HTMLDivElement>) =>
-                  finishResize(event, true),
-                onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) =>
-                  finishResize(event, true),
-                onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) =>
-                  beginResize(event, paneResizeState),
-                onPointerMove: moveResize,
-                onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => finishResize(event),
-              }
-            : {};
-
-        const paneClassName = clsx(
-          'three-pane-scaffold__pane',
-          frameLevitated && 'three-pane-scaffold__pane--levitated',
-          hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-          hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
-        );
-
-        return (
-          <Activity key={role} mode={staticallyHidden ? 'hidden' : 'visible'}>
-            <div
-              {...paneResizeHandlers}
-              ref={(node) => {
-                if (node === null) delete paneRefs.current[role];
-                else paneRefs.current[role] = node;
-              }}
-              className={paneClassName}
-              role={interactable ? 'region' : undefined}
-              aria-label={interactable ? paneAriaLabel : undefined}
-              data-pane-role={role}
-              data-pane-adapted-value={adaptedValue.type}
-              data-pane-interactable={interactable}
-              data-pane-motion={frame?.motion}
-              data-resize-state={paneResizeState?.value}
-              inert={!interactable || undefined}
-              tabIndex={-1}
-              style={frame === undefined ? paneStyle(placement) : transitionPaneStyle(frame)}
-            >
-              {hasResizeHandle ? (
-                <div
-                  className="three-pane-scaffold__levitated-resize-handle"
-                  data-orientation={paneResizeState.orientation}
-                  data-resize-state={paneResizeState.value}
-                  role="button"
-                  aria-label={levitatedPaneDragHandleAriaLabel}
-                  aria-description={paneResizeAriaState?.description}
-                  tabIndex={0}
-                  onClick={(event) => resizeClick(event, paneResizeState)}
-                  onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
-                  onLostPointerCapture={(event) => finishResize(event, true)}
-                  onPointerCancel={(event) => finishResize(event, true)}
-                  onPointerDown={(event) => beginResize(event, paneResizeState)}
-                  onPointerMove={moveResize}
-                  onPointerUp={(event) => finishResize(event)}
-                >
-                  {resizeHandle}
-                </div>
-              ) : null}
-              {hasPaneResizeAction && paneResizeState !== undefined ? (
-                <button
-                  type="button"
-                  className="three-pane-scaffold__levitated-resize-action"
-                  data-orientation={paneResizeState.orientation}
-                  data-resize-state={paneResizeState.value}
-                  aria-label={levitatedPaneDragHandleAriaLabel}
-                  aria-description={paneResizeAriaState?.description}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    paneResizeState.moveToNextState();
-                  }}
-                  onPointerDown={(event) => event.stopPropagation()}
-                >
-                  {levitatedPaneDragHandleAriaLabel}
-                </button>
-              ) : null}
-              {hasResizeHandle ? (
-                <div className="three-pane-scaffold__levitated-content">{content}</div>
-              ) : (
-                content
-              )}
-            </div>
-          </Activity>
-        );
-      })}
-      {showDragHandle && dragHandleOffset !== PaneExpansionUnspecified ? (
-        <div
-          className="three-pane-scaffold__drag-handle"
-          role="separator"
-          aria-label={paneExpansionHandleAriaLabel}
-          aria-description={dragHandleAriaState.description}
-          aria-orientation="vertical"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={dragHandlePercent}
-          aria-valuetext={dragHandleAriaState.valueText}
-          inert={dragHandleInteractionBlocked || undefined}
-          tabIndex={dragHandleInteractionBlocked ? -1 : 0}
-          style={{
-            left: dragHandlePlacement?.centerX ?? dragHandleOffset,
-            minWidth: dragHandlePlacement?.minWidth,
-            opacity: dragHandleOpacity,
-          }}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          onPointerCancel={(event) => finishPointerDrag(event, 0)}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={(event) => finishPointerDrag(event, pointerDragRef.current?.velocity ?? 0)}
-          onLostPointerCapture={(event) => finishPointerDrag(event, 0)}
-        >
-          {dragHandle}
-        </div>
-      ) : null}
-      {renderedScrim != null ? (
-        <div
-          className="three-pane-scaffold__scrim"
-          style={{ opacity: scrimOpacity }}
-        >
-          {renderedScrim}
-        </div>
-      ) : null}
+        })}
+        {showDragHandle && dragHandleOffset !== PaneExpansionUnspecified ? (
+          <div
+            className="three-pane-scaffold__drag-handle"
+            role="separator"
+            aria-label={paneExpansionHandleAriaLabel}
+            aria-description={dragHandleAriaState.description}
+            aria-orientation="vertical"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={dragHandlePercent}
+            aria-valuetext={dragHandleAriaState.valueText}
+            inert={dragHandleInteractionBlocked || undefined}
+            tabIndex={dragHandleInteractionBlocked ? -1 : 0}
+            style={{
+              left: dragHandlePlacement?.centerX ?? dragHandleOffset,
+              minWidth: dragHandlePlacement?.minWidth,
+              opacity: dragHandleOpacity,
+            }}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            onPointerCancel={(event) => finishPointerDrag(event, 0)}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={(event) => finishPointerDrag(event, pointerDragRef.current?.velocity ?? 0)}
+            onLostPointerCapture={(event) => finishPointerDrag(event, 0)}
+          >
+            {dragHandle}
+          </div>
+        ) : null}
+        {renderedScrim != null ? (
+          <div
+            className="three-pane-scaffold__scrim"
+            style={{ opacity: scrimOpacity }}
+          >
+            {renderedScrim}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

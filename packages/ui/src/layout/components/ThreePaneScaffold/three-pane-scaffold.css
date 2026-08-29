@@ -7,6 +7,17 @@
   overflow: hidden;
 }
 
+/*
+ * AndroidX owns predictive-back scale in a separate graphics layer with a
+ * fixed center TransformOrigin. Keep caller transforms/origins on the outer
+ * scaffold and scale this full-size inner layer independently.
+ */
+.three-pane-scaffold__predictive-back-layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+}
+
 .three-pane-scaffold__pane {
   position: absolute;
   z-index: 0;

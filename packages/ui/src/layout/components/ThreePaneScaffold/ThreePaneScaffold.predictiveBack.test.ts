@@ -1,17 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
   PredictiveBackMinScale,
+  calculatePredictiveBackReturnSpringDurationMs,
   calculatePredictiveBackScale,
+  getPredictiveBackLayerStyle,
   getPredictiveBackScale,
-  getPredictiveBackScaffoldStyle,
+  samplePredictiveBackReturnSpring,
 } from './ThreePaneScaffold.predictiveBack';
 
 describe('predictive-back scaffold scale', () => {
-  it('matches the pinned AndroidX decay curve', () => {
+  it('matches the pinned AndroidX Float decay curve', () => {
     expect(calculatePredictiveBackScale(0)).toBe(1);
-    expect(calculatePredictiveBackScale(0.25)).toBeCloseTo(0.9545454545, 9);
-    expect(calculatePredictiveBackScale(0.5)).toBeCloseTo(0.9523809524, 9);
-    expect(calculatePredictiveBackScale(1)).toBeCloseTo(0.9512195122, 9);
+    expect(calculatePredictiveBackScale(0.25)).toBe(0.9545454382896423);
+    expect(calculatePredictiveBackScale(0.5)).toBe(0.9523809552192688);
+    expect(calculatePredictiveBackScale(1)).toBe(0.9512194991111755);
     expect(calculatePredictiveBackScale(1)).toBeGreaterThan(PredictiveBackMinScale);
   });
 
@@ -23,7 +25,7 @@ describe('predictive-back scaffold scale', () => {
     }
   });
 
-  it('exposes no scale outside predictive back', () => {
+  it('exposes no seek scale outside predictive back', () => {
     expect(getPredictiveBackScale(undefined)).toBeUndefined();
     expect(
       getPredictiveBackScale({
@@ -33,36 +35,66 @@ describe('predictive-back scaffold scale', () => {
     ).toBeUndefined();
   });
 
-  it('leaves static scaffold styles untouched', () => {
-    const style = { width: 480 } as const;
+  it('uses Animatable default Float spring duration when returning to 1', () => {
     expect(
-      getPredictiveBackScaffoldStyle(style, {
-        progressFraction: 0.5,
-        isPredictiveBackInProgress: false,
-      }),
-    ).toBe(style);
-    expect(getPredictiveBackScaffoldStyle(style, undefined)).toBe(style);
+      calculatePredictiveBackReturnSpringDurationMs(
+        calculatePredictiveBackScale(0.25),
+      ),
+    ).toBe(74);
+    expect(
+      calculatePredictiveBackReturnSpringDurationMs(
+        calculatePredictiveBackScale(0.5),
+      ),
+    ).toBe(75);
+    expect(
+      calculatePredictiveBackReturnSpringDurationMs(
+        calculatePredictiveBackScale(1),
+      ),
+    ).toBe(76);
   });
 
-  it('preserves caller transform while applying individual scale around center', () => {
-    expect(
-      getPredictiveBackScaffoldStyle(
-        { transform: 'translateX(8px)' },
-        { progressFraction: 0.5, isPredictiveBackInProgress: true },
-      ),
-    ).toEqual({
-      transform: 'translateX(8px)',
-      scale: 0.9523809523809523,
+  it('samples the critically damped return spring at Compose Float precision', () => {
+    const initialScale = calculatePredictiveBackScale(0.5);
+    expect(samplePredictiveBackReturnSpring(initialScale, 0)).toBe(initialScale);
+    expect(samplePredictiveBackReturnSpring(initialScale, 16)).toBe(
+      0.9584963321685791,
+    );
+    expect(samplePredictiveBackReturnSpring(initialScale, 32)).toBe(
+      0.9691213369369507,
+    );
+    expect(samplePredictiveBackReturnSpring(initialScale, 64)).toBe(
+      0.9861097931861877,
+    );
+    expect(samplePredictiveBackReturnSpring(initialScale, 75)).toBe(1);
+  });
+
+  it('preserves Compose estimator semantics around the Float visibility threshold', () => {
+    const nonZeroWithinThreshold = calculatePredictiveBackScale(0.0032);
+    expect(1 - nonZeroWithinThreshold).toBeLessThan(0.01);
+    expect(calculatePredictiveBackReturnSpringDurationMs(nonZeroWithinThreshold)).toBe(35);
+    expect(samplePredictiveBackReturnSpring(nonZeroWithinThreshold, 0)).toBe(
+      nonZeroWithinThreshold,
+    );
+    expect(samplePredictiveBackReturnSpring(nonZeroWithinThreshold, 35)).toBe(1);
+
+    const immediateWithinThreshold = calculatePredictiveBackScale(0.005);
+    expect(1 - immediateWithinThreshold).toBeLessThan(0.01);
+    expect(calculatePredictiveBackReturnSpringDurationMs(immediateWithinThreshold)).toBe(0);
+    expect(samplePredictiveBackReturnSpring(immediateWithinThreshold, 0)).toBe(1);
+  });
+
+  it('keeps predictive scale on a dedicated center-origin graphics layer', () => {
+    expect(getPredictiveBackLayerStyle(calculatePredictiveBackScale(0.5))).toEqual({
+      scale: 0.9523809552192688,
       transformOrigin: 'center center',
     });
   });
 
-  it('preserves an explicit transform origin', () => {
-    expect(
-      getPredictiveBackScaffoldStyle(
-        { transformOrigin: 'left top' },
-        { progressFraction: 1, isPredictiveBackInProgress: true },
-      ),
-    ).toMatchObject({ transformOrigin: 'left top' });
+  it('validates return-spring input', () => {
+    expect(() => calculatePredictiveBackReturnSpringDurationMs(0)).toThrow(RangeError);
+    expect(() =>
+      calculatePredictiveBackReturnSpringDurationMs(Number.MAX_VALUE),
+    ).toThrow(RangeError);
+    expect(() => samplePredictiveBackReturnSpring(0.95, Number.NaN)).toThrow(RangeError);
   });
 });
