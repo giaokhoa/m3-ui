@@ -1,0 +1,50 @@
+---
+title: Surface
+description: Material surface composition with tonal and shadow elevation plus explicit clickable, selectable, and toggleable web semantics.
+---
+
+<ParitySummary component="surface" />
+
+## Overview
+
+`Surface` is the general Material container primitive. It owns surface color, content color, shape, border, tonal elevation, shadow elevation, and optional interaction semantics without forcing a higher-level component contract.
+
+<ComponentPreview>
+  <SurfacePreview />
+</ComponentPreview>
+
+## Passive surfaces
+
+Without `interaction`, `Surface` remains a plain content container. Use this form for grouping and elevation composition where the surface itself is not an action or selection target.
+
+```tsx
+<Surface
+  color="var(--surface-container)"
+  tonalElevation="level1"
+  shape="var(--shape-corner-large)"
+>
+  <Content />
+</Surface>
+```
+
+Nested surfaces accumulate tonal elevation through the internal surface context, mirroring the Material concept of absolute tonal elevation rather than treating every child elevation as an unrelated color override.
+
+## Interaction contracts
+
+Interactive surfaces opt into one explicit semantic model through `interaction`:
+
+- `clickable` exposes button semantics and calls `onPress`.
+- `selectable` defaults to radio semantics and can use `role="option"` when option semantics match the surrounding widget.
+- `toggleable` defaults to checkbox semantics and can use `role="switch"` or `role="button"` for switch or pressed-button state.
+
+The component derives `aria-checked`, `aria-selected`, or `aria-pressed` from that model and supports Enter/Space activation.
+
+## Nested controls
+
+An interactive `Surface` does not activate itself when a nested link, button, input, select, textarea, summary, or other recognized interactive descendant receives the click. That preserves the nested control's native action instead of turning the whole subtree into one accidental hit target.
+
+Use a dedicated Material component such as `Card`, `Button`, or `ListItem` when its higher-level contract matches the UI. `Surface` is appropriate when the application truly needs a compositional surface primitive.
+
+## Elevation and stacking
+
+`tonalElevation` affects Material surface tonal treatment; `shadowElevation` controls rendered shadow. Neither property changes DOM stacking order. If an application needs overlap ordering, it owns positioning and z-index separately.
