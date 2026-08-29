@@ -31,6 +31,7 @@ import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
 } from './ThreePaneScaffold.layout';
+import { applyPaneMargins, type PaneMargins } from './paneMargins';
 
 export interface PaneTransitionFrame {
   placement: PanePlacement;
@@ -62,6 +63,7 @@ export interface ThreePaneScaffoldTransitionOptions {
   excludedBounds?: readonly LayoutBounds[];
   preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
 }
 
@@ -139,6 +141,7 @@ function calculateValuePlacements({
   excludedBounds,
   preferredWidths,
   preferredHeights,
+  paneMargins,
   paneExpansionState,
 }: Omit<ThreePaneScaffoldTransitionOptions, 'currentValue' | 'targetValue' | 'progressFraction'> & {
   value: ThreePaneScaffoldValue;
@@ -153,6 +156,7 @@ function calculateValuePlacements({
     excludedBounds,
     preferredWidths,
     preferredHeights,
+    paneMargins,
     paneExpansionState,
   });
   const placements: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
@@ -178,7 +182,7 @@ function calculateValuePlacements({
       scaffoldHeight: height,
       direction,
     });
-    placements[role] =
+    const unmarginedPlacement =
       resized === undefined
         ? base
         : calculateLevitatedPanePlacement({
@@ -190,6 +194,13 @@ function calculateValuePlacements({
             preferredWidth: resized.width,
             preferredHeight: resized.height,
           });
+    placements[role] = applyPaneMargins(
+      unmarginedPlacement,
+      paneMargins?.[role],
+      width,
+      height,
+      direction,
+    );
   }
   return placements;
 }
@@ -350,6 +361,7 @@ function prepareTransition({
   excludedBounds = directive.excludedBounds,
   preferredWidths,
   preferredHeights,
+  paneMargins,
   paneExpansionState = null,
 }: ThreePaneScaffoldTransitionLayoutOptions): PreparedTransition {
   const physicalOrder: ThreePaneScaffoldHorizontalOrder =
@@ -364,6 +376,7 @@ function prepareTransition({
     excludedBounds,
     preferredWidths,
     preferredHeights,
+    paneMargins,
     paneExpansionState,
   };
   const currentPlacements = calculateValuePlacements({ ...common, value: currentValue });

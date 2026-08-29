@@ -39,6 +39,7 @@ The foundation currently ports pinned AndroidX behavior for:
 - Explicit folding posture and hinge policies without inventing a browser posture API.
 - Hide/Reflow/Levitate `calculateThreePaneScaffoldValue` adaptation with destination-history priority.
 - `ThreePaneScaffold` measurement and placement: pane priority, preferred sizes, RTL order, physical hinge partitions and vertical reflow.
+- Per-pane outer margins across expanded, reflowed, levitated and transition geometry, including logical RTL resolution and safe-edge constraints without consuming scaffold partition spacers.
 - `ListDetailPaneScaffold` with List → Detail → Extra logical order.
 - `SupportingPaneScaffold` with Main → Supporting → Extra order and Supporting → Main reflow strategy.
 - `PaneExpansionState`: width/proportion overrides, anchors, pointer resize and separator semantics.
@@ -65,6 +66,8 @@ Android `dp` layout thresholds map to CSS pixels because both are logical, densi
 
 `ThreePaneScaffold` uses pure measurement/state calculators plus DOM placement. This is intentional: AndroidX pane allocation is not equivalent to equal CSS grid fractions. Each expanded pane starts from its preferred width; surplus width goes to the highest-priority visible pane (Primary → Secondary → Tertiary), while constrained layouts scale preferred widths proportionally. Physical hinge bounds partition the available surface before that allocation.
 
+`PaneMargins` is applied to measured pane bounds rather than as CSS `margin`. Fixed inline margins are logical CSS-pixel geometry and resolve through the scaffold direction; optional scaffold-local inset bounds represent the safe edges supplied by AndroidX ruler inputs. The clamp happens after pane allocation/reflow, so an existing horizontal or vertical partition spacer is preserved. When an outer pane edge violates a margin, the pane is remeasured smaller against that edge instead of being translated to preserve its previous size. The same post-margin geometry feeds static expanded/reflowed placement, levitated placement and transition endpoints; no Compose `Modifier` abstraction is recreated in the browser API.
+
 Default pane-expansion state follows AndroidX ownership rather than treating every two-pane layout as one global split. Without a drag handle the renderer keeps one cheap stub state. When a drag handle is present and the caller has not supplied `paneExpansionState`, the renderer caches independent default states for Primary + Secondary, Primary + Tertiary, and Secondary + Tertiary so a user-adjusted split is restored when that pair returns. A caller-provided `paneExpansionState` always bypasses this cache and remains explicitly shared/owned by the caller.
 
 Pane-expansion accessibility stays on the browser-native `separator` role. AndroidX exposes the current anchor as state description and an accessibility `onClick` action for the next anchor. The web maps the current anchored split to `aria-valuetext`, the next-anchor action label to `aria-description`, and semantic activation to Enter/Space plus synthetic assistive-tech clicks. Real pointer clicks remain part of the drag interaction and do not cycle anchors. `paneExpansionHandleAriaStrings` can override the pinned English anchor/state/action formatters for localization while `paneExpansionHandleAriaLabel` remains the existing accessible-name override.
@@ -85,6 +88,6 @@ Layout components should prefer CSS Grid/Flexbox and logical properties over Jav
 
 ## Deliberate next slices
 
-The major adaptive pane-layout, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence/semantics, pane-boundary semantics and levitated resize semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
+The major adaptive pane-layout, pane-margin, motion, predictive-back, `AnimatedPane` visual, pane-state-retention, pane-expansion persistence/semantics, pane-boundary semantics and levitated resize semantics contracts are now represented. Further work should be driven by concrete parity gaps found by upstream audits, browser contracts or application integration rather than by mechanically translating more Compose runtime primitives.
 
 Generic `Box`/`Row`/`Column` wrappers remain deferred until they demonstrate semantic/API value beyond native CSS Flexbox/Grid.

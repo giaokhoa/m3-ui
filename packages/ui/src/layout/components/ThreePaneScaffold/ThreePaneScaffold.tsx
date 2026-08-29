@@ -36,14 +36,19 @@ import {
 } from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import {
-  getPredictiveBackScale,
-  getPredictiveBackScaffoldStyle,
-} from './ThreePaneScaffold.predictiveBack';
+  getPaneExpansionHandleAriaState,
+  type PaneExpansionHandleAriaStrings,
+} from './paneExpansionSemantics';
+import { applyPaneMargins, type PaneMargins } from './paneMargins';
 import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
   type ThreePaneScaffoldLayout,
 } from './ThreePaneScaffold.layout';
+import {
+  getPredictiveBackScale,
+  getPredictiveBackScaffoldStyle,
+} from './ThreePaneScaffold.predictiveBack';
 import {
   calculateThreePaneScaffoldTransitionDuration,
   calculateThreePaneScaffoldTransitionFrame,
@@ -52,10 +57,6 @@ import {
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
 } from './ThreePaneScaffold.transition';
-import {
-  getPaneExpansionHandleAriaState,
-  type PaneExpansionHandleAriaStrings,
-} from './paneExpansionSemantics';
 import { useDefaultPaneExpansionState } from './useDefaultPaneExpansionState';
 import './three-pane-scaffold.css';
 
@@ -76,6 +77,8 @@ export interface ThreePaneScaffoldProps
   tertiaryPane?: ReactNode;
   preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  /** AndroidX PaneMargins analogue keyed by pane role. */
+  paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState;
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
   paneExpansionHandleAriaLabel?: string;
@@ -187,6 +190,7 @@ export function ThreePaneScaffold({
   tertiaryPane,
   preferredWidths,
   preferredHeights,
+  paneMargins,
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionHandleAriaLabel = 'Resize panes',
@@ -323,6 +327,7 @@ export function ThreePaneScaffold({
         excludedBounds: localExcludedBounds,
         preferredWidths,
         preferredHeights,
+        paneMargins,
         paneExpansionState: expansionState,
       });
     });
@@ -337,6 +342,7 @@ export function ThreePaneScaffold({
     paneOrder,
     preferredWidths,
     preferredHeights,
+    paneMargins,
     expansionState,
   ]);
 
@@ -357,6 +363,7 @@ export function ThreePaneScaffold({
     excludedBounds,
     preferredWidths,
     preferredHeights,
+    paneMargins,
     paneExpansionState: expansionState,
   });
 
@@ -373,6 +380,7 @@ export function ThreePaneScaffold({
       excludedBounds,
       preferredWidths,
       preferredHeights,
+      paneMargins,
       paneExpansionState: expansionState,
     });
 
@@ -655,7 +663,7 @@ export function ThreePaneScaffold({
             scaffoldHeight: geometry.height,
             direction: geometry.direction,
           });
-          placement =
+          const unmarginedPlacement =
             resized === undefined
               ? basePlacement
               : calculateLevitatedPanePlacement({
@@ -667,6 +675,13 @@ export function ThreePaneScaffold({
                   preferredWidth: resized.width,
                   preferredHeight: resized.height,
                 });
+          placement = applyPaneMargins(
+            unmarginedPlacement,
+            paneMargins?.[role],
+            geometry.width,
+            geometry.height,
+            geometry.direction,
+          );
         } else if (!staticallyHidden) {
           placement = getPlacement(layout, role);
         }
