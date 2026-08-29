@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 4173 --strictPort",
+    "dev": "node scripts/build-search-index.mjs public/search-index.json && vite --host 0.0.0.0 --port 4173 --strictPort",
     "build": "vite build && node scripts/build-search-index.mjs",
     "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",
