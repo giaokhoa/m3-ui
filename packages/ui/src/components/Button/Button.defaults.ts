@@ -2,7 +2,6 @@ import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
 import {
   elevationMotionTokens,
-  getElevationBoxShadow,
   type ElevationLevel,
 } from '../../internal/elevation';
 import type { ButtonInteraction } from './Button.interactions';
@@ -137,20 +136,15 @@ export function resolveButtonElevationTransition({
   return `box-shadow ${spec.durationMs}ms ${spec.easing}`;
 }
 
-function resolveButtonTransition(
+function resolveButtonShapeTransition(
   state: ButtonInteractionState,
   hasAnimatedShape: boolean,
 ): string {
-  const elevationTransition = resolveButtonElevationTransition(state);
-  const transitions = [
-    elevationTransition === 'none' ? null : elevationTransition,
-    hasAnimatedShape && !state.isDisabled ? buttonShapeTransition : null,
-  ].filter((value): value is string => value !== null);
-  return transitions.length > 0 ? transitions.join(', ') : 'none';
+  return hasAnimatedShape && !state.isDisabled ? buttonShapeTransition : 'none';
 }
 
 export function getButtonStyle(
-  variant: ButtonVariant,
+  _variant: ButtonVariant,
   state: ButtonInteractionState,
   options: ButtonStyleOptions = {},
 ): ButtonStyle {
@@ -164,7 +158,9 @@ export function getButtonStyle(
     ...(activeShape === null
       ? {}
       : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
-    boxShadow: getElevationBoxShadow(resolveButtonElevation(variant, state)),
-    transition: resolveButtonTransition(state, options.shapes !== undefined),
+    transition: resolveButtonShapeTransition(
+      state,
+      options.shapes !== undefined,
+    ),
   };
 }
