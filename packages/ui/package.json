@@ -38,6 +38,7 @@
     "@internationalized/date": "3.12.3",
     "@m3-ui/tokens": "workspace:*",
     "@material/material-color-utilities": "0.3.0",
+    "clsx": "2.1.1",
     "react-aria-components": "^1.0.0"
   },
   "devDependencies": {
