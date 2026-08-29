@@ -1,4 +1,8 @@
 export const generatedStyleDependencies = {
+  'src/internal/elevation/elevation.css': [
+    '../tokens/dist/generated/elevation.css',
+  ],
+  'src/internal/ripple/ripple.css': ['../tokens/dist/generated/ripple.css'],
   'src/components/Button/button.css': ['../tokens/dist/generated/button.css'],
 };
 
