@@ -17,6 +17,7 @@ import { feedbackSearchMdxComponents } from './feedbackSearchMdxComponents';
 import { groupedControlMdxComponents } from './groupedControlMdxComponents';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
+import { parityMdxComponents } from './parityMdxComponents';
 import { pickerMdxComponents } from './pickerMdxComponents';
 import { smallPrimitiveMdxComponents } from './smallPrimitiveMdxComponents';
 import './styles.css';
@@ -87,6 +88,7 @@ function DocsPage() {
     ...smallPrimitiveMdxComponents,
     ...appBarToolbarMdxComponents,
     ...actionOverflowMdxComponents,
+    ...parityMdxComponents,
   };
 
   return (
