@@ -1,0 +1,87 @@
+---
+title: FAB
+description: Material 3 floating action buttons, extended forms, audited sizes, elevation, and compatibility variants.
+---
+
+<MaterialParity component="fab" />
+
+## Basic and extended FABs
+
+FABs represent a prominent action. The public API exposes icon-only and extended forms:
+
+<ComponentPreview>
+  <FabPreview />
+</ComponentPreview>
+
+```tsx
+<FloatingActionButton aria-label="Create">
+  <AddIcon />
+</FloatingActionButton>
+
+<ExtendedFloatingActionButton icon={<AddIcon />}>
+  Create
+</ExtendedFloatingActionButton>
+```
+
+For icon-only FABs, provide an accessible name on the button because the icon content is presentation-only.
+
+## Size families
+
+The standard FAB exports are:
+
+| Size | Public component |
+| --- | --- |
+| Small | `SmallFloatingActionButton` |
+| Baseline | `FloatingActionButton` |
+| Medium | `MediumFloatingActionButton` |
+| Large | `LargeFloatingActionButton` |
+
+The extended family mirrors those sizes with `SmallExtendedFloatingActionButton`, `ExtendedFloatingActionButton`, `MediumExtendedFloatingActionButton`, and `LargeExtendedFloatingActionButton`.
+
+The component functions select audited size tokens; applications do not need to reproduce container or icon dimensions.
+
+## Extended collapse behavior
+
+An extended FAB with an icon can set `expanded={false}` to collapse to the icon. A text-only extended FAB remains expanded because there would be no visual action affordance after collapsing.
+
+```tsx
+<ExtendedFloatingActionButton
+  icon={<ComposeIcon />}
+  expanded={showLabel}
+>
+  Compose
+</ExtendedFloatingActionButton>
+```
+
+When the collapsed label is a string, the implementation can derive an accessible button name from that label if `aria-label` is not supplied. Explicit accessible naming is still preferable when the visible label is not plain text.
+
+## Color families
+
+The default `variant` is `primaryContainer`. The audited variant contract also includes `secondaryContainer` and `tertiaryContainer`, preserving the generated Compose container-role families.
+
+```tsx
+<FloatingActionButton
+  aria-label="Edit"
+  variant="secondaryContainer"
+>
+  <EditIcon />
+</FloatingActionButton>
+```
+
+`containerColor`, `contentColor`, `shape`, and `elevation` are explicit customization hooks. Canonical defaults remain owned by the component token layer.
+
+## Elevation
+
+`elevation` accepts `default` or `lowered`. Interaction state drives the corresponding audited Material elevation levels and motion through the shared elevation engine.
+
+Avoid manually animating `box-shadow` around a FAB when the goal is standard Material interaction behavior; that state transition is already part of the component.
+
+## Material Web compatibility surface
+
+The public `FabVariant` also preserves `surface`, `primary`, `secondary`, and `tertiary`, and the package exports `BrandedFloatingActionButton`. Those names are retained from the pinned Material Web public surface audited by the project.
+
+They are **not presented as Compose-only APIs**. Use the Compose-aligned container-role families when that is the intended parity target, and treat the additional variants/branded form as deliberate cross-source compatibility.
+
+## Interaction ownership
+
+React Aria Button owns the action semantics, disabled/interaction state, keyboard and pointer handling, hover, and focus visibility. Material tokens and the shared ripple/elevation engines own container, content, state-layer, shape, elevation, and motion presentation.
