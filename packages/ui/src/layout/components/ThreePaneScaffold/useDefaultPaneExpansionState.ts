@@ -1,25 +1,13 @@
 import { useState } from 'react';
 import { PaneExpansionState } from '../../adaptive/paneExpansionState';
-import {
-  getPaneAdaptedValue,
-  ThreePaneScaffoldRole,
-  type ThreePaneScaffoldValue,
-} from '../../adaptive/threePaneScaffold';
-
-const rolesByPriority = [
-  ThreePaneScaffoldRole.Primary,
-  ThreePaneScaffoldRole.Secondary,
-  ThreePaneScaffoldRole.Tertiary,
-] as const;
+import { paneExpansionStateKeyId } from '../../adaptive/paneExpansionStateCache';
+import { getPaneExpansionStateKey } from '../../adaptive/paneExpansionStateKey';
+import type { ThreePaneScaffoldValue } from '../../adaptive/threePaneScaffold';
 
 const StubKey = 'stub';
-const DefaultKey = 'default';
 
 export function getPaneExpansionStateCacheKey(value: ThreePaneScaffoldValue): string {
-  const expandedRoles = rolesByPriority.filter(
-    (role) => getPaneAdaptedValue(value, role).type === 'expanded',
-  );
-  return expandedRoles.length === 2 ? expandedRoles.join(':') : DefaultKey;
+  return paneExpansionStateKeyId(getPaneExpansionStateKey(value));
 }
 
 /**

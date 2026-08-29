@@ -213,7 +213,7 @@ export class PaneExpansionState {
   private settling = false;
   private revision = 0;
   private readonly listeners = new Set<() => void>();
-  private readonly defaultAnimation: PaneExpansionAnimation;
+  private defaultAnimation: PaneExpansionAnimation;
   private animationController: AbortController | null = null;
   private restoreInterruptibleAnimationController: AbortController | null = null;
   private animationTargetOffset = PaneExpansionUnspecified;
@@ -386,6 +386,10 @@ export class PaneExpansionState {
 
   setConsumeDragDelta(consumeDragDelta: (delta: number) => number) {
     this.consumeDragDelta = consumeDragDelta;
+  }
+
+  setAnimation(animation: PaneExpansionAnimation) {
+    this.defaultAnimation = animation;
   }
 
   onMeasured(measuredWidth: number, direction: 'ltr' | 'rtl' = 'ltr') {
