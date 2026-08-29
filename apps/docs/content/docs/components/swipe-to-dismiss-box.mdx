@@ -1,0 +1,62 @@
+---
+title: Swipe to dismiss
+ description: Compose Material3 swipe-to-dismiss behavior with logical directions, controlled settled state, foreground interaction, and browser gesture arbitration.
+---
+
+<ParitySummary component="swipe-to-dismiss-box" />
+
+## Overview
+
+`SwipeToDismissBox` reveals background content as the foreground is dragged toward a logical start-to-end or end-to-start dismissal anchor.
+
+The component owns drag recognition and Material settling. The application owns what dismissal means for its data model.
+
+## Live example
+
+<ComponentPreview>
+  <SwipeToDismissPreview />
+</ComponentPreview>
+
+The foreground still contains a normal button. Swipe recognition does not require replacing the row with a non-interactive gesture surface.
+
+## State
+
+The public values are:
+
+- `settled`
+- `start-to-end`
+- `end-to-start`
+
+Use `value` + `onValueChange` for controlled state or `defaultValue` for an uncontrolled interaction.
+
+```tsx
+<SwipeToDismissBox
+  aria-label="Dismissible message"
+  backgroundContent={<Actions />}
+  value={value}
+  onValueChange={setValue}
+  onDismiss={removeMessage}
+>
+  <MessageRow />
+</SwipeToDismissBox>
+```
+
+`onDismiss` fires after the interaction has settled at a dismissal anchor. Removing an item from an array, undo handling, or resetting it to `settled` remain application responsibilities.
+
+## Logical directions and RTL
+
+Start/end directions follow the document reading direction. In RTL, start-to-end and end-to-start resolve to the opposite physical horizontal directions without changing the application state vocabulary.
+
+`enableDismissFromStartToEnd` and `enableDismissFromEndToStart` can independently disable either logical direction.
+
+## Gesture arbitration
+
+The pointer recognizer locks onto horizontal intent and rejects vertical gestures so parent/page scrolling can continue normally. `gesturesEnabled={false}` disables drag interaction without changing the rendered content or controlled state API.
+
+The Material positional threshold and release velocity decide whether the foreground returns to `settled` or advances to the next enabled anchor. Reduced-motion preference removes unnecessary settling animation while preserving the state result.
+
+## Foreground accessibility
+
+`SwipeToDismissBox` does not flatten or replace its children with a single fake button. Links, buttons, inputs, and other controls inside the foreground retain their own semantics and interaction.
+
+Provide an accessible name for the dismissible container when the swipe action needs contextual identification. Background actions should also remain independently named if they are interactive.
