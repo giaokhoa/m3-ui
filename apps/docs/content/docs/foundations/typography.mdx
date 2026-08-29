@@ -1,0 +1,71 @@
+---
+title: Typography
+description: Material 3 type roles with canonical metrics and M3 Expressive emphasized variants.
+---
+
+## Type scale
+
+The Material type scale is organized into display, headline, title, body, and label families, each with large, medium, and small roles.
+
+[Material 3 typography overview](https://m3.material.io/styles/typography/overview)
+
+<TypeScaleSamples />
+
+Every sample above is rendered with `getMaterialTypeCssProperties()`. Font size, line height, weight, letter spacing, and typeface role come from canonical generated `@m3-ui/tokens`; the docs application does not reproduce those measurements.
+
+## Public roles
+
+| Family | Roles |
+| --- | --- |
+| Display | `displayLarge`, `displayMedium`, `displaySmall` |
+| Headline | `headlineLarge`, `headlineMedium`, `headlineSmall` |
+| Title | `titleLarge`, `titleMedium`, `titleSmall` |
+| Body | `bodyLarge`, `bodyMedium`, `bodySmall` |
+| Label | `labelLarge`, `labelMedium`, `labelSmall` |
+
+Use the semantic role appropriate to the content hierarchy rather than selecting a role only because its pixel size looks convenient.
+
+## Runtime projection
+
+Use `getMaterialTypeStyle()` when code needs the Material typography values as data, or `getMaterialTypeCssProperties()` when applying the result directly to a React `style` prop.
+
+```tsx
+<h2 style={getMaterialTypeCssProperties('headlineMedium')}>
+  Account settings
+</h2>
+```
+
+The typeface token is resolved through the theme variables `--font-family-plain` and `--font-family-brand`, so typography participates in the active theme instead of baking a font family into each component.
+
+## M3 Expressive emphasis
+
+The canonical token graph also contains the emphasized counterpart for every type role. Pass `emphasized` as the second argument to opt into that Material 3 Expressive role.
+
+<TypeScaleSamples emphasis="emphasized" />
+
+```tsx
+<div
+  style={getMaterialTypeCssProperties(
+    'headlineLarge',
+    'emphasized',
+  )}
+>
+  Expressive headline
+</div>
+```
+
+Standard remains the default so existing Material typography does not change merely because emphasized tokens are available.
+
+## Theme typefaces
+
+`ThemeProvider` supplies the plain and brand typeface variables and currently includes the default Roboto stylesheet used by the library. Components and docs type roles refer to those theme variables rather than importing their own font metrics.
+
+## Semantic HTML
+
+Typography is a visual role, not a replacement for document semantics. The docs application keeps Markdown headings as `h1`–`h4`, paragraphs as `p`, and lists as native list elements, then maps those elements to appropriate Material type roles at the MDX boundary.
+
+There is intentionally no public `Typography` or `Prose` component created only to make the docs site look Material.
+
+## Code text
+
+Material does not define a dedicated code type role. Documentation code uses a monospace browser adaptation while its surrounding surfaces and text colors still use Material semantic roles. That adaptation stays local to `apps/docs` and is not presented as part of the Material type scale.
