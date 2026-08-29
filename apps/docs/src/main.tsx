@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
 import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
 import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
@@ -49,7 +50,7 @@ function ThemeGlyph({ preference }: { preference: 'system' | 'light' | 'dark' })
   return (
     <svg viewBox="0 0 24 24">
       <path
-        d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6h1v3h-2V2h1Zm0 17h1v3h-2v-3h1ZM2 11h3v2H2v-2Zm17 0h3v2h-3v-2ZM4.22 5.64l1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12Zm12.02 12.02 1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12ZM16.24 6.34l2.12-2.12 1.42 1.42-2.12 2.12-1.42-1.42ZM4.22 18.36l2.12-2.12 1.42 1.42-2.12 2.12-1.42-1.42Z"
+        d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6h1v3h-2V2h1Zm0 17h1v3h-2v-3h1ZM2 11h3v2H2v-2Zm17 0h3v2h-3v-2ZM4.22 5.64l1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12Zm12.02 12.02 1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12ZM16.24 6.34l2.12-2.12 1.42 1.42 2.12 2.12-1.42 1.42ZM4.22 18.36l2.12-2.12 1.42 1.42-2.12 2.12-1.42-1.42Z"
         fill="currentColor"
       />
     </svg>
@@ -77,6 +78,7 @@ function DocsPage() {
     ...groupedControlMdxComponents,
     ...contentPrimitiveMdxComponents,
     ...pickerMdxComponents,
+    ...carouselSheetMdxComponents,
   };
 
   return (
