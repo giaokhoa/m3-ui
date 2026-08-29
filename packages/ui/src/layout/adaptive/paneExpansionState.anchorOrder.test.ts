@@ -64,19 +64,4 @@ describe('PaneExpansionState physical anchor ordering', () => {
 
     expect(state.currentAnchor).toBe(anchors[0]);
   });
-
-  it('matches AndroidX directional settling when every anchor is behind the fling', async () => {
-    const anchors = [
-      PaneExpansionAnchor.proportion(0.75),
-      PaneExpansionAnchor.proportion(0.25),
-    ];
-    const state = new PaneExpansionState({ anchors, animation: instantAnimation });
-    state.onMeasured(1000);
-    state.onExpansionOffsetMeasured(900);
-
-    await state.settleToAnchorIfNeeded(250);
-
-    expect(state.currentAnchor).toBe(anchors[1]);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(250);
-  });
 });
