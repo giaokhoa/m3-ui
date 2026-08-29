@@ -9,6 +9,7 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { applyPaneMargins, type PaneMargins } from './paneMargins';
 
 export interface PanePlacement {
   left: number;
@@ -34,6 +35,8 @@ export interface ThreePaneScaffoldLayoutOptions {
   excludedBounds?: readonly LayoutBounds[];
   preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  /** Outer pane margins applied after partition measurement, keyed by pane role. */
+  paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
 }
 
@@ -90,6 +93,7 @@ export function calculateThreePaneScaffoldLayout({
   excludedBounds = directive.excludedBounds,
   preferredWidths = {},
   preferredHeights = {},
+  paneMargins = {},
   paneExpansionState = null,
 }: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayout {
   assertDimension(width, 'width');
@@ -125,6 +129,15 @@ export function calculateThreePaneScaffoldLayout({
     preferredWidths[role] ?? defaultPreferredWidth;
   const preferredHeight = (role: ThreePaneScaffoldRole) =>
     preferredHeights[role] ?? defaultPreferredHeight;
+  const placePane = (role: ThreePaneScaffoldRole, placement: PanePlacement) => {
+    result[role] = applyPaneMargins(
+      placement,
+      paneMargins[role],
+      width,
+      height,
+      direction,
+    );
+  };
 
   const placePartition = (bounds: LayoutBounds, expandedRole: ThreePaneScaffoldRole) => {
     const reflowValue = reflowed === undefined ? undefined : getPaneAdaptedValue(value, reflowed);
@@ -138,27 +151,27 @@ export function calculateThreePaneScaffoldLayout({
         availableHeight - preferredHeight(reflowed),
         availableHeight / 2,
       );
-      result[expandedRole] = {
+      placePane(expandedRole, {
         left: bounds.left,
         top: bounds.top,
         width: rectWidth(bounds),
         height: expandedHeight,
-      };
-      result[reflowed] = {
+      });
+      placePane(reflowed, {
         left: bounds.left,
         top: bounds.top + expandedHeight + verticalGap,
         width: rectWidth(bounds),
         height: availableHeight - expandedHeight,
-      };
+      });
       return;
     }
 
-    result[expandedRole] = {
+    placePane(expandedRole, {
       left: bounds.left,
       top: bounds.top,
       width: rectWidth(bounds),
       height: rectHeight(bounds),
-    };
+    });
   };
 
   const placePartitionsInBounds = (

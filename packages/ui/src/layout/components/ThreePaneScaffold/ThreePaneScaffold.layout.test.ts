@@ -69,6 +69,24 @@ describe('calculateThreePaneScaffoldLayout', () => {
     expect(layout.secondary).toEqual({ left: 640, top: 0, width: 360, height: 800 });
   });
 
+  it('applies outer pane margins after allocation without changing the partition gap', () => {
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      paneMargins: {
+        secondary: { inlineStart: 32, blockStart: 16, blockEnd: 20 },
+        primary: { inlineEnd: 40, blockStart: 16, blockEnd: 20 },
+      },
+    });
+
+    expect(layout.secondary).toEqual({ left: 32, top: 16, width: 328, height: 764 });
+    expect(layout.primary).toEqual({ left: 384, top: 16, width: 576, height: 764 });
+    expect(layout.primary!.left - (layout.secondary!.left + layout.secondary!.width)).toBe(24);
+  });
+
   it('reflows a pane below its expanded anchor with AndroidX height allocation', () => {
     const reflowDirective: PaneScaffoldDirective = {
       ...directive,
@@ -93,6 +111,36 @@ describe('calculateThreePaneScaffoldLayout', () => {
 
     expect(layout.primary).toEqual({ left: 0, top: 0, width: 600, height: 556 });
     expect(layout.secondary).toEqual({ left: 0, top: 580, width: 600, height: 420 });
+  });
+
+  it('applies pane margins after reflow measurement', () => {
+    const reflowDirective: PaneScaffoldDirective = {
+      ...directive,
+      maxHorizontalPartitions: 1,
+      maxVerticalPartitions: 2,
+      horizontalPartitionSpacerSize: '0px',
+      verticalPartitionSpacerSize: '24px',
+    };
+    const value: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Reflowed(ThreePaneScaffoldRole.Primary),
+      tertiary: PaneAdaptedValue.Hidden,
+    };
+
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 600,
+      height: 1000,
+      directive: reflowDirective,
+      value,
+      paneOrder: supportingPaneScaffoldOrder,
+      paneMargins: {
+        primary: { blockStart: 20 },
+        secondary: { blockEnd: 30 },
+      },
+    });
+
+    expect(layout.primary).toEqual({ left: 0, top: 20, width: 600, height: 536 });
+    expect(layout.secondary).toEqual({ left: 0, top: 580, width: 600, height: 390 });
   });
 
   it('uses physical hinge partitions before preferred-width allocation', () => {
