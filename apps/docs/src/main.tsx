@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { actionOverflowMdxComponents } from './actionOverflowMdxComponents';
 import { appBarToolbarMdxComponents } from './appBarToolbarMdxComponents';
 import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
 import { composeUtilityMdxComponents } from './composeUtilityMdxComponents';
@@ -85,6 +86,7 @@ function DocsPage() {
     ...composeUtilityMdxComponents,
     ...smallPrimitiveMdxComponents,
     ...appBarToolbarMdxComponents,
+    ...actionOverflowMdxComponents,
   };
 
   return (
