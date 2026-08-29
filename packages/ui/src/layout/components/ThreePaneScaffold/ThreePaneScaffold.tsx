@@ -40,6 +40,7 @@ import {
   type PaneExpansionHandleAriaStrings,
 } from './paneExpansionSemantics';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
+import type { PanePreferredSize } from './preferredPaneSize';
 import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
@@ -75,8 +76,8 @@ export interface ThreePaneScaffoldProps
   primaryPane: ReactNode;
   secondaryPane: ReactNode;
   tertiaryPane?: ReactNode;
-  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
-  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
+  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   /** AndroidX PaneMargins analogue keyed by pane role. */
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState;

@@ -10,6 +10,10 @@ import {
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
+import {
+  resolvePanePreferredSize,
+  type PanePreferredSize,
+} from './preferredPaneSize';
 
 export interface PanePlacement {
   left: number;
@@ -33,8 +37,8 @@ export interface ThreePaneScaffoldLayoutOptions {
   direction?: 'ltr' | 'rtl';
   /** Excluded bounds converted to scaffold-local physical CSS pixels. */
   excludedBounds?: readonly LayoutBounds[];
-  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
-  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
+  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   /** Outer pane margins applied after partition measurement, keyed by pane role. */
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
@@ -126,9 +130,19 @@ export function calculateThreePaneScaffoldLayout({
   const result: ThreePaneScaffoldLayout = {};
 
   const preferredWidth = (role: ThreePaneScaffoldRole) =>
-    preferredWidths[role] ?? defaultPreferredWidth;
+    resolvePanePreferredSize(
+      preferredWidths[role],
+      width,
+      defaultPreferredWidth,
+      `${role} preferredWidth`,
+    );
   const preferredHeight = (role: ThreePaneScaffoldRole) =>
-    preferredHeights[role] ?? defaultPreferredHeight;
+    resolvePanePreferredSize(
+      preferredHeights[role],
+      height,
+      defaultPreferredHeight,
+      `${role} preferredHeight`,
+    );
   const placePane = (role: ThreePaneScaffoldRole, placement: PanePlacement) => {
     result[role] = applyPaneMargins(
       placement,

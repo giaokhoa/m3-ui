@@ -32,6 +32,7 @@ import {
   type PanePlacement,
 } from './ThreePaneScaffold.layout';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
+import type { PanePreferredSize } from './preferredPaneSize';
 
 export interface PaneTransitionFrame {
   placement: PanePlacement;
@@ -61,8 +62,8 @@ export interface ThreePaneScaffoldTransitionOptions {
   paneOrder: ThreePaneScaffoldHorizontalOrder;
   direction?: 'ltr' | 'rtl';
   excludedBounds?: readonly LayoutBounds[];
-  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, number>>;
-  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, number>>;
+  preferredWidths?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
+  preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
 }

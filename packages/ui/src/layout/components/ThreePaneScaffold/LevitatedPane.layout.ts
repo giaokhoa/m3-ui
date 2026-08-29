@@ -1,6 +1,10 @@
 import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import type { LevitatedPaneAlignment } from '../../adaptive/threePaneScaffold';
 import type { PanePlacement } from './ThreePaneScaffold.layout';
+import {
+  resolvePanePreferredSize,
+  type PanePreferredSize,
+} from './preferredPaneSize';
 
 export interface LevitatedPaneLayoutOptions {
   width: number;
@@ -8,8 +12,8 @@ export interface LevitatedPaneLayoutOptions {
   directive: PaneScaffoldDirective;
   alignment: LevitatedPaneAlignment;
   direction?: 'ltr' | 'rtl';
-  preferredWidth?: number;
-  preferredHeight?: number;
+  preferredWidth?: PanePreferredSize;
+  preferredHeight?: PanePreferredSize;
 }
 
 function px(value: string, name: string): number {
@@ -52,16 +56,26 @@ export function calculateLevitatedPanePlacement({
   directive,
   alignment,
   direction = 'ltr',
-  preferredWidth = px(directive.defaultPanePreferredWidth, 'defaultPanePreferredWidth'),
-  preferredHeight = px(directive.defaultPanePreferredHeight, 'defaultPanePreferredHeight'),
+  preferredWidth,
+  preferredHeight,
 }: LevitatedPaneLayoutOptions): PanePlacement {
   assertDimension(width, 'width');
   assertDimension(height, 'height');
-  assertDimension(preferredWidth, 'preferredWidth');
-  assertDimension(preferredHeight, 'preferredHeight');
 
-  const paneWidth = Math.min(preferredWidth, width);
-  const paneHeight = Math.min(preferredHeight, height);
+  const resolvedPreferredWidth = resolvePanePreferredSize(
+    preferredWidth,
+    width,
+    px(directive.defaultPanePreferredWidth, 'defaultPanePreferredWidth'),
+    'preferredWidth',
+  );
+  const resolvedPreferredHeight = resolvePanePreferredSize(
+    preferredHeight,
+    height,
+    px(directive.defaultPanePreferredHeight, 'defaultPanePreferredHeight'),
+    'preferredHeight',
+  );
+  const paneWidth = Math.min(resolvedPreferredWidth, width);
+  const paneHeight = Math.min(resolvedPreferredHeight, height);
   const { vertical, horizontal } = alignmentParts(alignment);
 
   let left: number;
