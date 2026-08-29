@@ -30,6 +30,10 @@ import {
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldState,
 } from '../../adaptive/threePaneScaffoldState';
+import {
+  getDragToResizeHandleAriaState,
+  type DragToResizeHandleAriaStrings,
+} from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import {
   getPredictiveBackScale,
@@ -90,6 +94,8 @@ export interface ThreePaneScaffoldProps
    */
   levitatedPaneDragHandles?: Partial<Record<ThreePaneScaffoldRole, LevitatedPaneDragHandle>>;
   levitatedPaneDragHandleAriaLabel?: string;
+  /** Localized formatters for levitated resize-handle state and next action text. */
+  levitatedPaneDragHandleAriaStrings?: Partial<DragToResizeHandleAriaStrings>;
 }
 
 interface ScaffoldGeometry {
@@ -188,6 +194,7 @@ export function ThreePaneScaffold({
   paneAriaLabels,
   levitatedPaneDragHandles,
   levitatedPaneDragHandleAriaLabel = 'Resize pane',
+  levitatedPaneDragHandleAriaStrings,
   className,
   style,
   ...props
@@ -574,6 +581,15 @@ export function ThreePaneScaffold({
     state.moveToNextState();
   };
 
+  const resizeClick = (
+    event: ReactMouseEvent<HTMLDivElement>,
+    state: DragToResizeState,
+  ) => {
+    if (transitionActive || event.detail !== 0) return;
+    event.preventDefault();
+    state.moveToNextState();
+  };
+
   let staticScrim: ReactNode | undefined;
   if (!transitionActive) {
     for (const [role] of paneEntries) {
@@ -664,6 +680,13 @@ export function ThreePaneScaffold({
         const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
         const paneResizeState =
           adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
+        const paneResizeAriaState =
+          paneResizeState === undefined
+            ? undefined
+            : getDragToResizeHandleAriaState(
+                paneResizeState,
+                levitatedPaneDragHandleAriaStrings,
+              );
         const resizeHandleSpec = levitatedPaneDragHandles?.[role];
         const resizeHandle =
           paneResizeState === undefined
@@ -721,9 +744,12 @@ export function ThreePaneScaffold({
                 <div
                   className="three-pane-scaffold__levitated-resize-handle"
                   data-orientation={paneResizeState.orientation}
+                  data-resize-state={paneResizeState.value}
                   role="button"
                   aria-label={levitatedPaneDragHandleAriaLabel}
+                  aria-description={paneResizeAriaState?.description}
                   tabIndex={0}
+                  onClick={(event) => resizeClick(event, paneResizeState)}
                   onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
                   onLostPointerCapture={(event) => finishResize(event, true)}
                   onPointerCancel={(event) => finishResize(event, true)}
