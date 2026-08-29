@@ -1,0 +1,45 @@
+---
+title: Checkbox
+description: Material 3 checkbox states and browser-native selection semantics.
+---
+
+<MaterialParity component="checkbox" />
+
+## Usage
+
+Checkboxes represent independent binary choices. The public component keeps Material visual states while React Aria owns the web checkbox behavior.
+
+<ComponentPreview>
+  <CheckboxPreview />
+</ComponentPreview>
+
+```tsx
+import { Checkbox } from '@m3-ui/ui';
+
+<Checkbox defaultSelected>Remember this device</Checkbox>
+```
+
+## States
+
+The implementation distinguishes unchecked, checked, and indeterminate visual states and applies the Material disabled, hover, focus, and pressed treatments through canonical component tokens.
+
+```tsx
+<Checkbox>Unchecked</Checkbox>
+<Checkbox defaultSelected>Checked</Checkbox>
+<Checkbox isIndeterminate>Partially selected</Checkbox>
+<Checkbox isDisabled>Disabled</Checkbox>
+```
+
+`isIndeterminate` is a distinct presentation/state exposed by the underlying checkbox contract. Do not use it as a substitute for a selected value in application state.
+
+## Labeling and interaction
+
+Visible children act as the checkbox label. React Aria provides the checkbox semantics, keyboard behavior, focus visibility, pointer interaction, controlled/uncontrolled selection props, and accessible state exposure.
+
+For a control without visible label text, provide an accessible name through the inherited React Aria props.
+
+## Material presentation
+
+The visible box and marks are implementation details of `@m3-ui/ui`; their geometry and minimum interactive target come from the audited Material token layer. Consumer code should not reproduce the check path or container measurements.
+
+The shared ripple engine paints hover/focus/press indication around the Material control while the semantic checkbox remains the interaction owner.
