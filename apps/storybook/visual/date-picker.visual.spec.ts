@@ -198,6 +198,7 @@ test.describe('Material 3 DatePicker browser contract', () => {
     await expect(fields.locator('.date-picker__date-segment[data-type="year"]')).toHaveCount(2);
     await enterSegmentedDate(fields.nth(0), '2026-09-10');
     await enterSegmentedDate(fields.nth(1), '2026-09-01');
+    await page.getByTestId('range-input-value').click();
     await expect(page.getByRole('alert')).toContainText('End date must');
     await expect(page.getByTestId('range-input-value')).toHaveText('2026-08-20/2026-08-25');
   });

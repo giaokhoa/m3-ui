@@ -408,9 +408,10 @@ function RangeCalendarBody(props: CalendarBodyBase & { value: DatePickerRangeVal
   );
 }
 
-function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnMount, label = 'Date' }: {
+function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled, focusOnMount, label = 'Date' }: {
   value: DatePickerDate | null;
   onChange: (value: DatePickerDate | null, valid: boolean) => void;
+  onCommit?: (value: DatePickerDate | null, valid: boolean) => void;
   yearRange: readonly [number, number];
   unavailable?: (value: DatePickerDate) => boolean;
   disabled: boolean;
@@ -440,6 +441,12 @@ function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnM
       isInvalid={invalid}
       isDisabled={disabled}
       autoFocus={focusOnMount}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+        const iso = draft?.toString() ?? null;
+        const valid = iso === null || (isWithinYearRange(iso, yearRange) && !unavailable?.(iso));
+        onCommit?.(iso, valid);
+      }}
       onChange={(next) => {
         setDraft(next);
         const iso = next?.toString() ?? null;
@@ -545,7 +552,8 @@ export function DateRangePicker({
               <DateInput
                 label="Start date"
                 value={startDraft}
-                onChange={(next, valid) => { setStartDraft(next); if (valid) commitDraft(next, endDraft); }}
+                onChange={(next) => setStartDraft(next)}
+              onCommit={(next, valid) => { if (valid) commitDraft(next, endDraft); }}
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
@@ -554,7 +562,8 @@ export function DateRangePicker({
               <DateInput
                 label="End date"
                 value={endDraft}
-                onChange={(next, valid) => { setEndDraft(next); if (valid) commitDraft(startDraft, next); }}
+                onChange={(next) => setEndDraft(next)}
+              onCommit={(next, valid) => { if (valid) commitDraft(startDraft, next); }}
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
