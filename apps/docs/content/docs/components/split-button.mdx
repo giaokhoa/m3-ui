@@ -1,0 +1,47 @@
+---
+title: Split button
+description: Material split actions with independent leading and trailing buttons, expressive size geometry, and application-owned menu state.
+---
+
+<MaterialParity component="split-button" />
+
+## Overview
+
+`SplitButton` composes two Material button actions into the audited split-button shape: a primary leading action and an independent trailing action.
+
+The trailing side may expose pressed or expanded state, but the component deliberately does **not** create a menu or popover. Applications own the secondary-action surface and its lifecycle.
+
+## Live example
+
+<ComponentPreview>
+  <SplitButtonPreview />
+</ComponentPreview>
+
+The example toggles `aria-expanded` state only. That state is the contract a separately composed menu can consume; the split button itself does not invent menu content.
+
+## Variants and sizes
+
+```tsx
+<SplitButton
+  leading="Create"
+  trailing={<ChevronDownIcon />}
+  onLeadingPress={create}
+  onTrailingPress={() => setOpen((value) => !value)}
+  trailingExpanded={open}
+  trailingAriaLabel="Show create options"
+/>
+```
+
+Available variants are `filled`, `tonal`, `elevated`, and `outlined`. Split-button sizes reuse the public Material button size family from extra-small through extra-large while applying the split-specific leading/trailing corner geometry.
+
+## Trailing state
+
+Set `trailingExpanded` when the trailing action controls an external expandable surface. Set `trailingChecked` + `onTrailingCheckedChange` when it acts as a persistent toggle; this exposes `aria-pressed` on the real trailing button.
+
+Do not set toggle state merely to style a menu trigger. Use `trailingExpanded` for disclosure and reserve `trailingChecked` for a true pressed/toggled action.
+
+## Accessibility
+
+Both halves reuse the public Material button engine and therefore preserve React Aria keyboard, pointer, disabled, focus-visible, and press semantics.
+
+Provide `leadingAriaLabel` or `trailingAriaLabel` when a half's visual content does not already contain meaningful text. Icon-only trailing disclosure controls need an accessible name.
