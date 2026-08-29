@@ -1,0 +1,71 @@
+.docs-parity-catalog {
+  margin-block: 24px;
+}
+
+.docs-parity-catalog__count {
+  margin: 0 0 12px;
+  color: var(--on-surface-variant);
+}
+
+.docs-parity-catalog__entries {
+  display: grid;
+  gap: 12px;
+}
+
+.docs-parity-catalog__surface {
+  border: 1px solid var(--outline-variant);
+}
+
+.docs-parity-catalog__entry {
+  margin: 0;
+}
+
+.docs-parity-catalog__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+}
+
+.docs-parity-catalog__contract {
+  color: var(--on-surface-variant);
+  text-align: end;
+}
+
+.docs-parity-catalog__entry[open] > .docs-parity-catalog__summary {
+  border-block-end: 1px solid var(--outline-variant);
+}
+
+.docs-parity-catalog__body {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.docs-parity-catalog__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.docs-parity-catalog__details {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+
+.docs-parity-catalog__details > div {
+  display: grid;
+  gap: 4px;
+}
+
+.docs-parity-catalog__details dt,
+.docs-parity-catalog__details dd {
+  margin: 0;
+}
+
+.docs-parity-catalog__details dd {
+  color: var(--on-surface-variant);
+}
