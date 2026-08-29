@@ -30,6 +30,31 @@ function thresholdAt(
 }
 
 /**
+ * PaneMotionDefaults uses an IntRect visibility threshold of one pixel for
+ * bounds, offset, and size animations. Their AndroidX TwoWayConverters round
+ * every sampled vector component back to Int with fastRoundToInt(). The only
+ * default Float pane-motion vector is visibility, whose threshold is 0.01.
+ */
+function usesIntPaneMotionConverter(
+  visibilityThresholds: number | readonly number[],
+  dimensionCount: number,
+) {
+  for (let index = 0; index < dimensionCount; index += 1) {
+    if (thresholdAt(visibilityThresholds, index) !== 1) return false;
+  }
+  return true;
+}
+
+function convertPaneMotionVector(
+  values: readonly number[],
+  visibilityThresholds: number | readonly number[],
+): number[] {
+  return usesIntPaneMotionConverter(visibilityThresholds, values.length)
+    ? values.map((value) => Math.round(value))
+    : [...values];
+}
+
+/**
  * Port of the under-damped branch of AndroidX SpringSimulation.updateValues.
  * PaneMotionDefaults uses dampingRatio=0.8, so this is the exact branch used by
  * the pinned Material 3 adaptive pane motion specs.
@@ -134,6 +159,8 @@ export function calculatePaneMotionVectorSpringDurationMs(
 /**
  * Samples a vectorized TargetBasedAnimation at a shared playtime. AndroidX
  * snaps the whole vector to target once the slowest dimension reaches duration.
+ * IntRect/IntOffset/IntSize pane-motion converters also round every sampled
+ * component to an integer before exposing the animated value.
  */
 export function samplePaneMotionVectorSpringAtPlayTime(
   initialValues: readonly number[],
@@ -149,10 +176,17 @@ export function samplePaneMotionVectorSpringAtPlayTime(
     targetValues,
     visibilityThresholds,
   );
-  if (duration === 0 || playTimeMs >= duration) return [...targetValues];
-  if (playTimeMs <= 0) return [...initialValues];
-  return initialValues.map((initialValue, index) =>
-    samplePaneMotionSpring(initialValue, targetValues[index]!, playTimeMs),
+  if (duration === 0 || playTimeMs >= duration) {
+    return convertPaneMotionVector(targetValues, visibilityThresholds);
+  }
+  if (playTimeMs <= 0) {
+    return convertPaneMotionVector(initialValues, visibilityThresholds);
+  }
+  return convertPaneMotionVector(
+    initialValues.map((initialValue, index) =>
+      samplePaneMotionSpring(initialValue, targetValues[index]!, playTimeMs),
+    ),
+    visibilityThresholds,
   );
 }
 
@@ -210,14 +244,21 @@ export function samplePaneMotionDelayedVectorSpringAtPlayTime(
   );
   const delayedTimeMs = Math.trunc(originalDuration * PaneMotionDefaults.delayedRatio);
   const totalDuration = originalDuration + delayedTimeMs;
-  if (totalDuration === 0 || playTimeMs >= totalDuration) return [...targetValues];
-  if (playTimeMs <= delayedTimeMs) return [...initialValues];
-  return initialValues.map((initialValue, index) =>
-    samplePaneMotionSpring(
-      initialValue,
-      targetValues[index]!,
-      playTimeMs - delayedTimeMs,
+  if (totalDuration === 0 || playTimeMs >= totalDuration) {
+    return convertPaneMotionVector(targetValues, visibilityThresholds);
+  }
+  if (playTimeMs <= delayedTimeMs) {
+    return convertPaneMotionVector(initialValues, visibilityThresholds);
+  }
+  return convertPaneMotionVector(
+    initialValues.map((initialValue, index) =>
+      samplePaneMotionSpring(
+        initialValue,
+        targetValues[index]!,
+        playTimeMs - delayedTimeMs,
+      ),
     ),
+    visibilityThresholds,
   );
 }
 

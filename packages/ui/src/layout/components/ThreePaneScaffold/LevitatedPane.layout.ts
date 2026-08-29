@@ -80,7 +80,9 @@ export function calculateLevitatedPanePlacement({
 
   let left: number;
   if (horizontal === 'center') {
-    left = (width - paneWidth) / 2;
+    // Compose Alignment.align returns IntOffset. For centered panes its bias
+    // calculation rounds the half-space to the nearest Int pixel.
+    left = Math.round((width - paneWidth) / 2);
   } else {
     const logicalStart = horizontal === 'start';
     const physicalLeft = direction === 'ltr' ? logicalStart : !logicalStart;
@@ -92,7 +94,7 @@ export function calculateLevitatedPanePlacement({
       ? 0
       : vertical === 'bottom'
         ? height - paneHeight
-        : (height - paneHeight) / 2;
+        : Math.round((height - paneHeight) / 2);
 
   return { left, top, width: paneWidth, height: paneHeight };
 }
