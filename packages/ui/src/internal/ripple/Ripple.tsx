@@ -1,4 +1,5 @@
 import * as token from '@m3-ui/tokens';
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { useTheme } from '../../theme/ThemeProvider';
 import type { RippleController } from './useRipple';
@@ -84,7 +85,7 @@ export function Ripple({
       {...props}
       ref={controller.containerRef}
       aria-hidden="true"
-      className={className ? `ripple ${className}` : 'ripple'}
+      className={clsx('ripple', className)}
       data-focus-ring-radius={focusRingRadius === undefined ? undefined : true}
       data-focus-visible={
         rippleFocus === 'opacity' && resolvedStateInteraction === 'focus'
