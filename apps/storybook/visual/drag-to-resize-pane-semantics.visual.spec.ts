@@ -22,7 +22,10 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
     'partially expanded. expand',
   );
 
-  // Keyboard activation owned by pane contents must not bubble into resizing.
+  // Pointer and keyboard activation owned by pane contents must not bubble
+  // into the whole-pane resize gesture/click target.
+  await innerAction.click();
+  await expect(pane).toHaveAttribute('data-resize-state', 'default');
   await innerAction.focus();
   await page.keyboard.press('Enter');
   await expect(pane).toHaveAttribute('data-resize-state', 'default');
@@ -43,7 +46,8 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
     'collapsed. partially expand',
   );
 
-  // A pointer click on the pane itself keeps AndroidX whole-pane click-to-resize behavior.
+  // A pointer click on non-interactive pane content keeps AndroidX whole-pane
+  // click-to-resize behavior.
   await pane.click({ position: { x: 8, y: 8 } });
   await expect(pane).toHaveAttribute('data-resize-state', 'default');
 });
