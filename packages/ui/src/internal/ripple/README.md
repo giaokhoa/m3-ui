@@ -74,6 +74,14 @@ packages/tokens/dist/generated/ripple.css
 
 The Ripple primitive imports it through the reviewed token-package CSS subpath. Modular `@m3-ui/ui/styles/*.css` entries containing handwritten `internal/ripple/ripple.css` must inline the generated adapter before the handwritten CSS so public style exports remain self-contained.
 
+## Browser value semantics
+
+Generated-artifact tests may lock the canonical textual serialization emitted by Style Dictionary, for example `--_ripple-hover-opacity: 0.08;` in `dist/generated/ripple.css`.
+
+Browser/visual tests must instead validate the **computed semantic value**. A bundler/minifier is allowed to serialize equivalent CSS numbers differently, such as `0.08` becoming `.08`. Browser tests must parse numeric custom-property values before comparing them and must not force runtime inline-style projection or formatter workarounds merely to preserve pre-minification spelling.
+
+This distinction is part of the runtime boundary: generated-source tests own source serialization; browser tests own rendered semantics.
+
 ## Pinned AndroidX baseline
 
 - Repository: `https://android.googlesource.com/platform/frameworks/support`
@@ -142,6 +150,7 @@ Do not:
 - move concrete Material color ownership out of `ThemeProvider`;
 - move wave geometry/measurement into Style Dictionary or static CSS;
 - add native pointer/keyboard listeners to Ripple when the host React Aria interaction contract already supplies the event;
+- force CSS lexical spellings through runtime inline styles or formatter hacks when bundled browser output is semantically equivalent;
 - merge ripple, elevation, focus ring, and content into a monolithic effect primitive with one paint bound;
 - hand-edit `packages/tokens/dist/**`.
 
@@ -154,6 +163,6 @@ Required coverage includes:
 3. architecture guards proving `<Ripple>` does not project static token constants through React style;
 4. modular style tests proving generated ripple CSS precedes handwritten ripple CSS;
 5. UI unit/type/build tests;
-6. Storybook/Chromium visual regression for default opacity, inset ring, wave geometry, overlay ordering, and forced-colors behavior.
+6. Storybook/Chromium visual regression for default opacity, inset ring, wave geometry, overlay ordering, and forced-colors behavior. Browser numeric custom-property assertions must compare parsed semantic values rather than minifier-dependent lexical spellings.
 
 Existing Chromium coverage verifies default opacity behavior, stroke widths/insets/colors, overlay ordering, Button 40px visual indication bounds, Checkbox 48/40/18 target/state/ring geometry with 4.5px → 3.5px inset radius, RadioButton 48/40/24 geometry with 12px → 11px inset radius, and the independent focus-ring + hover-state-layer case.
