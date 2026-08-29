@@ -22,6 +22,27 @@ The revision is intentionally pinned rather than following `androidx-main`. Upst
 - `src/androidDeviceTest/kotlin/androidx/compose/material3/TextFieldTest.kt`
 - `src/androidDeviceTest/kotlin/androidx/compose/material3/OutlinedTextFieldTest.kt`
 
+## Token and style ownership
+
+TextField has no immutable design-token projection layer in React. Canonical `component.textField.*` color tokens alias `color.role.*`; Style Dictionary resolves those aliases to ThemeProvider-owned runtime variables and emits the complete immutable base-style projection in `@m3-ui/tokens/text-field.css`.
+
+The generated adapter owns shared dimensions, typography, motion, colors, disabled opacity, and filled/outlined padding, shape, indicator/outline, and color defaults. Handwritten `text-field.css` owns structural/state selectors. React Aria and the browser own focus, invalid, disabled, read-only, value/placeholder, and form semantics. User `className`/`style` props remain ordinary runtime overrides and are not mixed with generated design defaults.
+
+```text
+component.textField.*
+    -> semantic DTCG aliases / immutable values
+    -> Style Dictionary
+    -> dist/generated/text-field.css
+    -> handwritten TextField structural CSS
+
+component.textField.*Color
+    -> {color.role.*}
+    -> var(--role)
+    -> ThemeProvider concrete runtime value
+```
+
+Do not reintroduce `TextField.tokens.ts` / `TextField.defaults.ts` merely to reshape static tokens into inline CSS. Do not decode `var(--role)` and reconstruct it in TypeScript.
+
 ## Filled baseline
 
 The filled field ports these Compose contracts:
@@ -63,4 +84,4 @@ These are intentional DOM translations rather than literal Compose mechanisms:
 
 ## Regression coverage
 
-Storybook covers both variants across empty, populated, invalid, disabled, icons/affixes, multiline, state matrices, light/dark themes, and dynamic source-color themes. Playwright keeps the existing filled visual goldens and adds outlined DOM/layout assertions for the 56px container, 1/2px border transition, 4px shape, label cutout behavior, label click-to-focus, invalid+focused precedence, multiline semantics, and responsive theme-card width. Unit tests cover immutable token/default mappings, disabled outline opacity, cutout spacing, typography, and motion values.
+Storybook covers both variants across empty, populated, invalid, disabled, icons/affixes, multiline, state matrices, light/dark themes, and dynamic source-color themes. Playwright keeps the existing filled visual goldens and adds outlined DOM/layout assertions for the 56px container, 1/2px border transition, 4px shape, label cutout behavior, label click-to-focus, invalid+focused precedence, multiline semantics, and responsive theme-card width. Generated-token tests lock immutable defaults, semantic color aliases, typography, motion, disabled outline opacity, and cutout spacing; browser tests validate the resulting computed styles.

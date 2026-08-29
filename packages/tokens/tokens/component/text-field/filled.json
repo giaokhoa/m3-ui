@@ -21,11 +21,11 @@
           "focusedThickness": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
         },
         "colors": {
-          "container": { "$type": "string", "$value": "var(--surface-container-highest)" },
-          "indicator": { "$type": "string", "$value": "var(--on-surface-variant)" },
-          "focusedIndicator": { "$type": "string", "$value": "var(--primary)" },
-          "disabledIndicator": { "$type": "string", "$value": "var(--on-surface)" },
-          "errorIndicator": { "$type": "string", "$value": "var(--error)" }
+          "container": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+          "indicator": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+          "focusedIndicator": { "$type": "string", "$value": "{color.role.primary}" },
+          "disabledIndicator": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "errorIndicator": { "$type": "string", "$value": "{color.role.error}" }
         }
       }
     }

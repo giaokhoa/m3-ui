@@ -9,6 +9,7 @@ const uiSourceRoot = new URL('../ui/src/', packageRoot);
 const allowedTokenCssSubpaths = new Set([
   '@m3-ui/tokens/button.css',
   '@m3-ui/tokens/chip.css',
+  '@m3-ui/tokens/text-field.css',
   '@m3-ui/tokens/elevation.css',
   '@m3-ui/tokens/ripple.css',
 ]);
@@ -64,7 +65,7 @@ test('Style Dictionary reads only canonical DTCG and emits reviewed platform art
   assert.deepEqual(config.source, ['tokens/**/*.json']);
   assert.equal(Object.hasOwn(config, 'include'), false, 'upstream references must never be Style Dictionary includes');
   assert.deepEqual(Object.keys(config.platforms), ['js', 'css']);
-  assert.deepEqual(config.platforms.css.files.map((file) => file.destination), ['button.css', 'chip.css', 'elevation.css', 'ripple.css'], 'CSS output must stay explicit and consumer-driven rather than becoming a generic token dump');
+  assert.deepEqual(config.platforms.css.files.map((file) => file.destination), ['button.css', 'chip.css', 'text-field.css', 'elevation.css', 'ripple.css'], 'CSS output must stay explicit and consumer-driven rather than becoming a generic token dump');
 });
 
 test('package exposes generated JS root plus reviewed CSS adapters', async () => {
@@ -72,13 +73,8 @@ test('package exposes generated JS root plus reviewed CSS adapters', async () =>
   assert.equal(manifest.main, './dist/generated/tokens.js');
   assert.equal(manifest.module, './dist/generated/tokens.js');
   assert.equal(manifest.types, './dist/generated/tokens.d.ts');
-  assert.deepEqual(Object.keys(manifest.exports), ['.', './button.css', './chip.css', './elevation.css', './ripple.css']);
-  assert.equal(manifest.exports['.'].import, './dist/generated/tokens.js');
-  assert.equal(manifest.exports['.'].types, './dist/generated/tokens.d.ts');
-  assert.equal(manifest.exports['./button.css'], './dist/generated/button.css');
-  assert.equal(manifest.exports['./chip.css'], './dist/generated/chip.css');
-  assert.equal(manifest.exports['./elevation.css'], './dist/generated/elevation.css');
-  assert.equal(manifest.exports['./ripple.css'], './dist/generated/ripple.css');
+  assert.deepEqual(Object.keys(manifest.exports), ['.', './button.css', './chip.css', './text-field.css', './elevation.css', './ripple.css']);
+  for (const name of ['button', 'chip', 'text-field', 'elevation', 'ripple']) assert.equal(manifest.exports[`./${name}.css`], `./dist/generated/${name}.css`);
   assert.doesNotMatch(manifest.scripts.build, /\btsc\b/);
   assert.equal(Object.hasOwn(manifest.scripts, 'typecheck'), false);
 });
@@ -152,6 +148,26 @@ test('Chip static colors are compiler-owned instead of decoded and rebuilt in Ty
   assert.doesNotMatch(chipDefaults, /--_chip-(?:container-color|label-color|leading-icon-color|trailing-icon-color|outline-color|outline-width)/);
   assert.match(chipContract, /Style Dictionary compiles.*color\/outline matrix/is);
   assert.match(chipContract, /must not decode `var\(--role\)`/i);
+});
+
+test('TextField immutable defaults are compiler-owned with no React token projection layer', async () => {
+  const textField = await readFile(new URL('../ui/src/components/TextField/TextField.tsx', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/TextField/README.md', packageRoot), 'utf8');
+  assert.match(textField, /@m3-ui\/tokens\/text-field\.css/);
+  assert.doesNotMatch(textField, /TextField\.defaults|TextField\.tokens|filledTextFieldBaseStyle|outlinedTextFieldBaseStyle/);
+  await assert.rejects(access(new URL('../ui/src/components/TextField/TextField.tokens.ts', packageRoot)));
+  await assert.rejects(access(new URL('../ui/src/components/TextField/TextField.defaults.ts', packageRoot)));
+  assert.match(contract, /no immutable design-token projection layer in React/i);
+  assert.match(contract, /complete immutable base-style projection/i);
+});
+
+test('runtime color CSS expressions are never decoded back into semantic token names', async () => {
+  const tokenValues = await readFile(new URL('../ui/src/internal/tokenValues.ts', packageRoot), 'utf8');
+  assert.doesNotMatch(tokenValues, /\bcolorRole\b/);
+  for (const file of await sourceFiles(uiSourceRoot)) {
+    const source = await readFile(file, 'utf8');
+    assert.doesNotMatch(source, /\bcolorRole\s*\(/, `${uiRelativePath(file)} must use semantic DTCG aliases/generated CSS rather than decode var(--role)`);
+  }
 });
 
 test('legacy TypeScript elevation serialization is frozen to the existing migration allowlist', async () => {

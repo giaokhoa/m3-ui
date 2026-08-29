@@ -24,10 +24,10 @@
         },
         "colors": {
           "container": { "$type": "string", "$value": "transparent" },
-          "outline": { "$type": "string", "$value": "var(--outline)" },
-          "focusedOutline": { "$type": "string", "$value": "var(--primary)" },
-          "disabledOutline": { "$type": "string", "$value": "var(--on-surface)" },
-          "errorOutline": { "$type": "string", "$value": "var(--error)" }
+          "outline": { "$type": "string", "$value": "{color.role.outline}" },
+          "focusedOutline": { "$type": "string", "$value": "{color.role.primary}" },
+          "disabledOutline": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "errorOutline": { "$type": "string", "$value": "{color.role.error}" }
         }
       }
     }
