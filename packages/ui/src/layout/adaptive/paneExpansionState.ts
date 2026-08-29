@@ -41,10 +41,11 @@ function composeFloat(value: number) {
 
 export const PaneExpansionAnchor = Object.freeze({
   proportion(proportion: number): PaneExpansionAnchor {
-    if (!Number.isFinite(proportion) || proportion < 0 || proportion > 1) {
+    const floatProportion = composeFloat(proportion);
+    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
       throw new RangeError('Proportion value needs to be in [0, 1]');
     }
-    return Object.freeze({ type: 'proportion', proportion: composeFloat(proportion) });
+    return Object.freeze({ type: 'proportion', proportion: floatProportion });
   },
   fromStart(offset: number): PaneExpansionAnchor {
     finiteNonNegative(offset, 'offset');
@@ -346,16 +347,13 @@ export class PaneExpansionState {
   }
 
   setFirstPaneProportion(firstPaneProportion: number) {
-    if (
-      !Number.isFinite(firstPaneProportion) ||
-      firstPaneProportion < 0 ||
-      firstPaneProportion > 1
-    ) {
+    const floatProportion = composeFloat(firstPaneProportion);
+    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
       throw new RangeError('Proportion value needs to be in [0, 1]');
     }
     this.firstPaneWidthState = PaneExpansionUnspecified;
     this.currentDraggingOffsetState = PaneExpansionUnspecified;
-    this.firstPaneProportionState = composeFloat(firstPaneProportion);
+    this.firstPaneProportionState = floatProportion;
     this.currentAnchorState = null;
     this.notify();
   }
