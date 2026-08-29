@@ -34,6 +34,12 @@ import {
   DynamicColorPreview,
   TypeScaleSamples,
 } from './foundationDemos';
+import {
+  CheckboxPreview,
+  RadioButtonPreview,
+  SliderPreview,
+  SwitchPreview,
+} from './selectionControlDemos';
 
 function Heading1({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
   return (
@@ -253,6 +259,10 @@ export const materialMdxComponents = {
   ColorRoleGrid,
   DynamicColorPreview,
   TypeScaleSamples,
+  CheckboxPreview,
+  RadioButtonPreview,
+  SwitchPreview,
+  SliderPreview,
   Button,
   ElevatedButton,
   FilledTonalButton,
