@@ -31,6 +31,8 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Migrate class composition
         run: node packages/ui/scripts/migrate-clsx.mjs
+      - name: Build UI dependency
+        run: pnpm --filter @m3-ui/tokens build
       - name: Test UI
         run: pnpm --filter @m3-ui/ui test
       - name: Typecheck UI
