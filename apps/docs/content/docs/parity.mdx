@@ -1,0 +1,28 @@
+---
+title: Parity catalog
+description: A data-driven index of documented Material and Compose contracts, implementation boundaries, and intentional web adaptations.
+---
+
+## What this catalog means
+
+This catalog is generated from the same component metadata used by every guide's parity summary. It is an index of **documented contracts**, not a percentage score and not a claim that every pixel or internal Compose mechanism is reproduced literally on the web.
+
+<ParityCatalog />
+
+## How to read it
+
+Each entry links to its public `m3-ui` guide and, where available, the Material family page or Android Developers Material3 API used as the contract reference.
+
+The Compose mapping names the source API or composition being audited. Implementation describes what `m3-ui` currently owns. Web adaptation records intentional browser differences such as native controls, React Aria interaction semantics, portals, focus behavior, or platform-specific geometry.
+
+## Source-of-truth boundary
+
+This page contains no second component inventory. Adding or changing an entry in `allComponentDocs` updates the catalog automatically, so parity metadata stays centralized instead of drifting between overview pages.
+
+Canonical dimensions, typography, color roles, motion values, and component tokens continue to come from the generated token graph and audited component runtime rather than this documentation surface.
+
+## Current exclusions
+
+The catalog covers component guides that are intentionally published today. It does not promote `BottomSheetScaffold`, adaptive pane policy, window-size classes, or navigation-mode switching into this component registry while the dedicated layout/adaptive subsystem is evolving separately.
+
+Foundations such as color, typography, and theming also remain outside the component count because they have their own runtime contracts and documentation sections.
