@@ -1,0 +1,62 @@
+---
+title: Button group
+description: Standard Material action groups with local overflow and connected single or multiple selection groups with distinct semantics.
+---
+
+<MaterialParity component="button-group" />
+
+## Overview
+
+`ButtonGroup` exposes two materially different contracts:
+
+- `variant="standard"` groups independent actions and applies expressive pressed-width redistribution. When the row runs out of local space it moves a suffix of actions into its own overflow menu.
+- `variant="connected"` joins selectable buttons into one connected shape and requires `selectionMode="single"` or `selectionMode="multiple"`.
+
+They share the Material button-group family but should not be treated as one generic selection API.
+
+## Live example
+
+<ComponentPreview>
+  <ButtonGroupPreview />
+</ComponentPreview>
+
+The first example is intentionally width-constrained so the component can exercise its local overflow behavior. That is component-level overflow, not a Material window-size class or adaptive-pane rule.
+
+## Standard action group
+
+```tsx
+<ButtonGroup
+  aria-label="Document actions"
+  items={[
+    { id: 'share', label: 'Share', onAction: share },
+    { id: 'export', label: 'Export', onAction: exportFile },
+    { id: 'archive', label: 'Archive', onAction: archive },
+  ]}
+/>
+```
+
+Each item may select its own public Material button variant. The group measures rendered actions with `ResizeObserver`, keeps the largest visible prefix that fits, and exposes the remaining items through a menu trigger.
+
+The overflow menu restores focus to its trigger after Escape and closes after an item action or outside pointer interaction. This local overflow policy belongs to `ButtonGroup`; it does not choose navigation rails, drawers, panes, or window-size classes.
+
+## Connected selection
+
+Single selection uses React Aria radio-group/radio semantics:
+
+```tsx
+<ButtonGroup
+  aria-label="Time range"
+  variant="connected"
+  selectionMode="single"
+  defaultSelectedKey="week"
+  items={ranges}
+/>
+```
+
+Multiple selection uses independent React Aria toggle-button semantics and `selectedKeys` / `defaultSelectedKeys`.
+
+## Expressive press behavior
+
+Standard groups mirror AndroidX pressed-width redistribution: the pressed item borrows available compression from adjacent items, with edge and middle items following the corresponding neighbor rules. Growth is clamped so neighboring content cannot collapse.
+
+Connected groups instead preserve connected selected/unselected color and corner-state behavior. All sizes reuse the audited Material button size family.
