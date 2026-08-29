@@ -16,13 +16,16 @@ function percent(value) {
   return `${Number(value) * 100}%`;
 }
 
-function createButtonCss({ dictionary }) {
+function createButtonCss({ dictionary, options }) {
+  const valueOf = (token) => options.usesDtcg ? token.$value : token.value;
   const tokens = new Map(
-    dictionary.allTokens.map((token) => [token.path.join('.'), token.value]),
+    dictionary.allTokens.map((token) => [token.path.join('.'), valueOf(token)]),
   );
   const get = (path) => {
     if (!tokens.has(path)) throw new Error(`Missing token for Button CSS: ${path}`);
-    return tokens.get(path);
+    const value = tokens.get(path);
+    if (value === undefined) throw new Error(`Undefined token for Button CSS: ${path}`);
+    return value;
   };
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const typography = (role) => [
