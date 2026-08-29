@@ -694,12 +694,13 @@ export function ThreePaneScaffold({
     paneExpansionHandleAriaStrings,
   );
   const predictiveBackScale = getPredictiveBackScale(scaffoldState);
+  const scaffoldClassName = ['three-pane-scaffold', className].filter(Boolean).join(' ');
 
   return (
     <div
       {...props}
       ref={rootRef}
-      className={['three-pane-scaffold', className].filter(Boolean).join(' ')}
+      className={scaffoldClassName}
       data-predictive-back-scale={predictiveBackScale}
       style={getPredictiveBackScaffoldStyle(style, scaffoldState)}
     >
@@ -797,6 +798,15 @@ export function ThreePaneScaffold({
               }
             : {};
 
+        const paneClassName = [
+          'three-pane-scaffold__pane',
+          frameLevitated && 'three-pane-scaffold__pane--levitated',
+          hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
+          hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
+        ]
+          .filter(Boolean)
+          .join(' ');
+
         return (
           <Activity key={role} mode={staticallyHidden ? 'hidden' : 'visible'}>
             <div
@@ -805,14 +815,7 @@ export function ThreePaneScaffold({
                 if (node === null) delete paneRefs.current[role];
                 else paneRefs.current[role] = node;
               }}
-              className={[
-                'three-pane-scaffold__pane',
-                frameLevitated && 'three-pane-scaffold__pane--levitated',
-                hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-                hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
-              ]
-                .filter(Boolean)
-                .join(' ')}
+              className={paneClassName}
               role={interactable ? 'region' : undefined}
               aria-label={interactable ? paneAriaLabel : undefined}
               data-pane-role={role}
