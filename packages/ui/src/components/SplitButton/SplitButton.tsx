@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ComponentType, CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import {
   Button,
@@ -93,7 +94,7 @@ export function SplitButton({
   return (
     <div
       {...props}
-      className={className ? `split-button ${className}` : 'split-button'}
+      className={clsx('split-button', className)}
       data-size={size}
       data-variant={variant}
       style={{ ...getSplitButtonStyle(size), ...style }}

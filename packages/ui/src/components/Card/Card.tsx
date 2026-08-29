@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useEffect,
   useRef,
@@ -102,8 +103,7 @@ function CardImpl({
   const elevationLevel = getCardElevationLevel(variant, disabled, interaction);
   const elevationMotion = getCardElevationMotion(disabled, interaction, previousInteraction);
   const tokenStyle = getCardStyle(variant, { isDisabled: disabled, shape });
-  const baseClassName = `card ${variantClassName(variant)}`;
-  const resolvedClassName = className ? `${baseClassName} ${className}` : baseClassName;
+  const resolvedClassName = clsx('card', variantClassName(variant), className);
 
   return (
     <div

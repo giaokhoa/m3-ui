@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useEffect,
   useRef,
@@ -327,9 +328,7 @@ export function ModalWideNavigationRail({
   return (
     <div
       {...props}
-      className={['modal-wide-navigation-rail-host', className]
-        .filter(Boolean)
-        .join(' ')}
+      className={clsx('modal-wide-navigation-rail-host', className)}
       data-hide-on-collapse={hideOnCollapse || undefined}
       data-state={railState.targetValue}
     >

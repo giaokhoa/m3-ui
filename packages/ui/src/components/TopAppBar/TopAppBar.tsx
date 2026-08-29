@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useLayoutEffect,
   useRef,
@@ -231,7 +232,7 @@ export function TopAppBar({
     <header
       {...props}
       ref={center.rootRef}
-      className={className ? `top-app-bar ${className}` : 'top-app-bar'}
+      className={clsx('top-app-bar', className)}
       data-variant={variant}
       data-scroll-fraction={fraction}
       data-overlapped-fraction={overlap}

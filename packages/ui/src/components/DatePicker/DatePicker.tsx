@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useContext,
   useEffect,
@@ -463,7 +464,7 @@ function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled
 }
 
 function classes(className: string | undefined, range: boolean) {
-  return ['date-picker', range && 'date-picker--range', className].filter(Boolean).join(' ');
+  return clsx('date-picker', range && 'date-picker--range', className);
 }
 
 export function DatePicker({

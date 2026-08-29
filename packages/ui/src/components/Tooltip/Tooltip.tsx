@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   Children,
   cloneElement,
@@ -144,7 +145,7 @@ export function PlainTooltip({
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
-        return ['plain-tooltip', userClassName].filter(Boolean).join(' ');
+        return clsx('plain-tooltip', userClassName);
       }}
       style={(renderProps) => {
         const userStyle =
@@ -248,7 +249,7 @@ export function RichTooltipTrigger({
     <RichTooltipContext.Provider value={context}>
       <span
         ref={triggerRef}
-        className={['rich-tooltip-trigger', className].filter(Boolean).join(' ')}
+        className={clsx('rich-tooltip-trigger', className)}
         style={style}
         onBlurCapture={() => {
           window.requestAnimationFrame(() => {
@@ -367,7 +368,7 @@ export function RichTooltip({
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
-        return ['rich-tooltip', userClassName].filter(Boolean).join(' ');
+        return clsx('rich-tooltip', userClassName);
       }}
       style={(renderProps) => {
         const userStyle =

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useId, useSyncExternalStore, type CSSProperties } from 'react';
 import {
   ProgressBar as AriaProgressBar,
@@ -89,14 +90,10 @@ function waveDuration(wavelength: number, waveSpeed: number): string {
 }
 
 function classes(kind: 'linear' | 'circular', userClassName?: string): string {
-  return [
-    'progress-indicator',
+  return clsx('progress-indicator',
     `progress-indicator--${kind}`,
     'progress-indicator--wavy',
-    userClassName,
-  ]
-    .filter(Boolean)
-    .join(' ');
+    userClassName,);
 }
 
 function CircularWavePath({ frames, duration, className, pathLength }: {
@@ -182,7 +179,7 @@ function LinearIndeterminate({ amplitude, wavelength }: { amplitude: number; wav
   const height = progressIndicatorTokens.linear.waveHeight;
   const path = buildLinearWavePath(width, height, waveAmplitude, wavelength, wavelength);
   const bar = (modifier: 'primary' | 'secondary') => (
-    <span className={`progress-indicator__linear-bar progress-indicator__linear-bar--${modifier}`}>
+    <span className={clsx('progress-indicator__linear-bar', `progress-indicator__linear-bar--${modifier}`)}>
       <span className="progress-indicator__linear-bar-inner">
         <svg aria-hidden="true" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
           <path className="progress-indicator__active progress-indicator__wave-path" d={path} vectorEffect="non-scaling-stroke" />

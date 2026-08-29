@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useId, useSyncExternalStore, type CSSProperties } from 'react';
 import {
   ProgressBar as AriaProgressBar,
@@ -87,13 +88,12 @@ function classes(
   wavy: boolean,
   userClassName: string | undefined,
 ): string {
-  const names = [
+  return clsx(
     'progress-indicator',
     `progress-indicator--${kind}`,
     wavy ? 'progress-indicator--wavy' : 'progress-indicator--standard',
-  ];
-  if (userClassName) names.push(userClassName);
-  return names.join(' ');
+    userClassName,
+  );
 }
 
 function resolvedAmplitude(
@@ -241,11 +241,10 @@ function LinearIndeterminateVisual({
   return (
     <span
       aria-hidden="true"
-      className={`progress-indicator__linear-indeterminate${
-        fourColor
-          ? ' progress-indicator__linear-indeterminate--four-color'
-          : ''
-      }`}
+      className={clsx(
+        'progress-indicator__linear-indeterminate',
+        fourColor && 'progress-indicator__linear-indeterminate--four-color',
+      )}
     >
       <span className="progress-indicator__linear-bar progress-indicator__linear-bar--primary">
         <span className="progress-indicator__linear-bar-inner">
@@ -523,11 +522,12 @@ function CircularIndeterminateVisual({
   return (
     <svg
       aria-hidden="true"
-      className={`progress-indicator__svg progress-indicator__circular-svg progress-indicator__circular-indeterminate${
-        fourColor
-          ? ' progress-indicator__circular-indeterminate--four-color'
-          : ''
-      }`}
+      className={clsx(
+        'progress-indicator__svg',
+        'progress-indicator__circular-svg',
+        'progress-indicator__circular-indeterminate',
+        fourColor && 'progress-indicator__circular-indeterminate--four-color',
+      )}
       viewBox={`0 0 ${size} ${size}`}
     >
       <g className="progress-indicator__circular-global-rotation">

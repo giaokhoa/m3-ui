@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   createContext,
   useContext,
@@ -130,9 +131,7 @@ export function ListItemSelectionGroup({
       <div
         {...props}
         className={
-          className
-            ? `list-item-selection-group ${className}`
-            : 'list-item-selection-group'
+          clsx('list-item-selection-group', className)
         }
         role="radiogroup"
         onKeyDown={handleKeyDown}
@@ -255,7 +254,7 @@ export function ListItem(props: ListItemProps) {
       <div
         aria-disabled={isDisabled || undefined}
         aria-label={ariaLabel}
-        className={className ? `list-item ${className}` : 'list-item'}
+        className={clsx('list-item', className)}
         data-dragged={isDragged || undefined}
         data-lines={lineCount}
         data-testid={testId}
@@ -292,9 +291,7 @@ export function ListItem(props: ListItemProps) {
     <AriaButton
       aria-label={ariaLabel}
       className={
-        className
-          ? `list-item list-item--interactive ${className}`
-          : 'list-item list-item--interactive'
+        clsx('list-item list-item--interactive', className)
       }
       data-dragged={isDragged || undefined}
       data-lines={lineCount}

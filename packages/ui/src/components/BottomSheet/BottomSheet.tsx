@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useEffect,
   useLayoutEffect,
@@ -397,7 +398,7 @@ export function BottomSheet({
       aria-label={ariaLabel}
       aria-hidden={hidden ? true : ariaHidden}
       inert={hidden ? true : inert}
-      className={['bottom-sheet', className].filter(Boolean).join(' ')}
+      className={clsx('bottom-sheet', className)}
       data-dragging={dragOffset !== null || undefined}
       data-ready={layout !== null || undefined}
       data-state={sheetState.currentValue}

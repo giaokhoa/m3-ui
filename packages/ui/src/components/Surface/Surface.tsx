@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   type CSSProperties,
   type HTMLAttributes,
@@ -119,7 +120,7 @@ export function Surface({
     ...style,
   };
   const semantics = interactionSemantics(interaction);
-  const resolvedClassName = className ? `surface ${className}` : 'surface';
+  const resolvedClassName = clsx('surface', className);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (

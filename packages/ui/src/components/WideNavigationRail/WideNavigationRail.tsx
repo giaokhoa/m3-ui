@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   createContext,
   useContext,
@@ -124,9 +125,7 @@ export function WideNavigationRail({
       ref={railRef}
       aria-label={ariaLabel}
       className={
-        className
-          ? `wide-navigation-rail ${className}`
-          : 'wide-navigation-rail'
+        clsx('wide-navigation-rail', className)
       }
       data-expanded={expanded || undefined}
       data-state={railState.targetValue}

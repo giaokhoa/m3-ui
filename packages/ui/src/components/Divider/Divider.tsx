@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import {
   getDividerStyle,
@@ -32,13 +33,9 @@ function DividerRoot({
       role="separator"
       aria-orientation={orientation}
       data-orientation={orientation}
-      className={[
-        'divider',
+      className={clsx('divider',
         `divider--${orientation}`,
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        className,)}
       style={{
         ...getDividerStyle({ color, thickness }),
         ...style,

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useLayoutEffect,
   useRef,
@@ -39,7 +40,7 @@ export function AnimatedPane({
     <div
       {...props}
       ref={rootRef}
-      className={['animated-pane', className].filter(Boolean).join(' ')}
+      className={clsx('animated-pane', className)}
       style={{ ...style, borderRadius: shape }}
     />
   );

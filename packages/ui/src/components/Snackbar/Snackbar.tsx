@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import {
   TextButton,
@@ -58,7 +59,7 @@ export function Snackbar({
   return (
     <div
       {...props}
-      className={['snackbar', className].filter(Boolean).join(' ')}
+      className={clsx('snackbar', className)}
       data-action-on-new-line={hasNewLineAction || undefined}
       data-has-action={action ? true : undefined}
       data-has-dismiss={dismissAction ? true : undefined}
