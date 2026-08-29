@@ -8,7 +8,10 @@
   "main": "./dist/generated/tokens.js",
   "module": "./dist/generated/tokens.js",
   "types": "./dist/generated/tokens.d.ts",
-  "exports": {".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"}},
+  "exports": {
+    ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
+    "./button.css": "./dist/generated/button.css"
+  },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
     "build": "rm -rf dist && pnpm tokens:build",
