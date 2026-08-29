@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { Elevation } from '../../internal/elevation';
 import {
   TextButton,
   type ButtonProps,
@@ -12,6 +13,7 @@ import {
   getSnackbarActionStyle,
   getSnackbarDismissActionStyle,
   getSnackbarStyle,
+  snackbarTokens,
   type SnackbarStyleOptions,
 } from './Snackbar.defaults';
 import './snackbar.css';
@@ -69,13 +71,17 @@ export function Snackbar({
           contentColor,
           actionColor,
           iconColor,
-          shadowColor,
           shape,
           maxWidth,
         }),
         ...style,
       }}
     >
+      <Elevation
+        className="snackbar__elevation"
+        level={snackbarTokens.containerElevation}
+        shadowColor={shadowColor ?? snackbarTokens.containerShadowColor}
+      />
       <div
         className="snackbar__message"
         role="status"

@@ -28,7 +28,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/NavigationDrawer/NavigationDrawer.defaults.ts',
   'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
-  'components/Snackbar/Snackbar.defaults.ts',
   'components/TopAppBar/TopAppBar.defaults.ts',
   'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
   'components/WideNavigationRail/WideNavigationRail.defaults.ts',
@@ -178,6 +177,27 @@ test('Tooltip colors stay semantic and RichTooltip elevation paints through the 
   assert.match(styleDependencies, /src\/components\/Tooltip\/tooltip\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
   assert.match(contract, /Browser tests must inspect `\.rich-tooltip__elevation`/i);
   assert.match(contract, /must not call `getElevationBoxShadow\(\)`/i);
+});
+
+test('Snackbar colors stay semantic and its static level3 elevation paints through the shared primitive', async () => {
+  const snackbarTokens = JSON.parse(await readFile(new URL('tokens/component/snackbar.json', packageRoot), 'utf8'));
+  const sharedStates = JSON.parse(await readFile(new URL('tokens/component/tooltip-snackbar-web-states.json', packageRoot), 'utf8'));
+  const snackbar = await readFile(new URL('../ui/src/components/Snackbar/Snackbar.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/Snackbar/Snackbar.defaults.ts', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/Snackbar/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+
+  assert.equal(snackbarTokens.component.snackbar.action.labelTextColor.$value, '{color.role.inversePrimary}');
+  assert.equal(snackbarTokens.component.snackbar.container.color.$value, '{color.role.inverseSurface}');
+  assert.equal(snackbarTokens.component.snackbar.icon.color.$value, '{color.role.inverseOnSurface}');
+  assert.equal(sharedStates.component.snackbar.container.shadowColor.$value, '{color.role.shadow}');
+  assert.match(snackbar, /<Elevation/);
+  assert.match(snackbar, /shadowColor=\{shadowColor \?\? snackbarTokens\.containerShadowColor\}/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_snackbar-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/Snackbar\/snackbar\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /Browser\/visual tests must inspect `\.snackbar__elevation`/i);
+  assert.match(contract, /call `getElevationBoxShadow\(\)` from `Snackbar\.defaults\.ts`/i);
+  assert.match(contract, /interaction-dependent action\/icon mappings are behavior/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {

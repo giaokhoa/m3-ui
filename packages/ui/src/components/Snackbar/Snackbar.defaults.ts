@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type SnackbarStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -41,6 +38,8 @@ export interface SnackbarStyleOptions {
   shape?: CSSProperties['borderRadius'];
   maxWidth?: CSSProperties['maxWidth'];
 }
+
+type SnackbarSurfaceStyleOptions = Omit<SnackbarStyleOptions, 'shadowColor'>;
 
 export interface SnackbarInteractionState {
   isFocusVisible?: boolean;
@@ -115,12 +114,11 @@ function typographyVariables(prefix: string, role: SnackbarTypography) {
 }
 
 export function getSnackbarStyle(
-  options: SnackbarStyleOptions = {},
+  options: SnackbarSurfaceStyleOptions = {},
 ): SnackbarStyle {
   const shape = options.shape ?? shapeRadius[snackbarTokens.containerShape];
   const actionColor = options.actionColor ?? snackbarTokens.actionLabelTextColor;
   const iconColor = options.iconColor ?? snackbarTokens.iconColor;
-  const shadowColor = options.shadowColor ?? snackbarTokens.containerShadowColor;
 
   return {
     '--_snackbar-container-color':
@@ -167,10 +165,6 @@ export function getSnackbarStyle(
       snackbarTokens.iconPressedStateLayerOpacity,
     '--_snackbar-icon-size': snackbarTokens.iconSize,
     '--_snackbar-radius': cssLength(shape as CssLength),
-    '--_snackbar-box-shadow': getElevationBoxShadow(
-      snackbarTokens.containerElevation,
-      shadowColor as string,
-    ),
     '--_snackbar-single-line-height': snackbarTokens.containerSingleLineHeight,
     '--_snackbar-two-lines-height': snackbarTokens.containerTwoLinesHeight,
     '--_snackbar-max-width': cssLength(

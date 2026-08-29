@@ -31,9 +31,12 @@ test.describe('Material 3 Snackbar browser contract', () => {
         paddingLeft: computed.paddingLeft,
         paddingRight: computed.paddingRight,
         borderRadius: computed.borderRadius,
-        boxShadow: computed.boxShadow,
       };
     });
+    const elevation = snackbar.locator('.snackbar__elevation');
+    const elevationShadow = await elevation.evaluate(
+      (element) => getComputedStyle(element).boxShadow,
+    );
     const type = await message.evaluate((element) => {
       const computed = getComputedStyle(element);
       return {
@@ -52,7 +55,8 @@ test.describe('Material 3 Snackbar browser contract', () => {
       paddingRight: '8px',
       borderRadius: '4px',
     });
-    expect(surface.boxShadow).not.toBe('none');
+    await expect(elevation).toHaveAttribute('data-elevation', 'level3');
+    expect(elevationShadow).not.toBe('none');
     expect(type).toEqual({
       fontSize: '14px',
       lineHeight: '20px',
