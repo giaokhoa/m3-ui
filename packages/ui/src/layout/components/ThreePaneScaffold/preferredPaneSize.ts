@@ -35,9 +35,12 @@ export function resolvePanePreferredSize(
 ): number {
   if (preferredSize === undefined) return fallbackSize;
   if (typeof preferredSize === 'number') {
-    if (!Number.isFinite(preferredSize) || preferredSize < 0) {
+    // AndroidX PaneScaffoldScope.preferredWidth/Height(Dp) accepts only a
+    // positive value or Dp.Unspecified. Undefined is the web equivalent of
+    // Unspecified; zero is valid only for the proportion overload.
+    if (!Number.isFinite(preferredSize) || preferredSize <= 0) {
       throw new RangeError(
-        `${name} must be a finite, non-negative CSS pixel value, received ${preferredSize}`,
+        `${name} must be a finite, positive CSS pixel value, received ${preferredSize}`,
       );
     }
     return preferredSize;
