@@ -1,0 +1,78 @@
+---
+title: Slider
+description: Material 3 single-value and range sliders with audited sizes and browser-native input semantics.
+---
+
+<MaterialParity component="slider" />
+
+## Usage
+
+`Slider` selects one numeric value. `RangeSlider` selects a start/end tuple while preserving independent accessible thumbs.
+
+<ComponentPreview>
+  <SliderPreview />
+</ComponentPreview>
+
+```tsx
+import { RangeSlider, Slider } from '@m3-ui/ui';
+
+<Slider defaultValue={40} label="Volume" />
+
+<RangeSlider
+  defaultValue={[25, 75]}
+  label="Price range"
+  thumbLabels={['Minimum price', 'Maximum price']}
+/>
+```
+
+## Sizes
+
+The public size family is:
+
+| Size | Value |
+| --- | --- |
+| Extra small | `xSmall` |
+| Small | `small` |
+| Medium | `medium` |
+| Large | `large` |
+| Extra large | `xLarge` |
+
+`xSmall` is the default and maps the Compose baseline slider geometry. The other sizes use the audited Material size-family tokens; consumer code should not reproduce handle or track measurements.
+
+## Values and steps
+
+The inherited slider props provide `minValue`, `maxValue`, `step`, controlled/uncontrolled values, orientation, and change events. Defaults are `0`, `100`, and `1` respectively.
+
+For `RangeSlider`, the public value is a readonly two-number tuple. The component adapts that tuple to React Aria's multi-thumb array state internally.
+
+## Accessible thumb labels
+
+A single slider can derive its thumb name from a string `label` or root `aria-label`. For a range, use `thumbLabels` when the shared label is not sufficient or is not a string.
+
+```tsx
+<RangeSlider
+  aria-label="Temperature range"
+  defaultValue={[18, 24]}
+  thumbLabels={['Minimum temperature', 'Maximum temperature']}
+/>
+```
+
+React Aria owns slider/thumb roles, keyboard adjustment, pointer dragging, orientation, and value semantics.
+
+## Ticks and value indicators
+
+`showTicks` and `showValueIndicator` are explicit **Material Web adaptations** in this implementation. They do not redefine the canonical slider geometry.
+
+```tsx
+<Slider
+  defaultValue={60}
+  label="Stepped value"
+  minValue={0}
+  maxValue={100}
+  step={20}
+  showTicks
+  showValueIndicator
+/>
+```
+
+Ticks are derived from the configured range and step. The value indicator is visual only and appears while a thumb is active; `getValueLabel` can format that visual text without changing the slider's numeric state.

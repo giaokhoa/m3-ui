@@ -1,0 +1,52 @@
+---
+title: Switch
+description: Material 3 switch states with accessible on/off semantics and optional thumb content.
+---
+
+<MaterialParity component="switch" />
+
+## Usage
+
+Switches represent an immediate on/off setting. The public component uses React Aria switch semantics and the audited Material track, thumb, state-layer, and minimum-interaction geometry.
+
+<ComponentPreview>
+  <SwitchPreview />
+</ComponentPreview>
+
+```tsx
+import { Switch } from '@m3-ui/ui';
+
+<Switch defaultSelected>Notifications</Switch>
+```
+
+## Selection state
+
+`Switch` inherits controlled and uncontrolled selection props from React Aria. Use the selected state as the source of truth instead of styling the track or thumb directly.
+
+```tsx
+<Switch isSelected={enabled} onChange={setEnabled}>
+  Automatic updates
+</Switch>
+```
+
+## Thumb content
+
+`thumbContent` renders content inside the Material thumb. The implementation maps the Compose icon-sized thumb-content slot into React content while keeping the switch itself as the only semantic control.
+
+```tsx
+<Switch thumbContent={<CheckIcon />} defaultSelected>
+  Enabled
+</Switch>
+```
+
+Decorative thumb content should not become a second interactive element.
+
+## Focus treatment
+
+Switch participates in the global `ThemeProvider` ripple focus configuration. The default `opacity` treatment applies the focus state layer at the thumb; `inset-ring` moves the visible focus treatment to the track mapping implemented by the shared ripple engine.
+
+The focus strategy changes Material presentation, not keyboard semantics or the underlying accessible switch state.
+
+## Disabled state and labeling
+
+Use `isDisabled` for unavailable settings. Visible children act as the switch label; control-only usage needs an accessible name through the inherited React Aria props.

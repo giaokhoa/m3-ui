@@ -1,0 +1,40 @@
+---
+title: Radio button
+description: Material 3 radio buttons grouped with accessible single-selection behavior.
+---
+
+<MaterialParity component="radio-button" />
+
+## Usage
+
+Radio buttons choose one value from a mutually exclusive set. Use `RadioGroup` as the selection and labeling boundary and place `RadioButton` options inside it.
+
+<ComponentPreview>
+  <RadioButtonPreview />
+</ComponentPreview>
+
+```tsx
+import { RadioButton, RadioGroup } from '@m3-ui/ui';
+
+<RadioGroup defaultValue="standard" label="Density">
+  <RadioButton value="compact">Compact</RadioButton>
+  <RadioButton value="standard">Standard</RadioButton>
+  <RadioButton value="comfortable">Comfortable</RadioButton>
+</RadioGroup>
+```
+
+## Group contract
+
+`RadioGroup` adds a visible label plus optional description and validation error. It inherits React Aria group state, value, validation, and event props rather than introducing a second selection model.
+
+The default orientation is vertical. `orientation="horizontal"` is supported when the application composition calls for a horizontal group; that arrangement is a web layout choice around the Material radio controls, not a new Material radio variant.
+
+## Selection and keyboard behavior
+
+React Aria owns radio semantics and group keyboard navigation, including the selected value and focus movement between options. Material styling owns the control geometry, selected dot, colors, ripple/state indication, and disabled treatment.
+
+Keep every `RadioButton` inside a `RadioGroup` when the options are one logical choice set so the browser can expose the relationship correctly.
+
+## Labels
+
+Visible children provide each option label. The group label describes the shared question or setting. Description and error text are attached through the React Aria field semantics used by the group primitive.
