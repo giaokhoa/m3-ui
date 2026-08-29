@@ -43,7 +43,6 @@ export function PullToRefreshPreview() {
               className="docs-pull-to-refresh-demo__item"
               color="var(--surface-container)"
               contentColor="var(--on-surface)"
-              shape="var(--shape-corner-large)"
             >
               <span style={getMaterialTypeCssProperties('bodyLarge')}>{item}</span>
             </Surface>
@@ -90,7 +89,6 @@ export function SwipeToDismissPreview() {
           className="docs-swipe-demo__foreground"
           color="var(--surface-container)"
           contentColor="var(--on-surface)"
-          shape="var(--shape-corner-large)"
         >
           <span style={getMaterialTypeCssProperties('bodyLarge')}>
             Swipe this task horizontally
