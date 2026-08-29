@@ -5,7 +5,9 @@ import {
   calculatePaneMotionSpringDurationMs,
   calculatePaneMotionVectorSpringDurationMs,
   samplePaneMotionDelayedSpringAtPlayTime,
+  samplePaneMotionDelayedVectorSpringAtPlayTime,
   samplePaneMotionSpring,
+  samplePaneMotionVectorSpringAtPlayTime,
   samplePaneMotionVectorSpringAtProgress,
 } from './paneMotionSpring';
 
@@ -49,6 +51,38 @@ describe('pane motion spring parity', () => {
     );
     expect(halfway[0]).toBeGreaterThan(400);
     expect(halfway[1]).toBeGreaterThan(90);
+  });
+
+  it('rounds IntRect, IntOffset, and IntSize vector samples but keeps Float visibility continuous', () => {
+    const raw = samplePaneMotionSpring(0, 500, 100);
+    const intOffset = samplePaneMotionVectorSpringAtPlayTime([0, 0], [500, 0], 100, 1);
+    expect(intOffset).toEqual([Math.round(raw), 0]);
+    expect(Number.isInteger(intOffset[0])).toBe(true);
+
+    const intRect = samplePaneMotionVectorSpringAtProgress(
+      [0, 0, 500, 400],
+      [24, 16, 824, 716],
+      0.5,
+      [1, 1, 1, 1],
+    );
+    expect(intRect.every(Number.isInteger)).toBe(true);
+
+    const delayedIntOffset = samplePaneMotionDelayedVectorSpringAtPlayTime(
+      [500, 0],
+      [0, 0],
+      250,
+      1,
+    );
+    expect(delayedIntOffset.every(Number.isInteger)).toBe(true);
+
+    const floatVisibility = samplePaneMotionVectorSpringAtPlayTime(
+      [0],
+      [1],
+      100,
+      PaneMotionDefaultDisplacementThreshold,
+    )[0]!;
+    expect(floatVisibility).toBeCloseTo(samplePaneMotionSpring(0, 1, 100), 7);
+    expect(Number.isInteger(floatVisibility)).toBe(false);
   });
 
   it('ports DelayedSpringSpec duration and hold phase', () => {

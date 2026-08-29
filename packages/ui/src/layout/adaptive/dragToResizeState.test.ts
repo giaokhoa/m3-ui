@@ -26,6 +26,21 @@ describe('DragToResizeState', () => {
     expect(state.measure(measurement)).toEqual({ width: 360, height: 48 });
   });
 
+  it('rounds explicit min and max constraints like AndroidX roundToPx()', () => {
+    const state = new DragToResizeState({
+      dockedEdge: DockedEdge.Bottom,
+      minSize: 48.5,
+      maxSize: 600.5,
+    });
+    state.measure(measurement);
+
+    state.snapTo(DragToResizeValue.Collapsed);
+    expect(state.measure(measurement).height).toBe(49);
+
+    state.snapTo(DragToResizeValue.Expanded);
+    expect(state.measure(measurement).height).toBe(601);
+  });
+
   it('ignores transient zero-size scaffold measurements before real layout', () => {
     const state = new DragToResizeState({ dockedEdge: DockedEdge.Bottom });
 

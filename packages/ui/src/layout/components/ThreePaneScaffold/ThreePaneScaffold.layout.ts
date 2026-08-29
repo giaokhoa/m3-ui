@@ -73,6 +73,15 @@ function rectHeight(rect: LayoutBounds) {
   return Math.max(0, rect.bottom - rect.top);
 }
 
+function roundBounds(bounds: LayoutBounds): LayoutBounds {
+  return {
+    left: Math.round(bounds.left),
+    top: Math.round(bounds.top),
+    right: Math.round(bounds.right),
+    bottom: Math.round(bounds.bottom),
+  };
+}
+
 function clipBounds(bounds: LayoutBounds, width: number, height: number): LayoutBounds | null {
   const clipped = {
     left: Math.max(0, Math.min(width, bounds.left)),
@@ -161,9 +170,11 @@ export function calculateThreePaneScaffoldLayout({
       reflowValue.reflowUnder === expandedRole
     ) {
       const availableHeight = Math.max(0, rectHeight(bounds) - verticalGap);
+      // AndroidX operates on IntRect bounds here, so Int / 2 truncates before
+      // max() chooses the minimum half-partition height.
       const expandedHeight = Math.max(
         availableHeight - preferredHeight(reflowed),
-        availableHeight / 2,
+        Math.trunc(availableHeight / 2),
       );
       placePane(expandedRole, {
         left: bounds.left,
@@ -241,7 +252,9 @@ export function calculateThreePaneScaffoldLayout({
       const firstPane = expanded[0]!;
       const secondPane = expanded[1]!;
       if (expansion.currentDraggingOffset !== PaneExpansionUnspecified) {
-        const halfGap = horizontalGap / 2;
+        // AndroidX horizontalPartitionSpacerSize is an Int after roundToPx(),
+        // and Int / 2 truncates for odd spacer widths.
+        const halfGap = Math.trunc(horizontalGap / 2);
         if (expansion.currentDraggingOffset <= halfGap) {
           const bounds = expansion.isDraggingOrSettling
             ? { ...outerBounds, left: expansion.currentDraggingOffset * 2 }
@@ -294,6 +307,9 @@ export function calculateThreePaneScaffoldLayout({
   }
 
   const localExcluded = excludedBounds
+    // AndroidX converts window bounds to local coordinates and immediately
+    // calls roundToIntRect() before partitioning around hinges.
+    .map(roundBounds)
     .map((bound) => clipBounds(bound, width, height))
     .filter((bound): bound is LayoutBounds => bound !== null)
     .sort((a, b) => a.left - b.left);

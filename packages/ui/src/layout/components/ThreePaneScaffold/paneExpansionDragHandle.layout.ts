@@ -160,11 +160,11 @@ export function calculatePaneExpansionSpacerMiddleOffset({
   const firstPlacement = measuredLayout[expandedRoles[0]!];
   const secondPlacement = measuredLayout[expandedRoles[1]!];
   if (firstPlacement !== undefined && secondPlacement !== undefined) {
-    return (
-      firstPlacement.left +
-      firstPlacement.width +
-      secondPlacement.left
-    ) / 2;
+    // AndroidX performs this on Int pane positions and uses Int / 2, so an
+    // odd-width spacer midpoint truncates instead of landing on a half pixel.
+    return Math.trunc(
+      (firstPlacement.left + firstPlacement.width + secondPlacement.left) / 2,
+    );
   }
   if (firstPlacement !== undefined) {
     return firstPlacement.left + firstPlacement.width;
@@ -195,18 +195,21 @@ export function calculatePaneExpansionDragHandlePlacement({
   const partitionSpacerPx = pxNumber(partitionSpacerSize);
   finiteNonNegative(partitionSpacerPx, 'partitionSpacerSize');
 
-  // AndroidX uses horizontalPartitionSpacerSize / 2 as the minimum center
-  // margin. Bound it for pathological browser containers narrower than the
-  // spacer so the equivalent clamp remains well-defined.
-  const minHorizontalMargin = Math.min(partitionSpacerPx / 2, contentWidth / 2);
+  // AndroidX values are Ints after measurement. Its `/ 2` operations therefore
+  // truncate for odd spacer and touch-target sizes.
+  const minHorizontalMargin = Math.min(
+    Math.trunc(partitionSpacerPx / 2),
+    contentWidth / 2,
+  );
   const centerX = clamp(
     offsetX,
     minHorizontalMargin,
     contentWidth - minHorizontalMargin,
   );
   const appliedHorizontalMargin = Math.min(centerX, contentWidth - centerX);
+  const halfMinTouchTargetSize = Math.trunc(minTouchTargetSize / 2);
   const minWidth =
-    appliedHorizontalMargin < minTouchTargetSize / 2
+    appliedHorizontalMargin < halfMinTouchTargetSize
       ? 2 * (minTouchTargetSize - appliedHorizontalMargin)
       : minTouchTargetSize;
 

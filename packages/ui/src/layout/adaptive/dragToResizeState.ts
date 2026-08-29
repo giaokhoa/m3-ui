@@ -305,8 +305,15 @@ export class DragToResizeState {
       return { width: measuringWidth, height: measuringHeight };
     }
 
-    const minimum = this.minSize ?? DefaultMinPaneSize;
-    const maximum = Math.min(this.maxSize ?? Number.POSITIVE_INFINITY, scaffoldSize);
+    // rememberDragToResizeState resolves specified Dp constraints with
+    // roundToPx() before getDraggedWidth/getDraggedHeight builds the Float
+    // range. Keep drag/spring physics as Float, but quantize these constraints
+    // at the same measurement boundary.
+    const minimum = this.minSize === undefined ? DefaultMinPaneSize : Math.round(this.minSize);
+    const maximum = Math.min(
+      this.maxSize === undefined ? Number.POSITIVE_INFINITY : Math.round(this.maxSize),
+      scaffoldSize,
+    );
 
     this.rangeStart = minimum;
     this.rangeEnd = maximum;

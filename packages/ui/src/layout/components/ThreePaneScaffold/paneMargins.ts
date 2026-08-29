@@ -33,7 +33,10 @@ function finiteNonNegative(value: number | undefined, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
   }
-  return value;
+  // AndroidX resolves fixed PaddingValues with roundToPx() before the pane
+  // edge clamp. At the browser's 1:1 CSS-pixel analogue, Math.round matches
+  // Kotlin's nearest-Int / positive-infinity tie behavior.
+  return Math.round(value);
 }
 
 function finiteEdge(value: number | undefined, fallback: number, name: string) {
@@ -41,7 +44,9 @@ function finiteEdge(value: number | undefined, fallback: number, name: string) {
   if (!Number.isFinite(value)) {
     throw new RangeError(`${name} must be a finite scaffold-local CSS pixel coordinate`);
   }
-  return value;
+  // RectRuler.current() is Float in Compose, but PaneMargins immediately calls
+  // roundToInt() before taking the union of ruler edges.
+  return Math.round(value);
 }
 
 /**
