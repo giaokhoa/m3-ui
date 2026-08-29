@@ -109,9 +109,11 @@ test.describe('Material 3 Snackbar browser contract', () => {
     const ripple = action.locator('.ripple');
     await expect(ripple).toHaveAttribute('data-hovered', 'true');
     const hoverOpacity = await ripple.evaluate((element) =>
-      getComputedStyle(element).getPropertyValue('--_ripple-hover-opacity').trim(),
+      Number.parseFloat(
+        getComputedStyle(element).getPropertyValue('--_ripple-hover-opacity'),
+      ),
     );
-    expect(hoverOpacity).toBe('0.08');
+    expect(hoverOpacity).toBe(0.08);
 
     await page.mouse.move(1, 1);
     await page.keyboard.press('Tab');
