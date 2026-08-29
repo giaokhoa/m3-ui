@@ -3,11 +3,9 @@ import {
   useEffect,
   useRef,
   useState,
-  type ChangeEvent,
   type ReactNode,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type RefObject,
 } from 'react';
+import { parseDate, type CalendarDate } from '@internationalized/date';
 import {
   Calendar as AriaCalendar,
   CalendarCell,
@@ -17,7 +15,11 @@ import {
   CalendarHeaderCell,
   CalendarStateContext,
   CalendarYearPicker as AriaCalendarYearPicker,
+  DateField as AriaDateField,
+  DateInput as AriaDateInput,
+  DateSegment,
   I18nProvider,
+  Label,
   RangeCalendar as AriaRangeCalendar,
   RangeCalendarStateContext,
 } from 'react-aria-components';
@@ -144,6 +146,19 @@ function racDateFromIso(base: RacCalendarDate, value: DatePickerDate): RacCalend
   const parsed = parts(value);
   if (!parsed) throw new TypeError(`Invalid ISO calendar date: ${value}`);
   return base.set(parsed);
+}
+
+function dateFieldValue(value: DatePickerDate | null): CalendarDate | null {
+  if (value === null) return null;
+  if (!isDatePickerDate(value)) throw new TypeError(`Invalid ISO calendar date: ${value}`);
+  return parseDate(value);
+}
+
+function dateFieldBounds(range: readonly [number, number]) {
+  return {
+    minValue: parseDate(`${String(range[0]).padStart(4, '0')}-01-01`),
+    maxValue: parseDate(`${String(range[1]).padStart(4, '0')}-12-31`),
+  };
 }
 
 function useDisplayedMonth(
@@ -393,7 +408,7 @@ function RangeCalendarBody(props: CalendarBodyBase & { value: DatePickerRangeVal
   );
 }
 
-function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnMount, label = 'Date', inputRef, onKeyDown }: {
+function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnMount, label = 'Date' }: {
   value: DatePickerDate | null;
   onChange: (value: DatePickerDate | null, valid: boolean) => void;
   yearRange: readonly [number, number];
@@ -401,27 +416,39 @@ function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnM
   disabled: boolean;
   focusOnMount?: boolean;
   label?: string;
-  inputRef?: RefObject<HTMLInputElement | null>;
-  onKeyDown?: (event: ReactKeyboardEvent<HTMLInputElement>) => void;
 }) {
-  const localRef = useRef<HTMLInputElement>(null);
-  const ref = inputRef ?? localRef;
-  const [invalid, setInvalid] = useState(false);
-  useEffect(() => { if (focusOnMount) ref.current?.focus(); }, [focusOnMount, ref]);
-  const min = `${String(yearRange[0]).padStart(4, '0')}-01-01`;
-  const max = `${String(yearRange[1]).padStart(4, '0')}-12-31`;
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const next = event.target.value;
-    if (!next) { setInvalid(false); onChange(null, true); return; }
-    const valid = isDatePickerDate(next) && isWithinYearRange(next, yearRange) && !unavailable?.(next);
-    setInvalid(!valid);
-    onChange(valid ? next : null, valid);
-  };
+  const [draft, setDraft] = useState<CalendarDate | null>(() => dateFieldValue(value));
+  const bounds = dateFieldBounds(yearRange);
+
+  useEffect(() => {
+    const next = dateFieldValue(value);
+    if ((draft?.toString() ?? null) !== (next?.toString() ?? null)) setDraft(next);
+    // Sync only when the public/draft ISO value changes. RAC retains incomplete segment edits internally.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
-    <label className="date-picker__input-field">
-      <span>{label}</span>
-      <input ref={ref} type="date" value={value ?? ''} min={min} max={max} disabled={disabled} aria-invalid={invalid || undefined} onChange={handleChange} onKeyDown={onKeyDown} />
-    </label>
+    <AriaDateField
+      aria-label={label}
+      className="date-picker__input-field"
+      value={draft}
+      minValue={bounds.minValue}
+      maxValue={bounds.maxValue}
+      isDateUnavailable={(date) => Boolean(unavailable?.(date.toString()))}
+      isDisabled={disabled}
+      autoFocus={focusOnMount}
+      onChange={(next) => {
+        setDraft(next);
+        const iso = next?.toString() ?? null;
+        const valid = iso === null || (isWithinYearRange(iso, yearRange) && !unavailable?.(iso));
+        onChange(iso, valid);
+      }}
+    >
+      <Label className="date-picker__input-label">{label}</Label>
+      <AriaDateInput className="date-picker__date-input">
+        {(segment) => <DateSegment segment={segment} className="date-picker__date-segment" />}
+      </AriaDateInput>
+    </AriaDateField>
   );
 }
 
@@ -483,21 +510,17 @@ export function DateRangePicker({
   const [startDraft, setStartDraft] = useState<DatePickerDate | null>(value?.start ?? null);
   const [endDraft, setEndDraft] = useState<DatePickerDate | null>(value?.end ?? null);
   const [rangeError, setRangeError] = useState(false);
-  const startInputRef = useRef<HTMLInputElement>(null);
-  const endInputRef = useRef<HTMLInputElement>(null);
-  const createTabFocusHandler = (targetRef: RefObject<HTMLInputElement | null>, requireShift: boolean) => (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Tab' && event.shiftKey === requireShift) {
-      event.preventDefault();
-      targetRef.current?.focus();
-    }
-  };
   useEffect(() => { setStartDraft(value?.start ?? null); setEndDraft(value?.end ?? null); }, [value?.start, value?.end]);
   const commitDraft = (start: DatePickerDate | null, end: DatePickerDate | null) => {
     if (!start && !end) { setRangeError(false); setValue(null); return; }
     if (!start || !end) { setRangeError(false); return; }
-    const valid = compareDatePickerDates(start, end) <= 0 && !isDateUnavailable?.(start) && !isDateUnavailable?.(end);
-    setRangeError(!valid);
-    if (valid) setValue({ start, end });
+    const fieldsValid = isWithinYearRange(start, yearRange)
+      && isWithinYearRange(end, yearRange)
+      && !isDateUnavailable?.(start)
+      && !isDateUnavailable?.(end);
+    const ordered = compareDatePickerDates(start, end) <= 0;
+    setRangeError(fieldsValid && !ordered);
+    if (fieldsValid && ordered) setValue({ start, end });
   };
   return (
     <I18nProvider locale={locale}>
@@ -515,7 +538,7 @@ export function DateRangePicker({
           {effectiveMode === 'calendar' ? (
             <RangeCalendarBody value={value} onChange={setValue} displayedMonth={displayedMonth} onDisplayedMonthChange={setDisplayedMonth} yearRange={yearRange} locale={locale} firstDayOfWeek={firstDayOfWeek} isDateUnavailable={isDateUnavailable} disabled={isDisabled} />
           ) : (
-            <div className="date-picker__input-content date-picker__range-inputs">
+            <div className="date-picker__input-content date-picker__range-inputs" role="group" aria-label="Date range">
               <DateInput
                 label="Start date"
                 value={startDraft}
@@ -524,8 +547,6 @@ export function DateRangePicker({
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
                 focusOnMount
-                inputRef={startInputRef}
-                onKeyDown={createTabFocusHandler(endInputRef, false)}
               />
               <DateInput
                 label="End date"
@@ -534,8 +555,6 @@ export function DateRangePicker({
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
-                inputRef={endInputRef}
-                onKeyDown={createTabFocusHandler(startInputRef, true)}
               />
               {(rangeError || errorMessage) && <div className="date-picker__error" role="alert">{rangeError ? 'End date must be on or after start date.' : errorMessage}</div>}
             </div>

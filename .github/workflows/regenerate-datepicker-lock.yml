@@ -1,0 +1,29 @@
+name: Regenerate DatePicker lockfile
+
+on:
+  push:
+    branches:
+      - refactor/extract-datepicker-onkeydown-9122404013159643607
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --lockfile-only --no-frozen-lockfile
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error

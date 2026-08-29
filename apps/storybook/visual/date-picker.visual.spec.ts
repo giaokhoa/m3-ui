@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
@@ -15,6 +15,15 @@ function cellByText(page: Page, text: string) {
     .locator('.date-picker__cell:not([data-outside-month])')
     .filter({ hasText: new RegExp(`^${text}$`) })
     .first();
+}
+
+async function enterSegmentedDate(field: Locator, value: string) {
+  const [year, month, day] = value.split('-');
+  for (const [type, part] of [['year', year], ['month', month], ['day', day]] as const) {
+    const segment = field.locator(`.date-picker__date-segment[data-type="${type}"]`);
+    await segment.click();
+    await segment.pressSequentially(part);
+  }
 }
 
 test.describe('Material 3 DatePicker browser contract', () => {
@@ -120,12 +129,13 @@ test.describe('Material 3 DatePicker browser contract', () => {
     await expect(page.getByTestId('single-value')).toHaveText('2026-08-27');
   });
 
-  test('mode toggle transfers focus and uses pinned DefaultEffects/DefaultSpatial entry motion', async ({ page }) => {
+  test('mode toggle transfers focus to RAC segments and preserves pinned entry motion', async ({ page }) => {
     await openStory(page, 'components-datepicker--controlled');
     await page.getByRole('button', { name: 'Switch to text input mode' }).click();
-    const input = page.locator('input[type=date]');
+    const field = page.locator('.date-picker__input-field').first();
     const content = page.locator('.date-picker__content');
-    await expect(input).toBeFocused();
+    await expect(field.locator('.date-picker__date-segment[data-focused]')).toHaveCount(1);
+    await expect(page.locator('input[type=date]')).toHaveCount(0);
     const motion = await content.evaluate((element) => {
       const style = getComputedStyle(element);
       return { names: style.animationName, durations: style.animationDuration };
@@ -133,18 +143,18 @@ test.describe('Material 3 DatePicker browser contract', () => {
     expect(motion.names).toContain('date-picker-input-enter');
     expect(motion.durations).toContain('0.166s');
     expect(motion.durations).toContain('0.194s');
-    await input.fill('2026-09-01');
+    await enterSegmentedDate(field, '2026-09-01');
     await expect(page.getByTestId('single-value')).toHaveText('2026-09-01');
     await page.getByRole('button', { name: 'Switch to calendar mode' }).click();
     await expect(page.getByTestId('date-picker')).toHaveAttribute('data-display-mode', 'calendar');
   });
 
-  test('manual input rejects an out-of-range date without corrupting controlled state', async ({ page }) => {
+  test('RAC date field rejects an out-of-range date without corrupting controlled state', async ({ page }) => {
     await openStory(page, 'components-datepicker--controlled');
     await page.getByRole('button', { name: 'Switch to text input mode' }).click();
-    const input = page.locator('input[type=date]');
-    await input.fill('2201-01-01');
-    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    const field = page.locator('.date-picker__input-field').first();
+    await enterSegmentedDate(field, '2201-01-01');
+    await expect(field).toHaveAttribute('data-invalid', 'true');
     await expect(page.getByTestId('single-value')).toHaveText('2026-08-26');
   });
 
@@ -178,17 +188,15 @@ test.describe('Material 3 DatePicker browser contract', () => {
     await expect(page.getByTestId('range-value')).toHaveText('2026-08-28/2026-09-03');
   });
 
-  test('range input focus moves start to end and reversed/incomplete drafts do not publish', async ({ page }) => {
+  test('range input uses RAC segments and reversed drafts do not publish', async ({ page }) => {
     await openStory(page, 'components-datepicker--range-input');
-    const inputs = page.locator('input[type=date]');
-    await expect(inputs.nth(0)).toBeFocused();
-    await page.keyboard.press('Tab');
-    await expect(inputs.nth(1)).toBeFocused();
-    await inputs.nth(0).fill('2026-09-10');
-    await inputs.nth(1).fill('2026-09-01');
+    const fields = page.locator('.date-picker__input-field');
+    await expect(fields).toHaveCount(2);
+    await expect(fields.nth(0).locator('.date-picker__date-segment[data-focused]')).toHaveCount(1);
+    await expect(page.locator('input[type=date]')).toHaveCount(0);
+    await enterSegmentedDate(fields.nth(0), '2026-09-10');
+    await enterSegmentedDate(fields.nth(1), '2026-09-01');
     await expect(page.getByRole('alert')).toContainText('End date must');
-    await expect(page.getByTestId('range-input-value')).toHaveText('2026-08-20/2026-08-25');
-    await inputs.nth(1).fill('');
     await expect(page.getByTestId('range-input-value')).toHaveText('2026-08-20/2026-08-25');
   });
 

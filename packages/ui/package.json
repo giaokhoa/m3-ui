@@ -31,6 +31,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
+    "@internationalized/date": "3.12.3",
     "@m3-ui/tokens": "workspace:*",
     "@material/material-color-utilities": "0.3.0",
     "react-aria-components": "^1.0.0"
