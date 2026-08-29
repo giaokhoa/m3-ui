@@ -24,7 +24,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/FloatingToolbar/FloatingToolbar.defaults.ts',
   'components/ListItem/ListItem.defaults.ts',
   'components/Menu/Menu.defaults.ts',
-  'components/NavigationBar/NavigationBar.defaults.ts',
   'components/NavigationDrawer/NavigationDrawer.defaults.ts',
   'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',

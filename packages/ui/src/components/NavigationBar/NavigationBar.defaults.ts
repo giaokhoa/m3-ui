@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type NavigationBarStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -67,7 +64,8 @@ export const navigationBarTokens = {
 
 export const navigationBarRuntime = {
   // NavigationBar.kt deliberately renders Level0 even though the generated
-  // NavigationBarTokens.ContainerElevation remains Level2.
+  // NavigationBarTokens.ContainerElevation remains Level2. Level0 has no
+  // shadow paint, so this renderer must not invoke the legacy shadow serializer.
   runtimeElevation: 'level0' as ElevationLevel,
   horizontalItemSpacing: 8,
   itemToIconMinimumPadding: 44,
@@ -118,9 +116,7 @@ export function getNavigationBarStyle(
     '--_navigation-bar-content-color':
       options.contentColor ?? token.ColorRoleOnSurface,
     '--_navigation-bar-item-spacing': `${navigationBarRuntime.horizontalItemSpacing}px`,
-    '--_navigation-bar-box-shadow': getElevationBoxShadow(
-      navigationBarRuntime.runtimeElevation,
-    ),
+    '--_navigation-bar-box-shadow': 'none',
   };
 }
 
