@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useCallback,
   useEffect,
@@ -66,12 +67,12 @@ export function Menu<T extends object>({
         offset={offset}
         crossOffset={crossOffset}
         containerPadding={menuRuntime.viewportMargin}
-        className={['menu-popover', popoverClassName].filter(Boolean).join(' ')}
+        className={clsx('menu-popover', popoverClassName)}
         style={getMenuStyle()}
       >
         <AriaMenu
           {...menuProps}
-          className={['menu', className].filter(Boolean).join(' ')}
+          className={clsx('menu', className)}
           style={style}
         />
       </AriaPopover>
@@ -99,7 +100,7 @@ export function MenuItem({
   return (
     <AriaMenuItem
       {...props}
-      className={['menu-item', className].filter(Boolean).join(' ')}
+      className={clsx('menu-item', className)}
       textValue={props.textValue ?? (typeof children === 'string' ? children : undefined)}
     >
       {leading != null ? <span className="menu-item__leading">{leading}</span> : null}
@@ -129,13 +130,11 @@ export function MenuSection({
 }: MenuSectionProps) {
   return (
     <AriaSection
-      className={[
+      className={clsx(
         'menu-section',
-        variant === 'segmented' ? 'menu-section--segmented' : null,
+        variant === 'segmented' && 'menu-section--segmented',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
     >
       {label != null ? <AriaHeader className="menu-section__label">{label}</AriaHeader> : null}
       {children}
@@ -202,7 +201,7 @@ export function ExposedMenu<T extends object>({
   return (
     <div
       ref={anchorRef}
-      className={['exposed-menu', className].filter(Boolean).join(' ')}
+      className={clsx('exposed-menu', className)}
       style={{ ...getMenuStyle(), ...style }}
       onPointerDownCapture={(event) => {
         if (isDisabled || event.button !== 0) return;
