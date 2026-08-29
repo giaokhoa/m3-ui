@@ -13,6 +13,7 @@ import { feedbackSearchMdxComponents } from './feedbackSearchMdxComponents';
 import { groupedControlMdxComponents } from './groupedControlMdxComponents';
 import { getDocsPage } from './lib/source';
 import { getMdxComponents } from './mdx';
+import { pickerMdxComponents } from './pickerMdxComponents';
 import './styles.css';
 
 function currentSlugs(): string[] {
@@ -75,6 +76,7 @@ function DocsPage() {
     ...feedbackSearchMdxComponents,
     ...groupedControlMdxComponents,
     ...contentPrimitiveMdxComponents,
+    ...pickerMdxComponents,
   };
 
   return (

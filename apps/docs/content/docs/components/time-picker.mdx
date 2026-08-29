@@ -1,0 +1,53 @@
+---
+title: Time pickers
+description: Material dial and keyboard time input with shared 24-hour state, 12/24-hour presentation, and component-local orientation switching.
+---
+
+<MaterialParity component="time-picker" />
+
+## Overview
+
+`TimePicker` renders the Material clock-dial interaction, while `TimeInput` renders keyboard-friendly hour and minute fields. Both consume the same `TimeOfDay` value shape, so an application can let people switch between dial and text entry without translating state.
+
+## Live example
+
+<ComponentPreview>
+  <TimePickerPreview />
+</ComponentPreview>
+
+## Shared time state
+
+`TimeOfDay` always stores a normalized 24-hour value:
+
+```tsx
+const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
+
+<TimePicker value={time} onChange={setTime} />
+<TimeInput value={time} onChange={setTime} />
+```
+
+`hour` must be `0..23` and `minute` must be `0..59`. `normalizeTime`, `hour12`, `periodForHour`, and `withPeriod` expose the same normalization rules for application code.
+
+## Dial semantics
+
+The clock face exposes slider semantics for the active hour or minute selection. Arrow keys adjust the active value, while Enter or Space switches between hour and minute selection. In 12-hour mode, AM/PM uses radio-group semantics rather than an unrelated toggle abstraction.
+
+Pointer interaction maps position on the clock face to the selected hour or minute. After an hour pointer selection completes, the picker advances to minute selection.
+
+## Keyboard input
+
+`TimeInput` uses real numeric text inputs with explicit `Hour` and `Minute` accessible names. Values are validated against 12-hour or 24-hour limits, and invalid drafts expose `aria-invalid`. Entering a complete two-digit hour advances focus to the minute field.
+
+## 12-hour and 24-hour presentation
+
+Set `is24Hour` to expose `00..23` hour selection and remove the AM/PM radio group. Without it, the UI presents 12-hour values while the application state remains normalized to `0..23`.
+
+## Layout is component-local
+
+`layout` accepts `vertical`, `horizontal`, or `auto`. `auto` observes the picker's immediate container and switches orientation when that local space crosses the audited TimePicker threshold.
+
+This is **not** a Material adaptive window-size class and does not participate in pane directives, navigation switching, or `@m3-ui/ui/layout`. Applications can also force either orientation explicitly.
+
+## Visual variants
+
+`variant="standard"` uses the baseline picker shape family. `variant="vibrant"` exposes the audited expressive shape treatment while preserving the same value and accessibility semantics. The variant changes presentation, not the time-state contract.

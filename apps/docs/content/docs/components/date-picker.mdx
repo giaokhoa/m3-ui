@@ -1,0 +1,61 @@
+---
+title: Date pickers
+description: Material single-date and date-range pickers with calendar and native date-input modes, date-only state, and explicit dialog composition.
+---
+
+<MaterialParity component="date-picker" />
+
+## Overview
+
+`DatePicker` and `DateRangePicker` implement the Material date-selection surfaces for a single Gregorian calendar date or an inclusive date range. Both support controlled or uncontrolled values, calendar navigation, year selection, unavailable dates, locale-aware presentation, and an optional text-input mode.
+
+## Live example
+
+<ComponentPreview>
+  <DatePickerPreview />
+</ComponentPreview>
+
+## Date-only state
+
+The public state is intentionally timezone-free:
+
+```tsx
+const [date, setDate] = useState<DatePickerDate | null>('2026-08-29');
+
+<DatePicker value={date} onChange={setDate} />
+```
+
+`DatePickerDate` is an ISO calendar-date string such as `2026-08-29`. Selection state never becomes a JavaScript `Date`; UTC is used only internally as an `Intl.DateTimeFormat` transport when formatting a date for a locale.
+
+Helpers such as `isDatePickerDate`, `compareDatePickerDates`, `monthStart`, and `formatDatePickerDate` expose the same date-only contract to applications.
+
+## Single and range selection
+
+Use `DatePicker` for one date and `DateRangePicker` for `{ start, end }` state. Range input rejects an end date before its start date. `isDateUnavailable` keeps a calendar date focusable while preventing selection, and `yearRange` constrains both calendar and native date-input modes.
+
+## Calendar and input modes
+
+The default `calendar` mode uses React Aria Calendar or RangeCalendar semantics. The optional `input` mode uses native `input type="date"` controls while preserving the same ISO date-only application state.
+
+`locale` controls month, weekday, and headline formatting. `firstDayOfWeek` can override the locale default when the product has an explicit calendar convention.
+
+## Modal versus docked
+
+`variant="modal"` selects the Material modal-picker **surface style**. It does not create an overlay, focus trap, scrim, or dialog lifecycle by itself. Compose it with the public `Dialog` primitives when the picker should be modal.
+
+```tsx
+<DialogTrigger>
+  <Button>Choose date</Button>
+  <DialogOverlay>
+    <Dialog aria-label="Choose date">
+      <DatePicker />
+    </Dialog>
+  </DialogOverlay>
+</DialogTrigger>
+```
+
+`variant="docked"` keeps the calendar presentation docked and intentionally disables the calendar/input mode toggle.
+
+## Validation and errors
+
+Manual input exposes native date fields with `aria-invalid` when a value falls outside the year range, fails the ISO calendar-date contract, or is unavailable. Pass `errorMessage` for application-facing validation copy.

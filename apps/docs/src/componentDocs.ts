@@ -22,7 +22,9 @@ export type ComponentDocId =
   | 'list-item'
   | 'menu'
   | 'badge'
-  | 'divider';
+  | 'divider'
+  | 'date-picker'
+  | 'time-picker';
 
 export interface ComponentDocMetadata {
   family: string;
@@ -254,5 +256,23 @@ export const componentDocs = {
       'Implements horizontal and vertical Material dividers with canonical outline-variant color and audited thickness defaults, while allowing deliberate CSS color and thickness overrides.',
     webAdaptation:
       'Both variants render a real separator role with explicit aria-orientation. Custom color/thickness values are web composition overrides rather than new canonical tokens, and semantic dividers should not be inserted merely to create spacing where no meaningful boundary exists.',
+  },
+  'date-picker': {
+    family: 'Date pickers',
+    materialUrl: 'https://m3.material.io/components/date-pickers/overview',
+    composeMapping: ['DatePicker', 'DateRangePicker', 'DatePickerState-style date-only selection'],
+    implementation:
+      'Implements single-date and range Material picker surfaces, calendar and native date-input modes, locale and first-day-of-week presentation, unavailable dates, year bounds, controlled display state, and modal/docked visual variants.',
+    webAdaptation:
+      'React Aria Calendar and RangeCalendar own calendar semantics while input mode uses native date inputs. Public selection remains timezone-free ISO calendar-date strings. The modal variant is only the Material picker surface; applications compose Dialog for overlay, scrim, focus containment, and dismissal lifecycle.',
+  },
+  'time-picker': {
+    family: 'Time pickers',
+    materialUrl: 'https://m3.material.io/components/time-pickers/overview',
+    composeMapping: ['TimePicker', 'TimeInput'],
+    implementation:
+      'Implements Material clock-dial and keyboard-input forms with shared normalized TimeOfDay state, hour/minute selection, 12/24-hour presentation, AM/PM controls, standard/vibrant shape variants, and vertical/horizontal presentation.',
+    webAdaptation:
+      'The active clock face uses slider semantics, AM/PM uses radio-group semantics, and TimeInput uses native numeric text inputs with explicit accessible names and aria-invalid drafts. layout="auto" observes only the picker container to choose orientation; it is local component presentation and not an adaptive window-size or pane API.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;
