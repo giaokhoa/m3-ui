@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useCallback,
   useEffect,
@@ -417,7 +418,7 @@ export function ExposedDropdownMenu<T = unknown>({
   return (
     <div
       ref={anchorRef}
-      className={['exposed-dropdown-menu', className].filter(Boolean).join(' ')}
+      className={clsx('exposed-dropdown-menu', className)}
       style={{ ...getMenuStyle(), ...style }}
       data-open={effectiveOpen || undefined}
       data-readonly={isReadOnly || undefined}

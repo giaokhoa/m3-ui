@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { HTMLAttributes } from 'react';
 import {
   getScrimStyle,
@@ -48,7 +49,7 @@ export function Scrim({
   'aria-label': ariaLabel,
   ...props
 }: ScrimProps) {
-  const mergedClassName = ['scrim', className].filter(Boolean).join(' ');
+  const mergedClassName = clsx('scrim', className);
   const mergedStyle = {
     ...getScrimStyle({ containerColor, containerOpacity, alpha }),
     ...style,

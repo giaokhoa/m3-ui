@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   Children,
   isValidElement,
@@ -249,7 +250,7 @@ export function ScrollField({
     settleOffset(-delta);
   }
 
-  const classes = ['scroll-field', className].filter(Boolean).join(' ');
+  const classes = clsx('scroll-field', className);
   const componentStyle = {
     ...getScrollFieldStyle({
       containerColor,

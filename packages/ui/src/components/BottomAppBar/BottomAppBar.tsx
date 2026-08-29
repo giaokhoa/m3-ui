@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type {
   CSSProperties,
   HTMLAttributes,
@@ -124,7 +125,7 @@ export function BottomAppBar({
   return (
     <div
       {...props}
-      className={className ? `bottom-app-bar ${className}` : 'bottom-app-bar'}
+      className={clsx('bottom-app-bar', className)}
       data-variant="regular"
       data-collapsed-fraction={fraction}
       data-collapsed={fraction >= 1 ? true : undefined}
@@ -169,7 +170,7 @@ export function FlexibleBottomAppBar({
   return (
     <div
       {...props}
-      className={className ? `bottom-app-bar ${className}` : 'bottom-app-bar'}
+      className={clsx('bottom-app-bar', className)}
       data-variant="flexible"
       data-arrangement={horizontalArrangement}
       data-collapsed-fraction={fraction}

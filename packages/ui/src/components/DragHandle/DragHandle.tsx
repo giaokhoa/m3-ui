@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useState,
   type HTMLAttributes,
@@ -151,7 +152,7 @@ export function VerticalDragHandle({
   return (
     <span
       {...props}
-      className={['drag-handle', className].filter(Boolean).join(' ')}
+      className={clsx('drag-handle', className)}
       data-dragged={isDragged || undefined}
       data-focus-visible={isFocusVisible || undefined}
       data-hovered={isHovered || undefined}

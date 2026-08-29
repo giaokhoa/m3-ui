@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import './scaffold.css';
 
@@ -49,7 +50,7 @@ export function Scaffold({
   return (
     <div
       {...props}
-      className={className ? `scaffold ${className}` : 'scaffold'}
+      className={clsx('scaffold', className)}
       data-has-top-bar={hasTopBar || undefined}
       data-has-bottom-bar={hasBottomBar || undefined}
       data-has-fab={hasFab || undefined}
@@ -63,7 +64,7 @@ export function Scaffold({
     >
       {hasTopBar ? <div className="scaffold__top-bar">{topBar}</div> : null}
       <div
-        className={contentClassName ? `scaffold__content ${contentClassName}` : 'scaffold__content'}
+        className={clsx('scaffold__content', contentClassName)}
         style={contentStyle}
       >
         {children}

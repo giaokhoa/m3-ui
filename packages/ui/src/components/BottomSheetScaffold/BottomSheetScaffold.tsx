@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useLayoutEffect,
   useRef,
@@ -193,7 +194,7 @@ export function BottomSheetScaffold({
     <div
       {...props}
       ref={rootRef}
-      className={['bottom-sheet-scaffold', className].filter(Boolean).join(' ')}
+      className={clsx('bottom-sheet-scaffold', className)}
       data-sheet-state={sheetState.currentValue}
       style={rootStyle}
     >

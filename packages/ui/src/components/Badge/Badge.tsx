@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type {
   CSSProperties,
   HTMLAttributes,
@@ -32,13 +33,11 @@ export function Badge({
     <span
       {...props}
       data-variant={hasContent ? 'content' : 'dot'}
-      className={[
+      className={clsx(
         'badge',
         hasContent ? 'badge--content' : 'badge--dot',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
       style={{
         ...getBadgeStyle(hasContent, { containerColor, contentColor }),
         ...style,
@@ -59,7 +58,7 @@ export function BadgedBox({
   return (
     <span
       {...props}
-      className={['badged-box', className].filter(Boolean).join(' ')}
+      className={clsx('badged-box', className)}
       style={{ ...getBadgedBoxStyle(), ...style }}
     >
       <span className="badged-box__anchor">{children}</span>

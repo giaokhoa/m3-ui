@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import './three-pane-scaffold.css';
 
@@ -27,7 +28,7 @@ export function LevitatedPaneScrim({
   return (
     <div
       {...props}
-      className={['levitated-pane-scrim', className].filter(Boolean).join(' ')}
+      className={clsx('levitated-pane-scrim', className)}
       style={{ backgroundColor: color, ...style }}
     />
   );

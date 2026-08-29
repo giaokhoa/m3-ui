@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, {
@@ -10,6 +10,20 @@ async function openStory(page: Page, id: string) {
 function expectClose(actual: number | undefined, expected: number) {
   expect(actual).not.toBeUndefined();
   expect(Math.abs((actual ?? 0) - expected)).toBeLessThan(0.8);
+}
+
+async function dragHandleBy(page: Page, handle: Locator, deltaY: number) {
+  const box = await handle.boundingBox();
+  if (!box) throw new Error('BottomSheet drag handle missing');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + deltaY * 0.9, { steps: 6 });
+  await page.waitForTimeout(180);
+  await page.mouse.move(x, y + deltaY);
+  await page.mouse.up();
 }
 
 async function openModalSheet(page: Page) {
@@ -104,24 +118,12 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     await openStory(page, 'components-bottomsheet--default');
     const sheet = page.getByTestId('bottom-sheet-default');
     let handle = page.getByRole('button', { name: 'Expand bottom sheet' });
-    let box = await handle.boundingBox();
-    const x = (box?.x ?? 0) + (box?.width ?? 0) / 2;
-    const y = (box?.y ?? 0) + (box?.height ?? 0) / 2;
 
-    await page.mouse.move(x, y);
-    await page.mouse.down();
-    await page.mouse.move(x, y - 80, { steps: 6 });
-    await page.mouse.up();
+    await dragHandleBy(page, handle, -80);
     await expect(sheet).toHaveAttribute('data-state', 'expanded');
 
     handle = page.getByRole('button', { name: 'Collapse bottom sheet' });
-    box = await handle.boundingBox();
-    const expandedX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
-    const expandedY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
-    await page.mouse.move(expandedX, expandedY);
-    await page.mouse.down();
-    await page.mouse.move(expandedX, expandedY + 80, { steps: 6 });
-    await page.mouse.up();
+    await dragHandleBy(page, handle, 80);
     await expect(sheet).toHaveAttribute('data-state', 'partially-expanded');
   });
 

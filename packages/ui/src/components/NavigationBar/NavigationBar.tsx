@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import {
   Button as AriaButton,
@@ -43,7 +44,7 @@ export function NavigationBar({
     <nav
       {...props}
       aria-label={ariaLabel}
-      className={className ? `navigation-bar ${className}` : 'navigation-bar'}
+      className={clsx('navigation-bar', className)}
       style={navigationStyle}
     >
       <div

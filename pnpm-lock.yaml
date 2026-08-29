@@ -128,6 +128,9 @@ importers:
       '@material/material-color-utilities':
         specifier: 0.3.0
         version: 0.3.0
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
       react:
         specifier: ^19.0.0
         version: 19.2.8

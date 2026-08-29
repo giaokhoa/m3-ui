@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useLayoutEffect,
   useRef,
@@ -197,14 +198,10 @@ export function Tabs({
   return (
     <div
       {...props}
-      className={[
-        'tabs',
+      className={clsx('tabs',
         `tabs--${variant}`,
         `tabs--${mode}`,
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        className,)}
       data-mode={mode}
       data-variant={variant}
       style={tabsStyle}

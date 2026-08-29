@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type {
   ComponentProps,
   CSSProperties,
@@ -88,7 +89,7 @@ export function DialogOverlay({
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
-        return ['dialog-overlay', userClassName].filter(Boolean).join(' ');
+        return clsx('dialog-overlay', userClassName);
       }}
       style={(renderProps) => {
         const userStyle =
@@ -126,7 +127,7 @@ export function Dialog({
   return (
     <AriaDialog
       {...props}
-      className={['dialog', className].filter(Boolean).join(' ')}
+      className={clsx('dialog', className)}
       style={{
         ...getDialogStyle({
           containerColor,
@@ -147,7 +148,7 @@ export function DialogIcon({ className, ...props }: DialogIconProps) {
   return (
     <div
       {...props}
-      className={['dialog__icon', className].filter(Boolean).join(' ')}
+      className={clsx('dialog__icon', className)}
     />
   );
 }
@@ -157,7 +158,7 @@ export function DialogTitle({ className, ...props }: DialogTitleProps) {
     <AriaHeading
       {...props}
       slot="title"
-      className={['dialog__title', className].filter(Boolean).join(' ')}
+      className={clsx('dialog__title', className)}
     />
   );
 }
@@ -170,9 +171,7 @@ export function DialogDescription({
     <AriaText
       {...props}
       slot="description"
-      className={['dialog__description', className]
-        .filter(Boolean)
-        .join(' ')}
+      className={clsx('dialog__description', className)}
     />
   );
 }
@@ -181,7 +180,7 @@ export function DialogActions({ className, ...props }: DialogActionsProps) {
   return (
     <div
       {...props}
-      className={['dialog__actions', className].filter(Boolean).join(' ')}
+      className={clsx('dialog__actions', className)}
     />
   );
 }

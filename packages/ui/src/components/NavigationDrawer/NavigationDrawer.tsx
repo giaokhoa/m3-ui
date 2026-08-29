@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useEffect,
   useLayoutEffect,
@@ -399,11 +400,9 @@ function DrawerSheet({
     <aside
       {...props}
       aria-label={ariaLabel}
-      className={[
-        'navigation-drawer-sheet',
+      className={clsx('navigation-drawer-sheet',
         `${variant}-drawer-sheet`,
-        className,
-      ].filter(Boolean).join(' ')}
+        className,)}
       style={sheetStyle}
     >
       {children}
@@ -432,7 +431,7 @@ export function PermanentNavigationDrawer({
   return (
     <div
       {...props}
-      className={className ? `permanent-navigation-drawer ${className}` : 'permanent-navigation-drawer'}
+      className={clsx('permanent-navigation-drawer', className)}
     >
       {drawerContent}
       <div className="permanent-navigation-drawer__content">{children}</div>
@@ -468,7 +467,7 @@ export function DismissibleNavigationDrawer({
   return (
     <div
       {...props}
-      className={['dismissible-navigation-drawer', className].filter(Boolean).join(' ')}
+      className={clsx('dismissible-navigation-drawer', className)}
       data-dragging={gesture.isDragging || undefined}
       data-ready={ready || undefined}
       data-state={drawerState.currentValue}
@@ -581,7 +580,7 @@ export function ModalNavigationDrawer({
   return (
     <div
       {...props}
-      className={['modal-navigation-drawer', className].filter(Boolean).join(' ')}
+      className={clsx('modal-navigation-drawer', className)}
       data-state={drawerState.currentValue}
       style={style}
       onLostPointerCapture={gesture.cancel}

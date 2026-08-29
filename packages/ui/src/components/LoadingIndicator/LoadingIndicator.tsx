@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   useEffect,
   useState,
@@ -186,13 +187,9 @@ function LoadingRoot({
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
-        return [
-          'loading-indicator',
+        return clsx('loading-indicator',
           contained && 'loading-indicator--contained',
-          userClassName,
-        ]
-          .filter(Boolean)
-          .join(' ');
+          userClassName,);
       }}
       style={(renderProps) => {
         const userStyle =
