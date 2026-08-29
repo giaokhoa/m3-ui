@@ -1,13 +1,13 @@
 ---
 title: Text field
-description: Filled and outlined Material 3 text fields with labels, supporting content, validation, and multiline input.
+description: Filled, outlined, secure, and multiline Material 3 text fields with labels, supporting content, validation, and native form behavior.
 ---
 
 <MaterialParity component="text-field" />
 
 ## Overview
 
-Text fields let users enter and edit text. `m3-ui` provides the two Material container variants while preserving native form behavior through React Aria.
+Text fields let users enter and edit text. `m3-ui` provides filled and outlined Material containers, including secure single-line variants, while preserving native form behavior through React Aria.
 
 <ComponentPreview>
   <TextField label="Name" isMultiline={false} />
@@ -20,8 +20,10 @@ Text fields let users enter and edit text. `m3-ui` provides the two Material con
 | --- | --- |
 | `TextField` | Filled text field |
 | `OutlinedTextField` | Outlined text field |
+| `SecureTextField` | Filled secure single-line text field |
+| `OutlinedSecureTextField` | Outlined secure single-line text field |
 
-Choose the variant as part of a consistent form language rather than mixing filled and outlined fields without a hierarchy reason.
+Choose the container variant as part of a consistent form language rather than mixing filled and outlined fields without a hierarchy reason.
 
 ## Labels and supporting text
 
@@ -77,12 +79,48 @@ Set `isMultiline={false}` for a native single-line input. Multiline fields rende
   <TextField label="Message" rows={3} />
 </ComponentPreview>
 
-For single-line fields, `inputProps` and `inputRef` target the native input. This keeps browser input types, autocomplete, input modes, and other platform capabilities available instead of recreating them in a Material abstraction.
+For single-line fields, native browser capabilities such as input types, autocomplete, input modes, form names, and refs remain available instead of being recreated in a Material abstraction.
+
+## Secure text fields
+
+`SecureTextField` and `OutlinedSecureTextField` reuse the same filled/outlined field contract but always render a single-line native input. They default to `type="password"` and can expose a built-in reveal action that temporarily renders the same input as `type="text"`.
+
+<ComponentPreview>
+  <SecureTextField
+    label="Password"
+    autoComplete="current-password"
+    supportingText="Use at least 8 characters"
+  />
+  <OutlinedSecureTextField
+    label="New password"
+    autoComplete="new-password"
+  />
+</ComponentPreview>
+
+Reveal state can be uncontrolled with `defaultRevealed` or controlled with `isRevealed` and `onRevealChange`:
+
+```tsx
+const [revealed, setRevealed] = useState(false);
+
+<SecureTextField
+  label="Password"
+  isRevealed={revealed}
+  onRevealChange={setRevealed}
+/>
+```
+
+Set `isRevealable={false}` when an application intentionally does not want the built-in reveal action. `revealLabel` and `hideLabel` let applications localize the accessible action names, and an application `trailingIcon` can coexist with the reveal control.
+
+The reveal action is a native toggle button with `aria-pressed`. Pointer activation keeps focus on the input; when the input type changes, the implementation restores focus and preserves the current text selection where the browser supports the selection APIs.
+
+Reveal behavior is presentation only. These components do not store credentials, choose validation rules, implement a password manager, or define an application's security policy. Use native form attributes such as `name` and `autoComplete` for browser/password-manager integration.
 
 ## Accessibility
 
 React Aria owns the field, label, description, error, input, and textarea relationships. Material styling does not replace those semantics. Keep labels meaningful, expose errors as text, and use native input attributes for browser-specific requirements.
 
+For secure fields, the reveal button has an explicit Show/Hide password label and pressed state. Custom localized labels should remain action-oriented and describe the state change rather than the icon appearance.
+
 ## Web adaptation
 
-Compose text editing internals are not translated mechanically. The web implementation keeps native input and textarea elements and layers Material tokens, state styling, labels, indicators, outlines, supporting content, and error presentation on top.
+Compose text editing internals are not translated mechanically. The web implementation keeps native input and textarea elements and layers Material tokens, state styling, labels, indicators, outlines, supporting content, error presentation, and secure reveal behavior on top.
