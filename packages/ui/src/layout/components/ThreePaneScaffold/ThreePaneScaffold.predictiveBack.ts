@@ -6,6 +6,7 @@ import {
 } from 'react';
 
 export const PredictiveBackMinScale = 0.95;
+const PredictiveBackReturnSpringDampingRatio = 1;
 const PredictiveBackReturnSpringStiffness = 1500;
 const PredictiveBackReturnSpringVisibilityThreshold = 0.01;
 
@@ -27,17 +28,26 @@ function cancelFrame(id: number) {
   }
 }
 
+function composeFloat(value: number): number {
+  return Math.fround(value);
+}
+
 /**
- * Mirrors AndroidX PredictiveBackScaleState's decay curve.
+ * Mirrors AndroidX PredictiveBackScaleState's Float decay curve.
  *
  * fraction=0 starts at 1; as fraction approaches 1 the scale approaches
- * PredictiveBackMinScale without reaching it during the seek.
+ * PredictiveBackMinScale without reaching it during the seek. Math.fround is
+ * applied at the same Float expression boundaries as the Compose source.
  */
 export function calculatePredictiveBackScale(fraction: number): number {
-  const delta = 1 - PredictiveBackMinScale;
-  const shift = delta / 2;
-  const curveScale = (delta * delta) / 2;
-  return curveScale / (fraction + shift) + PredictiveBackMinScale;
+  const one = composeFloat(1);
+  const minimumScale = composeFloat(PredictiveBackMinScale);
+  const fractionFloat = composeFloat(fraction);
+  const delta = composeFloat(one - minimumScale);
+  const shift = composeFloat(delta / composeFloat(2));
+  const curveScale = composeFloat(composeFloat(delta * delta) / composeFloat(2));
+  const denominator = composeFloat(fractionFloat + shift);
+  return composeFloat(composeFloat(curveScale / denominator) + minimumScale);
 }
 
 export function getPredictiveBackScale(
@@ -46,6 +56,78 @@ export function getPredictiveBackScale(
   return state?.isPredictiveBackInProgress
     ? calculatePredictiveBackScale(state.progressFraction)
     : undefined;
+}
+
+/**
+ * Port of the critically-damped branch in AndroidX SpringEstimation.kt.
+ *
+ * FloatSpringSpec first normalizes its Float displacement by the Float
+ * visibility threshold, then estimateAnimationDurationMillis converts those
+ * Float arguments to Double and uses this Newton-Raphson estimator.
+ */
+function estimateComposeCriticalSpringDurationMs(initialDisplacement: number): number {
+  const initialVelocity = composeFloat(0);
+  if (initialDisplacement === 0 && initialVelocity === 0) return 0;
+
+  const stiffness = Number(composeFloat(PredictiveBackReturnSpringStiffness));
+  const dampingRatio = Number(composeFloat(PredictiveBackReturnSpringDampingRatio));
+  const delta = Number(composeFloat(1));
+
+  const dampingCoefficient = 2 * dampingRatio * Math.sqrt(stiffness);
+  const partialRoot = dampingCoefficient * dampingCoefficient - 4 * stiffness;
+  const partialRootReal = partialRoot < 0 ? 0 : Math.sqrt(partialRoot);
+  const firstRootReal = (-dampingCoefficient + partialRootReal) * 0.5;
+
+  const v0 = initialDisplacement < 0 ? -initialVelocity : initialVelocity;
+  const p0 = Math.abs(initialDisplacement);
+  const r = firstRootReal;
+  const c1 = p0;
+  const c2 = v0 - r * c1;
+
+  const t1 = Math.log(Math.abs(delta / c1)) / r;
+  const guess = Math.log(Math.abs(delta / c2));
+  let t = guess;
+  for (let iteration = 0; iteration <= 5; iteration += 1) {
+    t = guess - Math.log(Math.abs(t / r));
+  }
+  const t2 = t / r;
+
+  let tCurrent =
+    !Number.isFinite(t1) ? t2 : !Number.isFinite(t2) ? t1 : Math.max(t1, t2);
+
+  const tInflection = -(r * c1 + c2) / (r * c2);
+  const xInflection =
+    c1 * Math.exp(r * tInflection) +
+    c2 * tInflection * Math.exp(r * tInflection);
+
+  let signedDelta: number;
+  if (Number.isNaN(tInflection) || tInflection <= 0) {
+    signedDelta = -delta;
+  } else if (tInflection > 0 && -xInflection < delta) {
+    if (c2 < 0 && c1 > 0) tCurrent = 0;
+    signedDelta = -delta;
+  } else {
+    tCurrent = -(2 / r) - c1 / c2;
+    signedDelta = delta;
+  }
+
+  let tDelta = Number.POSITIVE_INFINITY;
+  let iterations = 0;
+  while (tDelta > 0.001 && iterations < 100) {
+    iterations += 1;
+    const previous = tCurrent;
+    const exponential = Math.exp(r * tCurrent);
+    const value = (c1 + c2 * tCurrent) * exponential + signedDelta;
+    const derivative =
+      (c2 * (r * tCurrent + 1) + c1 * r) * exponential;
+    tCurrent -= value / derivative;
+    tDelta = Math.abs(previous - tCurrent);
+  }
+
+  // Kotlin Double.toLong() truncates toward zero. The predictive scale range
+  // keeps this finite; NaN is retained as Compose's zero conversion fallback.
+  const milliseconds = tCurrent * 1000;
+  return Number.isNaN(milliseconds) ? 0 : Math.trunc(milliseconds);
 }
 
 /**
@@ -60,33 +142,20 @@ export function calculatePredictiveBackReturnSpringDurationMs(
     throw new RangeError(`initialScale must be finite and positive, received ${initialScale}`);
   }
 
-  const displacement = Math.abs(initialScale - 1);
-  if (displacement <= PredictiveBackReturnSpringVisibilityThreshold) return 0;
-
-  // FloatSpringSpec normalizes displacement by visibilityThreshold before
-  // estimateAnimationDurationMillis. With DampingRatioNoBouncy=1 and
-  // StiffnessMedium=1500, the normalized critical solution is
-  // (c1 + c2*t) * exp(r*t), where c2 = -r*c1 for zero initial velocity.
-  const normalizedDisplacement =
-    displacement / PredictiveBackReturnSpringVisibilityThreshold;
-  const r = -Math.sqrt(PredictiveBackReturnSpringStiffness);
-  const c1 = normalizedDisplacement;
-  const c2 = -r * c1;
-  const valueAt = (seconds: number) =>
-    (c1 + c2 * seconds) * Math.exp(r * seconds);
-
-  let low = 0;
-  let high = 1;
-  while (valueAt(high) > 1) high *= 2;
-  for (let iteration = 0; iteration < 60; iteration += 1) {
-    const middle = (low + high) / 2;
-    if (valueAt(middle) > 1) low = middle;
-    else high = middle;
+  const initialValue = composeFloat(initialScale);
+  if (!Number.isFinite(initialValue) || initialValue <= 0) {
+    throw new RangeError(`initialScale must fit in a positive Float, received ${initialScale}`);
   }
 
-  // AndroidX converts the solved seconds to milliseconds with toLong(), which
-  // truncates toward zero for this positive duration.
-  return Math.trunc(((low + high) / 2) * 1000);
+  const targetValue = composeFloat(1);
+  const visibilityThreshold = composeFloat(
+    PredictiveBackReturnSpringVisibilityThreshold,
+  );
+  const initialDisplacement = composeFloat(
+    composeFloat(initialValue - targetValue) / visibilityThreshold,
+  );
+
+  return estimateComposeCriticalSpringDurationMs(initialDisplacement);
 }
 
 /** Samples the same critically-damped default Float spring as Animatable. */
@@ -97,22 +166,26 @@ export function samplePredictiveBackReturnSpring(
   if (!Number.isFinite(playTimeMs)) {
     throw new RangeError(`playTimeMs must be finite, received ${playTimeMs}`);
   }
-  if (playTimeMs <= 0) return initialScale;
 
-  const durationMs = calculatePredictiveBackReturnSpringDurationMs(initialScale);
-  if (durationMs === 0 || playTimeMs >= durationMs) return 1;
+  const initialValue = composeFloat(initialScale);
+  const durationMs = calculatePredictiveBackReturnSpringDurationMs(initialValue);
+  if (playTimeMs >= durationMs) return 1;
+  if (playTimeMs <= 0) return initialValue;
 
   // FloatSpringSpec truncates nanos to whole milliseconds before querying
-  // SpringSimulation, so preserve that precision boundary here.
+  // SpringSimulation. SpringSimulation does its analytical math in Double and
+  // converts the resulting value back to Float.
   const seconds = Math.floor(playTimeMs) / 1000;
-  const naturalFrequency = Math.sqrt(PredictiveBackReturnSpringStiffness);
-  const adjustedDisplacement = initialScale - 1;
+  const naturalFrequency = Math.sqrt(
+    Number(composeFloat(PredictiveBackReturnSpringStiffness)),
+  );
+  const adjustedDisplacement = composeFloat(initialValue - composeFloat(1));
   const coefficientA = adjustedDisplacement;
   const coefficientB = naturalFrequency * adjustedDisplacement;
   const displacement =
     (coefficientA + coefficientB * seconds) *
     Math.exp(-naturalFrequency * seconds);
-  return displacement + 1;
+  return composeFloat(displacement + composeFloat(1));
 }
 
 /**
