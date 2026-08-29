@@ -1,0 +1,79 @@
+.docs-small-primitive-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  inline-size: 100%;
+}
+
+.docs-small-primitive-card {
+  display: grid;
+  gap: 12px;
+  min-block-size: 136px;
+  padding: 20px;
+}
+
+.docs-scrim-demo,
+.docs-drag-handle-demo,
+.docs-scrollbar-demo {
+  display: grid;
+  gap: 16px;
+  inline-size: min(100%, 560px);
+}
+
+.docs-scrim-demo__stage {
+  block-size: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.docs-scrim-demo__content {
+  display: grid;
+  gap: 8px;
+  max-inline-size: 320px;
+  padding: 24px;
+}
+
+.docs-drag-handle-demo__stage {
+  align-items: stretch;
+  block-size: 180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  inline-size: 100%;
+  overflow: hidden;
+}
+
+.docs-drag-handle-demo__pane {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-inline-size: 0;
+  padding: 16px;
+}
+
+.docs-drag-handle-demo__stage > .drag-handle {
+  align-self: center;
+}
+
+.docs-scrollbar-demo__host {
+  block-size: 240px;
+  inline-size: min(100%, 360px);
+  overflow: hidden;
+  position: relative;
+}
+
+.docs-scrollbar-demo__scroller {
+  inset: 0;
+  overflow-y: auto;
+  position: absolute;
+  scrollbar-width: none;
+}
+
+.docs-scrollbar-demo__content {
+  display: grid;
+  gap: 8px;
+  padding: 12px 20px 12px 12px;
+}
+
+.docs-scrollbar-demo__row {
+  padding: 16px;
+}
