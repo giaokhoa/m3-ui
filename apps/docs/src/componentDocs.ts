@@ -9,7 +9,12 @@ export type ComponentDocId =
   | 'card'
   | 'chip'
   | 'icon-button'
-  | 'fab';
+  | 'fab'
+  | 'search-bar'
+  | 'progress-indicator'
+  | 'loading-indicator'
+  | 'snackbar'
+  | 'tooltip';
 
 export interface ComponentDocMetadata {
   family: string;
@@ -124,5 +129,50 @@ export const componentDocs = {
       'Implements small, baseline, medium, and large FAB families, matching extended FAB sizes, container-role variants, default/lowered elevation, interactive elevation motion, extended collapse behavior, and the pinned branded/material-web variants present in the audited source surface.',
     webAdaptation:
       'React Aria Button owns action semantics and interaction state. Icon-only FAB content is presentation-only and therefore requires an accessible name; collapsed extended FABs derive one from string label content when possible. Branded and solid/surface variant vocabulary is preserved as an audited Material Web compatibility surface rather than presented as a Compose-only API.',
+  },
+  'search-bar': {
+    family: 'Search',
+    materialUrl: 'https://m3.material.io/components/search/overview',
+    composeMapping: ['SearchBar', 'ExpandedDockedSearchBar', 'ExpandedFullScreenSearchBar'],
+    implementation:
+      'Implements a collapsed Material search field plus docked and full-screen expanded search surfaces driven by a shared explicit search-bar state object. The input supports leading/trailing content, clearing, native search submission, and controlled or uncontrolled text values.',
+    webAdaptation:
+      'SearchBarInput renders a native search form and search input. React Aria owns the full-screen modal/dialog focus and dismissal behavior, while the docked surface owns browser outside-pointer and Escape dismissal. Search-result retrieval is deliberately outside the component and can be supplied by Fumadocs or any application search backend.',
+  },
+  'progress-indicator': {
+    family: 'Progress indicators',
+    materialUrl: 'https://m3.material.io/components/progress-indicators/overview',
+    composeMapping: ['LinearProgressIndicator', 'CircularProgressIndicator', 'LinearWavyProgressIndicator', 'CircularWavyProgressIndicator'],
+    implementation:
+      'Implements standard linear/circular progress plus M3 Expressive wavy linear/circular variants, determinate and indeterminate states, canonical stop/track geometry, reduced-motion behavior, and the current Compose-derived wavy amplitude and wavelength lifecycle.',
+    webAdaptation:
+      'React Aria ProgressBar owns progressbar semantics and value ranges; indicators require an accessible name because the visual has no label. Standard `bufferValue` and indeterminate `fourColor` remain audited Material Web renderer adaptations and are intentionally not inherited by the wavy Compose-aligned APIs.',
+  },
+  'loading-indicator': {
+    family: 'Loading indicator',
+    materialUrl: 'https://m3.material.io/components/loading-indicator/overview',
+    composeMapping: ['LoadingIndicator', 'ContainedLoadingIndicator'],
+    implementation:
+      'Implements the expressive morphing loading indicator and contained variant with the canonical Material shape sequence, Compose-derived motion timing, 0..1 determinate morphing, indeterminate shape cycling, and reduced-motion freezing.',
+    webAdaptation:
+      'React Aria ProgressBar owns progress semantics. Omitting `value` selects indeterminate mode and supplying a value selects determinate mode; the SVG renderer is aria-hidden and consumers must provide an accessible name. The Material Shapes port remains an internal renderer mechanism rather than a new public shape contract.',
+  },
+  snackbar: {
+    family: 'Snackbar',
+    materialUrl: 'https://m3.material.io/components/snackbar/overview',
+    composeMapping: ['Snackbar surface'],
+    implementation:
+      'Implements the Material snackbar surface, message, optional action, optional dismiss action, long-action-on-new-line composition, canonical colors/shape/elevation, and shared Material button interaction engines for actions.',
+    webAdaptation:
+      'The message is exposed as a polite atomic live status region. Queueing, replacement, timeout, and host policy are intentionally not implemented by this surface; applications own that state layer. SnackbarAction and SnackbarDismissAction reuse the accessible React Aria button and icon-button engines.',
+  },
+  tooltip: {
+    family: 'Tooltips',
+    materialUrl: 'https://m3.material.io/components/tooltips/overview',
+    composeMapping: ['PlainTooltip', 'RichTooltip', 'TooltipBox/tooltip state behavior'],
+    implementation:
+      'Implements plain and rich Material tooltip surfaces with canonical visual roles, placement spacing, portal inheritance, hover/focus invocation, persistent rich-tooltip behavior, actions, and theme-aware visual propagation.',
+    webAdaptation:
+      'Plain tooltips use the React Aria tooltip pattern and accessible description wiring. Rich tooltips can contain actions, so they intentionally use non-modal dialog semantics with aria-haspopup/expanded/controls relationships instead of misusing the non-interactive ARIA tooltip role.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;
