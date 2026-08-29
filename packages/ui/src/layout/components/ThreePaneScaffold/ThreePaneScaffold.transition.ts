@@ -575,7 +575,10 @@ function interpolatePaneTransitionFrame(
     };
   }
   return {
-    placement: interpolatePlacement(from.placement, to.placement, fraction),
+    placement:
+      to.motion === PaneMotion.AnimateBounds
+        ? sampleBoundsAtProgress(from.placement, to.placement, fraction)
+        : interpolatePlacement(from.placement, to.placement, fraction),
     translateX: interpolate(from.translateX, to.translateX, fraction),
     opacity: interpolate(from.opacity, to.opacity, fraction),
     inlineClipFraction: interpolate(
