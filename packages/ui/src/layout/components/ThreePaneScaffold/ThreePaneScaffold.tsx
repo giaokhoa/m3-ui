@@ -35,7 +35,10 @@ import {
   type DragToResizeHandleAriaStrings,
 } from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
-import { calculatePaneExpansionDragHandlePlacement } from './paneExpansionDragHandle.layout';
+import {
+  calculatePaneExpansionDragHandlePlacement,
+  calculatePaneExpansionSpacerMiddleOffset,
+} from './paneExpansionDragHandle.layout';
 import {
   getPaneExpansionHandleAriaState,
   type PaneExpansionHandleAriaStrings,
@@ -481,16 +484,22 @@ export function ThreePaneScaffold({
     if (expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified) {
       dragHandleOffset = expansionLayout.currentDraggingOffset;
     } else {
-      const firstPlacement = getPlacement(layout, expandedRoles[0]!);
-      const secondPlacement = getPlacement(layout, expandedRoles[1]!);
-      if (firstPlacement !== undefined && secondPlacement !== undefined) {
-        dragHandleOffset =
-          (firstPlacement.left + firstPlacement.width + secondPlacement.left) / 2;
-      } else if (firstPlacement !== undefined) {
-        dragHandleOffset = geometry.width;
-      } else if (secondPlacement !== undefined) {
-        dragHandleOffset = 0;
-      }
+      dragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
+        layout,
+        layoutOptions: {
+          width: geometry.width,
+          height: geometry.height,
+          directive,
+          value: targetValue,
+          paneOrder,
+          direction: geometry.direction,
+          excludedBounds,
+          preferredWidths,
+          preferredHeights,
+          paneMargins,
+          paneExpansionState: expansionState,
+        },
+      });
     }
   }
 

@@ -1,11 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { calculatePaneExpansionDragHandlePlacement } from './paneExpansionDragHandle.layout';
+import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
+import {
+  PaneAdaptedValue,
+  listDetailPaneScaffoldOrder,
+  type ThreePaneScaffoldValue,
+} from '../../adaptive/threePaneScaffold';
+import { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
+import {
+  calculatePaneExpansionDragHandlePlacement,
+  calculatePaneExpansionSpacerMiddleOffset,
+} from './paneExpansionDragHandle.layout';
 
 const base = {
   contentWidth: 1000,
   partitionSpacerSize: '24px',
   minTouchTargetSize: 48,
 } as const;
+
+const directive: PaneScaffoldDirective = {
+  maxHorizontalPartitions: 2,
+  horizontalPartitionSpacerSize: '24px',
+  maxVerticalPartitions: 1,
+  verticalPartitionSpacerSize: '0px',
+  defaultPanePreferredWidth: '360px',
+  defaultPanePreferredHeight: '420px',
+  excludedBounds: [],
+  shouldAutoFocusCurrentDestination: true,
+};
+
+const twoPaneValue: ThreePaneScaffoldValue = {
+  primary: PaneAdaptedValue.Expanded,
+  secondary: PaneAdaptedValue.Expanded,
+  tertiary: PaneAdaptedValue.Hidden,
+};
 
 describe('pane expansion drag-handle placement', () => {
   it('keeps the split-centered minimum target away from outer edges', () => {
@@ -72,5 +99,32 @@ describe('pane expansion drag-handle placement', () => {
         minTouchTargetSize: 48,
       }),
     ).toEqual({ centerX: 8, minWidth: 80 });
+  });
+
+  it('measures the spacer midpoint before pane ruler margins clip an internal edge', () => {
+    const layoutOptions = {
+      width: 1000,
+      height: 800,
+      directive,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+      paneMargins: {
+        secondary: { insetBounds: [{ right: 300 }] },
+      },
+    } as const;
+    const layout = calculateThreePaneScaffoldLayout(layoutOptions);
+
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 300, height: 800 });
+    expect(layout.primary).toEqual({ left: 384, top: 0, width: 616, height: 800 });
+    expect(
+      (layout.secondary!.left + layout.secondary!.width + layout.primary!.left) / 2,
+    ).toBe(342);
+
+    // AndroidX calls getSpacerMiddleOffsetX while measuredBounds are still the
+    // original 0..360 and 384..1000 partitions, then applies PaneMargins in
+    // doMeasureAndPlace. The expansion handle therefore remains at x=372.
+    expect(
+      calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions }),
+    ).toBe(372);
   });
 });
