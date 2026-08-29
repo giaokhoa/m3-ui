@@ -30,6 +30,62 @@ export interface ExposedDropdownMenuItemRenderState {
   isDisabled: boolean;
 }
 
+interface DropdownMenuItemProps<T> {
+  item: ExposedDropdownMenuItem<T>;
+  index: number;
+  isSelected: boolean;
+  isActive: boolean;
+  disabled: boolean;
+  optionIdPrefix: string;
+  setActiveIndex: (index: number) => void;
+  selectIndex: (index: number) => void;
+  renderItem?: (
+    item: ExposedDropdownMenuItem<T>,
+    state: ExposedDropdownMenuItemRenderState,
+  ) => ReactNode;
+}
+
+function DropdownMenuItem<T>({
+  item,
+  index,
+  isSelected,
+  isActive,
+  disabled,
+  optionIdPrefix,
+  setActiveIndex,
+  selectIndex,
+  renderItem,
+}: DropdownMenuItemProps<T>) {
+  return (
+    <div
+      id={`${optionIdPrefix}-${index}`}
+      role="option"
+      aria-selected={isSelected}
+      aria-disabled={disabled || undefined}
+      data-selected={isSelected || undefined}
+      data-focused={isActive || undefined}
+      data-disabled={disabled || undefined}
+      className="menu-item exposed-dropdown-menu__option"
+      onMouseEnter={() => {
+        if (!disabled) setActiveIndex(index);
+      }}
+      onClick={() => selectIndex(index)}
+    >
+      <span className="menu-item__body">
+        <span className="menu-item__label">
+          {renderItem
+            ? renderItem(item, {
+                isActive,
+                isSelected,
+                isDisabled: disabled,
+              })
+            : item.label}
+        </span>
+      </span>
+    </div>
+  );
+}
+
 export interface ExposedDropdownMenuAnchorRenderProps {
   inputRef: Ref<HTMLInputElement>;
   value: string;
@@ -411,33 +467,18 @@ export function ExposedDropdownMenu<T = unknown>({
             const isActive = index === activeIndex;
             const disabled = Boolean(item.isDisabled);
             return (
-              <div
+              <DropdownMenuItem
                 key={item.value}
-                id={`${optionIdPrefix}-${index}`}
-                role="option"
-                aria-selected={isSelected}
-                aria-disabled={disabled || undefined}
-                data-selected={isSelected || undefined}
-                data-focused={isActive || undefined}
-                data-disabled={disabled || undefined}
-                className="menu-item exposed-dropdown-menu__option"
-                onMouseEnter={() => {
-                  if (!disabled) setActiveIndex(index);
-                }}
-                onClick={() => selectIndex(index)}
-              >
-                <span className="menu-item__body">
-                  <span className="menu-item__label">
-                    {renderItem
-                      ? renderItem(item, {
-                          isActive,
-                          isSelected,
-                          isDisabled: disabled,
-                        })
-                      : item.label}
-                  </span>
-                </span>
-              </div>
+                item={item}
+                index={index}
+                isSelected={isSelected}
+                isActive={isActive}
+                disabled={disabled}
+                optionIdPrefix={optionIdPrefix}
+                setActiveIndex={setActiveIndex}
+                selectIndex={selectIndex}
+                renderItem={renderItem}
+              />
             );
           })}
         </div>
