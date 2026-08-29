@@ -44,7 +44,12 @@ export function samplePaneMotionSpring(
   assertFinite(targetValue, 'targetValue');
   assertFinite(playTimeMs, 'playTimeMs');
   assertFinite(initialVelocity, 'initialVelocity');
-  if (playTimeMs <= 0 || initialValue === targetValue) return initialValue;
+  if (
+    playTimeMs <= 0 ||
+    (initialValue === targetValue && initialVelocity === 0)
+  ) {
+    return initialValue;
+  }
 
   const dampingRatio = PaneMotionDefaults.dampingRatio;
   const naturalFrequency = Math.sqrt(PaneMotionDefaults.stiffness);
