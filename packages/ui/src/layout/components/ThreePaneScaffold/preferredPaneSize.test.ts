@@ -20,6 +20,25 @@ describe('preferred pane size', () => {
     ).toBe(333);
   });
 
+  it('uses Compose Float arithmetic before truncating proportional sizes', () => {
+    const preferredSize = preferredPaneSizeProportion(0.58);
+    expect(preferredSize.proportion).toBe(Math.fround(0.58));
+
+    // AndroidX computes (50 * 0.58f) as Float = 29f, then toInt() = 29.
+    // Raw JS double arithmetic is 28.999999999999996 and would truncate to 28.
+    expect(resolvePanePreferredSize(preferredSize, 50, 20, 'preferredWidth')).toBe(29);
+    expect(resolvePanePreferredSize({ proportion: 0.58 }, 50, 20, 'preferredHeight')).toBe(29);
+  });
+
+  it('validates the Float value seen by the AndroidX proportion overload', () => {
+    const roundsToOne = 1 + Number.EPSILON;
+    expect(preferredPaneSizeProportion(roundsToOne).proportion).toBe(1);
+    expect(resolvePanePreferredSize({ proportion: roundsToOne }, 50, 20, 'preferredWidth')).toBe(
+      50,
+    );
+    expect(() => preferredPaneSizeProportion(1.0001)).toThrow(RangeError);
+  });
+
   it('falls back to the directive preferred size when unspecified', () => {
     expect(resolvePanePreferredSize(undefined, 1000, 360, 'preferredWidth')).toBe(360);
   });
@@ -32,9 +51,9 @@ describe('preferred pane size', () => {
   it('rejects invalid proportions and absolute sizes', () => {
     expect(() => preferredPaneSizeProportion(-0.01)).toThrow(RangeError);
     expect(() => preferredPaneSizeProportion(1.01)).toThrow(RangeError);
-    expect(() => resolvePanePreferredSize({ proportion: Number.NaN }, 1000, 360, 'preferredWidth')).toThrow(
-      RangeError,
-    );
+    expect(() =>
+      resolvePanePreferredSize({ proportion: Number.NaN }, 1000, 360, 'preferredWidth'),
+    ).toThrow(RangeError);
     expect(() => resolvePanePreferredSize(-1, 1000, 360, 'preferredWidth')).toThrow(RangeError);
   });
 });

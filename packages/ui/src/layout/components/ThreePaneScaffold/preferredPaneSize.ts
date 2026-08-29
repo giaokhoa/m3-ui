@@ -9,17 +9,22 @@ export interface PanePreferredSizeProportion {
  */
 export type PanePreferredSize = number | PanePreferredSizeProportion;
 
-function assertProportion(proportion: number, name: string) {
-  if (!Number.isFinite(proportion) || proportion < 0 || proportion > 1) {
+function composeFloat(value: number) {
+  return Math.fround(value);
+}
+
+function normalizeProportion(proportion: number, name: string) {
+  const floatProportion = composeFloat(proportion);
+  if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
     throw new RangeError(`${name} must be a finite value in [0, 1], received ${proportion}`);
   }
+  return floatProportion;
 }
 
 export function preferredPaneSizeProportion(
   proportion: number,
 ): PanePreferredSizeProportion {
-  assertProportion(proportion, 'proportion');
-  return Object.freeze({ proportion });
+  return Object.freeze({ proportion: normalizeProportion(proportion, 'proportion') });
 }
 
 export function resolvePanePreferredSize(
@@ -38,6 +43,6 @@ export function resolvePanePreferredSize(
     return preferredSize;
   }
 
-  assertProportion(preferredSize.proportion, `${name} proportion`);
-  return Math.trunc(scaffoldSize * preferredSize.proportion);
+  const proportion = normalizeProportion(preferredSize.proportion, `${name} proportion`);
+  return Math.trunc(composeFloat(composeFloat(scaffoldSize) * proportion));
 }
