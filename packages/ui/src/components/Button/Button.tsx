@@ -4,8 +4,15 @@ import {
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
 import '@m3-ui/tokens/button.css';
+import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { getButtonStyle, type ButtonShapes } from './Button.defaults';
+import {
+  getButtonStyle,
+  resolveButtonElevation,
+  resolveButtonElevationTransition,
+  type ButtonInteractionState,
+  type ButtonShapes,
+} from './Button.defaults';
 import {
   endButtonInteraction,
   latestButtonInteraction,
@@ -98,6 +105,10 @@ function ButtonImpl({
   }, [interaction]);
   const variantClass = variantClassName(variant);
 
+  function interactionState(isDisabled: boolean): ButtonInteractionState {
+    return { isDisabled, interaction, previousInteraction };
+  }
+
   return (
     <AriaButton
       {...props}
@@ -114,11 +125,7 @@ function ButtonImpl({
         return {
           ...getButtonStyle(
             variant,
-            {
-              isDisabled: renderProps.isDisabled,
-              interaction,
-              previousInteraction,
-            },
+            interactionState(renderProps.isDisabled),
             { size, shapes },
           ),
           ...userStyle,
@@ -131,28 +138,36 @@ function ButtonImpl({
       onPressEnd={handlePressEnd}
       onPressStart={handlePressStart}
     >
-      {(renderProps) => (
-        <>
-          <Ripple
-            controller={ripple}
-            focusRingRadius="var(--_button-container-radius)"
-            isFocusVisible={renderProps.isFocusVisible}
-            stateInteraction={latestButtonStateLayerInteraction(
-              activeInteractions,
-              renderProps.isFocusVisible,
-            )}
-          />
-          <span className="button__content">
-            {startIcon ? (
-              <span aria-hidden="true" className="button__icon">{startIcon}</span>
-            ) : null}
-            {typeof children === 'function' ? children(renderProps) : children}
-            {endIcon ? (
-              <span aria-hidden="true" className="button__icon">{endIcon}</span>
-            ) : null}
-          </span>
-        </>
-      )}
+      {(renderProps) => {
+        const state = interactionState(renderProps.isDisabled);
+        return (
+          <>
+            <Elevation
+              className="button__elevation"
+              level={resolveButtonElevation(variant, state)}
+              style={{ transition: resolveButtonElevationTransition(state) }}
+            />
+            <Ripple
+              controller={ripple}
+              focusRingRadius="var(--_button-container-radius)"
+              isFocusVisible={renderProps.isFocusVisible}
+              stateInteraction={latestButtonStateLayerInteraction(
+                activeInteractions,
+                renderProps.isFocusVisible,
+              )}
+            />
+            <span className="button__content">
+              {startIcon ? (
+                <span aria-hidden="true" className="button__icon">{startIcon}</span>
+              ) : null}
+              {typeof children === 'function' ? children(renderProps) : children}
+              {endIcon ? (
+                <span aria-hidden="true" className="button__icon">{endIcon}</span>
+              ) : null}
+            </span>
+          </>
+        );
+      }}
     </AriaButton>
   );
 }
