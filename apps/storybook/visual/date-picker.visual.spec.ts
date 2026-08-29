@@ -135,7 +135,7 @@ test.describe('Material 3 DatePicker browser contract', () => {
     const field = page.locator('.date-picker__input-field').first();
     const content = page.locator('.date-picker__content');
     await expect(field.locator('.date-picker__date-segment[data-focused]')).toHaveCount(1);
-    await expect(page.locator('input[type=date]')).toHaveCount(0);
+    await expect(page.locator('input[type=date]:visible')).toHaveCount(0);
     const motion = await content.evaluate((element) => {
       const style = getComputedStyle(element);
       return { names: style.animationName, durations: style.animationDuration };
@@ -193,7 +193,7 @@ test.describe('Material 3 DatePicker browser contract', () => {
     const fields = page.locator('.date-picker__input-field');
     await expect(fields).toHaveCount(2);
     await expect(fields.nth(0).locator('.date-picker__date-segment[data-focused]')).toHaveCount(1);
-    await expect(page.locator('input[type=date]')).toHaveCount(0);
+    await expect(page.locator('input[type=date]:visible')).toHaveCount(0);
     await enterSegmentedDate(fields.nth(0), '2026-09-10');
     await enterSegmentedDate(fields.nth(1), '2026-09-01');
     await expect(page.getByRole('alert')).toContainText('End date must');

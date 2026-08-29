@@ -419,6 +419,8 @@ function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnM
 }) {
   const [draft, setDraft] = useState<CalendarDate | null>(() => dateFieldValue(value));
   const bounds = dateFieldBounds(yearRange);
+  const invalid = draft !== null
+    && (!isWithinYearRange(draft.toString(), yearRange) || Boolean(unavailable?.(draft.toString())));
 
   useEffect(() => {
     const next = dateFieldValue(value);
@@ -435,6 +437,7 @@ function DateInput({ value, onChange, yearRange, unavailable, disabled, focusOnM
       minValue={bounds.minValue}
       maxValue={bounds.maxValue}
       isDateUnavailable={(date) => Boolean(unavailable?.(date.toString()))}
+      isInvalid={invalid}
       isDisabled={disabled}
       autoFocus={focusOnMount}
       onChange={(next) => {
