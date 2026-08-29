@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   cloneElement,
   useEffect,
@@ -209,7 +210,7 @@ export function AppBarRow({
     <div
       {...props}
       ref={rootRef}
-      className={className ? `app-bar-row ${className}` : 'app-bar-row'}
+      className={clsx('app-bar-row', className)}
       data-inline-count={layout.inlineCount}
       data-overflow-count={layout.overflowCount}
       data-overflow={layout.hasOverflow || undefined}
