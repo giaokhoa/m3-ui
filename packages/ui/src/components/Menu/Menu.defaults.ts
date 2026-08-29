@@ -1,6 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 type MenuStyle = CSSProperties & Record<`--${string}`, string | number>;
 type TokenBag = Record<string, string | number>;
@@ -61,7 +61,6 @@ export function getMenuStyle(): MenuStyle {
     '--_menu-selected-color': menuTokens.selectedColor,
     '--_menu-segmented-container-color': menuTokens.segmentedContainerColor,
     '--_menu-radius': shapeRadius[shape] ?? shape,
-    '--_menu-shadow': getElevationBoxShadow(menuTokens.containerElevation, 'var(--shadow, #000)'),
     '--_menu-min-width': `${menuRuntime.minWidth}px`,
     '--_menu-max-width': `${menuRuntime.maxWidth}px`,
     '--_menu-item-min-height': `${menuRuntime.itemMinHeight}px`,

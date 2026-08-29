@@ -6,11 +6,16 @@ async function openStory(page: Page, id: string) {
 }
 
 test.describe('Material 3 Menu browser contract', () => {
-  test('trigger opens, focuses first enabled item, arrows skip disabled, and Enter activates', async ({ page }) => {
+  test('trigger opens, paints shared elevation, focuses first enabled item, arrows skip disabled, and Enter activates', async ({ page }) => {
     await openStory(page, 'components-menu--default');
     const trigger = page.getByTestId('menu-trigger');
     await trigger.focus();
     await trigger.press('Enter');
+
+    const popover = page.locator('.menu-popover');
+    const elevation = popover.locator('.menu__elevation');
+    await expect(popover).toHaveCSS('box-shadow', 'none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
 
     const items = page.getByRole('menuitem');
     await expect(items.first()).toBeFocused();

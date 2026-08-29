@@ -3,15 +3,27 @@
   min-inline-size: var(--_menu-min-width);
   max-inline-size: min(var(--_menu-max-width), calc(100vw - 16px));
   max-block-size: calc(100vh - 16px);
-  overflow: hidden;
-  color: var(--_menu-color);
-  background: var(--_menu-container-color);
-  border-radius: var(--_menu-radius);
-  box-shadow: var(--_menu-shadow);
+  overflow: visible;
   transform-origin: var(--trigger-anchor-point);
   transition:
     opacity var(--_menu-motion-duration) var(--_menu-motion-easing),
     transform var(--_menu-motion-duration) var(--_menu-motion-easing);
+}
+
+.menu-surface {
+  position: relative;
+  box-sizing: border-box;
+  max-block-size: inherit;
+  border-radius: var(--_menu-radius);
+}
+
+.menu-surface__clip {
+  box-sizing: border-box;
+  max-block-size: inherit;
+  overflow: hidden;
+  color: var(--_menu-color);
+  background: var(--_menu-container-color);
+  border-radius: inherit;
 }
 
 .menu-popover[data-entering],

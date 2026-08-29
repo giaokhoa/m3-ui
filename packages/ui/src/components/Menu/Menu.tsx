@@ -19,8 +19,9 @@ import {
   type MenuProps as AriaMenuProps,
   type PopoverProps as AriaPopoverProps,
 } from 'react-aria-components';
+import { Elevation } from '../../internal/elevation';
 import { TextField } from '../TextField';
-import { getMenuStyle, menuRuntime } from './Menu.defaults';
+import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
 import './menu.css';
 
 export interface MenuProps<T extends object>
@@ -35,6 +36,18 @@ export interface MenuProps<T extends object>
   className?: string;
   style?: CSSProperties;
   popoverClassName?: string;
+}
+
+function MenuSurface({ children }: { children: ReactNode }) {
+  return (
+    <div className="menu-surface">
+      <Elevation
+        className="menu__elevation"
+        level={menuTokens.containerElevation}
+      />
+      <div className="menu-surface__clip">{children}</div>
+    </div>
+  );
 }
 
 /**
@@ -70,11 +83,13 @@ export function Menu<T extends object>({
         className={clsx('menu-popover', popoverClassName)}
         style={getMenuStyle()}
       >
-        <AriaMenu
-          {...menuProps}
-          className={clsx('menu', className)}
-          style={style}
-        />
+        <MenuSurface>
+          <AriaMenu
+            {...menuProps}
+            className={clsx('menu', className)}
+            style={style}
+          />
+        </MenuSurface>
       </AriaPopover>
     </AriaMenuTrigger>
   );
@@ -249,12 +264,14 @@ export function ExposedMenu<T extends object>({
             : null),
         }}
       >
-        <AriaMenu
-          {...menuProps}
-          autoFocus="first"
-          data-exposed-menu="true"
-          className="menu"
-        />
+        <MenuSurface>
+          <AriaMenu
+            {...menuProps}
+            autoFocus="first"
+            data-exposed-menu="true"
+            className="menu"
+          />
+        </MenuSurface>
       </AriaPopover>
     </div>
   );

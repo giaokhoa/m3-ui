@@ -22,7 +22,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/DatePicker/DatePicker.defaults.ts',
   'components/FloatingToolbar/FloatingToolbar.defaults.ts',
   'components/ListItem/ListItem.defaults.ts',
-  'components/Menu/Menu.defaults.ts',
   'components/NavigationDrawer/NavigationDrawer.defaults.ts',
   'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
@@ -225,6 +224,24 @@ test('Dialog colors stay semantic and its scroll surface stays separate from Ele
   assert.match(contract, /Elevation must stay outside.*clipped scroll surface/i);
   assert.match(contract, /Browser\/visual tests inspect `\.dialog__elevation`/i);
   assert.match(contract, /separate shared UI layout workstream/i);
+});
+
+test('Menu level2 elevation stays outside its rounded clip surface', async () => {
+  const menu = await readFile(new URL('../ui/src/components/Menu/Menu.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/Menu/Menu.defaults.ts', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/Menu/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+
+  assert.match(menu, /function MenuSurface/);
+  assert.match(menu, /<Elevation/);
+  assert.match(menu, /className="menu__elevation"/);
+  assert.match(menu, /className="menu-surface__clip"/);
+  assert.match(menu, /level=\{menuTokens\.containerElevation\}/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_menu-shadow/);
+  assert.match(styleDependencies, /src\/components\/Menu\/menu\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /Popover itself must stay non-clipping/i);
+  assert.match(contract, /Browser\/visual tests inspect `\.menu__elevation`/i);
+  assert.match(contract, /existing canonical Menu color-role strings are migration debt/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {
