@@ -40,12 +40,12 @@ const value: ThreePaneScaffoldValue = {
 
 const paneMargins = {
   primary: {
-    inlineStart: 40,
+    inlineEnd: 56,
     blockStart: 32,
     blockEnd: 48,
   },
   secondary: {
-    inlineEnd: 56,
+    inlineStart: 40,
     blockStart: 16,
     blockEnd: 24,
   },
