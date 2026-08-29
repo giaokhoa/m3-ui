@@ -1,3 +1,8 @@
+import {
+  calculateDragToResizeSpringDurationMs,
+  sampleDragToResizeSpring,
+} from './dragToResizeSpring';
+
 export type DockedEdge = 'top' | 'bottom' | 'start' | 'end';
 
 export const DockedEdge = {
@@ -16,12 +21,25 @@ export const DragToResizeValue = {
   Default: 'default',
 } as const satisfies Record<string, DragToResizeValue>;
 
+export interface DragToResizeAnimationContext {
+  from: number;
+  to: number;
+  signal: AbortSignal;
+  update: (size: number) => void;
+}
+
+export type DragToResizeAnimation = (
+  context: DragToResizeAnimationContext,
+) => Promise<void>;
+
 export interface DragToResizeStateOptions {
   dockedEdge: DockedEdge;
   /** CSS pixel equivalent of AndroidX minSize. Unspecified defaults to 48dp. */
   minSize?: number;
   /** CSS pixel equivalent of AndroidX maxSize. Unspecified is scaffold-bounded. */
   maxSize?: number;
+  /** Web animation driver used for non-default click-to-resize state changes. */
+  animation?: DragToResizeAnimation;
 }
 
 export interface DragToResizeMeasurement {
@@ -49,12 +67,77 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function requestFrame(callback: FrameRequestCallback): number {
+  if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
+  return setTimeout(
+    () => callback(globalThis.performance?.now() ?? Date.now()),
+    16,
+  ) as unknown as number;
+}
+
+function cancelFrame(id: number) {
+  if (typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(id);
+  } else {
+    clearTimeout(id);
+  }
+}
+
+/**
+ * Browser driver for the default animation-core spring used by AndroidX
+ * DragToResizeState.animateTo. The physics sampler mirrors FloatSpringSpec's
+ * whole-millisecond precision and snaps to target at its estimated duration.
+ */
+export const defaultDragToResizeAnimation: DragToResizeAnimation = ({
+  from,
+  to,
+  signal,
+  update,
+}) =>
+  new Promise<void>((resolve) => {
+    const durationMs = calculateDragToResizeSpringDurationMs(from, to);
+    if (signal.aborted || from === to || durationMs === 0) {
+      update(to);
+      resolve();
+      return;
+    }
+
+    let frame = 0;
+    let startTime: number | undefined;
+    const finish = () => {
+      signal.removeEventListener('abort', abort);
+      resolve();
+    };
+    const tick = (time: number) => {
+      if (signal.aborted) {
+        finish();
+        return;
+      }
+      startTime ??= time;
+      const elapsed = Math.max(0, time - startTime);
+      if (elapsed >= durationMs) {
+        update(to);
+        finish();
+        return;
+      }
+      update(sampleDragToResizeSpring(from, to, elapsed));
+      frame = requestFrame(tick);
+    };
+    const abort = () => {
+      cancelFrame(frame);
+      finish();
+    };
+    signal.addEventListener('abort', abort, { once: true });
+    frame = requestFrame(tick);
+  });
+
 /**
  * Web state port of AndroidX DragToResizeState.
  *
- * The state keeps AndroidX size/state semantics while pointer ownership stays in
- * the React scaffold. Spring interpolation is deliberately left to the motion
- * slice; state changes snap to the same AndroidX target sizes synchronously.
+ * Pointer deltas stay synchronous. Click/semantic state changes follow the
+ * pinned AndroidX behavior: Default -> Expanded snaps immediately, while
+ * transitions from Expanded, Collapsed, or Dragged use animation-core's
+ * default critically-damped spring.
  */
 export class DragToResizeState {
   readonly dockedEdge: DockedEdge;
@@ -70,13 +153,21 @@ export class DragToResizeState {
   private lastDraggedSize = Number.NaN;
   private revision = 0;
   private readonly listeners = new Set<() => void>();
+  private readonly defaultAnimation: DragToResizeAnimation;
+  private animationController: AbortController | null = null;
 
-  constructor({ dockedEdge, minSize, maxSize }: DragToResizeStateOptions) {
+  constructor({
+    dockedEdge,
+    minSize,
+    maxSize,
+    animation = defaultDragToResizeAnimation,
+  }: DragToResizeStateOptions) {
     if (minSize !== undefined) finiteNonNegative(minSize, 'minSize');
     if (maxSize !== undefined) finiteNonNegative(maxSize, 'maxSize');
     this.dockedEdge = dockedEdge;
     this.minSize = minSize;
     this.maxSize = maxSize;
+    this.defaultAnimation = animation;
   }
 
   readonly subscribe = (listener: () => void) => {
@@ -89,6 +180,11 @@ export class DragToResizeState {
   private notify() {
     this.revision += 1;
     this.listeners.forEach((listener) => listener());
+  }
+
+  private cancelAnimation() {
+    this.animationController?.abort();
+    this.animationController = null;
   }
 
   get value() {
@@ -146,6 +242,10 @@ export class DragToResizeState {
   }
 
   private setSize(value: number) {
+    if (this.animationController !== null) {
+      this.setAnimatedSize(value);
+      return;
+    }
     if (!this.rangeIsEmpty) {
       if (value <= this.rangeStart) {
         this.valueInternal = DragToResizeValue.Collapsed;
@@ -159,6 +259,12 @@ export class DragToResizeState {
       }
     }
     this.sizeInternal = value;
+  }
+
+  private setAnimatedSize(value: number) {
+    this.sizeInternal = this.rangeIsEmpty
+      ? value
+      : clamp(value, this.rangeStart, this.rangeEnd);
   }
 
   private get defaultSize() {
@@ -212,7 +318,9 @@ export class DragToResizeState {
       : this.sizeInternal;
     this.setSize(nextSize);
 
-    const resolvedSize = this.sizeInternal;
+    // AndroidX keeps the state size as Float for drag/spring physics but returns
+    // size.toInt() from getAndUpdateDraggedSize for actual pane measurement.
+    const resolvedSize = Math.trunc(this.sizeInternal);
     // Direction is intentionally consumed here so callers can use one measure
     // path for logical Start/End states before dispatching drag deltas.
     void direction;
@@ -224,6 +332,7 @@ export class DragToResizeState {
 
   dispatchRawDelta(delta: number, direction: 'ltr' | 'rtl' = 'ltr') {
     if (!Number.isFinite(delta) || Number.isNaN(this.sizeInternal)) return;
+    this.cancelAnimation();
     const actualDelta = this.convertDelta(delta, direction);
     this.valueInternal = DragToResizeValue.Dragged;
     this.setSize(this.sizeInternal + actualDelta);
@@ -231,15 +340,61 @@ export class DragToResizeState {
     this.notify();
   }
 
-  /** Synchronous target equivalent of AndroidX animateTo; interpolation is a later motion concern. */
+  /** Snap immediately to a target and cancel any active click-to-resize motion. */
   snapTo(target: DragToResizeValue) {
     if (this.valueInternal === target || Number.isNaN(this.sizeInternal)) return;
+    this.cancelAnimation();
     this.setSize(this.targetSize(target));
     this.valueInternal = target;
     this.notify();
   }
 
+  /** AndroidX DragToResizeState.animateTo analogue. */
+  async animateTo(
+    target: DragToResizeValue,
+    animation: DragToResizeAnimation = this.defaultAnimation,
+  ) {
+    if (this.valueInternal === target || Number.isNaN(this.sizeInternal)) return;
+    this.cancelAnimation();
+
+    const sourceValue = this.valueInternal;
+    const targetSize = this.targetSize(target);
+    if (sourceValue === DragToResizeValue.Default) {
+      this.setSize(targetSize);
+      this.valueInternal = target;
+      this.notify();
+      return;
+    }
+
+    const controller = new AbortController();
+    this.animationController = controller;
+    const from = this.sizeInternal;
+    this.valueInternal = target;
+    this.notify();
+
+    try {
+      await animation({
+        from,
+        to: targetSize,
+        signal: controller.signal,
+        update: (size) => {
+          if (controller.signal.aborted) return;
+          this.setAnimatedSize(size);
+          this.notify();
+        },
+      });
+      if (controller.signal.aborted) return;
+      this.setAnimatedSize(targetSize);
+      this.valueInternal = target;
+    } finally {
+      if (this.animationController === controller) {
+        this.animationController = null;
+        this.notify();
+      }
+    }
+  }
+
   moveToNextState() {
-    this.snapTo(this.nextValue);
+    void this.animateTo(this.nextValue);
   }
 }
