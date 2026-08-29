@@ -126,7 +126,7 @@ function ButtonImpl({
           ...getButtonStyle(
             variant,
             interactionState(renderProps.isDisabled),
-            { size, shapes },
+            { size, shapes, legacyInlineElevation: false },
           ),
           ...userStyle,
         };
