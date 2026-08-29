@@ -1,0 +1,42 @@
+---
+title: Loading indicator
+description: M3 Expressive morphing loading indicators with contained and uncontained forms, determinate progress, and reduced-motion behavior.
+---
+
+import { LoadingIndicatorPreview } from '../../../src/feedbackSearchDemos';
+
+<MaterialParity component="loading-indicator" />
+
+## Overview
+
+`LoadingIndicator` and `ContainedLoadingIndicator` implement Material 3's expressive morphing loading component. Unlike the standard circular progress indicator, the visual cycles through Material shape geometry while preserving normal progress semantics.
+
+## Live example
+
+<ComponentPreview>
+  <LoadingIndicatorPreview />
+</ComponentPreview>
+
+## Modes
+
+Omit `value` for indeterminate loading. Provide a value from `0..1` for determinate loading.
+
+```tsx
+<LoadingIndicator aria-label="Loading" />
+<ContainedLoadingIndicator aria-label="Preparing workspace" />
+<LoadingIndicator aria-label="Import progress" value={0.72} />
+```
+
+Determinate values are safely coerced to the Material range. The contained variant uses its own canonical container and indicator color roles rather than wrapping the uncontained component in a docs-only surface.
+
+## Shape and motion contract
+
+The renderer follows the audited Compose Material shape sequence and motion timings. The internal Material Shapes port exists only to draw those paths; it is not a new public general-purpose shape API.
+
+In indeterminate mode the component cycles through the canonical shape sequence and rotation. Determinate mode morphs according to progress. With `prefers-reduced-motion: reduce`, animation freezes at a valid frame while the progress semantics remain intact.
+
+## Accessibility
+
+React Aria `ProgressBar` is the semantic owner. The SVG is `aria-hidden`, so provide `aria-label` or `aria-labelledby` for every standalone loading indicator.
+
+Use a progress indicator instead when the design calls for the standard linear/circular Material progress family rather than the expressive morphing loading affordance.
