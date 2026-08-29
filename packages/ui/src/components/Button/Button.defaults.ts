@@ -16,6 +16,12 @@ export interface ButtonShapes {
   readonly pressedShape: ButtonShapeValue;
 }
 
+export interface ButtonStyleOptions {
+  /** Static size values are applied by generated CSS through `data-size`. */
+  readonly size?: ButtonSize;
+  readonly shapes?: ButtonShapes;
+}
+
 export interface ButtonInteractionState {
   readonly isDisabled: boolean;
   readonly interaction: ButtonInteraction | null;
@@ -146,12 +152,12 @@ function resolveButtonTransition(
 export function getButtonStyle(
   variant: ButtonVariant,
   state: ButtonInteractionState,
-  shapes?: ButtonShapes,
+  options: ButtonStyleOptions = {},
 ): ButtonStyle {
-  const activeShape = shapes
+  const activeShape = options.shapes
     ? state.interaction === 'press'
-      ? shapes.pressedShape
-      : shapes.shape
+      ? options.shapes.pressedShape
+      : options.shapes.shape
     : null;
 
   return {
@@ -159,6 +165,6 @@ export function getButtonStyle(
       ? {}
       : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
     boxShadow: getElevationBoxShadow(resolveButtonElevation(variant, state)),
-    transition: resolveButtonTransition(state, shapes !== undefined),
+    transition: resolveButtonTransition(state, options.shapes !== undefined),
   };
 }
