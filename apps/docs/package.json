@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 4173 --strictPort",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-search-index.mjs",
     "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
