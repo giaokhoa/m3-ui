@@ -7,13 +7,28 @@ import type {
 } from 'react';
 import {
   Button,
+  Dialog,
+  DialogAction,
+  DialogActions,
+  DialogCloseAction,
+  DialogDescription,
+  DialogIcon,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
   ElevatedButton,
   FilledTonalButton,
   OutlinedButton,
+  OutlinedTextField,
   Surface,
   TextButton,
+  TextField,
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
+import {
+  componentDocs,
+  type ComponentDocId,
+} from './componentDocs';
 
 function Heading1({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
   return (
@@ -123,6 +138,36 @@ function Blockquote({
   );
 }
 
+function Table({ style, ...props }: HTMLAttributes<HTMLTableElement>) {
+  return (
+    <div className="docs-table-scroll">
+      <table
+        {...props}
+        className="docs-table"
+        style={{ ...getMaterialTypeCssProperties('bodyMedium'), ...style }}
+      />
+    </div>
+  );
+}
+
+function TableHeader({ style, ...props }: HTMLAttributes<HTMLTableCellElement>) {
+  return (
+    <th
+      {...props}
+      style={{ ...getMaterialTypeCssProperties('titleSmall'), ...style }}
+    />
+  );
+}
+
+function TableCell({ style, ...props }: HTMLAttributes<HTMLTableCellElement>) {
+  return (
+    <td
+      {...props}
+      style={{ ...getMaterialTypeCssProperties('bodyMedium'), ...style }}
+    />
+  );
+}
+
 function ComponentPreview({ children }: PropsWithChildren) {
   return (
     <Surface
@@ -131,6 +176,55 @@ function ComponentPreview({ children }: PropsWithChildren) {
       contentColor="var(--on-surface)"
     >
       <div className="docs-preview__content">{children}</div>
+    </Surface>
+  );
+}
+
+function MaterialParity({ component }: { component: ComponentDocId }) {
+  const metadata = componentDocs[component];
+
+  return (
+    <Surface
+      className="docs-parity"
+      color="var(--surface-container-low)"
+      contentColor="var(--on-surface)"
+    >
+      <div className="docs-parity__content">
+        <div
+          className="docs-parity__eyebrow"
+          style={getMaterialTypeCssProperties('labelLarge')}
+        >
+          Material contract
+        </div>
+        <dl className="docs-parity__list">
+          <div>
+            <dt style={getMaterialTypeCssProperties('labelLarge')}>Family</dt>
+            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
+              <a className="docs-link" href={metadata.materialUrl}>
+                {metadata.family}
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt style={getMaterialTypeCssProperties('labelLarge')}>Compose mapping</dt>
+            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
+              {metadata.composeMapping.join(' · ')}
+            </dd>
+          </div>
+          <div>
+            <dt style={getMaterialTypeCssProperties('labelLarge')}>Implementation</dt>
+            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
+              {metadata.implementation}
+            </dd>
+          </div>
+          <div>
+            <dt style={getMaterialTypeCssProperties('labelLarge')}>Web adaptation</dt>
+            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
+              {metadata.webAdaptation}
+            </dd>
+          </div>
+        </dl>
+      </div>
     </Surface>
   );
 }
@@ -146,12 +240,27 @@ export const materialMdxComponents = {
   code: InlineCode,
   pre: CodeBlock,
   blockquote: Blockquote,
+  table: Table,
+  th: TableHeader,
+  td: TableCell,
   ComponentPreview,
+  MaterialParity,
   Button,
   ElevatedButton,
   FilledTonalButton,
   OutlinedButton,
   TextButton,
+  TextField,
+  OutlinedTextField,
+  DialogTrigger,
+  DialogOverlay,
+  Dialog,
+  DialogIcon,
+  DialogTitle,
+  DialogDescription,
+  DialogActions,
+  DialogAction,
+  DialogCloseAction,
 } satisfies MDXComponents;
 
 export function getMdxComponents(
