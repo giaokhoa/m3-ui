@@ -26,11 +26,16 @@ export type ComponentDocId =
   | 'date-picker'
   | 'time-picker'
   | 'carousel'
-  | 'bottom-sheet';
+  | 'bottom-sheet'
+  | 'pull-to-refresh'
+  | 'swipe-to-dismiss-box'
+  | 'scroll-field';
 
 export interface ComponentDocMetadata {
   family: string;
-  materialUrl: string;
+  materialUrl?: string;
+  referenceUrl?: string;
+  contractLabel?: string;
   composeMapping: readonly string[];
   implementation: string;
   webAdaptation: string;
@@ -294,5 +299,35 @@ export const componentDocs = {
       'Implements a local non-modal BottomSheet and a true ModalBottomSheet sharing one SheetState anchor model, deterministic hidden/partial/expanded anchors, drag settling, accessible handle actions, scrim configuration, theme-aware portals, and reduced-motion-aware dismissal completion.',
     webAdaptation:
       'The non-modal sheet remains a local region whose parent owns stacking and background interaction. ModalBottomSheet uses React Aria ModalOverlay/Modal for portal placement, focus containment, outside interaction, Escape, scroll locking, and focus restoration. Anchor measurement is local to the sheet containing block and is not an adaptive window-size or pane system.',
+  },
+  'pull-to-refresh': {
+    family: 'Pull to refresh',
+    referenceUrl: 'https://developer.android.com/reference/kotlin/androidx/compose/material3/pulltorefresh/PullToRefreshBox.composable',
+    contractLabel: 'Compose Material3 contract',
+    composeMapping: ['PullToRefreshBox', 'PullToRefreshState', 'PullToRefreshDefaults.Indicator'],
+    implementation:
+      'Implements Material pull progress, armed/refreshing lifecycle, thresholded release, app-controlled refreshing state, a customizable indicator render contract, and top-edge arbitration across nested scrollable content.',
+    webAdaptation:
+      'Pointer input and DOM scroll inspection replace Compose nested-scroll plumbing. The component claims a downward gesture only when the relevant scroll roots are at their top edge, invokes onRefresh once after an armed release, and exposes the default refreshing indicator through a polite status region while the application remains the owner of refresh completion.',
+  },
+  'swipe-to-dismiss-box': {
+    family: 'Swipe to dismiss',
+    referenceUrl: 'https://developer.android.com/reference/kotlin/androidx/compose/material3/SwipeToDismissBox.composable',
+    contractLabel: 'Compose Material3 contract',
+    composeMapping: ['SwipeToDismissBox', 'SwipeToDismissBoxState', 'SwipeToDismissBoxValue'],
+    implementation:
+      'Implements settled/start-to-end/end-to-start Material anchors, independent direction enablement, horizontal intent locking, positional and velocity settling, controlled/uncontrolled state, post-settle dismissal callbacks, RTL logical direction, and reduced-motion behavior.',
+    webAdaptation:
+      'Pointer gesture arbitration rejects vertical intent so page scrolling survives, while foreground links, buttons, inputs, and other controls retain their own DOM semantics. Dismissal updates component state but collection removal, undo, and persistence remain application responsibilities.',
+  },
+  'scroll-field': {
+    family: 'Scroll field',
+    referenceUrl: 'https://developer.android.com/reference/kotlin/androidx/compose/material3/ScrollField.composable',
+    contractLabel: 'Compose Material3 contract',
+    composeMapping: ['ScrollField', 'ScrollFieldState', 'rememberScrollFieldState'],
+    implementation:
+      'Implements Material scroll-wheel selection with a centered selected option, controlled/uncontrolled indices, fixed or generated item content, wheel/pointer/keyboard input, disabled state, and reduced-motion-aware scrolling.',
+    webAdaptation:
+      'The wheel is exposed as one spinbutton with value min/max/now/text instead of many repeated selectable nodes. getItemText supplies the accessibility description corresponding to Compose fieldAccessibilityDescription, and ResizeObserver measures only the local field height for presentation rather than adaptive layout.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;

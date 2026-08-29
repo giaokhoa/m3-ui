@@ -53,6 +53,14 @@ These pages document the public React API through the Material contract: family,
 - [Snackbar](/docs/components/snackbar) — transient-message surface, live-region semantics, actions, and an explicit host/timeout boundary.
 - [Tooltips](/docs/components/tooltip) — plain tooltip semantics kept distinct from interactive rich-tooltip dialog semantics.
 
+### Compose Material utilities
+
+These APIs are part of AndroidX Compose Material3 even when they do not have a dedicated component family page on `m3.material.io`. Their parity cards therefore link directly to the authoritative Android Developers API reference.
+
+- [Pull to refresh](/docs/components/pull-to-refresh) — top-boundary pull gestures with app-controlled refresh lifecycle and an overridable indicator slot.
+- [Swipe to dismiss](/docs/components/swipe-to-dismiss-box) — logical start/end dismissal anchors, foreground interaction preservation, and RTL-aware pointer settling.
+- [Scroll field](/docs/components/scroll-field) — wheel, drag, click, and keyboard selection exposed as an accessible spinbutton value.
+
 ## Documentation rule
 
 A component page should describe behavior that exists in `@m3-ui/ui`; it must not become a second implementation of the component. Live previews use the public package, and Material measurements remain sourced from canonical generated tokens rather than documentation CSS literals.

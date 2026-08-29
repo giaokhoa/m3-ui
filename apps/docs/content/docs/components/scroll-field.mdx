@@ -1,0 +1,55 @@
+---
+title: Scroll field
+description: Material3 scroll-wheel selection with spinbutton semantics, controlled or uncontrolled indices, custom item text, and keyboard/pointer input.
+---
+
+<ParitySummary component="scroll-field" />
+
+## Overview
+
+`ScrollField` is a compact wheel-style selector for ordered values such as hours, minutes, quantities, or units. It maps the current Compose Material3 ScrollField interaction to browser input semantics instead of rendering a purely visual infinite wheel.
+
+## Live example
+
+<ComponentPreview>
+  <ScrollFieldPreview />
+</ComponentPreview>
+
+Use Arrow Up/Down, the mouse wheel, pointer dragging, or direct item interaction to change the selected value.
+
+## Selection state
+
+For a simple list, pass `items` and either controlled or uncontrolled selection:
+
+```tsx
+<ScrollField
+  aria-label="Minutes"
+  items={['00', '15', '30', '45']}
+  selectedIndex={selectedIndex}
+  onSelectionChange={setSelectedIndex}
+/>
+```
+
+For generated or richer content, use `itemCount` with `renderItem`. `getItemText` supplies the accessible text when the rendered React content is not itself a useful plain-text value.
+
+## Accessibility
+
+The root exposes `role="spinbutton"` with the selected index as its value range and `aria-valuetext` derived from `getItemText` or the item label. Provide `aria-label` or another accessible name describing what the wheel selects.
+
+This differs intentionally from exposing every repeated visual slot as a separate selectable control. Assistive technology receives one value-adjustable field while sighted users see the wheel presentation.
+
+## Input behavior
+
+Arrow Up/Down changes the selected index from the keyboard. Wheel and pointer dragging update the same state, and clicking a visible item moves that option toward the selected position.
+
+`isDisabled` disables the interaction while preserving the current value semantics. Reduced-motion preference removes unnecessary smooth movement without changing selection behavior.
+
+## Compose mapping
+
+Compose Material3 exposes `ScrollFieldState` and `rememberScrollFieldState` for hoisted selection and scrolling. The React API maps that state shape to normal controlled/uncontrolled props so callers do not need coroutine-based imperative scrolling.
+
+The component can render a fixed `items` array or an indexed item renderer, corresponding to Compose's generic field lambda. `getItemText` is the web accessibility counterpart to Compose's field accessibility description.
+
+## Local measurement
+
+`ScrollField` measures its own rendered height to position the visible wheel slots. This is component-local presentation only and does not participate in adaptive window classes or pane layout.

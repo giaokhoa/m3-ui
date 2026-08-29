@@ -1,0 +1,60 @@
+---
+title: Pull to refresh
+description: Compose Material3 pull-to-refresh behavior with application-owned refresh lifecycle, top-edge gesture arbitration, and accessible indicator state.
+---
+
+<ParitySummary component="pull-to-refresh" />
+
+## Overview
+
+`PullToRefresh` wraps scrollable content and requests a refresh when a downward gesture crosses the audited Material threshold while the content is already at its top edge.
+
+The component owns gesture progress and indicator presentation. The application owns the actual refresh operation and decides when refreshing is complete.
+
+## Live example
+
+<ComponentPreview>
+  <PullToRefreshPreview />
+</ComponentPreview>
+
+Scroll the feed back to the top, then drag downward. The controls also let you inspect the externally controlled refreshing state without requiring a gesture.
+
+## Refresh lifecycle
+
+```tsx
+const [isRefreshing, setRefreshing] = useState(false);
+
+<PullToRefresh
+  isRefreshing={isRefreshing}
+  onRefresh={() => {
+    setRefreshing(true);
+    refreshData();
+  }}
+>
+  <Feed />
+</PullToRefresh>
+```
+
+`onRefresh` is a request, not a promise contract or hidden network lifecycle. Keep `isRefreshing` true while application work is active, then set it to false when that work completes.
+
+The default indicator reports the refreshing state through a polite status region while its visual progress follows the pull distance.
+
+## Gesture arbitration
+
+A downward pointer gesture is claimed only when the pull-to-refresh root is at the top and the originating nested scrollable is not scrolled away from its own top edge. This preserves normal nested scrolling instead of stealing every downward gesture in the subtree.
+
+Crossing the threshold arms the gesture. Releasing while armed calls `onRefresh` once. Releasing before the threshold returns to idle without requesting a refresh.
+
+`enabled={false}` disables the gesture while leaving the content usable.
+
+## Indicator customization
+
+Pass `indicator={(state) => ...}` to replace the default visual. The render state exposes progress plus the logical `idle`, `pulling`, `armed`, and `refreshing` status so a custom indicator can preserve the same lifecycle.
+
+Custom presentation should not move refresh ownership into the indicator itself; `isRefreshing` remains application state.
+
+## Compose mapping
+
+The interaction follows the current Compose Material3 `PullToRefreshBox` contract: a scrollable container, externally supplied refreshing state, a threshold-triggered refresh request, and an indicator layered over content.
+
+The web implementation translates the audited Material distance into CSS-pixel geometry and uses pointer/nested-scroll inspection appropriate for the browser rather than reproducing Compose nested-scroll internals literally.

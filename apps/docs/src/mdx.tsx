@@ -34,6 +34,7 @@ import {
 import {
   componentDocs,
   type ComponentDocId,
+  type ComponentDocMetadata,
 } from './componentDocs';
 import {
   ColorRoleGrid,
@@ -198,7 +199,8 @@ function ComponentPreview({ children }: PropsWithChildren) {
 }
 
 function MaterialParity({ component }: { component: ComponentDocId }) {
-  const metadata = componentDocs[component];
+  const metadata: ComponentDocMetadata = componentDocs[component];
+  const referenceUrl = metadata.referenceUrl ?? metadata.materialUrl;
 
   return (
     <Surface
@@ -211,15 +213,19 @@ function MaterialParity({ component }: { component: ComponentDocId }) {
           className="docs-parity__eyebrow"
           style={getMaterialTypeCssProperties('labelLarge')}
         >
-          Material contract
+          {metadata.contractLabel ?? 'Material contract'}
         </div>
         <dl className="docs-parity__list">
           <div>
             <dt style={getMaterialTypeCssProperties('labelLarge')}>Family</dt>
             <dd style={getMaterialTypeCssProperties('bodyMedium')}>
-              <a className="docs-link" href={metadata.materialUrl}>
-                {metadata.family}
-              </a>
+              {referenceUrl ? (
+                <a className="docs-link" href={referenceUrl}>
+                  {metadata.family}
+                </a>
+              ) : (
+                metadata.family
+              )}
             </dd>
           </div>
           <div>
@@ -262,6 +268,7 @@ export const materialMdxComponents = {
   td: TableCell,
   ComponentPreview,
   MaterialParity,
+  ParitySummary: MaterialParity,
   ColorRoleGrid,
   DynamicColorPreview,
   TypeScaleSamples,
