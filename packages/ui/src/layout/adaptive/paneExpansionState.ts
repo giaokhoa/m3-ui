@@ -358,16 +358,6 @@ export class PaneExpansionState {
     this.anchors = nextAnchors;
     this.initialAnchoredIndexState = initialAnchoredIndex;
     this.currentAnchorState = matchedCurrentAnchor ?? initialAnchorForCurrentAnchors;
-
-    if (this.maxExpansionWidth !== PaneExpansionUnspecified && this.currentAnchorState !== null) {
-      const offset = anchorPosition(
-        this.currentAnchorState,
-        this.maxExpansionWidth,
-        this.measuredDirection,
-      );
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
-    }
     this.notify();
   }
 
