@@ -7,6 +7,8 @@ import {
 
 const BUTTON_VARIANTS = ['filled', 'elevated', 'filledTonal', 'outlined', 'text'];
 const BUTTON_SIZES = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'];
+const CHIP_ACTION_VARIANTS = ['assist', 'elevatedAssist', 'suggestion', 'elevatedSuggestion'];
+const CHIP_SELECTABLE_VARIANTS = ['filter', 'elevatedFilter', 'input'];
 const ELEVATION_LEVELS = ['level0', 'level1', 'level2', 'level3', 'level4', 'level5'];
 const ELEVATION_LAYERS = ['layer1', 'layer2', 'layer3'];
 
@@ -118,6 +120,98 @@ function createButtonCss(context) {
   return [...base, ...variants, ...sizes, ''].join('\n');
 }
 
+function createChipCss(context) {
+  const get = tokenReader(context, 'Chip CSS');
+  const line = (name, value) => `  ${name}: ${cssValue(value)};`;
+  const className = (variant) =>
+    variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  const withOpacity = (color, opacity) => {
+    const numericOpacity = Number(opacity);
+    if (color === 'transparent' || numericOpacity <= 0) return 'transparent';
+    if (numericOpacity >= 1) return color;
+    return `color-mix(in srgb, ${color} ${percent(numericOpacity)}, transparent)`;
+  };
+
+  const actionBase = 'component.chip.action.base';
+  const actionRules = CHIP_ACTION_VARIANTS.flatMap((variant) => {
+    const prefix = `component.chip.variant.${variant}`;
+    const selector = `.chip--${className(variant)} > .chip__visual`;
+    return [
+      '',
+      `${selector} {`,
+      line('--_chip-container-color', get(`${prefix}.containerColor`)),
+      line('--_chip-label-color', get(`${prefix}.labelColor`)),
+      line('--_chip-leading-icon-color', get(`${prefix}.leadingIconColor`)),
+      line('--_chip-trailing-icon-color', get(`${prefix}.trailingIconColor`)),
+      line('--_chip-outline-color', get(`${prefix}.outlineColor`)),
+      line('--_chip-outline-width', get(`${prefix}.outlineWidth`)),
+      '}',
+      '',
+      `.chip--${className(variant)}[data-disabled] > .chip__visual {`,
+      line('--_chip-container-color', withOpacity(get(`${prefix}.disabledContainerColor`), get(`${prefix}.disabledContainerOpacity`))),
+      line('--_chip-label-color', withOpacity(get(`${actionBase}.disabledLabelColor`), get(`${actionBase}.disabledLabelOpacity`))),
+      line('--_chip-leading-icon-color', withOpacity(get(`${actionBase}.disabledIconColor`), get(`${actionBase}.disabledIconOpacity`))),
+      line('--_chip-trailing-icon-color', withOpacity(get(`${actionBase}.disabledIconColor`), get(`${actionBase}.disabledIconOpacity`))),
+      line('--_chip-outline-color', withOpacity(get(`${prefix}.disabledOutlineColor`), get(`${prefix}.disabledOutlineOpacity`))),
+      line('--_chip-outline-width', get(`${prefix}.outlineWidth`)),
+      '}',
+    ];
+  });
+
+  const selectableBase = 'component.chip.selectable.base';
+  const selectableRules = CHIP_SELECTABLE_VARIANTS.flatMap((variant) => {
+    const prefix = `component.chip.variant.${variant}`;
+    const selector = `.chip--${className(variant)} > .chip__visual`;
+    const elevated = variant === 'elevatedFilter';
+    const unselectedOutlineColor = elevated ? get(`${prefix}.unselectedOutlineColor`) : get(`${selectableBase}.unselectedOutlineColor`);
+    const disabledUnselectedOutlineColor = elevated ? get(`${prefix}.disabledUnselectedOutlineColor`) : get(`${selectableBase}.disabledUnselectedOutlineColor`);
+    const unselectedOutlineWidth = elevated ? get(`${prefix}.unselectedOutlineWidth`) : get(`${selectableBase}.unselectedOutlineWidth`);
+    const disabledUnselectedContainerColor = elevated ? get(`${prefix}.disabledUnselectedContainerColor`) : get(`${selectableBase}.disabledUnselectedContainerColor`);
+
+    return [
+      '',
+      `${selector} {`,
+      line('--_chip-container-color', get(`${prefix}.unselectedContainerColor`)),
+      line('--_chip-label-color', get(`${prefix}.unselectedLabelColor`)),
+      line('--_chip-leading-icon-color', get(`${prefix}.unselectedLeadingIconColor`)),
+      line('--_chip-trailing-icon-color', get(`${prefix}.unselectedTrailingIconColor`)),
+      line('--_chip-outline-color', unselectedOutlineColor),
+      line('--_chip-outline-width', unselectedOutlineWidth),
+      '}',
+      '',
+      `${selector}[data-selected] {`,
+      line('--_chip-container-color', get(`${prefix}.selectedContainerColor`)),
+      line('--_chip-label-color', get(`${prefix}.selectedLabelColor`)),
+      line('--_chip-leading-icon-color', get(`${prefix}.selectedLeadingIconColor`)),
+      line('--_chip-trailing-icon-color', get(`${prefix}.selectedTrailingIconColor`)),
+      line('--_chip-outline-color', get(`${selectableBase}.selectedOutlineColor`)),
+      line('--_chip-outline-width', get(`${selectableBase}.selectedOutlineWidth`)),
+      '}',
+      '',
+      `${selector}[data-expressive-shapes]:not([data-selected]) {`,
+      line('--_chip-leading-icon-color', get(`${prefix}.expressiveUnselectedLeadingIconColor`)),
+      '}',
+      '',
+      `.chip--${className(variant)}[data-disabled] > .chip__visual {`,
+      line('--_chip-container-color', withOpacity(disabledUnselectedContainerColor, get(`${selectableBase}.disabledContainerOpacity`))),
+      line('--_chip-label-color', withOpacity(get(`${selectableBase}.disabledContentColor`), get(`${selectableBase}.disabledContentOpacity`))),
+      line('--_chip-leading-icon-color', withOpacity(get(`${selectableBase}.disabledContentColor`), get(`${selectableBase}.disabledContentOpacity`))),
+      line('--_chip-trailing-icon-color', withOpacity(get(`${selectableBase}.disabledContentColor`), get(`${selectableBase}.disabledContentOpacity`))),
+      line('--_chip-outline-color', withOpacity(disabledUnselectedOutlineColor, get(`${selectableBase}.disabledOutlineOpacity`))),
+      line('--_chip-outline-width', unselectedOutlineWidth),
+      '}',
+      '',
+      `.chip--${className(variant)}[data-disabled] > .chip__visual[data-selected] {`,
+      line('--_chip-container-color', withOpacity(get(`${selectableBase}.disabledSelectedContainerColor`), get(`${selectableBase}.disabledContainerOpacity`))),
+      line('--_chip-outline-color', withOpacity(get(`${selectableBase}.disabledSelectedOutlineColor`), get(`${selectableBase}.disabledOutlineOpacity`))),
+      line('--_chip-outline-width', get(`${selectableBase}.selectedOutlineWidth`)),
+      '}',
+    ];
+  });
+
+  return [...actionRules, ...selectableRules, ''].join('\n');
+}
+
 function createElevationCss(context) {
   const get = tokenReader(context, 'Elevation CSS');
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
@@ -135,10 +229,7 @@ function createElevationCss(context) {
   const levels = ELEVATION_LEVELS.flatMap((level) => [
     '',
     `.elevation[data-elevation='${level}'] {`,
-    line(
-      '--_elevation-box-shadow',
-      ELEVATION_LAYERS.map((layer) => shadowLayer(level, layer)).join(', '),
-    ),
+    line('--_elevation-box-shadow', ELEVATION_LAYERS.map((layer) => shadowLayer(level, layer)).join(', ')),
     '}',
   ]);
 
@@ -186,62 +277,37 @@ function createRippleCss(context) {
 
 export default {
   source: ['tokens/**/*.json'],
-
   log: {
     warnings: logWarningLevels.error,
-    errors: {
-      brokenReferences: logBrokenReferenceLevels.throw,
-    },
+    errors: { brokenReferences: logBrokenReferenceLevels.throw },
   },
-
   hooks: {
     formats: {
       'm3/button-css': createButtonCss,
+      'm3/chip-css': createChipCss,
       'm3/elevation-css': createElevationCss,
       'm3/ripple-css': createRippleCss,
     },
   },
-
   platforms: {
     js: {
       transformGroup: transformGroups.js,
       buildPath: 'dist/generated/',
-      options: {
-        showFileHeader: false,
-      },
+      options: { showFileHeader: false },
       files: [
-        {
-          destination: 'tokens.js',
-          format: formats.javascriptEs6,
-        },
-        {
-          destination: 'tokens.d.ts',
-          format: formats.typescriptEs6Declarations,
-          options: {
-            outputStringLiterals: true,
-          },
-        },
+        { destination: 'tokens.js', format: formats.javascriptEs6 },
+        { destination: 'tokens.d.ts', format: formats.typescriptEs6Declarations, options: { outputStringLiterals: true } },
       ],
     },
     css: {
       transformGroup: transformGroups.css,
       buildPath: 'dist/generated/',
-      options: {
-        showFileHeader: false,
-      },
+      options: { showFileHeader: false },
       files: [
-        {
-          destination: 'button.css',
-          format: 'm3/button-css',
-        },
-        {
-          destination: 'elevation.css',
-          format: 'm3/elevation-css',
-        },
-        {
-          destination: 'ripple.css',
-          format: 'm3/ripple-css',
-        },
+        { destination: 'button.css', format: 'm3/button-css' },
+        { destination: 'chip.css', format: 'm3/chip-css' },
+        { destination: 'elevation.css', format: 'm3/elevation-css' },
+        { destination: 'ripple.css', format: 'm3/ripple-css' },
       ],
     },
   },

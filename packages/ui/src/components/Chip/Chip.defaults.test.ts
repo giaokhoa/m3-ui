@@ -1,18 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  getChipElevationMotion,
-  getChipRootStyle,
-  getChipStyle,
-  resolveChipElevation,
-} from './Chip.defaults';
-import {
-  assistChipTokens,
-  elevatedAssistChipTokens,
-  elevatedFilterChipTokens,
-  filterChipTokens,
-  inputChipTokens,
-  suggestionChipTokens,
-} from './Chip.tokens';
+import { getChipElevationMotion, getChipRootStyle, getChipStyle, resolveChipElevation } from './Chip.defaults';
+import { assistChipTokens, elevatedAssistChipTokens, elevatedFilterChipTokens, filterChipTokens, inputChipTokens } from './Chip.tokens';
 
 describe('Material 3 chip defaults', () => {
   it('keeps visual geometry separate from the minimum interactive target', () => {
@@ -24,36 +12,17 @@ describe('Material 3 chip defaults', () => {
     expect(inputChipTokens.disabledAvatarOpacity).toBe(0.38);
     expect(getChipRootStyle('assist')['--_chip-hit-size']).toBe('48px');
   });
-
-  it('maps flat and elevated action-chip colors/elevations from runtime defaults', () => {
-    expect(assistChipTokens.containerColor).toBe('transparent');
-    expect(assistChipTokens.outlineColor).toBe('outlineVariant');
-    expect(assistChipTokens.outlineWidth).toBe(1);
+  it('keeps action-chip elevation selection in runtime behavior', () => {
     expect(assistChipTokens.hoveredElevation).toBe('level0');
-    expect(elevatedAssistChipTokens.containerColor).toBe('surfaceContainerLow');
-    expect(elevatedAssistChipTokens.disabledContainerColor).toBe('onSurface');
-    expect(elevatedAssistChipTokens.disabledContainerOpacity).toBe(0.12);
     expect(elevatedAssistChipTokens.defaultElevation).toBe('level1');
     expect(elevatedAssistChipTokens.hoveredElevation).toBe('level2');
-    expect(suggestionChipTokens.labelColor).toBe('onSurfaceVariant');
-    expect(suggestionChipTokens.leadingIconColor).toBe('primary');
+    expect(resolveChipElevation('elevatedAssist', { isDisabled: false, interaction: 'hover' })).toBe('level2');
   });
-
-  it('maps selectable state colors and borders without generated interaction colors', () => {
-    expect(filterChipTokens.unselectedContainerColor).toBe('transparent');
-    expect(filterChipTokens.selectedContainerColor).toBe('secondaryContainer');
-    expect(filterChipTokens.unselectedOutlineWidth).toBe(1);
-    expect(filterChipTokens.selectedOutlineWidth).toBe(0);
+  it('keeps selectable geometry and elevation selection in runtime behavior', () => {
     expect(filterChipTokens.hoveredElevation).toBe('level1');
-    const selected = getChipStyle('filter', { isDisabled: false, isSelected: true, interaction: null });
-    expect(selected['--_chip-container-color']).toBe('var(--secondary-container)');
-    expect(selected['--_chip-label-color']).toBe('var(--on-secondary-container)');
-    expect(selected['--_chip-outline-width']).toBe('0px');
-    const disabledElevated = getChipStyle('elevatedFilter', { isDisabled: true, isSelected: false, interaction: null });
-    expect(elevatedFilterChipTokens.disabledUnselectedContainerColor).toBe('onSurface');
-    expect(disabledElevated['--_chip-container-color']).toBe('color-mix(in srgb, var(--on-surface) 12%, transparent)');
+    expect(elevatedFilterChipTokens.defaultElevation).toBe('level1');
+    expect(resolveChipElevation('filter', { isDisabled: false, isSelected: false, interaction: 'hover' })).toBe('level1');
   });
-
   it('uses InputChip avatar/icon padding and avatar opacity exactly like InputChipDefaults', () => {
     const plain = getChipStyle('input', { isDisabled: false, isSelected: false, interaction: null });
     expect(plain['--_chip-padding-inline-start']).toBe('4px');
@@ -68,23 +37,20 @@ describe('Material 3 chip defaults', () => {
     const disabledAvatar = getChipStyle('input', { isDisabled: true, isSelected: true, interaction: null }, { hasAvatar: true });
     expect(disabledAvatar['--_chip-avatar-opacity']).toBe(0.38);
   });
-
-  it('ports expressive shapes, tonal leading color and compact spacing', () => {
+  it('ports expressive shapes and compact spacing without projecting static colors', () => {
     const unselected = getChipStyle('filter', { isDisabled: false, isSelected: false, interaction: null }, { shapes: {}, hasLeadingIcon: true, hasTrailingIcon: true });
     expect(unselected['--_chip-container-radius']).toBe('12px');
-    expect(unselected['--_chip-leading-icon-color']).toBe('var(--on-surface-variant)');
     expect(unselected['--_chip-leading-gap']).toBe('4px');
     expect(unselected['--_chip-trailing-gap']).toBe('4px');
     expect(unselected['--_chip-shape-transition']).toContain('137ms');
+    expect(unselected['--_chip-container-color']).toBeUndefined();
+    expect(unselected['--_chip-label-color']).toBeUndefined();
     const selected = getChipStyle('filter', { isDisabled: false, isSelected: true, interaction: null }, { shapes: {} });
     expect(selected['--_chip-container-radius']).toBe('9999px');
     const pressed = getChipStyle('filter', { isDisabled: false, isSelected: true, interaction: 'press' }, { shapes: {} });
     expect(pressed['--_chip-container-radius']).toBe('8px');
   });
-
   it('uses Material elevation transition selection', () => {
-    expect(resolveChipElevation('elevatedAssist', { isDisabled: false, interaction: 'hover' })).toBe('level2');
-    expect(resolveChipElevation('filter', { isDisabled: false, isSelected: false, interaction: 'hover' })).toBe('level1');
     expect(getChipElevationMotion({ isDisabled: false, interaction: null, previousInteraction: 'hover' }).durationMs).toBe(120);
     expect(getChipElevationMotion({ isDisabled: false, interaction: null, previousInteraction: 'press' }).durationMs).toBe(150);
   });

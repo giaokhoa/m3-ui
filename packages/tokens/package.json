@@ -11,6 +11,7 @@
   "exports": {
     ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
     "./button.css": "./dist/generated/button.css",
+    "./chip.css": "./dist/generated/chip.css",
     "./elevation.css": "./dist/generated/elevation.css",
     "./ripple.css": "./dist/generated/ripple.css"
   },
