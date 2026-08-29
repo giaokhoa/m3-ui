@@ -1,0 +1,49 @@
+---
+title: Snackbar
+description: Material snackbar surface, actions, dismiss affordances, live-region semantics, and the explicit host-state boundary.
+---
+
+import { SnackbarPreview } from '../../../src/feedbackSearchDemos';
+
+<MaterialParity component="snackbar" />
+
+## Overview
+
+`Snackbar` is the Material transient-message **surface**. It renders the message plus optional `SnackbarAction` and `SnackbarDismissAction`, including the long-action layout where the primary action moves to a new line.
+
+It deliberately does not own queueing, replacement, timeout, or host orchestration.
+
+## Live example
+
+<ComponentPreview>
+  <SnackbarPreview />
+</ComponentPreview>
+
+## Composition
+
+```tsx
+<Snackbar
+  action={<SnackbarAction onPress={undo}>Undo</SnackbarAction>}
+  dismissAction={
+    <SnackbarDismissAction aria-label="Dismiss" onPress={dismiss}>
+      <CloseIcon />
+    </SnackbarDismissAction>
+  }
+>
+  Message archived
+</Snackbar>
+```
+
+Set `actionOnNewLine` when a longer action should use the Material long-action composition.
+
+## Accessibility
+
+The message is exposed as `role="status"` with `aria-live="polite"` and `aria-atomic="true"`, so updates are announced without forcing focus into the snackbar.
+
+`SnackbarAction` reuses the public Material text-button interaction engine. `SnackbarDismissAction` reuses the icon-button engine and requires an accessible label because its icon is presentation-only.
+
+## Host boundary
+
+A Compose `SnackbarHost` coordinates lifecycle policy around snackbar content. The current React package intentionally stops at the surface primitive: applications decide how messages are queued, replaced, timed out, persisted, or restored.
+
+Do not implement those policies with hidden timers inside `Snackbar`; keep them in application state or a dedicated host layer.
