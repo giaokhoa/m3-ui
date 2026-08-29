@@ -55,7 +55,7 @@ describe('preferred pane size proportions in scaffold geometry', () => {
     expect(layout.secondary?.left).toBe(600);
   });
 
-  it('scales already-resolved proportional widths when the scaffold is constrained', () => {
+  it('truncates each scaled proportional width when the scaffold is constrained', () => {
     const layout = calculateThreePaneScaffoldLayout({
       width: 1000,
       height: 800,
@@ -68,9 +68,11 @@ describe('preferred pane size proportions in scaffold geometry', () => {
       },
     });
 
-    const scale = 976 / 1300;
-    expect(layout.primary?.width).toBeCloseTo(700 * scale);
-    expect(layout.secondary?.width).toBeCloseTo(600 * scale);
+    // AndroidX scales the already-resolved 700/600px preferred widths against
+    // 976px, then calls toInt() for each pane independently. The dropped
+    // fractions are not redistributed, so the trailing edge ends at 999px.
+    expect(layout.primary).toEqual({ left: 0, top: 0, width: 525, height: 800 });
+    expect(layout.secondary).toEqual({ left: 549, top: 0, width: 450, height: 800 });
   });
 
   it('uses scaffold-height proportions for reflowed pane preferred height', () => {
