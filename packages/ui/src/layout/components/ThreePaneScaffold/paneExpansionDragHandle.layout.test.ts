@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PaneExpansionUnspecified } from '../../adaptive/paneExpansionState';
 import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
 import {
   PaneAdaptedValue,
@@ -7,8 +8,10 @@ import {
 } from '../../adaptive/threePaneScaffold';
 import { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
 import {
+  calculatePaneExpansionDragHandleFadeFrame,
   calculatePaneExpansionDragHandlePlacement,
   calculatePaneExpansionSpacerMiddleOffset,
+  updatePaneExpansionDragHandleFadeOffsets,
 } from './paneExpansionDragHandle.layout';
 
 const base = {
@@ -126,5 +129,101 @@ describe('pane expansion drag-handle placement', () => {
     expect(
       calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions }),
     ).toBe(372);
+  });
+});
+
+describe('pane expansion drag-handle fading', () => {
+  it('tracks the previous lookahead target instead of recomputing current layout geometry', () => {
+    const empty = {
+      originalOffsetX: PaneExpansionUnspecified,
+      targetOffsetX: PaneExpansionUnspecified,
+    };
+    const firstTarget = updatePaneExpansionDragHandleFadeOffsets(empty, 688);
+    expect(firstTarget).toEqual({
+      originalOffsetX: PaneExpansionUnspecified,
+      targetOffsetX: 688,
+    });
+
+    expect(updatePaneExpansionDragHandleFadeOffsets(firstTarget, 688)).toBe(firstTarget);
+    expect(updatePaneExpansionDragHandleFadeOffsets(firstTarget, 588)).toEqual({
+      originalOffsetX: 688,
+      targetOffsetX: 588,
+    });
+  });
+
+  it('records disappearance as a new unspecified lookahead target', () => {
+    expect(
+      updatePaneExpansionDragHandleFadeOffsets(
+        { originalOffsetX: 688, targetOffsetX: 588 },
+        PaneExpansionUnspecified,
+      ),
+    ).toEqual({ originalOffsetX: 588, targetOffsetX: PaneExpansionUnspecified });
+  });
+
+  it('stays fully opaque when the lookahead offset does not move', () => {
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: 688,
+        targetOffsetX: 688,
+        progressFraction: 0.5,
+      }),
+    ).toEqual({ offsetX: 688, opacity: 1 });
+  });
+
+  it('fades out at the original offset using Compose FastOutSlowIn easing', () => {
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: 688,
+        targetOffsetX: 588,
+        progressFraction: 0,
+      }),
+    ).toEqual({ offsetX: 688, opacity: 1 });
+
+    const quarter = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.25,
+    });
+    expect(quarter.offsetX).toBe(688);
+    expect(quarter.opacity).toBeCloseTo(0.52682528, 7);
+  });
+
+  it('switches offsets at the tween zero crossing and then fades back in', () => {
+    // FastOutSlowInEasing(0.35) == 0.5, so the -1..1 animation reaches zero
+    // at progress 0.35. AndroidX uses `value > 0`, therefore the zero frame
+    // still occupies the original offset at alpha 0.
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: 688,
+        targetOffsetX: 588,
+        progressFraction: 0.35,
+      }),
+    ).toEqual({ offsetX: 688, opacity: 0 });
+
+    const halfway = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.5,
+    });
+    expect(halfway.offsetX).toBe(588);
+    expect(halfway.opacity).toBeCloseTo(0.55112262, 7);
+
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: 688,
+        targetOffsetX: 588,
+        progressFraction: 1,
+      }),
+    ).toEqual({ offsetX: 588, opacity: 1 });
+  });
+
+  it('validates transition progress', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: 688,
+        targetOffsetX: 588,
+        progressFraction: -0.01,
+      }),
+    ).toThrow(RangeError);
   });
 });
