@@ -41,7 +41,7 @@ describe('Material 3 Dialog defaults', () => {
     });
   });
 
-  it('emits Material surface, typography, icon and Level3 elevation variables', () => {
+  it('emits Material surface, typography and icon variables while elevation stays semantic', () => {
     const style = getDialogStyle();
 
     expect(style['--_dialog-container-color']).toBe(
@@ -58,7 +58,13 @@ describe('Material 3 Dialog defaults', () => {
     expect(style['--_dialog-action-font-size']).toBe(
       token.TypographyLabelLargeFontSize,
     );
-    expect(String(style['--_dialog-box-shadow'])).toContain('color-mix');
+    expect(dialogTokens.containerElevation).toBe('level3');
+    expect(style['--_dialog-box-shadow']).toBeUndefined();
+    expect(
+      getDialogStyle({ shadowColor: 'rebeccapurple' })[
+        '--_dialog-box-shadow'
+      ],
+    ).toBeUndefined();
   });
 
   it('reuses the Scrim recipe while keeping RAC as the interactive underlay', () => {

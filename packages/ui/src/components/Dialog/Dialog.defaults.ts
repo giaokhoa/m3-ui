@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import { getScrimStyle } from '../Scrim';
 
 export type DialogStyle = CSSProperties &
@@ -138,10 +135,6 @@ export function getDialogStyle(
       options.actionColor ?? dialogTokens.actionPressedLabelTextColor,
     '--_dialog-icon-size': dialogTokens.iconSize,
     '--_dialog-radius': cssLength(shape as CssLength),
-    '--_dialog-box-shadow': getElevationBoxShadow(
-      dialogTokens.containerElevation,
-      (options.shadowColor ?? 'var(--shadow)') as string,
-    ),
     '--_dialog-content-padding': `${dialogRuntime.contentPadding}px`,
     '--_dialog-icon-bottom-spacing': `${dialogRuntime.iconBottomSpacing}px`,
     '--_dialog-title-bottom-spacing': `${dialogRuntime.titleBottomSpacing}px`,

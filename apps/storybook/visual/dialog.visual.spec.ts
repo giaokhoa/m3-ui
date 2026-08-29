@@ -28,6 +28,7 @@ test.describe('Material 3 Dialog browser contract', () => {
     await openStory(page, 'components-dialog--geometry');
     const dialog = page.getByTestId('dialog-geometry');
     const modal = page.locator('.dialog-modal');
+    const elevation = page.locator('.dialog__elevation');
     const modalBox = await modal.boundingBox();
     const surface = await dialog.evaluate((element) => {
       const computed = getComputedStyle(element);
@@ -39,6 +40,9 @@ test.describe('Material 3 Dialog browser contract', () => {
         boxShadow: computed.boxShadow,
       };
     });
+    const elevationShadow = await elevation.evaluate(
+      (element) => getComputedStyle(element).boxShadow,
+    );
     const title = dialog.locator('.dialog__title');
     const description = dialog.locator('.dialog__description');
 
@@ -46,7 +50,8 @@ test.describe('Material 3 Dialog browser contract', () => {
     expect(surface.paddingInline).toBe('24px');
     expect(surface.paddingBlock).toBe('24px');
     expect(surface.borderRadius).toBe('28px');
-    expect(surface.boxShadow).not.toBe('none');
+    expect(surface.boxShadow).toBe('none');
+    expect(elevationShadow).not.toBe('none');
     await expect(title).toHaveCSS('font-size', '24px');
     await expect(title).toHaveCSS('line-height', '32px');
     await expect(description).toHaveCSS('font-size', '14px');

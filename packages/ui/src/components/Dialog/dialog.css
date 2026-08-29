@@ -35,20 +35,25 @@
   outline: none;
 }
 
+.dialog-surface {
+  position: relative;
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-block-size: inherit;
+  border-radius: var(--_dialog-radius);
+}
+
 .dialog {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   inline-size: 100%;
-  max-block-size: calc(
-    100vh - var(--_dialog-viewport-margin) - var(--_dialog-viewport-margin)
-  );
+  max-block-size: inherit;
   padding: var(--_dialog-content-padding);
   overflow: auto;
-  border-radius: var(--_dialog-radius);
+  border-radius: inherit;
   outline: none;
   background-color: var(--_dialog-container-color);
-  box-shadow: var(--_dialog-box-shadow);
 }
 
 .dialog__icon {

@@ -13,9 +13,11 @@ import {
   ModalOverlay as AriaModalOverlay,
   Text as AriaText,
 } from 'react-aria-components';
+import { Elevation } from '../../internal/elevation';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextButton, type ButtonProps } from '../Button';
 import {
+  dialogTokens,
   getDialogActionStyle,
   getDialogOverlayStyle,
   getDialogStyle,
@@ -111,7 +113,11 @@ export function DialogOverlay({
   );
 }
 
-/** Material surface layered on top of RAC Dialog semantics. */
+/**
+ * Material surface layered on top of RAC Dialog semantics.
+ * The outer surface is deliberately non-scrolling so Elevation is not clipped;
+ * the inner AriaDialog remains the semantic and scrolling surface.
+ */
 export function Dialog({
   containerColor,
   headlineColor,
@@ -125,22 +131,28 @@ export function Dialog({
   ...props
 }: DialogProps) {
   return (
-    <AriaDialog
-      {...props}
-      className={clsx('dialog', className)}
-      style={{
-        ...getDialogStyle({
-          containerColor,
-          headlineColor,
-          supportingTextColor,
-          iconColor,
-          actionColor,
-          shape,
-          shadowColor,
-        }),
-        ...style,
-      }}
-    />
+    <div
+      className="dialog-surface"
+      style={getDialogStyle({
+        containerColor,
+        headlineColor,
+        supportingTextColor,
+        iconColor,
+        actionColor,
+        shape,
+      })}
+    >
+      <Elevation
+        className="dialog__elevation"
+        level={dialogTokens.containerElevation}
+        shadowColor={shadowColor}
+      />
+      <AriaDialog
+        {...props}
+        className={clsx('dialog', className)}
+        style={style}
+      />
+    </div>
   );
 }
 

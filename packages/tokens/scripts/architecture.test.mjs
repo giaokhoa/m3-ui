@@ -20,7 +20,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
   'components/DatePicker/DatePicker.defaults.ts',
-  'components/Dialog/Dialog.defaults.ts',
   'components/FloatingToolbar/FloatingToolbar.defaults.ts',
   'components/ListItem/ListItem.defaults.ts',
   'components/Menu/Menu.defaults.ts',
@@ -197,6 +196,35 @@ test('Snackbar colors stay semantic and its static level3 elevation paints throu
   assert.match(contract, /Browser\/visual tests must inspect `\.snackbar__elevation`/i);
   assert.match(contract, /call `getElevationBoxShadow\(\)` from `Snackbar\.defaults\.ts`/i);
   assert.match(contract, /interaction-dependent action\/icon mappings are behavior/i);
+});
+
+test('Dialog colors stay semantic and its scroll surface stays separate from Elevation paint', async () => {
+  const surfaceControls = JSON.parse(await readFile(new URL('tokens/component/surface-controls.json', packageRoot), 'utf8'));
+  const dialogStates = JSON.parse(await readFile(new URL('tokens/component/dialog-sheet-web-states.json', packageRoot), 'utf8'));
+  const dialog = await readFile(new URL('../ui/src/components/Dialog/Dialog.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/Dialog/Dialog.defaults.ts', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/Dialog/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+  const tokens = surfaceControls.component.dialog;
+  const states = dialogStates.component.dialog;
+
+  assert.equal(tokens.actionLabelTextColor.$value, '{color.role.primary}');
+  assert.equal(tokens.containerColor.$value, '{color.role.surfaceContainerHigh}');
+  assert.equal(tokens.headlineColor.$value, '{color.role.onSurface}');
+  assert.equal(tokens.supportingTextColor.$value, '{color.role.onSurfaceVariant}');
+  assert.equal(tokens.iconColor.$value, '{color.role.secondary}');
+  assert.equal(states.actionFocusStateLayerColor.$value, '{color.role.primary}');
+  assert.equal(states.actionHoverStateLayerColor.$value, '{color.role.primary}');
+  assert.equal(states.actionPressedStateLayerColor.$value, '{color.role.primary}');
+  assert.match(dialog, /<Elevation/);
+  assert.match(dialog, /className="dialog__elevation"/);
+  assert.match(dialog, /className="dialog-surface"/);
+  assert.match(dialog, /shadowColor=\{shadowColor\}/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_dialog-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/Dialog\/dialog\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /Elevation must stay outside.*clipped scroll surface/i);
+  assert.match(contract, /Browser\/visual tests inspect `\.dialog__elevation`/i);
+  assert.match(contract, /separate shared UI layout workstream/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {

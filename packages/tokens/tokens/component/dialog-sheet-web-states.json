@@ -1,11 +1,11 @@
 {
   "component": {
     "dialog": {
-      "actionFocusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionFocusStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
       "actionFocusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
-      "actionHoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionHoverStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
       "actionHoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
-      "actionPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "actionPressedStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
       "actionPressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
     },
     "sheetBottom": {

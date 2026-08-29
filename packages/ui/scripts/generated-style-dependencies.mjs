@@ -20,6 +20,10 @@ export const generatedStyleDependencies = {
     '../tokens/dist/generated/elevation.css',
     'src/internal/elevation/elevation.css',
   ],
+  'src/components/Dialog/dialog.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+  ],
 };
 
 export function expandStyleSources(sources) {
