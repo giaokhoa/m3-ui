@@ -91,7 +91,7 @@ export function getToggleButtonStyle(
   const base = getButtonStyle(
     variant,
     { isDisabled: state.isDisabled, interaction },
-    { size, shapes },
+    { size, shapes, legacyInlineElevation: false },
   );
   const transition = state.isDisabled
     ? 'none'
