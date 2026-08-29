@@ -17,17 +17,17 @@ describe('Button runtime defaults', () => {
   });
 
   it('only emits a radius override when runtime shapes are supplied', () => {
-    const baseline = getButtonStyle('filled', idleState);
+    const baseline = getButtonStyle('filled', idleState, { size: 'medium' });
     expect(baseline['--_button-container-radius']).toBeUndefined();
     expect(baseline['--_button-container-color']).toBeUndefined();
     expect(baseline['--_button-min-height']).toBeUndefined();
 
     const shapes = buttonShapesForSize('medium');
-    const idle = getButtonStyle('filled', idleState, shapes);
+    const idle = getButtonStyle('filled', idleState, { size: 'medium', shapes });
     const pressed = getButtonStyle(
       'filled',
       { ...idleState, interaction: 'press' },
-      shapes,
+      { size: 'medium', shapes },
     );
     expect(idle['--_button-container-radius']).toBe('9999px');
     expect(pressed['--_button-container-radius']).toBe('12px');
