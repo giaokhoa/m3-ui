@@ -1,0 +1,41 @@
+---
+title: Dividers
+description: Horizontal and vertical Material separators with explicit separator semantics and token-backed color and thickness defaults.
+---
+
+<MaterialParity component="divider" />
+
+## Overview
+
+`HorizontalDivider` and `VerticalDivider` render the Material divider visual while exposing real separator semantics. Orientation is part of the component contract rather than inferred from surrounding CSS.
+
+## Live example
+
+<ComponentPreview>
+  <DividerPreview />
+</ComponentPreview>
+
+## Orientation
+
+```tsx
+<HorizontalDivider />
+<VerticalDivider />
+```
+
+Both variants render `role="separator"` and the matching `aria-orientation`. Use the horizontal form between vertically stacked regions and the vertical form between horizontally arranged regions when a semantic separation is actually useful.
+
+## Material defaults
+
+The default divider color is the Material `outline-variant` role and the default thickness comes from the audited divider token set. Those values remain owned by the component/token layer.
+
+`color` and `thickness` are explicit web overrides for deliberate custom composition. Numeric thickness values are interpreted as CSS pixels; string values may use normal CSS lengths.
+
+```tsx
+<HorizontalDivider thickness="2px" />
+```
+
+An override does not create a new canonical Material token. Reusable design decisions should still live in the token system rather than being copied across application CSS.
+
+## Semantics boundary
+
+Do not add dividers solely to reproduce spacing. A semantic separator communicates a boundary to assistive technology. When only visual spacing is needed, prefer layout spacing rather than inserting an unnecessary separator role.

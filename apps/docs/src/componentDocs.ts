@@ -18,7 +18,11 @@ export type ComponentDocId =
   | 'tabs'
   | 'segmented-button'
   | 'split-button'
-  | 'button-group';
+  | 'button-group'
+  | 'list-item'
+  | 'menu'
+  | 'badge'
+  | 'divider';
 
 export interface ComponentDocMetadata {
   family: string;
@@ -214,5 +218,41 @@ export const componentDocs = {
       'Implements standard action groups with AndroidX-style pressed-width redistribution and a tokenized local overflow menu, plus connected single/multiple selection groups across the audited extra-small through extra-large size family.',
     webAdaptation:
       'Standard groups contain independent React Aria-backed actions and use ResizeObserver to move a suffix into a component-local menu when the row cannot fit; that is local overflow, not adaptive window layout. Connected single selection uses React Aria RadioGroup/Radio semantics, while connected multiple selection uses ToggleButton semantics.',
+  },
+  'list-item': {
+    family: 'Lists',
+    materialUrl: 'https://m3.material.io/components/lists/overview',
+    composeMapping: ['ListItem'],
+    implementation:
+      'Implements one-, two-, and three-line Material list rows with leading, overline, headline, supporting, and trailing slots plus passive, action, selected, disabled, dragged, hover, focus, and pressed presentation.',
+    webAdaptation:
+      'Passive rows remain div content; action rows use React Aria Button semantics. Single-selection rows expose radio semantics and an optional roving-focus ListItemSelectionGroup, while multiple-selection rows expose checkbox semantics. Dragged state is presentation-only and does not implement browser drag-and-drop by itself.',
+  },
+  menu: {
+    family: 'Menus',
+    materialUrl: 'https://m3.material.io/components/menus/overview',
+    composeMapping: ['DropdownMenu', 'DropdownMenuItem', 'ExposedDropdownMenu-style read-only selection'],
+    implementation:
+      'Implements anchored Material menus, menu items, labeled or segmented sections, viewport-aware popover spacing, supporting/leading/trailing slots, and a read-only exposed menu anchored to the existing Material TextField renderer.',
+    webAdaptation:
+      'React Aria owns menu/menuitem semantics, roving focus, Arrow/Home/End movement, typeahead, Escape, outside dismissal, overlay positioning, and focus restoration. ExposedMenu deliberately remains a read-only menu with aria-haspopup/expanded rather than pretending to be an editable combobox or autocomplete.',
+  },
+  badge: {
+    family: 'Badges',
+    materialUrl: 'https://m3.material.io/components/badges/overview',
+    composeMapping: ['Badge', 'BadgedBox'],
+    implementation:
+      'Implements Material dot and content badge geometry plus logical top-end BadgedBox positioning, with canonical error/on-error defaults and explicit container/content color overrides.',
+    webAdaptation:
+      'Badge and BadgedBox do not guess the semantic meaning of a dot or count and do not rewrite the anchor accessible name. Applications decide whether the visual badge is aria-hidden and include meaningful status wording on the anchor, or label a standalone badge directly when it conveys independent information.',
+  },
+  divider: {
+    family: 'Dividers',
+    materialUrl: 'https://m3.material.io/components/divider/overview',
+    composeMapping: ['HorizontalDivider', 'VerticalDivider'],
+    implementation:
+      'Implements horizontal and vertical Material dividers with canonical outline-variant color and audited thickness defaults, while allowing deliberate CSS color and thickness overrides.',
+    webAdaptation:
+      'Both variants render a real separator role with explicit aria-orientation. Custom color/thickness values are web composition overrides rather than new canonical tokens, and semantic dividers should not be inserted merely to create spacing where no meaningful boundary exists.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;

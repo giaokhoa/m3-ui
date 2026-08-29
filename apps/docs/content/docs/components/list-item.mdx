@@ -1,0 +1,59 @@
+---
+title: Lists and list items
+description: Material one-, two-, and three-line list items with passive, action, single-selection, and multiple-selection semantics kept distinct.
+---
+
+<MaterialParity component="list-item" />
+
+## Overview
+
+`ListItem` renders Material list-row geometry and content slots while preserving four different browser contracts:
+
+- passive content;
+- an action button through `onPress`;
+- single selection through radio semantics;
+- multiple selection through checkbox semantics.
+
+The visual family is shared, but these modes are not interchangeable accessibility patterns.
+
+## Live example
+
+<ComponentPreview>
+  <ListItemPreview />
+</ComponentPreview>
+
+## Lines and slots
+
+The row infers one, two, or three Material lines from `overline` and `supportingText`, or accepts an explicit `lineCount`. `leading` and `trailing` are visual slots and are marked presentation-only by the component.
+
+```tsx
+<ListItem
+  overline="Workspace"
+  supportingText="Last synced 2 minutes ago"
+  trailing="12 files"
+>
+  Material library
+</ListItem>
+```
+
+## Action rows
+
+Supplying `onPress` turns the row into the public React Aria-backed button path with ripple, hover, press, focus-visible, and disabled states.
+
+```tsx
+<ListItem onPress={openDetails} supportingText="View details">
+  Release notes
+</ListItem>
+```
+
+Use a real link outside the list-item primitive when the semantic action is navigation and native link behavior is required.
+
+## Selection
+
+`selectionMode="single"` exposes a radio item. Wrap related single-selection rows in `ListItemSelectionGroup`; the group supplies `radiogroup` semantics plus Arrow, Home, and End movement and keeps only the selected row in the normal tab sequence.
+
+`selectionMode="multiple"` exposes checkbox semantics and calls `onSelectionChange` with the next selected state. Multiple-selection rows are independent controls and do not use the single-selection roving-focus group.
+
+## Drag presentation
+
+`isDragged` is a visual interaction state used by the audited Material list tokens. It does not implement drag-and-drop semantics or data transfer by itself; applications must supply the actual drag system when needed.

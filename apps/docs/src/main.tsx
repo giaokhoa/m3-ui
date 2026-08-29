@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
 import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
 import { feedbackSearchMdxComponents } from './feedbackSearchMdxComponents';
@@ -73,6 +74,7 @@ function DocsPage() {
   const docsMdxComponents = {
     ...feedbackSearchMdxComponents,
     ...groupedControlMdxComponents,
+    ...contentPrimitiveMdxComponents,
   };
 
   return (

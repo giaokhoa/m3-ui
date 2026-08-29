@@ -1,0 +1,42 @@
+---
+title: Badges
+description: Material dot and content badges positioned with BadgedBox while accessible status wording remains application-owned.
+---
+
+<MaterialParity component="badge" />
+
+## Overview
+
+`Badge` renders either the Material small dot form or the content form. `BadgedBox` positions a badge at the logical top-end of its anchor without changing the anchor's interaction semantics.
+
+## Live example
+
+<ComponentPreview>
+  <BadgePreview />
+</ComponentPreview>
+
+## Dot and content forms
+
+Omitting children selects the dot geometry. Supplying content selects the content badge geometry and typography.
+
+```tsx
+<BadgedBox badge={<Badge aria-hidden="true">3</Badge>}>
+  <IconButton aria-label="Notifications, 3 unread">
+    <NotificationsIcon />
+  </IconButton>
+</BadgedBox>
+```
+
+`containerColor` and `contentColor` override the rendered CSS colors. Their defaults remain the canonical Material error/on-error roles.
+
+## Accessibility boundary
+
+A badge is often supplementary information attached to another control. The component does not guess whether a dot means “new”, whether a number is a count, or whether the badge should be announced independently.
+
+For an icon button with an unread count, include the meaning in the button's accessible name and hide a duplicated visual badge from assistive technology, as in the example above. If a standalone badge itself carries meaningful status, give that badge an appropriate accessible name instead.
+
+`BadgedBox` is positioning only: it does not merge accessibility trees or rewrite the anchor label.
+
+## Positioning
+
+The box uses logical top/end placement from the Material badge contract, so it remains direction-aware. Do not reproduce that offset with docs or application-specific absolute-position literals unless a deliberately custom composition is required.

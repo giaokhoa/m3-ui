@@ -1,0 +1,60 @@
+---
+title: Menus
+description: Material anchored menus, sections, items, and read-only exposed menus with React Aria focus and dismissal semantics.
+---
+
+<MaterialParity component="menu" />
+
+## Overview
+
+`Menu` renders an anchored Material menu around React Aria menu, menu-item, trigger, popover, and section semantics. Material owns geometry, tokens, spacing, state presentation, and viewport margins; React Aria owns the menu interaction model.
+
+`ExposedMenu` reuses the Material text-field anchor for a read-only select-style menu. It is intentionally **not** an editable combobox or autocomplete.
+
+## Live example
+
+<ComponentPreview>
+  <MenuPreview />
+</ComponentPreview>
+
+## Anchored menu
+
+```tsx
+<Menu
+  aria-label="Document actions"
+  trigger={<Button>Actions</Button>}
+  onAction={(key) => runAction(key)}
+>
+  <MenuSection label="Edit">
+    <MenuItem id="rename">Rename</MenuItem>
+    <MenuItem id="duplicate" supportingText="Create a copy">
+      Duplicate
+    </MenuItem>
+  </MenuSection>
+</Menu>
+```
+
+`placement`, `offset`, and `crossOffset` configure browser overlay positioning without changing the Material menu token contract.
+
+## Interaction semantics
+
+React Aria owns roving focus, Arrow/Home/End keyboard movement, typeahead through `textValue`, Escape, outside dismissal, and focus restoration. `MenuItem` exposes leading, supporting, and trailing visual slots while keeping the menu item itself as the semantic control.
+
+Sections use React Aria section/header relationships. The `segmented` section variant changes Material presentation; it does not create a separate selection model.
+
+## Exposed menu
+
+`ExposedMenu` presents a read-only Material `TextField` with `aria-haspopup="menu"` and `aria-expanded`. Pointer activation, Enter, Space, or ArrowDown opens the menu; Escape closes it and restores focus to the field anchor.
+
+```tsx
+<ExposedMenu
+  label="Density"
+  value={densityLabel}
+  onAction={(key) => selectDensity(key)}
+>
+  <MenuItem id="compact">Compact</MenuItem>
+  <MenuItem id="standard">Standard</MenuItem>
+</ExposedMenu>
+```
+
+Use the dedicated autocomplete/exposed-dropdown family when users must type and filter options. Do not treat this read-only menu as an editable combobox merely because its anchor looks like a text field.
