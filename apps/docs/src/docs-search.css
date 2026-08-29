@@ -1,0 +1,21 @@
+.docs-search__results {
+  inline-size: min(100%, 80ch);
+  margin-inline: auto;
+  padding: 12px 24px 32px;
+}
+
+.docs-search__status {
+  margin: 0;
+  padding: 20px 16px;
+  color: var(--on-surface-variant);
+}
+
+.docs-search__result-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.docs-search__result-link:focus-visible {
+  outline: none;
+}
