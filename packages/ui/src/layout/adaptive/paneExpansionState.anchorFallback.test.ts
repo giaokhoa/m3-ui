@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PaneExpansionAnchor, PaneExpansionState } from './paneExpansionState';
 
 describe('PaneExpansionState anchor-list fallback', () => {
-  it('uses the new initial anchor when the current anchor is removed', () => {
+  it('uses the new initial anchor when the current anchor is removed without moving the split', () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0),
       PaneExpansionAnchor.proportion(0.25),
@@ -17,10 +17,10 @@ describe('PaneExpansionState anchor-list fallback', () => {
     state.setAnchors(nextAnchors);
 
     expect(state.currentAnchor).toBe(nextAnchors[3]);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(1000);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
-  it('uses the updated initial index when the anchor list is replaced', () => {
+  it('uses the updated initial index when the anchor list is replaced without moving the split', () => {
     const state = new PaneExpansionState({
       anchors: [
         PaneExpansionAnchor.proportion(0.2),
@@ -38,7 +38,7 @@ describe('PaneExpansionState anchor-list fallback', () => {
     state.setAnchors(nextAnchors, 1);
 
     expect(state.currentAnchor).toBe(nextAnchors[1]);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(700);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(800);
   });
 
   it('keeps the current anchor when it is still in the updated list', () => {
@@ -57,7 +57,7 @@ describe('PaneExpansionState anchor-list fallback', () => {
     expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
-  it('falls back to no anchor when the updated initial index is -1', () => {
+  it('falls back to no anchor when the updated initial index is -1 without moving the split', () => {
     const current = PaneExpansionAnchor.proportion(0.75);
     const state = new PaneExpansionState({
       anchors: [PaneExpansionAnchor.proportion(0.25), current],
@@ -68,6 +68,7 @@ describe('PaneExpansionState anchor-list fallback', () => {
     state.setAnchors([PaneExpansionAnchor.proportion(0.5)], -1);
 
     expect(state.currentAnchor).toBeNull();
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
   it('uses the new initial anchor when the previous state had no current anchor', () => {
