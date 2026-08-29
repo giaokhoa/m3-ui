@@ -276,7 +276,12 @@ export function calculateThreePaneScaffoldLayout({
         const firstPaneWidth =
           expansion.firstPaneWidth !== PaneExpansionUnspecified
             ? expansion.firstPaneWidth
-            : Math.trunc(expansion.firstPaneProportion * (width - horizontalGap));
+            : Math.trunc(
+                Math.fround(
+                  Math.fround(expansion.firstPaneProportion) *
+                    Math.fround(width - horizontalGap),
+                ),
+              );
         const firstPaneRight = outerBounds.left + firstPaneWidth;
         placePartition({ ...outerBounds, right: firstPaneRight }, firstPane);
         placePartition(

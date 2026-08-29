@@ -35,12 +35,17 @@ function finite(value: number, name: string) {
   }
 }
 
+function composeFloat(value: number) {
+  return Math.fround(value);
+}
+
 export const PaneExpansionAnchor = Object.freeze({
   proportion(proportion: number): PaneExpansionAnchor {
-    if (!Number.isFinite(proportion) || proportion < 0 || proportion > 1) {
+    const floatProportion = composeFloat(proportion);
+    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
       throw new RangeError('Proportion value needs to be in [0, 1]');
     }
-    return Object.freeze({ type: 'proportion', proportion });
+    return Object.freeze({ type: 'proportion', proportion: floatProportion });
   },
   fromStart(offset: number): PaneExpansionAnchor {
     finiteNonNegative(offset, 'offset');
@@ -74,7 +79,7 @@ function clamp(value: number, min: number, max: number) {
 function anchorEquals(a: PaneExpansionAnchor, b: PaneExpansionAnchor) {
   if (a.type !== b.type) return false;
   if (a.type === 'proportion' && b.type === 'proportion') {
-    return a.proportion === b.proportion;
+    return composeFloat(a.proportion) === composeFloat(b.proportion);
   }
   return (
     a.type === 'offset' &&
@@ -91,7 +96,9 @@ function anchorPosition(
 ) {
   let offset: number;
   if (anchor.type === 'proportion') {
-    offset = Math.round(totalSize * anchor.proportion);
+    offset = Math.round(
+      composeFloat(composeFloat(totalSize) * composeFloat(anchor.proportion)),
+    );
   } else if (anchor.direction === 'start') {
     offset = anchor.offset;
   } else {
@@ -340,16 +347,13 @@ export class PaneExpansionState {
   }
 
   setFirstPaneProportion(firstPaneProportion: number) {
-    if (
-      !Number.isFinite(firstPaneProportion) ||
-      firstPaneProportion < 0 ||
-      firstPaneProportion > 1
-    ) {
+    const floatProportion = composeFloat(firstPaneProportion);
+    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
       throw new RangeError('Proportion value needs to be in [0, 1]');
     }
     this.firstPaneWidthState = PaneExpansionUnspecified;
     this.currentDraggingOffsetState = PaneExpansionUnspecified;
-    this.firstPaneProportionState = firstPaneProportion;
+    this.firstPaneProportionState = floatProportion;
     this.currentAnchorState = null;
     this.notify();
   }

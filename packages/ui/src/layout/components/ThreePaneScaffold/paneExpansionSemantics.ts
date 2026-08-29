@@ -29,7 +29,7 @@ export function describePaneExpansionAnchor(
   strings: PaneExpansionHandleAriaStrings = defaultPaneExpansionHandleAriaStrings,
 ): string {
   if (anchor.type === 'proportion') {
-    return strings.proportionAnchor(Math.trunc(anchor.proportion * 100));
+    return strings.proportionAnchor(Math.trunc(Math.fround(anchor.proportion * 100)));
   }
   const offset = Math.trunc(anchor.offset);
   return anchor.direction === 'start'
