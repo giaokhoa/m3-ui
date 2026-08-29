@@ -6,6 +6,7 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import '@m3-ui/ui/styles.css';
+import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
 import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
 import { DocsSearch } from './DocsSearch';
 import { DocsThemeProvider, useDocsTheme } from './DocsThemeProvider';
@@ -77,6 +78,7 @@ function DocsPage() {
     ...groupedControlMdxComponents,
     ...contentPrimitiveMdxComponents,
     ...pickerMdxComponents,
+    ...carouselSheetMdxComponents,
   };
 
   return (

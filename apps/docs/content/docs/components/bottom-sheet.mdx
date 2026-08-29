@@ -1,0 +1,64 @@
+---
+title: Bottom sheets
+description: Material non-modal and modal bottom sheets with shared anchor state, drag-handle semantics, and explicit modal lifecycle ownership.
+---
+
+<MaterialParity component="bottom-sheet" />
+
+## Overview
+
+`BottomSheet` renders a Material sheet inside the local composition tree. `ModalBottomSheet` wraps the same Material anchor and drag behavior in a true modal overlay with a scrim, focus containment, outside interaction policy, Escape handling, scroll locking, and focus restoration.
+
+Both use `SheetState` as the single owner of Material anchor state.
+
+## Non-modal sheet
+
+<ComponentPreview>
+  <BottomSheetPreview />
+</ComponentPreview>
+
+The preview is deliberately bounded by a local stage. The parent owns that stacking context and the background remains interactive.
+
+```tsx
+const state = useSheetState({
+  initialValue: SheetValue.PartiallyExpanded,
+});
+
+<BottomSheet state={state}>
+  {content}
+</BottomSheet>
+```
+
+The standard logical values are `Hidden`, `PartiallyExpanded`, and `Expanded`. Applications can control which values are enabled and can veto transitions with `confirmValueChange`.
+
+## Modal sheet
+
+<ComponentPreview>
+  <ModalBottomSheetPreview />
+</ComponentPreview>
+
+`ModalBottomSheet` requires the hidden anchor because dismissal first settles the Material sheet to `Hidden`, then completes the overlay lifecycle.
+
+React Aria `ModalOverlay` and `Modal` own browser modal behavior: portal placement, focus containment, outside interaction, Escape, scroll locking, and focus restoration. The sheet itself is exposed as a dialog with `aria-modal="true"`.
+
+`shouldDismissOnClickOutside` and `shouldDismissOnEscape` independently control those dismissal paths. `onDismissRequest` runs after the Material hide transition completes rather than removing the sheet at the start of the gesture.
+
+## Drag and handle actions
+
+The built-in drag handle is a real button, not presentation-only decoration. Its accessible action label follows the current state, for example “Expand bottom sheet”, “Collapse bottom sheet”, or “Dismiss bottom sheet”.
+
+`gesturesEnabled` controls pointer dragging. `handleActionEnabled` can control the button action independently, so disabling drag does not require removing keyboard activation of the handle.
+
+Pass `dragHandle={null}` only when the design intentionally removes the affordance.
+
+## Anchors and local measurement
+
+The sheet calculates anchors from the height of its own containing block and its rendered sheet height. `partialExpandedHeight` can override the visible height of the partial anchor for a specific composition.
+
+This measurement is sheet-local geometry. It is not an adaptive window-size model, pane directive, or navigation breakpoint.
+
+## State control
+
+`SheetState` exposes imperative transitions such as `show()`, `hide()`, `expand()`, and `partialExpand()`. The logical value updates through one state controller while `BottomSheet` handles the visual interpolation between measured anchors.
+
+This page intentionally documents the sheet surfaces and their state contract only. `BottomSheetScaffold` orchestration is not reimplemented or documented here while the dedicated layout/scaffold work evolves separately.

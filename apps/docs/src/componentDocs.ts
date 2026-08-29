@@ -24,7 +24,9 @@ export type ComponentDocId =
   | 'badge'
   | 'divider'
   | 'date-picker'
-  | 'time-picker';
+  | 'time-picker'
+  | 'carousel'
+  | 'bottom-sheet';
 
 export interface ComponentDocMetadata {
   family: string;
@@ -274,5 +276,23 @@ export const componentDocs = {
       'Implements Material clock-dial and keyboard-input forms with shared normalized TimeOfDay state, hour/minute selection, 12/24-hour presentation, AM/PM controls, standard/vibrant shape variants, and vertical/horizontal presentation.',
     webAdaptation:
       'The active clock face uses slider semantics, AM/PM uses radio-group semantics, and TimeInput uses native numeric text inputs with explicit accessible names and aria-invalid drafts. layout="auto" observes only the picker container to choose orientation; it is local component presentation and not an adaptive window-size or pane API.',
+  },
+  carousel: {
+    family: 'Carousels',
+    materialUrl: 'https://m3.material.io/components/carousel/overview',
+    composeMapping: ['HorizontalMultiBrowseCarousel', 'HorizontalUncontainedCarousel', 'HorizontalCenteredHeroCarousel', 'CarouselState'],
+    implementation:
+      'Implements multi-browse, uncontained, and centered-hero Material carousel geometry with keyline masking, focal item state, controlled/uncontrolled navigation, programmatic scrolling, RTL-aware direction, pointer dragging, and reduced-motion behavior.',
+    webAdaptation:
+      'The carousel is exposed as a named region with aria-roledescription="carousel" and a focusable viewport supporting logical Arrow keys plus Home/End. Native horizontal scrolling and pointer dragging update the same current-item state. ResizeObserver measures only the carousel viewport for local geometry and does not create adaptive window classes.',
+  },
+  'bottom-sheet': {
+    family: 'Bottom sheets',
+    materialUrl: 'https://m3.material.io/components/bottom-sheets/overview',
+    composeMapping: ['ModalBottomSheet', 'SheetState', 'BottomSheetScaffold sheet surface'],
+    implementation:
+      'Implements a local non-modal BottomSheet and a true ModalBottomSheet sharing one SheetState anchor model, deterministic hidden/partial/expanded anchors, drag settling, accessible handle actions, scrim configuration, theme-aware portals, and reduced-motion-aware dismissal completion.',
+    webAdaptation:
+      'The non-modal sheet remains a local region whose parent owns stacking and background interaction. ModalBottomSheet uses React Aria ModalOverlay/Modal for portal placement, focus containment, outside interaction, Escape, scroll locking, and focus restoration. Anchor measurement is local to the sheet containing block and is not an adaptive window-size or pane system.',
   },
 } as const satisfies Record<ComponentDocId, ComponentDocMetadata>;
