@@ -35,6 +35,7 @@ import {
   type DragToResizeHandleAriaStrings,
 } from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
+import { calculatePaneExpansionDragHandlePlacement } from './paneExpansionDragHandle.layout';
 import {
   getPaneExpansionHandleAriaState,
   type PaneExpansionHandleAriaStrings,
@@ -82,6 +83,8 @@ export interface ThreePaneScaffoldProps
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState;
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
+  /** Browser equivalent of paneExpansionDraggable minTouchTargetSize. */
+  paneExpansionDragHandleMinTouchTargetSize?: number;
   paneExpansionHandleAriaLabel?: string;
   /** Localized formatters for anchored pane-expansion state and next-anchor action text. */
   paneExpansionHandleAriaStrings?: Partial<PaneExpansionHandleAriaStrings>;
@@ -231,6 +234,7 @@ export function ThreePaneScaffold({
   paneMargins,
   paneExpansionState,
   paneExpansionDragHandle,
+  paneExpansionDragHandleMinTouchTargetSize = 48,
   paneExpansionHandleAriaLabel = 'Resize panes',
   paneExpansionHandleAriaStrings,
   paneAriaLabels,
@@ -489,6 +493,18 @@ export function ThreePaneScaffold({
       }
     }
   }
+
+  const dragHandlePlacement =
+    showDragHandle &&
+    dragHandleOffset !== PaneExpansionUnspecified &&
+    geometry.width > 0
+      ? calculatePaneExpansionDragHandlePlacement({
+          offsetX: dragHandleOffset,
+          contentWidth: geometry.width,
+          partitionSpacerSize: directive.horizontalPartitionSpacerSize,
+          minTouchTargetSize: paneExpansionDragHandleMinTouchTargetSize,
+        })
+      : undefined;
 
   useLayoutEffect(() => {
     if (
@@ -858,7 +874,10 @@ export function ThreePaneScaffold({
           aria-valuetext={dragHandleAriaState.valueText}
           inert={hasBlockingScrim || undefined}
           tabIndex={hasBlockingScrim ? -1 : 0}
-          style={{ left: dragHandleOffset }}
+          style={{
+            left: dragHandlePlacement?.centerX ?? dragHandleOffset,
+            minWidth: dragHandlePlacement?.minWidth,
+          }}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           onPointerCancel={(event) => finishPointerDrag(event, 0)}
