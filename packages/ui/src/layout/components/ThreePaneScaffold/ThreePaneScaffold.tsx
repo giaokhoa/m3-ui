@@ -712,11 +712,11 @@ export function ThreePaneScaffold({
               : resizeHandleSpec;
         const hasResizeHandle =
           !transitionActive && paneResizeState !== undefined && resizeHandle != null;
+        const hasPaneResizeAction =
+          !transitionActive && paneResizeState !== undefined && !hasResizeHandle;
         const paneResizeHandlers =
-          !transitionActive && paneResizeState !== undefined && !hasResizeHandle
+          hasPaneResizeAction && paneResizeState !== undefined
             ? {
-                onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) =>
-                  resizeKeyDown(event, paneResizeState),
                 onLostPointerCapture: (event: ReactPointerEvent<HTMLDivElement>) =>
                   finishResize(event, true),
                 onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) =>
@@ -740,8 +740,7 @@ export function ThreePaneScaffold({
                 'three-pane-scaffold__pane',
                 frameLevitated && 'three-pane-scaffold__pane--levitated',
                 hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-                !transitionActive && paneResizeState !== undefined && !hasResizeHandle &&
-                  'three-pane-scaffold__pane--resize-target',
+                hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
               ]
                 .filter(Boolean)
                 .join(' ')}
@@ -775,6 +774,23 @@ export function ThreePaneScaffold({
                 >
                   {resizeHandle}
                 </div>
+              ) : null}
+              {hasPaneResizeAction && paneResizeState !== undefined ? (
+                <button
+                  type="button"
+                  className="three-pane-scaffold__levitated-resize-action"
+                  data-orientation={paneResizeState.orientation}
+                  data-resize-state={paneResizeState.value}
+                  aria-label={levitatedPaneDragHandleAriaLabel}
+                  aria-description={paneResizeAriaState?.description}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    paneResizeState.moveToNextState();
+                  }}
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  {levitatedPaneDragHandleAriaLabel}
+                </button>
               ) : null}
               {hasResizeHandle ? (
                 <div className="three-pane-scaffold__levitated-content">{content}</div>
