@@ -296,7 +296,7 @@ export class PaneExpansionState {
     for (const anchorPosition of positions) {
       if (currentOffset < anchorPosition.position) return anchorPosition.anchor;
     }
-    return positions[0]!.anchor;
+    return this.anchors[0] ?? null;
   }
 
   isUnspecified() {
