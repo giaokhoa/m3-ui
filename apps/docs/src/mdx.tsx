@@ -34,6 +34,7 @@ import {
 import {
   componentDocs,
   type ComponentDocId,
+  type ComponentDocMetadata,
 } from './componentDocs';
 import {
   ColorRoleGrid,
@@ -198,7 +199,7 @@ function ComponentPreview({ children }: PropsWithChildren) {
 }
 
 function MaterialParity({ component }: { component: ComponentDocId }) {
-  const metadata = componentDocs[component];
+  const metadata: ComponentDocMetadata = componentDocs[component];
   const referenceUrl = metadata.referenceUrl ?? metadata.materialUrl;
 
   return (
