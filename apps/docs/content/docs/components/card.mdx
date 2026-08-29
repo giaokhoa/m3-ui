@@ -1,0 +1,68 @@
+---
+title: Card
+description: Material 3 filled, elevated, and outlined card surfaces with explicit web interaction semantics.
+---
+
+<MaterialParity component="card" />
+
+## Variants
+
+`m3-ui` exposes the three Material card families as separate React components:
+
+<ComponentPreview>
+  <CardPreview />
+</ComponentPreview>
+
+```tsx
+import { Card, ElevatedCard, OutlinedCard } from '@m3-ui/ui';
+
+<Card>Filled content</Card>
+<ElevatedCard>Elevated content</ElevatedCard>
+<OutlinedCard>Outlined content</OutlinedCard>
+```
+
+Container color, outline, shape, elevation, state layers, and elevation motion are resolved by the component's audited Material token layer. Docs and application code do not need to reproduce those values.
+
+## Static cards
+
+Without `onPress`, a card is a non-interactive `div` surface. Use normal semantic elements inside the card for its actual content and actions.
+
+```tsx
+<Card>
+  <article>
+    <h2>Release notes</h2>
+    <p>Read what changed in this version.</p>
+  </article>
+</Card>
+```
+
+Do not make a static card focusable only for visual consistency.
+
+## Interactive cards
+
+Supplying `onPress` enables the library's whole-card pointer, keyboard, focus, hover, pressed, ripple, and elevation-state behavior. The current web implementation intentionally does **not** infer what semantic role the card action represents.
+
+Provide the matching role yourself when the entire surface is one action:
+
+```tsx
+<OutlinedCard
+  role="button"
+  onPress={() => openDetails()}
+>
+  Open account details
+</OutlinedCard>
+```
+
+For a button-like card, the implementation activates on Enter and Space and makes the surface focusable. `isDisabled` removes interactive activation and focusability for that card action.
+
+If the card contains independent links, buttons, form controls, or other nested interactions, prefer keeping the card itself static instead of creating competing whole-card semantics.
+
+## Shape override
+
+`shape` is an escape hatch for a card container radius. The Material default remains the component token value; application overrides should be intentional rather than copied from documentation examples.
+
+## Accessibility boundary
+
+Unlike Button, Checkbox, Dialog, and most other interactive primitives in this library, Card does not delegate its whole-card semantics to React Aria. Its interaction engine is implemented directly because a card can be either a passive container or an application-defined action surface.
+
+That means Material visual parity and accessible role selection are separate responsibilities: `m3-ui` owns the former, while the application must identify the latter when `onPress` is used.

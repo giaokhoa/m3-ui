@@ -1,0 +1,72 @@
+---
+title: Chip
+description: Material 3 assist, suggestion, filter, and input chips with explicit action and selection semantics.
+---
+
+<MaterialParity component="chip" />
+
+## Families
+
+The public chip surface follows the Material chip families rather than one `variant` prop exposed to consumers:
+
+<ComponentPreview>
+  <ChipPreview />
+</ComponentPreview>
+
+| Family | Public component | Web semantics |
+| --- | --- | --- |
+| Assist | `AssistChip`, `ElevatedAssistChip` | button |
+| Suggestion | `SuggestionChip`, `ElevatedSuggestionChip` | button |
+| Filter | `FilterChip`, `ElevatedFilterChip` | selectable checkbox |
+| Input | `InputChip` | selectable checkbox |
+
+This separation keeps action chips and selectable chips on different React Aria primitives instead of pretending every chip has the same state model.
+
+## Assist and suggestion chips
+
+Assist and suggestion chips are actions. They inherit button interaction, disabled, focus, keyboard, and press behavior from React Aria.
+
+```tsx
+<AssistChip leadingIcon={<CalendarIcon />}>
+  Add to calendar
+</AssistChip>
+
+<SuggestionChip icon={<RestaurantIcon />}>
+  Nearby restaurants
+</SuggestionChip>
+```
+
+Leading/trailing visuals are presentation slots. Give the chip itself an accessible name when the visible label does not provide one.
+
+## Filter chips
+
+Filter chips use selected/unselected semantics and can be controlled or uncontrolled through the inherited React Aria checkbox props.
+
+```tsx
+<FilterChip
+  isSelected={selected}
+  onChange={setSelected}
+>
+  Available now
+</FilterChip>
+```
+
+The selected state drives the canonical Material colors, elevation, state layers, and optional expressive selected-shape morphing. Application CSS should not duplicate those state rules.
+
+## Input chip boundary
+
+`InputChip` currently shares the selectable-chip implementation and therefore exposes checkbox-style selected state. `avatar`, `leadingIcon`, and `trailingIcon` are visual slots.
+
+A `trailingIcon` is currently **not** a second dismiss button: the visual slot is hidden from accessibility and the chip remains the only interactive element. Do not present that slot as an independently actionable remove control.
+
+This documentation describes the implemented web contract rather than implying a richer trailing-action API that does not exist yet.
+
+## Shapes and expressive state
+
+Action chips accept a `shape` override. Selectable chips also accept `shapes`, which enables the audited Material expressive selected/interaction shape behavior.
+
+The default shapes remain canonical component token values. Avoid copying radius values into application code just to match a screenshot.
+
+## Accessibility
+
+React Aria owns action/selection semantics, focus visibility, keyboard and pointer behavior, disabled state, and selection exposure. Material tokens own the chip surface, typography, icon/avatar sizing, state layers, elevation, and motion.

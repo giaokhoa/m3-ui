@@ -26,6 +26,12 @@ import {
   getMaterialTypeCssProperties,
 } from '@m3-ui/ui';
 import {
+  CardPreview,
+  ChipPreview,
+  FabPreview,
+  IconButtonPreview,
+} from './actionSurfaceDemos';
+import {
   componentDocs,
   type ComponentDocId,
 } from './componentDocs';
@@ -263,6 +269,10 @@ export const materialMdxComponents = {
   RadioButtonPreview,
   SwitchPreview,
   SliderPreview,
+  CardPreview,
+  ChipPreview,
+  IconButtonPreview,
+  FabPreview,
   Button,
   ElevatedButton,
   FilledTonalButton,

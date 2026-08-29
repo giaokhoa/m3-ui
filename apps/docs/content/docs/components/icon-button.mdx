@@ -1,0 +1,84 @@
+---
+title: Icon button
+description: Material 3 action and toggle icon buttons across the audited variant, size, width, and shape families.
+---
+
+<MaterialParity component="icon-button" />
+
+## Variants
+
+Action and toggle icon buttons both support the Material visual families:
+
+<ComponentPreview>
+  <IconButtonPreview />
+</ComponentPreview>
+
+| Visual family | Action | Toggle |
+| --- | --- | --- |
+| Standard | `IconButton` | `IconToggleButton` |
+| Filled | `FilledIconButton` | `FilledIconToggleButton` |
+| Filled tonal | `FilledTonalIconButton` | `FilledTonalIconToggleButton` |
+| Outlined | `OutlinedIconButton` | `OutlinedIconToggleButton` |
+
+The public components keep action and toggle semantics separate rather than switching behavior from a visual variant prop.
+
+## Accessible names are required
+
+The icon child is rendered as presentation-only content. For an icon-only action, put the accessible name on the button:
+
+```tsx
+<IconButton aria-label="Add item">
+  <AddIcon />
+</IconButton>
+```
+
+Do not rely on the SVG's own title or accessible name; `m3-ui` intentionally hides the icon container from accessibility so the control has one stable name.
+
+## Toggle buttons
+
+Toggle variants are controlled and require both `isSelected` and `onChange`:
+
+```tsx
+<FilledTonalIconToggleButton
+  aria-label="Favorite"
+  isSelected={favorite}
+  onChange={setFavorite}
+>
+  <FavoriteIcon />
+</FilledTonalIconToggleButton>
+```
+
+React Aria `ToggleButton` owns the pressed/selected semantics and interaction model. Material tokens own selected/unselected presentation.
+
+## Size, width, and shape
+
+The audited Material options exposed by the component are:
+
+| Dimension | Values |
+| --- | --- |
+| `size` | `extraSmall`, `small`, `medium`, `large`, `extraLarge` |
+| `width` | `narrow`, `default`, `wide` |
+| `shape` | `round`, `square` |
+
+These names map to component token families. Consumer code should select the semantic option instead of reproducing container or icon measurements in CSS.
+
+```tsx
+<OutlinedIconButton
+  aria-label="Open menu"
+  size="large"
+  width="wide"
+  shape="round"
+>
+  <MenuIcon />
+</OutlinedIconButton>
+```
+
+## Expressive shape helpers
+
+`shapes` can provide the normal/pressed Material expressive shape mapping for action icon buttons; toggle icon buttons use their corresponding toggle-shape contract.
+
+This is an opt-in behavior. Omitting it preserves the standard audited shape path.
+
+## Interaction ownership
+
+React Aria owns button/toggle semantics, disabled state, keyboard and pointer behavior, hover, focus visibility, and toggle selection. The shared Material ripple engine and canonical tokens own visual state indication, container geometry, content color, and expressive shape behavior.
