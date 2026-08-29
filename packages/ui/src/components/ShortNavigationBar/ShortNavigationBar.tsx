@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { Children, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
 import {
   Button as AriaButton,
@@ -66,11 +67,7 @@ export function ShortNavigationBar({
     <nav
       {...props}
       aria-label={ariaLabel}
-      className={
-        className
-          ? `short-navigation-bar ${className}`
-          : 'short-navigation-bar'
-      }
+      className={clsx('short-navigation-bar', className)}
       data-arrangement={arrangement}
       data-safe-area={safeArea || undefined}
       style={navigationStyle}
@@ -156,9 +153,7 @@ export function ShortNavigationBarItem({
     ripple.onPressEnd();
     onPressEnd?.(event);
   };
-  const itemClassName = className
-    ? `short-navigation-bar-item ${className}`
-    : 'short-navigation-bar-item';
+  const itemClassName = clsx('short-navigation-bar-item', className);
 
   const renderItem = (renderProps: {
     isHovered: boolean;
