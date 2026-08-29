@@ -1,0 +1,24 @@
+---
+title: Foundations
+description: Implemented Material 3 foundations shared by every m3-ui component.
+---
+
+## Implemented foundations
+
+The public docs only describe foundation contracts that are already represented in runtime code and canonical tokens.
+
+- [Color](/docs/foundations/color) — semantic Material color roles, baseline schemes, dynamic color, and contrast level.
+- [Typography](/docs/foundations/typography) — the full Material type scale plus M3 Expressive emphasized roles.
+- [Theming](/docs/theming) — how `ThemeProvider` projects those foundations into an application and theme-aware portals.
+
+## Source of truth
+
+Foundation values are not defined in the docs application. Canonical design values live in `@m3-ui/tokens`, while `@m3-ui/ui` exposes runtime projections such as color CSS variables and the Material type-scale helpers.
+
+## Deliberately not listed yet
+
+Shape, motion, and elevation should get public foundation pages only when their reusable runtime contracts are implemented and audited. Component-local token usage is not enough reason to publish a parallel global theme API from documentation.
+
+## Layout is separate
+
+Adaptive window classes, pane directives, canonical scaffolds, hinge handling, and pane behavior belong to the dedicated `@m3-ui/ui/layout` subsystem rather than the visual foundation layer.

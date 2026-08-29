@@ -15,7 +15,21 @@ The visible product surface is owned by `m3-ui`:
 - `ThemeProvider` owns Material light/dark colors and typeface roles;
 - interactive UI uses public `@m3-ui/ui` components;
 - Markdown typography maps to the public Material type scale from `@m3-ui/ui`;
-- docs-only constructs such as code blocks, parity summaries, semantic tables, and component previews remain local adapters.
+- docs-only constructs such as code blocks, parity summaries, semantic tables, component previews, color swatches, and type-scale visualizers remain local adapters.
+
+## Foundation documentation contract
+
+Only publish a foundation as a public docs section when the reusable runtime contract actually exists in `@m3-ui/ui` or its canonical token graph.
+
+The current documented foundation scope is:
+
+- semantic Material color roles and baseline/dynamic color schemes;
+- Material standard and emphasized type scales;
+- `ThemeProvider` propagation of color/typeface values, ripple focus configuration, and theme-aware portals.
+
+Do not infer a global theme API from component-local tokens. Shape, motion, and elevation remain omitted from public foundation navigation until equivalent reusable runtime contracts are implemented and audited.
+
+Foundation visualizers in `src/foundationDemos.tsx` must consume public theme/type APIs rather than copy Material values. Example source colors may be literal application inputs, but they must never be presented as canonical `m3-ui` tokens.
 
 ## Component page contract
 

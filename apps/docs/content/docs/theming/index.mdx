@@ -1,0 +1,93 @@
+---
+title: Theming
+description: Material 3 color, typography, ripple focus, and portal propagation through ThemeProvider.
+---
+
+## ThemeProvider
+
+`ThemeProvider` is the runtime boundary that projects the implemented Material foundations into a React subtree. It owns the active light or dark `ColorScheme`, theme CSS variables, typeface variables, ripple focus configuration, and a theme-aware portal container.
+
+```tsx
+import { ThemeProvider } from '@m3-ui/ui';
+
+<ThemeProvider mode="light">
+  <App />
+</ThemeProvider>
+```
+
+## Props
+
+| Prop | Contract | Default |
+| --- | --- | --- |
+| `mode` | `light | dark` Material color mode | `light` |
+| `sourceColor` | Optional color used to derive a dynamic `SchemeTonalSpot` scheme | baseline scheme |
+| `contrastLevel` | Material dynamic-color contrast level from `-1` to `1` | `0` |
+| `rippleFocus` | `opacity | inset-ring` global Material ripple focus treatment | `opacity` |
+| `style` | CSS and custom-property overrides applied after generated theme values | — |
+
+Normal `div` attributes such as `className` are also forwarded to the themed wrapper.
+
+## Baseline and dynamic schemes
+
+Without `sourceColor`, the provider resolves the baseline Material scheme for the selected mode. With a source color, it generates the complete Material color role set through Material Color Utilities.
+
+```tsx
+<ThemeProvider
+  mode="dark"
+  sourceColor="#0061a4"
+  contrastLevel={0}
+>
+  <App />
+</ThemeProvider>
+```
+
+See [Color](/docs/foundations/color) for the semantic roles and dynamic-color preview.
+
+## Typography
+
+The same wrapper installs the theme typeface variables consumed by the public Material type-scale helpers and components. See [Typography](/docs/foundations/typography) for the standard and M3 Expressive emphasized roles.
+
+## System preference belongs to the app
+
+`ThemeMode` intentionally contains only `light | dark`. A browser application can resolve `prefers-color-scheme`, persistence, or a user preference and then pass the resolved Material mode into `ThemeProvider`.
+
+The docs application follows exactly that pattern: its local `DocsThemeProvider` owns `system | light | dark`, listens to `prefers-color-scheme`, persists the preference, and passes only the resolved `light | dark` value to the public provider.
+
+```tsx
+const resolvedMode =
+  preference === 'system' ? systemMode : preference;
+
+<ThemeProvider mode={resolvedMode}>
+  {children}
+</ThemeProvider>
+```
+
+This keeps operating-system policy out of the Material theme contract.
+
+## Theme-aware portals
+
+The provider creates a themed portal container in `document.body` with the same generated style and `data-theme` value as the local wrapper. Components that need portals can obtain this container through the library theme context.
+
+That is why dialogs and other portaled Material surfaces retain the same color and typography variables instead of falling out of the theme when their DOM is moved under `body`.
+
+## Ripple focus treatment
+
+`rippleFocus="opacity"` matches the default AndroidX ripple-theme configuration. `inset-ring` selects the library mapping of AndroidX's inset focus-ring configuration while leaving browser focus semantics with the underlying interactive component.
+
+```tsx
+<ThemeProvider rippleFocus="inset-ring">
+  <App />
+</ThemeProvider>
+```
+
+## Style overrides
+
+`style` is applied after the generated color and typography variables. This makes controlled application-level overrides possible without changing the canonical token graph.
+
+Prefer semantic custom-property overrides over component-specific hardcoded colors when the intention is genuinely theme-wide.
+
+## Current foundation boundary
+
+The reusable public theme contract currently covers color schemes, typography/typeface projection, ripple focus configuration, and portal propagation. Shape, motion, and elevation are not documented here as global theme APIs until equivalent reusable runtime contracts are implemented and audited.
+
+Adaptive layout is a separate subsystem and is not selected or configured by `ThemeProvider`.
