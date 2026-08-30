@@ -134,7 +134,7 @@ Static ownership includes baseline geometry, variant color/outline mapping, expr
 
 Runtime TypeScript keeps interaction precedence/history, elevation level/transition selection, and user-supplied pressed-shape behavior. Button now renders the shared `<Elevation>` primitive rather than serializing the canonical shadow recipe into its root inline style.
 
-Connected ButtonGroup still uses the old inline elevation compatibility path while it awaits its own component migration. That path is explicit migration debt and is frozen by the architecture allowlist; it is not a model for new code.
+Connected ButtonGroup now selects semantic elevation levels on its existing React Aria `label` / `button` hosts and consumes the generated elevation adapter without adding wrapper-only paint structure.
 
 ## Chip color slice
 
@@ -202,9 +202,9 @@ Ripple focus-ring colors alias canonical `Secondary` / `OnSecondary` roles; the 
 
 This build composition does not move generated files out of the token package. Generated artifacts remain centralized under `packages/tokens/dist/generated/`.
 
-## Change-local documentation contract
+## Change-local implementation notes
 
-Before changing a foundation, read the matching contract:
+Before changing a foundation, read the matching notes:
 
 - token/compiler boundary: `/.agents/skills/style-dictionary/SKILL.md` and this README;
 - repository-wide architecture: `/docs/architecture/README.md`;
@@ -213,7 +213,7 @@ Before changing a foundation, read the matching contract:
 - ripple/state layer/focus indication: `/packages/ui/src/internal/ripple/README.md`;
 - runtime theme/color ownership: `/packages/ui/src/theme/README.md`.
 
-If ownership, injection, generated output, runtime responsibilities, or an escape hatch changes, update the local contract in the same PR and add/update an executable architecture guard when practical.
+If ownership, injection, generated output, runtime responsibilities, or an escape hatch changes, update the relevant notes in the same PR. These notes guide implementation and review; they do not require a source-regex guard for incidental DOM, class, wrapper, or paint choices.
 
 ## Upstream audit
 
@@ -261,4 +261,4 @@ Do not reintroduce:
 - `pnpm --filter @m3-ui/tokens exec node --test scripts/motion-reference-evidence.test.mjs`
 - `pnpm --filter @m3-ui/tokens exec node --test scripts/elevation-reference-evidence.test.mjs`
 
-See the local architecture contracts above before changing token/theme/effect boundaries.
+See the local implementation notes above before changing token/theme/effect boundaries.
