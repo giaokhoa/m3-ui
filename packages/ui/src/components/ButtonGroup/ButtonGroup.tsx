@@ -42,8 +42,8 @@ function OverflowItem({ item, onAction }: { item: ButtonGroupActionItem; onActio
     <AriaButton
       className="button-group__menu-item"
       isDisabled={item.isDisabled}
-      role="menuitem"
       type="button"
+      render={(domProps) => <button {...domProps} role="menuitem" />}
       onPress={onAction}
       onPressStart={(event) => ripple.onPressStart(event)}
       onPressEnd={() => ripple.onPressEnd()}
