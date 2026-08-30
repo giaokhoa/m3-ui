@@ -6,9 +6,11 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type RefObject,
 } from 'react';
 import { parseDate, type CalendarDate } from '@internationalized/date';
 import {
+  Button as AriaButton,
   Calendar as AriaCalendar,
   CalendarCell,
   CalendarGrid,
@@ -26,6 +28,7 @@ import {
   RangeCalendarStateContext,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
+import { Ripple, useRipple } from '../../internal/ripple';
 import { IconButton } from '../IconButton';
 import {
   datePickerRuntime,
@@ -277,6 +280,31 @@ function CalendarSync({
   return null;
 }
 
+function MonthYearButton({ children, onPress }: { children: ReactNode; onPress: () => void }) {
+  const ripple = useRipple();
+  return (
+    <AriaButton
+      aria-label="Choose year"
+      className="date-picker__month-button"
+      onPress={onPress}
+      onPressStart={(event) => ripple.onPressStart(event)}
+      onPressEnd={() => ripple.onPressEnd()}
+    >
+      {(renderProps) => (
+        <>
+          <Ripple
+            controller={ripple}
+            focusRingRadius="9999px"
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+          {children}
+        </>
+      )}
+    </AriaButton>
+  );
+}
+
 function CalendarNavigation({
   yearRange,
   displayedMonth,
@@ -294,15 +322,53 @@ function CalendarNavigation({
   const nextDisabled = start.year >= yearRange[1] && start.month >= 12;
   return (
     <div className="date-picker__calendar-nav">
-      <button type="button" className="date-picker__month-button" onClick={onToggleYears} aria-label="Choose year">
+      <MonthYearButton onPress={onToggleYears}>
         <span className="date-picker__month-heading">{formatMonthYear(displayedMonth, locale)}</span>
-        <span aria-hidden="true">▾</span>
-      </button>
+        <span className="date-picker__month-arrow" aria-hidden="true">▾</span>
+      </MonthYearButton>
       <div className="date-picker__month-actions">
         <IconButton slot="previous" aria-label="Previous month" isDisabled={previousDisabled}><Chevron direction="left" /></IconButton>
         <IconButton slot="next" aria-label="Next month" isDisabled={nextDisabled}><Chevron direction="right" /></IconButton>
       </div>
     </div>
+  );
+}
+
+function YearOption({
+  selected,
+  selectedRef,
+  label,
+  onPress,
+}: {
+  selected: boolean;
+  selectedRef: RefObject<HTMLButtonElement | null>;
+  label: ReactNode;
+  onPress: () => void;
+}) {
+  const ripple = useRipple();
+  return (
+    <AriaButton
+      ref={selected ? selectedRef : undefined}
+      role="option"
+      aria-selected={selected}
+      className="date-picker__year"
+      data-selected={selected || undefined}
+      onPress={onPress}
+      onPressStart={(event) => ripple.onPressStart(event)}
+      onPressEnd={() => ripple.onPressEnd()}
+    >
+      {(renderProps) => (
+        <>
+          <Ripple
+            controller={ripple}
+            focusRingRadius="9999px"
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+          <span className="date-picker__year-label">{label}</span>
+        </>
+      )}
+    </AriaButton>
   );
 }
 
@@ -325,26 +391,112 @@ function YearPicker({ yearRange, onChoose, onClose }: {
             .map((item) => {
               const selected = picker.value === item.id;
               return (
-                <button
+                <YearOption
                   key={item.id}
-                  ref={selected ? selectedRef : undefined}
-                  type="button"
-                  role="option"
-                  aria-selected={selected}
-                  className="date-picker__year"
-                  data-selected={selected || undefined}
-                  onClick={() => {
+                  selected={selected}
+                  selectedRef={selectedRef}
+                  label={item.formatted}
+                  onPress={() => {
                     onChoose(item.date.toString());
                     onClose();
                   }}
-                >
-                  {item.formatted}
-                </button>
+                />
               );
             })}
         </div>
       )}
     </AriaCalendarYearPicker>
+  );
+}
+
+function DatePickerCalendarCell({ date }: { date: CalendarDate }) {
+  const ripple = useRipple();
+  return (
+    <CalendarCell
+      date={date}
+      className="date-picker__cell"
+      render={(domProps, renderProps) => {
+        const {
+          onBlur,
+          onKeyDown,
+          onKeyUp,
+          onPointerCancel,
+          onPointerDown,
+          onPointerLeave,
+          onPointerUp,
+          ...rest
+        } = domProps;
+        const enabled = !renderProps.isDisabled && !renderProps.isUnavailable;
+        return (
+          <div
+            {...rest}
+            onBlur={(event) => {
+              ripple.onPressEnd();
+              onBlur?.(event);
+            }}
+            onKeyDown={(event) => {
+              if (
+                enabled &&
+                !event.repeat &&
+                (event.key === 'Enter' || event.key === ' ')
+              ) {
+                ripple.onPressStart({
+                  pointerType: 'keyboard',
+                  target: ripple.containerRef.current ?? event.currentTarget,
+                  x: 0,
+                  y: 0,
+                });
+              }
+              onKeyDown?.(event);
+            }}
+            onKeyUp={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') ripple.onPressEnd();
+              onKeyUp?.(event);
+            }}
+            onPointerCancel={(event) => {
+              ripple.onPressEnd();
+              onPointerCancel?.(event);
+            }}
+            onPointerDown={(event) => {
+              if (enabled && event.isPrimary && event.button === 0) {
+                const target = ripple.containerRef.current ?? event.currentTarget;
+                const bounds = target.getBoundingClientRect();
+                ripple.onPressStart({
+                  pointerType:
+                    event.pointerType === 'touch' || event.pointerType === 'pen'
+                      ? event.pointerType
+                      : 'mouse',
+                  target,
+                  x: event.clientX - bounds.left,
+                  y: event.clientY - bounds.top,
+                });
+              }
+              onPointerDown?.(event);
+            }}
+            onPointerLeave={(event) => {
+              ripple.onPressEnd();
+              onPointerLeave?.(event);
+            }}
+            onPointerUp={(event) => {
+              ripple.onPressEnd();
+              onPointerUp?.(event);
+            }}
+          />
+        );
+      }}
+    >
+      {(renderProps) => (
+        <span className="date-picker__day-surface">
+          <Ripple
+            controller={ripple}
+            focusRingRadius="9999px"
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+          <span className="date-picker__day-label">{renderProps.formattedDate}</span>
+        </span>
+      )}
+    </CalendarCell>
   );
 }
 
@@ -355,11 +507,7 @@ function DateGrid() {
         {(day) => <CalendarHeaderCell className="date-picker__weekday">{day}</CalendarHeaderCell>}
       </CalendarGridHeader>
       <CalendarGridBody>
-        {(date) => (
-          <CalendarCell date={date} className="date-picker__cell">
-            {({ formattedDate }) => <span className="date-picker__day-surface">{formattedDate}</span>}
-          </CalendarCell>
-        )}
+        {(date) => <DatePickerCalendarCell date={date} />}
       </CalendarGridBody>
     </CalendarGrid>
   );
