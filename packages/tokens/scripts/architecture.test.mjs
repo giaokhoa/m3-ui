@@ -17,7 +17,6 @@ const allowedTokenCssSubpaths = new Set([
 const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
-  'components/DatePicker/DatePicker.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
   'components/TopAppBar/TopAppBar.defaults.ts',
   'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
@@ -303,6 +302,30 @@ test('ListItem keeps clipped root geometry while generated host elevation owns s
   assert.match(contract, /root deliberately uses the shared `\.elevation-host` paint mode/i);
   assert.match(contract, /descendant shadow painter would be clipped/i);
   assert.match(contract, /adding a wrapper solely for elevation would change the existing DOM\/geometry contract/i);
+});
+
+test('DatePicker keeps its clipped root while modal and docked variants select distinct host elevation', async () => {
+  const dockedTokens = JSON.parse(await readFile(new URL('tokens/component/date-picker-docked.json', packageRoot), 'utf8'));
+  const datePicker = await readFile(new URL('../ui/src/components/DatePicker/DatePicker.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/DatePicker/DatePicker.defaults.ts', packageRoot), 'utf8');
+  const css = await readFile(new URL('../ui/src/components/DatePicker/date-picker.css', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/DatePicker/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+
+  assert.equal(dockedTokens.component.datePickerDocked.containerElevation.$value, 'level3');
+  assert.match(datePicker, /@m3-ui\/tokens\/elevation\.css/);
+  assert.match(datePicker, /internal\/elevation\/elevation\.css/);
+  assert.match(datePicker, /elevation-host/);
+  assert.match(datePicker, /data-elevation=\{getDatePickerElevationLevel\(variant\)\}/);
+  assert.match(defaults, /getDatePickerElevationLevel/);
+  assert.match(defaults, /variant === 'docked' \? docked\.containerElevation : 'level0'/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_date-picker-box-shadow/);
+  assert.match(css, /overflow: hidden/);
+  assert.doesNotMatch(css, /--_date-picker-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/DatePicker\/date-picker\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /modal.*level0.*docked.*level3/is);
+  assert.match(contract, /descendant `<Elevation>` painter would be clipped/i);
+  assert.match(contract, /outer wrapper solely for elevation would change the existing DatePicker DOM\/geometry contract/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {

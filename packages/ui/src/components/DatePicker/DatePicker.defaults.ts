@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import { pxNumber } from '../../internal/tokenValues';
 
 export type DatePickerStyle = CSSProperties & Record<`--${string}`, string | number>;
@@ -112,6 +109,14 @@ function typography(prefix: string, role: 'labelLarge' | 'headlineLarge' | 'titl
   } as Record<`--${string}`, string | number>;
 }
 
+export function getDatePickerElevationLevel(
+  variant: 'modal' | 'docked',
+): ElevationLevel {
+  // Compose DatePicker is dialog content and does not add its own modal shadow.
+  // The separately tokenized docked web surface carries canonical level3 elevation.
+  return variant === 'docked' ? docked.containerElevation : 'level0';
+}
+
 export function getDatePickerStyle(
   variant: 'modal' | 'docked',
   mode: 'calendar' | 'input',
@@ -152,11 +157,6 @@ export function getDatePickerStyle(
     '--_date-picker-range-label-color': modal.rangeLabelColor,
     '--_date-picker-divider-color': divider.color,
     '--_date-picker-divider-thickness': `${divider.thickness}px`,
-    // Compose DatePicker is content intended for a Dialog and does not add its own modal shadow.
-    // The separately tokenized docked web surface does carry its canonical elevation.
-    '--_date-picker-box-shadow': isDocked
-      ? getElevationBoxShadow(docked.containerElevation)
-      : 'none',
     '--_date-picker-mode-parallax': `${datePickerRuntime.modeParallaxDistance}px`,
     '--_date-picker-spatial-duration': datePickerRuntime.motion.defaultSpatial.duration,
     '--_date-picker-spatial-easing': datePickerRuntime.motion.defaultSpatial.easing,
