@@ -1,69 +1,42 @@
-# ListItem architecture contract
+# ListItem implementation notes
 
 Read this file before changing ListItem token ownership, elevation painting, interaction-state projection, or DOM structure.
 
-## Elevation boundary
+## Material elevation semantics
 
 ListItem has two canonical semantic elevation states:
 
 - normal: `component.list.base.itemContainerElevation` (`level0`);
 - dragged: `component.list.base.itemDraggedContainerElevation` (`level4`).
 
-Runtime interaction code may choose between those semantic levels, but it must not serialize Material shadow geometry in TypeScript.
+Runtime interaction code may choose between those semantic levels, while immutable Material shadow geometry remains compiler-owned rather than being serialized in TypeScript.
 
-The ListItem root deliberately uses the shared `.elevation-host` paint mode instead of a descendant `<Elevation>` element. The root already owns `overflow: hidden` so its animated expressive shape clips the state layer and content correctly. A descendant shadow painter would be clipped by that overflow, while adding a wrapper solely for elevation would change the existing DOM/geometry contract.
+Dragged state is the state that changes ListItem elevation. `getListItemElevationLevel()` currently selects normal versus dragged elevation.
 
-Therefore the root keeps its existing element and receives:
+## Current web rendering
 
-```text
-class="list-item elevation-host"
-data-elevation="level0|level4"
-```
+The current ListItem root owns `overflow: hidden` so its expressive shape clips state-layer/content paint. A child shadow painter inside that clipped root would not render the outer shadow correctly, so the current implementation paints the generated elevation recipe on the root using `.elevation-host` and `data-elevation`.
 
-`@m3-ui/tokens/elevation.css` owns the immutable level recipe, `internal/elevation/elevation.css` applies the shared host `box-shadow`, and `ThemeProvider` continues to own the concrete `--shadow` role value.
+That host choice is an implementation detail. A future implementation may use another paint boundary or DOM arrangement if it preserves the same `level0`/`level4` semantics, shape clipping, geometry, interaction states, selection semantics, ripple behavior, accessibility, and RTL behavior.
 
-`ListItem.defaults.ts` must not call `getElevationBoxShadow()` or emit `--_list-item-box-shadow`.
+`@m3-ui/tokens/elevation.css` owns the immutable level recipe, shared elevation CSS applies it, and `ThemeProvider` owns the concrete `--shadow` role.
 
-## Interaction ownership
+## Interaction and token ownership
 
-ListItem interaction state remains runtime behavior. Hover, focus, press, selection, disabled, dragged shape selection, content colors, ripple state and keyboard/selection semantics are not static CSS-token compilation problems and may remain in React/TypeScript.
+Hover, focus, press, selection, disabled state, dragged shape selection, content colors, ripple state, and keyboard/selection semantics remain runtime behavior.
 
-Dragged state is the only state that changes the ListItem elevation level. `getListItemElevationLevel()` is the single runtime selector for normal versus dragged semantic elevation.
+The current `component.list.base` direct color-role strings are pre-existing semantic-token migration debt. This elevation work does not decode or reconstruct those runtime role expressions in React. A later reviewed token migration can replace them with `color.role.*` aliases independently.
 
 ## CSS packaging
 
-`ListItem.tsx` imports the reviewed generated elevation adapter and shared elevation paint CSS before `list-item.css` so source/dev consumers receive the host recipe.
+Source/dev and modular style consumers currently include generated elevation CSS and shared elevation paint CSS before `list-item.css`. Generated shadow geometry remains centralized under token build output rather than copied into component CSS.
 
-The modular `@m3-ui/ui/styles/ListItem.css` path must also inline, in order:
+## Validation
 
-1. `packages/tokens/dist/generated/elevation.css`;
-2. `packages/ui/src/internal/elevation/elevation.css`;
-3. `packages/ui/src/components/ListItem/list-item.css`.
+Tests should cover the observable behavior:
 
-Do not copy the generated recipe into `list-item.css`.
+- normal/selected items select semantic `level0` and compute no shadow;
+- dragged items select canonical `level4` and compute the generated shadow;
+- existing 56/72/88 geometry, slot placement, expressive shape clipping, selection semantics, ripple behavior, keyboard behavior, and RTL behavior remain correct.
 
-## Browser contract
-
-Browser tests inspect the actual host paint element: the ListItem root itself, because this component intentionally uses `.elevation-host`.
-
-They must verify:
-
-- normal/selected items expose `data-elevation="level0"` and compute `box-shadow: none`;
-- dragged items expose `data-elevation="level4"` and compute a non-`none` shadow;
-- existing 56/72/88 geometry, slot placement, selection semantics, ripple behavior and RTL behavior remain unchanged.
-
-## Token migration boundary
-
-The current `component.list.base` color-role strings are pre-existing semantic-token migration debt. This elevation migration does not decode or rewrite those runtime role expressions in React. A later semantic-color migration should convert the canonical DTCG color values to `color.role.*` aliases as one reviewed token change, without coupling that sweep to elevation painting.
-
-## Forbidden regressions
-
-Do not:
-
-- restore `getElevationBoxShadow()` or a private ListItem shadow string;
-- hardcode level4 shadow geometry/opacities in ListItem CSS or TypeScript;
-- add a child elevation painter inside the clipped root;
-- add a wrapper solely to paint elevation;
-- add positioning, sizing, overflow or transform behavior through `.elevation-host`;
-- change ListItem line geometry, selection semantics, ripple behavior or DOM hierarchy as part of an elevation/token refactor;
-- treat the existing direct List color-role strings as permission to decode `var(--role)` values in runtime code.
+Do not add a source-regex guard for `.elevation-host`, wrapper names, root paint ownership, or a particular DOM hierarchy. If the paint implementation changes, update these notes and validate the resulting Material behavior directly.
