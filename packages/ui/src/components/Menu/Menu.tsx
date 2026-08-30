@@ -20,6 +20,7 @@ import {
   type PopoverProps as AriaPopoverProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
+import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextField } from '../TextField';
 import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
 import './menu.css';
@@ -68,6 +69,8 @@ export function Menu<T extends object>({
   popoverClassName,
   ...menuProps
 }: MenuProps<T>) {
+  const themePortalContainer = useThemePortalContainer();
+
   return (
     <AriaMenuTrigger
       isOpen={isOpen}
@@ -80,6 +83,7 @@ export function Menu<T extends object>({
         offset={offset}
         crossOffset={crossOffset}
         containerPadding={menuRuntime.viewportMargin}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className={clsx('menu-popover', popoverClassName)}
         style={getMenuStyle()}
       >
@@ -190,6 +194,7 @@ export function ExposedMenu<T extends object>({
   ...menuProps
 }: ExposedMenuProps<T>) {
   const anchorRef = useRef<HTMLDivElement>(null);
+  const themePortalContainer = useThemePortalContainer();
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = controlledOpen ?? uncontrolledOpen;
 
@@ -256,6 +261,7 @@ export function ExposedMenu<T extends object>({
         placement="bottom start"
         offset={4}
         containerPadding={menuRuntime.viewportMargin}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-menu__popover"
         style={{
           ...getMenuStyle(),
