@@ -1,6 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import type { ButtonSize } from '../Button/Button.types';
 
 export type ButtonGroupSize = ButtonSize;
@@ -113,7 +113,6 @@ export function buttonGroupStyle(
     '--_button-group-selected-content': connectedButtonGroupColorTokens.selectedContent,
     '--_button-group-menu-container-color': buttonGroupOverflowMenuTokens.containerColor,
     '--_button-group-menu-container-radius': buttonGroupOverflowMenuTokens.containerRadius,
-    '--_button-group-menu-container-shadow': getElevationBoxShadow(buttonGroupOverflowMenuTokens.containerElevation),
     '--_button-group-menu-item-color': buttonGroupOverflowMenuTokens.itemLabelColor,
     '--_button-group-menu-item-container-color': buttonGroupOverflowMenuTokens.itemContainerColor,
     '--_button-group-menu-item-disabled-color': buttonGroupOverflowMenuTokens.itemDisabledLabelColor,
