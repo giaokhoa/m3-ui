@@ -19,7 +19,7 @@ The outer `.dialog-surface` wrapper is non-semantic. Focus trapping, Escape hand
 
 Component-internal wrapper, positioning, overflow and layout changes are allowed when required by this rendering boundary. The separate shared UI layout workstream is outside this component migration.
 
-Browser/visual tests inspect `.dialog__elevation`, the actual shadow paint layer, rather than requiring `.dialog` itself to own `box-shadow`.
+Browser/visual tests inspect the direct `<Elevation>` paint layer rather than requiring `.dialog` itself to own `box-shadow`.
 
 The modular Dialog stylesheet includes both the generated Elevation adapter and handwritten Elevation structural CSS before `dialog.css`.
 

@@ -21,7 +21,7 @@ A portaled Menu that escapes `[data-m3-theme-portal]` is an architecture regress
 
 Component-internal wrappers and CSS layout may change to preserve this boundary. The separate shared UI layout workstream is outside this component migration.
 
-Browser/visual tests inspect `.menu__elevation`, the actual paint layer, rather than requiring `.menu-popover` to own `box-shadow`.
+Browser/visual tests inspect the direct `<Elevation>` paint layer rather than requiring `.menu-popover` to own `box-shadow`.
 
 The modular Menu stylesheet includes generated Elevation CSS and handwritten Elevation structural CSS before `menu.css`.
 

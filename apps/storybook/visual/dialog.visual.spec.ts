@@ -28,7 +28,7 @@ test.describe('Material 3 Dialog browser contract', () => {
     await openStory(page, 'components-dialog--geometry');
     const dialog = page.getByTestId('dialog-geometry');
     const modal = page.locator('.dialog-modal');
-    const elevation = page.locator('.dialog__elevation');
+    const elevation = page.locator('.dialog-surface > .elevation');
     const modalBox = await modal.boundingBox();
     const surface = await dialog.evaluate((element) => {
       const computed = getComputedStyle(element);

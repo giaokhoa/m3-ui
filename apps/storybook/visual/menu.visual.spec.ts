@@ -16,7 +16,7 @@ test.describe('Material 3 Menu browser contract', () => {
 
     const themePortal = page.locator(themePortalSelector);
     const popover = page.locator('.menu-popover');
-    const elevation = popover.locator('.menu__elevation');
+    const elevation = popover.locator('.menu-surface > .elevation');
     await expect(themePortal.locator('.menu-popover')).toBeVisible();
     expect(
       await popover.evaluate((element) =>

@@ -143,7 +143,6 @@ export function Dialog({
       })}
     >
       <Elevation
-        className="dialog__elevation"
         level={dialogTokens.containerElevation}
         shadowColor={shadowColor}
       />

@@ -42,10 +42,7 @@ export interface MenuProps<T extends object>
 function MenuSurface({ children }: { children: ReactNode }) {
   return (
     <div className="menu-surface">
-      <Elevation
-        className="menu__elevation"
-        level={menuTokens.containerElevation}
-      />
+      <Elevation level={menuTokens.containerElevation} />
       <div className="menu-surface__clip">{children}</div>
     </div>
   );
