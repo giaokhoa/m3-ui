@@ -26,10 +26,6 @@
   border-radius: var(--_fab-container-radius);
 }
 
-.fab__elevation {
-  border-radius: var(--_fab-container-radius);
-}
-
 .fab__surface {
   position: relative;
   box-sizing: border-box;
@@ -141,7 +137,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fab__elevation,
+  .fab__visual > .elevation,
   .fab__content,
   .fab__label {
     transition: none !important;
