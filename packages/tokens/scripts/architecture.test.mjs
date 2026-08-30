@@ -15,7 +15,6 @@ const allowedTokenCssSubpaths = new Set([
 ]);
 
 const legacyElevationSerializerCallers = new Set([
-  'components/BottomAppBar/BottomAppBar.defaults.ts',
   'components/BottomSheet/BottomSheet.defaults.ts',
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
@@ -242,6 +241,22 @@ test('Menu level2 elevation stays outside its rounded clip surface', async () =>
   assert.match(contract, /Popover itself must stay non-clipping/i);
   assert.match(contract, /Browser\/visual tests inspect `\.menu__elevation`/i);
   assert.match(contract, /existing canonical Menu color-role strings are migration debt/i);
+});
+
+test('BottomAppBar keeps AndroidX tonal elevation separate from shadow elevation', async () => {
+  const bottomAppBarTokens = JSON.parse(await readFile(new URL('tokens/component/bottom-app-bar.json', packageRoot), 'utf8'));
+  const defaults = await readFile(new URL('../ui/src/components/BottomAppBar/BottomAppBar.defaults.ts', packageRoot), 'utf8');
+  const css = await readFile(new URL('../ui/src/components/BottomAppBar/bottom-app-bar.css', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/BottomAppBar/README.md', packageRoot), 'utf8');
+
+  assert.equal(bottomAppBarTokens.component.bottomAppBar.containerColor.$value, '{color.role.surfaceContainer}');
+  assert.match(defaults, /getSurfaceBackground/);
+  assert.match(defaults, /elevationLevelToPx/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_bottom-app-bar-box-shadow/);
+  assert.doesNotMatch(css, /box-shadow|--_bottom-app-bar-box-shadow/);
+  assert.match(contract, /tonal elevation.*not.*drop shadow/is);
+  assert.match(contract, /shadowElevation.*0\.dp/is);
+  assert.match(contract, /box-shadow: none/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {

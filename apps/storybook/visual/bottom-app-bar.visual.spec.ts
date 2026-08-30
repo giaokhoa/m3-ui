@@ -11,7 +11,7 @@ function expectClose(actual: number | undefined, expected: number) {
 }
 
 test.describe('Material 3 BottomAppBar browser contract', () => {
-  test('regular bar locks the canonical 80px surface-container Level2 container', async ({ page }) => {
+  test('regular bar locks the canonical 80px surface-container Level2 tonal container without shadow', async ({ page }) => {
     await openStory(page, 'components-bottomappbar--standard');
     const bar = page.getByTestId('bottom-app-bar');
     expectClose((await bar.boundingBox())?.height, 80);
@@ -25,7 +25,7 @@ test.describe('Material 3 BottomAppBar browser contract', () => {
       };
     });
     expect(visual.backgroundColor).toBe('rgb(243, 237, 247)');
-    expect(visual.boxShadow).not.toBe('none');
+    expect(visual.boxShadow).toBe('none');
     expect(visual.borderRadius).toBe('0px');
   });
 

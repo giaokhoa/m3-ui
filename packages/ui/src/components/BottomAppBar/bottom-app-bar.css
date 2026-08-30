@@ -6,7 +6,6 @@
   block-size: var(--_bottom-app-bar-height);
   background: var(--_bottom-app-bar-container-color);
   color: var(--_bottom-app-bar-content-color);
-  box-shadow: var(--_bottom-app-bar-box-shadow);
   border-radius: 0;
   transition: block-size var(--_bottom-app-bar-motion-duration)
     var(--_bottom-app-bar-motion-easing);

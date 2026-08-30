@@ -1,9 +1,10 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
+import { type ElevationLevel } from '../../internal/elevation';
 import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+  elevationLevelToPx,
+  getSurfaceBackground,
+} from '../Surface/Surface.defaults';
 
 export type BottomAppBarStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -96,18 +97,20 @@ export function getBottomAppBarStyle(
     (flexible
       ? bottomAppBarTokens.flexibleContainerElevation
       : bottomAppBarTokens.containerElevation);
+  const containerColor =
+    options.containerColor ??
+    (flexible
+      ? bottomAppBarTokens.flexibleContainerColor
+      : bottomAppBarTokens.containerColor);
 
   return {
     '--_bottom-app-bar-height': `${height}px`,
     '--_bottom-app-bar-expanded-height': `${fullHeight}px`,
-    '--_bottom-app-bar-container-color':
-      options.containerColor ??
-      (flexible
-        ? bottomAppBarTokens.flexibleContainerColor
-        : bottomAppBarTokens.containerColor),
+    '--_bottom-app-bar-container-color': getSurfaceBackground(
+      containerColor,
+      elevationLevelToPx(elevation),
+    ),
     '--_bottom-app-bar-content-color': options.contentColor ?? 'var(--on-surface)',
-    '--_bottom-app-bar-box-shadow':
-      elevation === 'level0' ? 'none' : getElevationBoxShadow(elevation),
     '--_bottom-app-bar-content-horizontal-padding': `${bottomAppBarRuntime.contentHorizontalPadding}px`,
     '--_bottom-app-bar-content-top-padding': `${bottomAppBarRuntime.contentTopPadding}px`,
     '--_bottom-app-bar-fab-horizontal-padding': `${bottomAppBarRuntime.fabHorizontalPadding}px`,
