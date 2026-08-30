@@ -176,7 +176,7 @@ export function getButtonStyle(
       : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
     ...(legacyInlineElevation
       ? { boxShadow: getElevationBoxShadow(resolveButtonElevation(variant, state)) }
-      : {}),
+      : { '--_button-elevation-transition': resolveButtonElevationTransition(state) }),
     transition: resolveButtonTransition(
       state,
       options.shapes !== undefined,

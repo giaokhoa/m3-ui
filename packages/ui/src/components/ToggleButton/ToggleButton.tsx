@@ -6,10 +6,7 @@ import {
 import '@m3-ui/tokens/button.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  resolveButtonElevation,
-  resolveButtonElevationTransition,
-} from '../Button/Button.defaults';
+import { resolveButtonElevation } from '../Button/Button.defaults';
 import {
   getToggleButtonStyle,
   resolveToggleButtonInteraction,
@@ -106,10 +103,7 @@ function ToggleButtonImpl({
         };
         return (
           <>
-            <Elevation
-              level={resolveButtonElevation(variant, elevationState)}
-              style={{ transition: resolveButtonElevationTransition(elevationState) }}
-            />
+            <Elevation level={resolveButtonElevation(variant, elevationState)} />
             <Ripple
               controller={ripple}
               focusRingRadius="var(--_button-container-radius)"

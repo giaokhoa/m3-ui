@@ -9,7 +9,6 @@ import { Ripple, useRipple } from '../../internal/ripple';
 import {
   getButtonStyle,
   resolveButtonElevation,
-  resolveButtonElevationTransition,
   type ButtonInteractionState,
   type ButtonShapes,
 } from './Button.defaults';
@@ -142,10 +141,7 @@ function ButtonImpl({
         const state = interactionState(renderProps.isDisabled);
         return (
           <>
-            <Elevation
-              level={resolveButtonElevation(variant, state)}
-              style={{ transition: resolveButtonElevationTransition(state) }}
-            />
+            <Elevation level={resolveButtonElevation(variant, state)} />
             <Ripple
               controller={ripple}
               focusRingRadius="var(--_button-container-radius)"
