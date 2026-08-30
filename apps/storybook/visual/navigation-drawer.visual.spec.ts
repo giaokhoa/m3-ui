@@ -67,8 +67,7 @@ test.describe('Material 3 NavigationDrawer browser contract', () => {
       return { backgroundColor: style.backgroundColor, boxShadow: style.boxShadow, minWidth: style.minWidth, maxWidth: style.maxWidth };
     });
     expect(visual.backgroundColor).toBe('rgb(254, 247, 255)');
-    expect(visual.boxShadow).not.toBe('none');
-    expect(visual.boxShadow.match(/0px 0px 0px 0px/g)).toHaveLength(3);
+    expect(visual.boxShadow).toBe('none');
     expect(visual.minWidth).toBe('240px');
     expect(visual.maxWidth).toBe('360px');
   });
@@ -98,7 +97,7 @@ test.describe('Material 3 NavigationDrawer browser contract', () => {
     });
     const scrimOpacity = await overlay.evaluate((element) => getComputedStyle(element, '::before').opacity);
     expect(visual.backgroundColor).toBe('rgb(247, 242, 250)');
-    expect(visual.boxShadow.match(/0px 0px 0px 0px/g)).toHaveLength(3);
+    expect(visual.boxShadow).toBe('none');
     expect(visual.borderStartStartRadius).toBe('0px');
     expect(visual.borderStartEndRadius).toBe('16px');
     expect(visual.borderEndEndRadius).toBe('16px');

@@ -41,7 +41,7 @@ test.describe('Material 3 WideNavigationRail browser contract', () => {
     expectClose(iconBox?.width, 24);
     expectClose(iconBox?.height, 24);
     expect(visual.backgroundColor).toBe('rgb(254, 247, 255)');
-    expect(visual.boxShadow.match(/0px 0px 0px 0px/g)).toHaveLength(3);
+    expect(visual.boxShadow).toBe('none');
     expect(labelVisual).toEqual({
       color: 'rgb(98, 91, 113)',
       fontSize: '12px',
