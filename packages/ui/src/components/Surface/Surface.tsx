@@ -132,7 +132,6 @@ export function Surface({
   onFocus,
   onKeyDown,
   onKeyUp,
-  onLostPointerCapture,
   onPointerCancel,
   onPointerDown,
   onPointerEnter,
@@ -236,10 +235,6 @@ export function Surface({
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
-        onLostPointerCapture={(event) => {
-          ripple.onPressEnd();
-          onLostPointerCapture?.(event);
-        }}
         onPointerCancel={(event) => {
           ripple.onPressEnd();
           onPointerCancel?.(event);
@@ -254,9 +249,6 @@ export function Surface({
           ) {
             const target = ripple.containerRef.current ?? event.currentTarget;
             ripple.onPressStart(toRipplePressEvent(event, target));
-            if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
-              event.currentTarget.setPointerCapture(event.pointerId);
-            }
           }
           onPointerDown?.(event);
         }}
@@ -266,13 +258,11 @@ export function Surface({
         }}
         onPointerLeave={(event) => {
           setIsHovered(false);
+          ripple.onPressEnd();
           onPointerLeave?.(event);
         }}
         onPointerUp={(event) => {
           ripple.onPressEnd();
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }
           onPointerUp?.(event);
         }}
         style={resolvedStyle}
