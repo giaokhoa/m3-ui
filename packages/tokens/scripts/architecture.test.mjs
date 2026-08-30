@@ -17,8 +17,6 @@ const allowedTokenCssSubpaths = new Set([
 const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
-  'components/SearchBar/SearchBar.defaults.ts',
-  'components/TopAppBar/TopAppBar.defaults.ts',
   'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
 ]);
 

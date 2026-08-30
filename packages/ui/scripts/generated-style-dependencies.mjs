@@ -44,6 +44,10 @@ export const generatedStyleDependencies = {
     '../tokens/dist/generated/elevation.css',
     'src/internal/elevation/elevation.css',
   ],
+  'src/components/TopAppBar/top-app-bar.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+  ],
 };
 
 export function expandStyleSources(sources) {

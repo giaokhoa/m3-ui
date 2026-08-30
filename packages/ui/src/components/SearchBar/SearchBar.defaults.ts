@@ -1,6 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type SearchBarStyle = CSSProperties & Record<`--${string}`, string | number>;
 type SearchShape = 'full' | 'extraLarge' | 'none';
@@ -103,7 +103,6 @@ export function getSearchBarStyle(): SearchBarStyle {
     '--_search-supporting-color': searchBarTokens.supportingTextColor,
     '--_search-leading-icon-color': searchBarTokens.leadingIconColor,
     '--_search-trailing-icon-color': searchBarTokens.trailingIconColor,
-    '--_search-box-shadow': getElevationBoxShadow(searchBarTokens.containerElevation, 'var(--shadow)'),
     ...runtimeVariables(),
     ...typographyVariables(searchBarTokens.inputTextTypography),
   };
@@ -119,7 +118,6 @@ export function getSearchViewStyle(mode: 'docked' | 'fullscreen'): SearchBarStyl
     '--_search-view-header-height': fullScreen
       ? searchViewTokens.fullScreenHeaderHeight
       : searchViewTokens.dockedHeaderHeight,
-    '--_search-view-box-shadow': getElevationBoxShadow(searchViewTokens.containerElevation, 'var(--shadow)'),
     '--_search-input-color': searchViewTokens.inputTextColor,
     '--_search-leading-icon-color': searchViewTokens.leadingIconColor,
     '--_search-supporting-color': searchViewTokens.supportingTextColor,

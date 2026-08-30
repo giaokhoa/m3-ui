@@ -16,7 +16,6 @@
   height: var(--_search-container-height);
   border-radius: var(--_search-container-radius);
   background: var(--_search-container-color);
-  box-shadow: var(--_search-box-shadow);
   overflow: hidden;
 }
 
@@ -91,7 +90,6 @@
 .search-view {
   background: var(--_search-view-container-color);
   border-radius: var(--_search-view-radius);
-  box-shadow: var(--_search-view-box-shadow);
   overflow: hidden;
 }
 .search-view__header {

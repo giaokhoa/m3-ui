@@ -6,7 +6,6 @@
   height: var(--_top-app-bar-height);
   background: var(--_top-app-bar-container-color);
   color: var(--_top-app-bar-title-color);
-  box-shadow: var(--_top-app-bar-box-shadow);
   transition:
     height var(--_top-app-bar-motion-duration) var(--_top-app-bar-motion-easing),
     background-color var(--_top-app-bar-motion-duration) var(--_top-app-bar-motion-easing),

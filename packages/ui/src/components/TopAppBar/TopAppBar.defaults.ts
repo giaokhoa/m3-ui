@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type TopAppBarVariant =
   | 'small'
@@ -214,11 +211,6 @@ export function getTopAppBarStyle(
     '--_top-app-bar-container-color': isScrolled
       ? options.scrolledContainerColor ?? topAppBarTokens.scrolledContainerColor
       : options.containerColor ?? topAppBarTokens.containerColor,
-    '--_top-app-bar-box-shadow': getElevationBoxShadow(
-      isScrolled
-        ? topAppBarTokens.scrolledContainerElevation
-        : topAppBarTokens.containerElevation,
-    ),
     '--_top-app-bar-title-color': options.titleColor ?? topAppBarTokens.titleColor,
     '--_top-app-bar-subtitle-color': options.subtitleColor ?? topAppBarTokens.subtitleColor,
     '--_top-app-bar-navigation-icon-color':
