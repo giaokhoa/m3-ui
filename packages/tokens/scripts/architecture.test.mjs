@@ -16,7 +16,6 @@ const allowedTokenCssSubpaths = new Set([
 
 const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
-  'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
 ]);
 
 async function sourceFiles(directory) {

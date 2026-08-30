@@ -77,7 +77,6 @@
   overflow: hidden;
   background: var(--_modal-wide-navigation-rail-container-color);
   color: var(--_modal-wide-navigation-rail-content-color);
-  box-shadow: var(--_modal-wide-navigation-rail-box-shadow);
   border-radius: var(--_modal-wide-navigation-rail-radius);
 }
 
