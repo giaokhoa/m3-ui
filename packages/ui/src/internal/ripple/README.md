@@ -1,4 +1,4 @@
-# Ripple parity and architecture contract
+# Ripple parity and implementation notes
 
 Read this file before changing `packages/ui/src/internal/ripple`, ripple/state-layer token serialization, focus indication, or component ripple injection.
 
@@ -97,7 +97,7 @@ This distinction is part of the runtime boundary: generated-source tests own sou
 - `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/RadioButtonTest.kt`
 - `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/CheckboxTest.kt`
 
-## Ported runtime contract
+## Ported runtime behavior
 
 The default remains the opacity-based Material focus indication. `ThemeProvider rippleFocus="inset-ring"` is the web theme-level equivalent of Compose's `RippleDefaults.InsetFocusRingThemeConfiguration` supplied through `LocalRippleThemeConfiguration`.
 
@@ -160,7 +160,7 @@ Required coverage includes:
 
 1. canonical AndroidX/state-layer/focus-ring token tests;
 2. generated `ripple.css` tests proving static token bindings are emitted and theme roles are not defined;
-3. architecture guards proving `<Ripple>` does not project static token constants through React style;
+3. runtime/unit coverage for wave geometry, lifecycle, interaction semantics, and focus-indication behavior;
 4. modular style tests proving generated ripple CSS precedes handwritten ripple CSS;
 5. UI unit/type/build tests;
 6. Storybook/Chromium visual regression for default opacity, inset ring, wave geometry, overlay ordering, and forced-colors behavior. Browser numeric custom-property assertions must compare parsed semantic values rather than minifier-dependent lexical spellings.
