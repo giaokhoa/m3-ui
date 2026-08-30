@@ -14,6 +14,13 @@ test('generated Elevation CSS serializes canonical shadow geometry through the t
   assert.match(css, /--_elevation-shadow-color: var\(--shadow\);/);
   assert.match(css, /--_elevation-box-shadow: none;/);
 
+  const level0 = css.match(
+    /\.elevation\[data-elevation='level0'\] \{([\s\S]*?)\n\}/,
+  )?.[1];
+  assert.ok(level0, 'missing generated level0 elevation rule');
+  assert.match(level0, /--_elevation-box-shadow: none;/);
+  assert.doesNotMatch(level0, /color-mix\(/);
+
   assert.match(css, /\.elevation\[data-elevation='level1'\] \{/);
   assert.match(
     css,

@@ -99,6 +99,7 @@ test('foundation docs lock change-local interaction-effect contracts', async () 
   assert.match(elevation, /must not rebuild canonical shadow geometry in TypeScript/i);
   assert.match(elevation, /cross-source drift/i);
   assert.match(elevation, /New code must not add new callers/i);
+  assert.match(elevation, /level0.*box-shadow: none/is);
   assert.match(elevation, /Browser\/visual contract tests.*actual paint layer/is);
   assert.match(elevation, /must not require the interactive\/root element itself to own `box-shadow`/i);
   assert.match(ripple, /useRipple\(\).*wave geometry/is);

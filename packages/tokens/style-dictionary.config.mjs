@@ -313,7 +313,10 @@ function createElevationCss(context) {
       `color-mix(in srgb, var(--_elevation-shadow-color) ${percent(get(`${prefix}.opacity`))}, transparent)`,
     ].join(' ');
   };
-  const levels = ELEVATION_LEVELS.flatMap((level) => ['', `.elevation[data-elevation='${level}'] {`, line('--_elevation-box-shadow', ELEVATION_LAYERS.map((layer) => shadowLayer(level, layer)).join(', ')), '}']);
+  const shadow = (level) => level === 'level0'
+    ? 'none'
+    : ELEVATION_LAYERS.map((layer) => shadowLayer(level, layer)).join(', ');
+  const levels = ELEVATION_LEVELS.flatMap((level) => ['', `.elevation[data-elevation='${level}'] {`, line('--_elevation-box-shadow', shadow(level)), '}']);
   return ['.elevation {', line('--_elevation-shadow-color', 'var(--shadow)'), line('--_elevation-box-shadow', 'none'), '}', ...levels, ''].join('\n');
 }
 

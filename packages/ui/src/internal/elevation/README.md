@@ -54,6 +54,12 @@ style={{ boxShadow: buildShadowFromTokenLayers(level) }}
 
 Static shadow geometry, opacities, and ThemeProvider shadow-role wiring belong in the generated adapter, not inline React style.
 
+### Level0 is semantic absence of shadow
+
+`level0` must serialize to `--_elevation-box-shadow: none`. Do not serialize the canonical zero geometry as three colored `0px 0px 0px 0px` shadow layers: while that can look identical, the browser still computes a non-`none` shadow list and no longer represents the semantic absence of elevation.
+
+The generated adapter may therefore special-case `level0` at the platform-serialization boundary. This does not mutate the canonical DTCG recipe. Levels `level1` through `level5` continue to serialize the canonical three-layer shadow geometry and opacities.
+
 ## Shadow color overrides
 
 The primitive may accept a real runtime `shadowColor` override. Such an override should set the private shadow-color CSS variable only; it must not cause React to regenerate the shadow list.
@@ -104,6 +110,7 @@ Do not:
 - rebuild `box-shadow` strings from generated token constants in new component code;
 - hardcode a shadow color instead of resolving through `--shadow` by default;
 - make generated elevation CSS define the concrete `--shadow` theme role;
+- serialize `level0` as zero-geometry colored shadow layers instead of `box-shadow: none`;
 - switch the canonical 3-layer recipe to Material Web's 2-layer renderer recipe without resolving the tracked provenance drift;
 - restore root `box-shadow` merely to satisfy a browser test written before the `<Elevation>` paint-layer migration;
 - hand-edit `packages/tokens/dist/**`;
