@@ -62,10 +62,10 @@ Do not:
 
 ## Required validation
 
-Changes to this contract should cover:
+Changes to this behavior should cover:
 
 1. canonical BottomAppBar token aliasing;
 2. unit tests proving default `surfaceContainer` stays unchanged and `surface` receives the Level2 tonal overlay;
-3. architecture guards rejecting the legacy shadow serializer;
+3. semantic tests distinguishing tonal elevation from shadow elevation;
 4. browser checks proving the default regular and flexible bars compute `box-shadow: none`;
 5. normal UI test/build/typecheck and Material token audits.
