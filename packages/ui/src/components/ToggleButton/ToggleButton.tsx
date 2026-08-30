@@ -107,7 +107,6 @@ function ToggleButtonImpl({
         return (
           <>
             <Elevation
-              className="toggle-button__elevation"
               level={resolveButtonElevation(variant, elevationState)}
               style={{ transition: resolveButtonElevationTransition(elevationState) }}
             />

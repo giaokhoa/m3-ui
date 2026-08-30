@@ -143,7 +143,6 @@ function ButtonImpl({
         return (
           <>
             <Elevation
-              className="button__elevation"
               level={resolveButtonElevation(variant, state)}
               style={{ transition: resolveButtonElevationTransition(state) }}
             />
