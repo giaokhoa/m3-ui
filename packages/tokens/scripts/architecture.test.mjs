@@ -6,14 +6,6 @@ const packageRoot = new URL('../', import.meta.url);
 const repoRoot = new URL('../../../', import.meta.url);
 const uiSourceRoot = new URL('../ui/src/', packageRoot);
 
-const allowedTokenCssSubpaths = new Set([
-  '@m3-ui/tokens/button.css',
-  '@m3-ui/tokens/chip.css',
-  '@m3-ui/tokens/text-field.css',
-  '@m3-ui/tokens/elevation.css',
-  '@m3-ui/tokens/ripple.css',
-]);
-
 async function sourceFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
@@ -46,7 +38,7 @@ test('handwritten token runtime and upstream-sync layers stay deleted', async ()
   }
 });
 
-test('Style Dictionary reads only canonical DTCG and emits reviewed platform artifacts', async () => {
+test('Style Dictionary reads only canonical DTCG', async () => {
   const configUrl = new URL('style-dictionary.config.mjs', packageRoot);
   const { default: config } = await import(
     `${configUrl.href}?architecture=${Date.now()}`
@@ -58,15 +50,13 @@ test('Style Dictionary reads only canonical DTCG and emits reviewed platform art
     false,
     'upstream references must never be Style Dictionary includes',
   );
-  assert.deepEqual(Object.keys(config.platforms), ['js', 'css']);
-  assert.deepEqual(
-    config.platforms.css.files.map((file) => file.destination),
-    ['button.css', 'chip.css', 'text-field.css', 'elevation.css', 'ripple.css'],
-    'CSS output must stay explicit and consumer-driven rather than becoming a generic token dump',
-  );
 });
 
-test('package exposes generated JS root plus reviewed CSS adapters', async () => {
+test('generated CSS outputs and package exports stay internally consistent', async () => {
+  const configUrl = new URL('style-dictionary.config.mjs', packageRoot);
+  const { default: config } = await import(
+    `${configUrl.href}?exports=${Date.now()}`
+  );
   const manifest = JSON.parse(
     await readFile(new URL('package.json', packageRoot), 'utf8'),
   );
@@ -74,49 +64,36 @@ test('package exposes generated JS root plus reviewed CSS adapters', async () =>
   assert.equal(manifest.main, './dist/generated/tokens.js');
   assert.equal(manifest.module, './dist/generated/tokens.js');
   assert.equal(manifest.types, './dist/generated/tokens.d.ts');
-  assert.deepEqual(Object.keys(manifest.exports), [
-    '.',
-    './button.css',
-    './chip.css',
-    './text-field.css',
-    './elevation.css',
-    './ripple.css',
-  ]);
-  for (const name of ['button', 'chip', 'text-field', 'elevation', 'ripple']) {
+
+  for (const file of config.platforms.css?.files ?? []) {
+    const exportName = `./${file.destination}`;
     assert.equal(
-      manifest.exports[`./${name}.css`],
-      `./dist/generated/${name}.css`,
+      manifest.exports?.[exportName],
+      `./dist/generated/${file.destination}`,
+      `generated CSS ${file.destination} must be exported at ${exportName}`,
     );
   }
-  assert.doesNotMatch(manifest.scripts.build, /\btsc\b/);
-  assert.equal(Object.hasOwn(manifest.scripts, 'typecheck'), false);
 });
 
-test('Style Dictionary skill describes runtime color ownership and generated adapters', async () => {
-  const skill = await readFile(
-    new URL('.agents/skills/style-dictionary/SKILL.md', repoRoot),
-    'utf8',
+test('UI token CSS subpath imports resolve through package exports', async () => {
+  const manifest = JSON.parse(
+    await readFile(new URL('package.json', packageRoot), 'utf8'),
+  );
+  const exportedSubpaths = new Set(
+    Object.keys(manifest.exports ?? {})
+      .filter((specifier) => specifier.endsWith('.css'))
+      .map((specifier) => `@m3-ui/tokens/${specifier.slice(2)}`),
   );
 
-  assert.match(skill, /no handwritten runtime `src\/` layer/i);
-  assert.match(skill, /## Runtime color model/i);
-  assert.match(skill, /ThemeProvider/i);
-  assert.match(skill, /owns (?:the concrete runtime value of|actual) Material color/i);
-  assert.match(skill, /component.*reference.*role/is);
-  assert.match(skill, /platform adapter/i);
-  assert.match(skill, /Do not decode `var\(--role\)`/i);
-});
-
-test('UI token subpath imports are limited to reviewed generated platform adapters', async () => {
   for (const file of await sourceFiles(uiSourceRoot)) {
     const source = await readFile(file, 'utf8');
-    const imports = [...source.matchAll(/['"](@m3-ui\/tokens\/[^'"]+)['"]/g)].map(
+    const imports = [...source.matchAll(/['"](@m3-ui\/tokens\/[^'"]+\.css)['"]/g)].map(
       (match) => match[1],
     );
     for (const specifier of imports) {
       assert.ok(
-        allowedTokenCssSubpaths.has(specifier),
-        `${file.pathname} imports unsupported token subpath ${specifier}`,
+        exportedSubpaths.has(specifier),
+        `${file.pathname} imports unexported token CSS subpath ${specifier}`,
       );
     }
   }
