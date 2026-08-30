@@ -13,7 +13,7 @@ These rules are intentionally strict where they define token source/build owners
 5. Do not recreate `scripts/compose-sync`, `packages/tokens/src/generated/androidx`, or any equivalent upstream-to-runtime snapshot generator.
 6. Dynamic Material colors belong to `ThemeProvider`. Core color-role tokens terminate in runtime CSS expressions such as `var(--primary)`; component color tokens alias those canonical roles.
 7. Non-color design tokens are generated static values. They may be serialized into a consumer-specific generated CSS adapter, but must not become a generic global token-variable dump without a concrete platform need.
-8. `packages/tokens` has no handwritten runtime `src/` layer. JavaScript consumers import immutable values from the package root. UI code may import only explicitly reviewed generated CSS adapter subpaths such as `@m3-ui/tokens/button.css`.
+8. `packages/tokens` has no handwritten runtime `src/` layer. JavaScript consumers import immutable values from the package root. UI code may import generated CSS adapter subpaths exported by the token package.
 9. Component/runtime code may contain behavior, interaction history, DOM geometry, and real runtime overrides, but must not duplicate or reserialize immutable design constants when Style Dictionary/CSS can own the platform representation.
 10. A new upstream revision is adopted by reviewing canonical changes and audit drift; never by regenerating canonical files from upstream.
 
@@ -78,7 +78,7 @@ public components
 apps / consumers
 ```
 
-Lower layers must not depend on public components. Production code must never import from test fixtures. JavaScript/TypeScript token values come from the `@m3-ui/tokens` package root. A token subpath import is allowed only when it is an explicit generated platform adapter declared in the token package exports and architecture allowlist.
+Lower layers must not depend on public components. Production code must never import from test fixtures. JavaScript/TypeScript token values come from the `@m3-ui/tokens` package root. A token CSS subpath import is valid when the token package exports that generated adapter; consistency tests verify generated outputs, package exports, and UI imports agree without maintaining a separate name allowlist.
 
 ## Dynamic colors and CSS variables
 
