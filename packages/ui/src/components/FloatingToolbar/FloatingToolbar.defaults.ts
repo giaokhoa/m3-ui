@@ -1,6 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type FloatingToolbarOrientation = 'horizontal' | 'vertical';
 export type FloatingToolbarVariant = 'standard' | 'vibrant';
@@ -137,25 +137,31 @@ export function getFloatingToolbarTranslation(
     : `translateX(${-logicalOffset}px)`;
 }
 
-function shadow(level: ElevationLevel): string {
-  return level === 'level0' ? 'none' : getElevationBoxShadow(level);
-}
-
-export function getFloatingToolbarStyle(
-  variant: FloatingToolbarVariant,
+export function resolveFloatingToolbarElevation(
   expanded: boolean,
   withFab: boolean,
-  options: FloatingToolbarStyleOptions = {},
-): FloatingToolbarStyle {
+  options: Pick<
+    FloatingToolbarStyleOptions,
+    'expandedElevation' | 'collapsedElevation'
+  > = {},
+): ElevationLevel {
   const defaultExpandedElevation = withFab
     ? floatingToolbarRuntime.expandedElevationWithFab
     : floatingToolbarRuntime.expandedElevation;
   const defaultCollapsedElevation = withFab
     ? floatingToolbarRuntime.collapsedElevationWithFab
     : floatingToolbarRuntime.collapsedElevation;
-  const level = expanded
+  return expanded
     ? options.expandedElevation ?? defaultExpandedElevation
     : options.collapsedElevation ?? defaultCollapsedElevation;
+}
+
+export function getFloatingToolbarStyle(
+  variant: FloatingToolbarVariant,
+  expanded: boolean,
+  _withFab: boolean,
+  options: FloatingToolbarStyleOptions = {},
+): FloatingToolbarStyle {
   const defaultContainerColor =
     variant === 'standard'
       ? floatingToolbarTokens.standardContainerColor
@@ -177,7 +183,6 @@ export function getFloatingToolbarStyle(
     '--_floating-toolbar-container-color':
       options.containerColor ?? defaultContainerColor,
     '--_floating-toolbar-content-color': options.contentColor ?? defaultContentColor,
-    '--_floating-toolbar-box-shadow': shadow(level),
     '--_floating-toolbar-fab-gap': `${floatingToolbarRuntime.toolbarToFabGap}px`,
     '--_floating-toolbar-fab-size': expanded
       ? floatingToolbarTokens.fabBaselineSize

@@ -20,7 +20,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
   'components/DatePicker/DatePicker.defaults.ts',
-  'components/FloatingToolbar/FloatingToolbar.defaults.ts',
   'components/ListItem/ListItem.defaults.ts',
   'components/NavigationDrawer/NavigationDrawer.defaults.ts',
   'components/NavigationRail/NavigationRail.defaults.ts',

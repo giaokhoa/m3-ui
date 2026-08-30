@@ -24,6 +24,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await openStory(page, 'components-floatingtoolbar--horizontal-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
+    const elevation = toolbar.locator('.floating-toolbar__elevation');
     const first = toolbar.locator('.icon-button').first();
     const last = toolbar.locator('.icon-button').last();
     const [surfaceBox, firstBox, lastBox] = await Promise.all([
@@ -34,6 +35,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
 
     await expect(toolbar).toHaveAttribute('role', 'toolbar');
     await expect(toolbar).toHaveAttribute('aria-orientation', 'horizontal');
+    await expect(elevation).toHaveAttribute('data-elevation', 'level0');
     expectClose(surfaceBox?.height, 64);
     expectClose((firstBox?.x ?? 0) - (surfaceBox?.x ?? 0), 8);
     expectClose(
@@ -52,6 +54,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     });
     expect(visual.backgroundColor).toBe('rgb(243, 237, 247)');
     expect(visual.boxShadow).toBe('none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).toBe('none');
     expect(visual.borderRadius).toBeGreaterThanOrEqual(32);
   });
 
@@ -70,10 +73,11 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await expect(toolbar.getByRole('button', { name: 'Search' })).toBeFocused();
   });
 
-  test('expanded horizontal FAB toolbar reserves 80px cross-axis while FAB is 56px and toolbar surface is Level1', async ({ page }) => {
+  test('expanded horizontal FAB toolbar reserves 80px cross-axis while FAB is 56px and toolbar paint is Level1', async ({ page }) => {
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
+    const elevation = toolbar.locator('.floating-toolbar__elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const fab = fabSlot.locator('.fab');
     const fabVisual = fabSlot.locator('.fab__visual');
@@ -92,13 +96,16 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     expectClose(fabBox?.width, 56);
     expectClose(visualBox?.width, 56);
     expectClose((slotBox?.x ?? 0) - ((surfaceBox?.x ?? 0) + (surfaceBox?.width ?? 0)), 8);
-    expect((await surface.evaluate((element) => getComputedStyle(element).boxShadow))).not.toBe('none');
+    await expect(elevation).toHaveAttribute('data-elevation', 'level1');
+    await expect(surface).toHaveCSS('box-shadow', 'none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
   });
 
   test('collapsed FAB toolbar hides the toolbar part and grows only the FAB to 80px', async ({ page }) => {
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-collapsed');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
+    const elevation = toolbar.locator('.floating-toolbar__elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const fabVisual = fabSlot.locator('.fab__visual');
     const [toolbarBox, surfaceBox, slotBox, visualBox] = await Promise.all([
@@ -112,6 +119,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     expectClose(surfaceBox?.width, 0);
     expectClose(surfaceBox?.height, 0);
     await expect(surface).toHaveCSS('visibility', 'hidden');
+    await expect(elevation).toHaveAttribute('data-elevation', 'level0');
     expectClose(slotBox?.width, 80);
     expectClose(slotBox?.height, 80);
     expectClose(visualBox?.width, 80);
@@ -190,14 +198,15 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     expectClose(translation.y, 0);
   });
 
-  test('reduced motion removes toolbar size and translation transition duration', async ({ page }) => {
+  test('reduced motion removes toolbar size, elevation and translation transition duration', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
+    const elevation = toolbar.locator('.floating-toolbar__elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const durations = await Promise.all(
-      [toolbar, surface, fabSlot].map((locator) =>
+      [toolbar, surface, elevation, fabSlot].map((locator) =>
         locator.evaluate((element) => getComputedStyle(element).transitionDuration),
       ),
     );
