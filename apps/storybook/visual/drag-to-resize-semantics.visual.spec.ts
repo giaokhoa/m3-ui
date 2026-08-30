@@ -7,7 +7,6 @@ async function openStory(page: Page, id: string) {
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
-  await expect(page.locator('#storybook-root')).toBeVisible();
 }
 
 test.describe('Material 3 levitated drag-to-resize semantics', () => {
@@ -20,6 +19,9 @@ test.describe('Material 3 levitated drag-to-resize semantics', () => {
     const pane = root.locator('[data-pane-role="tertiary"]');
     const handle = root.getByRole('button', { name: 'Resize pane' });
 
+    // The built Storybook preview can finish network activity before the React
+    // story commits under parallel CI load. Wait on the semantic pane itself.
+    await expect(pane).toBeVisible({ timeout: 15_000 });
     await expect(pane).toHaveAttribute('data-resize-state', 'default');
     await expect(handle).toHaveAttribute('data-resize-state', 'default');
     await expect(handle).toHaveAttribute('aria-description', 'partially expanded. expand');
