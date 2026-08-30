@@ -1,144 +1,80 @@
-# Elevation architecture contract
+# Elevation implementation notes
 
-Read this file before changing `packages/ui/src/internal/elevation`, elevation token serialization, or component elevation injection.
+Read this file before changing `packages/ui/src/internal/elevation`, elevation token serialization, or component elevation integration.
 
-This subsystem translates Material 3 semantic elevation levels into web shadow painting. It deliberately separates **runtime state selection** from **immutable shadow rendering**.
+This subsystem maps Material 3 semantic elevation levels to web shadow paint while separating **runtime level selection** from **immutable shadow serialization**.
 
-## Ownership
+## Material/token ownership
 
-```text
-component interaction state
-        |
-        | runtime: choose level0...level5
-        v
-<Elevation /> child paint OR .elevation-host root paint
-        |
-        | data-elevation="levelN"
-        v
-Style Dictionary generated elevation.css
-        |
-        | canonical shadow geometry + opacity
-        v
-handwritten elevation.css
-        |
-        v
-browser box-shadow
-
-ThemeProvider -> --shadow -> generated elevation adapter
-```
-
-- canonical DTCG owns semantic elevation levels and shadow recipes;
-- Style Dictionary owns CSS serialization of the immutable shadow recipe;
+- canonical DTCG owns semantic elevation levels and the reviewed shadow recipes;
+- Style Dictionary serializes immutable shadow geometry/opacities into generated `elevation.css`;
 - `ThemeProvider` owns the concrete runtime `--shadow` color;
-- React/component code owns interaction precedence/history and chooses the semantic elevation level;
-- `<Elevation>` is the default narrow child painting primitive. It must not rebuild canonical shadow geometry in TypeScript;
-- `.elevation-host` is a paint-only host mode for a component whose existing root must remain the shadow painter because a descendant paint layer would be clipped or an added wrapper would alter scroll, transform, measurement, or positioning behavior.
+- component runtime code owns interaction precedence/history and chooses the semantic `ElevationLevel`;
+- component code should not rebuild canonical `box-shadow` strings from token constants.
 
-## Required rendering boundary
-
-Current child-paint migrations pass the semantic `ElevationLevel` to `<Elevation>`. Component-specific layout, stacking, and motion remain on the owning component boundary and reach the paint layer through private CSS variables and structural selectors where needed.
-
-Current child-paint shape:
+The default child-paint integration is intentionally narrow:
 
 ```tsx
 <Elevation level={level} />
 ```
 
-When a component already has a clipping or scrolling root that must also own transform or measurement geometry, use the documented host-paint mode instead of adding a wrapper solely for elevation:
+A component using `<Elevation>` should normally only select the semantic `level`. Genuine runtime values such as a public `shadowColor` override or runtime-selected transition style may also be passed when the component behavior requires them.
 
-```tsx
-<div
-  className="component elevation-host"
-  data-elevation={level}
-  style={{ '--_elevation-shadow-color': shadowColor }}
-/>
-```
+Do not create component-specific Elevation alias classes such as `button__elevation`, `dialog__elevation`, or similar merely to name the paint node. Generic paint-layer structure belongs to the shared primitive; component-specific behavior can target the actual structural relationship when needed. Existing callers that violate this rule are migration debt to handle when those components are audited, not a reason to type-lock the primitive API.
 
-Host mode is deliberately narrow. `.elevation-host` must not add positioning, sizing, overflow, transform, border-radius, or other layout behavior. It only paints `box-shadow: var(--_elevation-box-shadow)` from the same generated recipe used by `<Elevation>`.
+## Shared paint implementation
 
-Bad:
+The current `<Elevation>` paint node uses the shared `.elevation` class and `data-elevation="levelN"`. Handwritten elevation CSS owns generic paint-layer behavior such as absolute fill, inherited radius, and pointer-event transparency; generated CSS supplies the selected shadow recipe.
 
-```ts
-style={{ boxShadow: buildShadowFromTokenLayers(level) }}
-```
+Some components currently paint the same generated recipe on an existing root through `.elevation-host[data-elevation]` because their clipped/scrolling/transformed/measured DOM makes a descendant paint node inconvenient. This host mode is a web implementation escape hatch, not a Material component contract and not a repository-wide requirement.
 
-Static shadow geometry, opacities, and ThemeProvider shadow-role wiring belong in the generated adapter, not inline React style. Host mode changes **where** the generated recipe is painted, not who owns the recipe.
+`.elevation-host` is currently paint-only. Components may be refactored to another paint boundary when that produces the same Material rendering and preserves their geometry, clipping, scrolling, transforms, measurements, interactions, and accessibility. Do not add executable guards that freeze host mode, wrapper names, or a particular DOM hierarchy.
 
-### Level0 is semantic absence of shadow
+## Level 0
 
-`level0` must serialize to `--_elevation-box-shadow: none`. Do not serialize the canonical zero geometry as three colored `0px 0px 0px 0px` shadow layers: while that can look identical, the browser still computes a non-`none` shadow list and no longer represents the semantic absence of elevation.
+Material level 0 has no visible shadow. The current generated web adapter serializes that state as `box-shadow: none`; higher levels use the reviewed generated shadow recipe.
 
-The generated adapter may therefore special-case `level0` at the platform-serialization boundary. This does not mutate the canonical DTCG recipe. Levels `level1` through `level5` continue to serialize the canonical three-layer shadow geometry and opacities. The same semantic rule applies to both `.elevation` and `.elevation-host` selectors.
+Treat `none` as the current platform representation of semantic absence, not as a reason to push shadow serialization back into React. If the platform serializer changes while preserving Material semantics, review the generated-output and browser tests together rather than locking an incidental textual form in component code.
 
 ## Shadow color overrides
 
-The primitive may accept a real runtime `shadowColor` override. Such an override should set the private shadow-color CSS variable only; it must not cause React to regenerate the shadow list.
-
-A host-paint consumer follows the same rule: a runtime override may set `--_elevation-shadow-color` on the host, while the generated adapter remains responsible for the shadow list.
+A real runtime `shadowColor` override may set the private shadow-color variable used by the generated recipe. It must not cause React to regenerate the shadow list.
 
 The default remains `var(--shadow)`, whose concrete value is supplied by `ThemeProvider`.
 
 ## Motion
 
-Elevation transition **selection** remains runtime where the correct incoming/outgoing spec depends on current and previous interaction. In the migrated child-paint components, the selected motion values live on the component boundary and reach `.elevation` through private CSS variables and structural CSS. The motion token values themselves remain canonical immutable tokens.
+Elevation transition **selection** remains runtime when the correct incoming/outgoing transition depends on interaction state or history. Immutable motion token values remain canonical tokens.
 
-Do not move interaction-history logic into the generated CSS merely to remove JavaScript. Conversely, do not use runtime transition selection as justification for serializing static shadow geometry in JavaScript.
+Runtime transition selection is not justification for serializing static shadow geometry in JavaScript. Conversely, generated CSS should not absorb interaction-history logic merely to eliminate runtime state.
 
 ## Current provenance and known drift
 
 Semantic levels `0 / 1 / 3 / 6 / 8 / 12` are reconciled against the pinned AndroidX and Material Web evidence.
 
-The canonical web shadow recipe currently has three layers with opacities `0.20 / 0.14 / 0.12`. Pinned Figma Material 3 and Material Web renderer evidence uses two key/ambient layers at `0.30 / 0.15`. This is an explicit tracked cross-source drift in `packages/tokens/audit/elevation-reference-evidence.json` and `foundation-drift.json`.
+The canonical web shadow recipe currently has three layers with opacities `0.20 / 0.14 / 0.12`. Pinned Figma Material 3 and Material Web renderer evidence uses two key/ambient layers at `0.30 / 0.15`. This remains explicit cross-source drift in `packages/tokens/audit/elevation-reference-evidence.json` and `foundation-drift.json`.
 
-Do **not** silently replace the canonical three-layer recipe with the Material Web two-layer renderer recipe. Any canonical change requires a separate normative Material specification review and corresponding audit/drift update.
-
-## Component integration
-
-Production component elevation selects a semantic `ElevationLevel` at runtime and leaves shadow serialization to the generated elevation adapter. Use `<Elevation>` when a child paint layer matches the component's DOM and paint bounds.
-
-If the existing root clips descendants, owns transform or measurement geometry, or otherwise must remain the shadow painter, `.elevation-host[data-elevation]` can paint the same generated recipe on that root without adding a wrapper. Connected ButtonGroup items are one example: React Aria keeps the existing `label` / `button` hosts, while runtime interaction state selects the semantic level for `data-elevation`.
-
-Choose between child paint and host paint from the component's actual DOM and paint geometry rather than from a repository-wide implementation convention.
+Do not silently replace the canonical recipe during an implementation cleanup. A canonical recipe change requires a separate Material/spec provenance review and corresponding audit/drift update.
 
 ## Generated CSS location
 
-Generated platform CSS stays centralized with other Style Dictionary artifacts:
+Generated platform CSS stays centralized under:
 
 ```text
 packages/tokens/dist/generated/elevation.css
 ```
 
-The UI primitive imports it through the reviewed token-package CSS subpath. Modular `@m3-ui/ui/styles/*.css` builds that include handwritten `internal/elevation/elevation.css` must inline the generated adapter before that handwritten CSS so the public style artifact stays self-contained. The same dependency ordering is required for component styles that consume `.elevation-host`.
+Public modular UI styles that consume Elevation must include the generated adapter and the shared handwritten paint CSS required for their rendered output. Tests may verify that the resulting public CSS is self-contained without maintaining a component-name allowlist.
 
-## Browser test boundary
+## Validation
 
-Browser/visual contract tests must assert the actual paint layer when checking `box-shadow`: normally the descendant `.elevation` in child-paint mode, or the root carrying `.elevation-host` in documented host-paint mode. They must not require the interactive/root element itself to own `box-shadow` merely because an older implementation painted there; root painting is valid only when the component deliberately uses host mode for clipping/geometry reasons.
+Prefer tests that validate Material/token semantics and observable rendering:
 
-Root-level tests may still verify container background, border, geometry, semantics, interaction attributes, and documented host elevation state. Elevation tests should verify the semantic level/state on the actual paint element and its computed shadow.
+1. canonical elevation reference evidence and generated CSS output;
+2. component runtime selection of the correct semantic `ElevationLevel`;
+3. computed browser shadow on the paint boundary actually used by the component;
+4. runtime shadow-color and motion behavior where applicable;
+5. component geometry, clipping, interactions, and accessibility after paint-boundary changes;
+6. normal unit/type/build and visual regression coverage.
 
-## Forbidden regressions
-
-Do not:
-
-- copy elevation shadow geometry or opacity constants into React/TypeScript;
-- rebuild `box-shadow` strings from generated token constants in new component code;
-- hardcode a shadow color instead of resolving through `--shadow` by default;
-- make generated elevation CSS define the concrete `--shadow` theme role;
-- serialize `level0` as zero-geometry colored shadow layers instead of `box-shadow: none`;
-- switch the canonical 3-layer recipe to Material Web's 2-layer renderer recipe without resolving the tracked provenance drift;
-- use `.elevation-host` as a general styling/layout class or add geometry rules to it;
-- restore handwritten root shadow serialization merely to satisfy a browser test; root painting is allowed only through `.elevation-host` plus the generated recipe;
-- add a wrapper solely for elevation when it would alter an existing component's scroll, transform, measurement, or positioning contract;
-- hand-edit `packages/tokens/dist/**`;
-- create a second elevation event state machine inside the painting primitive.
-
-## Required validation
-
-Changes to this subsystem should cover:
-
-1. canonical elevation reference-evidence tests;
-2. generated `elevation.css` tests for both child and host selectors;
-3. component tests for affected semantic level selection and paint boundaries;
-4. UI unit/type/build tests;
-5. modular style self-containment tests;
-6. visual regression for affected elevated components, asserting shadow on the actual paint layer used by that component.
+Do not add source-regex tests for exact Elevation class names, wrapper names, `.elevation-host` usage, paint-node placement, or README wording. Those are implementation details unless a Material requirement makes the observable result itself normative.
