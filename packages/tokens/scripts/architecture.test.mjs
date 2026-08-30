@@ -18,12 +18,9 @@ const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
   'components/DatePicker/DatePicker.defaults.ts',
-  'components/NavigationDrawer/NavigationDrawer.defaults.ts',
-  'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
   'components/TopAppBar/TopAppBar.defaults.ts',
   'components/WideNavigationRail/ModalWideNavigationRail.defaults.ts',
-  'components/WideNavigationRail/WideNavigationRail.defaults.ts',
 ]);
 
 async function sourceFiles(directory) {

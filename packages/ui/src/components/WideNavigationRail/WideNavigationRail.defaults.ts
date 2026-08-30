@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type WideNavigationRailStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -130,9 +127,7 @@ export function getWideNavigationRailStyle(
       wideNavigationRailTokens.headerSpaceMinimum,
     '--_wide-navigation-rail-collapsed-item-space':
       wideNavigationRailTokens.collapsedItemSpace,
-    '--_wide-navigation-rail-box-shadow': getElevationBoxShadow(
-      wideNavigationRailTokens.collapsedContainerElevation,
-    ),
+    '--_wide-navigation-rail-box-shadow': 'none',
     '--_wide-navigation-rail-spatial-duration':
       wideNavigationRailRuntime.motion.spatial.duration,
     '--_wide-navigation-rail-spatial-easing':

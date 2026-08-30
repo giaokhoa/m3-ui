@@ -1,6 +1,5 @@
 import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
-import { getElevationBoxShadow } from '../../internal/elevation';
 import {
   getDismissibleDrawerSheetStyle,
   getModalDrawerSheetStyle,
@@ -56,7 +55,7 @@ describe('NavigationDrawer defaults', () => {
         '--_navigation-drawer-container-color': token.ComponentNavigationDrawerStandardContainerColor,
         '--_navigation-drawer-radius-start-start': token.ShapeNone,
         '--_navigation-drawer-radius-start-end': token.ShapeNone,
-        '--_navigation-drawer-box-shadow': getElevationBoxShadow('level0'),
+        '--_navigation-drawer-box-shadow': 'none',
       });
     }
   });
@@ -69,7 +68,7 @@ describe('NavigationDrawer defaults', () => {
       '--_navigation-drawer-radius-start-end': token.ShapeCornerLargeEndTopEnd,
       '--_navigation-drawer-radius-end-end': token.ShapeCornerLargeEndBottomEnd,
       '--_navigation-drawer-radius-end-start': token.ShapeCornerLargeEndBottomStart,
-      '--_navigation-drawer-box-shadow': getElevationBoxShadow('level0'),
+      '--_navigation-drawer-box-shadow': 'none',
     });
   });
 

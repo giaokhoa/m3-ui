@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type NavigationRailStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -117,9 +114,7 @@ export function getNavigationRailStyle(
     '--_navigation-rail-vertical-padding': `${navigationRailRuntime.verticalPadding}px`,
     '--_navigation-rail-item-spacing': `${navigationRailRuntime.itemSpacing}px`,
     '--_navigation-rail-header-spacer-height': `${navigationRailRuntime.headerSpacerHeight}px`,
-    '--_navigation-rail-box-shadow': getElevationBoxShadow(
-      navigationRailTokens.containerElevation,
-    ),
+    '--_navigation-rail-box-shadow': 'none',
   };
 }
 
