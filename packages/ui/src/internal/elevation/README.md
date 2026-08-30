@@ -36,9 +36,9 @@ ThemeProvider -> --shadow -> generated elevation adapter
 
 ## Required rendering boundary
 
-A component that has interaction-driven elevation should pass only the semantic `ElevationLevel` to `<Elevation>` when a separate child paint layer is compatible with its DOM and clipping bounds. Component-specific layout, stacking, and motion stay on the owning component boundary; when the paint layer needs those values, expose them through the component's private CSS variables and structural selectors rather than adding a component class or inline style to `<Elevation>`.
+Current child-paint migrations pass the semantic `ElevationLevel` to `<Elevation>`. Component-specific layout, stacking, and motion remain on the owning component boundary and reach the paint layer through private CSS variables and structural selectors where needed.
 
-Good child-paint mode:
+Current child-paint shape:
 
 ```tsx
 <Elevation level={level} />
@@ -80,7 +80,7 @@ The default remains `var(--shadow)`, whose concrete value is supplied by `ThemeP
 
 ## Motion
 
-Elevation transition **selection** may remain runtime when the correct incoming/outgoing spec depends on current and previous interaction. The selected motion values belong to the component boundary and should reach the child paint layer through private CSS variables plus structural CSS; they are not component-specific props or inline styles on `<Elevation>`. The motion token values themselves remain canonical immutable tokens.
+Elevation transition **selection** remains runtime where the correct incoming/outgoing spec depends on current and previous interaction. In the migrated child-paint components, the selected motion values live on the component boundary and reach `.elevation` through private CSS variables and structural CSS. The motion token values themselves remain canonical immutable tokens.
 
 Do not move interaction-history logic into the generated CSS merely to remove JavaScript. Conversely, do not use runtime transition selection as justification for serializing static shadow geometry in JavaScript.
 
