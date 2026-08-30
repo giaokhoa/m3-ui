@@ -7,7 +7,7 @@
   isolation: isolate;
 }
 
-.surface__elevation {
+.surface > .elevation {
   z-index: -1;
 }
 
