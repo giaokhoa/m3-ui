@@ -128,14 +128,11 @@ test.describe('Material 3 ListDetailPaneScaffold visual parity', () => {
     const detailOffsetX = detailBounds.x - scaffoldBounds.x;
     const listOffsetX = listBounds.x - scaffoldBounds.x;
 
-    // At progress=0.5 the pinned 0.8 / 380 spring has just overshot the
-    // compact-pane target: List is ~0.14px past x=0 and Detail is ~0.14px
-    // past the 480px trailing edge. Keep this as a browser geometry contract
-    // instead of snapshotting font rasterization.
-    expect(listOffsetX).toBeGreaterThanOrEqual(0);
-    expect(listOffsetX).toBeLessThan(1);
-    expect(detailOffsetX).toBeGreaterThan(480);
-    expect(detailOffsetX).toBeLessThan(481);
+    // The pinned spring still evaluates in Float motion space, but AndroidX
+    // places panes with IntOffset geometry. The browser renderer mirrors that
+    // quantization before placement, so the halfway offsets land on exact edges.
+    expect(listOffsetX).toBe(0);
+    expect(detailOffsetX).toBe(480);
   });
 
   test('predictive back scales graphics without feeding back into layout', async ({ page }) => {
