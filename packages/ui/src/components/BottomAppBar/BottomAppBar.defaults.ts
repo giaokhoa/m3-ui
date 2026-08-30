@@ -102,14 +102,14 @@ export function getBottomAppBarStyle(
     (flexible
       ? bottomAppBarTokens.flexibleContainerColor
       : bottomAppBarTokens.containerColor);
+  const resolvedContainerColor =
+    getSurfaceBackground(containerColor, elevationLevelToPx(elevation)) ??
+    containerColor;
 
   return {
     '--_bottom-app-bar-height': `${height}px`,
     '--_bottom-app-bar-expanded-height': `${fullHeight}px`,
-    '--_bottom-app-bar-container-color': getSurfaceBackground(
-      containerColor,
-      elevationLevelToPx(elevation),
-    ),
+    '--_bottom-app-bar-container-color': resolvedContainerColor,
     '--_bottom-app-bar-content-color': options.contentColor ?? 'var(--on-surface)',
     '--_bottom-app-bar-content-horizontal-padding': `${bottomAppBarRuntime.contentHorizontalPadding}px`,
     '--_bottom-app-bar-content-top-padding': `${bottomAppBarRuntime.contentTopPadding}px`,
