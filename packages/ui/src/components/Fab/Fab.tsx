@@ -217,7 +217,6 @@ function FabImpl({
         return (
           <span className="fab__visual">
             <Elevation
-              className="fab__elevation"
               level={level}
               style={{
                 transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
@@ -333,7 +332,6 @@ function ExtendedFabImpl({
         return (
           <span className="fab__visual">
             <Elevation
-              className="fab__elevation"
               level={level}
               style={{
                 transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
