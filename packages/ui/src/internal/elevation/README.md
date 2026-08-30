@@ -92,13 +92,13 @@ The canonical web shadow recipe currently has three layers with opacities `0.20 
 
 Do **not** silently replace the canonical three-layer recipe with the Material Web two-layer renderer recipe. Any canonical change requires a separate normative Material specification review and corresponding audit/drift update.
 
-## Incremental migration
+## Component integration
 
-Legacy components may still call the old TypeScript shadow serializer while they await component-level migration. New code must not add new callers. When a component is touched for elevation architecture work, migrate it to `<Elevation>` where its DOM/paint bounds make that primitive appropriate.
+Production component elevation selects a semantic `ElevationLevel` at runtime and leaves shadow serialization to the generated elevation adapter. Use `<Elevation>` when a child paint layer matches the component's DOM and paint bounds.
 
-If the component root has `overflow: hidden` / `overflow: auto`, owns the transform used for motion, or is itself the measured scroll/surface box, a child elevation layer may be clipped and an extra wrapper may change behavior. In that case, prefer `.elevation-host[data-elevation]` and preserve the existing DOM/layout geometry. Document the reason locally in the component contract.
+If the existing root clips descendants, owns transform or measurement geometry, or otherwise must remain the shadow painter, `.elevation-host[data-elevation]` can paint the same generated recipe on that root without adding a wrapper. Connected ButtonGroup items are one example: React Aria keeps the existing `label` / `button` hosts, while runtime interaction state selects the semantic level for `data-elevation`.
 
-The target end state is no TypeScript shadow serialization for ordinary Material component elevation.
+Choose between child paint and host paint from the component's actual DOM and paint geometry rather than from a repository-wide implementation convention.
 
 ## Generated CSS location
 
@@ -138,7 +138,7 @@ Changes to this subsystem should cover:
 
 1. canonical elevation reference-evidence tests;
 2. generated `elevation.css` tests for both child and host selectors;
-3. architecture guards that reject static shadow serialization returning to `<Elevation>`/migrated components;
+3. component tests for affected semantic level selection and paint boundaries;
 4. UI unit/type/build tests;
 5. modular style self-containment tests;
 6. visual regression for affected elevated components, asserting shadow on the actual paint layer used by that component.

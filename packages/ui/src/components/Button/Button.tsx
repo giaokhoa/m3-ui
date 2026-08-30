@@ -123,9 +123,8 @@ function ButtonImpl({
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return {
           ...getButtonStyle(
-            variant,
             interactionState(renderProps.isDisabled),
-            { size, shapes, legacyInlineElevation: false },
+            { size, shapes },
           ),
           ...userStyle,
         };

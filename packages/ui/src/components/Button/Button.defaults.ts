@@ -2,7 +2,6 @@ import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
 import {
   elevationMotionTokens,
-  getElevationBoxShadow,
   type ElevationLevel,
 } from '../../internal/elevation';
 import type { ButtonInteraction } from './Button.interactions';
@@ -20,12 +19,6 @@ export interface ButtonStyleOptions {
   /** Static size values are applied by generated CSS through `data-size`. */
   readonly size?: ButtonSize;
   readonly shapes?: ButtonShapes;
-  /**
-   * Transitional compatibility for connected ButtonGroup, which still paints
-   * elevation on its host instead of rendering the shared Elevation primitive.
-   * New consumers must set this to false and render Elevation directly.
-   */
-  readonly legacyInlineElevation?: boolean;
 }
 
 export interface ButtonInteractionState {
@@ -146,20 +139,11 @@ export function resolveButtonElevationTransition({
 function resolveButtonTransition(
   state: ButtonInteractionState,
   hasAnimatedShape: boolean,
-  legacyInlineElevation: boolean,
 ): string {
-  const elevationTransition = legacyInlineElevation
-    ? resolveButtonElevationTransition(state)
-    : 'none';
-  const transitions = [
-    elevationTransition === 'none' ? null : elevationTransition,
-    hasAnimatedShape && !state.isDisabled ? buttonShapeTransition : null,
-  ].filter((value): value is string => value !== null);
-  return transitions.length > 0 ? transitions.join(', ') : 'none';
+  return hasAnimatedShape && !state.isDisabled ? buttonShapeTransition : 'none';
 }
 
 export function getButtonStyle(
-  variant: ButtonVariant,
   state: ButtonInteractionState,
   options: ButtonStyleOptions = {},
 ): ButtonStyle {
@@ -168,19 +152,12 @@ export function getButtonStyle(
       ? options.shapes.pressedShape
       : options.shapes.shape
     : null;
-  const legacyInlineElevation = options.legacyInlineElevation ?? true;
 
   return {
     ...(activeShape === null
       ? {}
       : { '--_button-container-radius': normalizeShapeValue(activeShape) }),
-    ...(legacyInlineElevation
-      ? { boxShadow: getElevationBoxShadow(resolveButtonElevation(variant, state)) }
-      : { '--_button-elevation-transition': resolveButtonElevationTransition(state) }),
-    transition: resolveButtonTransition(
-      state,
-      options.shapes !== undefined,
-      legacyInlineElevation,
-    ),
+    '--_button-elevation-transition': resolveButtonElevationTransition(state),
+    transition: resolveButtonTransition(state, options.shapes !== undefined),
   };
 }

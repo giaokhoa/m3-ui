@@ -14,10 +14,6 @@ const allowedTokenCssSubpaths = new Set([
   '@m3-ui/tokens/ripple.css',
 ]);
 
-const legacyElevationSerializerCallers = new Set([
-  'components/Button/Button.defaults.ts',
-]);
-
 async function sourceFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
@@ -87,7 +83,6 @@ test('foundation docs lock change-local interaction-effect contracts', async () 
   assert.match(elevation, /Style Dictionary owns CSS serialization/i);
   assert.match(elevation, /must not rebuild canonical shadow geometry in TypeScript/i);
   assert.match(elevation, /cross-source drift/i);
-  assert.match(elevation, /New code must not add new callers/i);
   assert.match(elevation, /level0.*box-shadow: none/is);
   assert.match(elevation, /\.elevation-host/i);
   assert.match(elevation, /must not add positioning, sizing, overflow, transform/i);
@@ -120,7 +115,6 @@ test('Elevation and Ripple primitives do not serialize immutable design tokens i
   assert.doesNotMatch(ripple, /RippleRadiusDuration|StateLayerOpacityHover|RippleFocusRingOuterStrokeWidth/);
   assert.match(button, /<Elevation/);
   assert.doesNotMatch(button, /getElevationBoxShadow/);
-  assert.match(button, /legacyInlineElevation: false/);
 });
 
 test('Chip static colors are compiler-owned instead of decoded and rebuilt in TypeScript', async () => {
@@ -325,18 +319,4 @@ test('runtime color CSS expressions are never decoded back into semantic token n
     const source = await readFile(file, 'utf8');
     assert.doesNotMatch(source, /\bcolorRole\s*\(/, `${uiRelativePath(file)} must use semantic DTCG aliases/generated CSS rather than decode var(--role)`);
   }
-});
-
-test('legacy TypeScript elevation serialization is frozen to the existing migration allowlist', async () => {
-  const observed = new Set();
-  for (const file of await sourceFiles(uiSourceRoot)) {
-    const relative = uiRelativePath(file);
-    if (!relative || relative.startsWith('internal/elevation/')) continue;
-    if (/\.(?:test|stories)\.[jt]sx?$/.test(relative)) continue;
-    const source = await readFile(file, 'utf8');
-    if (!source.includes('getElevationBoxShadow')) continue;
-    observed.add(relative);
-    assert.ok(legacyElevationSerializerCallers.has(relative), `${relative} adds a new legacy getElevationBoxShadow caller; use <Elevation> + generated elevation.css instead`);
-  }
-  assert.deepEqual([...observed].sort(), [...legacyElevationSerializerCallers].sort(), 'legacy elevation allowlist changed; migrations must remove the caller from this set in the same PR');
 });

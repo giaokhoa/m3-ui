@@ -8,7 +8,6 @@ import {
 } from './Button.defaults';
 
 const idleState = { isDisabled: false, interaction: null } as const;
-const primitiveElevation = { legacyInlineElevation: false } as const;
 
 describe('Button runtime defaults', () => {
   it('keeps expressive shape resolution in runtime because shapes may be supplied by props', () => {
@@ -18,25 +17,17 @@ describe('Button runtime defaults', () => {
   });
 
   it('only emits runtime shape overrides when shapes are supplied', () => {
-    const baseline = getButtonStyle('filled', idleState, {
-      size: 'medium',
-      ...primitiveElevation,
-    });
+    const baseline = getButtonStyle(idleState, { size: 'medium' });
     expect(baseline['--_button-container-radius']).toBeUndefined();
     expect(baseline['--_button-container-color']).toBeUndefined();
     expect(baseline['--_button-min-height']).toBeUndefined();
     expect(baseline.boxShadow).toBeUndefined();
 
     const shapes = buttonShapesForSize('medium');
-    const idle = getButtonStyle('filled', idleState, {
-      size: 'medium',
-      shapes,
-      ...primitiveElevation,
-    });
+    const idle = getButtonStyle(idleState, { size: 'medium', shapes });
     const pressed = getButtonStyle(
-      'filled',
       { ...idleState, interaction: 'press' },
-      { size: 'medium', shapes, ...primitiveElevation },
+      { size: 'medium', shapes },
     );
     expect(idle['--_button-container-radius']).toBe('9999px');
     expect(pressed['--_button-container-radius']).toBe('12px');
@@ -62,21 +53,5 @@ describe('Button runtime defaults', () => {
     expect(resolveButtonElevationTransition({ ...idleState, interaction: 'hover' })).toBe('box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1)');
     expect(resolveButtonElevationTransition({ ...idleState, previousInteraction: 'hover' })).toBe('box-shadow 120ms cubic-bezier(0.4, 0, 0.6, 1)');
     expect(resolveButtonElevationTransition({ ...idleState, previousInteraction: 'press' })).toBe('box-shadow 150ms cubic-bezier(0.4, 0, 0.6, 1)');
-  });
-
-  it('keeps inline shadow serialization only as transitional compatibility', () => {
-    const legacy = getButtonStyle('elevated', {
-      ...idleState,
-      interaction: 'hover',
-    });
-    expect(legacy.boxShadow).toContain('var(--shadow)');
-
-    const migrated = getButtonStyle(
-      'elevated',
-      { ...idleState, interaction: 'hover' },
-      primitiveElevation,
-    );
-    expect(migrated.boxShadow).toBeUndefined();
-    expect(migrated.transition).toBe('none');
   });
 });
