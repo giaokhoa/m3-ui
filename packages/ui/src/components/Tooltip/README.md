@@ -1,4 +1,4 @@
-# Tooltip architecture contract
+# Tooltip implementation notes
 
 Read this file before changing Tooltip token ownership, elevation rendering, portal inheritance, or interaction semantics.
 
@@ -8,25 +8,18 @@ Read this file before changing Tooltip token ownership, elevation rendering, por
 - RichTooltip keeps its non-modal dialog behavior, portal inheritance, pointer/focus travel, and public runtime overrides in React.
 - Canonical Tooltip colors reference `color.role.*`; `ThemeProvider` owns the concrete runtime role values.
 - Tooltip shape, typography, geometry, and motion projections remain local until they receive their own reviewed generated component adapter.
-- RichTooltip shadow geometry is not a Tooltip runtime projection. The shared `<Elevation>` primitive paints the canonical level through generated `@m3-ui/tokens/elevation.css`.
+- RichTooltip shadow geometry is not a Tooltip runtime projection. The current implementation uses shared Elevation with generated `@m3-ui/tokens/elevation.css` for the canonical shadow recipe.
 
 ## RichTooltip elevation
 
-`richTooltipTokens.containerElevation` selects the semantic elevation level. The public `shadowColor` prop is a real runtime override and is passed to `<Elevation>`; when absent, the canonical `containerShadowColor` role is used.
+`richTooltipTokens.containerElevation` selects the semantic elevation level. The public `shadowColor` prop is a real runtime override; when absent, the canonical `containerShadowColor` role is used.
 
-`Tooltip.defaults.ts` must not call `getElevationBoxShadow()` or emit a private Tooltip `box-shadow` token. Browser tests inspect the direct `<Elevation>` paint layer rather than requiring the AriaPopover root to own `box-shadow`.
+Canonical elevation geometry remains compiler-owned rather than being rebuilt in Tooltip TypeScript. Browser tests should validate the semantic elevation level and computed shadow paint rather than require the AriaPopover root itself to own `box-shadow`.
 
-The modular Tooltip stylesheet must include both the generated Elevation adapter and the handwritten Elevation structural CSS before `tooltip.css`.
+The modular Tooltip stylesheet currently includes both the generated Elevation adapter and handwritten Elevation structural CSS before `tooltip.css`.
 
-## Forbidden regressions
+## Material and behavior constraints
 
-Do not:
+Preserve Tooltip runtime color roles, RichTooltip semantic elevation, the public `shadowColor` override, React Aria placement/interaction semantics, and focus/pointer travel behavior.
 
-- copy `var(--role)` strings into canonical Tooltip color tokens when a `color.role.*` alias exists;
-- rebuild canonical elevation shadow layers in Tooltip TypeScript;
-- move RichTooltip placement, focus travel, or portal behavior into the Elevation primitive;
-- make the interactive/popover root own shadow geometry merely to satisfy a test;
-- drop the public `shadowColor` runtime override while migrating static rendering;
-- change Tooltip geometry or placement as part of an elevation/token refactor.
-
-When this boundary changes, update this README and its executable architecture guard in the same PR.
+Do not move Tooltip interaction behavior into the Elevation primitive or rebuild canonical shadow layers merely to preserve a particular DOM/test structure. Paint-layer placement and selector structure may change when the resulting Material rendering and behavior remain correct; update these notes rather than adding a source-regex guard for the current implementation.
