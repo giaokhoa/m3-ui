@@ -21,6 +21,9 @@
 
 .card > .elevation {
   z-index: 0;
+  transition-property: box-shadow;
+  transition-duration: var(--_card-elevation-duration, 0ms);
+  transition-timing-function: var(--_card-elevation-easing, linear);
 }
 
 .card__surface {

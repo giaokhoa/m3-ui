@@ -16,6 +16,7 @@ import {
   getBrandedFabStyle,
   getExtendedFabStyle,
   getFabStyle,
+  type FabStyle,
 } from './Fab.defaults';
 import {
   endFabInteraction,
@@ -77,6 +78,15 @@ type FabInteractionCallbacks = Pick<
   AriaButtonProps,
   'onBlur' | 'onFocus' | 'onHoverEnd' | 'onHoverStart' | 'onPressEnd' | 'onPressStart'
 >;
+
+function elevationStyle(
+  motion: ReturnType<typeof getFabElevationMotion>,
+): FabStyle {
+  return {
+    '--_fab-elevation-duration': `${motion?.durationMs ?? 0}ms`,
+    '--_fab-elevation-easing': motion?.easing ?? 'linear',
+  };
+}
 
 function useFabInteractions({
   onBlur,
@@ -215,15 +225,8 @@ function FabImpl({
         );
 
         return (
-          <span className="fab__visual">
-            <Elevation
-              level={level}
-              style={{
-                transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
-                transitionProperty: motion ? 'box-shadow' : undefined,
-                transitionTimingFunction: motion?.easing,
-              }}
-            />
+          <span className="fab__visual" style={elevationStyle(motion)}>
+            <Elevation level={level} />
             <span className="fab__surface">
               <Ripple
                 controller={interactions.ripple}
@@ -330,15 +333,8 @@ function ExtendedFabImpl({
         );
 
         return (
-          <span className="fab__visual">
-            <Elevation
-              level={level}
-              style={{
-                transitionDuration: motion ? `${motion.durationMs}ms` : undefined,
-                transitionProperty: motion ? 'box-shadow' : undefined,
-                transitionTimingFunction: motion?.easing,
-              }}
-            />
+          <span className="fab__visual" style={elevationStyle(motion)}>
+            <Elevation level={level} />
             <span className="fab__surface">
               <Ripple
                 controller={interactions.ripple}

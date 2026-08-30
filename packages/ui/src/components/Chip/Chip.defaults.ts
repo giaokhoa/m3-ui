@@ -63,6 +63,7 @@ export function getChipStyle(variant: ChipVariant, state: ChipInteractionState, 
   const spacing = resolveSpacing(variant, options, tokens.iconSpacing, selectable?.compactIconSpacing ?? tokens.iconSpacing);
   const padding = resolvePadding(variant, options, tokens.contentPaddingInline);
   const typography = tokens.labelTypography;
+  const elevationMotion = getChipElevationMotion(state);
   return {
     '--_chip-height': `${tokens.height}px`,
     '--_chip-container-radius': resolveRadius(state, options, tokens.containerRadius),
@@ -81,5 +82,7 @@ export function getChipStyle(variant: ChipVariant, state: ChipInteractionState, 
     '--_chip-font-weight': typography.fontWeight,
     '--_chip-letter-spacing': `${typography.letterSpacing}px`,
     '--_chip-shape-transition': options.shapes ? chipShapeTransition : 'none',
+    '--_chip-elevation-duration': `${elevationMotion.durationMs}ms`,
+    '--_chip-elevation-easing': elevationMotion.easing,
   };
 }

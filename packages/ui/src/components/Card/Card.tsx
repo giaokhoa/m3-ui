@@ -16,6 +16,7 @@ import {
   getCardElevationLevel,
   getCardElevationMotion,
   getCardStyle,
+  type CardStyle,
 } from './Card.defaults';
 import {
   endCardInteraction,
@@ -103,6 +104,12 @@ function CardImpl({
   const elevationLevel = getCardElevationLevel(variant, disabled, interaction);
   const elevationMotion = getCardElevationMotion(disabled, interaction, previousInteraction);
   const tokenStyle = getCardStyle(variant, { isDisabled: disabled, shape });
+  const resolvedStyle: CardStyle = {
+    ...tokenStyle,
+    '--_card-elevation-duration': `${elevationMotion.durationMs}ms`,
+    '--_card-elevation-easing': elevationMotion.easing,
+    ...style,
+  };
   const resolvedClassName = clsx('card', variantClassName(variant), className);
 
   return (
@@ -134,10 +141,10 @@ function CardImpl({
       onPointerLeave={handlePointerLeave}
       onPointerUp={handlePointerUp}
       role={role}
-      style={{ ...tokenStyle, ...style }}
+      style={resolvedStyle}
       tabIndex={tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)}
     >
-      <Elevation level={elevationLevel} style={{ transitionDuration: `${elevationMotion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: elevationMotion.easing }} />
+      <Elevation level={elevationLevel} />
       <div className="card__surface">
         {interactive ? (
           <Ripple controller={ripple} focusRingRadius="var(--_card-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestCardStateLayerInteraction(activeInteractions, isFocusVisible)} />

@@ -26,6 +26,12 @@
   border-radius: var(--_fab-container-radius);
 }
 
+.fab__visual > .elevation {
+  transition-property: box-shadow;
+  transition-duration: var(--_fab-elevation-duration, 0ms);
+  transition-timing-function: var(--_fab-elevation-easing, linear);
+}
+
 .fab__surface {
   position: relative;
   box-sizing: border-box;

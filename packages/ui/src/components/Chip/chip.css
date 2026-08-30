@@ -51,6 +51,9 @@
 
 .chip__visual > .elevation {
   z-index: 0;
+  transition-property: box-shadow;
+  transition-duration: var(--_chip-elevation-duration, 0ms);
+  transition-timing-function: var(--_chip-elevation-easing, linear);
 }
 
 .chip__surface {

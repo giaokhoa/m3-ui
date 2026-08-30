@@ -8,7 +8,7 @@ import {
 import '@m3-ui/tokens/chip.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { getChipElevationMotion, getChipRootStyle, getChipStyle, resolveChipElevation, type ChipShapeValue, type ChipShapes } from './Chip.defaults';
+import { getChipRootStyle, getChipStyle, resolveChipElevation, type ChipShapeValue, type ChipShapes } from './Chip.defaults';
 import { endChipInteraction, latestChipInteraction, latestChipStateLayerInteraction, startChipInteraction, type ChipInteraction } from './Chip.interactions';
 import type { ChipVariant } from './Chip.tokens';
 import './chip.css';
@@ -28,11 +28,10 @@ function resolveCheckboxChildren(children: AriaCheckboxProps['children'], render
 function ChipVisual({ variant, label, slots, controller, activeInteractions, previousInteraction, isDisabled, isSelected, isFocusVisible, shape, shapes }: { variant: ChipVariant; label: ReactNode; slots: VisualSlots; controller: ReturnType<typeof useRipple>; activeInteractions: readonly ChipInteraction[]; previousInteraction: ChipInteraction | null; isDisabled: boolean; isSelected: boolean; isFocusVisible: boolean; shape?: ChipShapeValue; shapes?: ChipShapes; }) {
   const interaction = latestChipInteraction(activeInteractions);
   const state = { isDisabled, isSelected, interaction, previousInteraction };
-  const motion = getChipElevationMotion(state);
   const style = getChipStyle(variant, state, { shape, shapes, hasLeadingIcon: slots.leadingIcon != null, hasTrailingIcon: slots.trailingIcon != null, hasAvatar: slots.avatar != null });
   return (
     <span className="chip__visual" data-selected={isSelected || undefined} data-expressive-shapes={shapes ? true : undefined} style={style}>
-      <Elevation level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
+      <Elevation level={resolveChipElevation(variant, state)} />
       <span className="chip__surface">
         <Ripple controller={controller} focusRingRadius="var(--_chip-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestChipStateLayerInteraction(activeInteractions, isFocusVisible)} />
         <span className="chip__content">

@@ -138,10 +138,6 @@
     border-radius var(--_fab-toggle-spatial-duration) var(--_fab-toggle-spatial-easing);
 }
 
-.fab-menu-toggle .fab__visual > .elevation {
-  transition: border-radius var(--_fab-toggle-spatial-duration) var(--_fab-toggle-spatial-easing);
-}
-
 .fab-menu-toggle .fab__surface {
   transition:
     background-color var(--_fab-toggle-effects-duration) var(--_fab-toggle-effects-easing),
@@ -189,7 +185,6 @@
 @media (prefers-reduced-motion: reduce) {
   .fab-menu__item-slot,
   .fab-menu-toggle .fab__visual,
-  .fab-menu-toggle .fab__visual > .elevation,
   .fab-menu-toggle .fab__surface,
   .fab-menu-toggle__icon {
     transition-duration: 0s !important;
