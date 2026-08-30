@@ -49,9 +49,8 @@
   transition: var(--_chip-shape-transition);
 }
 
-.chip__elevation {
+.chip__visual > .elevation {
   z-index: 0;
-  border-radius: inherit;
 }
 
 .chip__surface {
@@ -143,7 +142,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .chip__visual,
-  .chip__elevation {
+  .chip__visual > .elevation {
     transition: none !important;
   }
 }
