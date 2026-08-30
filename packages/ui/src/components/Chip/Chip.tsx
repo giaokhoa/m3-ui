@@ -32,7 +32,7 @@ function ChipVisual({ variant, label, slots, controller, activeInteractions, pre
   const style = getChipStyle(variant, state, { shape, shapes, hasLeadingIcon: slots.leadingIcon != null, hasTrailingIcon: slots.trailingIcon != null, hasAvatar: slots.avatar != null });
   return (
     <span className="chip__visual" data-selected={isSelected || undefined} data-expressive-shapes={shapes ? true : undefined} style={style}>
-      <Elevation className="chip__elevation" level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
+      <Elevation level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
       <span className="chip__surface">
         <Ripple controller={controller} focusRingRadius="var(--_chip-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestChipStateLayerInteraction(activeInteractions, isFocusVisible)} />
         <span className="chip__content">
