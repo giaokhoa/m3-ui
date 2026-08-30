@@ -1,82 +1,44 @@
-# BottomSheet architecture contract
+# BottomSheet implementation notes
 
 Read this file before changing BottomSheet token ownership, elevation painting, sheet geometry, anchors, gestures, or modal lifecycle.
 
-## Elevation semantics
+## Material elevation semantics
 
-BottomSheet uses **shadow elevation**, not the BottomAppBar tonal-elevation model. AndroidX exposes `sheetShadowElevation` and passes it to the sheet `Surface.shadowElevation`.
+BottomSheet uses **shadow elevation**, not the BottomAppBar tonal-elevation model. The pinned AndroidX source exposes `sheetShadowElevation` and passes it to `Surface.shadowElevation`.
 
-The canonical sheet tokens currently map both standard and modal containers to `level1`. Runtime code may select the semantic standard/modal level, but it must not serialize Material shadow geometry in TypeScript.
+The canonical sheet tokens currently map both standard and modal containers to `level1`. Runtime code may select the semantic standard/modal level, while immutable shadow geometry remains compiler-owned rather than being rebuilt in TypeScript.
 
-## Why this component uses elevation host paint
+The public `shadowColor` prop is a genuine runtime override. It may override the shared shadow color without regenerating the shadow recipe in React.
 
-The `.bottom-sheet` root already owns all of these contracts simultaneously:
+## Current web rendering
 
-- `overflow: auto` for the sheet surface;
-- the `translate3d(...)` offset used by anchors and drag settling;
-- `offsetHeight` / `offsetParent` measurement used to calculate anchors;
-- the actual top-only rounded surface.
+The current `.bottom-sheet` root already owns scrolling, the translated drag/settle offset, anchor measurements, and the top-only rounded sheet surface. Because that root uses `overflow: auto`, a descendant shadow painter inside it would be clipped.
 
-A descendant `<Elevation>` painter would be clipped by the scrolling root. Adding an outer wrapper solely to paint elevation would change the measured/transformed DOM boundary and risks altering anchor/layout behavior.
+The current implementation therefore paints the generated elevation recipe on the existing root using `.elevation-host` plus `data-elevation`. This avoids introducing another measured/transformed wrapper solely for the shadow.
 
-Therefore BottomSheet deliberately uses the shared `.elevation-host` mode on the existing root:
+That host choice is a web implementation detail, not a Material API contract. A future implementation may use a different paint boundary or wrapper if it preserves the same Material level1 shadow, sheet geometry, scrolling, measurements, anchor behavior, transforms, gestures, and modal semantics.
 
-```text
-class="bottom-sheet elevation-host"
-data-elevation="levelN"
-```
+`@m3-ui/tokens/elevation.css` owns immutable shadow geometry/opacities, shared elevation CSS applies the generated recipe, and `ThemeProvider` owns the concrete `--shadow` role.
 
-`@m3-ui/tokens/elevation.css` owns immutable shadow geometry/opacities. `internal/elevation/elevation.css` applies the host `box-shadow`. `ThemeProvider` owns the concrete `--shadow` role.
+## Runtime and color ownership
 
-`BottomSheet.defaults.ts` must not call `getElevationBoxShadow()` or emit `--_bottom-sheet-box-shadow`.
+`getBottomSheetElevationLevel()` currently selects the standard/modal semantic level. `getBottomSheetStyle()` owns surface/handle/shape/motion projection and remains independent of shadow serialization.
 
-## Runtime override boundary
+The canonical BottomSheet token branch uses semantic DTCG aliases for its container, drag-handle, and focus-indicator colors. `ThemeProvider` resolves those roles at runtime; React should not decode runtime CSS values back into semantic role names.
 
-The public `shadowColor` prop is a genuine runtime override. It may set only `--_elevation-shadow-color` on the existing host root. It must never regenerate the shadow list in React.
-
-`getBottomSheetElevationLevel()` is the single selector for standard versus modal semantic elevation. `getBottomSheetStyle()` owns surface/handle/shape/motion projection and is intentionally independent of shadow serialization.
-
-## Canonical color roles
-
-The BottomSheet canonical token branch uses semantic DTCG aliases:
-
-- docked container → `color.role.surfaceContainerLow`;
-- drag handle → `color.role.onSurfaceVariant`;
-- focus indicator → `color.role.secondary`.
-
-`ThemeProvider` resolves those role values at runtime. Do not replace these aliases with duplicated `var(--role)` strings or decode runtime CSS values back into semantic names.
-
-## Geometry and interaction ownership
-
-Sheet anchors, measurements, pointer drag state, velocity dampening, settle target selection, hidden/partial/expanded state, modal focus containment, Escape/outside-dismiss lifecycle and transform motion are runtime behavior. Elevation refactors must not change them.
-
-In particular, do not add/remove wrappers around `.bottom-sheet`, change its positioned containing block, or move `sheetRef` to another element as part of token/elevation work.
-
-The shared `packages/ui/src/layout/**` workstream is separate from this component contract and must not be edited as part of BottomSheet elevation/token migration.
+Sheet anchors, measurements, pointer drag state, velocity dampening, settle-target selection, hidden/partial/expanded state, modal focus containment, Escape/outside-dismiss lifecycle, and transform motion remain runtime behavior. Elevation work should preserve those observable behaviors rather than freeze a particular DOM arrangement.
 
 ## CSS packaging
 
-Source/dev consumers import the generated elevation adapter and shared host paint CSS before `bottom-sheet.css`.
+Source/dev and modular style consumers currently include generated elevation CSS and shared elevation paint CSS before `bottom-sheet.css`. Generated shadow geometry remains centralized under the token build output rather than copied into component CSS.
 
-The modular `@m3-ui/ui/styles/BottomSheet.css` entry must inline, in order:
+## Validation
 
-1. `packages/tokens/dist/generated/elevation.css`;
-2. `packages/ui/src/internal/elevation/elevation.css`;
-3. `packages/ui/src/components/BottomSheet/bottom-sheet.css`.
+Tests should cover the Material/runtime behavior that matters:
 
-## Browser contract
+- standard and modal sheets select canonical `level1` shadow elevation;
+- the actual paint boundary computes the generated level1 shadow;
+- the public `shadowColor` override still affects paint;
+- existing width, top-only shape, handle geometry, anchors, drag/settling behavior, motion, scrim, focus containment, and dismissal semantics remain correct.
 
-BottomSheet intentionally paints elevation on its existing root host. Browser tests should inspect that root and verify the semantic `data-elevation` plus computed `box-shadow`, while preserving the existing 640px width, top-only shape, handle geometry, anchor/drag behavior, motion, scrim and modal focus/dismiss contracts.
-
-## Forbidden regressions
-
-Do not:
-
-- restore `getElevationBoxShadow()` or `--_bottom-sheet-box-shadow`;
-- hardcode level shadow geometry/opacities in BottomSheet CSS or TypeScript;
-- add a descendant shadow painter inside the scrolling root;
-- add a wrapper solely for elevation;
-- move measurement, transform, scrolling or anchor ownership to satisfy elevation painting;
-- turn `shadowColor` into a shadow-string serializer;
-- revert canonical BottomSheet role aliases to direct `var(--role)` strings;
-- change sheet geometry, gestures, anchors or modal lifecycle in a token/elevation refactor.
+Do not add a source-regex guard for `.elevation-host`, wrapper names, `sheetRef` placement, or a specific DOM hierarchy. If the paint implementation changes, update these notes and validate the resulting behavior directly.
