@@ -1,4 +1,4 @@
-import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/ripple.css';
 import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -49,28 +49,7 @@ export function Ripple({
       : stateInteraction;
   const hasFocus = isFocusVisible || resolvedStateInteraction === 'focus';
 
-  const tokenStyle: RippleStyle = {
-    '--_ripple-radius-duration': token.RippleRadiusDuration,
-    '--_ripple-hover-duration': token.RippleHoverTransitionDuration,
-    '--_ripple-focus-in-duration': token.RippleFocusInTransitionDuration,
-    '--_ripple-fade-in-duration': token.RippleFadeInDuration,
-    '--_ripple-fade-out-duration': token.RippleFadeOutDuration,
-    '--_ripple-radius-easing': token.RippleRadiusEasing,
-    '--_ripple-center-easing': token.RippleCenterEasing,
-    '--_ripple-opacity-easing': token.RippleOpacityEasing,
-    '--_ripple-hover-opacity': token.StateLayerOpacityHover,
-    '--_ripple-focus-opacity': token.StateLayerOpacityFocus,
-    '--_ripple-pressed-opacity': token.StateLayerOpacityPressed,
-    '--_ripple-focus-ring-outer-inset': token.RippleFocusRingOuterStrokeInset,
-    '--_ripple-focus-ring-outer-width': token.RippleFocusRingOuterStrokeWidth,
-    '--_ripple-focus-ring-inner-inset': token.RippleFocusRingInnerStrokeInset,
-    '--_ripple-focus-ring-inner-width': token.RippleFocusRingInnerStrokeWidth,
-    '--_ripple-focus-ring-outer-color': token.RippleFocusRingOuterStrokeColor,
-    '--_ripple-focus-ring-inner-color': token.RippleFocusRingInnerStrokeColor,
-    '--_ripple-focus-ring-in-duration': token.RippleFocusRingFocusInDuration,
-    '--_ripple-focus-ring-in-easing': token.RippleFocusRingFocusInEasing,
-    '--_ripple-focus-ring-out-duration': token.RippleFocusRingFocusOutDuration,
-    '--_ripple-focus-ring-out-easing': token.RippleFocusRingFocusOutEasing,
+  const runtimeStyle: RippleStyle = {
     ...(focusRingRadius === undefined
       ? {}
       : { '--_ripple-focus-ring-radius': cssLength(focusRingRadius) }),
@@ -96,7 +75,7 @@ export function Ripple({
       data-inset-focus-visible={
         rippleFocus === 'inset-ring' && hasFocus ? true : undefined
       }
-      style={tokenStyle}
+      style={runtimeStyle}
     >
       <span className="ripple__state-layer" />
       {controller.waves.map((wave) => {

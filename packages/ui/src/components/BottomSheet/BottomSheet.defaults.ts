@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import { getScrimStyle } from '../Scrim';
 
 export type BottomSheetStyle = CSSProperties &
@@ -21,6 +18,11 @@ export interface BottomSheetStyleOptions {
   elevation?: BottomSheetElevation;
   maxWidth?: CSSProperties['maxWidth'];
 }
+
+type BottomSheetSurfaceStyleOptions = Omit<
+  BottomSheetStyleOptions,
+  'shadowColor' | 'elevation'
+>;
 
 export interface ModalBottomSheetOverlayStyleOptions {
   scrimColor?: CSSProperties['backgroundColor'];
@@ -76,15 +78,17 @@ function cssLength(value: CssLength): string {
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-export function getBottomSheetStyle(
-  options: BottomSheetStyleOptions = {},
-): BottomSheetStyle {
-  const elevation = options.elevation ?? 'standard';
-  const elevationLevel =
-    elevation === 'modal'
-      ? bottomSheetTokens.modalContainerElevation
-      : bottomSheetTokens.standardContainerElevation;
+export function getBottomSheetElevationLevel(
+  elevation: BottomSheetElevation = 'standard',
+): ElevationLevel {
+  return elevation === 'modal'
+    ? bottomSheetTokens.modalContainerElevation
+    : bottomSheetTokens.standardContainerElevation;
+}
 
+export function getBottomSheetStyle(
+  options: BottomSheetSurfaceStyleOptions = {},
+): BottomSheetStyle {
   return {
     '--_bottom-sheet-container-color':
       options.containerColor ?? bottomSheetTokens.containerColor,
@@ -110,10 +114,6 @@ export function getBottomSheetStyle(
       options.focusIndicatorColor ?? bottomSheetTokens.focusIndicatorColor,
     '--_bottom-sheet-focus-indicator-width':
       token.RippleFocusRingOuterStrokeWidth,
-    '--_bottom-sheet-box-shadow': getElevationBoxShadow(
-      elevationLevel,
-      (options.shadowColor ?? 'var(--shadow)') as string,
-    ),
     '--_bottom-sheet-max-width': cssLength(
       (options.maxWidth ?? bottomSheetRuntime.maximumWidth) as CssLength,
     ),

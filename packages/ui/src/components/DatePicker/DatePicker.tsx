@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
 import {
   useContext,
@@ -24,8 +25,13 @@ import {
   RangeCalendar as AriaRangeCalendar,
   RangeCalendarStateContext,
 } from 'react-aria-components';
+import '../../internal/elevation/elevation.css';
 import { IconButton } from '../IconButton';
-import { getDatePickerStyle, datePickerRuntime } from './DatePicker.defaults';
+import {
+  datePickerRuntime,
+  getDatePickerElevationLevel,
+  getDatePickerStyle,
+} from './DatePicker.defaults';
 import type {
   DatePickerDate,
   DatePickerDisplayMode,
@@ -464,7 +470,7 @@ function DateInput({ value, onChange, onCommit, yearRange, unavailable, disabled
 }
 
 function classes(className: string | undefined, range: boolean) {
-  return clsx('date-picker', range && 'date-picker--range', className);
+  return clsx('date-picker', 'elevation-host', range && 'date-picker--range', className);
 }
 
 export function DatePicker({
@@ -485,6 +491,7 @@ export function DatePicker({
         {...domProps}
         className={classes(className, false)}
         data-display-mode={effectiveMode}
+        data-elevation={getDatePickerElevationLevel(variant)}
         data-variant={variant}
         data-disabled={isDisabled || undefined}
         data-testid={domProps['data-testid'] ?? 'date-picker'}
@@ -539,6 +546,7 @@ export function DateRangePicker({
         {...domProps}
         className={classes(className, true)}
         data-display-mode={effectiveMode}
+        data-elevation={getDatePickerElevationLevel(variant)}
         data-variant={variant}
         data-disabled={isDisabled || undefined}
         data-testid={domProps['data-testid'] ?? 'date-range-picker'}
@@ -554,7 +562,7 @@ export function DateRangePicker({
                 label="Start date"
                 value={startDraft}
                 onChange={(next) => setStartDraft(next)}
-              onCommit={(next, valid) => { if (valid) commitDraft(next, endDraft); }}
+                onCommit={(next, valid) => { if (valid) commitDraft(next, endDraft); }}
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}
@@ -564,7 +572,7 @@ export function DateRangePicker({
                 label="End date"
                 value={endDraft}
                 onChange={(next) => setEndDraft(next)}
-              onCommit={(next, valid) => { if (valid) commitDraft(startDraft, next); }}
+                onCommit={(next, valid) => { if (valid) commitDraft(startDraft, next); }}
                 yearRange={yearRange}
                 unavailable={isDateUnavailable}
                 disabled={isDisabled}

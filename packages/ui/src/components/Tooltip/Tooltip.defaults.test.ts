@@ -112,14 +112,14 @@ describe('RichTooltip defaults', () => {
     expect(richTooltipRuntime.motion.opacity.duration).toBe('108ms');
   });
 
-  it('emits surface, level2 elevation, typography and geometry CSS variables', () => {
+  it('emits surface, typography and geometry CSS variables without serializing elevation', () => {
     const style = getRichTooltipStyle();
     expect(style['--_rich-tooltip-container-color']).toBe('var(--surface-container)');
     expect(style['--_rich-tooltip-content-color']).toBe('var(--on-surface-variant)');
     expect(style['--_rich-tooltip-title-color']).toBe('var(--on-surface-variant)');
     expect(style['--_rich-tooltip-action-color']).toBe('var(--primary)');
     expect(style['--_rich-tooltip-radius']).toBe('12px');
-    expect(style['--_rich-tooltip-box-shadow']).toContain('var(--shadow)');
+    expect(style['--_rich-tooltip-box-shadow']).toBeUndefined();
     expect(style['--_rich-tooltip-min-width']).toBe('40px');
     expect(style['--_rich-tooltip-min-height']).toBe('24px');
     expect(style['--_rich-tooltip-max-width']).toBe('320px');
@@ -132,13 +132,12 @@ describe('RichTooltip defaults', () => {
     expect(style['--_rich-tooltip-action-line-height']).toBe('20px');
   });
 
-  it('keeps RichTooltip visual overrides local to the renderer projection', () => {
+  it('keeps RichTooltip surface overrides local to the renderer projection', () => {
     const style = getRichTooltipStyle({
       containerColor: 'navy',
       contentColor: 'white',
       titleColor: 'gold',
       actionColor: 'cyan',
-      shadowColor: 'black',
       shape: 20,
       maxWidth: 360,
     });
@@ -148,6 +147,5 @@ describe('RichTooltip defaults', () => {
     expect(style['--_rich-tooltip-action-color']).toBe('cyan');
     expect(style['--_rich-tooltip-radius']).toBe('20px');
     expect(style['--_rich-tooltip-max-width']).toBe('360px');
-    expect(style['--_rich-tooltip-box-shadow']).toContain('black');
   });
 });

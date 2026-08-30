@@ -1,10 +1,10 @@
 import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
-import { getElevationBoxShadow, type ElevationLevel } from '../../internal/elevation';
 import { scrimTokens } from '../Scrim';
 import {
   bottomSheetRuntime,
   bottomSheetTokens,
+  getBottomSheetElevationLevel,
   getBottomSheetStyle,
   getModalBottomSheetOverlayStyle,
 } from './BottomSheet.defaults';
@@ -55,7 +55,7 @@ describe('BottomSheet defaults', () => {
     });
   });
 
-  it('emits canonical surface, handle, elevation and top-only shape variables', () => {
+  it('emits canonical surface, handle and top-only shape variables without serializing shadow geometry', () => {
     expect(getBottomSheetStyle()).toMatchObject({
       '--_bottom-sheet-container-color':
         token.ComponentSheetBottomDockedContainerColor,
@@ -77,19 +77,18 @@ describe('BottomSheet defaults', () => {
       '--_bottom-sheet-drag-handle-padding-block': '22px',
       '--_bottom-sheet-focus-indicator-color':
         token.ComponentSheetBottomFocusIndicatorColor,
-      '--_bottom-sheet-box-shadow': getElevationBoxShadow(
-        token.ComponentSheetBottomDockedStandardContainerElevation as ElevationLevel,
-      ),
       '--_bottom-sheet-max-width': '640px',
     });
+    expect(getBottomSheetStyle()['--_bottom-sheet-box-shadow']).toBeUndefined();
   });
 
-  it('switches to the canonical modal elevation without duplicating a shadow recipe', () => {
-    expect(getBottomSheetStyle({ elevation: 'modal' })).toMatchObject({
-      '--_bottom-sheet-box-shadow': getElevationBoxShadow(
-        token.ComponentSheetBottomDockedModalContainerElevation as ElevationLevel,
-      ),
-    });
+  it('selects canonical standard and modal elevation levels without duplicating a shadow recipe', () => {
+    expect(getBottomSheetElevationLevel()).toBe(
+      token.ComponentSheetBottomDockedStandardContainerElevation,
+    );
+    expect(getBottomSheetElevationLevel('modal')).toBe(
+      token.ComponentSheetBottomDockedModalContainerElevation,
+    );
   });
 
   it('projects canonical scrim values with DefaultEffects motion', () => {
@@ -106,14 +105,13 @@ describe('BottomSheet defaults', () => {
     });
   });
 
-  it('keeps public visual overrides local', () => {
+  it('keeps public surface overrides local', () => {
     expect(
       getBottomSheetStyle({
         containerColor: 'rebeccapurple',
         contentColor: 'white',
         dragHandleColor: 'gold',
         focusIndicatorColor: 'cyan',
-        shadowColor: 'black',
         maxWidth: 720,
       }),
     ).toMatchObject({

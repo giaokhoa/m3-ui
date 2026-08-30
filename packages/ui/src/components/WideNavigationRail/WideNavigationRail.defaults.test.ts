@@ -38,12 +38,8 @@ describe('WideNavigationRail defaults', () => {
       '--_wide-navigation-rail-top-space': '44px',
       '--_wide-navigation-rail-header-space': '40px',
       '--_wide-navigation-rail-collapsed-item-space': '4px',
+      '--_wide-navigation-rail-box-shadow': 'none',
     });
-    expect(
-      String(style['--_wide-navigation-rail-box-shadow']).match(
-        /0px 0px 0px 0px/g,
-      ),
-    ).toHaveLength(3);
   });
 
   it('switches labeled items from 64px top-icon to 56px start-icon geometry', () => {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { getElevationBoxShadow } from '../../internal/elevation';
 import {
   getSnackbarActionStyle,
   getSnackbarDismissActionStyle,
@@ -55,7 +54,7 @@ describe('Snackbar defaults', () => {
     });
   });
 
-  it('emits canonical surface, typography, elevation and geometry variables', () => {
+  it('emits canonical surface, typography and geometry variables without serializing elevation', () => {
     const style = getSnackbarStyle();
 
     expect(style).toMatchObject({
@@ -84,9 +83,7 @@ describe('Snackbar defaults', () => {
       '--_snackbar-action-font-weight': 500,
       '--_snackbar-action-letter-spacing': '0.1px',
     });
-    expect(style['--_snackbar-box-shadow']).toBe(
-      getElevationBoxShadow('level3', 'var(--shadow)'),
-    );
+    expect(style['--_snackbar-box-shadow']).toBeUndefined();
   });
 
   it('keeps visual overrides local to the rendered Snackbar surface', () => {
@@ -95,7 +92,6 @@ describe('Snackbar defaults', () => {
       contentColor: 'white',
       actionColor: 'gold',
       iconColor: 'silver',
-      shadowColor: 'black',
       shape: 12,
       maxWidth: 420,
     });
@@ -110,9 +106,6 @@ describe('Snackbar defaults', () => {
       '--_snackbar-radius': '12px',
       '--_snackbar-max-width': '420px',
     });
-    expect(style['--_snackbar-box-shadow']).toBe(
-      getElevationBoxShadow('level3', 'black'),
-    );
   });
 
   it('maps RAC action states to Snackbar-specific label and state-layer roles', () => {

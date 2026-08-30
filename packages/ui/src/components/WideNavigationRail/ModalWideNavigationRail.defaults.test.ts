@@ -30,9 +30,7 @@ describe('ModalWideNavigationRail defaults', () => {
       '--_modal-wide-navigation-rail-content-color': token.ColorRoleOnSurface,
       '--_modal-wide-navigation-rail-radius': token.ShapeCornerLarge,
     });
-    expect(
-      String(style['--_modal-wide-navigation-rail-box-shadow']),
-    ).not.toMatch(/^0px 0px 0px 0px/);
+    expect(modalWideNavigationRailTokens.modalContainerElevation).toBe('level2');
   });
 
   it('keeps AndroidX modal motion partitions beside the renderer', () => {

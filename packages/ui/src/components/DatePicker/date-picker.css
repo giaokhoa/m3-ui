@@ -7,7 +7,6 @@
   overflow: hidden;
   border-radius: var(--_date-picker-container-radius);
   background: var(--_date-picker-container-color);
-  box-shadow: var(--_date-picker-box-shadow);
   color: var(--on-surface);
   font-family: var(--_date-picker-body-font-family);
 }

@@ -6,6 +6,7 @@ import {
   floatingToolbarTokens,
   getFloatingToolbarStyle,
   getFloatingToolbarTranslation,
+  resolveFloatingToolbarElevation,
   setFloatingToolbarOffset,
   settleFloatingToolbarState,
   shouldCollapseFloatingToolbar,
@@ -46,27 +47,14 @@ describe('FloatingToolbar defaults', () => {
     ).toBe('var(--on-primary-container)');
   });
 
-  it('uses Level0 without FAB and Level1 only for the expanded toolbar part with FAB', () => {
+  it('chooses Level0 without FAB and Level1 only for the expanded toolbar part with FAB', () => {
+    expect(resolveFloatingToolbarElevation(true, false)).toBe('level0');
+    expect(resolveFloatingToolbarElevation(false, false)).toBe('level0');
+    expect(resolveFloatingToolbarElevation(true, true)).toBe('level1');
+    expect(resolveFloatingToolbarElevation(false, true)).toBe('level0');
     expect(
-      getFloatingToolbarStyle('standard', true, false)[
-        '--_floating-toolbar-box-shadow'
-      ],
-    ).toBe('none');
-    expect(
-      getFloatingToolbarStyle('standard', false, false)[
-        '--_floating-toolbar-box-shadow'
-      ],
-    ).toBe('none');
-    expect(
-      getFloatingToolbarStyle('standard', true, true)[
-        '--_floating-toolbar-box-shadow'
-      ],
-    ).not.toBe('none');
-    expect(
-      getFloatingToolbarStyle('standard', false, true)[
-        '--_floating-toolbar-box-shadow'
-      ],
-    ).toBe('none');
+      getFloatingToolbarStyle('standard', true, true),
+    ).not.toHaveProperty('--_floating-toolbar-box-shadow');
   });
 
   it('uses the pinned FAB range with the FAB smallest when toolbar is expanded', () => {
@@ -129,6 +117,16 @@ describe('FloatingToolbar defaults', () => {
     expect(style['--_floating-toolbar-content-color']).toBe('white');
     expect(style['--_floating-toolbar-container-radius']).toBe('12px');
     expect(style['--_floating-toolbar-content-padding']).toBe('4px');
-    expect(style['--_floating-toolbar-box-shadow']).not.toBe('none');
+    expect(style).not.toHaveProperty('--_floating-toolbar-box-shadow');
+    expect(
+      resolveFloatingToolbarElevation(true, false, {
+        expandedElevation: 'level1',
+      }),
+    ).toBe('level1');
+    expect(
+      resolveFloatingToolbarElevation(false, true, {
+        collapsedElevation: 'level2',
+      }),
+    ).toBe('level2');
   });
 });

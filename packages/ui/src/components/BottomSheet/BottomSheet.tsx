@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
 import {
   useEffect,
@@ -15,9 +16,11 @@ import {
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
+import '../../internal/elevation/elevation.css';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   bottomSheetRuntime,
+  getBottomSheetElevationLevel,
   getBottomSheetStyle,
   getModalBottomSheetOverlayStyle,
   type BottomSheetElevation,
@@ -375,16 +378,18 @@ export function BottomSheet({
     dragOffset ??
     (layout ? restingOffset(sheetState, layout) : null);
   const hidden = sheetState.currentValue === SheetValue.Hidden;
+  const elevationLevel = getBottomSheetElevationLevel(elevation);
   const sheetStyle: BottomSheetStyle = {
     ...getBottomSheetStyle({
       containerColor,
       contentColor,
       dragHandleColor,
       focusIndicatorColor,
-      shadowColor,
-      elevation,
       maxWidth,
     }),
+    ...(shadowColor === undefined
+      ? {}
+      : { '--_elevation-shadow-color': shadowColor as string }),
     '--_bottom-sheet-offset':
       offset === null ? (hidden ? '100%' : '0px') : `${offset}px`,
     ...style,
@@ -398,8 +403,9 @@ export function BottomSheet({
       aria-label={ariaLabel}
       aria-hidden={hidden ? true : ariaHidden}
       inert={hidden ? true : inert}
-      className={clsx('bottom-sheet', className)}
+      className={clsx('bottom-sheet', 'elevation-host', className)}
       data-dragging={dragOffset !== null || undefined}
+      data-elevation={elevationLevel}
       data-ready={layout !== null || undefined}
       data-state={sheetState.currentValue}
       style={sheetStyle}

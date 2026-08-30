@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   datePickerRuntime,
   datePickerTokens,
+  getDatePickerElevationLevel,
   getDatePickerStyle,
 } from './DatePicker.defaults';
 import {
@@ -47,9 +48,14 @@ describe('DatePicker defaults and date-only helpers', () => {
     expect(style['--_date-picker-effects-out-duration']).toBe('108ms');
   });
 
-  it('keeps modal elevation in the Dialog owner while docked retains its tokenized surface elevation', () => {
-    expect(getDatePickerStyle('modal', 'calendar', false)['--_date-picker-box-shadow']).toBe('none');
-    expect(getDatePickerStyle('docked', 'calendar', false)['--_date-picker-box-shadow']).not.toBe('none');
+  it('keeps modal elevation in the Dialog owner while docked selects its canonical level3 host elevation', () => {
+    expect(getDatePickerElevationLevel('modal')).toBe('level0');
+    expect(getDatePickerElevationLevel('docked')).toBe(
+      datePickerTokens.docked.containerElevation,
+    );
+    expect(getDatePickerElevationLevel('docked')).toBe('level3');
+    expect(getDatePickerStyle('modal', 'calendar', false)['--_date-picker-box-shadow']).toBeUndefined();
+    expect(getDatePickerStyle('docked', 'calendar', false)['--_date-picker-box-shadow']).toBeUndefined();
   });
 
   it('uses the explicit web input surface override beside the web consumer', () => {

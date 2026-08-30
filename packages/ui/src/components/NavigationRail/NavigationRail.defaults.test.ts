@@ -43,10 +43,8 @@ describe('NavigationRail defaults', () => {
       '--_navigation-rail-vertical-padding': '4px',
       '--_navigation-rail-item-spacing': '4px',
       '--_navigation-rail-header-spacer-height': '8px',
+      '--_navigation-rail-box-shadow': 'none',
     });
-    expect(
-      String(style['--_navigation-rail-box-shadow']).match(/0px 0px 0px 0px/g),
-    ).toHaveLength(3);
   });
 
   it('uses 56x32 labeled indicators and 56x56 icon-only indicators', () => {

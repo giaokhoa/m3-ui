@@ -51,7 +51,9 @@ const variantColors = {
   },
 } as const;
 
-function interactionFor(state: ToggleButtonState): 'press' | 'hover' | 'focus' | null {
+export function resolveToggleButtonInteraction(
+  state: ToggleButtonState,
+): 'press' | 'hover' | 'focus' | null {
   if (state.isPressed) return 'press';
   if (state.isHovered) return 'hover';
   if (state.isFocused) return 'focus';
@@ -78,7 +80,7 @@ export function getToggleButtonStyle(
   state: ToggleButtonState,
   size: ToggleButtonSize = 'small',
 ): ToggleButtonStyle {
-  const interaction = interactionFor(state);
+  const interaction = resolveToggleButtonInteraction(state);
   const shapes = buttonShapesForSize(size);
   const colors = variantColors[variant];
   const activeShape = state.isPressed
@@ -87,7 +89,6 @@ export function getToggleButtonStyle(
       ? selectedShape[size]
       : shapes.shape;
   const base = getButtonStyle(
-    variant,
     { isDisabled: state.isDisabled, interaction },
     { size, shapes },
   );

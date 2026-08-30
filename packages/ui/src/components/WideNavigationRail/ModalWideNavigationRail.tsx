@@ -19,6 +19,8 @@ import {
   WideNavigationRail,
   type WideNavigationRailArrangement,
 } from './WideNavigationRail';
+import '@m3-ui/tokens/elevation.css';
+import '../../internal/elevation/elevation.css';
 import {
   WideNavigationRailState,
   WideNavigationRailValue,
@@ -311,8 +313,6 @@ export function ModalWideNavigationRail({
   });
   const railStyle = {
     ...modalStyle,
-    '--_wide-navigation-rail-box-shadow':
-      'var(--_modal-wide-navigation-rail-box-shadow)',
     '--_wide-navigation-rail-spatial-duration':
       'var(--_modal-wide-navigation-rail-width-duration)',
     '--_wide-navigation-rail-spatial-easing':
@@ -392,12 +392,13 @@ export function ModalWideNavigationRail({
           >
             <WideNavigationRail
               aria-label={ariaLabel}
-              className="modal-wide-navigation-rail__rail"
+              className="modal-wide-navigation-rail__rail elevation-host"
               containerColor={
                 modalContainerColor ??
                 modalWideNavigationRailTokens.modalContainerColor
               }
               contentColor={modalContentColor}
+              data-elevation={modalWideNavigationRailTokens.modalContainerElevation}
               header={
                 header !== undefined ? (
                   <div style={{ paddingTop: expandedHeaderTopPadding }}>

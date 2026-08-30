@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/elevation.css';
 import {
   createContext,
   forwardRef,
@@ -16,8 +17,14 @@ import {
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
+import '../../internal/elevation/elevation.css';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
-import { getSearchBarStyle, getSearchViewStyle } from './SearchBar.defaults';
+import {
+  getSearchBarStyle,
+  getSearchViewStyle,
+  searchBarTokens,
+  searchViewTokens,
+} from './SearchBar.defaults';
 import type { SearchBarState } from './SearchBarState';
 import './search-bar.css';
 
@@ -152,8 +159,9 @@ export function SearchBar({ state, children, className, style, ...props }: Searc
   return (
     <div
       {...props}
+      data-elevation={searchBarTokens.containerElevation}
       data-state={state.value}
-      className={join('search-bar', className)}
+      className={join('search-bar', 'elevation-host', className)}
       style={{ ...getSearchBarStyle(), ...(style as CSSProperties | undefined) }}
     >
       {children}
@@ -208,8 +216,9 @@ export function ExpandedDockedSearchBar({
     <div
       {...props}
       ref={root}
+      data-elevation={searchViewTokens.containerElevation}
       data-state="expanded"
-      className={join('search-view', 'search-view--docked', className)}
+      className={join('search-view', 'search-view--docked', 'elevation-host', className)}
       style={{ ...getSearchViewStyle('docked'), ...(style as CSSProperties | undefined) }}
     >
       <div className="search-view__header">
@@ -254,8 +263,9 @@ export function ExpandedFullScreenSearchBar({
         <AriaDialog aria-label="Search" className="search-view-dialog">
           <div
             {...props}
+            data-elevation={searchViewTokens.containerElevation}
             data-state="expanded"
-            className={join('search-view', 'search-view--fullscreen', className)}
+            className={join('search-view', 'search-view--fullscreen', 'elevation-host', className)}
             style={{ ...getSearchViewStyle('fullscreen'), ...(style as CSSProperties | undefined) }}
           >
             <div className="search-view__header">

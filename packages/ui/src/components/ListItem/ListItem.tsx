@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
 import {
   createContext,
@@ -11,8 +12,10 @@ import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
+import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import {
+  getListItemElevationLevel,
   getListItemStyle,
   type ListItemInteractionState,
 } from './ListItem.defaults';
@@ -130,9 +133,7 @@ export function ListItemSelectionGroup({
     <SingleSelectionGroupContext.Provider value>
       <div
         {...props}
-        className={
-          clsx('list-item-selection-group', className)
-        }
+        className={clsx('list-item-selection-group', className)}
         role="radiogroup"
         onKeyDown={handleKeyDown}
       >
@@ -248,14 +249,16 @@ export function ListItem(props: ListItemProps) {
     'selectionMode' in props ? props.selectionMode : undefined;
   const inSingleSelectionGroup = useContext(SingleSelectionGroupContext);
   const interactive = 'onPress' in props || selectionMode === 'multiple';
+  const elevationLevel = getListItemElevationLevel({ isDragged });
 
   if (!interactive) {
     return (
       <div
         aria-disabled={isDisabled || undefined}
         aria-label={ariaLabel}
-        className={clsx('list-item', className)}
+        className={clsx('list-item', 'elevation-host', className)}
         data-dragged={isDragged || undefined}
+        data-elevation={elevationLevel}
         data-lines={lineCount}
         data-testid={testId}
         style={{
@@ -290,10 +293,14 @@ export function ListItem(props: ListItemProps) {
   return (
     <AriaButton
       aria-label={ariaLabel}
-      className={
-        clsx('list-item list-item--interactive', className)
-      }
+      className={clsx(
+        'list-item',
+        'list-item--interactive',
+        'elevation-host',
+        className,
+      )}
       data-dragged={isDragged || undefined}
+      data-elevation={elevationLevel}
       data-lines={lineCount}
       data-selected={selected || undefined}
       data-testid={testId}

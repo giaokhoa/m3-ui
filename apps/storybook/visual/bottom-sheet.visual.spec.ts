@@ -12,6 +12,11 @@ function expectClose(actual: number | undefined, expected: number) {
   expect(Math.abs((actual ?? 0) - expected)).toBeLessThan(0.8);
 }
 
+async function elevationPaint(surface: Locator) {
+  if (await surface.getAttribute('data-elevation')) return surface;
+  return surface.locator('[data-elevation]').first();
+}
+
 async function dragHandleBy(page: Page, handle: Locator, deltaY: number) {
   const box = await handle.boundingBox();
   if (!box) throw new Error('BottomSheet drag handle missing');
@@ -41,6 +46,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     await openStory(page, 'components-bottomsheet--default');
     const stage = page.getByTestId('bottom-sheet-stage');
     const sheet = page.getByTestId('bottom-sheet-default');
+    const elevation = await elevationPaint(sheet);
     const handle = sheet.locator('.bottom-sheet__drag-handle');
     const bar = sheet.locator('.bottom-sheet__drag-handle-bar');
     const stageBox = await stage.boundingBox();
@@ -56,11 +62,11 @@ test.describe('Material 3 BottomSheet browser contract', () => {
         borderStartEndRadius: computed.borderStartEndRadius,
         borderEndStartRadius: computed.borderEndStartRadius,
         borderEndEndRadius: computed.borderEndEndRadius,
-        boxShadow: computed.boxShadow,
         maxWidth: computed.maxWidth,
       };
     });
 
+    await expect(elevation).toHaveAttribute('data-elevation', 'level1');
     expectClose(sheetBox?.width, 640);
     expect(surface.maxWidth).toBe('640px');
     expect(surface.backgroundColor).toBe('rgb(247, 242, 250)');
@@ -69,7 +75,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     expect(surface.borderStartEndRadius).toBe('28px');
     expect(surface.borderEndStartRadius).toBe('0px');
     expect(surface.borderEndEndRadius).toBe('0px');
-    expect(surface.boxShadow).not.toBe('none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
     expectClose(handleBox?.height, 48);
     expectClose(barBox?.width, 32);
     expectClose(barBox?.height, 4);
@@ -177,18 +183,18 @@ test.describe('Material 3 BottomSheet browser contract', () => {
   }) => {
     await openStory(page, 'components-bottomsheet--modal');
     const { sheet } = await openModalSheet(page);
+    const elevation = await elevationPaint(sheet);
     await expect(page.getByRole('dialog', { name: 'Modal places' })).toBeVisible();
+    await expect(elevation).toHaveAttribute('data-elevation', 'level1');
 
     const overlay = page.locator('.modal-bottom-sheet-overlay');
     await page.waitForTimeout(200);
     const visual = await overlay.evaluate((element) => {
       const scrim = getComputedStyle(element, '::before');
-      const sheet = element.querySelector('[data-testid="modal-bottom-sheet"]');
       return {
         scrimOpacity: scrim.opacity,
         scrimDuration: scrim.transitionDuration,
         scrimTiming: scrim.transitionTimingFunction,
-        boxShadow: sheet ? getComputedStyle(sheet).boxShadow : 'none',
         activeInsideDialog: document.activeElement?.closest('[role="dialog"]') !== null,
       };
     });
@@ -196,7 +202,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     expect(visual.scrimOpacity).toBe('0.32');
     expect(visual.scrimDuration).toBe('0.166s');
     expect(visual.scrimTiming).toContain('linear(');
-    expect(visual.boxShadow).not.toBe('none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
     expect(visual.activeInsideDialog).toBe(true);
     await expect(sheet).toHaveAttribute('aria-modal', 'true');
   });

@@ -84,8 +84,8 @@ test.describe('Material 3 FAB visual parity', () => {
     await expect(extended).toHaveAttribute('data-variant', 'branded');
     await expect(extended).toHaveAttribute('data-extended', 'true');
     await expect(extended).toHaveAttribute('data-has-icon', 'true');
-    await expect(normal.locator('.fab__elevation')).toHaveAttribute('data-elevation', 'level3');
-    await expect(lowered.locator('.fab__elevation')).toHaveAttribute('data-elevation', 'level1');
+    await expect(normal.locator('.fab__visual > .elevation')).toHaveAttribute('data-elevation', 'level3');
+    await expect(lowered.locator('.fab__visual > .elevation')).toHaveAttribute('data-elevation', 'level1');
     expect(normalIconBox?.width).toBe(36);
     expect(normalIconBox?.height).toBe(36);
     expect(extendedIconBox?.width).toBe(36);
@@ -105,8 +105,8 @@ test.describe('Material 3 FAB visual parity', () => {
 
     const normal = page.getByRole('button', { name: 'Surface normal', exact: true });
     const lowered = page.getByRole('button', { name: 'Surface lowered', exact: true });
-    const normalElevation = normal.locator('.fab__elevation');
-    const loweredElevation = lowered.locator('.fab__elevation');
+    const normalElevation = normal.locator('.fab__visual > .elevation');
+    const loweredElevation = lowered.locator('.fab__visual > .elevation');
 
     await expect(normalElevation).toHaveAttribute('data-elevation', 'level3');
     await expect(loweredElevation).toHaveAttribute('data-elevation', 'level1');

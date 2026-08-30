@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type PlainTooltipStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -66,6 +63,8 @@ export interface RichTooltipStyleOptions {
   shape?: CSSProperties['borderRadius'];
   maxWidth?: CSSProperties['maxWidth'];
 }
+
+type RichTooltipSurfaceStyleOptions = Omit<RichTooltipStyleOptions, 'shadowColor'>;
 
 export const plainTooltipTokens = {
   containerColor: token.ComponentTooltipPlainContainerColor,
@@ -192,10 +191,9 @@ export function getPlainTooltipStyle(
 }
 
 export function getRichTooltipStyle(
-  options: RichTooltipStyleOptions = {},
+  options: RichTooltipSurfaceStyleOptions = {},
 ): RichTooltipStyle {
   const shape = options.shape ?? shapeRadius[richTooltipTokens.containerShape];
-  const shadowColor = options.shadowColor ?? richTooltipTokens.containerShadowColor;
   return {
     '--_rich-tooltip-container-color':
       options.containerColor ?? richTooltipTokens.containerColor,
@@ -205,10 +203,6 @@ export function getRichTooltipStyle(
     '--_rich-tooltip-action-color':
       options.actionColor ?? richTooltipTokens.actionLabelTextColor,
     '--_rich-tooltip-radius': cssLength(shape as CssLength),
-    '--_rich-tooltip-box-shadow': getElevationBoxShadow(
-      richTooltipTokens.containerElevation,
-      shadowColor as string,
-    ),
     '--_rich-tooltip-min-width': `${richTooltipRuntime.minimumWidth}px`,
     '--_rich-tooltip-min-height': `${richTooltipRuntime.minimumHeight}px`,
     '--_rich-tooltip-max-width': cssLength(

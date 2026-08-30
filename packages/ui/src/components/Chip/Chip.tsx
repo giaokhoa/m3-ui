@@ -5,67 +5,33 @@ import {
   type ButtonProps as AriaButtonProps,
   type CheckboxProps as AriaCheckboxProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/chip.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  getChipElevationMotion,
-  getChipRootStyle,
-  getChipStyle,
-  resolveChipElevation,
-  type ChipShapeValue,
-  type ChipShapes,
-} from './Chip.defaults';
-import {
-  endChipInteraction,
-  latestChipInteraction,
-  latestChipStateLayerInteraction,
-  startChipInteraction,
-  type ChipInteraction,
-} from './Chip.interactions';
+import { getChipRootStyle, getChipStyle, resolveChipElevation, type ChipShapeValue, type ChipShapes } from './Chip.defaults';
+import { endChipInteraction, latestChipInteraction, latestChipStateLayerInteraction, startChipInteraction, type ChipInteraction } from './Chip.interactions';
 import type { ChipVariant } from './Chip.tokens';
 import './chip.css';
 
-interface VisualSlots {
-  readonly leadingIcon?: ReactNode;
-  readonly trailingIcon?: ReactNode;
-  readonly avatar?: ReactNode;
-}
-
-export interface ActionChipProps extends Omit<AriaButtonProps, 'children'>, VisualSlots {
-  children?: AriaButtonProps['children'];
-  shape?: ChipShapeValue;
-}
-
-export interface SuggestionChipProps extends Omit<ActionChipProps, 'leadingIcon' | 'trailingIcon'> {
-  icon?: ReactNode;
-}
-
-export interface SelectableChipProps extends Omit<AriaCheckboxProps, 'children'>, VisualSlots {
-  children?: AriaCheckboxProps['children'];
-  shape?: ChipShapeValue;
-  shapes?: ChipShapes;
-}
-
+interface VisualSlots { readonly leadingIcon?: ReactNode; readonly trailingIcon?: ReactNode; readonly avatar?: ReactNode; }
+export interface ActionChipProps extends Omit<AriaButtonProps, 'children'>, VisualSlots { children?: AriaButtonProps['children']; shape?: ChipShapeValue; }
+export interface SuggestionChipProps extends Omit<ActionChipProps, 'leadingIcon' | 'trailingIcon'> { icon?: ReactNode; }
+export interface SelectableChipProps extends Omit<AriaCheckboxProps, 'children'>, VisualSlots { children?: AriaCheckboxProps['children']; shape?: ChipShapeValue; shapes?: ChipShapes; }
 export interface InputChipProps extends SelectableChipProps {}
 interface ActionChipImplProps extends ActionChipProps { variant: 'assist' | 'elevatedAssist' | 'suggestion' | 'elevatedSuggestion'; }
 interface SelectableChipImplProps extends SelectableChipProps { variant: 'filter' | 'elevatedFilter' | 'input'; }
 
-function variantClassName(variant: ChipVariant): string {
-  return `chip--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
-}
+function variantClassName(variant: ChipVariant): string { return `chip--${variant.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`; }
 function resolveButtonChildren(children: AriaButtonProps['children'], renderProps: Parameters<Exclude<AriaButtonProps['children'], ReactNode>>[0]) { return typeof children === 'function' ? children(renderProps) : children; }
 function resolveCheckboxChildren(children: AriaCheckboxProps['children'], renderProps: Parameters<Exclude<AriaCheckboxProps['children'], ReactNode>>[0]) { return typeof children === 'function' ? children(renderProps) : children; }
 
-function ChipVisual({ variant, label, slots, controller, activeInteractions, previousInteraction, isDisabled, isSelected, isFocusVisible, shape, shapes }: {
-  variant: ChipVariant; label: ReactNode; slots: VisualSlots; controller: ReturnType<typeof useRipple>; activeInteractions: readonly ChipInteraction[]; previousInteraction: ChipInteraction | null; isDisabled: boolean; isSelected: boolean; isFocusVisible: boolean; shape?: ChipShapeValue; shapes?: ChipShapes;
-}) {
+function ChipVisual({ variant, label, slots, controller, activeInteractions, previousInteraction, isDisabled, isSelected, isFocusVisible, shape, shapes }: { variant: ChipVariant; label: ReactNode; slots: VisualSlots; controller: ReturnType<typeof useRipple>; activeInteractions: readonly ChipInteraction[]; previousInteraction: ChipInteraction | null; isDisabled: boolean; isSelected: boolean; isFocusVisible: boolean; shape?: ChipShapeValue; shapes?: ChipShapes; }) {
   const interaction = latestChipInteraction(activeInteractions);
   const state = { isDisabled, isSelected, interaction, previousInteraction };
-  const motion = getChipElevationMotion(state);
   const style = getChipStyle(variant, state, { shape, shapes, hasLeadingIcon: slots.leadingIcon != null, hasTrailingIcon: slots.trailingIcon != null, hasAvatar: slots.avatar != null });
   return (
     <span className="chip__visual" data-selected={isSelected || undefined} data-expressive-shapes={shapes ? true : undefined} style={style}>
-      <Elevation className="chip__elevation" level={resolveChipElevation(variant, state)} style={{ transitionDuration: `${motion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: motion.easing }} />
+      <Elevation level={resolveChipElevation(variant, state)} />
       <span className="chip__surface">
         <Ripple controller={controller} focusRingRadius="var(--_chip-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestChipStateLayerInteraction(activeInteractions, isFocusVisible)} />
         <span className="chip__content">

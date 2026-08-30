@@ -1,16 +1,30 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const themePortalSelector = '[data-' + 'm3' + '-theme-portal]';
+
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
   await expect(page.locator('#storybook-root')).toBeVisible();
 }
 
 test.describe('Material 3 Menu browser contract', () => {
-  test('trigger opens, focuses first enabled item, arrows skip disabled, and Enter activates', async ({ page }) => {
+  test('trigger opens, preserves theme role scope, paints shared elevation, focuses first enabled item, arrows skip disabled, and Enter activates', async ({ page }) => {
     await openStory(page, 'components-menu--default');
     const trigger = page.getByTestId('menu-trigger');
     await trigger.focus();
     await trigger.press('Enter');
+
+    const themePortal = page.locator(themePortalSelector);
+    const popover = page.locator('.menu-popover');
+    const elevation = popover.locator('.menu-surface > .elevation');
+    await expect(themePortal.locator('.menu-popover')).toBeVisible();
+    expect(
+      await popover.evaluate((element) =>
+        getComputedStyle(element).getPropertyValue('--shadow').trim(),
+      ),
+    ).not.toBe('');
+    await expect(popover).toHaveCSS('box-shadow', 'none');
+    expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
 
     const items = page.getByRole('menuitem');
     await expect(items.first()).toBeFocused();
@@ -95,13 +109,14 @@ test.describe('Material 3 Menu browser contract', () => {
     expect((labelBox?.x ?? 0) + (labelBox?.width ?? 0)).toBeLessThan(trailingBox?.x ?? 0);
   });
 
-  test('exposed menu reuses TextField anchor, selects, and matches anchor width', async ({ page }) => {
+  test('exposed menu reuses TextField anchor, stays in theme portal, selects, and matches anchor width', async ({ page }) => {
     await openStory(page, 'components-menu--exposed');
     const field = page.getByRole('textbox', { name: 'Density' });
     await field.click();
     const menu = page.getByRole('menu');
     const popover = page.locator('.exposed-menu__popover');
     await expect(menu).toBeVisible();
+    await expect(page.locator(`${themePortalSelector} .exposed-menu__popover`)).toBeVisible();
     await expect(popover).not.toHaveAttribute('data-entering');
     await expect(popover).toHaveCSS('transform', 'none');
     const fieldBox = await field

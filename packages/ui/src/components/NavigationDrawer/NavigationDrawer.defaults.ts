@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import { getScrimStyle } from '../Scrim';
 
 export type NavigationDrawerStyle = CSSProperties &
@@ -217,9 +214,6 @@ function sheetStyle(
 ): NavigationDrawerStyle {
   const modal = variant === 'modal';
   const shape = options.shape;
-  const elevation = modal
-    ? navigationDrawerRuntime.modalRuntimeElevation
-    : navigationDrawerTokens.standardContainerElevation;
 
   return {
     '--_navigation-drawer-min-width': `${navigationDrawerRuntime.minimumDrawerWidth}px`,
@@ -240,7 +234,7 @@ function sheetStyle(
       shape ?? (modal ? token.ShapeCornerLargeEndBottomEnd : token.ShapeNone),
     '--_navigation-drawer-radius-end-start':
       shape ?? (modal ? token.ShapeCornerLargeEndBottomStart : token.ShapeNone),
-    '--_navigation-drawer-box-shadow': getElevationBoxShadow(elevation),
+    '--_navigation-drawer-box-shadow': 'none',
   };
 }
 

@@ -3,9 +3,11 @@ import type {
   HTMLAttributes,
   ReactNode,
 } from 'react';
+import { Elevation } from '../../internal/elevation';
 import {
   getFloatingToolbarStyle,
   getFloatingToolbarTranslation,
+  resolveFloatingToolbarElevation,
   type FloatingToolbarExitDirection,
   type FloatingToolbarFabPosition,
   type FloatingToolbarOrientation,
@@ -68,25 +70,32 @@ export function FloatingToolbar({
     expandedElevation,
     collapsedElevation,
   });
+  const elevationLevel = resolveFloatingToolbarElevation(expanded, withFab, {
+    expandedElevation,
+    collapsedElevation,
+  });
   const transform = getFloatingToolbarTranslation(state, exitDirection, resolvedDir);
   const toolbar = (
-    <div
-      aria-hidden={withFab && !expanded ? true : undefined}
-      className="floating-toolbar__surface"
-      data-expanded={expanded || undefined}
-    >
+    <div className="floating-toolbar__surface-shell">
+      <Elevation level={elevationLevel} />
       <div
-        aria-hidden={!expanded || undefined}
-        className="floating-toolbar__conditional floating-toolbar__leading"
+        aria-hidden={withFab && !expanded ? true : undefined}
+        className="floating-toolbar__surface"
+        data-expanded={expanded || undefined}
       >
-        {leadingContent}
-      </div>
-      <div className="floating-toolbar__content">{children}</div>
-      <div
-        aria-hidden={!expanded || undefined}
-        className="floating-toolbar__conditional floating-toolbar__trailing"
-      >
-        {trailingContent}
+        <div
+          aria-hidden={!expanded || undefined}
+          className="floating-toolbar__conditional floating-toolbar__leading"
+        >
+          {leadingContent}
+        </div>
+        <div className="floating-toolbar__content">{children}</div>
+        <div
+          aria-hidden={!expanded || undefined}
+          className="floating-toolbar__conditional floating-toolbar__trailing"
+        >
+          {trailingContent}
+        </div>
       </div>
     </div>
   );

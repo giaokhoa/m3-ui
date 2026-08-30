@@ -14,10 +14,7 @@ import {
   type FieldErrorProps,
   type TextFieldProps as AriaTextFieldProps,
 } from 'react-aria-components';
-import {
-  filledTextFieldBaseStyle,
-  outlinedTextFieldBaseStyle,
-} from './TextField.defaults';
+import '@m3-ui/tokens/text-field.css';
 import './text-field.css';
 
 export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
@@ -64,7 +61,6 @@ export function TextFieldImpl({
   isMultiline = true,
   rows,
   className,
-  style,
   inputType,
   inputProps,
   inputRef,
@@ -118,12 +114,6 @@ export function TextFieldImpl({
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames(staticClasses, userClassName);
-      }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        const baseStyle =
-          variant === 'filled' ? filledTextFieldBaseStyle : outlinedTextFieldBaseStyle;
-        return { ...baseStyle, ...userStyle };
       }}
     >
       {variant === 'filled' ? (

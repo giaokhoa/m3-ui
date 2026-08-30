@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 
 export type ModalWideNavigationRailStyle = CSSProperties &
   Record<`--${string}`, string | number>;
@@ -54,9 +51,6 @@ export function getModalWideNavigationRailStyle(
       options.modalContentColor ?? token.ColorRoleOnSurface,
     '--_modal-wide-navigation-rail-radius':
       options.modalShape ?? modalWideNavigationRailRuntime.modalRadius,
-    '--_modal-wide-navigation-rail-box-shadow': getElevationBoxShadow(
-      modalWideNavigationRailTokens.modalContainerElevation,
-    ),
     '--_modal-wide-navigation-rail-width-duration':
       modalWideNavigationRailRuntime.motion.expandWidth.duration,
     '--_modal-wide-navigation-rail-width-easing':

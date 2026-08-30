@@ -47,6 +47,23 @@ Flat Assist/Suggestion use transparent containers with 1px `OutlineVariant`; dis
 
 Flat Filter/Input use transparent unselected containers, `SecondaryContainer` selected containers, 1px unselected outlines and no selected outline. Elevated Filter uses `SurfaceContainerLow` unselected and `SecondaryContainer` selected. Disabled selected/elevated containers use `OnSurface` at 12%; disabled content uses `OnSurface` at 38%. InputChip applies its disabled 0.38 opacity directly to the avatar box, matching the pinned implementation rather than recoloring arbitrary avatar content.
 
+## Token and style ownership
+
+Chip component color tokens alias canonical `color.role.*` tokens. Only those core color-role endpoints contain runtime expressions such as `var(--on-surface)`; Chip canonical files must not duplicate those expressions.
+
+Style Dictionary compiles the immutable enabled/disabled and selected/unselected color/outline matrix into `@m3-ui/tokens/chip.css`. The generated adapter consumes ThemeProvider-owned runtime role variables but does not define them. Handwritten `chip.css` owns structural painting/layout, while React owns only behavior or values that genuinely depend on runtime state or callsite geometry.
+
+In particular, `Chip.tokens.ts` and `Chip.defaults.ts` must not decode `var(--role)` into names and reconstruct it, and they must not rebuild static `color-mix(...)` disabled colors. Runtime TypeScript retains interaction ordering, elevation selection/motion, slot-dependent padding/spacing, avatar disabled opacity, and shape overrides/expressive shape morphing.
+
+The intended color path is:
+
+```text
+component.chip.*Color
+    -> {color.role.*}
+    -> var(--role)
+    -> ThemeProvider concrete runtime value
+```
+
 ## Elevation and expressive shapes
 
 Elevation tracks the latest still-active press/hover/focus interaction and uses the shared AndroidX internal elevation motion specs: 120ms incoming, 120ms hover-outgoing, and 150ms other outgoing transitions. Drag elevation tokens are preserved but no artificial public drag state is added without an InteractionSource equivalent.

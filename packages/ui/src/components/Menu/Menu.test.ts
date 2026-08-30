@@ -12,7 +12,7 @@ describe('Menu defaults', () => {
     });
   });
 
-  it('projects canonical menu tokens into renderer variables', () => {
+  it('projects canonical menu tokens into renderer variables without serializing elevation', () => {
     const style = getMenuStyle();
     expect(style['--_menu-container-color']).toBe(menuTokens.containerColor);
     expect(style['--_menu-disabled-opacity']).toBe(menuTokens.disabledOpacity);
@@ -20,5 +20,7 @@ describe('Menu defaults', () => {
       menuTokens.selectedContainerColor,
     );
     expect(style['--_menu-item-min-height']).toBe('48px');
+    expect(menuTokens.containerElevation).toBe('level2');
+    expect(style['--_menu-shadow']).toBeUndefined();
   });
 });

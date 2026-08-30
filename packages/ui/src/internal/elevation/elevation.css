@@ -1,3 +1,8 @@
+.elevation,
+.elevation-host {
+  box-shadow: var(--_elevation-box-shadow);
+}
+
 .elevation {
   position: absolute;
   inset: 0;

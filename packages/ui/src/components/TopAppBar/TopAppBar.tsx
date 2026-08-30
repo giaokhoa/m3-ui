@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
 import {
   useLayoutEffect,
@@ -7,10 +8,12 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
+import '../../internal/elevation/elevation.css';
 import {
   clampScrollFraction,
   getTopAppBarStyle,
   topAppBarRuntime,
+  topAppBarTokens,
   type TopAppBarStyleOptions,
   type TopAppBarVariant,
 } from './TopAppBar.defaults';
@@ -221,6 +224,9 @@ export function TopAppBar({
     ...style,
   } as CSSProperties;
   const visuallyScrolled = twoRow ? fraction > 0 : overlap > 0.01;
+  const elevationLevel = visuallyScrolled
+    ? topAppBarTokens.scrolledContainerElevation
+    : topAppBarTokens.containerElevation;
   const centerTitleStyle = center.layout
     ? ({
         insetInlineStart: `${center.layout.inlineStart}px`,
@@ -232,7 +238,8 @@ export function TopAppBar({
     <header
       {...props}
       ref={center.rootRef}
-      className={clsx('top-app-bar', className)}
+      className={clsx('top-app-bar', 'elevation-host', className)}
+      data-elevation={elevationLevel}
       data-variant={variant}
       data-scroll-fraction={fraction}
       data-overlapped-fraction={overlap}

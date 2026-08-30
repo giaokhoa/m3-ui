@@ -29,6 +29,33 @@ describe('BottomAppBar defaults', () => {
     expect(bottomAppBarTokens.flexibleContainerElevation).toBe('level0');
   });
 
+  it('keeps AndroidX tonal elevation separate from shadow elevation', () => {
+    const defaultStyle = getBottomAppBarStyle('regular', 0);
+    expect(defaultStyle['--_bottom-app-bar-container-color']).toBe(
+      'var(--surface-container)',
+    );
+    expect(defaultStyle).not.toHaveProperty('--_bottom-app-bar-box-shadow');
+
+    expect(
+      getBottomAppBarStyle('regular', 0, { containerColor: 'var(--surface)' })[
+        '--_bottom-app-bar-container-color'
+      ],
+    ).toBe(
+      'color-mix(in srgb, var(--surface-tint) 8.238324625039507%, var(--surface))',
+    );
+    expect(
+      getBottomAppBarStyle('regular', 0, {
+        containerColor: 'var(--surface)',
+        tonalElevation: 'level0',
+      })['--_bottom-app-bar-container-color'],
+    ).toBe('var(--surface)');
+    expect(
+      getBottomAppBarStyle('regular', 0, { containerColor: 'tomato' })[
+        '--_bottom-app-bar-container-color'
+      ],
+    ).toBe('tomato');
+  });
+
   it('keeps AndroidX content and FAB renderer insets beside the consumer', () => {
     expect(bottomAppBarRuntime.contentHorizontalPadding).toBe(4);
     expect(bottomAppBarRuntime.contentTopPadding).toBe(4);

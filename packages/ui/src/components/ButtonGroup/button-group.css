@@ -72,7 +72,6 @@
   border-radius: var(--_button-group-menu-container-radius);
   background: var(--_button-group-menu-container-color);
   color: var(--_button-group-menu-item-color);
-  box-shadow: var(--_button-group-menu-container-shadow);
 }
 
 .button-group__menu-item {

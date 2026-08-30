@@ -50,9 +50,6 @@ describe('TopAppBar defaults', () => {
     expect(collapsed['--_top-app-bar-container-color']).toBe(
       topAppBarTokens.scrolledContainerColor,
     );
-    expect(collapsed['--_top-app-bar-box-shadow']).not.toBe(
-      expanded['--_top-app-bar-box-shadow'],
-    );
   });
 
   it('uses overlap, not collapse, for pinned/single-row scrolled visuals', () => {

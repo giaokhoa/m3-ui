@@ -2,33 +2,33 @@
   "component": {
     "tooltip": {
       "rich": {
-        "actionFocusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionFocusStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
         "actionFocusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
-        "actionHoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionHoverStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
         "actionHoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
-        "actionPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+        "actionPressedStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
         "actionPressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
-        "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" }
+        "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" }
       }
     },
     "snackbar": {
       "action": {
-        "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "focusStateLayerColor": { "$type": "string", "$value": "{color.role.inversePrimary}" },
         "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
-        "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "{color.role.inversePrimary}" },
         "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
-        "pressedStateLayerColor": { "$type": "string", "$value": "var(--inverse-primary)" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "{color.role.inversePrimary}" },
         "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
       },
       "container": {
-        "shadowColor": { "$type": "string", "$value": "var(--shadow)" }
+        "shadowColor": { "$type": "string", "$value": "{color.role.shadow}" }
       },
       "icon": {
-        "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "focusStateLayerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
         "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
-        "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
         "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
-        "pressedStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+        "pressedStateLayerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
         "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
       }
     }

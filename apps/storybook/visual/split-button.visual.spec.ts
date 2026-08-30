@@ -21,14 +21,17 @@ test.describe('Material 3 SplitButton browser contracts', () => {
           return {
             backgroundColor: style.backgroundColor,
             borderWidth: style.borderTopWidth,
-            boxShadow: style.boxShadow,
           };
         }),
       ),
     );
+    const elevatedShadow = await buttons
+      .nth(4)
+      .locator('.elevation')
+      .evaluate((element) => getComputedStyle(element).boxShadow);
 
     expect(styles[0]!.backgroundColor).not.toBe(styles[1]!.backgroundColor);
-    expect(styles[2]!.boxShadow).not.toBe('none');
+    expect(elevatedShadow).not.toBe('none');
     expect(styles[3]!.borderWidth).toBe('1px');
   });
 

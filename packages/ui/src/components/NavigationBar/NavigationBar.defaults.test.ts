@@ -37,10 +37,8 @@ describe('NavigationBar defaults', () => {
     expect(style).toMatchObject({
       '--_navigation-bar-height': '80px',
       '--_navigation-bar-container-color': token.ComponentNavigationBarContainerColor,
+      '--_navigation-bar-box-shadow': 'none',
     });
-    expect(
-      String(style['--_navigation-bar-box-shadow']).match(/0px 0px 0px 0px/g),
-    ).toHaveLength(3);
   });
 
   it('projects canonical selected and unselected item roles', () => {

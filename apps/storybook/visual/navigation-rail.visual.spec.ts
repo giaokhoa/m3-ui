@@ -44,7 +44,7 @@ test.describe('Material 3 NavigationRail browser contract', () => {
     expectClose(iconBox?.width, 24);
     expectClose(iconBox?.height, 24);
     expect(visual.backgroundColor).toBe('rgb(254, 247, 255)');
-    expect(visual.boxShadow.match(/0px 0px 0px 0px/g)).toHaveLength(3);
+    expect(visual.boxShadow).toBe('none');
     expect(itemVisual[0]).toBe('rgb(29, 25, 43)');
     expect(itemVisual[1]).toEqual({ color: 'rgb(98, 91, 113)', fontSize: '12px', lineHeight: '16px' });
     expect(itemVisual[2]).toBe('rgb(232, 222, 248)');

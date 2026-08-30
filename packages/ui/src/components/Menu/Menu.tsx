@@ -19,8 +19,10 @@ import {
   type MenuProps as AriaMenuProps,
   type PopoverProps as AriaPopoverProps,
 } from 'react-aria-components';
+import { Elevation } from '../../internal/elevation';
+import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextField } from '../TextField';
-import { getMenuStyle, menuRuntime } from './Menu.defaults';
+import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
 import './menu.css';
 
 export interface MenuProps<T extends object>
@@ -35,6 +37,15 @@ export interface MenuProps<T extends object>
   className?: string;
   style?: CSSProperties;
   popoverClassName?: string;
+}
+
+function MenuSurface({ children }: { children: ReactNode }) {
+  return (
+    <div className="menu-surface">
+      <Elevation level={menuTokens.containerElevation} />
+      <div className="menu-surface__clip">{children}</div>
+    </div>
+  );
 }
 
 /**
@@ -55,6 +66,8 @@ export function Menu<T extends object>({
   popoverClassName,
   ...menuProps
 }: MenuProps<T>) {
+  const themePortalContainer = useThemePortalContainer();
+
   return (
     <AriaMenuTrigger
       isOpen={isOpen}
@@ -67,14 +80,17 @@ export function Menu<T extends object>({
         offset={offset}
         crossOffset={crossOffset}
         containerPadding={menuRuntime.viewportMargin}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className={clsx('menu-popover', popoverClassName)}
         style={getMenuStyle()}
       >
-        <AriaMenu
-          {...menuProps}
-          className={clsx('menu', className)}
-          style={style}
-        />
+        <MenuSurface>
+          <AriaMenu
+            {...menuProps}
+            className={clsx('menu', className)}
+            style={style}
+          />
+        </MenuSurface>
       </AriaPopover>
     </AriaMenuTrigger>
   );
@@ -175,6 +191,7 @@ export function ExposedMenu<T extends object>({
   ...menuProps
 }: ExposedMenuProps<T>) {
   const anchorRef = useRef<HTMLDivElement>(null);
+  const themePortalContainer = useThemePortalContainer();
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = controlledOpen ?? uncontrolledOpen;
 
@@ -241,6 +258,7 @@ export function ExposedMenu<T extends object>({
         placement="bottom start"
         offset={4}
         containerPadding={menuRuntime.viewportMargin}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-menu__popover"
         style={{
           ...getMenuStyle(),
@@ -249,12 +267,14 @@ export function ExposedMenu<T extends object>({
             : null),
         }}
       >
-        <AriaMenu
-          {...menuProps}
-          autoFocus="first"
-          data-exposed-menu="true"
-          className="menu"
-        />
+        <MenuSurface>
+          <AriaMenu
+            {...menuProps}
+            autoFocus="first"
+            data-exposed-menu="true"
+            className="menu"
+          />
+        </MenuSurface>
       </AriaPopover>
     </div>
   );
