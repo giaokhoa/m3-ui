@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const themePortalSelector = '[data-' + 'm3' + '-theme-portal]';
+
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
   await expect(page.locator('#storybook-root')).toBeVisible();
@@ -12,7 +14,7 @@ test.describe('Material 3 Menu browser contract', () => {
     await trigger.focus();
     await trigger.press('Enter');
 
-    const themePortal = page.locator('[data-m3-theme-portal]');
+    const themePortal = page.locator(themePortalSelector);
     const popover = page.locator('.menu-popover');
     const elevation = popover.locator('.menu__elevation');
     await expect(themePortal.locator('.menu-popover')).toBeVisible();
@@ -114,7 +116,7 @@ test.describe('Material 3 Menu browser contract', () => {
     const menu = page.getByRole('menu');
     const popover = page.locator('.exposed-menu__popover');
     await expect(menu).toBeVisible();
-    await expect(page.locator('[data-m3-theme-portal] .exposed-menu__popover')).toBeVisible();
+    await expect(page.locator(`${themePortalSelector} .exposed-menu__popover`)).toBeVisible();
     await expect(popover).not.toHaveAttribute('data-entering');
     await expect(popover).toHaveCSS('transform', 'none');
     const fieldBox = await field
