@@ -143,11 +143,11 @@ The current canonical three-layer shadow recipe is intentionally preserved while
 
 React Aria/native host interactions remain the web interaction source of truth. Do not add a second pointer/keyboard event state machine to the shared Ripple primitive simply because Material Web's standalone custom element owns DOM listeners.
 
-## Local architecture contracts
+## Local implementation notes
 
-Before editing a foundational subsystem, read its local architecture contract and update it in the same PR if ownership, injection, generated output, runtime responsibilities, or an escape hatch changes.
+Before editing a foundational subsystem, read the relevant notes and update them when ownership, injection, generated output, runtime responsibilities, or an escape hatch changes.
 
-Required contracts for this area:
+Relevant notes for this area:
 
 - `/docs/architecture/README.md` for repository-wide boundaries;
 - `/packages/tokens/README.md` for compiler/token ownership;
@@ -155,7 +155,7 @@ Required contracts for this area:
 - `/packages/ui/src/internal/ripple/README.md` for ripple/state-layer/focus-indication behavior;
 - `/packages/ui/src/theme/README.md` for runtime theme ownership.
 
-Documentation is paired with executable architecture guards. A change is incomplete if it updates code but leaves the applicable contract stale, or if it removes a forbidden pattern without adding a guard that prevents its return when practical.
+These notes document the current implementation and research conclusions. They are not executable contracts on component DOM structure, class names, wrappers, paint placement, or exact wording. Validate Material/token semantics and observable behavior directly; do not add source-regex guards merely to preserve the implementation chosen during one refactor.
 
 ## DTCG rules
 
@@ -187,7 +187,7 @@ When a custom formatter receives a DTCG dictionary, read the transformed token v
 
 Every token-pipeline change should verify:
 
-1. applicable local architecture contracts are current;
+1. applicable local implementation notes are current;
 2. canonical validation catches missing/cyclic references;
 3. the real Style Dictionary build succeeds;
 4. generated JS declarations still match the package API;
