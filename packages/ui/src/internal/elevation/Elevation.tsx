@@ -11,6 +11,14 @@ export interface ElevationProps extends HTMLAttributes<HTMLSpanElement> {
   shadowColor?: string;
 }
 
+/**
+ * Material elevation paint primitive.
+ *
+ * Component consumers select the semantic elevation level and let this
+ * primitive own the elevation paint layer. Do not add component-specific
+ * classes to <Elevation>; existing callers that still do so are migration
+ * debt and should be handled when those components are audited.
+ */
 export function Elevation({
   level = 'level0',
   shadowColor,
