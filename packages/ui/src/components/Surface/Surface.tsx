@@ -174,11 +174,7 @@ export function Surface({
         style={resolvedStyle}
         tabIndex={tabIndex ?? (interactive && !isDisabled ? 0 : undefined)}
       >
-        <Elevation
-          className="surface__elevation"
-          level={shadowElevation}
-          shadowColor="var(--shadow)"
-        />
+        <Elevation level={shadowElevation} />
         <div className="surface__content">{children}</div>
       </div>
     </AbsoluteTonalElevationProvider>
