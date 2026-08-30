@@ -15,7 +15,6 @@ const allowedTokenCssSubpaths = new Set([
 ]);
 
 const legacyElevationSerializerCallers = new Set([
-  'components/BottomSheet/BottomSheet.defaults.ts',
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
   'components/DatePicker/DatePicker.defaults.ts',
@@ -258,6 +257,34 @@ test('BottomAppBar keeps AndroidX tonal elevation separate from shadow elevation
   assert.match(contract, /tonal elevation.*not.*drop shadow/is);
   assert.match(contract, /shadowElevation.*0\.dp/is);
   assert.match(contract, /box-shadow: none/i);
+});
+
+test('BottomSheet keeps its measured scrolling root while generated host elevation owns shadow paint', async () => {
+  const surfaceControls = JSON.parse(await readFile(new URL('tokens/component/surface-controls.json', packageRoot), 'utf8'));
+  const bottomSheet = await readFile(new URL('../ui/src/components/BottomSheet/BottomSheet.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/BottomSheet/BottomSheet.defaults.ts', packageRoot), 'utf8');
+  const css = await readFile(new URL('../ui/src/components/BottomSheet/bottom-sheet.css', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/BottomSheet/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+  const tokens = surfaceControls.component.sheetBottom;
+
+  assert.equal(tokens.dockedContainerColor.$value, '{color.role.surfaceContainerLow}');
+  assert.equal(tokens.dockedDragHandleColor.$value, '{color.role.onSurfaceVariant}');
+  assert.equal(tokens.focusIndicatorColor.$value, '{color.role.secondary}');
+  assert.match(bottomSheet, /@m3-ui\/tokens\/elevation\.css/);
+  assert.match(bottomSheet, /internal\/elevation\/elevation\.css/);
+  assert.match(bottomSheet, /elevation-host/);
+  assert.match(bottomSheet, /data-elevation=\{elevationLevel\}/);
+  assert.match(bottomSheet, /getBottomSheetElevationLevel/);
+  assert.match(bottomSheet, /--_elevation-shadow-color/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_bottom-sheet-box-shadow/);
+  assert.match(css, /overflow: auto/);
+  assert.match(css, /transform: translate3d/);
+  assert.doesNotMatch(css, /--_bottom-sheet-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/BottomSheet\/bottom-sheet\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /shared `\.elevation-host` mode on the existing root/i);
+  assert.match(contract, /Adding an outer wrapper solely to paint elevation would change the measured\/transformed DOM boundary/i);
+  assert.match(contract, /public `shadowColor` prop is a genuine runtime override/i);
 });
 
 test('ListItem keeps clipped root geometry while generated host elevation owns shadow paint', async () => {

@@ -61,6 +61,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
       };
     });
 
+    await expect(sheet).toHaveAttribute('data-elevation', 'level1');
     expectClose(sheetBox?.width, 640);
     expect(surface.maxWidth).toBe('640px');
     expect(surface.backgroundColor).toBe('rgb(247, 242, 250)');
@@ -178,6 +179,7 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     await openStory(page, 'components-bottomsheet--modal');
     const { sheet } = await openModalSheet(page);
     await expect(page.getByRole('dialog', { name: 'Modal places' })).toBeVisible();
+    await expect(sheet).toHaveAttribute('data-elevation', 'level1');
 
     const overlay = page.locator('.modal-bottom-sheet-overlay');
     await page.waitForTimeout(200);

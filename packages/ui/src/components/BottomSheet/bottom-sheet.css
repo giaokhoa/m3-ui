@@ -15,7 +15,6 @@
   border-start-end-radius: var(--_bottom-sheet-radius-top-end);
   border-end-end-radius: var(--_bottom-sheet-radius-bottom-end);
   border-end-start-radius: var(--_bottom-sheet-radius-bottom-start);
-  box-shadow: var(--_bottom-sheet-box-shadow);
   transform: translate3d(0, var(--_bottom-sheet-offset), 0);
   transition: none;
   will-change: transform;

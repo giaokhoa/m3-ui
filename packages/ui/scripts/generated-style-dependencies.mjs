@@ -36,6 +36,10 @@ export const generatedStyleDependencies = {
     '../tokens/dist/generated/elevation.css',
     'src/internal/elevation/elevation.css',
   ],
+  'src/components/BottomSheet/bottom-sheet.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+  ],
 };
 
 export function expandStyleSources(sources) {
