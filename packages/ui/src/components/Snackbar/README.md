@@ -12,9 +12,9 @@ Read this file before changing Snackbar token ownership, elevation rendering, ac
 
 ## Rendering contract
 
-The Snackbar root remains the layout/surface element. Adding the absolute `.snackbar__elevation` paint layer must not change the 48px/68px container geometry, width cap, flex layout, action-on-new-line spacing, status semantics, or keyboard ordering.
+The Snackbar root remains the layout/surface element. Adding the absolute `<Elevation>` paint layer must not change the 48px/68px container geometry, width cap, flex layout, action-on-new-line spacing, status semantics, or keyboard ordering.
 
-Browser/visual tests must inspect `.snackbar__elevation`, the actual shadow paint layer, rather than requiring the Snackbar root itself to own `box-shadow`.
+Browser/visual tests inspect the direct `<Elevation>` paint layer rather than requiring the Snackbar root itself to own `box-shadow`.
 
 The modular Snackbar stylesheet must include both the generated Elevation adapter and handwritten Elevation structural CSS before `snackbar.css`.
 

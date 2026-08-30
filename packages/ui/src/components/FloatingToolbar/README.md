@@ -16,7 +16,7 @@ Read this file before changing FloatingToolbar elevation, surface layering, expa
 
 The paint layer must remain outside `.floating-toolbar__surface` because that surface uses `overflow: hidden`. Putting `<Elevation>` inside the clipped surface would truncate the Material shadow.
 
-Browser/visual tests inspect `.floating-toolbar__elevation`, the actual paint layer, and verify its semantic `data-elevation` value. They must not require `.floating-toolbar__surface` or the toolbar root to own `box-shadow`.
+Browser/visual tests inspect the direct `<Elevation>` paint layer and verify its semantic `data-elevation` value. They must not require `.floating-toolbar__surface` or the toolbar root to own `box-shadow`.
 
 The modular FloatingToolbar stylesheet must inline generated Elevation CSS and handwritten Elevation structural CSS before `floating-toolbar.css`.
 

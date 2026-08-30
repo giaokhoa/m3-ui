@@ -189,7 +189,7 @@ test.describe('Material 3 RichTooltip browser contract', () => {
         borderRadius: computed.borderRadius,
       };
     });
-    const elevation = tooltip.locator('.rich-tooltip__elevation');
+    const elevation = tooltip.locator(':scope > .elevation');
     const elevationShadow = await elevation.evaluate(
       (element) => getComputedStyle(element).boxShadow,
     );

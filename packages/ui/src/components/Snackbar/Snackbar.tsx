@@ -78,7 +78,6 @@ export function Snackbar({
       }}
     >
       <Elevation
-        className="snackbar__elevation"
         level={snackbarTokens.containerElevation}
         shadowColor={shadowColor ?? snackbarTokens.containerShadowColor}
       />

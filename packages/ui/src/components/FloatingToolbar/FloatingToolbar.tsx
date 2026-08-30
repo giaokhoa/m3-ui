@@ -77,10 +77,7 @@ export function FloatingToolbar({
   const transform = getFloatingToolbarTranslation(state, exitDirection, resolvedDir);
   const toolbar = (
     <div className="floating-toolbar__surface-shell">
-      <Elevation
-        className="floating-toolbar__elevation"
-        level={elevationLevel}
-      />
+      <Elevation level={elevationLevel} />
       <div
         aria-hidden={withFab && !expanded ? true : undefined}
         className="floating-toolbar__surface"

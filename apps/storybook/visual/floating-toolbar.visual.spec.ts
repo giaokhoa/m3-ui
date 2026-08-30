@@ -24,7 +24,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await openStory(page, 'components-floatingtoolbar--horizontal-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
-    const elevation = toolbar.locator('.floating-toolbar__elevation');
+    const elevation = toolbar.locator('.floating-toolbar__surface-shell > .elevation');
     const first = toolbar.locator('.icon-button').first();
     const last = toolbar.locator('.icon-button').last();
     const [surfaceBox, firstBox, lastBox] = await Promise.all([
@@ -77,7 +77,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
-    const elevation = toolbar.locator('.floating-toolbar__elevation');
+    const elevation = toolbar.locator('.floating-toolbar__surface-shell > .elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const fab = fabSlot.locator('.fab');
     const fabVisual = fabSlot.locator('.fab__visual');
@@ -105,7 +105,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-collapsed');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
-    const elevation = toolbar.locator('.floating-toolbar__elevation');
+    const elevation = toolbar.locator('.floating-toolbar__surface-shell > .elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const fabVisual = fabSlot.locator('.fab__visual');
     const [toolbarBox, surfaceBox, slotBox, visualBox] = await Promise.all([
@@ -203,7 +203,7 @@ test.describe('Material 3 FloatingToolbar browser contract', () => {
     await openStory(page, 'components-floatingtoolbar--horizontal-fab-expanded');
     const toolbar = page.getByTestId('floating-toolbar');
     const surface = toolbar.locator('.floating-toolbar__surface');
-    const elevation = toolbar.locator('.floating-toolbar__elevation');
+    const elevation = toolbar.locator('.floating-toolbar__surface-shell > .elevation');
     const fabSlot = toolbar.locator('.floating-toolbar__fab');
     const durations = await Promise.all(
       [toolbar, surface, elevation, fabSlot].map((locator) =>

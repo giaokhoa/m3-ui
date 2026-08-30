@@ -14,7 +14,7 @@ Read this file before changing Tooltip token ownership, elevation rendering, por
 
 `richTooltipTokens.containerElevation` selects the semantic elevation level. The public `shadowColor` prop is a real runtime override and is passed to `<Elevation>`; when absent, the canonical `containerShadowColor` role is used.
 
-`Tooltip.defaults.ts` must not call `getElevationBoxShadow()` or emit a private Tooltip `box-shadow` token. Browser tests must inspect `.rich-tooltip__elevation`, the actual paint layer, rather than requiring the AriaPopover root to own `box-shadow`.
+`Tooltip.defaults.ts` must not call `getElevationBoxShadow()` or emit a private Tooltip `box-shadow` token. Browser tests inspect the direct `<Elevation>` paint layer rather than requiring the AriaPopover root to own `box-shadow`.
 
 The modular Tooltip stylesheet must include both the generated Elevation adapter and the handwritten Elevation structural CSS before `tooltip.css`.
 

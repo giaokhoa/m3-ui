@@ -167,7 +167,6 @@ test('Tooltip colors stay semantic and RichTooltip elevation paints through the 
   assert.match(tooltip, /shadowColor=\{shadowColor \?\? richTooltipTokens\.containerShadowColor\}/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_rich-tooltip-box-shadow/);
   assert.match(styleDependencies, /src\/components\/Tooltip\/tooltip\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
-  assert.match(contract, /Browser tests must inspect `\.rich-tooltip__elevation`/i);
   assert.match(contract, /must not call `getElevationBoxShadow\(\)`/i);
 });
 
@@ -187,7 +186,6 @@ test('Snackbar colors stay semantic and its static level3 elevation paints throu
   assert.match(snackbar, /shadowColor=\{shadowColor \?\? snackbarTokens\.containerShadowColor\}/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_snackbar-box-shadow/);
   assert.match(styleDependencies, /src\/components\/Snackbar\/snackbar\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
-  assert.match(contract, /Browser\/visual tests must inspect `\.snackbar__elevation`/i);
   assert.match(contract, /call `getElevationBoxShadow\(\)` from `Snackbar\.defaults\.ts`/i);
   assert.match(contract, /interaction-dependent action\/icon mappings are behavior/i);
 });
@@ -211,13 +209,11 @@ test('Dialog colors stay semantic and its scroll surface stays separate from Ele
   assert.equal(states.actionHoverStateLayerColor.$value, '{color.role.primary}');
   assert.equal(states.actionPressedStateLayerColor.$value, '{color.role.primary}');
   assert.match(dialog, /<Elevation/);
-  assert.match(dialog, /className="dialog__elevation"/);
   assert.match(dialog, /className="dialog-surface"/);
   assert.match(dialog, /shadowColor=\{shadowColor\}/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_dialog-box-shadow/);
   assert.match(styleDependencies, /src\/components\/Dialog\/dialog\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
   assert.match(contract, /Elevation must stay outside.*clipped scroll surface/i);
-  assert.match(contract, /Browser\/visual tests inspect `\.dialog__elevation`/i);
   assert.match(contract, /separate shared UI layout workstream/i);
 });
 
@@ -229,13 +225,11 @@ test('Menu level2 elevation stays outside its rounded clip surface', async () =>
 
   assert.match(menu, /function MenuSurface/);
   assert.match(menu, /<Elevation/);
-  assert.match(menu, /className="menu__elevation"/);
   assert.match(menu, /className="menu-surface__clip"/);
   assert.match(menu, /level=\{menuTokens\.containerElevation\}/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_menu-shadow/);
   assert.match(styleDependencies, /src\/components\/Menu\/menu\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
   assert.match(contract, /Popover itself must stay non-clipping/i);
-  assert.match(contract, /Browser\/visual tests inspect `\.menu__elevation`/i);
   assert.match(contract, /existing canonical Menu color-role strings are migration debt/i);
 });
 

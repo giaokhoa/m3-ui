@@ -28,7 +28,6 @@ test('FloatingToolbar chooses runtime elevation levels while shared Elevation ow
 
   assert.match(toolbar, /resolveFloatingToolbarElevation/);
   assert.match(toolbar, /<Elevation/);
-  assert.match(toolbar, /className="floating-toolbar__elevation"/);
   assert.match(toolbar, /className="floating-toolbar__surface-shell"/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_floating-toolbar-box-shadow/);
   assert.match(defaults, /export function resolveFloatingToolbarElevation/);

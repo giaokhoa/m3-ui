@@ -390,7 +390,6 @@ export function RichTooltip({
       }}
     >
       <Elevation
-        className="rich-tooltip__elevation"
         level={richTooltipTokens.containerElevation}
         shadowColor={shadowColor ?? richTooltipTokens.containerShadowColor}
       />

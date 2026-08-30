@@ -34,7 +34,7 @@
   border-radius: var(--_floating-toolbar-container-radius);
 }
 
-.floating-toolbar__elevation {
+.floating-toolbar__surface-shell > .elevation {
   transition: box-shadow var(--_floating-toolbar-motion-duration) var(--_floating-toolbar-motion-easing);
 }
 
@@ -142,7 +142,7 @@
 @media (prefers-reduced-motion: reduce) {
   .floating-toolbar,
   .floating-toolbar__surface,
-  .floating-toolbar__elevation,
+  .floating-toolbar__surface-shell > .elevation,
   .floating-toolbar__conditional,
   .floating-toolbar__fab {
     transition-duration: 0s !important;

@@ -33,7 +33,7 @@ test.describe('Material 3 Snackbar browser contract', () => {
         borderRadius: computed.borderRadius,
       };
     });
-    const elevation = snackbar.locator('.snackbar__elevation');
+    const elevation = snackbar.locator(':scope > .elevation');
     const elevationShadow = await elevation.evaluate(
       (element) => getComputedStyle(element).boxShadow,
     );

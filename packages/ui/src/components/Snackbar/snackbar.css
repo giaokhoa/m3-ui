@@ -13,10 +13,6 @@
   color: var(--_snackbar-content-color);
 }
 
-.snackbar__elevation {
-  border-radius: inherit;
-}
-
 .snackbar[data-has-dismiss] {
   padding-inline-end: 0;
 }
@@ -77,7 +73,7 @@
     forced-color-adjust: none;
   }
 
-  .snackbar__elevation {
+  .snackbar > .elevation {
     display: none;
   }
 

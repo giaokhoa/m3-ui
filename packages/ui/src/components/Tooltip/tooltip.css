@@ -53,10 +53,6 @@
     var(--_rich-tooltip-scale-easing);
 }
 
-.rich-tooltip__elevation {
-  border-radius: inherit;
-}
-
 .rich-tooltip__dialog {
   box-sizing: border-box;
   max-inline-size: 100%;
