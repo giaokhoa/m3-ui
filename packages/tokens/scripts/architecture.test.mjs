@@ -177,7 +177,7 @@ test('Snackbar colors stay semantic and its static level3 elevation paints throu
   assert.equal(snackbarTokens.component.snackbar.action.labelTextColor.$value, '{color.role.inversePrimary}');
   assert.equal(snackbarTokens.component.snackbar.container.color.$value, '{color.role.inverseSurface}');
   assert.equal(snackbarTokens.component.snackbar.icon.color.$value, '{color.role.inverseOnSurface}');
-  assert.equal(sharedStates.component.snackbar.containerShadowColor.$value, '{color.role.shadow}');
+  assert.equal(sharedStates.component.snackbar.container.shadowColor.$value, '{color.role.shadow}');
   assert.match(snackbar, /<Elevation/);
   assert.match(snackbar, /shadowColor=\{shadowColor \?\? snackbarTokens\.containerShadowColor\}/);
   assert.doesNotMatch(defaults, /getElevationBoxShadow|--_snackbar-box-shadow/);
