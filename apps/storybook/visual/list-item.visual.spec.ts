@@ -10,6 +10,14 @@ function expectClose(actual: number | undefined, expected: number) {
   expect(Math.abs((actual ?? 0) - expected)).toBeLessThan(0.8);
 }
 
+function elevationPaint(page: Page, testId: string) {
+  return page
+    .locator(
+      `[data-testid="${testId}"][data-elevation], [data-testid="${testId}"] [data-elevation]`,
+    )
+    .first();
+}
+
 test.describe('Material 3 ListItem browser contract', () => {
   test('uses canonical 56/72/88 one/two/three-line geometry', async ({ page }) => {
     await openStory(page, 'components-listitem--geometry');
@@ -88,21 +96,28 @@ test.describe('Material 3 ListItem browser contract', () => {
     await openStory(page, 'components-listitem--visual-states');
     const selected = page.getByTestId('selected-item');
     const dragged = page.getByTestId('dragged-item');
+    const selectedPaint = elevationPaint(page, 'selected-item');
+    const draggedPaint = elevationPaint(page, 'dragged-item');
     await expect(selected).toHaveAttribute('data-selected', 'true');
-    await expect(selected).toHaveAttribute('data-elevation', 'level0');
+    await expect(selectedPaint).toHaveAttribute('data-elevation', 'level0');
     await expect(dragged).toHaveAttribute('data-dragged', 'true');
-    await expect(dragged).toHaveAttribute('data-elevation', 'level4');
+    await expect(draggedPaint).toHaveAttribute('data-elevation', 'level4');
     const selectedVisual = await selected.evaluate((element) => ({
       background: getComputedStyle(element, '::before').backgroundColor,
       radius: getComputedStyle(element).borderRadius,
-      shadow: getComputedStyle(element).boxShadow,
     }));
-    const draggedVisual = await dragged.evaluate((element) => ({ radius: getComputedStyle(element).borderRadius, shadow: getComputedStyle(element).boxShadow }));
+    const draggedVisual = await dragged.evaluate((element) => ({
+      radius: getComputedStyle(element).borderRadius,
+    }));
+    const [selectedShadow, draggedShadow] = await Promise.all([
+      selectedPaint.evaluate((element) => getComputedStyle(element).boxShadow),
+      draggedPaint.evaluate((element) => getComputedStyle(element).boxShadow),
+    ]);
     expect(selectedVisual.background).toBe('rgb(232, 222, 248)');
     expect(selectedVisual.radius).toBe('16px');
-    expect(selectedVisual.shadow).toBe('none');
+    expect(selectedShadow).toBe('none');
     expect(draggedVisual.radius).toBe('16px');
-    expect(draggedVisual.shadow).not.toMatch(/^none$/);
+    expect(draggedShadow).not.toMatch(/^none$/);
   });
 
   test('RTL swaps physical slot placement while preserving logical leading/trailing', async ({ page }) => {
