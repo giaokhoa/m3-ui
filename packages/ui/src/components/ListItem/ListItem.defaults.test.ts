@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import * as token from '@m3-ui/tokens';
-import { getListItemStyle, listItemTokens } from './ListItem.defaults';
+import {
+  getListItemElevationLevel,
+  getListItemStyle,
+  listItemTokens,
+} from './ListItem.defaults';
 
 describe('ListItem defaults', () => {
   it('maps one/two/three-line geometry from canonical list tokens', () => {
@@ -10,13 +14,16 @@ describe('ListItem defaults', () => {
     expect(getListItemStyle(3)['--_list-item-min-height']).toBe('88px');
   });
 
-  it('resolves canonical selected and dragged visual states without mutating tokens', () => {
+  it('keeps elevation selection semantic while generated CSS owns shadow serialization', () => {
     const selected = getListItemStyle(1, { isSelected: true });
     const dragged = getListItemStyle(1, { isDragged: true });
     expect(selected['--_list-item-container-color']).toBe(token.ComponentListBaseItemSelectedContainerColor);
     expect(selected['--_list-item-label-color']).toBe(token.ComponentListBaseItemSelectedLabelTextColor);
     expect(dragged['--_list-item-label-color']).toBe(token.ComponentListBaseItemDraggedLabelTextColor);
-    expect(dragged['--_list-item-box-shadow']).not.toBe(getListItemStyle(1)['--_list-item-box-shadow']);
+    expect(getListItemElevationLevel()).toBe(listItemTokens.container.elevation);
+    expect(getListItemElevationLevel({ isDragged: true })).toBe(listItemTokens.dragged.elevation);
+    expect(selected['--_list-item-box-shadow']).toBeUndefined();
+    expect(dragged['--_list-item-box-shadow']).toBeUndefined();
   });
 
   it('uses canonical disabled opacity and state-layer opacity', () => {

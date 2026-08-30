@@ -1,9 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import {
-  getElevationBoxShadow,
-  type ElevationLevel,
-} from '../../internal/elevation';
+import type { ElevationLevel } from '../../internal/elevation';
 import { pxNumber } from '../../internal/tokenValues';
 
 export type ListItemStyle = CSSProperties &
@@ -234,6 +231,14 @@ function resolveContentColors(state: ListItemInteractionState) {
   };
 }
 
+export function getListItemElevationLevel(
+  state: ListItemInteractionState = {},
+): ElevationLevel {
+  return state.isDragged
+    ? listItemTokens.dragged.elevation
+    : listItemTokens.container.elevation;
+}
+
 export function getListItemStyle(
   lineCount: 1 | 2 | 3,
   state: ListItemInteractionState = {},
@@ -254,9 +259,6 @@ export function getListItemStyle(
   const containerOpacity = selectedDisabled
     ? listItemTokens.selectedDisabled.containerOpacity
     : 1;
-  const elevation = state.isDragged
-    ? listItemTokens.dragged.elevation
-    : listItemTokens.container.elevation;
 
   return {
     '--_list-item-min-height': `${minHeight}px`,
@@ -267,7 +269,6 @@ export function getListItemStyle(
     '--_list-item-container-color': containerColor,
     '--_list-item-container-opacity': containerOpacity,
     '--_list-item-shape': resolveShape(state),
-    '--_list-item-box-shadow': getElevationBoxShadow(elevation),
     '--_list-item-focus-indicator-thickness': listItemTokens.focusIndicator.thickness,
     '--_list-item-focus-indicator-outline-offset':
       listItemTokens.focusIndicator.outlineOffset,

@@ -89,11 +89,18 @@ test.describe('Material 3 ListItem browser contract', () => {
     const selected = page.getByTestId('selected-item');
     const dragged = page.getByTestId('dragged-item');
     await expect(selected).toHaveAttribute('data-selected', 'true');
+    await expect(selected).toHaveAttribute('data-elevation', 'level0');
     await expect(dragged).toHaveAttribute('data-dragged', 'true');
-    const selectedVisual = await selected.evaluate((element) => ({ background: getComputedStyle(element, '::before').backgroundColor, radius: getComputedStyle(element).borderRadius }));
+    await expect(dragged).toHaveAttribute('data-elevation', 'level4');
+    const selectedVisual = await selected.evaluate((element) => ({
+      background: getComputedStyle(element, '::before').backgroundColor,
+      radius: getComputedStyle(element).borderRadius,
+      shadow: getComputedStyle(element).boxShadow,
+    }));
     const draggedVisual = await dragged.evaluate((element) => ({ radius: getComputedStyle(element).borderRadius, shadow: getComputedStyle(element).boxShadow }));
     expect(selectedVisual.background).toBe('rgb(232, 222, 248)');
     expect(selectedVisual.radius).toBe('16px');
+    expect(selectedVisual.shadow).toBe('none');
     expect(draggedVisual.radius).toBe('16px');
     expect(draggedVisual.shadow).not.toMatch(/^none$/);
   });

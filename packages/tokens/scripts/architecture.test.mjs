@@ -19,7 +19,6 @@ const legacyElevationSerializerCallers = new Set([
   'components/Button/Button.defaults.ts',
   'components/ButtonGroup/ButtonGroup.defaults.ts',
   'components/DatePicker/DatePicker.defaults.ts',
-  'components/ListItem/ListItem.defaults.ts',
   'components/NavigationDrawer/NavigationDrawer.defaults.ts',
   'components/NavigationRail/NavigationRail.defaults.ts',
   'components/SearchBar/SearchBar.defaults.ts',
@@ -99,6 +98,8 @@ test('foundation docs lock change-local interaction-effect contracts', async () 
   assert.match(elevation, /cross-source drift/i);
   assert.match(elevation, /New code must not add new callers/i);
   assert.match(elevation, /level0.*box-shadow: none/is);
+  assert.match(elevation, /\.elevation-host/i);
+  assert.match(elevation, /must not add positioning, sizing, overflow, transform/i);
   assert.match(elevation, /Browser\/visual contract tests.*actual paint layer/is);
   assert.match(elevation, /must not require the interactive\/root element itself to own `box-shadow`/i);
   assert.match(ripple, /useRipple\(\).*wave geometry/is);
@@ -257,6 +258,27 @@ test('BottomAppBar keeps AndroidX tonal elevation separate from shadow elevation
   assert.match(contract, /tonal elevation.*not.*drop shadow/is);
   assert.match(contract, /shadowElevation.*0\.dp/is);
   assert.match(contract, /box-shadow: none/i);
+});
+
+test('ListItem keeps clipped root geometry while generated host elevation owns shadow paint', async () => {
+  const listItem = await readFile(new URL('../ui/src/components/ListItem/ListItem.tsx', packageRoot), 'utf8');
+  const defaults = await readFile(new URL('../ui/src/components/ListItem/ListItem.defaults.ts', packageRoot), 'utf8');
+  const css = await readFile(new URL('../ui/src/components/ListItem/list-item.css', packageRoot), 'utf8');
+  const contract = await readFile(new URL('../ui/src/components/ListItem/README.md', packageRoot), 'utf8');
+  const styleDependencies = await readFile(new URL('../ui/scripts/generated-style-dependencies.mjs', packageRoot), 'utf8');
+
+  assert.match(listItem, /@m3-ui\/tokens\/elevation\.css/);
+  assert.match(listItem, /internal\/elevation\/elevation\.css/);
+  assert.match(listItem, /elevation-host/);
+  assert.match(listItem, /data-elevation=\{elevationLevel\}/);
+  assert.match(listItem, /getListItemElevationLevel/);
+  assert.doesNotMatch(defaults, /getElevationBoxShadow|--_list-item-box-shadow/);
+  assert.match(css, /overflow: hidden/);
+  assert.doesNotMatch(css, /--_list-item-box-shadow/);
+  assert.match(styleDependencies, /src\/components\/ListItem\/list-item\.css[\s\S]*dist\/generated\/elevation\.css[\s\S]*internal\/elevation\/elevation\.css/);
+  assert.match(contract, /root deliberately uses the shared `\.elevation-host` paint mode/i);
+  assert.match(contract, /descendant shadow painter would be clipped/i);
+  assert.match(contract, /adding a wrapper solely for elevation would change the existing DOM\/geometry contract/i);
 });
 
 test('runtime color CSS expressions are never decoded back into semantic token names', async () => {
