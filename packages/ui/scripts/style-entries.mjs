@@ -175,7 +175,7 @@ export const publicComponentStyleSources = {
   chip: 'src/components/Chip/chip.css',
   'date-picker': 'src/components/DatePicker/date-picker.css',
   dialog: 'src/components/Dialog/dialog.css',
-  divider: 'src/components/Divider/Divider.css',
+  divider: 'src/components/Divider/divider.css',
   'drag-handle': 'src/components/DragHandle/drag-handle.css',
   fab: 'src/components/Fab/fab.css',
   'fab-menu': 'src/components/FabMenu/fab-menu.css',
