@@ -1,86 +1,42 @@
-# DatePicker architecture contract
+# DatePicker implementation notes
 
 Read this file before changing DatePicker token ownership, elevation painting, modal/docked surface behavior, calendar geometry, or display-mode runtime behavior.
 
-## Elevation ownership
+## Material elevation semantics
 
-DatePicker has two different elevation contracts and they must stay distinct.
+DatePicker has two distinct semantic elevation cases:
 
-- `variant="modal"` is dialog content. The Dialog surface owns the modal shadow, so DatePicker itself selects semantic `level0` and paints no shadow.
-- `variant="docked"` is a standalone web surface. Its canonical `component.datePickerDocked.containerElevation` token is `level3`, and the DatePicker root must paint that level.
+- `variant="modal"` is dialog content. The Dialog surface owns the modal shadow, so DatePicker itself selects `level0` and adds no second shadow.
+- `variant="docked"` is a standalone surface. Its canonical `component.datePickerDocked.containerElevation` token is `level3`.
 
-`getDatePickerElevationLevel()` is the single runtime selector for this distinction. Runtime code may select the semantic level, but it must not serialize Material shadow geometry in TypeScript.
+`getDatePickerElevationLevel()` currently selects between those cases. Runtime code may choose the semantic level, while immutable Material shadow geometry remains compiler-owned rather than being rebuilt in TypeScript.
 
-`DatePicker.defaults.ts` must not call `getElevationBoxShadow()` or emit `--_date-picker-box-shadow`.
+The same modal/docked distinction applies to DateRangePicker because it shares the same surface implementation.
 
-## Why DatePicker uses elevation host paint
+## Current web rendering
 
-The existing `.date-picker` root deliberately owns the rounded clipping boundary:
+The current `.date-picker` root owns rounded clipping with `overflow: hidden`. A descendant shadow painter inside that clipped root would not render the outer shadow correctly, so the current implementation paints the generated elevation recipe on the root using `.elevation-host` and `data-elevation`.
 
-```css
-.date-picker {
-  overflow: hidden;
-  border-radius: var(--_date-picker-container-radius);
-}
-```
+That host-paint arrangement is an implementation detail, not the semantic DatePicker contract. A future implementation may use another paint boundary if it preserves modal `level0`, docked `level3`, clipping, calendar geometry, animation, interaction behavior, and Dialog composition.
 
-A descendant `<Elevation>` painter would be clipped by that root. Adding an outer wrapper solely for elevation would change the existing DatePicker DOM/geometry contract for no semantic benefit.
+`@m3-ui/tokens/elevation.css` owns immutable shadow geometry/opacities, shared elevation CSS applies the generated recipe, and `ThemeProvider` owns the concrete `--shadow` role.
 
-Therefore DatePicker and DateRangePicker use the shared host mode on the existing root:
+## Runtime behavior
 
-```text
-class="date-picker elevation-host"
-data-elevation="level0 | level3"
-```
+Calendar/date state, year-range validation, locale formatting, React Aria focus/selection state, month navigation, year chooser behavior, display-mode transitions, and reduced-motion behavior remain runtime concerns. Elevation work should preserve those observable mechanics rather than freeze the current wrapper/root structure.
 
-`@m3-ui/tokens/elevation.css` owns immutable shadow geometry/opacities. `internal/elevation/elevation.css` applies the host `box-shadow`. `ThemeProvider` owns the concrete `--shadow` role.
-
-The host paint primitive must not change DatePicker sizing, clipping, calendar grid geometry, animation or interaction ownership.
-
-## Modal versus docked contract
-
-Modal DatePicker deliberately remains `level0` even though it can be rendered without a Dialog in isolated stories. That renderer rule reflects the component contract: Compose DatePicker is dialog content and does not add another modal shadow.
-
-Docked DatePicker uses canonical `level3`. Do not collapse this into a generic component-wide elevation value, and do not give modal DatePicker the docked shadow merely to make an isolated story look elevated.
-
-The same distinction applies to DateRangePicker because it shares the same root surface implementation.
-
-## Runtime behavior boundary
-
-Calendar/date-only state, year-range validation, locale formatting, RAC focus/selection state, month navigation, year chooser behavior, display-mode transitions and reduced-motion behavior remain runtime concerns.
-
-Elevation work must not change those mechanics. In particular, do not add/remove wrappers around `.date-picker`, move the root clipping boundary, or change calendar/content geometry solely to paint a shadow.
-
-The shared `packages/ui/src/layout/**` workstream is separate and must not be edited as part of DatePicker elevation/token migration.
+Modal DatePicker remains semantically `level0` even in isolated stories; the standalone story does not change its role as dialog content. Docked DatePicker remains canonical `level3` unless the Material/token source changes.
 
 ## CSS packaging
 
-Source/dev consumers import generated elevation CSS and shared host paint CSS before `date-picker.css`.
+Source/dev and modular style consumers currently include generated elevation CSS and shared elevation paint CSS before `date-picker.css`. Generated shadow geometry remains centralized under the token build output rather than copied into DatePicker CSS.
 
-The modular `@m3-ui/ui/styles/DatePicker.css` entry must inline, in order:
+## Validation
 
-1. `packages/tokens/dist/generated/elevation.css`;
-2. `packages/ui/src/internal/elevation/elevation.css`;
-3. `packages/ui/src/components/DatePicker/date-picker.css`.
+Tests should cover the actual semantic/rendering result:
 
-## Browser contract
+- modal DatePicker selects `level0` and computes no DatePicker-owned shadow;
+- docked DatePicker selects canonical `level3` and computes a visible generated shadow;
+- existing clipping, calendar geometry, date selection, keyboard behavior, locale behavior, motion, and Dialog composition remain correct.
 
-Browser tests must verify both semantic branches on the actual root host:
-
-- modal root has `data-elevation="level0"` and computed `box-shadow: none`;
-- docked root has `data-elevation="level3"` and a non-`none` computed `box-shadow`.
-
-Existing geometry, date selection, keyboard, locale, motion and Dialog-composition browser contracts remain authoritative.
-
-## Forbidden regressions
-
-Do not:
-
-- restore `getElevationBoxShadow()` or `--_date-picker-box-shadow`;
-- hardcode level3 shadow geometry/opacities in DatePicker CSS or TypeScript;
-- add a descendant shadow painter inside the clipped root;
-- add a wrapper solely for elevation;
-- make modal DatePicker paint the docked level3 shadow;
-- make docked DatePicker level0 while its canonical token remains level3;
-- change DatePicker calendar/layout mechanics as part of elevation migration;
-- edit `packages/ui/src/layout/**` for this component migration.
+Do not add a source-regex guard for `.elevation-host`, wrapper names, or a particular DOM hierarchy. If the paint implementation changes, update these notes and validate the resulting Material behavior directly.
