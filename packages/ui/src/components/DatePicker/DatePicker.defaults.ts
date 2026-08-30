@@ -61,8 +61,6 @@ export const datePickerRuntime = {
   horizontalPadding: 12,
   monthYearHeight: 56,
   modeParallaxDistance: 48,
-  hoverOpacity: 0.08,
-  pressOpacity: 0.1,
   motion: {
     defaultSpatial: {
       duration: token.MotionSpringDefaultSpatialDuration,
@@ -164,8 +162,6 @@ export function getDatePickerStyle(
     '--_date-picker-effects-in-easing': datePickerRuntime.motion.defaultEffects.easing,
     '--_date-picker-effects-out-duration': datePickerRuntime.motion.fastEffects.duration,
     '--_date-picker-effects-out-easing': datePickerRuntime.motion.fastEffects.easing,
-    '--_date-picker-hover-percentage': `${datePickerRuntime.hoverOpacity * 100}%`,
-    '--_date-picker-press-percentage': `${datePickerRuntime.pressOpacity * 100}%`,
     ...typography('date-picker-label', 'labelLarge'),
     ...typography('date-picker-headline', 'headlineLarge'),
     ...typography('date-picker-range-headline', 'titleLarge'),
