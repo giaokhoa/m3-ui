@@ -4,7 +4,7 @@ This repository ports Material 3 behavior and visuals from AndroidX Compose to R
 
 ## Hard architectural invariants
 
-These rules are intentionally strict. They exist to prevent the token pipeline and interaction effects from drifting back toward older experiments.
+These rules are intentionally strict where they define token source/build ownership. Component DOM shape, class names, wrapper choices, and paint plumbing are implementation details unless the Material contract itself requires a particular observable result.
 
 1. `packages/tokens/tokens/**/*.json` is the **only authoritative immutable design-token source**.
 2. Canonical tokens are manually reviewed DTCG. AndroidX, Figma Material 3, Material Web, and other upstreams are **read-only audit oracles**.
@@ -17,20 +17,20 @@ These rules are intentionally strict. They exist to prevent the token pipeline a
 9. Component/runtime code may contain behavior, interaction history, DOM geometry, and real runtime overrides, but must not duplicate or reserialize immutable design constants when Style Dictionary/CSS can own the platform representation.
 10. A new upstream revision is adopted by reviewing canonical changes and audit drift; never by regenerating canonical files from upstream.
 
-The token package enforces these boundaries in `packages/tokens/scripts/architecture.test.mjs`. Repository-specific Style Dictionary rules live in `/.agents/skills/style-dictionary/SKILL.md`.
+The token package checks its source/build boundaries in `packages/tokens/scripts/architecture.test.mjs`. Repository-specific Style Dictionary guidance lives in `/.agents/skills/style-dictionary/SKILL.md`.
 
-## Change-local documentation contract
+## Change-local implementation notes
 
-Foundational subsystems own an architecture contract next to the code. **Read that contract before editing the subsystem.** When a change alters ownership, injection, runtime behavior, generated output, or an allowed escape hatch, update the local contract in the same PR and add or update an executable guard where practical.
+Foundational subsystems keep research and ownership notes next to the code. Read the relevant notes before editing the subsystem and update them in the same PR when ownership, injection, runtime behavior, generated output, or an allowed escape hatch materially changes.
 
-Current required local contracts:
+Relevant local notes:
 
 - token/compiler changes: `/.agents/skills/style-dictionary/SKILL.md` and `/packages/tokens/README.md`;
 - elevation changes: `/packages/ui/src/internal/elevation/README.md`;
 - ripple/state-layer/focus-indication changes: `/packages/ui/src/internal/ripple/README.md`;
 - theme/runtime-color changes: `/packages/ui/src/theme/README.md`.
 
-A local README is not merely explanatory documentation. It is part of the architecture contract. Architecture tests should assert the important semantic rules so stale documentation or a future AI refactor cannot silently restore a forbidden pattern.
+These notes are guidance, not executable contracts on component DOM structure, class names, wrappers, or exact wording. Tests should assert Material/token semantics and observable behavior directly instead of freezing the implementation chosen during one refactor with source-regex guards.
 
 ## What “1:1” means
 
@@ -175,7 +175,7 @@ Do not create a second independent event state machine inside ripple when the ho
 
 Before implementing or substantially refactoring a component family:
 
-1. Read the applicable local architecture contracts listed above.
+1. Read the applicable local implementation notes listed above.
 2. Confirm the pinned AndroidX revision and inspect the relevant component, generated token files, Defaults/runtime resolution code, and tests.
 3. Identify which values are true immutable tokens versus runtime behavior or web-only adaptation.
 4. Add or update canonical DTCG manually under `packages/tokens/tokens/`; alias shared core tokens when semantic identity is genuinely shared.
@@ -183,7 +183,7 @@ Before implementing or substantially refactoring a component family:
 6. Let Style Dictionary generate JS/`.d.ts` and any reviewed platform adapter; do not write a parallel TypeScript or ad-hoc CSS generator.
 7. Keep runtime TypeScript limited to behavior/arithmetic that requires runtime information. Prefer CSS for immutable visual mappings.
 8. Implement behavior with React Aria/native HTML and CSS-first visual states.
-9. Update the local architecture contract when the responsibility boundary changes, and add a guard that fails on the regression you are removing.
+9. Update the local implementation notes when the responsibility boundary changes. Add tests for Material/token semantics or observable behavior affected by the change; do not add a source-regex guard merely to preserve an incidental implementation choice.
 10. Add token/default/behavior/layout tests and Storybook visual regression coverage.
 11. Document intentional web differences.
 
@@ -191,13 +191,13 @@ If an upstream value does not map cleanly to the web implementation, document th
 
 ## Testing layers
 
-Every substantial port should be covered by canonical validation, generated-output tests, read-only upstream audit where applicable, architecture guards, defaults/layout tests, interaction/accessibility tests, and Chromium Storybook visual regression. Expected test data must not be generated from the production resolver being tested.
+Every substantial port should be covered by canonical validation, generated-output tests, read-only upstream audit where applicable, defaults/layout tests, interaction/accessibility tests, and Chromium Storybook visual regression. Expected test data must not be generated from the production resolver being tested.
 
 ## Review checklist
 
 A component/token change is not ready until reviewers can answer yes to all relevant questions:
 
-- Were the applicable local architecture contracts read and updated if the boundary changed?
+- Were the applicable local implementation notes read and updated if the boundary changed?
 - Is every immutable design value canonical DTCG or a deliberate runtime-derived value?
 - Does Style Dictionary remain the sole token/platform build engine?
 - Are generated CSS adapters explicit, consumer-driven, and centralized under token build output?
@@ -208,5 +208,4 @@ A component/token change is not ready until reviewers can answer yes to all rele
 - Are React Aria/native semantics used where available?
 - Are audit/test fixtures independent from production output?
 - Are intentional web adaptations documented?
-- Is there an executable guard against the architectural regression being removed?
 - Do validation, audit, test, typecheck, build, and visual regression pass?
