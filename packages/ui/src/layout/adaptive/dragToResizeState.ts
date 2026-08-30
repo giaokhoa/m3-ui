@@ -280,7 +280,8 @@ export class DragToResizeState {
 
   /**
    * Measure/re-coerce the resizable axis and return the pane size for layout.
-   * This mirrors AndroidX getDraggedWidth/getDraggedHeight.
+   * This mirrors AndroidX getDraggedWidth/getDraggedHeight. Before the scaffold
+   * has a real resizable-axis constraint, no drag override is available yet.
    */
   measure({
     measuringWidth,
@@ -288,7 +289,7 @@ export class DragToResizeState {
     scaffoldWidth,
     scaffoldHeight,
     direction = 'ltr',
-  }: DragToResizeMeasurement): DragToResizeSize {
+  }: DragToResizeMeasurement): DragToResizeSize | undefined {
     finiteNonNegative(measuringWidth, 'measuringWidth');
     finiteNonNegative(measuringHeight, 'measuringHeight');
     finiteNonNegative(scaffoldWidth, 'scaffoldWidth');
@@ -300,9 +301,9 @@ export class DragToResizeState {
 
     // React can render once before the scaffold has measurable geometry. Do not
     // let that transient zero constraint initialize or coerce persistent resize
-    // state; AndroidX receives real layout constraints when this state measures.
+    // state, and do not expose it as a measured preferred-size override.
     if (scaffoldSize === 0) {
-      return { width: measuringWidth, height: measuringHeight };
+      return undefined;
     }
 
     // rememberDragToResizeState resolves specified Dp constraints with
