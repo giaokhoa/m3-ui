@@ -316,8 +316,14 @@ function createElevationCss(context) {
   const shadow = (level) => level === 'level0'
     ? 'none'
     : ELEVATION_LAYERS.map((layer) => shadowLayer(level, layer)).join(', ');
-  const levels = ELEVATION_LEVELS.flatMap((level) => ['', `.elevation[data-elevation='${level}'] {`, line('--_elevation-box-shadow', shadow(level)), '}']);
-  return ['.elevation {', line('--_elevation-shadow-color', 'var(--shadow)'), line('--_elevation-box-shadow', 'none'), '}', ...levels, ''].join('\n');
+  const targetSelector = '.elevation, .elevation-host';
+  const levels = ELEVATION_LEVELS.flatMap((level) => [
+    '',
+    `.elevation[data-elevation='${level}'], .elevation-host[data-elevation='${level}'] {`,
+    line('--_elevation-box-shadow', shadow(level)),
+    '}',
+  ]);
+  return [targetSelector + ' {', line('--_elevation-shadow-color', 'var(--shadow)'), line('--_elevation-box-shadow', 'none'), '}', ...levels, ''].join('\n');
 }
 
 function createRippleCss(context) {

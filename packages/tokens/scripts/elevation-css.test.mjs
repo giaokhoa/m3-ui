@@ -10,18 +10,21 @@ test('generated Elevation CSS serializes canonical shadow geometry through the t
     'utf8',
   );
 
-  assert.match(css, /\.elevation \{/);
+  assert.match(css, /\.elevation, \.elevation-host \{/);
   assert.match(css, /--_elevation-shadow-color: var\(--shadow\);/);
   assert.match(css, /--_elevation-box-shadow: none;/);
 
   const level0 = css.match(
-    /\.elevation\[data-elevation='level0'\] \{([\s\S]*?)\n\}/,
+    /\.elevation\[data-elevation='level0'\], \.elevation-host\[data-elevation='level0'\] \{([\s\S]*?)\n\}/,
   )?.[1];
   assert.ok(level0, 'missing generated level0 elevation rule');
   assert.match(level0, /--_elevation-box-shadow: none;/);
   assert.doesNotMatch(level0, /color-mix\(/);
 
-  assert.match(css, /\.elevation\[data-elevation='level1'\] \{/);
+  assert.match(
+    css,
+    /\.elevation\[data-elevation='level1'\], \.elevation-host\[data-elevation='level1'\] \{/,
+  );
   assert.match(
     css,
     /0px 2px 1px -1px color-mix\(in srgb, var\(--_elevation-shadow-color\) 20%, transparent\)/,
@@ -36,7 +39,12 @@ test('generated Elevation CSS serializes canonical shadow geometry through the t
   );
 
   for (const level of ['level0', 'level1', 'level2', 'level3', 'level4', 'level5']) {
-    assert.match(css, new RegExp(`\\.elevation\\[data-elevation='${level}'\\] \\{`));
+    assert.match(
+      css,
+      new RegExp(
+        `\\.elevation\\[data-elevation='${level}'\\], \\.elevation-host\\[data-elevation='${level}'\\] \\{`,
+      ),
+    );
   }
 
   assert.doesNotMatch(css, /(^|\s)--shadow\s*:/m);
@@ -49,7 +57,7 @@ test('generated Elevation CSS preserves the canonical three-layer recipe rather 
     'utf8',
   );
   const level1 = css.match(
-    /\.elevation\[data-elevation='level1'\] \{([\s\S]*?)\n\}/,
+    /\.elevation\[data-elevation='level1'\], \.elevation-host\[data-elevation='level1'\] \{([\s\S]*?)\n\}/,
   )?.[1];
 
   assert.ok(level1, 'missing generated level1 elevation rule');
