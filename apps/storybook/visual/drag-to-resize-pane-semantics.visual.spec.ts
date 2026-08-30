@@ -3,6 +3,15 @@ import { expect, test } from '@playwright/test';
 test('no-handle levitated pane exposes a semantic resize action without replacing its region', async ({
   page,
 }) => {
+  page.on('pageerror', (error) => {
+    console.error(`[storybook pageerror] ${error.stack ?? error.message}`);
+  });
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      console.error(`[storybook console] ${message.text()}`);
+    }
+  });
+
   await page.goto(
     '/iframe.html?id=layout-dragtoresizepanesemantics--no-handle&viewMode=story',
     { waitUntil: 'networkidle' },
@@ -15,8 +24,6 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
   const resizeAction = page.getByRole('button', { name: 'Resize pane' });
   const innerAction = page.getByTestId('inner-action');
 
-  // The built Storybook preview can finish network activity before the React
-  // story commits under parallel CI load. Wait on the semantic pane itself.
   await expect(pane).toBeVisible({ timeout: 15_000 });
   await expect(pane).toHaveAttribute('data-resize-state', 'default');
   await expect(resizeAction).toHaveAttribute('data-resize-state', 'default');
