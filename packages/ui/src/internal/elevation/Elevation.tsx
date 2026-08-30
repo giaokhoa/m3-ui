@@ -15,9 +15,9 @@ export interface ElevationProps extends HTMLAttributes<HTMLSpanElement> {
  * Material elevation paint primitive.
  *
  * Component consumers select the semantic elevation level and let this
- * primitive own the elevation paint layer. Do not add component-specific
- * classes to <Elevation>; existing callers that still do so are migration
- * debt and should be handled when those components are audited.
+ * primitive own the paint layer. Keep component-specific classes, styles and
+ * motion on the owning component boundary rather than passing them to
+ * <Elevation>. shadowColor is reserved for genuine runtime color overrides.
  */
 export function Elevation({
   level = 'level0',

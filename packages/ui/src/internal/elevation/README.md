@@ -36,15 +36,12 @@ ThemeProvider -> --shadow -> generated elevation adapter
 
 ## Required rendering boundary
 
-A component that has interaction-driven elevation should pass a semantic `ElevationLevel` to `<Elevation>` when a separate child paint layer is compatible with its DOM and clipping bounds. Runtime transition style may remain on that paint layer when transition choice depends on interaction history.
+A component that has interaction-driven elevation should pass only the semantic `ElevationLevel` to `<Elevation>` when a separate child paint layer is compatible with its DOM and clipping bounds. Component-specific layout, stacking, and motion stay on the owning component boundary; when the paint layer needs those values, expose them through the component's private CSS variables and structural selectors rather than adding a component class or inline style to `<Elevation>`.
 
 Good child-paint mode:
 
 ```tsx
-<Elevation
-  level={level}
-  style={{ transition: elevationTransition }}
-/>
+<Elevation level={level} />
 ```
 
 When a component already has a clipping or scrolling root that must also own transform or measurement geometry, use the documented host-paint mode instead of adding a wrapper solely for elevation:
@@ -83,7 +80,7 @@ The default remains `var(--shadow)`, whose concrete value is supplied by `ThemeP
 
 ## Motion
 
-Elevation transition **selection** may remain runtime when the correct incoming/outgoing spec depends on current and previous interaction. The motion token values themselves remain canonical immutable tokens.
+Elevation transition **selection** may remain runtime when the correct incoming/outgoing spec depends on current and previous interaction. The selected motion values belong to the component boundary and should reach the child paint layer through private CSS variables plus structural CSS; they are not component-specific props or inline styles on `<Elevation>`. The motion token values themselves remain canonical immutable tokens.
 
 Do not move interaction-history logic into the generated CSS merely to remove JavaScript. Conversely, do not use runtime transition selection as justification for serializing static shadow geometry in JavaScript.
 
