@@ -137,7 +137,7 @@ function CardImpl({
       style={{ ...tokenStyle, ...style }}
       tabIndex={tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)}
     >
-      <Elevation className="card__elevation" level={elevationLevel} style={{ transitionDuration: `${elevationMotion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: elevationMotion.easing }} />
+      <Elevation level={elevationLevel} style={{ transitionDuration: `${elevationMotion.durationMs}ms`, transitionProperty: 'box-shadow', transitionTimingFunction: elevationMotion.easing }} />
       <div className="card__surface">
         {interactive ? (
           <Ripple controller={ripple} focusRingRadius="var(--_card-container-radius)" isFocusVisible={isFocusVisible} stateInteraction={latestCardStateLayerInteraction(activeInteractions, isFocusVisible)} />
