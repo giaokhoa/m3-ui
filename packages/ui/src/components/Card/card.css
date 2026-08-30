@@ -19,7 +19,7 @@
   color: var(--_card-disabled-content-color);
 }
 
-.card__elevation {
+.card > .elevation {
   z-index: 0;
 }
 
@@ -56,12 +56,8 @@
   color: inherit;
 }
 
-.card > .card__elevation {
-  border-radius: inherit;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .card__elevation {
+  .card > .elevation {
     transition: none !important;
   }
 }
