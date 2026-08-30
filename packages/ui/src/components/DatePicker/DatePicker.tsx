@@ -349,10 +349,11 @@ function YearOption({
   return (
     <AriaButton
       ref={selected ? selectedRef : undefined}
-      role="option"
-      aria-selected={selected}
       className="date-picker__year"
       data-selected={selected || undefined}
+      render={(domProps) => (
+        <button {...domProps} role="option" aria-selected={selected} />
+      )}
       onPress={onPress}
       onPressStart={(event) => ripple.onPressStart(event)}
       onPressEnd={() => ripple.onPressEnd()}
