@@ -535,7 +535,7 @@ export function ThreePaneScaffold({
     measuredDragHandleOffset !== PaneExpansionUnspecified &&
     geometry.width > 0
       ? calculatePaneExpansionDragHandlePlacement({
-          offsetX: Math.max(measuredDragHandleOffset, 0),
+          offsetX: measuredDragHandleOffset,
           contentWidth: geometry.width,
           partitionSpacerSize: directive.horizontalPartitionSpacerSize,
           minTouchTargetSize: paneExpansionDragHandleMinTouchTargetSize,
