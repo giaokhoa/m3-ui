@@ -38,6 +38,17 @@ describe('preferred pane size', () => {
     expect(resolvePanePreferredSize({ proportion: 0.58 }, 50, 20, 'preferredHeight')).toBe(29);
   });
 
+  it('saturates proportional Float.toInt at the Compose Int boundary', () => {
+    expect(
+      resolvePanePreferredSize(
+        preferredPaneSizeProportion(1),
+        2147483647,
+        360,
+        'preferredWidth',
+      ),
+    ).toBe(2147483647);
+  });
+
   it('validates the Float value seen by the AndroidX proportion overload', () => {
     const roundsToOne = 1 + Number.EPSILON;
     expect(preferredPaneSizeProportion(roundsToOne).proportion).toBe(1);
