@@ -12,6 +12,8 @@ interface CandidateOptions {
   tabIndex?: number;
   programmaticallyFocusable?: boolean;
   disabled?: boolean;
+  placed?: boolean;
+  children?: HTMLElement[];
 }
 
 function rect({ left, top, width, height }: RectInput): DOMRect {
@@ -34,23 +36,27 @@ function candidate(
     tabIndex = 0,
     programmaticallyFocusable = true,
     disabled = false,
+    placed = true,
+    children = [],
   }: CandidateOptions = {},
 ) {
   const focus = vi.fn();
   return {
     tabIndex,
+    children,
     matches: (selector: string) =>
       selector === ':disabled' ? disabled : programmaticallyFocusable,
     closest: () => null,
+    getClientRects: () => (placed ? [rect(bounds)] : []),
     getBoundingClientRect: () => rect(bounds),
     focus,
   } as unknown as HTMLElement & { focus: ReturnType<typeof vi.fn> };
 }
 
-function pane(candidates: HTMLElement[]) {
+function pane(children: HTMLElement[]) {
   return {
+    children,
     getBoundingClientRect: () => rect({ left: 0, top: 0, width: 600, height: 400 }),
-    querySelectorAll: () => candidates,
   } as unknown as HTMLElement;
 }
 
@@ -117,5 +123,41 @@ describe('ThreePaneScaffold destination focus', () => {
 
     expect(requestPaneDestinationFocus(pane([disabled]))).toBe(false);
     expect(disabled.focus).not.toHaveBeenCalled();
+  });
+
+  it('ignores unrendered focus targets', () => {
+    const hidden = candidate(
+      { left: 20, top: 20, width: 80, height: 40 },
+      { placed: false },
+    );
+
+    expect(requestPaneDestinationFocus(pane([hidden]))).toBe(false);
+    expect(hidden.focus).not.toHaveBeenCalled();
+  });
+
+  it('stops descending once a focusable target is reached on a branch', () => {
+    const nested = candidate({ left: 10, top: 10, width: 20, height: 20 });
+    const parent = candidate(
+      { left: 220, top: 0, width: 100, height: 80 },
+      { children: [nested] },
+    );
+    const sibling = candidate({ left: 20, top: 100, width: 80, height: 40 });
+
+    expect(requestPaneDestinationFocus(pane([parent, sibling]))).toBe(true);
+    expect(parent.focus).not.toHaveBeenCalled();
+    expect(sibling.focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(nested.focus).not.toHaveBeenCalled();
+  });
+
+  it('descends through non-focusable wrappers to accessible focus targets', () => {
+    const nested = candidate({ left: 20, top: 20, width: 80, height: 40 });
+    const wrapper = candidate(
+      { left: 0, top: 0, width: 100, height: 100 },
+      { programmaticallyFocusable: false, children: [nested] },
+    );
+
+    expect(requestPaneDestinationFocus(pane([wrapper]))).toBe(true);
+    expect(nested.focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(wrapper.focus).not.toHaveBeenCalled();
   });
 });
