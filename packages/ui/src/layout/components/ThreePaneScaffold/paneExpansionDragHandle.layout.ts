@@ -87,6 +87,10 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function composeIntAdd(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a + b) | 0 : a + b;
+}
+
 function composeFloatAdd(a: number, b: number) {
   return Math.fround(Math.fround(a) + Math.fround(b));
 }
@@ -339,14 +343,16 @@ export function calculatePaneExpansionSpacerMiddleOffset({
   const firstPlacement = measuredLayout[expandedRoles[0]!];
   const secondPlacement = measuredLayout[expandedRoles[1]!];
   if (firstPlacement !== undefined && secondPlacement !== undefined) {
-    // AndroidX performs this on Int pane positions and uses Int / 2, so an
-    // odd-width spacer midpoint truncates instead of landing on a half pixel.
-    return Math.trunc(
-      (firstPlacement.left + firstPlacement.width + secondPlacement.left) / 2,
+    // AndroidX evaluates the Int additions before Int / 2. Preserve overflow
+    // in those additions, while retaining fractional browser-native geometry.
+    const sum = composeIntAdd(
+      composeIntAdd(firstPlacement.left, firstPlacement.width),
+      secondPlacement.left,
     );
+    return Math.trunc(sum / 2);
   }
   if (firstPlacement !== undefined) {
-    return firstPlacement.left + firstPlacement.width;
+    return composeIntAdd(firstPlacement.left, firstPlacement.width);
   }
   if (secondPlacement !== undefined) return 0;
   return PaneExpansionUnspecified;
