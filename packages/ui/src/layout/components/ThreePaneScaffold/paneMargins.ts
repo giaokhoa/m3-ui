@@ -32,28 +32,31 @@ const ComposeIntMax = 2147483647;
 const ComposeIntMin = -2147483648;
 
 function composeRoundToInt(value: number) {
-  if (Number.isNaN(value)) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) {
     throw new RangeError('Cannot round NaN value');
   }
-  if (value >= ComposeIntMax) return ComposeIntMax;
-  if (value <= ComposeIntMin) return ComposeIntMin;
-  return Math.round(value);
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
 }
 
 function nonNegativeMargin(value: number | undefined, name: string) {
   if (value === undefined) return 0;
-  if (Number.isNaN(value) || value < 0) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue) || floatValue < 0) {
     throw new RangeError(`${name} must be a non-negative CSS pixel value`);
   }
-  // AndroidX resolves fixed PaddingValues with roundToPx() before the pane
-  // edge clamp. Positive infinity is valid Dp and becomes Int.MAX_VALUE.
-  return composeRoundToInt(value);
+  // AndroidX stores Dp as Float, then resolves fixed PaddingValues with
+  // roundToPx() before the pane-edge clamp. Positive infinity is valid Dp and
+  // becomes Int.MAX_VALUE.
+  return composeRoundToInt(floatValue);
 }
 
 function roundedEdge(value: number | undefined, fallback: number) {
   if (value === undefined) return fallback;
   // RectRuler.current() is Float in Compose, and PaneMargins immediately calls
-  // roundToInt(). Infinity saturates to Int bounds; only NaN is invalid.
+  // roundToInt(). Preserve that Float32 boundary before integer rounding.
   return composeRoundToInt(value);
 }
 
