@@ -418,8 +418,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   /**
    * Animate the raw transition timeline fraction to 1 and commit targetState.
    * Snap/seek/retarget or a changed driver aborts the prior animation. Repeating
-   * the same target with the same driver starts a new mutator animation from the
-   * current fraction, matching SeekableTransitionState.animateTo cancellation.
+   * the same target with the same driver continues the in-flight timeline,
+   * matching SeekableTransitionState's retained currentAnimation behavior.
    */
   async animateTo(
     targetState: ThreePaneScaffoldValue = this.targetStateValue,
@@ -438,6 +438,21 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     if (this.updateSettledPredictiveBack(targetState, false)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
+
+    const runningAnimation = this.activeAnimation;
+    if (
+      !targetChanged &&
+      runningAnimation !== null &&
+      !runningAnimation.controller.signal.aborted &&
+      runningAnimation.driver === animation &&
+      threePaneScaffoldValuesEqual(runningAnimation.targetState, targetState)
+    ) {
+      const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
+      this.predictiveBack = isPredictiveBackInProgress;
+      if (predictiveBackChanged) this.notify();
+      await runningAnimation.completion;
+      return;
+    }
 
     this.cancelAnimation();
 
