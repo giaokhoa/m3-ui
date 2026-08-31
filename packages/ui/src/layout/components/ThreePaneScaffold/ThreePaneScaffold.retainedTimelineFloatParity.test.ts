@@ -7,10 +7,10 @@ import {
 
 const MillisToNanos = 1_000_000;
 
-function materialIntTrack(playTimeMs: number): PaneTransitionTrack {
+function materialIntTrack(playTimeMs: number, targetValue = 1000): PaneTransitionTrack {
   return {
     initialValue: 0,
-    targetValue: 1000,
+    targetValue,
     initialVelocity: 0,
     playTimeMs,
     visibilityThreshold: 1,
@@ -56,5 +56,51 @@ describe('ThreePaneScaffold retained timeline Float parity', () => {
     expect(oldAddedElapsedSample).toBe(924);
     expect(sampled).toBe(composeSample);
     expect(sampled).not.toBe(oldAddedElapsedSample);
+  });
+
+  it('continues the original running SeekingAnimationState instead of restarting from its current fraction', () => {
+    const sourceDurationMs = 344;
+    const sourceDurationNanos = sourceDurationMs * MillisToNanos;
+    const runningStartFraction = Math.fround(0.4611676335334778);
+    const runningProgressMs = 43.281411;
+    const animationSpecDurationNanos = Math.round(
+      sourceDurationNanos * (1 - runningStartFraction),
+    );
+    const runningTimelineFraction = Math.fround(
+      Math.fround(runningProgressMs * MillisToNanos) /
+        Math.fround(animationSpecDurationNanos),
+    );
+    const currentFraction = Math.fround(
+      Math.fround(
+        Math.fround(1 - runningTimelineFraction) * runningStartFraction,
+      ) + runningTimelineFraction,
+    );
+    const sourcePlayTimeMs =
+      Math.round(sourceDurationNanos * currentFraction) / MillisToNanos;
+    const source = materialIntTrack(sourcePlayTimeMs, 2000);
+
+    const retained = retargetPaneTransitionTrack({
+      fromValue: samplePaneTransitionTrack(source).value,
+      toValue: source.targetValue,
+      fromTrack: source,
+      sourceTransitionDurationMs: sourceDurationMs,
+      sourceTransitionProgressFraction: currentFraction,
+      sourceTransitionRunningTimeline: {
+        startFraction: runningStartFraction,
+        progressMs: runningProgressMs,
+      },
+      fallbackVisibilityThreshold: 1,
+      fallbackQuantizationStep: 1,
+    });
+
+    const elapsedMs = 22.076915;
+    const sampled = samplePaneTransitionTrack(retained!, 0, elapsedMs).value;
+
+    // Continuing the original SeekingAnimationState reaches 223.999984ms,
+    // while restarting from currentFraction reaches 224.000004ms. The
+    // FloatSpringSpec millisecond truncation therefore samples 223ms vs 224ms.
+    expect(samplePaneTransitionTrack(source, 223.999984).value).toBe(2011);
+    expect(samplePaneTransitionTrack(source, 224.000004).value).toBe(2012);
+    expect(sampled).toBe(2011);
   });
 });
