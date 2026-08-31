@@ -719,6 +719,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       fromTrack: sourcePane?.translateX,
       toTrack: targetPane?.translateX,
       sourceTransitionDurationMs: source.durationMs,
+      sourceTransitionProgressFraction: previousSnapshot.progressFraction,
       fallbackVisibilityThreshold: 1,
       fallbackQuantizationStep: 1,
     });
@@ -734,6 +735,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       fromTrack: sourcePane?.opacity,
       toTrack: targetPane?.opacity,
       sourceTransitionDurationMs: source.durationMs,
+      sourceTransitionProgressFraction: previousSnapshot.progressFraction,
       fallbackVisibilityThreshold: FloatVisibilityThreshold,
     });
 
@@ -757,6 +759,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       fromTrack: sourcePane?.inlineSize,
       toTrack: targetPane?.inlineSize,
       sourceTransitionDurationMs: source.durationMs,
+      sourceTransitionProgressFraction: previousSnapshot.progressFraction,
       fallbackVisibilityThreshold: 1,
       fallbackQuantizationStep: 1,
     });
@@ -770,6 +773,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
     fromTrack: source.tracks.scrimOpacity,
     toTrack: destination.tracks.scrimOpacity,
     sourceTransitionDurationMs: source.durationMs,
+    sourceTransitionProgressFraction: previousSnapshot.progressFraction,
     fallbackVisibilityThreshold: FloatVisibilityThreshold,
   });
   const durationMs = transitionTracksDurationMs(panes, scrimOpacity, 0);
