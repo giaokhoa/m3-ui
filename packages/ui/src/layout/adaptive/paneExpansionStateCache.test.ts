@@ -45,6 +45,33 @@ describe('PaneExpansionStateCache', () => {
     expect(first.currentAnchor).toEqual(anchors[4]);
   });
 
+  it('reruns restore when the persistent key changes and keeps the call-site fallback', () => {
+    const cache = new PaneExpansionStateCache();
+    const firstKey = getPaneExpansionStateKey(value(true, true, false));
+    const secondKey = getPaneExpansionStateKey(value(false, true, true));
+    const twoAnchors = [anchors[1], anchors[3]] as const;
+
+    const first = cache.getOrCreate(firstKey, {
+      anchors: twoAnchors,
+      initialAnchoredIndex: 0,
+    });
+    cache.update(firstKey, { anchors: twoAnchors, initialAnchoredIndex: 0 });
+    first.setFirstPaneWidth(320);
+    expect(first.currentAnchor).toBeNull();
+
+    const second = cache.getOrCreate(secondKey, {
+      anchors: twoAnchors,
+      initialAnchoredIndex: 1,
+    });
+    cache.update(secondKey, { anchors: twoAnchors, initialAnchoredIndex: 1 });
+    expect(second.currentAnchor).toBe(twoAnchors[1]);
+
+    // initialAnchoredIndex changed while the structurally-equal anchor list did
+    // not, so remember(anchors) still owns index 0 as the restore fallback.
+    cache.update(firstKey, { anchors: [...twoAnchors], initialAnchoredIndex: 1 });
+    expect(first.currentAnchor).toBe(twoAnchors[0]);
+  });
+
   it('matches AndroidX identity-aware equality for NaN proportion anchors', () => {
     const nanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
     const otherNanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
