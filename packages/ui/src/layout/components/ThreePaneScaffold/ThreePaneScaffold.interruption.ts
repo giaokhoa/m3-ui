@@ -23,8 +23,10 @@ export interface PaneTransitionTrack {
   readonly retainedCompletionPlayTimeMs?: number;
   /** Full Transition duration owned by the SeekingAnimationState retaining this child. */
   readonly retainedTimelineDurationMs?: number;
-  /** Float fraction at which the child became an initial-value animation. */
+  /** Float start fraction owned by the retained SeekingAnimationState. */
   readonly retainedTimelineStartFraction?: number;
+  /** Already-consumed play time of the retained SeekingAnimationState. */
+  readonly retainedTimelineProgressMs?: number;
   readonly visibilityThreshold: number;
   readonly quantizationStep?: number;
   readonly spec: PaneTransitionTrackSpec;
@@ -34,6 +36,12 @@ export interface PaneTransitionTrack {
 
 export interface PaneTransitionTrackSample extends AnimationSpringMotion {
   readonly durationMs: number;
+}
+
+export interface PaneTransitionRunningTimeline {
+  readonly durationMs: number;
+  readonly startFraction: number;
+  readonly progressMs: number;
 }
 
 const ComposeIntMax = 2147483647;
@@ -108,6 +116,7 @@ function calculateDelayedTimeMs(originalDurationMs: number) {
 function retainedTimelinePlayTimeNanos(
   durationMs: number,
   startFraction: number,
+  initialProgressMs: number,
   elapsedMs: number,
 ) {
   const durationNanos = Math.max(0, Math.round(durationMs * MillisToNanos));
@@ -115,7 +124,9 @@ function retainedTimelinePlayTimeNanos(
   const animationSpecDurationNanos = Math.round(
     durationNanos * (1.0 - fraction),
   );
-  const progressNanos = Math.max(0, Math.round(elapsedMs * MillisToNanos));
+  const progressNanos =
+    Math.max(0, Math.round(initialProgressMs * MillisToNanos)) +
+    Math.max(0, Math.round(elapsedMs * MillisToNanos));
   if (progressNanos >= animationSpecDurationNanos) return durationNanos;
   if (animationSpecDurationNanos <= 0) return durationNanos;
 
@@ -132,13 +143,11 @@ function retainedTimelineAdvanceMs(track: PaneTransitionTrack, elapsedMs: number
   const safeElapsedMs = Math.max(0, elapsedMs);
   if (durationMs === undefined || startFraction === undefined) return safeElapsedMs;
 
-  const durationNanos = Math.max(0, Math.round(durationMs * MillisToNanos));
-  const initialPlayTimeNanos = Math.round(
-    durationNanos * Number(composeFloat(startFraction)),
-  );
+  const initialPlayTimeNanos = Math.max(0, Math.round(track.playTimeMs * MillisToNanos));
   const currentPlayTimeNanos = retainedTimelinePlayTimeNanos(
     durationMs,
     startFraction,
+    track.retainedTimelineProgressMs ?? 0,
     safeElapsedMs,
   );
   return Math.max(0, currentPlayTimeNanos - initialPlayTimeNanos) / MillisToNanos;
@@ -214,8 +223,12 @@ function retainedInitialValueAnimationIsComplete(
   if (durationMs !== undefined && startFraction !== undefined) {
     const durationNanos = Math.max(0, Math.round(durationMs * MillisToNanos));
     return (
-      retainedTimelinePlayTimeNanos(durationMs, startFraction, Math.max(0, elapsedMs)) >=
-      durationNanos
+      retainedTimelinePlayTimeNanos(
+        durationMs,
+        startFraction,
+        track.retainedTimelineProgressMs ?? 0,
+        Math.max(0, elapsedMs),
+      ) >= durationNanos
     );
   }
 
@@ -319,6 +332,7 @@ export function capturePaneTransitionTrack(
         retainedCompletionPlayTimeMs: undefined,
         retainedTimelineDurationMs: undefined,
         retainedTimelineStartFraction: undefined,
+        retainedTimelineProgressMs: undefined,
         initialValueAnimation: undefined,
         useOnlyInitialValue: undefined,
       };
@@ -337,10 +351,12 @@ export function capturePaneTransitionTrack(
       retainedCompletionPlayTimeMs: undefined,
       retainedTimelineDurationMs: undefined,
       retainedTimelineStartFraction: undefined,
+      retainedTimelineProgressMs: undefined,
       initialValueAnimation: {
         ...capturedRetained,
         retainedTimelineDurationMs: undefined,
         retainedTimelineStartFraction: undefined,
+        retainedTimelineProgressMs: undefined,
       },
       useOnlyInitialValue: true,
     };
@@ -354,6 +370,7 @@ export function capturePaneTransitionTrack(
     retainedCompletionPlayTimeMs: track.retainedCompletionPlayTimeMs,
     retainedTimelineDurationMs: undefined,
     retainedTimelineStartFraction: undefined,
+    retainedTimelineProgressMs: undefined,
     initialValueAnimation: undefined,
   };
 }
@@ -365,6 +382,7 @@ export interface RetargetPaneTransitionTrackOptions {
   readonly toTrack?: PaneTransitionTrack;
   readonly sourceTransitionDurationMs?: number;
   readonly sourceTransitionProgressFraction?: number;
+  readonly sourceTransitionRunningTimeline?: PaneTransitionRunningTimeline;
   readonly fallbackVisibilityThreshold: number;
   readonly fallbackQuantizationStep?: number;
 }
@@ -373,21 +391,25 @@ function retainSourceTrack(
   track: PaneTransitionTrack,
   sourceTransitionDurationMs: number | undefined,
   sourceTransitionProgressFraction: number | undefined,
+  sourceTransitionRunningTimeline: PaneTransitionRunningTimeline | undefined,
 ) {
-  return sourceTransitionDurationMs === undefined
-    ? track
-    : {
-        ...track,
-        retainedCompletionPlayTimeMs: Math.max(0, sourceTransitionDurationMs),
-        retainedTimelineDurationMs:
-          sourceTransitionProgressFraction === undefined
-            ? undefined
-            : Math.max(0, sourceTransitionDurationMs),
-        retainedTimelineStartFraction:
-          sourceTransitionProgressFraction === undefined
-            ? undefined
-            : composeFloat(sourceTransitionProgressFraction),
-      };
+  if (sourceTransitionDurationMs === undefined) return track;
+  const retainedDurationMs =
+    sourceTransitionRunningTimeline?.durationMs ?? Math.max(0, sourceTransitionDurationMs);
+  const retainedStartFraction =
+    sourceTransitionRunningTimeline?.startFraction ?? sourceTransitionProgressFraction;
+  return {
+    ...track,
+    retainedCompletionPlayTimeMs: Math.max(0, sourceTransitionDurationMs),
+    retainedTimelineDurationMs:
+      retainedStartFraction === undefined ? undefined : Math.max(0, retainedDurationMs),
+    retainedTimelineStartFraction:
+      retainedStartFraction === undefined ? undefined : composeFloat(retainedStartFraction),
+    retainedTimelineProgressMs:
+      retainedStartFraction === undefined
+        ? undefined
+        : Math.max(0, sourceTransitionRunningTimeline?.progressMs ?? 0),
+  };
 }
 
 export function retargetPaneTransitionTrack({
@@ -397,6 +419,7 @@ export function retargetPaneTransitionTrack({
   toTrack,
   sourceTransitionDurationMs,
   sourceTransitionProgressFraction,
+  sourceTransitionRunningTimeline,
   fallbackVisibilityThreshold,
   fallbackQuantizationStep,
 }: RetargetPaneTransitionTrackOptions): PaneTransitionTrack | undefined {
@@ -416,6 +439,7 @@ export function retargetPaneTransitionTrack({
       retainedCompletionPlayTimeMs: undefined,
       retainedTimelineDurationMs: undefined,
       retainedTimelineStartFraction: undefined,
+      retainedTimelineProgressMs: undefined,
       initialValueAnimation: undefined,
       useOnlyInitialValue: undefined,
     };
@@ -469,6 +493,7 @@ export function retargetPaneTransitionTrack({
     sourceTrack,
     sourceTransitionDurationMs,
     sourceTransitionProgressFraction,
+    sourceTransitionRunningTimeline,
   );
 
   if (sourceTrack.targetValue === toValue) {
