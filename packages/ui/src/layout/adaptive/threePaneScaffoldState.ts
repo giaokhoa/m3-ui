@@ -445,12 +445,23 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
     const resolvedCurrent = this.currentStateValue;
     const resolvedTarget = this.targetStateValue;
+    const startingFraction = this.progressFraction;
+    if (!targetChanged && startingFraction === 1) {
+      // SeekableTransitionState only creates a new fraction animation when
+      // fraction < 1f. At the target fraction there is no animationSpec to run;
+      // the transition simply commits its target state.
+      this.currentStateValue = resolvedTarget;
+      this.targetStateValue = resolvedTarget;
+      this.progressFractionValue = 0;
+      this.predictiveBack = false;
+      this.notify();
+      return;
+    }
     const durationMs = this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget);
 
     this.predictiveBack = isPredictiveBackInProgress;
     const controller = new AbortController();
     this.animationController = controller;
-    const startingFraction = this.progressFraction;
     this.notify();
 
     let resolveCompletion!: () => void;
