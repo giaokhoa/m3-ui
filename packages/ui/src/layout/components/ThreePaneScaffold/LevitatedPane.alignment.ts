@@ -17,6 +17,14 @@ function alignmentParts(alignment: LevitatedPaneAlignmentPreset): {
   return { vertical, horizontal };
 }
 
+function composeBiasCoordinate(size: number, space: number, bias: -1 | 0 | 1): number {
+  // Compose BiasAlignment first converts the remaining Int space to Float,
+  // performs the bias arithmetic as Float, and only then fastRoundToInt().
+  const center = Math.fround(Math.fround(space - size) / Math.fround(2));
+  const coordinate = Math.fround(center * Math.fround(1 + bias));
+  return Math.round(coordinate);
+}
+
 /**
  * Resolve either a built-in web preset or a custom AndroidX-style alignment.
  * Custom alignments receive raw sizes; this matters for drag-to-resize where
@@ -40,20 +48,14 @@ export function resolveLevitatedPaneAlignment(
   }
 
   const { vertical, horizontal } = alignmentParts(alignment);
-  let left: number;
-  if (horizontal === 'center') {
-    left = Math.round((scaffoldWidth - paneWidth) / 2);
-  } else {
-    const logicalStart = horizontal === 'start';
-    const physicalLeft = direction === 'ltr' ? logicalStart : !logicalStart;
-    left = physicalLeft ? 0 : scaffoldWidth - paneWidth;
-  }
+  const logicalHorizontalBias =
+    horizontal === 'start' ? -1 : horizontal === 'end' ? 1 : 0;
+  const horizontalBias =
+    direction === 'ltr' ? logicalHorizontalBias : (-logicalHorizontalBias as -1 | 0 | 1);
+  const verticalBias = vertical === 'top' ? -1 : vertical === 'bottom' ? 1 : 0;
 
-  const top =
-    vertical === 'top'
-      ? 0
-      : vertical === 'bottom'
-        ? scaffoldHeight - paneHeight
-        : Math.round((scaffoldHeight - paneHeight) / 2);
-  return { left, top };
+  return {
+    left: composeBiasCoordinate(paneWidth, scaffoldWidth, horizontalBias),
+    top: composeBiasCoordinate(paneHeight, scaffoldHeight, verticalBias),
+  };
 }
