@@ -14,7 +14,6 @@ body {
   padding: 32px;
   background: var(--surface);
   color: var(--on-surface);
-  font-family: sans-serif;
 }
 
 .storybook-center {
