@@ -169,3 +169,10 @@ jobs:
         run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
       - name: Visual regression
         run: pnpm --filter @m3-ui/storybook test:visual
+      - name: Upload visual regression failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-failures
+          path: apps/storybook/test-results
+          if-no-files-found: ignore
