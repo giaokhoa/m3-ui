@@ -86,6 +86,16 @@ function composeFloatLerp(start: number, stop: number, fraction: number) {
   );
 }
 
+function composeLinearTransitionDurationMs(
+  from: number,
+  to: number,
+  fullDurationMs: number,
+) {
+  const totalDurationNanos = Math.round(fullDurationMs * MillisToNanos);
+  const fractionDelta = Math.abs(composeFloat(to) - composeFloat(from));
+  return Math.round(totalDurationNanos * fractionDelta) / MillisToNanos;
+}
+
 function composeLinearTransitionFraction(
   from: number,
   to: number,
@@ -319,7 +329,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     if (startFraction === null || durationMs === null) return null;
     return Math.max(
       0,
-      durationMs * Math.abs(1 - startFraction) - this.activeDefaultAnimationProgressMs,
+      composeLinearTransitionDurationMs(startFraction, 1, durationMs) -
+        this.activeDefaultAnimationProgressMs,
     );
   }
 
@@ -366,7 +377,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const oldDurationMs = this.resolveTransitionDurationMs(oldCurrent, oldTarget);
     return Math.max(
       retainedRemaining,
-      oldDurationMs * Math.abs(1 - oldFraction),
+      composeLinearTransitionDurationMs(oldFraction, 1, oldDurationMs),
     );
   }
 
