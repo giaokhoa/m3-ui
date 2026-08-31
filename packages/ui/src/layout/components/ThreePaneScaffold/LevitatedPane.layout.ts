@@ -42,9 +42,10 @@ function assertDimension(value: number, name: string) {
 /**
  * Port of AndroidX levitated-pane measurement and Alignment placement.
  *
- * A levitated pane is measured from its preferred size, clamped to the full
- * scaffold bounds, and aligned independently of expanded-pane partitions and
- * excluded hinge bounds.
+ * Alignment receives the raw preferred IntSize after only the scaffold-size
+ * upper clamp. PaneMeasurable clamps the actual child measurement to a
+ * non-negative size afterwards, so custom directives with negative preferred
+ * sizes keep their raw alignment semantics without producing invalid CSS size.
  */
 export function calculateLevitatedPanePlacement({
   width,
@@ -70,16 +71,21 @@ export function calculateLevitatedPanePlacement({
     px(directive.defaultPanePreferredHeight, 'defaultPanePreferredHeight'),
     'preferredHeight',
   );
-  const paneWidth = Math.min(resolvedPreferredWidth, width);
-  const paneHeight = Math.min(resolvedPreferredHeight, height);
+  const rawPaneWidth = Math.min(resolvedPreferredWidth, width);
+  const rawPaneHeight = Math.min(resolvedPreferredHeight, height);
   const { left, top } = resolveLevitatedPaneAlignment(
     alignment,
-    paneWidth,
-    paneHeight,
+    rawPaneWidth,
+    rawPaneHeight,
     width,
     height,
     direction,
   );
 
-  return { left, top, width: paneWidth, height: paneHeight };
+  return {
+    left,
+    top,
+    width: Math.max(rawPaneWidth, 0),
+    height: Math.max(rawPaneHeight, 0),
+  };
 }
