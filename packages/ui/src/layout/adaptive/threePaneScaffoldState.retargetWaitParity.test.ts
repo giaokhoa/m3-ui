@@ -24,17 +24,35 @@ const primarySecondary: ThreePaneScaffoldValue = {
 };
 
 const instantAnimation: ThreePaneScaffoldProgressAnimation = async ({ update }) => {
-  update(1);
+  update(1, 0);
 };
 
+function installFrameHarness() {
+  let nextId = 1;
+  const callbacks = new Map<number, FrameRequestCallback>();
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    const id = nextId++;
+    callbacks.set(id, callback);
+    return id;
+  });
+  vi.stubGlobal('cancelAnimationFrame', (id: number) => {
+    callbacks.delete(id);
+  });
+  return {
+    flush(time: number) {
+      const current = [...callbacks.values()];
+      callbacks.clear();
+      current.forEach((callback) => callback(time));
+    },
+    get pending() {
+      return callbacks.size;
+    },
+  };
+}
+
 describe('MutableThreePaneScaffoldState retarget completion parity', () => {
-  it('waits for old initial-value animations after the new timeline reaches 1', async () => {
-    const frames: FrameRequestCallback[] = [];
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      frames.push(callback);
-      return frames.length;
-    });
-    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  it('waits for retained initial values after the new timeline reaches 1', async () => {
+    const frames = installFrameHarness();
 
     try {
       const state = new MutableThreePaneScaffoldState(hidden);
@@ -50,20 +68,23 @@ describe('MutableThreePaneScaffoldState retarget completion parity', () => {
       await Promise.resolve();
 
       expect(state.progressFraction).toBe(1);
-      expect(state.initialTransition?.progressFraction).toBe(0.5);
+      expect(state.animationPlayTimeMs).toBe(0);
       expect(completed).toBe(false);
       expect(state.currentState).toBe(primary);
       expect(state.targetState).toBe(primarySecondary);
+      expect(frames.pending).toBe(1);
 
-      frames.shift()!(0);
-      frames.shift()!(150);
+      frames.flush(0);
+      expect(state.animationPlayTimeMs).toBe(0);
+      frames.flush(150);
       await running;
 
       expect(completed).toBe(true);
-      expect(state.initialTransition).toBeNull();
       expect(state.currentState).toBe(primarySecondary);
       expect(state.targetState).toBe(primarySecondary);
       expect(state.progressFraction).toBe(0);
+      expect(state.animationPlayTimeMs).toBe(0);
+      expect(frames.pending).toBe(0);
     } finally {
       vi.unstubAllGlobals();
     }
