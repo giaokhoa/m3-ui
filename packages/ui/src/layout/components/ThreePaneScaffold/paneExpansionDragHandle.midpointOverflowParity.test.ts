@@ -81,43 +81,60 @@ describe('pane-expansion spacer midpoint Int overflow parity', () => {
   it('preserves a negative midpoint when a custom negative spacer allows it', () => {
     const negativeSpacerDirective: PaneScaffoldDirective = {
       ...directive,
-      horizontalPartitionSpacerSize: '-200px',
+      horizontalPartitionSpacerSize: '-1000px',
     };
     const layoutOptions = {
-      ...overflowLayoutOptions,
+      width: 1000,
+      height: 800,
       directive: negativeSpacerDirective,
-    };
+      value: twoExpanded,
+      paneOrder: listDetailPaneScaffoldOrder,
+      excludedBounds: [],
+    } as const;
     const layout = calculateThreePaneScaffoldLayout(layoutOptions);
     const midpoint = calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions });
 
-    expect(midpoint).toBe(-76);
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 360, height: 800 });
+    expect(layout.primary).toEqual({ left: -640, top: 0, width: 1640, height: 800 });
+    expect(midpoint).toBe(-140);
     expect(
       calculatePaneExpansionDragHandlePlacement({
         offsetX: midpoint,
-        contentWidth: 2147483647,
+        contentWidth: 1000,
         partitionSpacerSize: negativeSpacerDirective.horizontalPartitionSpacerSize,
         minTouchTargetSize: 48,
       }),
-    ).toEqual({ centerX: -76, minWidth: 248 });
+    ).toEqual({ centerX: -140, minWidth: 376 });
 
     const tracked = updatePaneExpansionDragHandleFadeOffsets(
-      { originalOffsetX: 0, targetOffsetX: -76 },
-      -50,
+      { originalOffsetX: 0, targetOffsetX: -140 },
+      -100,
     );
-    expect(tracked).toEqual({ originalOffsetX: -76, targetOffsetX: -50 });
+    expect(tracked).toEqual({ originalOffsetX: -140, targetOffsetX: -100 });
     expect(
       calculatePaneExpansionDragHandleFadeFrame({
         currentOffsetX: tracked.originalOffsetX,
         targetOffsetX: tracked.targetOffsetX,
         progressFraction: 0,
       }),
-    ).toEqual({ offsetX: -76, opacity: 1 });
+    ).toEqual({ offsetX: -140, opacity: 1 });
     expect(
       calculatePaneExpansionDragHandleFadeFrame({
         currentOffsetX: tracked.originalOffsetX,
         targetOffsetX: tracked.targetOffsetX,
         progressFraction: 1,
       }),
-    ).toEqual({ offsetX: -50, opacity: 1 });
+    ).toEqual({ offsetX: -100, opacity: 1 });
+  });
+
+  it('preserves Int overflow when deriving the handle placement range', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: -76,
+        contentWidth: 2147483647,
+        partitionSpacerSize: '-200px',
+        minTouchTargetSize: 48,
+      }),
+    ).toThrow(RangeError);
   });
 });
