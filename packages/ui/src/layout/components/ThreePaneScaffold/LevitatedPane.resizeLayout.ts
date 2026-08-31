@@ -1,25 +1,16 @@
-import type { LevitatedPaneAlignment } from '../../adaptive/threePaneScaffold';
 import type { PanePlacement } from './ThreePaneScaffold.layout';
+import {
+  resolveLevitatedPaneAlignment,
+  type ResolvableLevitatedPaneAlignment,
+} from './LevitatedPane.alignment';
 
 export interface LevitatedPaneResizeLayoutOptions {
   rawWidth: number;
   rawHeight: number;
   scaffoldWidth: number;
   scaffoldHeight: number;
-  alignment: LevitatedPaneAlignment;
+  alignment: ResolvableLevitatedPaneAlignment;
   direction?: 'ltr' | 'rtl';
-}
-
-function alignmentParts(alignment: LevitatedPaneAlignment): {
-  vertical: 'top' | 'center' | 'bottom';
-  horizontal: 'start' | 'center' | 'end';
-} {
-  if (alignment === 'center') return { vertical: 'center', horizontal: 'center' };
-  const [vertical, horizontal] = alignment.split('-') as [
-    'top' | 'center' | 'bottom',
-    'start' | 'center' | 'end',
-  ];
-  return { vertical, horizontal };
 }
 
 /**
@@ -35,23 +26,14 @@ export function calculateLevitatedPaneResizePlacement({
   alignment,
   direction = 'ltr',
 }: LevitatedPaneResizeLayoutOptions): PanePlacement {
-  const { vertical, horizontal } = alignmentParts(alignment);
-
-  let left: number;
-  if (horizontal === 'center') {
-    left = Math.round((scaffoldWidth - rawWidth) / 2);
-  } else {
-    const logicalStart = horizontal === 'start';
-    const physicalLeft = direction === 'ltr' ? logicalStart : !logicalStart;
-    left = physicalLeft ? 0 : scaffoldWidth - rawWidth;
-  }
-
-  const top =
-    vertical === 'top'
-      ? 0
-      : vertical === 'bottom'
-        ? scaffoldHeight - rawHeight
-        : Math.round((scaffoldHeight - rawHeight) / 2);
+  const { left, top } = resolveLevitatedPaneAlignment(
+    alignment,
+    rawWidth,
+    rawHeight,
+    scaffoldWidth,
+    scaffoldHeight,
+    direction,
+  );
 
   return {
     left,
