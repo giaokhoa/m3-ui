@@ -86,6 +86,7 @@ describe('ThreePaneScaffold retained timeline Float parity', () => {
       sourceTransitionDurationMs: sourceDurationMs,
       sourceTransitionProgressFraction: currentFraction,
       sourceTransitionRunningTimeline: {
+        durationMs: sourceDurationMs,
         startFraction: runningStartFraction,
         progressMs: runningProgressMs,
       },
