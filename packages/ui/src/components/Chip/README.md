@@ -53,7 +53,7 @@ Chip component color tokens alias canonical `color.role.*` tokens. Only those co
 
 Style Dictionary compiles the immutable enabled/disabled and selected/unselected color/outline matrix into `@m3-ui/tokens/chip.css`. The generated adapter consumes ThemeProvider-owned runtime role variables but does not define them. Handwritten `chip.css` owns structural painting/layout, while React owns only behavior or values that genuinely depend on runtime state or callsite geometry.
 
-In particular, `Chip.tokens.ts` and `Chip.defaults.ts` must not decode `var(--role)` into names and reconstruct it, and they must not rebuild static `color-mix(...)` disabled colors. Runtime TypeScript retains interaction ordering, elevation selection/motion, slot-dependent padding/spacing, avatar disabled opacity, and shape overrides/expressive shape morphing.
+In particular, `Chip.tokens.ts` and `Chip.defaults.ts` must not decode `var(--role)` into names and reconstruct it, and they must not rebuild static `color-mix(...)` disabled colors. Runtime TypeScript currently retains slot-dependent padding/spacing, avatar opacity, and shape overrides/expressive shape morphing; #150 separately audits which remaining static projections can compile into generated CSS. Shared Elevation/Ripple interaction routing is not component-local runtime state.
 
 The intended color path is:
 
@@ -66,9 +66,11 @@ component.chip.*Color
 
 ## Elevation and expressive shapes
 
-Elevation tracks the latest still-active press/hover/focus interaction and uses the shared AndroidX internal elevation motion specs: 120ms incoming, 120ms hover-outgoing, and 150ms other outgoing transitions. Drag elevation tokens are preserved but no artificial public drag state is added without an InteractionSource equivalent.
+React Aria Button/Checkbox render state is the interaction source of truth. Chip passes current disabled/pressed/hovered/focused state plus generated semantic level values to shared `Elevation`; shared Elevation owns common precedence and any previous-state bookkeeping required for the 120ms incoming / 120ms hover-outgoing / 150ms other-outgoing motion. Chip does not maintain a local latest-interaction history merely to select elevation.
 
-The Filter/ElevatedFilter/Input `shapes` prop maps the pinned expressive `ChipShapes` overload. Default expressive radii are 12px unselected, full selected, and 8px pressed, animated with the pinned FastSpatial motion. The expressive overload also uses the compact 4px icon spacing rules from AndroidX. Its tonal Filter defaults change the unselected leading icon from `Primary` to `OnSurfaceVariant`; this is preserved rather than treating expressive mode as shape-only.
+Ripple likewise consumes current RAC hover/focus-visible state and normalized RAC PressEvents through `useRipple().getPressProps()`. Chip does not maintain a `latestChipStateLayerInteraction` bridge.
+
+The Filter/ElevatedFilter/Input `shapes` prop maps the pinned expressive `ChipShapes` overload. Default expressive radii are 12px unselected, full selected, and 8px pressed, animated with the pinned FastSpatial motion. Pressed shape reads RAC `isPressed` directly, independently of Elevation/Ripple. The expressive overload also uses the compact 4px icon spacing rules from AndroidX. Its tonal Filter defaults change the unselected leading icon from `Primary` to `OnSurfaceVariant`; this is preserved rather than treating expressive mode as shape-only.
 
 ## Intentional web differences / remaining gaps
 
