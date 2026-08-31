@@ -20,6 +20,7 @@ import {
   type PopoverProps as AriaPopoverProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
+import { Ripple, useRipple } from '../../internal/ripple';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextField } from '../TextField';
 import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
@@ -111,22 +112,43 @@ export function MenuItem({
   trailing,
   supportingText,
   className,
+  onPressStart,
+  onPressEnd,
   ...props
 }: MenuItemProps) {
+  const ripple = useRipple();
+
   return (
     <AriaMenuItem
       {...props}
       className={clsx('menu-item', className)}
       textValue={props.textValue ?? (typeof children === 'string' ? children : undefined)}
+      onPressStart={(event) => {
+        ripple.onPressStart(event);
+        onPressStart?.(event);
+      }}
+      onPressEnd={(event) => {
+        ripple.onPressEnd();
+        onPressEnd?.(event);
+      }}
     >
-      {leading != null ? <span className="menu-item__leading">{leading}</span> : null}
-      <span className="menu-item__body">
-        <span className="menu-item__label">{children}</span>
-        {supportingText != null ? (
-          <span className="menu-item__supporting">{supportingText}</span>
-        ) : null}
-      </span>
-      {trailing != null ? <span className="menu-item__trailing">{trailing}</span> : null}
+      {(renderProps) => (
+        <>
+          <Ripple
+            controller={ripple}
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+          {leading != null ? <span className="menu-item__leading">{leading}</span> : null}
+          <span className="menu-item__body">
+            <span className="menu-item__label">{children}</span>
+            {supportingText != null ? (
+              <span className="menu-item__supporting">{supportingText}</span>
+            ) : null}
+          </span>
+          {trailing != null ? <span className="menu-item__trailing">{trailing}</span> : null}
+        </>
+      )}
     </AriaMenuItem>
   );
 }

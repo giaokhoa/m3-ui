@@ -1,9 +1,13 @@
 export const styleEntries = {
   badge: ['src/components/Badge/badge.css'],
   'bottom-app-bar': ['src/components/BottomAppBar/bottom-app-bar.css'],
-  'bottom-sheet': ['src/components/BottomSheet/bottom-sheet.css'],
+  'bottom-sheet': [
+    'src/internal/ripple/ripple.css',
+    'src/components/BottomSheet/bottom-sheet.css',
+  ],
   'bottom-sheet-scaffold': [
     'src/layout/components/Scaffold/scaffold.css',
+    'src/internal/ripple/ripple.css',
     'src/components/BottomSheet/bottom-sheet.css',
     'src/components/BottomSheetScaffold/bottom-sheet-scaffold.css',
   ],
@@ -97,6 +101,7 @@ export const styleEntries = {
   ],
   'progress-indicator': ['src/components/ProgressIndicator/progress-indicator.css'],
   'pull-to-refresh': [
+    'src/internal/elevation/elevation.css',
     'src/components/ProgressIndicator/progress-indicator.css',
     'src/components/PullToRefresh/pull-to-refresh.css',
   ],

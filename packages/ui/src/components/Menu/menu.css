@@ -53,28 +53,7 @@
   cursor: default;
   outline: none;
   user-select: none;
-}
-
-.menu-item::before {
-  position: absolute;
-  inset: 0;
-  content: '';
-  pointer-events: none;
-  background: currentColor;
-  opacity: 0;
-}
-
-.menu-item[data-hovered]::before {
-  opacity: 0.08;
-}
-
-.menu-item[data-focused]::before,
-.menu-item[data-focus-visible]::before {
-  opacity: 0.12;
-}
-
-.menu-item[data-pressed]::before {
-  opacity: 0.12;
+  --ripple-color: currentColor;
 }
 
 .menu-item[data-selected] {

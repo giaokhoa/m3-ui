@@ -7,6 +7,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
+import { Elevation } from '../../internal/elevation';
 import { CircularProgressIndicator } from '../ProgressIndicator';
 import './pull-to-refresh.css';
 
@@ -30,6 +31,8 @@ export interface PullToRefreshIndicatorProps {
 export const pullToRefreshDefaults = {
   /** AndroidX PullToRefreshDefaults.PositionalThreshold (80.dp), projected to CSS px. */
   threshold: 80,
+  /** AndroidX PullToRefreshDefaults.Elevation. */
+  elevation: 'level2',
   /** AndroidX drag multiplier used before threshold/progress calculations. */
   dragMultiplier: 0.5,
 } as const;
@@ -83,6 +86,7 @@ export function PullToRefreshIndicator({ state, className }: PullToRefreshIndica
       } as CSSProperties}
     >
       <div className="pull-to-refresh__indicator-surface">
+        <Elevation level={pullToRefreshDefaults.elevation} />
         <CircularProgressIndicator
           aria-hidden="true"
           {...(state.isRefreshing

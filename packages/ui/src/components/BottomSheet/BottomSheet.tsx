@@ -17,6 +17,7 @@ import {
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
+import { Ripple, useRipple } from '../../internal/ripple';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   bottomSheetRuntime,
@@ -195,6 +196,9 @@ export function BottomSheet({
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<ActiveDrag | null>(null);
   const suppressClickRef = useRef(false);
+  const handleRipple = useRipple({ origin: 'center' });
+  const [handleHovered, setHandleHovered] = useState(false);
+  const [handleFocusVisible, setHandleFocusVisible] = useState(false);
   const [layout, setLayout] = useState<SheetLayout | null>(null);
   const [dragOffset, setDragOffset] = useState<number | null>(null);
 
@@ -416,18 +420,81 @@ export function BottomSheet({
           className="bottom-sheet__drag-handle"
           aria-label={handleActionLabel(sheetState)}
           disabled={!isHandleActionEnabled}
+          onBlur={() => {
+            setHandleFocusVisible(false);
+            handleRipple.onPressEnd();
+          }}
           onClick={activateHandle}
-          onLostPointerCapture={cancelDrag}
-          onPointerCancel={cancelDrag}
-          onPointerDown={beginDrag}
+          onFocus={(event) => {
+            setHandleFocusVisible(event.currentTarget.matches(':focus-visible'));
+          }}
+          onKeyDown={(event) => {
+            if (
+              isHandleActionEnabled &&
+              !event.repeat &&
+              (event.key === 'Enter' || event.key === ' ')
+            ) {
+              handleRipple.onPressStart({
+                pointerType: 'keyboard',
+                target: handleRipple.containerRef.current ?? event.currentTarget,
+                x: 0,
+                y: 0,
+              });
+            }
+          }}
+          onKeyUp={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              handleRipple.onPressEnd();
+            }
+          }}
+          onLostPointerCapture={(event) => {
+            handleRipple.onPressEnd();
+            cancelDrag(event);
+          }}
+          onPointerCancel={(event) => {
+            handleRipple.onPressEnd();
+            cancelDrag(event);
+          }}
+          onPointerDown={(event) => {
+            if (isHandleActionEnabled && event.isPrimary && event.button === 0) {
+              const pointerType =
+                event.pointerType === 'touch' || event.pointerType === 'pen'
+                  ? event.pointerType
+                  : 'mouse';
+              handleRipple.onPressStart({
+                pointerType,
+                target: handleRipple.containerRef.current ?? event.currentTarget,
+                x: 0,
+                y: 0,
+              });
+            }
+            beginDrag(event);
+          }}
+          onPointerEnter={() => {
+            if (isHandleActionEnabled) setHandleHovered(true);
+          }}
+          onPointerLeave={() => {
+            setHandleHovered(false);
+            handleRipple.onPressEnd();
+          }}
           onPointerMove={moveDrag}
-          onPointerUp={finishDrag}
+          onPointerUp={(event) => {
+            handleRipple.onPressEnd();
+            finishDrag(event);
+          }}
         >
-          {dragHandle === undefined ? (
-            <span aria-hidden="true" className="bottom-sheet__drag-handle-bar" />
-          ) : (
-            dragHandle
-          )}
+          <span className="bottom-sheet__drag-handle-indication">
+            <Ripple
+              controller={handleRipple}
+              isFocusVisible={handleFocusVisible}
+              isHovered={handleHovered}
+            />
+            {dragHandle === undefined ? (
+              <span aria-hidden="true" className="bottom-sheet__drag-handle-bar" />
+            ) : (
+              dragHandle
+            )}
+          </span>
         </button>
       )}
       <div className="bottom-sheet__content">{children}</div>

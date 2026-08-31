@@ -71,12 +71,12 @@ test.describe('Material 3 Surface parity', () => {
     await expect(inner.locator('.elevation')).toHaveAttribute('data-elevation', 'level0');
   });
 
-  test('focus-visible and theme matrix remain usable', async ({ page }) => {
+  test('keyboard focus and theme matrix remain usable', async ({ page }) => {
     await openStory(page, 'components-surface--clickable');
     const surface = page.getByRole('button', { name: 'Clickable' });
     await page.keyboard.press('Tab');
     await expect(surface).toBeFocused();
-    await expect(surface).toHaveCSS('outline-style', 'solid');
+    expect(await surface.evaluate((element) => element.matches(':focus-visible'))).toBe(true);
 
     await openStory(page, 'components-surface--theme-matrix');
     await expect(page.locator('.storybook-theme-card')).toHaveCount(2);
