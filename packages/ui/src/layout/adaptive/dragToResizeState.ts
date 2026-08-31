@@ -86,10 +86,6 @@ function resolvedConstraint(value: number | undefined, unspecified: number) {
   return value === undefined || Number.isNaN(value) ? unspecified : composeRoundToPx(value);
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
 function requestFrame(callback: FrameRequestCallback): number {
   if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
   return setTimeout(
@@ -314,18 +310,18 @@ export class DragToResizeState {
     const measuringSize = horizontal ? measuringWidth : measuringHeight;
     const scaffoldSize = horizontal ? scaffoldWidth : scaffoldHeight;
 
-    // DragToResizeState selects a physical Left/Right implementation from the
-    // logical Start/End edge when the state is remembered. The web state learns
-    // that layout direction at its first measurement and keeps the same physical
-    // edge for its lifetime instead of changing drag direction on later relayouts.
-    this.physicalEdge(direction);
-
     // React can render once before the scaffold has measurable geometry. Do not
-    // let that transient zero constraint initialize or coerce persistent resize
-    // state, and do not expose it as a measured preferred-size override.
+    // let that transient zero constraint initialize/coerce persistent resize
+    // state or lock logical Start/End to the placeholder LTR geometry.
     if (scaffoldSize === 0) {
       return undefined;
     }
+
+    // DragToResizeState selects a physical Left/Right implementation from the
+    // logical Start/End edge when the state is remembered. The web state learns
+    // the real layout direction at its first non-zero measurement and keeps the
+    // same physical edge for its lifetime.
+    this.physicalEdge(direction);
 
     const minimum = resolvedConstraint(this.minSize, DefaultMinPaneSize);
     const maximum = Math.min(
