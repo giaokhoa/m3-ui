@@ -7,6 +7,7 @@ import {
   paneScaffoldTokens,
   type FoldingFeature,
   type HingePolicy,
+  type PaneScaffoldDirective,
   type WindowPosture,
 } from './paneScaffoldDirective';
 
@@ -40,6 +41,17 @@ describe('Material 3 pane scaffold directive', () => {
       expect(directive.defaultPanePreferredHeight).toBe('420px');
     },
   );
+
+  it('keeps custom partition counts open like AndroidX PaneScaffoldDirective', () => {
+    const directive: PaneScaffoldDirective = {
+      ...calculatePaneScaffoldDirective(info(1200)),
+      maxHorizontalPartitions: 4,
+      maxVerticalPartitions: 3,
+    };
+
+    expect(directive.maxHorizontalPartitions).toBe(4);
+    expect(directive.maxVerticalPartitions).toBe(3);
+  });
 
   it('uses two vertical partitions for expanded height only in a single-pane width', () => {
     expect(calculatePaneScaffoldDirective(info(600, 900))).toMatchObject({

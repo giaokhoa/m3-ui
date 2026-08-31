@@ -18,15 +18,30 @@
   transform-origin: center center;
 }
 
+/*
+ * AndroidX places Hidden panes at their saved z-index minus 0.1 so panes that
+ * remain visible always paint above panes exiting from the same level. CSS
+ * z-index is integer-valued, so keep the same relative ordering with discrete
+ * internal tiers: hidden normal < visible normal < handle < scrim < hidden
+ * levitated < visible levitated.
+ */
 .three-pane-scaffold__pane {
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   min-inline-size: 0;
   min-block-size: 0;
 }
 
+.three-pane-scaffold__pane[data-pane-adapted-value='hidden'][data-pane-motion] {
+  z-index: 0;
+}
+
 .three-pane-scaffold__pane--levitated {
-  z-index: 3;
+  z-index: 5;
+}
+
+.three-pane-scaffold__pane--levitated[data-pane-adapted-value='hidden'][data-pane-motion] {
+  z-index: 4;
 }
 
 .animated-pane {
@@ -62,14 +77,27 @@
   flex-direction: column;
 }
 
-.three-pane-scaffold__pane--resize-target {
-  touch-action: none;
+/*
+ * Compose draggable arbitrates only along its configured orientation. Keep the
+ * orthogonal native browser pan (and pinch zoom) available when the whole
+ * levitated pane is the resize target instead of disabling every touch action.
+ */
+.three-pane-scaffold__pane--resize-target:has(
+    > .three-pane-scaffold__levitated-resize-action[data-orientation='horizontal']
+  ) {
+  touch-action: pan-y pinch-zoom;
+}
+
+.three-pane-scaffold__pane--resize-target:has(
+    > .three-pane-scaffold__levitated-resize-action[data-orientation='vertical']
+  ) {
+  touch-action: pan-x pinch-zoom;
 }
 
 .three-pane-scaffold__drag-handle {
   position: absolute;
   inset-block-start: 50%;
-  z-index: 1;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +109,7 @@
 
 .three-pane-scaffold__scrim {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   inset: 0;
   overflow: hidden;
 }

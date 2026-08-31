@@ -16,13 +16,18 @@ export interface LevitatedPaneLayoutOptions {
   preferredHeight?: PanePreferredSize;
 }
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
 function px(value: string, name: string): number {
   if (!value.endsWith('px')) {
     throw new Error(`${name} must resolve to CSS pixels, received ${value}`);
   }
-  const parsed = Number.parseFloat(value);
-  if (!Number.isFinite(parsed)) throw new Error(`Invalid ${name}: ${value}`);
-  return parsed;
+  const parsed = Math.fround(Number.parseFloat(value));
+  if (Number.isNaN(parsed)) throw new Error(`Invalid ${name}: ${value}`);
+  if (parsed >= ComposeIntMax) return ComposeIntMax;
+  if (parsed <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(parsed);
 }
 
 function assertDimension(value: number, name: string) {

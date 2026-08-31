@@ -12,8 +12,10 @@ export interface ThreePaneScaffoldState {
 export interface ThreePaneScaffoldProgressAnimationContext {
   from: number;
   to: number;
-  /** Full transition duration before accounting for an already-seeked fraction. */
+  /** Full transition duration at animation start. */
   durationMs: number;
+  /** Latest full transition duration; the default linear driver observes changes while running. */
+  getDurationMs?: () => number;
   signal: AbortSignal;
   update: (fraction: number) => void;
 }
@@ -23,7 +25,7 @@ export type ThreePaneScaffoldProgressAnimation = (
 ) => Promise<void>;
 
 export interface ThreePaneScaffoldAnimateOptions {
-  /** Equivalent of AndroidX animateTo(animationSpec = ...). */
+  /** Web animation driver corresponding to AndroidX animateTo(animationSpec = ...). */
   animation?: ThreePaneScaffoldProgressAnimation;
   isPredictiveBackInProgress?: boolean;
 }
@@ -49,6 +51,14 @@ function clampFraction(fraction: number) {
   return fraction;
 }
 
+function coerceAnimationFraction(fraction: number) {
+  // Kotlin Float.coerceIn keeps NaN unchanged because neither comparison is
+  // true, while finite overshoot is clamped to the transition interval.
+  if (fraction < 0) return 0;
+  if (fraction > 1) return 1;
+  return fraction;
+}
+
 function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boolean {
   if (a === b) return true;
   if (a.type !== b.type) return false;
@@ -66,15 +76,17 @@ function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boole
   return false;
 }
 
-/** Structural equality equivalent to AndroidX ThreePaneScaffoldValue equality. */
+/**
+ * Structural equality equivalent to AndroidX ThreePaneScaffoldValue equality.
+ * currentDestination is internal metadata upstream and is deliberately excluded.
+ */
 export function threePaneScaffoldValuesEqual(
   a: ThreePaneScaffoldValue,
   b: ThreePaneScaffoldValue,
 ): boolean {
   return (
     a === b ||
-    (a.currentDestination === b.currentDestination &&
-      paneAdaptedValuesEqual(a.primary, b.primary) &&
+    (paneAdaptedValuesEqual(a.primary, b.primary) &&
       paneAdaptedValuesEqual(a.secondary, b.secondary) &&
       paneAdaptedValuesEqual(a.tertiary, b.tertiary))
   );
@@ -96,14 +108,17 @@ function cancelFrame(id: number) {
 /**
  * AndroidX SeekableTransitionState.animateTo(animationSpec = null) linearly
  * traverses the transition playtime. Spring/easing belongs to the Transition's
- * child animation specs, not to this normalized state fraction.
+ * child animation specs, not to this normalized state fraction. If the
+ * Transition total duration changes while running, AndroidX recomputes the
+ * remaining linear duration from the same start fraction; the live duration
+ * getter mirrors that behavior here.
  */
 export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgressAnimation =
-  ({ from, to, durationMs, signal, update }) =>
+  ({ from, to, durationMs, getDurationMs, signal, update }) =>
     new Promise<void>((resolve) => {
       const delta = to - from;
-      const remainingDurationMs = Math.max(0, durationMs * Math.abs(delta));
-      if (signal.aborted || delta === 0 || remainingDurationMs === 0) {
+      const initialRemainingDurationMs = Math.max(0, durationMs * Math.abs(delta));
+      if (signal.aborted || delta === 0 || initialRemainingDurationMs === 0) {
         update(to);
         resolve();
         return;
@@ -122,7 +137,10 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
         }
         startTime ??= time;
         const elapsed = Math.max(0, time - startTime);
-        const timelineFraction = Math.min(1, elapsed / remainingDurationMs);
+        const fullDurationMs = getDurationMs?.() ?? durationMs;
+        const remainingDurationMs = Math.max(0, fullDurationMs * Math.abs(delta));
+        const timelineFraction =
+          remainingDurationMs === 0 ? 1 : Math.min(1, elapsed / remainingDurationMs);
         update(from + delta * timelineFraction);
         if (timelineFraction >= 1) {
           update(to);
@@ -154,7 +172,16 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private revision = 0;
   private readonly listeners = new Set<() => void>();
   private animationController: AbortController | null = null;
+  private activeAnimation:
+    | {
+        driver: ThreePaneScaffoldProgressAnimation;
+        targetState: ThreePaneScaffoldValue;
+        controller: AbortController;
+        completion: Promise<void>;
+      }
+    | null = null;
   private readonly defaultAnimation: ThreePaneScaffoldProgressAnimation;
+  private transitionOwner: object | null;
   private transitionDurationResolver: ThreePaneScaffoldTransitionDurationResolver | null;
 
   constructor(
@@ -167,6 +194,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.currentStateValue = initialScaffoldValue;
     this.targetStateValue = initialScaffoldValue;
     this.defaultAnimation = animation;
+    this.transitionOwner = transitionDurationResolver === undefined ? null : this;
     this.transitionDurationResolver = transitionDurationResolver ?? null;
   }
 
@@ -185,6 +213,19 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private cancelAnimation() {
     this.animationController?.abort();
     this.animationController = null;
+  }
+
+  private resolveTransitionDurationMs(
+    currentState: ThreePaneScaffoldValue,
+    targetState: ThreePaneScaffoldValue,
+  ) {
+    const durationMs =
+      this.transitionDurationResolver?.(currentState, targetState) ??
+      DefaultUnboundTransitionDurationMs;
+    if (!Number.isFinite(durationMs) || durationMs < 0) {
+      throw new RangeError(`Transition duration must be finite and non-negative. Got ${durationMs}`);
+    }
+    return durationMs;
   }
 
   get currentState() {
@@ -210,16 +251,22 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   }
 
   /**
-   * Attach the Transition duration resolver owned by the rendering scaffold.
-   * AndroidX SeekableTransitionState similarly binds to exactly one Transition.
+   * Attach the duration resolver for one rendering Transition owner. Resolver
+   * updates from that same owner are allowed, but the owner itself is retained
+   * for the state's lifetime even after cleanup, matching transitionRemoved().
    */
-  setTransitionDurationResolver(resolver: ThreePaneScaffoldTransitionDurationResolver) {
-    if (this.transitionDurationResolver !== null && this.transitionDurationResolver !== resolver) {
+  setTransitionDurationResolver(
+    owner: object,
+    resolver: ThreePaneScaffoldTransitionDurationResolver,
+  ) {
+    if (this.transitionOwner === null) {
+      this.transitionOwner = owner;
+    } else if (this.transitionOwner !== owner) {
       throw new Error('MutableThreePaneScaffoldState can only be attached to one transition');
     }
     this.transitionDurationResolver = resolver;
     return () => {
-      if (this.transitionDurationResolver === resolver) {
+      if (this.transitionOwner === owner && this.transitionDurationResolver === resolver) {
         this.transitionDurationResolver = null;
       }
     };
@@ -228,10 +275,18 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   /** Snap current and target to the same value and cancel any active transition. */
   snapTo(targetState: ThreePaneScaffoldValue) {
     this.cancelAnimation();
+    const predictiveBackChanged = this.predictiveBack;
+    this.predictiveBack = false;
+    if (
+      threePaneScaffoldValuesEqual(this.currentStateValue, targetState) &&
+      threePaneScaffoldValuesEqual(this.targetStateValue, targetState)
+    ) {
+      if (predictiveBackChanged) this.notify();
+      return;
+    }
     this.currentStateValue = targetState;
     this.targetStateValue = targetState;
     this.progressFractionValue = 0;
-    this.predictiveBack = false;
     this.notify();
   }
 
@@ -245,23 +300,34 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     isPredictiveBackInProgress = false,
   ) {
     clampFraction(fraction);
+    const oldTarget = this.targetStateValue;
+    const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.cancelAnimation();
-    this.targetStateValue = targetState;
+    const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
+    this.predictiveBack = isPredictiveBackInProgress;
+
+    if (!targetChanged && threePaneScaffoldValuesEqual(this.currentStateValue, targetState)) {
+      if (predictiveBackChanged) this.notify();
+      return;
+    }
+
+    if (targetChanged) {
+      this.targetStateValue = targetState;
+    }
     this.progressFractionValue = threePaneScaffoldValuesEqual(
       this.currentStateValue,
-      targetState,
+      this.targetStateValue,
     )
       ? 0
       : fraction;
-    this.predictiveBack = isPredictiveBackInProgress;
     this.notify();
   }
 
   /**
    * Animate the raw transition timeline fraction to 1 and commit targetState.
-   * A new snap/seek/animate call aborts the prior animation, mirroring AndroidX
-   * MutatorMutex behavior. The default driver is linear; a custom animation is
-   * the web equivalent of providing animateTo(animationSpec = ...).
+   * Snap/seek/retarget or a changed driver aborts the prior animation. Repeating
+   * the same target with the same driver continues the in-flight timeline,
+   * matching SeekableTransitionState's retained currentAnimation behavior.
    */
   async animateTo(
     targetState: ThreePaneScaffoldValue = this.targetStateValue,
@@ -270,33 +336,47 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       isPredictiveBackInProgress = false,
     }: ThreePaneScaffoldAnimateOptions = {},
   ) {
-    this.cancelAnimation();
+    const oldTarget = this.targetStateValue;
+    const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
 
-    if (threePaneScaffoldValuesEqual(this.currentStateValue, targetState)) {
-      this.currentStateValue = targetState;
-      this.targetStateValue = targetState;
-      this.progressFractionValue = 0;
+    if (!targetChanged && threePaneScaffoldValuesEqual(this.currentStateValue, oldTarget)) {
+      this.cancelAnimation();
+      const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
-      this.notify();
+      if (predictiveBackChanged) this.notify();
       return;
     }
 
-    const oldTarget = this.targetStateValue;
-    if (!threePaneScaffoldValuesEqual(targetState, oldTarget)) {
-      // AndroidX retargets from the previous target state. The React renderer
-      // separately captures the current visual frame so this discrete state
-      // change does not imply a visual jump.
+    const runningAnimation = this.activeAnimation;
+    if (
+      !targetChanged &&
+      runningAnimation !== null &&
+      !runningAnimation.controller.signal.aborted &&
+      runningAnimation.driver === animation &&
+      threePaneScaffoldValuesEqual(runningAnimation.targetState, targetState)
+    ) {
+      const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
+      this.predictiveBack = isPredictiveBackInProgress;
+      if (predictiveBackChanged) this.notify();
+      await runningAnimation.completion;
+      return;
+    }
+
+    this.cancelAnimation();
+
+    if (targetChanged) {
+      // SeekableTransitionState.animateTo retargets from the previous target,
+      // even when the requested target equals the pre-retarget current state.
+      // The React renderer separately captures the current visual frame so this
+      // discrete state change does not imply a visual jump.
       this.currentStateValue = oldTarget;
       this.targetStateValue = targetState;
       this.progressFractionValue = 0;
     }
 
-    const durationMs =
-      this.transitionDurationResolver?.(this.currentStateValue, targetState) ??
-      DefaultUnboundTransitionDurationMs;
-    if (!Number.isFinite(durationMs) || durationMs < 0) {
-      throw new RangeError(`Transition duration must be finite and non-negative. Got ${durationMs}`);
-    }
+    const resolvedCurrent = this.currentStateValue;
+    const resolvedTarget = this.targetStateValue;
+    const durationMs = this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget);
 
     this.predictiveBack = isPredictiveBackInProgress;
     const controller = new AbortController();
@@ -304,21 +384,33 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const startingFraction = this.progressFraction;
     this.notify();
 
+    let resolveCompletion!: () => void;
+    const completion = new Promise<void>((resolve) => {
+      resolveCompletion = resolve;
+    });
+    this.activeAnimation = {
+      driver: animation,
+      targetState: resolvedTarget,
+      controller,
+      completion,
+    };
+
     try {
       await animation({
         from: startingFraction,
         to: 1,
         durationMs,
+        getDurationMs: () => this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget),
         signal: controller.signal,
         update: (fraction) => {
           if (controller.signal.aborted) return;
-          this.progressFractionValue = clampFraction(fraction);
+          this.progressFractionValue = coerceAnimationFraction(fraction);
           this.notify();
         },
       });
       if (controller.signal.aborted) return;
-      this.currentStateValue = targetState;
-      this.targetStateValue = targetState;
+      this.currentStateValue = resolvedTarget;
+      this.targetStateValue = resolvedTarget;
       this.progressFractionValue = 0;
     } finally {
       if (this.animationController === controller) {
@@ -326,6 +418,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
         this.predictiveBack = false;
         this.notify();
       }
+      if (this.activeAnimation?.controller === controller) {
+        this.activeAnimation = null;
+      }
+      resolveCompletion();
     }
   }
 }

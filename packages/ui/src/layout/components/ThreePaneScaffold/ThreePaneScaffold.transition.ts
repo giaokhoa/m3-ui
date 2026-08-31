@@ -27,8 +27,9 @@ import {
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
+import { calculateLevitatedPaneResizePlacement } from './LevitatedPane.resizeLayout';
 import {
-  calculateThreePaneScaffoldLayout,
+  calculateThreePaneScaffoldLayoutPass,
   type PanePlacement,
 } from './ThreePaneScaffold.layout';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
@@ -132,6 +133,14 @@ function rectToPlacement(rect: readonly number[]): PanePlacement {
   };
 }
 
+function clampMeasuredSize(placement: PanePlacement): PanePlacement {
+  return {
+    ...placement,
+    width: Math.max(placement.width, 0),
+    height: Math.max(placement.height, 0),
+  };
+}
+
 interface ValuePlacements {
   measured: Partial<Record<ThreePaneScaffoldRole, PanePlacement>>;
   placed: Partial<Record<ThreePaneScaffoldRole, PanePlacement>>;
@@ -156,7 +165,7 @@ function calculateValuePlacements({
   // applied by PaneMeasurable.doMeasureAndPlace. Keep those two geometries
   // separate here as well: measured drives motion offsets while placed drives
   // the actual browser bounds and AnimateBounds interpolation.
-  const staticLayout = calculateThreePaneScaffoldLayout({
+  const staticPass = calculateThreePaneScaffoldLayoutPass({
     width,
     height,
     directive,
@@ -166,11 +175,14 @@ function calculateValuePlacements({
     excludedBounds,
     preferredWidths,
     preferredHeights,
-    paneMargins: {},
+    paneMargins,
     paneExpansionState,
   });
   const measured: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
-    ...staticLayout,
+    ...staticPass.raw,
+  };
+  const placed: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
+    ...staticPass.placed,
   };
 
   for (const role of roles) {
@@ -192,32 +204,36 @@ function calculateValuePlacements({
       scaffoldHeight: height,
       direction,
     });
-    measured[role] =
+    const rawPlacement =
       resized === undefined
         ? base
-        : calculateLevitatedPanePlacement({
-            width,
-            height,
-            directive,
-            alignment: adaptedValue.alignment,
-            direction,
-            preferredWidth: resized.width,
-            preferredHeight: resized.height,
-          });
-  }
-
-  const placed: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {};
-  for (const role of roles) {
-    const placement = measured[role];
-    if (placement === undefined) continue;
-    placed[role] = applyPaneMargins(
-      placement,
-      paneMargins?.[role],
-      width,
-      height,
-      direction,
+        : (() => {
+            const aligned = calculateLevitatedPaneResizePlacement({
+              rawWidth: resized.width,
+              rawHeight: resized.height,
+              scaffoldWidth: width,
+              scaffoldHeight: height,
+              alignment: adaptedValue.alignment,
+              direction,
+            });
+            return {
+              ...aligned,
+              width: resized.width,
+              height: resized.height,
+            };
+          })();
+    measured[role] = rawPlacement;
+    placed[role] = clampMeasuredSize(
+      applyPaneMargins(
+        rawPlacement,
+        paneMargins?.[role],
+        width,
+        height,
+        direction,
+      ),
     );
   }
+
   return { measured, placed };
 }
 

@@ -9,8 +9,18 @@ export interface PanePreferredSizeProportion {
  */
 export type PanePreferredSize = number | PanePreferredSizeProportion;
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
 function composeFloat(value: number) {
   return Math.fround(value);
+}
+
+function composeRoundToPx(value: number) {
+  const floatValue = composeFloat(value);
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
 }
 
 function normalizeProportion(proportion: number, name: string) {
@@ -35,15 +45,15 @@ export function resolvePanePreferredSize(
 ): number {
   if (preferredSize === undefined) return fallbackSize;
   if (typeof preferredSize === 'number') {
-    // AndroidX PaneScaffoldScope.preferredWidth/Height(Dp) accepts only a
-    // positive value or Dp.Unspecified. Undefined is the web equivalent of
-    // Unspecified; zero is valid only for the proportion overload.
-    if (!Number.isFinite(preferredSize) || preferredSize <= 0) {
+    // AndroidX accepts Dp.Unspecified or any value > 0.dp, then resolves the
+    // specified Dp with roundToPx() at pane measurement. Undefined is the web
+    // equivalent of Unspecified; Dp.Infinity becomes Constraints.Infinity.
+    if (Number.isNaN(preferredSize) || preferredSize <= 0) {
       throw new RangeError(
-        `${name} must be a finite, positive CSS pixel value, received ${preferredSize}`,
+        `${name} must be a positive CSS pixel value, received ${preferredSize}`,
       );
     }
-    return preferredSize;
+    return composeRoundToPx(preferredSize);
   }
 
   const proportion = normalizeProportion(preferredSize.proportion, `${name} proportion`);

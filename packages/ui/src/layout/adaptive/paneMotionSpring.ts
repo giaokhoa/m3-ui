@@ -3,6 +3,8 @@ import { PaneMotionDefaults } from './paneMotion';
 /** AndroidX Spring.DefaultDisplacementThreshold. */
 export const PaneMotionDefaultDisplacementThreshold = 0.01;
 
+const MillisToNanos = 1_000_000;
+
 function assertFinite(value: number, name: string) {
   if (!Number.isFinite(value)) throw new RangeError(`${name} must be finite`);
 }
@@ -11,6 +13,10 @@ function assertThreshold(value: number) {
   if (!Number.isFinite(value) || value <= 0) {
     throw new RangeError('visibilityThreshold must be a finite value greater than 0');
   }
+}
+
+function composeFloat(value: number) {
+  return Math.fround(value);
 }
 
 function clampProgress(value: number) {
@@ -69,15 +75,19 @@ export function samplePaneMotionSpring(
   assertFinite(targetValue, 'targetValue');
   assertFinite(playTimeMs, 'playTimeMs');
   assertFinite(initialVelocity, 'initialVelocity');
-  if (
-    playTimeMs <= 0 ||
-    (initialValue === targetValue && initialVelocity === 0)
-  ) {
-    return initialValue;
+
+  // FloatSpringSpec passes Float vectors into SpringSimulation. Preserve those
+  // boundaries before its analytical spring math is promoted to Double.
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  const velocity = composeFloat(initialVelocity);
+  if (playTimeMs <= 0 || (initial === target && velocity === 0)) {
+    return initial;
   }
 
-  const dampingRatio = PaneMotionDefaults.dampingRatio;
-  const naturalFrequency = Math.sqrt(PaneMotionDefaults.stiffness);
+  const dampingRatio = composeFloat(PaneMotionDefaults.dampingRatio);
+  const stiffness = composeFloat(PaneMotionDefaults.stiffness);
+  const naturalFrequency = Math.sqrt(stiffness);
   const dampingRatioSquared = dampingRatio * dampingRatio;
   if (dampingRatioSquared >= 1) {
     throw new Error('Pane motion spring sampler expects the pinned under-damped spring');
@@ -86,17 +96,18 @@ export function samplePaneMotionSpring(
   // FloatSpringSpec truncates nanos to whole milliseconds before querying the
   // SpringSimulation, so mirror that precision boundary here.
   const elapsedSeconds = Math.floor(playTimeMs) / 1000;
-  const adjustedDisplacement = initialValue - targetValue;
+  const adjustedDisplacement = composeFloat(initial - target);
   const r = -dampingRatio * naturalFrequency;
   const dampedFrequency = naturalFrequency * Math.sqrt(1 - dampingRatioSquared);
   const cosCoefficient = adjustedDisplacement;
   const sinCoefficient =
-    ((-r * adjustedDisplacement) + initialVelocity) / dampedFrequency;
+    ((-r * adjustedDisplacement) + velocity) / dampedFrequency;
   const dampedTime = dampedFrequency * elapsedSeconds;
   const displacement =
     Math.exp(r * elapsedSeconds) *
     (cosCoefficient * Math.cos(dampedTime) + sinCoefficient * Math.sin(dampedTime));
-  return displacement + targetValue;
+  // SpringSimulation packs the result back into a Float Motion value.
+  return composeFloat(displacement + target);
 }
 
 /**
@@ -115,12 +126,21 @@ export function calculatePaneMotionSpringDurationMs(
   assertFinite(initialVelocity, 'initialVelocity');
   assertThreshold(visibilityThreshold);
 
-  const normalizedDisplacement = (initialValue - targetValue) / visibilityThreshold;
-  const normalizedVelocity = initialVelocity / visibilityThreshold;
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  const threshold = composeFloat(visibilityThreshold);
+  const velocityInput = composeFloat(initialVelocity);
+  const normalizedDisplacement = composeFloat(
+    composeFloat(initial - target) / threshold,
+  );
+  const normalizedVelocity = composeFloat(velocityInput / threshold);
   if (normalizedDisplacement === 0 && normalizedVelocity === 0) return 0;
 
-  const dampingRatio = PaneMotionDefaults.dampingRatio;
-  const naturalFrequency = Math.sqrt(PaneMotionDefaults.stiffness);
+  // The Float overload of estimateAnimationDurationMillis promotes these
+  // Float parameters to Double before solving the under-damped envelope.
+  const dampingRatio = composeFloat(PaneMotionDefaults.dampingRatio);
+  const stiffness = composeFloat(PaneMotionDefaults.stiffness);
+  const naturalFrequency = Math.sqrt(stiffness);
   const r = -dampingRatio * naturalFrequency;
   const imaginaryRoot = naturalFrequency * Math.sqrt(1 - dampingRatio * dampingRatio);
   const velocity = normalizedDisplacement < 0 ? -normalizedVelocity : normalizedVelocity;
@@ -128,6 +148,9 @@ export function calculatePaneMotionSpringDurationMs(
   const c1 = position;
   const c2 = (velocity - r * c1) / imaginaryRoot;
   const envelope = Math.sqrt(c1 * c1 + c2 * c2);
+  // SpringEstimation can return a negative duration when the whole envelope is
+  // already inside the threshold. TargetBasedAnimation treats that as finished
+  // immediately, which is observably equivalent to a zero browser duration.
   if (envelope <= 1) return 0;
 
   const durationSeconds = Math.log(1 / envelope) / r;
@@ -211,6 +234,17 @@ export function samplePaneMotionVectorSpringAtProgress(
   );
 }
 
+function calculatePaneMotionDelayedTimeMs(originalDurationMs: number) {
+  // DelayedVectorizedSpringSpec calculates this in nanoseconds as
+  // (Long * delayedRatio: Float).toLong(). Preserve both the Long->Float
+  // precision boundary and sub-millisecond remainder before converting back.
+  const originalDurationNanos = Math.fround(originalDurationMs * MillisToNanos);
+  const delayedTimeNanos = Math.trunc(
+    Math.fround(originalDurationNanos * Math.fround(PaneMotionDefaults.delayedRatio)),
+  );
+  return delayedTimeNanos / MillisToNanos;
+}
+
 export function calculatePaneMotionDelayedSpringDurationMs(
   initialValues: readonly number[],
   targetValues: readonly number[],
@@ -221,12 +255,14 @@ export function calculatePaneMotionDelayedSpringDurationMs(
     targetValues,
     visibilityThresholds,
   );
-  return originalDuration + Math.trunc(originalDuration * PaneMotionDefaults.delayedRatio);
+  return originalDuration + calculatePaneMotionDelayedTimeMs(originalDuration);
 }
 
 /**
  * Samples AndroidX DelayedSpringSpec at an external/global transition playtime.
- * The delay is based on the original spring duration, not on the global one.
+ * The delay is calculated in nanoseconds from the original spring duration, so
+ * it can retain a sub-millisecond remainder even though FloatSpringSpec itself
+ * samples spring physics at whole-millisecond precision.
  */
 export function samplePaneMotionDelayedVectorSpringAtPlayTime(
   initialValues: readonly number[],
@@ -242,7 +278,7 @@ export function samplePaneMotionDelayedVectorSpringAtPlayTime(
     targetValues,
     visibilityThresholds,
   );
-  const delayedTimeMs = Math.trunc(originalDuration * PaneMotionDefaults.delayedRatio);
+  const delayedTimeMs = calculatePaneMotionDelayedTimeMs(originalDuration);
   const totalDuration = originalDuration + delayedTimeMs;
   if (totalDuration === 0 || playTimeMs >= totalDuration) {
     return convertPaneMotionVector(targetValues, visibilityThresholds);
@@ -269,12 +305,10 @@ export function samplePaneMotionDelayedSpringAtPlayTime(
   playTimeMs: number,
   vectorOriginalDurationMs: number,
 ): number {
-  const delayedTimeMs = Math.trunc(
-    vectorOriginalDurationMs * PaneMotionDefaults.delayedRatio,
-  );
+  const delayedTimeMs = calculatePaneMotionDelayedTimeMs(vectorOriginalDurationMs);
   const totalDuration = vectorOriginalDurationMs + delayedTimeMs;
-  if (totalDuration === 0 || playTimeMs >= totalDuration) return targetValue;
-  if (playTimeMs <= delayedTimeMs) return initialValue;
+  if (totalDuration === 0 || playTimeMs >= totalDuration) return composeFloat(targetValue);
+  if (playTimeMs <= delayedTimeMs) return composeFloat(initialValue);
   return samplePaneMotionSpring(
     initialValue,
     targetValue,

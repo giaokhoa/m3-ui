@@ -23,22 +23,22 @@ describe('pane motion spring parity', () => {
     ).toBe(328);
   });
 
-  it('samples the pinned under-damped SpringSimulation response', () => {
+  it('samples the pinned under-damped SpringSimulation Float response', () => {
     expect(samplePaneMotionSpring(0, 1, 0)).toBe(0);
-    expect(samplePaneMotionSpring(0, 1, 50)).toBeCloseTo(0.28017744, 7);
-    expect(samplePaneMotionSpring(0, 1, 100)).toBeCloseTo(0.65983106, 7);
-    expect(samplePaneMotionSpring(0, 1, 328)).toBeCloseTo(1.00973937, 7);
+    expect(samplePaneMotionSpring(0, 1, 50)).toBe(0.28017744421958923);
+    expect(samplePaneMotionSpring(0, 1, 100)).toBe(0.6598310470581055);
+    expect(samplePaneMotionSpring(0, 1, 328)).toBe(1.0097393989562988);
   });
 
   it('preserves initial velocity for pane-expansion anchor settling', () => {
-    expect(samplePaneMotionSpring(510, 750, 50, 250)).toBeCloseTo(582.65297362, 7);
-    expect(samplePaneMotionSpring(510, 750, 100, 250)).toBeCloseTo(672.49651081, 7);
+    expect(samplePaneMotionSpring(510, 750, 50, 250)).toBe(582.6529541015625);
+    expect(samplePaneMotionSpring(510, 750, 100, 250)).toBe(672.4965209960938);
     expect(calculatePaneMotionSpringDurationMs(510, 750, 1, 250)).toBe(381);
   });
 
   it('keeps spring motion when position already equals target but velocity remains', () => {
-    expect(samplePaneMotionSpring(500, 500, 50, 250)).toBeCloseTo(505.41038803, 7);
-    expect(samplePaneMotionSpring(500, 500, 100, 250)).toBeCloseTo(504.13705697, 7);
+    expect(samplePaneMotionSpring(500, 500, 50, 250)).toBe(505.410400390625);
+    expect(samplePaneMotionSpring(500, 500, 100, 250)).toBe(504.1370544433594);
     expect(calculatePaneMotionSpringDurationMs(500, 500, 1, 250)).toBe(196);
   });
 
@@ -81,13 +81,17 @@ describe('pane motion spring parity', () => {
       100,
       PaneMotionDefaultDisplacementThreshold,
     )[0]!;
-    expect(floatVisibility).toBeCloseTo(samplePaneMotionSpring(0, 1, 100), 7);
+    expect(floatVisibility).toBe(samplePaneMotionSpring(0, 1, 100));
     expect(Number.isInteger(floatVisibility)).toBe(false);
   });
 
-  it('ports DelayedSpringSpec duration and hold phase', () => {
-    expect(calculatePaneMotionDelayedSpringDurationMs([0], [500])).toBe(474);
-    expect(samplePaneMotionDelayedSpringAtPlayTime(0, 500, 43, 431)).toBe(0);
-    expect(samplePaneMotionDelayedSpringAtPlayTime(0, 500, 44, 431)).toBeGreaterThan(0);
+  it('ports DelayedSpringSpec nanos duration and hold phase', () => {
+    // 431ms spring duration -> (431_000_000L * 0.1f).toLong() = 43.1ms delay.
+    expect(calculatePaneMotionDelayedSpringDurationMs([0], [500])).toBeCloseTo(474.1, 6);
+    expect(samplePaneMotionDelayedSpringAtPlayTime(0, 500, 43.1, 431)).toBe(0);
+    // The delayed spring then truncates its own play time to whole milliseconds,
+    // so 44ms still has only 0.9ms of spring time and remains at the start value.
+    expect(samplePaneMotionDelayedSpringAtPlayTime(0, 500, 44, 431)).toBe(0);
+    expect(samplePaneMotionDelayedSpringAtPlayTime(0, 500, 44.1, 431)).toBeGreaterThan(0);
   });
 });

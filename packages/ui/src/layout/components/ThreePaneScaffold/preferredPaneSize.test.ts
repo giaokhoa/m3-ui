@@ -5,8 +5,16 @@ import {
 } from './preferredPaneSize';
 
 describe('preferred pane size', () => {
-  it('keeps positive absolute CSS-pixel sizes unchanged', () => {
+  it('rounds positive absolute sizes like AndroidX Dp.roundToPx()', () => {
     expect(resolvePanePreferredSize(320, 1000, 360, 'preferredWidth')).toBe(320);
+    expect(resolvePanePreferredSize(320.5, 1000, 360, 'preferredWidth')).toBe(321);
+    expect(resolvePanePreferredSize(0.4, 1000, 360, 'preferredWidth')).toBe(0);
+  });
+
+  it('accepts the AndroidX Dp.Infinity case as Constraints.Infinity', () => {
+    expect(
+      resolvePanePreferredSize(Number.POSITIVE_INFINITY, 1000, 360, 'preferredWidth'),
+    ).toBe(2147483647);
   });
 
   it('resolves proportions against the full scaffold dimension', () => {

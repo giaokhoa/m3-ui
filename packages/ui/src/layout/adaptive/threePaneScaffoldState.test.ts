@@ -6,6 +6,7 @@ import {
 } from './threePaneScaffold';
 import {
   MutableThreePaneScaffoldState,
+  defaultThreePaneScaffoldProgressAnimation,
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldProgressAnimation,
 } from './threePaneScaffoldState';
@@ -69,6 +70,37 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
+  it('keeps structurally equal destination-only targets as state no-ops', async () => {
+    const secondaryDestination: ThreePaneScaffoldValue = {
+      ...primary,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    const snapState = new MutableThreePaneScaffoldState(primary);
+    snapState.snapTo(secondaryDestination);
+    expect(snapState.currentState).toBe(primary);
+    expect(snapState.targetState).toBe(primary);
+
+    const seekState = new MutableThreePaneScaffoldState(primary);
+    seekState.seekTo(0.5, secondaryDestination, true);
+    expect(seekState.currentState).toBe(primary);
+    expect(seekState.targetState).toBe(primary);
+    expect(seekState.progressFraction).toBe(0);
+    expect(seekState.isPredictiveBackInProgress).toBe(true);
+
+    let animationCalled = false;
+    const animateState = new MutableThreePaneScaffoldState(primary);
+    await animateState.animateTo(secondaryDestination, {
+      animation: async () => {
+        animationCalled = true;
+      },
+    });
+    expect(animationCalled).toBe(false);
+    expect(animateState.currentState).toBe(primary);
+    expect(animateState.targetState).toBe(primary);
+    expect(animateState.isPredictiveBackInProgress).toBe(false);
+  });
+
   it('animates the fraction and commits the target', async () => {
     const state = new MutableThreePaneScaffoldState(hidden, {
       animation: instantAnimation,
@@ -83,6 +115,24 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.progressFraction).toBe(0);
     expect(state.isTransitionActive).toBe(false);
     expect(listener).toHaveBeenCalled();
+  });
+
+  it('coerces custom animation overshoot like SeekableTransitionState.animateTo', async () => {
+    const seen: number[] = [];
+    const state = new MutableThreePaneScaffoldState(hidden);
+
+    await state.animateTo(primary, {
+      animation: async ({ update }) => {
+        update(-0.2);
+        seen.push(state.progressFraction);
+        update(1.2);
+        seen.push(state.progressFraction);
+        update(1);
+      },
+    });
+
+    expect(seen).toEqual([0, 1]);
+    expect(state.currentState).toBe(primary);
   });
 
   it('uses zero duration while no renderer transition is attached', async () => {
@@ -106,12 +156,73 @@ describe('MutableThreePaneScaffoldState', () => {
       update(1);
     };
     const state = new MutableThreePaneScaffoldState(hidden, { animation });
-    const detach = state.setTransitionDurationResolver(() => 475);
+    const owner = {};
+    const detach = state.setTransitionDurationResolver(owner, () => 475);
 
     await state.animateTo(primary);
     expect(observedDuration).toBe(475);
 
     detach();
+  });
+
+  it('exposes the latest renderer duration while an animation is running', async () => {
+    let durationMs = 475;
+    const state = new MutableThreePaneScaffoldState(hidden);
+    const owner = {};
+    const detach = state.setTransitionDurationResolver(owner, () => durationMs);
+
+    await state.animateTo(primary, {
+      animation: async ({ durationMs: initialDurationMs, getDurationMs, update }) => {
+        expect(initialDurationMs).toBe(475);
+        expect(getDurationMs?.()).toBe(475);
+        durationMs = 950;
+        expect(getDurationMs?.()).toBe(950);
+        update(1);
+      },
+    });
+
+    detach();
+  });
+
+  it('recomputes the remaining default linear duration when total duration changes', async () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+
+    let durationMs = 1000;
+    const seen: number[] = [];
+    const controller = new AbortController();
+
+    try {
+      const running = defaultThreePaneScaffoldProgressAnimation({
+        from: 0.25,
+        to: 1,
+        durationMs,
+        getDurationMs: () => durationMs,
+        signal: controller.signal,
+        update: (fraction) => seen.push(fraction),
+      });
+
+      frames.shift()!(0);
+      frames.shift()!(300);
+      expect(seen.at(-1)).toBeCloseTo(0.55);
+
+      durationMs = 2000;
+      frames.shift()!(600);
+      // AndroidX keeps the same accumulated playtime but recomputes the
+      // remaining null-spec duration from the original 0.25 start fraction.
+      expect(seen.at(-1)).toBeCloseTo(0.55);
+
+      durationMs = 500;
+      frames.shift()!(600);
+      await running;
+      expect(seen.at(-1)).toBe(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('continues an existing seek when animating to the same target', async () => {
@@ -127,6 +238,44 @@ describe('MutableThreePaneScaffoldState', () => {
 
     expect(seen).toEqual([0.35]);
     expect(state.currentState).toBe(primary);
+  });
+
+  it('keeps an in-flight timeline when animateTo repeats the same target and driver', async () => {
+    let animationCalls = 0;
+    let updateRunning!: (fraction: number) => void;
+    let finishRunning!: () => void;
+    const animation: ThreePaneScaffoldProgressAnimation = ({ update }) => {
+      animationCalls += 1;
+      updateRunning = update;
+      return new Promise<void>((resolve) => {
+        finishRunning = () => {
+          update(1);
+          resolve();
+        };
+      });
+    };
+    const state = new MutableThreePaneScaffoldState(hidden, { animation });
+    const structurallyEqualPrimary: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Hidden,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    const first = state.animateTo(primary);
+    updateRunning(0.4);
+    const repeated = state.animateTo(structurallyEqualPrimary);
+
+    expect(animationCalls).toBe(1);
+    expect(state.progressFraction).toBe(0.4);
+
+    finishRunning();
+    await Promise.all([first, repeated]);
+
+    expect(animationCalls).toBe(1);
+    expect(state.currentState).toBe(primary);
+    expect(state.targetState).toBe(primary);
+    expect(state.progressFraction).toBe(0);
   });
 
   it('retargets from the previous target like SeekableTransitionState.animateTo', async () => {
@@ -146,13 +295,35 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.currentState).toBe(primarySecondary);
   });
 
-  it('allows only one attached transition duration resolver', () => {
+  it('retargets from the previous target even when the new target equals currentState', async () => {
     const state = new MutableThreePaneScaffoldState(hidden);
+    state.seekTo(0.5, primary);
+
+    let observedCurrent: ThreePaneScaffoldValue | undefined;
+    const animation: ThreePaneScaffoldProgressAnimation = async ({ update }) => {
+      observedCurrent = state.currentState;
+      update(1);
+    };
+    await state.animateTo(hidden, { animation });
+
+    expect(observedCurrent).toBe(primary);
+    expect(state.currentState).toBe(hidden);
+    expect(state.targetState).toBe(hidden);
+  });
+
+  it('retains one transition owner across resolver updates and detach', () => {
+    const state = new MutableThreePaneScaffoldState(hidden);
+    const owner = {};
+    const otherOwner = {};
     const first = () => 300;
-    const detach = state.setTransitionDurationResolver(first);
-    expect(() => state.setTransitionDurationResolver(() => 400)).toThrow();
+    const detach = state.setTransitionDurationResolver(owner, first);
+
+    expect(() => state.setTransitionDurationResolver(owner, () => 400)).not.toThrow();
+    expect(() => state.setTransitionDurationResolver(otherOwner, () => 500)).toThrow();
+
     detach();
-    expect(() => state.setTransitionDurationResolver(() => 400)).not.toThrow();
+    expect(() => state.setTransitionDurationResolver(owner, () => 600)).not.toThrow();
+    expect(() => state.setTransitionDurationResolver(otherOwner, () => 700)).toThrow();
   });
 
   it('validates seek fractions', () => {
@@ -173,6 +344,15 @@ describe('threePaneScaffoldValuesEqual', () => {
     };
     expect(threePaneScaffoldValuesEqual(primary, clone)).toBe(true);
     expect(threePaneScaffoldValuesEqual(primary, primarySecondary)).toBe(false);
+  });
+
+  it('ignores currentDestination like AndroidX ThreePaneScaffoldValue.equals', () => {
+    const secondaryDestination: ThreePaneScaffoldValue = {
+      ...primary,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    expect(threePaneScaffoldValuesEqual(primary, secondaryDestination)).toBe(true);
   });
 
   it('compares reflow anchors', () => {

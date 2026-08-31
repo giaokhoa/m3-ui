@@ -14,10 +14,10 @@ describe('DragToResizeState default spring', () => {
     });
   });
 
-  it('samples the pinned critically-damped SpringSimulation branch', () => {
+  it('samples the pinned critically-damped SpringSimulation Float response', () => {
     expect(sampleDragToResizeSpring(800, 48, 0)).toBe(800);
-    expect(sampleDragToResizeSpring(800, 48, 100)).toBeCloseTo(124.2074574, 6);
-    expect(sampleDragToResizeSpring(48, 800, 100)).toBeCloseTo(723.7925426, 6);
+    expect(sampleDragToResizeSpring(800, 48, 100)).toBe(124.20745849609375);
+    expect(sampleDragToResizeSpring(48, 800, 100)).toBe(723.7925415039062);
   });
 
   it('uses AndroidX whole-millisecond spring precision', () => {

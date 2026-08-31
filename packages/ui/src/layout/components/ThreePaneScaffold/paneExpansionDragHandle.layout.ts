@@ -1,4 +1,3 @@
-import { pxNumber } from '../../../internal/tokenValues';
 import { PaneExpansionUnspecified } from '../../adaptive/paneExpansionState';
 import { getPaneAdaptedValue } from '../../adaptive/threePaneScaffold';
 import {
@@ -42,10 +41,28 @@ export interface PaneExpansionDragHandleFadeOffsets {
   targetOffsetX: number;
 }
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
   }
+}
+
+function composeRoundToPx(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) throw new RangeError('Cannot round NaN value');
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
+}
+
+function cssPxRoundToPx(value: string, name: string) {
+  if (!value.endsWith('px')) throw new Error(`${name} must resolve to CSS pixels, received ${value}`);
+  const parsed = Number.parseFloat(value);
+  if (Number.isNaN(parsed)) throw new Error(`Invalid ${name}: ${value}`);
+  return composeRoundToPx(parsed);
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -192,11 +209,11 @@ export function calculatePaneExpansionDragHandlePlacement({
   finiteNonNegative(offsetX, 'offsetX');
   finiteNonNegative(contentWidth, 'contentWidth');
   finiteNonNegative(minTouchTargetSize, 'minTouchTargetSize');
-  const partitionSpacerPx = pxNumber(partitionSpacerSize);
-  finiteNonNegative(partitionSpacerPx, 'partitionSpacerSize');
+  const partitionSpacerPx = cssPxRoundToPx(partitionSpacerSize, 'partitionSpacerSize');
+  const minTouchTargetPx = composeRoundToPx(minTouchTargetSize);
 
-  // AndroidX values are Ints after measurement. Its `/ 2` operations therefore
-  // truncate for odd spacer and touch-target sizes.
+  // AndroidX values are Ints after roundToPx()/measurement. Its `/ 2`
+  // operations therefore truncate for odd spacer and touch-target sizes.
   const minHorizontalMargin = Math.min(
     Math.trunc(partitionSpacerPx / 2),
     contentWidth / 2,
@@ -207,11 +224,11 @@ export function calculatePaneExpansionDragHandlePlacement({
     contentWidth - minHorizontalMargin,
   );
   const appliedHorizontalMargin = Math.min(centerX, contentWidth - centerX);
-  const halfMinTouchTargetSize = Math.trunc(minTouchTargetSize / 2);
+  const halfMinTouchTargetSize = Math.trunc(minTouchTargetPx / 2);
   const minWidth =
     appliedHorizontalMargin < halfMinTouchTargetSize
-      ? 2 * (minTouchTargetSize - appliedHorizontalMargin)
-      : minTouchTargetSize;
+      ? 2 * (minTouchTargetPx - appliedHorizontalMargin)
+      : minTouchTargetPx;
 
   return { centerX, minWidth };
 }

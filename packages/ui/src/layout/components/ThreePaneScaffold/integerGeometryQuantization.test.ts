@@ -35,6 +35,46 @@ const twoPaneValue: ThreePaneScaffoldValue = {
 };
 
 describe('AndroidX integer geometry quantization', () => {
+  it('rounds directive Dp values before pane allocation', () => {
+    const fractionalDirective: PaneScaffoldDirective = {
+      ...oddSpacerDirective,
+      horizontalPartitionSpacerSize: '24.5px',
+      defaultPanePreferredWidth: '360.5px',
+      defaultPanePreferredHeight: '420.5px',
+    };
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive: fractionalDirective,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+    });
+
+    // AndroidX roundToPx(): 24.5dp -> 25px and 360.5dp -> 361px.
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 361, height: 800 });
+    expect(layout.primary).toEqual({ left: 386, top: 0, width: 614, height: 800 });
+
+    expect(
+      calculateLevitatedPanePlacement({
+        width: 1001,
+        height: 801,
+        directive: fractionalDirective,
+        alignment: PaneAlignment.Center,
+      }),
+    ).toEqual({ left: 320, top: 190, width: 361, height: 421 });
+  });
+
+  it('rounds drag-handle Dp values before Int edge geometry', () => {
+    expect(
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 0,
+        contentWidth: 1000,
+        partitionSpacerSize: '24.5px',
+        minTouchTargetSize: 48.5,
+      }),
+    ).toEqual({ centerX: 12, minWidth: 74 });
+  });
+
   it('uses Int division for an odd pane-expansion spacer while dragging', () => {
     const paneExpansionState = new PaneExpansionState();
     paneExpansionState.onMeasured(1000);

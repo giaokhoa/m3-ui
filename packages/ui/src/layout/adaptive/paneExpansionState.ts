@@ -6,6 +6,8 @@ import {
 export const PaneExpansionUnspecified = -1;
 const AnchoringVelocityThreshold = 200;
 const AnchoringVisibilityThreshold = 1;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
 
 export type PaneExpansionAnchor =
   | { readonly type: 'proportion'; readonly proportion: number }
@@ -39,21 +41,48 @@ function composeFloat(value: number) {
   return Math.fround(value);
 }
 
+function nonNegativeAnchorOffset(value: number) {
+  const floatOffset = composeFloat(value);
+  if (Number.isNaN(floatOffset) || floatOffset < 0) {
+    throw new RangeError('Offset must larger than or equal to 0 CSS pixels.');
+  }
+  return floatOffset;
+}
+
+function composeRoundToInt(value: number) {
+  if (Number.isNaN(value)) {
+    throw new RangeError('Cannot round NaN value.');
+  }
+  if (value >= ComposeIntMax) return ComposeIntMax;
+  if (value <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(value);
+}
+
+function composeFloatToInt(value: number) {
+  const floatValue = composeFloat(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
 export const PaneExpansionAnchor = Object.freeze({
   proportion(proportion: number): PaneExpansionAnchor {
-    const floatProportion = composeFloat(proportion);
-    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
-      throw new RangeError('Proportion value needs to be in [0, 1]');
-    }
-    return Object.freeze({ type: 'proportion', proportion: floatProportion });
+    return Object.freeze({ type: 'proportion', proportion: composeFloat(proportion) });
   },
   fromStart(offset: number): PaneExpansionAnchor {
-    finiteNonNegative(offset, 'offset');
-    return Object.freeze({ type: 'offset', direction: 'start', offset });
+    return Object.freeze({
+      type: 'offset',
+      direction: 'start',
+      offset: nonNegativeAnchorOffset(offset),
+    });
   },
   fromEnd(offset: number): PaneExpansionAnchor {
-    finiteNonNegative(offset, 'offset');
-    return Object.freeze({ type: 'offset', direction: 'end', offset });
+    return Object.freeze({
+      type: 'offset',
+      direction: 'end',
+      offset: nonNegativeAnchorOffset(offset),
+    });
   },
 });
 
@@ -77,6 +106,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function anchorEquals(a: PaneExpansionAnchor, b: PaneExpansionAnchor) {
+  if (a === b) return true;
   if (a.type !== b.type) return false;
   if (a.type === 'proportion' && b.type === 'proportion') {
     return composeFloat(a.proportion) === composeFloat(b.proportion);
@@ -96,16 +126,19 @@ function anchorPosition(
 ) {
   let offset: number;
   if (anchor.type === 'proportion') {
-    offset = Math.round(
-      composeFloat(composeFloat(totalSize) * composeFloat(anchor.proportion)),
+    offset = clamp(
+      composeRoundToInt(
+        composeFloat(composeFloat(totalSize) * composeFloat(anchor.proportion)),
+      ),
+      0,
+      totalSize,
     );
   } else if (anchor.direction === 'start') {
-    offset = anchor.offset;
+    offset = composeRoundToInt(anchor.offset);
   } else {
-    offset = totalSize - anchor.offset;
+    offset = totalSize - composeRoundToInt(anchor.offset);
   }
-  const coerced = clamp(Math.round(offset), 0, totalSize);
-  return direction === 'rtl' ? totalSize - coerced : coerced;
+  return direction === 'rtl' ? totalSize - offset : offset;
 }
 
 interface IndexedAnchorPosition {
@@ -295,7 +328,7 @@ export class PaneExpansionState {
 
   private setAnimatedOffset(value: number) {
     if (this.maxExpansionWidth === PaneExpansionUnspecified) return;
-    const offset = clamp(Math.trunc(value), 0, this.maxExpansionWidth);
+    const offset = clamp(composeFloatToInt(value), 0, this.maxExpansionWidth);
     this.currentDraggingOffsetState = offset;
     this.currentMeasuredDraggingOffset = offset;
   }
@@ -323,7 +356,6 @@ export class PaneExpansionState {
       this.currentDraggingOffsetState === PaneExpansionUnspecified
         ? this.currentMeasuredDraggingOffset
         : this.currentDraggingOffsetState;
-    if (currentOffset === PaneExpansionUnspecified) return positions[0]!.anchor;
     for (const anchorPosition of positions) {
       if (currentOffset < anchorPosition.position) return anchorPosition.anchor;
     }
@@ -404,7 +436,11 @@ export class PaneExpansionState {
     this.maxExpansionWidth = nextWidth;
     this.measuredDirection = direction;
     if (!this.isDraggingOrSettling && this.currentAnchorState !== null) {
-      const offset = anchorPosition(this.currentAnchorState, nextWidth, direction);
+      const offset = clamp(
+        anchorPosition(this.currentAnchorState, nextWidth, direction),
+        0,
+        nextWidth,
+      );
       this.currentDraggingOffsetState = offset;
       this.currentMeasuredDraggingOffset = offset;
     } else if (this.currentDraggingOffsetState !== PaneExpansionUnspecified) {
@@ -428,23 +464,21 @@ export class PaneExpansionState {
   }
 
   dispatchRawDelta(delta: number) {
+    const remainingDelta = composeFloat(this.consumeDragDelta(composeFloat(delta)));
     if (
       this.maxExpansionWidth === PaneExpansionUnspecified ||
       this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
     ) {
       return;
     }
-    const cancelledSettling = this.cancelAnimation();
-    const remainingDelta = this.consumeDragDelta(delta);
     const nextOffset = clamp(
-      Math.trunc(this.currentMeasuredDraggingOffset + remainingDelta),
+      composeFloatToInt(
+        composeFloat(composeFloat(this.currentMeasuredDraggingOffset) + remainingDelta),
+      ),
       0,
       this.maxExpansionWidth,
     );
-    if (nextOffset === this.currentDraggingOffsetState) {
-      if (cancelledSettling) this.notify();
-      return;
-    }
+    if (nextOffset === this.currentDraggingOffsetState) return;
     this.currentDraggingOffsetState = nextOffset;
     this.currentMeasuredDraggingOffset = nextOffset;
     this.notify();
@@ -459,21 +493,6 @@ export class PaneExpansionState {
     void this.settleToAnchorIfNeeded(velocity);
   }
 
-  snapToAnchor(anchor: PaneExpansionAnchor) {
-    const matched = this.findAnchor(anchor);
-    if (matched === undefined) {
-      throw new RangeError('The provided anchor is not in the anchor list');
-    }
-    this.cancelAnimation();
-    this.currentAnchorState = matched;
-    if (this.maxExpansionWidth !== PaneExpansionUnspecified) {
-      const offset = anchorPosition(matched, this.maxExpansionWidth, this.measuredDirection);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
-    }
-    this.notify();
-  }
-
   private async animateToMatchedAnchor(
     matched: PaneExpansionAnchor,
     initialVelocity: number,
@@ -481,10 +500,7 @@ export class PaneExpansionState {
   ) {
     this.cancelAnimation();
     this.currentAnchorState = matched;
-    if (
-      this.maxExpansionWidth === PaneExpansionUnspecified ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) {
       this.notify();
       return;
     }
@@ -539,7 +555,6 @@ export class PaneExpansionState {
 
   /** AndroidX PaneExpansionState.animateTo analogue. */
   async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
-    finite(initialVelocity, 'initialVelocity');
     const matched = this.findAnchor(anchor);
     if (matched === undefined) {
       throw new RangeError('The provided anchor is not in the anchor list');
@@ -555,12 +570,7 @@ export class PaneExpansionState {
   async settleToAnchorIfNeeded(velocity: number) {
     finite(velocity, 'velocity');
     const positions = this.getIndexedAnchorPositions();
-    if (
-      positions.length === 0 ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
-      return;
-    }
+    if (positions.length === 0) return;
 
     const currentPosition = this.currentMeasuredDraggingOffset;
     let bestAnchorPosition = positions[0]!;

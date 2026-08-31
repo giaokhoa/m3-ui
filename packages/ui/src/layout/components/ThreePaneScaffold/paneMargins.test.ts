@@ -46,6 +46,32 @@ describe('applyPaneMargins', () => {
     ).toEqual({ left: 40, top: 30, width: 860, height: 620 });
   });
 
+  it('preserves Compose infinity rounding for fixed margins and ruler edges', () => {
+    expect(
+      applyPaneMargins(
+        fullPane,
+        { inlineStart: Number.POSITIVE_INFINITY },
+        1000,
+        800,
+      ),
+    ).toEqual({ left: 2147483647, top: 0, width: 0, height: 800 });
+
+    expect(
+      applyPaneMargins(
+        fullPane,
+        { insetBounds: [{ right: Number.NEGATIVE_INFINITY }] },
+        1000,
+        800,
+      ),
+    ).toEqual({ left: 0, top: 0, width: 0, height: 800 });
+  });
+
+  it('keeps negative fixed margins invalid like PaddingValues', () => {
+    expect(() =>
+      applyPaneMargins(fullPane, { inlineStart: -1 }, 1000, 800),
+    ).toThrow(RangeError);
+  });
+
   it('does not move internal pane edges that already respect outer margins', () => {
     const placement = { left: 120, top: 80, width: 300, height: 400 };
     expect(

@@ -55,11 +55,15 @@ describe('Material 3 window size classes', () => {
     });
   });
 
-  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(
-    'rejects invalid dimensions: %s',
-    (value) => {
-      expect(() => calculateWindowWidthSizeClass(value)).toThrow(RangeError);
-      expect(() => calculateWindowHeightSizeClass(value)).toThrow(RangeError);
-    },
-  );
+  it('falls back to compact for non-matching dimensions like the AndroidX selector', () => {
+    expect(calculateWindowWidthSizeClass(-1)).toBe('compact');
+    expect(calculateWindowHeightSizeClass(-1)).toBe('compact');
+    expect(calculateWindowWidthSizeClass(Number.NaN)).toBe('compact');
+    expect(calculateWindowHeightSizeClass(Number.NaN)).toBe('compact');
+  });
+
+  it('classifies positive infinity in the largest bucket', () => {
+    expect(calculateWindowWidthSizeClass(Number.POSITIVE_INFINITY)).toBe('extra-large');
+    expect(calculateWindowHeightSizeClass(Number.POSITIVE_INFINITY)).toBe('expanded');
+  });
 });

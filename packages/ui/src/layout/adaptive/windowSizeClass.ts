@@ -42,17 +42,9 @@ export const windowSizeClassBreakpoints = {
   },
 } as const;
 
-function assertDimension(value: number, name: string) {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
-  }
-}
-
 export function calculateWindowWidthSizeClass(
   width: number,
 ): WindowWidthSizeClass {
-  assertDimension(width, 'width');
-
   if (width >= windowSizeClassBreakpoints.width.extraLarge) return 'extra-large';
   if (width >= windowSizeClassBreakpoints.width.large) return 'large';
   if (width >= windowSizeClassBreakpoints.width.expanded) return 'expanded';
@@ -63,8 +55,6 @@ export function calculateWindowWidthSizeClass(
 export function calculateWindowHeightSizeClass(
   height: number,
 ): WindowHeightSizeClass {
-  assertDimension(height, 'height');
-
   if (height >= windowSizeClassBreakpoints.height.expanded) return 'expanded';
   if (height >= windowSizeClassBreakpoints.height.medium) return 'medium';
   return 'compact';

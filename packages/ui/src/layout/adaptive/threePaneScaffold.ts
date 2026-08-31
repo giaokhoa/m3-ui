@@ -42,15 +42,24 @@ export const PaneAlignment = {
 
 /**
  * React input equivalent of the @Composable scrim carried by AndroidX
- * Levitate. Functions are normalized to React elements before entering the
- * adapted value so hooks execute in a real component render boundary.
+ * Levitate. Functions are normalized to React elements so hooks execute in a
+ * real component render boundary. The normalization is memoized by function
+ * identity because AndroidX Levitated.equals compares its composable scrim by
+ * identity as well.
  */
 export type LevitatedPaneScrimContent = ReactNode | (() => ReactNode);
+
+const normalizedLevitatedPaneScrims = new WeakMap<() => ReactNode, ReactNode>();
 
 function normalizeLevitatedPaneScrim(
   scrim: LevitatedPaneScrimContent | undefined,
 ): ReactNode | undefined {
-  return typeof scrim === 'function' ? createElement(scrim) : scrim;
+  if (typeof scrim !== 'function') return scrim;
+  const cached = normalizedLevitatedPaneScrims.get(scrim);
+  if (cached !== undefined) return cached;
+  const normalized = createElement(scrim);
+  normalizedLevitatedPaneScrims.set(scrim, normalized);
+  return normalized;
 }
 
 export interface HidePaneAdaptStrategy {
@@ -218,12 +227,6 @@ export const SupportingPaneScaffoldRole = {
   Extra: ThreePaneScaffoldRole.Tertiary,
 } as const;
 
-function assertPartitionCount(value: number, name: string) {
-  if (!Number.isInteger(value) || value < 1) {
-    throw new RangeError(`${name} must be a positive integer`);
-  }
-}
-
 function strategyForRole(
   strategies: ThreePaneScaffoldAdaptStrategies,
   role: ThreePaneScaffoldRole,
@@ -254,9 +257,6 @@ export function calculateThreePaneScaffoldValue({
   adaptStrategies?: ThreePaneScaffoldAdaptStrategies;
   destinationHistory?: readonly ThreePaneScaffoldDestinationItem[];
 }): ThreePaneScaffoldValue {
-  assertPartitionCount(maxHorizontalPartitions, 'maxHorizontalPartitions');
-  assertPartitionCount(maxVerticalPartitions, 'maxVerticalPartitions');
-
   let expandedCount = 0;
   const adapted: Partial<Record<ThreePaneScaffoldRole, PaneAdaptedValue>> = {};
 

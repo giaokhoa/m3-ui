@@ -6,4 +6,9 @@ export * from './paneExpansionSemantics';
 export * from './paneMargins';
 export * from './preferredPaneSize';
 export * from './ThreePaneScaffold';
-export * from './ThreePaneScaffold.layout';
+export { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
+export type {
+  PanePlacement,
+  ThreePaneScaffoldLayout,
+  ThreePaneScaffoldLayoutOptions,
+} from './ThreePaneScaffold.layout';

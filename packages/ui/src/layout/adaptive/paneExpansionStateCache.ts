@@ -15,7 +15,7 @@ export interface PaneExpansionStateCacheOptions {
 
 interface PaneExpansionStateCacheEntry {
   readonly state: PaneExpansionState;
-  anchorsId: string;
+  anchors: readonly PaneExpansionAnchor[];
   animation: PaneExpansionAnimation;
 }
 
@@ -27,6 +27,7 @@ export function paneExpansionStateKeyId(key: PaneExpansionStateKey): string {
     : `${key.firstExpandedPane}:${key.secondExpandedPane}`;
 }
 
+/** Legacy structural diagnostic id; cache change detection uses AndroidX equality below. */
 export function paneExpansionAnchorsId(
   anchors: readonly PaneExpansionAnchor[],
 ): string {
@@ -37,6 +38,33 @@ export function paneExpansionAnchorsId(
         : `o:${anchor.direction}:${anchor.offset}`,
     )
     .join('|');
+}
+
+export function paneExpansionAnchorEquals(
+  a: PaneExpansionAnchor,
+  b: PaneExpansionAnchor,
+): boolean {
+  if (a === b) return true;
+  if (a.type !== b.type) return false;
+  if (a.type === 'proportion' && b.type === 'proportion') {
+    // AndroidX Proportion.equals uses Float == after its identity fast path.
+    return a.proportion === b.proportion;
+  }
+  return (
+    a.type === 'offset' &&
+    b.type === 'offset' &&
+    a.direction === b.direction &&
+    a.offset === b.offset
+  );
+}
+
+export function paneExpansionAnchorsEqual(
+  a: readonly PaneExpansionAnchor[],
+  b: readonly PaneExpansionAnchor[],
+): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  return a.every((anchor, index) => paneExpansionAnchorEquals(anchor, b[index]!));
 }
 
 /**
@@ -68,7 +96,7 @@ export class PaneExpansionStateCache {
     });
     this.entries.set(id, {
       state,
-      anchorsId: paneExpansionAnchorsId(anchors),
+      anchors,
       animation,
     });
     return state;
@@ -94,14 +122,13 @@ export class PaneExpansionStateCache {
 
     state.setConsumeDragDelta(consumeDragDelta);
 
-    const nextAnchorsId = paneExpansionAnchorsId(anchors);
-    const anchorsChanged = entry.anchorsId !== nextAnchorsId;
+    const anchorsChanged = !paneExpansionAnchorsEqual(entry.anchors, anchors);
     const animationChanged = entry.animation !== animation;
     if (anchorsChanged) {
       // AndroidX only lets the latest initialAnchoredIndex become the fallback
       // when the anchors themselves change.
       state.setAnchors(anchors, initialAnchoredIndex);
-      entry.anchorsId = nextAnchorsId;
+      entry.anchors = anchors;
     } else if (animationChanged) {
       // Changing anchoringAnimationSpec re-runs AndroidX restore() under the
       // PreventUserInput mutex. Re-applying the same anchors here interrupts a

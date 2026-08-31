@@ -10,6 +10,10 @@ function assertFinite(value: number, name: string) {
   }
 }
 
+function composeFloat(value: number) {
+  return Math.fround(value);
+}
+
 /**
  * Port of the critically-damped branch of AndroidX SpringSimulation.updateValues.
  * DragToResizeState uses Compose animation-core's default spring():
@@ -25,17 +29,21 @@ export function sampleDragToResizeSpring(
   assertFinite(playTimeMs, 'playTimeMs');
   if (playTimeMs <= 0 || initialValue === targetValue) return initialValue;
 
-  // FloatSpringSpec truncates animation-core nanos to whole milliseconds
-  // before querying SpringSimulation.
+  // FloatSpringSpec and SpringSimulation both receive Float state. Preserve
+  // those Float boundaries before the simulation promotes its math to Double.
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  const stiffness = composeFloat(DragToResizeSpringDefaults.stiffness);
   const elapsedSeconds = Math.floor(playTimeMs) / 1000;
-  const naturalFrequency = Math.sqrt(DragToResizeSpringDefaults.stiffness);
-  const adjustedDisplacement = initialValue - targetValue;
+  const naturalFrequency = Math.sqrt(stiffness);
+  const adjustedDisplacement = composeFloat(initial - target);
   const coefficientA = adjustedDisplacement;
   const coefficientB = naturalFrequency * adjustedDisplacement;
   const exponential = Math.exp(-naturalFrequency * elapsedSeconds);
   const displacement =
     (coefficientA + coefficientB * elapsedSeconds) * exponential;
-  return displacement + targetValue;
+  // SpringSimulation packs the returned value as Float.
+  return composeFloat(displacement + target);
 }
 
 /**
@@ -49,11 +57,17 @@ export function calculateDragToResizeSpringDurationMs(
   assertFinite(initialValue, 'initialValue');
   assertFinite(targetValue, 'targetValue');
 
-  const threshold = DragToResizeSpringDefaults.visibilityThreshold;
-  const normalizedDisplacement = Math.abs(initialValue - targetValue) / threshold;
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  const threshold = composeFloat(DragToResizeSpringDefaults.visibilityThreshold);
+  const normalizedDisplacement = Math.abs(
+    composeFloat(composeFloat(initial - target) / threshold),
+  );
   if (normalizedDisplacement <= 1) return 0;
 
-  const root = -Math.sqrt(DragToResizeSpringDefaults.stiffness);
+  // FloatSpringSpec passes Float stiffness to SpringEstimation, which then
+  // promotes it to Double for root solving.
+  const root = -Math.sqrt(composeFloat(DragToResizeSpringDefaults.stiffness));
   const coefficient1 = normalizedDisplacement;
   const coefficient2 = -root * coefficient1;
   const delta = 1;
