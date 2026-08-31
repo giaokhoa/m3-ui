@@ -87,9 +87,7 @@ export function Ripple({
       className={clsx('ripple', className)}
       data-focus-ring-radius={focusRingRadius === undefined ? undefined : true}
       data-focus-visible={
-        rippleFocus === 'opacity' && resolvedStateInteraction === 'focus'
-          ? true
-          : undefined
+        rippleFocus === 'opacity' && hasFocus ? true : undefined
       }
       data-hovered={resolvedStateInteraction === 'hover' || undefined}
       data-inset-focus-visible={
