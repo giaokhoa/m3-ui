@@ -23,6 +23,14 @@ function composeRoundToPx(value: number) {
   return Math.round(floatValue);
 }
 
+function composeFloatToInt(value: number) {
+  const floatValue = composeFloat(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
 function normalizeProportion(proportion: number, name: string) {
   const floatProportion = composeFloat(proportion);
   if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
@@ -58,5 +66,8 @@ export function resolvePanePreferredSize(
   }
 
   const proportion = normalizeProportion(preferredSize.proportion, `${name} proportion`);
-  return Math.trunc(composeFloat(composeFloat(scaffoldSize) * proportion));
+  // AndroidX evaluates Int * Float as Float and then calls Float.toInt(), which
+  // saturates values outside the Int range. Int.MAX_VALUE itself first rounds
+  // up to 2147483648f, so a 1f proportion must still resolve back to Int.MAX.
+  return composeFloatToInt(composeFloat(composeFloat(scaffoldSize) * proportion));
 }
