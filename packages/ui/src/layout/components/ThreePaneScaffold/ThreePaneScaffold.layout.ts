@@ -309,21 +309,41 @@ export function calculateThreePaneScaffoldLayoutPass({
         const halfGap = Math.trunc(horizontalGap / 2);
         if (expansion.currentDraggingOffset <= halfGap) {
           const bounds = expansion.isDraggingOrSettling
-            ? { ...outerBounds, left: expansion.currentDraggingOffset * 2 }
+            ? {
+                ...outerBounds,
+                left: composeIntAdd(
+                  composeIntMultiply(expansion.currentDraggingOffset, 2),
+                  outerBounds.left,
+                ),
+              }
             : outerBounds;
           placePartition(bounds, secondPane);
-        } else if (expansion.currentDraggingOffset >= width - halfGap) {
+        } else if (
+          expansion.currentDraggingOffset >= composeIntSubtract(width, halfGap)
+        ) {
           const bounds = expansion.isDraggingOrSettling
-            ? { ...outerBounds, right: expansion.currentDraggingOffset * 2 - width }
+            ? {
+                ...outerBounds,
+                right: composeIntSubtract(
+                  composeIntMultiply(expansion.currentDraggingOffset, 2),
+                  outerBounds.right,
+                ),
+              }
             : outerBounds;
           placePartition(bounds, firstPane);
         } else {
           placePartition(
-            { ...outerBounds, right: expansion.currentDraggingOffset - halfGap },
+            {
+              ...outerBounds,
+              right: composeIntSubtract(expansion.currentDraggingOffset, halfGap),
+            },
             firstPane,
           );
           placePartition(
-            { ...outerBounds, left: expansion.currentDraggingOffset + halfGap },
+            {
+              ...outerBounds,
+              left: composeIntAdd(expansion.currentDraggingOffset, halfGap),
+            },
             secondPane,
           );
         }
@@ -333,24 +353,24 @@ export function calculateThreePaneScaffoldLayoutPass({
       ) {
         placePartition(outerBounds, secondPane);
       } else if (
-        expansion.firstPaneWidth >= width - horizontalGap ||
+        expansion.firstPaneWidth >= composeIntSubtract(width, horizontalGap) ||
         expansion.firstPaneProportion >= 1
       ) {
         placePartition(outerBounds, firstPane);
       } else {
+        const availableWidth = composeIntSubtract(width, horizontalGap);
         const firstPaneWidth =
           expansion.firstPaneWidth !== PaneExpansionUnspecified
             ? expansion.firstPaneWidth
             : composeFloatToInt(
                 Math.fround(
-                  Math.fround(expansion.firstPaneProportion) *
-                    Math.fround(width - horizontalGap),
+                  Math.fround(expansion.firstPaneProportion) * Math.fround(availableWidth),
                 ),
               );
-        const firstPaneRight = outerBounds.left + firstPaneWidth;
+        const firstPaneRight = composeIntAdd(outerBounds.left, firstPaneWidth);
         placePartition({ ...outerBounds, right: firstPaneRight }, firstPane);
         placePartition(
-          { ...outerBounds, left: firstPaneRight + horizontalGap },
+          { ...outerBounds, left: composeIntAdd(firstPaneRight, horizontalGap) },
           secondPane,
         );
       }
