@@ -49,6 +49,7 @@ export interface MutableThreePaneScaffoldStateOptions {
 // AndroidX SeekableTransitionState has no timeline until it is attached to a Transition.
 // The web state snaps by default while unbound; the mounted scaffold supplies the real duration.
 const DefaultUnboundTransitionDurationMs = 0;
+const MillisToNanos = 1_000_000;
 
 function composeFloat(value: number) {
   return Math.fround(value);
@@ -69,6 +70,42 @@ function coerceAnimationFraction(fraction: number) {
   if (floatFraction < 0) return 0;
   if (floatFraction > 1) return 1;
   return floatFraction;
+}
+
+function composeFloatLerp(start: number, stop: number, fraction: number) {
+  const floatStart = composeFloat(start);
+  const floatStop = composeFloat(stop);
+  const floatFraction = composeFloat(fraction);
+  const inverseFraction = composeFloat(composeFloat(1) - floatFraction);
+  return composeFloat(
+    composeFloat(inverseFraction * floatStart) +
+      composeFloat(floatFraction * floatStop),
+  );
+}
+
+function composeLinearTransitionFraction(
+  from: number,
+  to: number,
+  elapsedMs: number,
+  fullDurationMs: number,
+) {
+  const floatFrom = composeFloat(from);
+  const floatTo = composeFloat(to);
+  const totalDurationNanos = Math.round(fullDurationMs * MillisToNanos);
+  const animationDurationNanos = Math.round(
+    totalDurationNanos * Math.abs(floatTo - floatFrom),
+  );
+  if (animationDurationNanos <= 0) return floatTo;
+
+  const playTimeNanos = Math.max(0, Math.round(elapsedMs * MillisToNanos));
+  if (playTimeNanos >= animationDurationNanos) return floatTo;
+
+  // SeekableTransitionState's null-spec path converts both Long nanos values
+  // to Float for division, then lerps Float start/target values.
+  const timelineFraction = composeFloat(
+    composeFloat(playTimeNanos) / composeFloat(animationDurationNanos),
+  );
+  return composeFloatLerp(floatFrom, floatTo, timelineFraction);
 }
 
 function levitatedPaneAlignmentsEqual(
@@ -137,10 +174,18 @@ function cancelFrame(id: number) {
 export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgressAnimation =
   ({ from, to, durationMs, getDurationMs, signal, update }) =>
     new Promise<void>((resolve) => {
-      const delta = to - from;
-      const initialRemainingDurationMs = Math.max(0, durationMs * Math.abs(delta));
-      if (signal.aborted || delta === 0 || initialRemainingDurationMs === 0) {
-        update(to);
+      const floatFrom = composeFloat(from);
+      const floatTo = composeFloat(to);
+      const initialRemainingDurationMs = Math.max(
+        0,
+        durationMs * Math.abs(floatTo - floatFrom),
+      );
+      if (
+        signal.aborted ||
+        floatFrom === floatTo ||
+        initialRemainingDurationMs === 0
+      ) {
+        update(floatTo);
         resolve();
         return;
       }
@@ -159,12 +204,15 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
         startTime ??= time;
         const elapsed = Math.max(0, time - startTime);
         const fullDurationMs = getDurationMs?.() ?? durationMs;
-        const remainingDurationMs = Math.max(0, fullDurationMs * Math.abs(delta));
-        const timelineFraction =
-          remainingDurationMs === 0 ? 1 : Math.min(1, elapsed / remainingDurationMs);
-        update(from + delta * timelineFraction);
-        if (timelineFraction >= 1) {
-          update(to);
+        const fraction = composeLinearTransitionFraction(
+          floatFrom,
+          floatTo,
+          elapsed,
+          fullDurationMs,
+        );
+        update(fraction);
+        if (fraction === floatTo) {
+          update(floatTo);
           finish();
           return;
         }
