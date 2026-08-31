@@ -95,7 +95,7 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
-  it('updates destination-only metadata without starting motion', async () => {
+  it('ignores destination-only targets like ThreePaneScaffoldValue.equals', async () => {
     const secondaryDestination: ThreePaneScaffoldValue = {
       ...primary,
       currentDestination: ThreePaneScaffoldRole.Secondary,
@@ -103,14 +103,14 @@ describe('MutableThreePaneScaffoldState', () => {
 
     const snapState = attachedState(primary);
     snapState.snapTo(secondaryDestination);
-    expect(snapState.currentState).toBe(secondaryDestination);
-    expect(snapState.targetState).toBe(secondaryDestination);
+    expect(snapState.currentState).toBe(primary);
+    expect(snapState.targetState).toBe(primary);
     expect(snapState.isTransitionActive).toBe(false);
 
     const seekState = attachedState(primary);
     seekState.seekTo(0.5, secondaryDestination, true);
-    expect(seekState.currentState).toBe(secondaryDestination);
-    expect(seekState.targetState).toBe(secondaryDestination);
+    expect(seekState.currentState).toBe(primary);
+    expect(seekState.targetState).toBe(primary);
     expect(seekState.progressFraction).toBe(0);
     expect(seekState.isTransitionActive).toBe(false);
     expect(seekState.isPredictiveBackInProgress).toBe(true);
@@ -123,8 +123,8 @@ describe('MutableThreePaneScaffoldState', () => {
       },
     });
     expect(animationCalled).toBe(false);
-    expect(animateState.currentState).toBe(secondaryDestination);
-    expect(animateState.targetState).toBe(secondaryDestination);
+    expect(animateState.currentState).toBe(primary);
+    expect(animateState.targetState).toBe(primary);
     expect(animateState.isTransitionActive).toBe(false);
     expect(animateState.isPredictiveBackInProgress).toBe(false);
   });
@@ -324,15 +324,15 @@ describe('MutableThreePaneScaffoldState', () => {
     const repeated = state.animateTo(structurallyEqualPrimary);
 
     expect(animationCalls).toBe(1);
-    expect(state.targetState).toBe(structurallyEqualPrimary);
+    expect(state.targetState).toBe(primary);
     expect(state.progressFraction).toBe(0.4);
 
     finishRunning();
     await Promise.all([first, repeated]);
 
     expect(animationCalls).toBe(1);
-    expect(state.currentState).toBe(structurallyEqualPrimary);
-    expect(state.targetState).toBe(structurallyEqualPrimary);
+    expect(state.currentState).toBe(primary);
+    expect(state.targetState).toBe(primary);
     expect(state.progressFraction).toBe(0);
   });
 
