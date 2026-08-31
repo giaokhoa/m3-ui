@@ -405,7 +405,7 @@ export function ThreePaneScaffold({
   useLayoutEffect(() => {
     if (value === undefined || internalScaffoldStateRef.current === null) return;
     void internalScaffoldStateRef.current.animateTo(value);
-  }, [value]);
+  }, [geometry.width, value]);
 
   useLayoutEffect(() => {
     if (
