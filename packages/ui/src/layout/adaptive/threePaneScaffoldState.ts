@@ -283,6 +283,33 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.animationController = null;
   }
 
+  private updateSettledMetadata(
+    targetState: ThreePaneScaffoldValue,
+    predictiveBack: boolean,
+  ) {
+    if (
+      !threePaneScaffoldValuesEqual(this.currentStateValue, targetState) ||
+      !threePaneScaffoldValuesEqual(this.targetStateValue, targetState)
+    ) {
+      return false;
+    }
+    const destinationChanged =
+      this.currentStateValue.currentDestination !== targetState.currentDestination ||
+      this.targetStateValue.currentDestination !== targetState.currentDestination;
+    const predictiveBackChanged = this.predictiveBack !== predictiveBack;
+    if (destinationChanged) {
+      this.currentStateValue = targetState;
+      this.targetStateValue = targetState;
+    }
+    if (predictiveBackChanged) {
+      this.predictiveBack = predictiveBack;
+    }
+    if (destinationChanged || predictiveBackChanged) {
+      this.notify();
+    }
+    return true;
+  }
+
   private resolveTransitionDurationMs(
     currentState: ThreePaneScaffoldValue,
     targetState: ThreePaneScaffoldValue,
@@ -342,16 +369,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   /** Snap current and target to the same value and cancel any active transition. */
   snapTo(targetState: ThreePaneScaffoldValue) {
+    if (this.updateSettledMetadata(targetState, false)) return;
     this.cancelAnimation();
-    const predictiveBackChanged = this.predictiveBack;
     this.predictiveBack = false;
-    if (
-      threePaneScaffoldValuesEqual(this.currentStateValue, targetState) &&
-      threePaneScaffoldValuesEqual(this.targetStateValue, targetState)
-    ) {
-      if (predictiveBackChanged) this.notify();
-      return;
-    }
     this.currentStateValue = targetState;
     this.targetStateValue = targetState;
     this.progressFractionValue = 0;
@@ -368,20 +388,12 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     isPredictiveBackInProgress = false,
   ) {
     const resolvedFraction = clampFraction(fraction);
+    if (this.updateSettledMetadata(targetState, isPredictiveBackInProgress)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.cancelAnimation();
-    const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
     this.predictiveBack = isPredictiveBackInProgress;
-
-    if (!targetChanged && threePaneScaffoldValuesEqual(this.currentStateValue, targetState)) {
-      if (predictiveBackChanged) this.notify();
-      return;
-    }
-
-    if (targetChanged) {
-      this.targetStateValue = targetState;
-    }
+    this.targetStateValue = targetState;
     this.progressFractionValue = threePaneScaffoldValuesEqual(
       this.currentStateValue,
       this.targetStateValue,
@@ -389,6 +401,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       ? 0
       : resolvedFraction;
     this.notify();
+    void targetChanged;
   }
 
   /**
@@ -404,16 +417,11 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       isPredictiveBackInProgress = false,
     }: ThreePaneScaffoldAnimateOptions = {},
   ) {
+    if (this.updateSettledMetadata(targetState, false)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
-
-    if (!targetChanged && threePaneScaffoldValuesEqual(this.currentStateValue, oldTarget)) {
-      this.cancelAnimation();
-      const predictiveBackChanged = this.predictiveBack;
-      this.predictiveBack = false;
-      if (predictiveBackChanged) this.notify();
-      return;
-    }
+    const targetMetadataChanged =
+      oldTarget.currentDestination !== targetState.currentDestination;
 
     const runningAnimation = this.activeAnimation;
     if (
@@ -423,9 +431,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       runningAnimation.driver === animation &&
       threePaneScaffoldValuesEqual(runningAnimation.targetState, targetState)
     ) {
+      if (targetMetadataChanged) this.targetStateValue = targetState;
       const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
       this.predictiveBack = isPredictiveBackInProgress;
-      if (predictiveBackChanged) this.notify();
+      if (targetMetadataChanged || predictiveBackChanged) this.notify();
       await runningAnimation.completion;
       return;
     }
@@ -440,6 +449,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       this.currentStateValue = oldTarget;
       this.targetStateValue = targetState;
       this.progressFractionValue = 0;
+    } else {
+      this.targetStateValue = targetState;
     }
 
     const resolvedCurrent = this.currentStateValue;
@@ -465,7 +476,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       // wrapper state in finally even when SeekableTransitionState setup fails.
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
-      if (predictiveBackChanged) this.notify();
+      if (predictiveBackChanged || targetMetadataChanged) this.notify();
       throw error;
     }
 
@@ -490,7 +501,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
         from: startingFraction,
         to: 1,
         durationMs,
-        getDurationMs: () => this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget),
+        getDurationMs: () => this.resolveTransitionDurationMs(resolvedCurrent, this.targetStateValue),
         signal: controller.signal,
         update: (fraction) => {
           if (controller.signal.aborted) return;
@@ -499,8 +510,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
         },
       });
       if (controller.signal.aborted) return;
-      this.currentStateValue = resolvedTarget;
-      this.targetStateValue = resolvedTarget;
+      const committedTarget = this.targetStateValue;
+      this.currentStateValue = committedTarget;
+      this.targetStateValue = committedTarget;
       this.progressFractionValue = 0;
     } finally {
       if (this.animationController === controller) {
