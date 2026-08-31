@@ -8,6 +8,12 @@ interface RectInput {
   height: number;
 }
 
+interface CandidateOptions {
+  tabIndex?: number;
+  programmaticallyFocusable?: boolean;
+  disabled?: boolean;
+}
+
 function rect({ left, top, width, height }: RectInput): DOMRect {
   return {
     left,
@@ -22,11 +28,19 @@ function rect({ left, top, width, height }: RectInput): DOMRect {
   } as DOMRect;
 }
 
-function candidate(bounds: RectInput, tabIndex = 0) {
+function candidate(
+  bounds: RectInput,
+  {
+    tabIndex = 0,
+    programmaticallyFocusable = true,
+    disabled = false,
+  }: CandidateOptions = {},
+) {
   const focus = vi.fn();
   return {
     tabIndex,
-    matches: () => false,
+    matches: (selector: string) =>
+      selector === ':disabled' ? disabled : programmaticallyFocusable,
     closest: () => null,
     getBoundingClientRect: () => rect(bounds),
     focus,
@@ -75,10 +89,33 @@ describe('ThreePaneScaffold destination focus', () => {
     expect(only.focus).toHaveBeenCalledWith({ preventScroll: true });
   });
 
-  it('does not focus the pane when it has no eligible focus child', () => {
-    const excluded = candidate({ left: 20, top: 20, width: 80, height: 40 }, -1);
+  it('includes explicit tabindex=-1 descendants in programmatic focus enter', () => {
+    const programmaticOnly = candidate(
+      { left: 20, top: 20, width: 80, height: 40 },
+      { tabIndex: -1 },
+    );
 
-    expect(requestPaneDestinationFocus(pane([excluded]))).toBe(false);
-    expect(excluded.focus).not.toHaveBeenCalled();
+    expect(requestPaneDestinationFocus(pane([programmaticOnly]))).toBe(true);
+    expect(programmaticOnly.focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it('ignores generic descendants that merely report the default tabIndex=-1', () => {
+    const generic = candidate(
+      { left: 20, top: 20, width: 80, height: 40 },
+      { tabIndex: -1, programmaticallyFocusable: false },
+    );
+
+    expect(requestPaneDestinationFocus(pane([generic]))).toBe(false);
+    expect(generic.focus).not.toHaveBeenCalled();
+  });
+
+  it('ignores disabled focus targets', () => {
+    const disabled = candidate(
+      { left: 20, top: 20, width: 80, height: 40 },
+      { disabled: true },
+    );
+
+    expect(requestPaneDestinationFocus(pane([disabled]))).toBe(false);
+    expect(disabled.focus).not.toHaveBeenCalled();
   });
 });
