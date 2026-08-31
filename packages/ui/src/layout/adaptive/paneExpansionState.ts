@@ -593,10 +593,19 @@ export class PaneExpansionState {
         },
       });
     } finally {
+      if (mutexOwned && this.settleAnimationController !== controller) {
+        // A competing drag/restore mutation already performed the cancellation
+        // finalization synchronously before taking ownership. The suspended
+        // animation promise may resume later; that stale finally must not write
+        // its old target into the new data bucket or clear a newer settle.
+        return;
+      }
+
       // AndroidX animateToInternal assigns the target in finally, including
-      // cancellation and animation exceptions.
+      // cancellation and animation exceptions. For mutex-owned cancellation,
+      // cancelSettlingAnimation() performs this before relinquishing ownership.
       this.setAnimatedOffset(targetOffset);
-      if (mutexOwned && this.settleAnimationController === controller) {
+      if (mutexOwned) {
         this.settleAnimationController = null;
         this.settleAnimationTargetOffset = PaneExpansionUnspecified;
       }
