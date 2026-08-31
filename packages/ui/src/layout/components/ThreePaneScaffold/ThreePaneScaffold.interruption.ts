@@ -153,6 +153,22 @@ function retainedTimelineAdvanceMs(track: PaneTransitionTrack, elapsedMs: number
   return Math.max(0, currentPlayTimeNanos - initialPlayTimeNanos) / MillisToNanos;
 }
 
+function advancedRetainedTimelineProgressMs(
+  track: PaneTransitionTrack,
+  elapsedMs: number,
+) {
+  if (
+    track.retainedTimelineDurationMs === undefined ||
+    track.retainedTimelineStartFraction === undefined
+  ) {
+    return undefined;
+  }
+  const progressNanos =
+    Math.max(0, Math.round((track.retainedTimelineProgressMs ?? 0) * MillisToNanos)) +
+    Math.max(0, Math.round(Math.max(0, elapsedMs) * MillisToNanos));
+  return progressNanos / MillisToNanos;
+}
+
 function sampleOwnAnimation(
   track: PaneTransitionTrack,
   playTimeMs: number,
@@ -352,12 +368,7 @@ export function capturePaneTransitionTrack(
       retainedTimelineDurationMs: undefined,
       retainedTimelineStartFraction: undefined,
       retainedTimelineProgressMs: undefined,
-      initialValueAnimation: {
-        ...capturedRetained,
-        retainedTimelineDurationMs: undefined,
-        retainedTimelineStartFraction: undefined,
-        retainedTimelineProgressMs: undefined,
-      },
+      initialValueAnimation: capturedRetained,
       useOnlyInitialValue: true,
     };
   }
@@ -368,9 +379,9 @@ export function capturePaneTransitionTrack(
     playTimeMs: localPlayTimeMs,
     seekStartPlayTimeMs: undefined,
     retainedCompletionPlayTimeMs: track.retainedCompletionPlayTimeMs,
-    retainedTimelineDurationMs: undefined,
-    retainedTimelineStartFraction: undefined,
-    retainedTimelineProgressMs: undefined,
+    retainedTimelineDurationMs: track.retainedTimelineDurationMs,
+    retainedTimelineStartFraction: track.retainedTimelineStartFraction,
+    retainedTimelineProgressMs: advancedRetainedTimelineProgressMs(track, safeElapsedMs),
     initialValueAnimation: undefined,
   };
 }
