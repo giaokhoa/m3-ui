@@ -14,7 +14,8 @@
     "./chip.css": "./dist/generated/chip.css",
     "./text-field.css": "./dist/generated/text-field.css",
     "./elevation.css": "./dist/generated/elevation.css",
-    "./ripple.css": "./dist/generated/ripple.css"
+    "./ripple.css": "./dist/generated/ripple.css",
+    "./theme.css": "./dist/generated/theme.css"
   },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
