@@ -1,4 +1,5 @@
 import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
+import { paneScaffoldRolesEqual } from '../../adaptive/paneScaffoldRole';
 import {
   PaneExpansionUnspecified,
   type PaneExpansionState,
@@ -199,7 +200,7 @@ export function calculateThreePaneScaffoldLayoutPass({
     if (
       reflowed !== undefined &&
       reflowValue?.type === 'reflowed' &&
-      reflowValue.reflowUnder === expandedRole
+      paneScaffoldRolesEqual(reflowValue.reflowUnder, expandedRole)
     ) {
       const availableHeight = rectHeight(bounds) - verticalGap;
       const expandedRawHeight = Math.max(
