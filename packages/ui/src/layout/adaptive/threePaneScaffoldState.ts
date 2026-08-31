@@ -519,6 +519,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.transitionDurationResolver = resolver;
 
     if (
+      this.progressFractionValue < 1 &&
       this.activeDefaultAnimationStartFraction !== null &&
       this.activeDefaultAnimationDurationMs !== null &&
       !threePaneScaffoldValuesEqual(this.currentStateValue, this.targetStateValue)
