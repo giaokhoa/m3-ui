@@ -5,6 +5,7 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from './threePaneScaffold';
+import { assertThreePaneScaffoldHorizontalOrder } from './threePaneScaffoldHorizontalOrder';
 
 export type PaneMotion =
   | 'no-motion'
@@ -111,6 +112,7 @@ export function calculateThreePaneMotion(
   currentValue: ThreePaneScaffoldValue,
   paneOrder: ThreePaneScaffoldHorizontalOrder,
 ): ThreePaneMotion {
+  assertThreePaneScaffoldHorizontalOrder(paneOrder);
   const numOfPanes: number = paneOrder.length;
   const paneMotionTypes: PaneMotionType[] = Array.from({ length: numOfPanes }, () => 'hidden');
   const paneMotions: PaneMotion[] = Array.from(
