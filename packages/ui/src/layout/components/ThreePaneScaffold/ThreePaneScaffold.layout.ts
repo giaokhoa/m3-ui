@@ -385,7 +385,10 @@ export function calculateThreePaneScaffoldLayoutPass({
         right: excluded.left,
         bottom: outerBounds.bottom,
       });
-      actualLeft = Math.max(excluded.right, excluded.left + horizontalGap);
+      actualLeft = Math.max(
+        excluded.right,
+        composeIntAdd(excluded.left, horizontalGap),
+      );
     }
   }
   if (actualLeft < actualRight) {
