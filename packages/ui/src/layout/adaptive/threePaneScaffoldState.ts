@@ -529,7 +529,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
         this.currentStateValue,
         this.targetStateValue,
       );
-      if (currentDurationMs !== previousDurationMs) {
+      if (
+        composeDurationNanos(currentDurationMs) !==
+        composeDurationNanos(previousDurationMs)
+      ) {
         const progressNanos = composeDurationNanos(this.activeDefaultAnimationProgressMs);
         const totalDurationNanos = composeDurationNanos(currentDurationMs);
         if (progressNanos > totalDurationNanos) {
@@ -756,7 +759,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
               const previousDurationMs = this.activeDefaultAnimationDurationMs;
               if (
                 previousDurationMs !== null &&
-                currentDurationMs !== previousDurationMs &&
+                composeDurationNanos(currentDurationMs) !==
+                  composeDurationNanos(previousDurationMs) &&
                 composeDurationNanos(this.activeDefaultAnimationProgressMs) >
                   composeDurationNanos(currentDurationMs)
               ) {
