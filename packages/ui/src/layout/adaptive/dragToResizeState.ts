@@ -73,10 +73,11 @@ function composeRoundToPx(value: number) {
 }
 
 function composeFloatToInt(value: number) {
-  if (Number.isNaN(value)) return 0;
-  if (value >= ComposeIntMax) return ComposeIntMax;
-  if (value <= ComposeIntMin) return ComposeIntMin;
-  return Math.trunc(value);
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
 }
 
 function resolvedConstraint(value: number | undefined, unspecified: number) {
@@ -260,19 +261,20 @@ export class DragToResizeState {
   }
 
   private setSize(value: number) {
+    const floatValue = Math.fround(value);
     if (!this.rangeIsEmpty) {
-      if (value <= this.rangeStart) {
+      if (floatValue <= this.rangeStart) {
         this.valueInternal = DragToResizeValue.Collapsed;
         this.sizeInternal = this.rangeStart;
         return;
       }
-      if (value >= this.rangeEnd) {
+      if (floatValue >= this.rangeEnd) {
         this.valueInternal = DragToResizeValue.Expanded;
         this.sizeInternal = this.rangeEnd;
         return;
       }
     }
-    this.sizeInternal = value;
+    this.sizeInternal = floatValue;
   }
 
   private get defaultSize() {
@@ -321,10 +323,12 @@ export class DragToResizeState {
       scaffoldSize,
     );
 
-    this.rangeStart = minimum;
-    this.rangeEnd = maximum;
-    this.rangeIsEmpty = minimum > maximum;
-    this.lastMeasuredSize = measuringSize;
+    // AndroidX converts the IntRange produced by measurement into a Float
+    // range, so keep both boundaries at Float32 precision before coercion.
+    this.rangeStart = Math.fround(minimum);
+    this.rangeEnd = Math.fround(maximum);
+    this.rangeIsEmpty = this.rangeStart > this.rangeEnd;
+    this.lastMeasuredSize = Math.fround(measuringSize);
 
     const nextSize = Number.isNaN(this.sizeInternal)
       ? this.targetSize(this.valueInternal)
@@ -347,9 +351,9 @@ export class DragToResizeState {
     // AndroidX only ignores a drag while the state itself is still NaN. Raw
     // deltas then flow through the Float range setter without extra validation.
     if (Number.isNaN(this.sizeInternal)) return;
-    const actualDelta = this.convertDelta(delta, direction);
+    const actualDelta = Math.fround(this.convertDelta(Math.fround(delta), direction));
     this.valueInternal = DragToResizeValue.Dragged;
-    this.setSize(this.sizeInternal + actualDelta);
+    this.setSize(Math.fround(this.sizeInternal + actualDelta));
     this.lastDraggedSize = this.sizeInternal;
     this.notify();
   }
