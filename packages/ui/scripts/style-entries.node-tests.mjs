@@ -11,6 +11,7 @@ import {
 } from './style-entries.mjs';
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const themeTokenCss = '../tokens/dist/generated/theme.css';
 const rippleCss = 'src/internal/ripple/ripple.css';
 const rippleTokenCss = '../tokens/dist/generated/ripple.css';
 const elevationCss = 'src/internal/elevation/elevation.css';
@@ -39,6 +40,17 @@ test('every public CSS-bearing component has exactly one modular entry', () => {
       sources.at(-1),
       ownCss,
       `${name} component CSS must come after shared primitive CSS`,
+    );
+  }
+});
+
+test('every modular entry starts with the generated theme foundation', () => {
+  for (const [name, sources] of Object.entries(styleEntries)) {
+    const expanded = expandStyleSources(sources);
+    assert.equal(
+      expanded[0],
+      themeTokenCss,
+      `${name} must load the generated theme foundation first`,
     );
   }
 });
