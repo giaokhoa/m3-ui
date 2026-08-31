@@ -1,8 +1,10 @@
 import {
   PaneExpansionState,
+  PaneExpansionUnspecified,
   defaultPaneExpansionAnimation,
   type PaneExpansionAnchor,
   type PaneExpansionAnimation,
+  type PaneExpansionPersistentData,
 } from './paneExpansionState';
 import type { PaneExpansionStateKey } from './paneExpansionStateKey';
 
@@ -14,7 +16,7 @@ export interface PaneExpansionStateCacheOptions {
 }
 
 interface PaneExpansionStateCacheEntry {
-  readonly state: PaneExpansionState;
+  data: PaneExpansionPersistentData;
 }
 
 const identityConsumeDragDelta = (delta: number) => delta;
@@ -65,16 +67,33 @@ export function paneExpansionAnchorsEqual(
   return a.every((anchor, index) => paneExpansionAnchorEquals(anchor, b[index]!));
 }
 
+function initialPersistentData(
+  anchors: readonly PaneExpansionAnchor[],
+  initialAnchoredIndex: number,
+): PaneExpansionPersistentData {
+  if (initialAnchoredIndex < -1 || initialAnchoredIndex >= anchors.length) {
+    throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
+  }
+  return {
+    firstPaneWidth: PaneExpansionUnspecified,
+    firstPaneProportion: Number.NaN,
+    currentDraggingOffset: PaneExpansionUnspecified,
+    currentAnchor:
+      initialAnchoredIndex === -1 ? null : anchors[initialAnchoredIndex] ?? null,
+  };
+}
+
 /**
  * Hook-lifetime browser analogue of AndroidX rememberPersistentlyWithKey.
  *
- * The individual data buckets are currently represented by PaneExpansionState
- * instances, but restore scheduling follows rememberPaneExpansionState itself:
- * key changes always rerun restore, while initialAnchoredIndex only replaces
- * the fallback anchor when the structurally-compared anchor list changes.
+ * AndroidX persists only PaneExpansionStateData per key. PaneExpansionState
+ * itself is created by remember once and stays stable while restore swaps the
+ * active data bucket. Keep that split here so measurement, direction,
+ * subscriptions and drag runtime are not accidentally cached per key.
  */
 export class PaneExpansionStateCache {
   private readonly entries = new Map<string, PaneExpansionStateCacheEntry>();
+  private state: PaneExpansionState | null = null;
   private activeKeyId: string | null = null;
   private rememberedAnchors: readonly PaneExpansionAnchor[] | null = null;
   private fallbackInitialAnchoredIndex = -1;
@@ -90,23 +109,31 @@ export class PaneExpansionStateCache {
     }: PaneExpansionStateCacheOptions = {},
   ): PaneExpansionState {
     const id = paneExpansionStateKeyId(key);
-    const existing = this.entries.get(id);
-    if (existing !== undefined) return existing.state;
 
-    const state = new PaneExpansionState({
-      anchors,
-      initialAnchoredIndex,
-      consumeDragDelta,
-      animation,
-    });
-    this.entries.set(id, { state });
-    if (this.activeKeyId === null) {
+    if (!this.entries.has(id)) {
+      this.entries.set(id, {
+        data: initialPersistentData(anchors, initialAnchoredIndex),
+      });
+    }
+
+    if (this.state === null) {
+      this.state = new PaneExpansionState({
+        anchors,
+        initialAnchoredIndex,
+        consumeDragDelta,
+        animation,
+      });
+      this.entries.get(id)!.data = this.state.capturePersistentData();
       this.activeKeyId = id;
       this.rememberedAnchors = anchors;
       this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
       this.rememberedAnimation = animation;
     }
-    return state;
+
+    // Like remember { PaneExpansionState(...) }, the object identity does not
+    // change when rememberPersistentlyWithKey selects another data bucket.
+    // The effect-driven update() below performs the actual restore.
+    return this.state;
   }
 
   update(
@@ -141,12 +168,21 @@ export class PaneExpansionStateCache {
       this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
     }
 
+    if (keyChanged && this.activeKeyId !== null) {
+      const previousEntry = this.entries.get(this.activeKeyId);
+      if (previousEntry !== undefined) {
+        previousEntry.data = state.capturePersistentData();
+      }
+    }
+
     if (keyChanged || anchorsChanged || animationChanged) {
+      const data = keyChanged
+        ? this.entries.get(id)!.data
+        : state.capturePersistentData();
       // LaunchedEffect(key, anchors, anchoringAnimationSpec, flingBehavior)
-      // always calls restore when any of those keys changes. The fallback index
-      // is associated with the latest structurally-distinct anchors, not with
-      // each persistent PaneExpansionStateKey entry.
-      state.setAnchors(anchors, this.fallbackInitialAnchoredIndex);
+      // always calls restore when any key changes. The fallback index belongs
+      // to the call-site remember(anchors), not to each persistent data key.
+      state.restorePersistentData(data, anchors, this.fallbackInitialAnchoredIndex);
     }
 
     state.setAnimation(animation);
