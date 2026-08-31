@@ -1,6 +1,13 @@
 import { createElement, type ReactNode } from 'react';
 import type { DragToResizeState } from './dragToResizeState';
+import type { LevitatedPaneCustomAlignment } from './levitatedPaneAlignment';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
+
+export type {
+  LevitatedPaneCustomAlignment,
+  LevitatedPaneOffset,
+  LevitatedPaneSize,
+} from './levitatedPaneAlignment';
 
 export type ThreePaneScaffoldRole = 'primary' | 'secondary' | 'tertiary';
 
@@ -16,7 +23,7 @@ export type ThreePaneScaffoldHorizontalOrder = readonly [
   ThreePaneScaffoldRole,
 ];
 
-export type LevitatedPaneAlignment =
+export type LevitatedPaneAlignmentPreset =
   | 'top-start'
   | 'top-center'
   | 'top-end'
@@ -26,6 +33,14 @@ export type LevitatedPaneAlignment =
   | 'bottom-start'
   | 'bottom-center'
   | 'bottom-end';
+
+/**
+ * AndroidX accepts any Alignment implementation for levitated panes. The web
+ * keeps the built-in presets and also accepts custom alignment objects.
+ */
+export type LevitatedPaneAlignment =
+  | LevitatedPaneAlignmentPreset
+  | LevitatedPaneCustomAlignment;
 
 /** Web equivalents of Compose Alignment presets used by levitated panes. */
 export const PaneAlignment = {
@@ -38,7 +53,7 @@ export const PaneAlignment = {
   BottomStart: 'bottom-start',
   BottomCenter: 'bottom-center',
   BottomEnd: 'bottom-end',
-} as const satisfies Record<string, LevitatedPaneAlignment>;
+} as const satisfies Record<string, LevitatedPaneAlignmentPreset>;
 
 /**
  * React input equivalent of the @Composable scrim carried by AndroidX
