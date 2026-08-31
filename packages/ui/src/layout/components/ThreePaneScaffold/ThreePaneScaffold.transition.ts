@@ -507,7 +507,10 @@ function prepareTransition({
       case PaneMotion.EnterWithExpand:
         if (targetPlacement !== undefined) {
           const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
-          const initialOffset = hiddenLeft - roleMotionData.targetPosition.x;
+          const initialOffset = composeIntSubtract(
+            hiddenLeft,
+            roleMotionData.targetPosition.x,
+          );
           const collapsedPlacement = { ...targetPlacement, width: 0 };
           visibilityDurationMs = Math.max(
             visibilityDurationMs,
@@ -519,7 +522,10 @@ function prepareTransition({
       case PaneMotion.ExitWithShrink:
         if (currentPlacement !== undefined) {
           const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
-          const targetOffset = hidingLeft - roleMotionData.originPosition.x;
+          const targetOffset = composeIntSubtract(
+            hidingLeft,
+            roleMotionData.originPosition.x,
+          );
           visibilityDurationMs = Math.max(
             visibilityDurationMs,
             calculateRegularOffsetDuration(0, targetOffset),
@@ -722,7 +728,10 @@ export function calculateThreePaneScaffoldTransitionFrame({
       case PaneMotion.EnterWithExpand: {
         const paneIndex = physicalOrder.indexOf(role);
         const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
-        const initialOffset = hiddenLeft - motionData[paneIndex]!.targetPosition.x;
+        const initialOffset = composeIntSubtract(
+          hiddenLeft,
+          motionData[paneIndex]!.targetPosition.x,
+        );
         translateX = sampleRegularOffset(initialOffset, 0, visibilityPlayTimeMs);
         const collapsedPlacement = { ...placement, width: 0 };
         const animatedWidth = sampleHorizontalSize(
@@ -738,7 +747,10 @@ export function calculateThreePaneScaffoldTransitionFrame({
         placement = currentPlacement!;
         const paneIndex = physicalOrder.indexOf(role);
         const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
-        const targetOffset = hidingLeft - motionData[paneIndex]!.originPosition.x;
+        const targetOffset = composeIntSubtract(
+          hidingLeft,
+          motionData[paneIndex]!.originPosition.x,
+        );
         translateX = sampleRegularOffset(0, targetOffset, visibilityPlayTimeMs);
         const animatedWidth = sampleHorizontalSize(placement, 0, visibilityPlayTimeMs);
         inlineClipFraction =
