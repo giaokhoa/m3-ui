@@ -341,7 +341,7 @@ describe('PaneExpansionState', () => {
     expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
-  it('does not cancel active anchor settling from raw delta alone', async () => {
+  it('does not cancel a public anchor animation from raw delta alone', async () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0.25),
       PaneExpansionAnchor.proportion(0.75),
@@ -379,16 +379,19 @@ describe('PaneExpansionState', () => {
     expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
-  it('cancels active anchor settling when direct dragging resumes', async () => {
+  it('does not cancel a public anchor animation when direct dragging resumes', async () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0.25),
       PaneExpansionAnchor.proportion(0.75),
     ];
     let updateAnimation: ((offset: number) => void) | undefined;
+    let finishAnimation: (() => void) | undefined;
+    let animationSignal: AbortSignal | undefined;
     const animation: PaneExpansionAnimation = ({ signal, update }) => {
+      animationSignal = signal;
       updateAnimation = update;
       return new Promise<void>((resolve) => {
-        signal.addEventListener('abort', () => resolve(), { once: true });
+        finishAnimation = resolve;
       });
     };
     const state = new PaneExpansionState({
@@ -400,15 +403,55 @@ describe('PaneExpansionState', () => {
 
     const transition = state.animateTo(anchors[1]!);
     updateAnimation!(500);
-    expect(state.isSettling).toBe(true);
 
     state.beginDrag();
-    await transition;
-    expect(state.isSettling).toBe(false);
+    expect(animationSignal?.aborted).toBe(false);
+    expect(state.isSettling).toBe(true);
     expect(state.isDragging).toBe(true);
     expect(state.getLayoutState(1000).currentDraggingOffset).toBe(500);
 
     updateAnimation!(700);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(500);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(700);
+
+    finishAnimation!();
+    await transition;
+    expect(state.isSettling).toBe(false);
+    expect(state.isDragging).toBe(true);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+  });
+
+  it('cancels a mutex-owned settle when direct dragging resumes and snaps its target', async () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.75),
+    ];
+    let updateAnimation: ((offset: number) => void) | undefined;
+    let animationSignal: AbortSignal | undefined;
+    const animation: PaneExpansionAnimation = ({ signal, update }) => {
+      animationSignal = signal;
+      updateAnimation = update;
+      return new Promise<void>((resolve) => {
+        signal.addEventListener('abort', () => resolve(), { once: true });
+      });
+    };
+    const state = new PaneExpansionState({ anchors, animation });
+    state.onMeasured(1000);
+    state.onExpansionOffsetMeasured(500);
+
+    const transition = state.settleToAnchorIfNeeded(250);
+    updateAnimation!(600);
+    expect(state.currentAnchor).toBe(anchors[1]);
+    expect(state.isSettling).toBe(true);
+
+    state.beginDrag();
+    await transition;
+
+    expect(animationSignal?.aborted).toBe(true);
+    expect(state.isSettling).toBe(false);
+    expect(state.isDragging).toBe(true);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+
+    updateAnimation!(650);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 });
