@@ -212,7 +212,6 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
         );
         update(fraction);
         if (fraction === floatTo) {
-          update(floatTo);
           finish();
           return;
         }
