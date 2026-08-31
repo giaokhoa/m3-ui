@@ -108,6 +108,7 @@ export interface ThreePaneScaffoldProps
    * drag target like AndroidX AnimatedPane.
    */
   levitatedPaneDragHandles?: Partial<Record<ThreePaneScaffoldRole, LevitatedPaneDragHandle>>;
+  /** Optional web accessible-name override for the levitated resize action. */
   levitatedPaneDragHandleAriaLabel?: string;
   /** Localized formatters for levitated resize-handle state and next action text. */
   levitatedPaneDragHandleAriaStrings?: Partial<DragToResizeHandleAriaStrings>;
@@ -248,7 +249,7 @@ export function ThreePaneScaffold({
   paneExpansionHandleAriaStrings,
   paneAriaLabels,
   levitatedPaneDragHandles,
-  levitatedPaneDragHandleAriaLabel = 'Resize pane',
+  levitatedPaneDragHandleAriaLabel,
   levitatedPaneDragHandleAriaStrings,
   className,
   style,
@@ -722,14 +723,14 @@ export function ThreePaneScaffold({
     typeof paneExpansionDragHandle === 'function'
       ? paneExpansionDragHandle(expansionState)
       : paneExpansionDragHandle;
-  const dragHandlePercent =
-    measuredDragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
-      ? 0
-      : Math.round((measuredDragHandleOffset / geometry.width) * 100);
   const dragHandleAriaState = getPaneExpansionHandleAriaState(
     expansionState,
     paneExpansionHandleAriaStrings,
   );
+  const dragHandleAriaDescription =
+    [dragHandleAriaState.valueText, dragHandleAriaState.description]
+      .filter((value): value is string => value !== undefined)
+      .join('. ') || undefined;
   const predictiveBackScale = usePredictiveBackScale(activeScaffoldState);
 
   return (
@@ -798,8 +799,7 @@ export function ThreePaneScaffold({
           if (placement === undefined && !staticallyHidden) return null;
 
           const frameLevitated = frame?.levitated ?? adaptedValue.type === 'levitated';
-          const interactable =
-            !staticallyHidden && isPaneInteractable(targetValue, role);
+          const interactable = !staticallyHidden && isPaneInteractable(targetValue, role);
           const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
           const paneResizeState =
             adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
@@ -810,6 +810,8 @@ export function ThreePaneScaffold({
                   paneResizeState,
                   levitatedPaneDragHandleAriaStrings,
                 );
+          const paneResizeActionLabel =
+            levitatedPaneDragHandleAriaLabel ?? paneResizeAriaState?.actionDescription;
           const resizeHandleSpec = levitatedPaneDragHandles?.[role];
           const resizeHandle =
             paneResizeState === undefined
@@ -843,10 +845,12 @@ export function ThreePaneScaffold({
                   if (node === null) delete paneRefs.current[role];
                   else paneRefs.current[role] = node;
                 }}
-                className={clsx('three-pane-scaffold__pane',
+                className={clsx(
+                  'three-pane-scaffold__pane',
                   frameLevitated && 'three-pane-scaffold__pane--levitated',
                   hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-                  hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',)}
+                  hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
+                )}
                 role={interactable ? 'region' : undefined}
                 aria-label={interactable ? paneAriaLabel : undefined}
                 data-pane-role={role}
@@ -863,8 +867,8 @@ export function ThreePaneScaffold({
                     data-orientation={paneResizeState.orientation}
                     data-resize-state={paneResizeState.value}
                     role="button"
-                    aria-label={levitatedPaneDragHandleAriaLabel}
-                    aria-description={paneResizeAriaState?.description}
+                    aria-label={paneResizeActionLabel}
+                    aria-description={paneResizeAriaState?.stateDescription}
                     tabIndex={0}
                     onClick={(event) => resizeClick(event, paneResizeState)}
                     onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
@@ -883,15 +887,15 @@ export function ThreePaneScaffold({
                     className="three-pane-scaffold__levitated-resize-action"
                     data-orientation={paneResizeState.orientation}
                     data-resize-state={paneResizeState.value}
-                    aria-label={levitatedPaneDragHandleAriaLabel}
-                    aria-description={paneResizeAriaState?.description}
+                    aria-label={paneResizeActionLabel}
+                    aria-description={paneResizeAriaState?.stateDescription}
                     onClick={(event) => {
                       event.stopPropagation();
                       paneResizeState.moveToNextState();
                     }}
                     onPointerDown={(event) => event.stopPropagation()}
                   >
-                    {levitatedPaneDragHandleAriaLabel}
+                    {paneResizeActionLabel}
                   </button>
                 ) : null}
                 {hasResizeHandle ? (
@@ -906,14 +910,9 @@ export function ThreePaneScaffold({
         {showDragHandle && dragHandleOffset !== PaneExpansionUnspecified ? (
           <div
             className="three-pane-scaffold__drag-handle"
-            role="separator"
+            role="button"
             aria-label={paneExpansionHandleAriaLabel}
-            aria-description={dragHandleAriaState.description}
-            aria-orientation="vertical"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={dragHandlePercent}
-            aria-valuetext={dragHandleAriaState.valueText}
+            aria-description={dragHandleAriaDescription}
             inert={dragHandleInteractionBlocked || undefined}
             tabIndex={dragHandleInteractionBlocked ? -1 : 0}
             style={{
@@ -933,10 +932,7 @@ export function ThreePaneScaffold({
           </div>
         ) : null}
         {renderedScrim != null ? (
-          <div
-            className="three-pane-scaffold__scrim"
-            style={{ opacity: scrimOpacity }}
-          >
+          <div className="three-pane-scaffold__scrim" style={{ opacity: scrimOpacity }}>
             {renderedScrim}
           </div>
         ) : null}
