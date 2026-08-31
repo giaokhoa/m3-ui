@@ -46,9 +46,10 @@ export function resolvePanePreferredSize(
   if (preferredSize === undefined) return fallbackSize;
   if (typeof preferredSize === 'number') {
     // AndroidX accepts Dp.Unspecified or any value > 0.dp, then resolves the
-    // specified Dp with roundToPx() at pane measurement. Undefined is the web
-    // equivalent of Unspecified; Dp.Infinity becomes Constraints.Infinity.
-    if (Number.isNaN(preferredSize) || preferredSize <= 0) {
+    // specified Dp with roundToPx() at pane measurement. Preserve NaN as the
+    // Dp.Unspecified sentinel in addition to undefined, the idiomatic web form.
+    if (Number.isNaN(preferredSize)) return fallbackSize;
+    if (preferredSize <= 0) {
       throw new RangeError(
         `${name} must be a positive CSS pixel value, received ${preferredSize}`,
       );
