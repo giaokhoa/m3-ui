@@ -13,6 +13,14 @@ export interface RippleInteractionState {
   readonly isFocusVisible?: boolean;
 }
 
+export function resolveRippleStateInteraction(
+  state: RippleInteractionState,
+): RippleStateInteraction | null {
+  if (state.isHovered) return 'hover';
+  if (state.isFocusVisible) return 'focus';
+  return null;
+}
+
 export interface RippleProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   controller: RippleController;
@@ -54,11 +62,10 @@ export function Ripple({
   const currentIsFocusVisible = state?.isFocusVisible ?? isFocusVisible;
   const resolvedStateInteraction =
     stateInteraction === undefined
-      ? currentIsFocusVisible
-        ? 'focus'
-        : currentIsHovered
-          ? 'hover'
-          : null
+      ? resolveRippleStateInteraction({
+          isHovered: currentIsHovered,
+          isFocusVisible: currentIsFocusVisible,
+        })
       : stateInteraction;
   const hasFocus = currentIsFocusVisible || resolvedStateInteraction === 'focus';
 
