@@ -15,8 +15,6 @@ export interface PaneExpansionStateCacheOptions {
 
 interface PaneExpansionStateCacheEntry {
   readonly state: PaneExpansionState;
-  anchors: readonly PaneExpansionAnchor[];
-  animation: PaneExpansionAnimation;
 }
 
 const identityConsumeDragDelta = (delta: number) => delta;
@@ -69,11 +67,18 @@ export function paneExpansionAnchorsEqual(
 
 /**
  * Hook-lifetime browser analogue of AndroidX rememberPersistentlyWithKey.
- * Entries are indexed structurally so newly-created equivalent key objects
- * restore the same remembered PaneExpansionState.
+ *
+ * The individual data buckets are currently represented by PaneExpansionState
+ * instances, but restore scheduling follows rememberPaneExpansionState itself:
+ * key changes always rerun restore, while initialAnchoredIndex only replaces
+ * the fallback anchor when the structurally-compared anchor list changes.
  */
 export class PaneExpansionStateCache {
   private readonly entries = new Map<string, PaneExpansionStateCacheEntry>();
+  private activeKeyId: string | null = null;
+  private rememberedAnchors: readonly PaneExpansionAnchor[] | null = null;
+  private fallbackInitialAnchoredIndex = -1;
+  private rememberedAnimation: PaneExpansionAnimation | null = null;
 
   getOrCreate(
     key: PaneExpansionStateKey,
@@ -94,11 +99,13 @@ export class PaneExpansionStateCache {
       consumeDragDelta,
       animation,
     });
-    this.entries.set(id, {
-      state,
-      anchors,
-      animation,
-    });
+    this.entries.set(id, { state });
+    if (this.activeKeyId === null) {
+      this.activeKeyId = id;
+      this.rememberedAnchors = anchors;
+      this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
+      this.rememberedAnimation = animation;
+    }
     return state;
   }
 
@@ -118,27 +125,33 @@ export class PaneExpansionStateCache {
       consumeDragDelta,
       animation,
     });
-    const entry = this.entries.get(id)!;
 
     state.setConsumeDragDelta(consumeDragDelta);
 
-    const anchorsChanged = !paneExpansionAnchorsEqual(entry.anchors, anchors);
-    const animationChanged = entry.animation !== animation;
+    const keyChanged = this.activeKeyId !== id;
+    const anchorsChanged =
+      this.rememberedAnchors === null ||
+      !paneExpansionAnchorsEqual(this.rememberedAnchors, anchors);
+    const animationChanged = this.rememberedAnimation !== animation;
+
     if (anchorsChanged) {
-      // AndroidX only lets the latest initialAnchoredIndex become the fallback
-      // when the anchors themselves change.
-      state.setAnchors(anchors, initialAnchoredIndex);
-      entry.anchors = anchors;
-    } else if (animationChanged) {
-      // Changing anchoringAnimationSpec re-runs AndroidX restore() under the
-      // PreventUserInput mutex. Re-applying the same anchors here interrupts a
-      // settle-owned animation while preserving the fallback index associated
-      // with the current anchors.
-      state.setAnchors(anchors);
+      // Mirrors:
+      // val initialAnchorForCurrentAnchors = remember(anchors) { initialAnchor }
+      this.rememberedAnchors = anchors;
+      this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
+    }
+
+    if (keyChanged || anchorsChanged || animationChanged) {
+      // LaunchedEffect(key, anchors, anchoringAnimationSpec, flingBehavior)
+      // always calls restore when any of those keys changes. The fallback index
+      // is associated with the latest structurally-distinct anchors, not with
+      // each persistent PaneExpansionStateKey entry.
+      state.setAnchors(anchors, this.fallbackInitialAnchoredIndex);
     }
 
     state.setAnimation(animation);
-    entry.animation = animation;
+    this.activeKeyId = id;
+    this.rememberedAnimation = animation;
     return state;
   }
 }
