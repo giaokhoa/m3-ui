@@ -23,6 +23,7 @@ const second: ThreePaneScaffoldValue = {
 describe('MutableThreePaneScaffoldState Float fraction boundary', () => {
   it('converts seek fractions to Float before the AndroidX range check', () => {
     const state = new MutableThreePaneScaffoldState(first);
+    state.setTransitionDurationResolver({}, () => 0);
 
     state.seekTo(1 + Number.EPSILON, second);
     expect(state.progressFraction).toBe(1);
@@ -40,6 +41,7 @@ describe('MutableThreePaneScaffoldState Float fraction boundary', () => {
       await gate;
     };
     const state = new MutableThreePaneScaffoldState(first, { animation });
+    state.setTransitionDurationResolver({}, () => 0);
 
     const running = state.animateTo(second);
     await Promise.resolve();
