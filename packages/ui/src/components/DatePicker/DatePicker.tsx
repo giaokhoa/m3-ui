@@ -246,7 +246,6 @@ function useCalendarState(): RacCalendarState | RacRangeState {
   if (!state) throw new Error('DatePicker calendar state is unavailable');
   return state;
 }
-
 function CalendarSync({
   value,
   displayedMonth,
@@ -284,6 +283,7 @@ function MonthYearButton({ children, onPress }: { children: ReactNode; onPress: 
   const ripple = useRipple();
   return (
     <AriaButton
+      slot={null}
       aria-label="Choose year"
       className="date-picker__month-button"
       onPress={onPress}
@@ -348,6 +348,7 @@ function YearOption({
   const ripple = useRipple();
   return (
     <AriaButton
+      slot={null}
       ref={selected ? selectedRef : undefined}
       className="date-picker__year"
       data-selected={selected || undefined}
