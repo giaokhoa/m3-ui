@@ -492,7 +492,6 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   snapTo(targetState: ThreePaneScaffoldValue) {
     this.cancelAnimation();
     this.resetCurrentAnimationTiming();
-    this.clearInitialValueAnimations(true);
     if (this.transitionOwner === null) {
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
@@ -500,6 +499,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       return;
     }
     if (this.updateSettledPredictiveBack(targetState, false)) return;
+    this.clearInitialValueAnimations(true);
     this.predictiveBack = false;
     this.currentStateValue = targetState;
     this.targetStateValue = targetState;
