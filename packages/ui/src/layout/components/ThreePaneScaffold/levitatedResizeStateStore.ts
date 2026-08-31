@@ -7,15 +7,17 @@ import {
 
 const roles: readonly ThreePaneScaffoldRole[] = ['primary', 'secondary', 'tertiary'];
 
-/** Collect every distinct resize state carried by a levitated pane. */
+/** Collect every distinct resize state carried by levitated panes in the supplied values. */
 export function getLevitatedResizeStates(
-  value: ThreePaneScaffoldValue,
+  ...values: readonly ThreePaneScaffoldValue[]
 ): readonly DragToResizeState[] {
   const states = new Set<DragToResizeState>();
-  for (const role of roles) {
-    const paneValue = getPaneAdaptedValue(value, role);
-    if (paneValue.type === 'levitated' && paneValue.dragToResizeState !== undefined) {
-      states.add(paneValue.dragToResizeState);
+  for (const value of values) {
+    for (const role of roles) {
+      const paneValue = getPaneAdaptedValue(value, role);
+      if (paneValue.type === 'levitated' && paneValue.dragToResizeState !== undefined) {
+        states.add(paneValue.dragToResizeState);
+      }
     }
   }
   return [...states];
