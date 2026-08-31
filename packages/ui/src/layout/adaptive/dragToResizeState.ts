@@ -174,6 +174,7 @@ export class DragToResizeState {
   private rangeIsEmpty = false;
   private lastMeasuredSize = Number.NaN;
   private lastDraggedSize = Number.NaN;
+  private physicalEdgeInternal: 'top' | 'bottom' | 'left' | 'right' | undefined;
   private revision = 0;
   private readonly listeners = new Set<() => void>();
   private readonly defaultAnimation: DragToResizeAnimation;
@@ -189,6 +190,9 @@ export class DragToResizeState {
     this.minSize = minSize;
     this.maxSize = maxSize;
     this.defaultAnimation = animation;
+    if (dockedEdge === DockedEdge.Top || dockedEdge === DockedEdge.Bottom) {
+      this.physicalEdgeInternal = dockedEdge;
+    }
   }
 
   readonly subscribe = (listener: () => void) => {
@@ -243,16 +247,16 @@ export class DragToResizeState {
   }
 
   private physicalEdge(direction: 'ltr' | 'rtl'): 'top' | 'bottom' | 'left' | 'right' {
-    switch (this.dockedEdge) {
-      case DockedEdge.Top:
-        return 'top';
-      case DockedEdge.Bottom:
-        return 'bottom';
-      case DockedEdge.Start:
-        return direction === 'ltr' ? 'left' : 'right';
-      case DockedEdge.End:
-        return direction === 'ltr' ? 'right' : 'left';
-    }
+    if (this.physicalEdgeInternal !== undefined) return this.physicalEdgeInternal;
+    this.physicalEdgeInternal =
+      this.dockedEdge === DockedEdge.Start
+        ? direction === 'ltr'
+          ? 'left'
+          : 'right'
+        : direction === 'ltr'
+          ? 'right'
+          : 'left';
+    return this.physicalEdgeInternal;
   }
 
   private convertDelta(delta: number, direction: 'ltr' | 'rtl') {
@@ -310,6 +314,12 @@ export class DragToResizeState {
     const measuringSize = horizontal ? measuringWidth : measuringHeight;
     const scaffoldSize = horizontal ? scaffoldWidth : scaffoldHeight;
 
+    // DragToResizeState selects a physical Left/Right implementation from the
+    // logical Start/End edge when the state is remembered. The web state learns
+    // that layout direction at its first measurement and keeps the same physical
+    // edge for its lifetime instead of changing drag direction on later relayouts.
+    this.physicalEdge(direction);
+
     // React can render once before the scaffold has measurable geometry. Do not
     // let that transient zero constraint initialize or coerce persistent resize
     // state, and do not expose it as a measured preferred-size override.
@@ -338,9 +348,6 @@ export class DragToResizeState {
     // AndroidX keeps the state size as Float for drag/spring physics and uses
     // Float.toInt() for the raw IntSize that participates in alignment.
     const resolvedSize = composeFloatToInt(this.sizeInternal);
-    // Direction is intentionally consumed here so callers can use one measure
-    // path for logical Start/End states before dispatching drag deltas.
-    void direction;
 
     return horizontal
       ? { width: resolvedSize, height: measuringHeight }
