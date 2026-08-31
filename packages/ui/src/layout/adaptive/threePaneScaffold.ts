@@ -2,12 +2,14 @@ import { createElement, type ReactNode } from 'react';
 import type { DragToResizeState } from './dragToResizeState';
 import type { LevitatedPaneCustomAlignment } from './levitatedPaneAlignment';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
+import type { PaneScaffoldRole } from './paneScaffoldRole';
 
 export type {
   LevitatedPaneCustomAlignment,
   LevitatedPaneOffset,
   LevitatedPaneSize,
 } from './levitatedPaneAlignment';
+export type { PaneScaffoldRole } from './paneScaffoldRole';
 
 export type ThreePaneScaffoldRole = 'primary' | 'secondary' | 'tertiary';
 
@@ -83,7 +85,7 @@ export interface HidePaneAdaptStrategy {
 
 export interface ReflowPaneAdaptStrategy {
   type: 'reflow';
-  reflowUnder: ThreePaneScaffoldRole;
+  reflowUnder: PaneScaffoldRole;
 }
 
 export interface LevitatePaneAdaptStrategy {
@@ -133,7 +135,7 @@ function createLevitatePaneAdaptStrategy({
 
 export const PaneAdaptStrategy = {
   Hide: hidePaneAdaptStrategy,
-  Reflow(reflowUnder: ThreePaneScaffoldRole): ReflowPaneAdaptStrategy {
+  Reflow(reflowUnder: PaneScaffoldRole): ReflowPaneAdaptStrategy {
     return { type: 'reflow', reflowUnder };
   },
   Levitate(options: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
@@ -150,7 +152,7 @@ export interface ThreePaneScaffoldAdaptStrategies {
 export type PaneAdaptedValue =
   | { type: 'expanded' }
   | { type: 'hidden' }
-  | { type: 'reflowed'; reflowUnder: ThreePaneScaffoldRole }
+  | { type: 'reflowed'; reflowUnder: PaneScaffoldRole }
   | {
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
@@ -164,7 +166,7 @@ const hiddenPaneAdaptedValue = Object.freeze({ type: 'hidden' } as const);
 export const PaneAdaptedValue = {
   Expanded: expandedPaneAdaptedValue,
   Hidden: hiddenPaneAdaptedValue,
-  Reflowed(reflowUnder: ThreePaneScaffoldRole): PaneAdaptedValue {
+  Reflowed(reflowUnder: PaneScaffoldRole): PaneAdaptedValue {
     return { type: 'reflowed', reflowUnder };
   },
   Levitated(
@@ -200,6 +202,14 @@ const rolesByPriority: readonly ThreePaneScaffoldRole[] = [
   ThreePaneScaffoldRole.Secondary,
   ThreePaneScaffoldRole.Tertiary,
 ];
+
+function isThreePaneScaffoldRole(role: PaneScaffoldRole): role is ThreePaneScaffoldRole {
+  return (
+    role === ThreePaneScaffoldRole.Primary ||
+    role === ThreePaneScaffoldRole.Secondary ||
+    role === ThreePaneScaffoldRole.Tertiary
+  );
+}
 
 export const threePaneScaffoldDefaultAdaptStrategies: ThreePaneScaffoldAdaptStrategies =
   Object.freeze({
@@ -308,7 +318,7 @@ export function calculateThreePaneScaffoldValue({
 
     if (canReflow) {
       const strategy = strategyForRole(adaptStrategies, pane);
-      if (strategy.type === 'reflow') {
+      if (strategy.type === 'reflow' && isThreePaneScaffoldRole(strategy.reflowUnder)) {
         reflowedPane = pane;
         anchorPane = strategy.reflowUnder;
         anchorPaneValue = valueForRole(adapted, anchorPane);
