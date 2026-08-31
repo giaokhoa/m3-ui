@@ -328,12 +328,12 @@ export function ThreePaneScaffold({
   ];
   const resizeStates = getLevitatedResizeStates(currentValue, targetValue);
 
-  useSyncExternalStore(
+  const expansionRevision = useSyncExternalStore(
     expansionState.subscribe,
     expansionState.getSnapshot,
     expansionState.getSnapshot,
   );
-  useSyncExternalStore(
+  const resizeRevision = useSyncExternalStore(
     (listener) => subscribeLevitatedResizeStates(resizeStates, listener),
     () => getLevitatedResizeStatesSnapshot(resizeStates),
     () => getLevitatedResizeStatesSnapshot(resizeStates),
@@ -457,6 +457,8 @@ export function ThreePaneScaffold({
     preferredHeights,
     paneMargins,
     expansionState,
+    expansionRevision,
+    resizeRevision,
   ]);
 
   useLayoutEffect(() => {
