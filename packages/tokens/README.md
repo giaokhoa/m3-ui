@@ -19,6 +19,8 @@ tokens/
 │   ├── motion.json
 │   ├── ripple.json
 │   └── ...
+├── theme/
+│   └── baseline.json
 └── component/
     ├── button/
     ├── card.json
@@ -56,6 +58,7 @@ import * as token from '@m3-ui/tokens';
 Current reviewed CSS adapter exports include:
 
 ```text
+@m3-ui/tokens/theme.css
 @m3-ui/tokens/button.css
 @m3-ui/tokens/chip.css
 @m3-ui/tokens/text-field.css
@@ -65,9 +68,23 @@ Current reviewed CSS adapter exports include:
 
 Generated files are centralized under `dist/generated/`. `packages/ui` consumes them directly or inlines them into self-contained public style entries during its style build.
 
+## Theme foundation output
+
+Immutable Material baseline light/dark role values live in `tokens/theme/baseline.json`. The normal generated JS vocabulary exposes those values for JavaScript consumers such as the public `ColorScheme` view, while `dist/generated/theme.css` serializes the static browser foundation.
+
+The generated theme adapter owns:
+
+- baseline light and dark system-role CSS variables;
+- the matching `color-scheme` declaration;
+- default Material plain/brand font-family variables and the default plain font family.
+
+`ThemeProvider` marks its normal and portal scopes with `data-m3-theme` / `data-theme`. When no `sourceColor` exists, those scopes receive baseline values from generated CSS. When `sourceColor` exists, the provider emits runtime role variables inline, which override the generated baseline through normal CSS precedence.
+
+The UI modular-style build prepends this generated theme foundation to every self-contained `@m3-ui/ui/styles/*.css` component entry.
+
 ## Runtime color flow
 
-Material component color tokens reference semantic color-role tokens. Core color roles terminate in scoped runtime CSS variables supplied by `ThemeProvider`.
+Material component color tokens reference semantic color-role tokens. Core color roles terminate in scoped runtime CSS variables supplied by the active theme scope.
 
 Example canonical role endpoint:
 
@@ -101,7 +118,7 @@ The resulting runtime chain is:
 component token
     -> color.role.primary
     -> var(--primary)
-    -> ThemeProvider concrete value
+    -> active theme scope concrete value
 ```
 
 This lets `sourceColor`, mode and contrast change concrete system colors at runtime without rebuilding component token mappings.
@@ -112,13 +129,14 @@ Generated CSS adapters serialize static token-to-browser bindings for concrete c
 
 Reference slices currently in the repository:
 
+- Theme: generated baseline system roles and typeface foundation, with dynamic color overrides in `ThemeProvider`.
 - Button: generated size/variant/typography/color geometry plus runtime interaction/elevation logic in UI code.
 - Chip: generated static color/state mappings with runtime interaction and slot-dependent behavior in UI code.
 - TextField: generated shared + filled/outlined static default matrix.
 - Elevation: generated immutable shadow recipes selected by semantic runtime elevation level.
 - Ripple: generated immutable state-layer/motion/focus styling with runtime wave geometry/lifecycle.
 
-Issue #150 tracks expansion of this generated-adapter pattern across the remaining component and foundation surfaces.
+Issue #150 tracks expansion of this generated-adapter pattern across the remaining component surfaces.
 
 ## Upstream audit structure
 
