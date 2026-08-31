@@ -1,11 +1,11 @@
-import type { LevitatedPaneCustomAlignment } from '../../adaptive/levitatedPaneAlignment';
-import type { LevitatedPaneAlignment } from '../../adaptive/threePaneScaffold';
+import type {
+  LevitatedPaneAlignment,
+  LevitatedPaneAlignmentPreset,
+} from '../../adaptive/threePaneScaffold';
 
-export type ResolvableLevitatedPaneAlignment =
-  | LevitatedPaneAlignment
-  | LevitatedPaneCustomAlignment;
+export type ResolvableLevitatedPaneAlignment = LevitatedPaneAlignment;
 
-function alignmentParts(alignment: LevitatedPaneAlignment): {
+function alignmentParts(alignment: LevitatedPaneAlignmentPreset): {
   vertical: 'top' | 'center' | 'bottom';
   horizontal: 'start' | 'center' | 'end';
 } {
