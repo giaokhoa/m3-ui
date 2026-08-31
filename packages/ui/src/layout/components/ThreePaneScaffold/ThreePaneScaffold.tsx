@@ -326,7 +326,7 @@ export function ThreePaneScaffold({
     ['secondary', secondaryPane],
     ['tertiary', tertiaryPane],
   ];
-  const resizeStates = getLevitatedResizeStates(targetValue);
+  const resizeStates = getLevitatedResizeStates(currentValue, targetValue);
 
   useSyncExternalStore(
     expansionState.subscribe,
