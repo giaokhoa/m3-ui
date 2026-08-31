@@ -64,14 +64,22 @@ import {
   getPredictiveBackLayerStyle,
   usePredictiveBackScale,
 } from './ThreePaneScaffold.predictiveBack';
+import { createThreePaneScaffoldSeekingRemeasureSource } from './ThreePaneScaffold.seekingRemeasure';
 import {
   calculateThreePaneScaffoldTransitionDuration,
   calculateThreePaneScaffoldTransitionFrame,
-  captureThreePaneScaffoldTransitionOrigin,
-  interpolateThreePaneScaffoldTransitionFrames,
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
+  type ThreePaneScaffoldTransitionLayoutOptions,
 } from './ThreePaneScaffold.transition';
+import {
+  calculateThreePaneScaffoldVisibilityInterruptionDurationMs,
+  createThreePaneScaffoldVisibilityInterruption,
+  sampleThreePaneScaffoldVisibilityInterruption,
+  updateThreePaneScaffoldVisibilityInterruptionLayout,
+  type ThreePaneScaffoldTransitionSnapshot,
+  type ThreePaneScaffoldVisibilityInterruption,
+} from './ThreePaneScaffold.visibilityInterruption';
 import { useDefaultPaneExpansionState } from './useDefaultPaneExpansionState';
 import './three-pane-scaffold.css';
 
@@ -284,10 +292,17 @@ export function ThreePaneScaffold({
     targetOffsetX: PaneExpansionUnspecified,
   });
   const previousTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
+  const previousTransitionSnapshotRef = useRef<ThreePaneScaffoldTransitionSnapshot | undefined>(
+    undefined,
+  );
+  const previousAnimationPlayTimeMsRef = useRef(0);
+  const previousInitialValueAnimationsClearRevisionRef = useRef<number | null>(null);
   const renderedTransitionFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(
     undefined,
   );
-  const retargetOriginFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(undefined);
+  const visibilityInterruptionRef = useRef<ThreePaneScaffoldVisibilityInterruption | undefined>(
+    undefined,
+  );
   const retargetTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
   const [geometry, setGeometry] = useState<ScaffoldGeometry>(emptyGeometry);
 
@@ -371,7 +386,7 @@ export function ThreePaneScaffold({
           right: bound.right - geometry.viewportLeft,
           bottom: bound.bottom - geometry.viewportTop,
         }));
-        return calculateThreePaneScaffoldTransitionDuration({
+        const destinationLayout: ThreePaneScaffoldTransitionLayoutOptions = {
           width: geometry.width,
           height: geometry.height,
           directive,
@@ -384,7 +399,49 @@ export function ThreePaneScaffold({
           preferredHeights,
           paneMargins,
           paneExpansionState: expansionState,
-        });
+        };
+        const renderedClearRevision = previousInitialValueAnimationsClearRevisionRef.current;
+        if (
+          renderedClearRevision !== null &&
+          activeScaffoldState.initialValueAnimationsClearRevision !== renderedClearRevision
+        ) {
+          return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
+        }
+        const activeInterruption = visibilityInterruptionRef.current;
+        if (
+          activeInterruption !== undefined &&
+          retargetTargetValueRef.current !== null &&
+          threePaneScaffoldValuesEqual(retargetTargetValueRef.current, to) &&
+          threePaneScaffoldValuesEqual(activeScaffoldState.currentState, from) &&
+          threePaneScaffoldValuesEqual(activeScaffoldState.targetState, to)
+        ) {
+          return calculateThreePaneScaffoldVisibilityInterruptionDurationMs(
+            activeInterruption,
+            activeScaffoldState.animationPlayTimeMs,
+          );
+        }
+        const previousSnapshot = previousTransitionSnapshotRef.current;
+        const renderedFrame = renderedTransitionFrameRef.current;
+        if (
+          previousSnapshot !== undefined &&
+          renderedFrame !== undefined &&
+          threePaneScaffoldValuesEqual(previousSnapshot.layout.targetValue, from) &&
+          !threePaneScaffoldValuesEqual(from, to)
+        ) {
+          return createThreePaneScaffoldVisibilityInterruption({
+            renderedFrame,
+            previousSnapshot,
+            destinationLayout,
+            previousInterruption:
+              visibilityInterruptionRef.current === undefined
+                ? undefined
+                : {
+                    interruption: visibilityInterruptionRef.current,
+                    elapsedMs: previousAnimationPlayTimeMsRef.current,
+                  },
+          }).durationMs;
+        }
+        return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
       },
     );
   }, [
@@ -439,59 +496,144 @@ export function ThreePaneScaffold({
     paneExpansionState: expansionState,
   });
 
+  const transitionLayout: ThreePaneScaffoldTransitionLayoutOptions = {
+    width: geometry.width,
+    height: geometry.height,
+    directive,
+    currentValue,
+    targetValue,
+    paneOrder,
+    direction: geometry.direction,
+    excludedBounds,
+    preferredWidths,
+    preferredHeights,
+    paneMargins,
+    paneExpansionState: expansionState,
+  };
   const calculateTransitionFrameAt = (progressFraction: number) =>
     calculateThreePaneScaffoldTransitionFrame({
-      width: geometry.width,
-      height: geometry.height,
-      directive,
-      currentValue,
-      targetValue,
+      ...transitionLayout,
       progressFraction,
-      paneOrder,
-      direction: geometry.direction,
-      excludedBounds,
-      preferredWidths,
-      preferredHeights,
-      paneMargins,
-      paneExpansionState: expansionState,
     });
 
   const rawTransitionFrame = transitionActive
     ? calculateTransitionFrameAt(activeScaffoldState.progressFraction)
     : undefined;
+  const currentTransitionSnapshot: ThreePaneScaffoldTransitionSnapshot | undefined =
+    transitionActive
+      ? {
+          layout: transitionLayout,
+          progressFraction: activeScaffoldState.progressFraction,
+        }
+      : undefined;
+  const animationPlayTimeMs =
+    activeScaffoldState instanceof MutableThreePaneScaffoldState
+      ? activeScaffoldState.animationPlayTimeMs
+      : transitionActive
+        ? calculateThreePaneScaffoldTransitionDuration(transitionLayout) *
+          activeScaffoldState.progressFraction
+        : 0;
+  const initialValueAnimationsClearRevision =
+    activeScaffoldState instanceof MutableThreePaneScaffoldState
+      ? activeScaffoldState.initialValueAnimationsClearRevision
+      : null;
+
+  if (initialValueAnimationsClearRevision === null) {
+    previousInitialValueAnimationsClearRevisionRef.current = null;
+  } else {
+    const previousClearRevision = previousInitialValueAnimationsClearRevisionRef.current;
+    if (
+      previousClearRevision !== null &&
+      previousClearRevision !== initialValueAnimationsClearRevision
+    ) {
+      previousTargetValueRef.current = null;
+      previousTransitionSnapshotRef.current = undefined;
+      previousAnimationPlayTimeMsRef.current = 0;
+      renderedTransitionFrameRef.current = undefined;
+      visibilityInterruptionRef.current = undefined;
+      retargetTargetValueRef.current = null;
+    }
+    previousInitialValueAnimationsClearRevisionRef.current =
+      initialValueAnimationsClearRevision;
+  }
+
   let transitionFrame = rawTransitionFrame;
 
   if (transitionActive && rawTransitionFrame !== undefined) {
     const previousTargetValue = previousTargetValueRef.current;
+    const previousSnapshot = previousTransitionSnapshotRef.current;
     if (
       previousTargetValue !== null &&
       !threePaneScaffoldValuesEqual(previousTargetValue, targetValue) &&
+      previousSnapshot !== undefined &&
       renderedTransitionFrameRef.current !== undefined
     ) {
-      retargetOriginFrameRef.current = captureThreePaneScaffoldTransitionOrigin(
-        renderedTransitionFrameRef.current,
-        calculateTransitionFrameAt(0),
-      );
+      visibilityInterruptionRef.current = createThreePaneScaffoldVisibilityInterruption({
+        renderedFrame: renderedTransitionFrameRef.current,
+        previousSnapshot,
+        destinationLayout: transitionLayout,
+        previousInterruption:
+          visibilityInterruptionRef.current === undefined
+            ? undefined
+            : {
+                interruption: visibilityInterruptionRef.current,
+                elapsedMs: previousAnimationPlayTimeMsRef.current,
+              },
+      });
       retargetTargetValueRef.current = targetValue;
     }
 
     if (
-      retargetOriginFrameRef.current !== undefined &&
+      visibilityInterruptionRef.current === undefined &&
+      previousTargetValue !== null &&
+      threePaneScaffoldValuesEqual(previousTargetValue, targetValue) &&
+      previousSnapshot !== undefined &&
+      renderedTransitionFrameRef.current !== undefined
+    ) {
+      const remeasureSource = createThreePaneScaffoldSeekingRemeasureSource(previousSnapshot);
+      const remeasured = updateThreePaneScaffoldVisibilityInterruptionLayout({
+        interruption: remeasureSource,
+        renderedFrame: renderedTransitionFrameRef.current,
+        destinationLayout: transitionLayout,
+        elapsedMs: animationPlayTimeMs,
+        progressFraction: activeScaffoldState.progressFraction,
+      });
+      if (remeasured !== remeasureSource) {
+        visibilityInterruptionRef.current = remeasured;
+        retargetTargetValueRef.current = targetValue;
+      }
+    }
+
+    const activeInterruption = visibilityInterruptionRef.current;
+    const renderedFrame = renderedTransitionFrameRef.current;
+    if (
+      activeInterruption !== undefined &&
+      renderedFrame !== undefined &&
       retargetTargetValueRef.current !== null &&
       threePaneScaffoldValuesEqual(retargetTargetValueRef.current, targetValue)
     ) {
-      transitionFrame = interpolateThreePaneScaffoldTransitionFrames(
-        retargetOriginFrameRef.current,
-        calculateTransitionFrameAt(1),
+      const updatedInterruption = updateThreePaneScaffoldVisibilityInterruptionLayout({
+        interruption: activeInterruption,
+        renderedFrame,
+        destinationLayout: transitionLayout,
+        elapsedMs: animationPlayTimeMs,
+        progressFraction: activeScaffoldState.progressFraction,
+      });
+      visibilityInterruptionRef.current = updatedInterruption;
+      transitionFrame = sampleThreePaneScaffoldVisibilityInterruption(
+        updatedInterruption,
+        animationPlayTimeMs,
         activeScaffoldState.progressFraction,
       );
     }
   } else {
-    retargetOriginFrameRef.current = undefined;
+    visibilityInterruptionRef.current = undefined;
     retargetTargetValueRef.current = null;
   }
 
   previousTargetValueRef.current = targetValue;
+  previousTransitionSnapshotRef.current = currentTransitionSnapshot;
+  previousAnimationPlayTimeMsRef.current = animationPlayTimeMs;
   renderedTransitionFrameRef.current = transitionFrame;
 
   const expansionLayout = expansionState.getLayoutState(geometry.width, geometry.direction);
