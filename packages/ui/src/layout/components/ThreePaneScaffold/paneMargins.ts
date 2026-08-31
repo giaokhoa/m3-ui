@@ -31,6 +31,18 @@ export interface PaneMargins {
 const ComposeIntMax = 2147483647;
 const ComposeIntMin = -2147483648;
 
+function isComposeInt(value: number) {
+  return Number.isInteger(value) && value >= ComposeIntMin && value <= ComposeIntMax;
+}
+
+function composeIntAdd(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a - b) | 0 : a - b;
+}
+
 function composeRoundToInt(value: number) {
   const floatValue = Math.fround(value);
   if (Number.isNaN(floatValue)) {
@@ -102,17 +114,30 @@ export function applyPaneMargins(
     insetBottom = Math.min(insetBottom, roundedEdge(bounds.bottom, scaffoldHeight));
   }
 
-  const measuredRight = placement.left + placement.width;
-  const measuredBottom = placement.top + placement.height;
+  // Upstream measuredBounds is an IntRect before PaneMargins is applied. Its
+  // right/bottom construction, parent-edge margin subtraction, and resulting
+  // IntRect width/height all use wrapping Kotlin Int arithmetic. Preserve those
+  // boundaries for integer Compose geometry while leaving fractional browser
+  // measurements on their native number path.
+  const measuredRight = composeIntAdd(placement.left, placement.width);
+  const measuredBottom = composeIntAdd(placement.top, placement.height);
   const left = Math.max(placement.left, fixedLeft, insetLeft);
   const top = Math.max(placement.top, blockStart, insetTop);
-  const right = Math.min(measuredRight, scaffoldWidth - fixedRight, insetRight);
-  const bottom = Math.min(measuredBottom, scaffoldHeight - blockEnd, insetBottom);
+  const right = Math.min(
+    measuredRight,
+    composeIntSubtract(scaffoldWidth, fixedRight),
+    insetRight,
+  );
+  const bottom = Math.min(
+    measuredBottom,
+    composeIntSubtract(scaffoldHeight, blockEnd),
+    insetBottom,
+  );
 
   return {
     left,
     top,
-    width: Math.max(0, right - left),
-    height: Math.max(0, bottom - top),
+    width: Math.max(0, composeIntSubtract(right, left)),
+    height: Math.max(0, composeIntSubtract(bottom, top)),
   };
 }
