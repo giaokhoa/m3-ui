@@ -48,6 +48,22 @@ describe('Material 3 window size classes', () => {
     expect(calculateWindowHeightSizeClass(height)).toBe(expected);
   });
 
+  it('converts the public Float dimensions before truncating to Int breakpoints', () => {
+    // AndroidX's Float overload first receives these as Float values, where
+    // they round to the exact breakpoint, and only then calls Float.toInt().
+    expect(Math.fround(599.99999)).toBe(600);
+    expect(calculateWindowWidthSizeClass(599.99999)).toBe('medium');
+
+    expect(Math.fround(839.99999)).toBe(840);
+    expect(calculateWindowWidthSizeClass(839.99999)).toBe('expanded');
+
+    expect(Math.fround(479.99999)).toBe(480);
+    expect(calculateWindowHeightSizeClass(479.99999)).toBe('medium');
+
+    expect(Math.fround(899.99999)).toBe(900);
+    expect(calculateWindowHeightSizeClass(899.99999)).toBe('expanded');
+  });
+
   it('calculates width and height independently', () => {
     expect(calculateWindowSizeClass({ width: 1280, height: 720 })).toEqual({
       width: 'large',
