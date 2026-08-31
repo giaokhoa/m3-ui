@@ -6,9 +6,10 @@ import {
 } from './threePaneScaffold';
 import { threePaneScaffoldValuesEqual } from './threePaneScaffoldState';
 
-interface KeyedRole extends PaneScaffoldRoleObject {
+type KeyedRole = PaneScaffoldRoleObject & {
   key: string;
-}
+  equals(other: PaneScaffoldRole): boolean;
+};
 
 function keyedRole(key: string): KeyedRole {
   return {
