@@ -408,16 +408,17 @@ export class PaneExpansionState {
     // animateTo coroutine, and the canceled settle snaps its target in finally.
     this.cancelSettlingAnimation();
     const nextAnchors = [...anchors];
-    const matchedCurrentAnchor =
-      this.currentAnchorState === null
-        ? undefined
-        : nextAnchors.find((anchor) => anchorEquals(anchor, this.currentAnchorState!));
+    const currentAnchorStillPresent =
+      this.currentAnchorState !== null &&
+      nextAnchors.some((anchor) => anchorEquals(anchor, this.currentAnchorState!));
     const initialAnchorForCurrentAnchors =
       initialAnchoredIndex === -1 ? null : nextAnchors[initialAnchoredIndex] ?? null;
 
     this.anchors = nextAnchors;
     this.initialAnchoredIndexState = initialAnchoredIndex;
-    this.currentAnchorState = matchedCurrentAnchor ?? initialAnchorForCurrentAnchors;
+    if (!currentAnchorStillPresent) {
+      this.currentAnchorState = initialAnchorForCurrentAnchors;
+    }
     this.notify();
   }
 
