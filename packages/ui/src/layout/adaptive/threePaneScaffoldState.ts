@@ -46,8 +46,8 @@ export interface MutableThreePaneScaffoldStateOptions {
   transitionDurationResolver?: ThreePaneScaffoldTransitionDurationResolver;
 }
 
-// AndroidX SeekableTransitionState has no timeline until it is attached to a Transition.
-// The web state snaps by default while unbound; the mounted scaffold supplies the real duration.
+// SeekableTransitionState ignores state mutations until it is configured with a Transition.
+// A renderer-owned duration resolver is the web attachment boundary for that Transition.
 const DefaultUnboundTransitionDurationMs = 0;
 const MillisToNanos = 1_000_000;
 
@@ -370,8 +370,14 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   /** Snap current and target to the same value and cancel any active transition. */
   snapTo(targetState: ThreePaneScaffoldValue) {
-    if (this.updateSettledMetadata(targetState, false)) return;
     this.cancelAnimation();
+    if (this.transitionOwner === null) {
+      const predictiveBackChanged = this.predictiveBack;
+      this.predictiveBack = false;
+      if (predictiveBackChanged) this.notify();
+      return;
+    }
+    if (this.updateSettledMetadata(targetState, false)) return;
     this.predictiveBack = false;
     this.currentStateValue = targetState;
     this.targetStateValue = targetState;
@@ -391,10 +397,16 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     isPredictiveBackInProgress = false,
   ) {
     const resolvedFraction = clampFraction(fraction);
+    this.cancelAnimation();
+    if (this.transitionOwner === null) {
+      const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
+      this.predictiveBack = isPredictiveBackInProgress;
+      if (predictiveBackChanged) this.notify();
+      return;
+    }
     if (this.updateSettledMetadata(targetState, isPredictiveBackInProgress)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
-    this.cancelAnimation();
     this.predictiveBack = isPredictiveBackInProgress;
     if (targetChanged) this.currentStateValue = oldTarget;
     this.targetStateValue = targetState;
@@ -420,6 +432,13 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       isPredictiveBackInProgress = false,
     }: ThreePaneScaffoldAnimateOptions = {},
   ) {
+    if (this.transitionOwner === null) {
+      this.cancelAnimation();
+      const predictiveBackChanged = this.predictiveBack;
+      this.predictiveBack = false;
+      if (predictiveBackChanged) this.notify();
+      return;
+    }
     if (this.updateSettledMetadata(targetState, false)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
