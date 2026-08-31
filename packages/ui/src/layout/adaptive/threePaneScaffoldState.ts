@@ -53,6 +53,13 @@ export interface MutableThreePaneScaffoldStateOptions {
   transitionDurationResolver?: ThreePaneScaffoldTransitionDurationResolver;
 }
 
+/** Null-spec SeekingAnimationState fields needed when the running transition is retained. */
+export interface ThreePaneScaffoldRunningTimeline {
+  readonly durationMs: number;
+  readonly startFraction: number;
+  readonly progressMs: number;
+}
+
 const DefaultUnboundTransitionDurationMs = 0;
 const MillisToNanos = 1_000_000;
 
@@ -493,6 +500,19 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   get animationPlayTimeMs() {
     return this.animationPlayTimeMsValue;
+  }
+
+  get defaultAnimationTimeline(): ThreePaneScaffoldRunningTimeline | undefined {
+    const startFraction = this.activeDefaultAnimationStartFraction;
+    const durationMs = this.activeDefaultAnimationDurationMs;
+    if (startFraction === null || durationMs === null || this.progressFractionValue >= 1) {
+      return undefined;
+    }
+    return {
+      durationMs,
+      startFraction,
+      progressMs: this.activeDefaultAnimationProgressMs,
+    };
   }
 
   get initialValueAnimationsClearRevision() {
