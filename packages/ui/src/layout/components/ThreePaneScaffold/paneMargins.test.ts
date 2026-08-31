@@ -66,6 +66,26 @@ describe('applyPaneMargins', () => {
     ).toEqual({ left: 0, top: 0, width: 0, height: 800 });
   });
 
+  it('rounds fixed margins and ruler edges after the Compose Float boundary', () => {
+    expect(
+      applyPaneMargins(
+        { left: 0, top: 0, width: 20000000, height: 800 },
+        {
+          inlineStart: 16777216.6,
+          insetBounds: [{ right: 16777217.4 }],
+        },
+        20000000,
+        800,
+      ),
+    ).toEqual({ left: 16777216, top: 0, width: 2, height: 800 });
+  });
+
+  it('validates fixed margins after conversion to Compose Float', () => {
+    expect(
+      applyPaneMargins(fullPane, { inlineStart: -1e-50 }, 1000, 800),
+    ).toEqual(fullPane);
+  });
+
   it('keeps negative fixed margins invalid like PaddingValues', () => {
     expect(() =>
       applyPaneMargins(fullPane, { inlineStart: -1 }, 1000, 800),
