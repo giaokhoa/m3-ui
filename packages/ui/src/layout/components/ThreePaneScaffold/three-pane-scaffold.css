@@ -102,7 +102,7 @@
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -50%);
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
   cursor: col-resize;
 }
@@ -121,15 +121,16 @@
   justify-content: center;
   inline-size: 100%;
   min-block-size: 1px;
-  touch-action: none;
   user-select: none;
 }
 
 .three-pane-scaffold__levitated-resize-handle[data-orientation='horizontal'] {
+  touch-action: pan-y pinch-zoom;
   cursor: col-resize;
 }
 
 .three-pane-scaffold__levitated-resize-handle[data-orientation='vertical'] {
+  touch-action: pan-x pinch-zoom;
   cursor: row-resize;
 }
 
