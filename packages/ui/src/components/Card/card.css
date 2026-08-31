@@ -4,9 +4,6 @@
   border-radius: var(--_card-container-radius);
   color: var(--_card-content-color);
   outline: none;
-  --_card-outline-width: 0px;
-  --_card-outline-color: transparent;
-  --_card-disabled-outline-color: transparent;
 }
 
 .card[data-interactive] {
@@ -38,7 +35,8 @@
   overflow: hidden;
   border-radius: inherit;
   background: var(--_card-container-color);
-  box-shadow: inset 0 0 0 var(--_card-outline-width) var(--_card-outline-color);
+  box-shadow: inset 0 0 0 var(--_card-outline-width, 0px)
+    var(--_card-outline-color, transparent);
   color: inherit;
 }
 
@@ -49,8 +47,8 @@
 
 .card[data-disabled] .card__surface {
   background: var(--_card-disabled-container-color);
-  box-shadow: inset 0 0 0 var(--_card-outline-width)
-    var(--_card-disabled-outline-color);
+  box-shadow: inset 0 0 0 var(--_card-outline-width, 0px)
+    var(--_card-disabled-outline-color, transparent);
 }
 
 .card__content {
@@ -71,12 +69,12 @@
 @media (forced-colors: active) {
   .card__surface {
     background: Canvas;
-    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width)) CanvasText;
+    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width, 0px)) CanvasText;
     color: CanvasText;
   }
 
   .card[data-disabled] .card__surface {
-    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width)) GrayText;
+    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width, 0px)) GrayText;
     color: GrayText;
   }
 
