@@ -77,6 +77,18 @@ function composeFloatToInt(value: number) {
   return Math.trunc(floatValue);
 }
 
+function composeIntAdd(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a - b) | 0 : a - b;
+}
+
+function composeIntMultiply(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? Math.imul(a, b) : a * b;
+}
+
 function px(value: string, name: string): number {
   if (!value.endsWith('px')) {
     throw new Error(`${name} must resolve to CSS pixels, received ${value}`);
@@ -236,12 +248,13 @@ export function calculateThreePaneScaffoldLayoutPass({
     roles: readonly ThreePaneScaffoldRole[],
   ) => {
     if (roles.length === 0) return;
-    const allocatableWidth = rectWidth(bounds) - (roles.length - 1) * horizontalGap;
+    const spacerWidth = composeIntMultiply(roles.length - 1, horizontalGap);
+    const allocatableWidth = composeIntSubtract(rectWidth(bounds), spacerWidth);
     const widths = new Map<ThreePaneScaffoldRole, number>(
       roles.map((role) => [role, preferredWidth(role)]),
     );
     const totalPreferredWidth = roles.reduce(
-      (sum, role) => sum + (widths.get(role) ?? 0),
+      (sum, role) => composeIntAdd(sum, widths.get(role) ?? 0),
       0,
     );
 
@@ -251,7 +264,10 @@ export function calculateThreePaneScaffoldLayoutPass({
       );
       widths.set(
         highestPriorityRole,
-        (widths.get(highestPriorityRole) ?? 0) + allocatableWidth - totalPreferredWidth,
+        composeIntAdd(
+          widths.get(highestPriorityRole) ?? 0,
+          composeIntSubtract(allocatableWidth, totalPreferredWidth),
+        ),
       );
     } else if (allocatableWidth < totalPreferredWidth) {
       const scale = Math.fround(
@@ -268,11 +284,12 @@ export function calculateThreePaneScaffoldLayoutPass({
     let left = bounds.left;
     roles.forEach((role) => {
       const paneWidth = widths.get(role) ?? 0;
+      const right = composeIntAdd(left, paneWidth);
       placePartition(
-        { left, top: bounds.top, right: left + paneWidth, bottom: bounds.bottom },
+        { left, top: bounds.top, right, bottom: bounds.bottom },
         role,
       );
-      left += paneWidth + horizontalGap;
+      left = composeIntAdd(right, horizontalGap);
     });
   };
 
