@@ -231,6 +231,8 @@ export function usePredictiveBackScale(
 ): number {
   const progressFraction = composeFloat(state?.progressFraction ?? 0);
   const isPredictiveBackInProgress = state?.isPredictiveBackInProgress ?? false;
+  const predictiveBackRef = useRef(isPredictiveBackInProgress);
+  predictiveBackRef.current = isPredictiveBackInProgress;
   const previousProgressRef = useRef(0);
   const scaleRef = useRef(1);
   const frameRef = useRef<number | null>(null);
@@ -239,7 +241,7 @@ export function usePredictiveBackScale(
   useLayoutEffect(() => {
     const emission = collectPredictiveBackScaleEmission(previousProgressRef.current, {
       progressFraction,
-      isPredictiveBackInProgress,
+      isPredictiveBackInProgress: predictiveBackRef.current,
     });
     if (emission.type === 'none') return;
     previousProgressRef.current = emission.progressFraction;
@@ -287,7 +289,7 @@ export function usePredictiveBackScale(
         frameRef.current = null;
       }
     };
-  }, [progressFraction, isPredictiveBackInProgress]);
+  }, [progressFraction]);
 
   return animatedScale;
 }
