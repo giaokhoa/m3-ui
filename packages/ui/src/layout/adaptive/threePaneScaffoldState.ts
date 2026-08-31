@@ -1,4 +1,9 @@
-import type { PaneAdaptedValue, ThreePaneScaffoldValue } from './threePaneScaffold';
+import { customLevitatedPaneAlignmentsEqual } from './levitatedPaneAlignment';
+import type {
+  LevitatedPaneAlignment,
+  PaneAdaptedValue,
+  ThreePaneScaffoldValue,
+} from './threePaneScaffold';
 
 export interface ThreePaneScaffoldState {
   readonly currentState: ThreePaneScaffoldValue;
@@ -59,6 +64,15 @@ function coerceAnimationFraction(fraction: number) {
   return fraction;
 }
 
+function levitatedPaneAlignmentsEqual(
+  a: LevitatedPaneAlignment,
+  b: LevitatedPaneAlignment,
+): boolean {
+  if (a === b) return true;
+  if (typeof a === 'string' || typeof b === 'string') return false;
+  return customLevitatedPaneAlignmentsEqual(a, b);
+}
+
 function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boolean {
   if (a === b) return true;
   if (a.type !== b.type) return false;
@@ -68,7 +82,7 @@ function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boole
   }
   if (a.type === 'levitated' && b.type === 'levitated') {
     return (
-      a.alignment === b.alignment &&
+      levitatedPaneAlignmentsEqual(a.alignment, b.alignment) &&
       a.scrim === b.scrim &&
       a.dragToResizeState === b.dragToResizeState
     );
