@@ -380,7 +380,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   /**
    * Seek directly to a raw timeline fraction between currentState and targetState.
-   * Changing target preserves currentState, matching SeekableTransitionState.seekTo.
+   * Changing target advances currentState to the former target, matching
+   * SeekableTransitionState.seekTo. The renderer captures the current visual
+   * frame separately so this discrete state handoff does not imply a jump.
    */
   seekTo(
     fraction: number,
@@ -393,6 +395,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.cancelAnimation();
     this.predictiveBack = isPredictiveBackInProgress;
+    if (targetChanged) this.currentStateValue = oldTarget;
     this.targetStateValue = targetState;
     this.progressFractionValue = threePaneScaffoldValuesEqual(
       this.currentStateValue,
@@ -401,7 +404,6 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       ? 0
       : resolvedFraction;
     this.notify();
-    void targetChanged;
   }
 
   /**
