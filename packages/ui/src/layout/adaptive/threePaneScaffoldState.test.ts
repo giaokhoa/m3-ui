@@ -47,13 +47,26 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
-  it('seeks raw timeline progress without replacing currentState when target changes', () => {
+  it('seeks raw timeline progress without replacing the initial currentState', () => {
     const state = new MutableThreePaneScaffoldState(hidden);
     state.seekTo(0.4, primary, true);
 
     expect(state.currentState).toBe(hidden);
     expect(state.targetState).toBe(primary);
     expect(state.progressFraction).toBe(0.4);
+    expect(state.isTransitionActive).toBe(true);
+    expect(state.isPredictiveBackInProgress).toBe(true);
+  });
+
+  it('advances currentState to the former target when seekTo retargets', () => {
+    const state = new MutableThreePaneScaffoldState(hidden);
+    state.seekTo(0.4, primary);
+
+    state.seekTo(0.2, primarySecondary, true);
+
+    expect(state.currentState).toBe(primary);
+    expect(state.targetState).toBe(primarySecondary);
+    expect(state.progressFraction).toBe(Math.fround(0.2));
     expect(state.isTransitionActive).toBe(true);
     expect(state.isPredictiveBackInProgress).toBe(true);
   });
