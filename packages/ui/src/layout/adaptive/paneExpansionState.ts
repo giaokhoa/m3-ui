@@ -263,9 +263,8 @@ export class PaneExpansionState {
   private revision = 0;
   private readonly listeners = new Set<() => void>();
   private defaultAnimation: PaneExpansionAnimation;
-  private animationController: AbortController | null = null;
-  private restoreInterruptibleAnimationController: AbortController | null = null;
-  private animationTargetOffset = PaneExpansionUnspecified;
+  private settleAnimationController: AbortController | null = null;
+  private settleAnimationTargetOffset = PaneExpansionUnspecified;
 
   constructor({
     anchors = [],
@@ -296,27 +295,17 @@ export class PaneExpansionState {
     this.listeners.forEach((listener) => listener());
   }
 
-  private cancelAnimation() {
-    const controller = this.animationController;
+  /**
+   * Cancels only a drag-mutex-owned settle operation. Public animateTo calls are
+   * independent coroutines upstream and are deliberately left running.
+   * animateToInternal snaps its target in finally even when cancellation wins.
+   */
+  private cancelSettlingAnimation() {
+    const controller = this.settleAnimationController;
     if (controller === null) return false;
-    if (this.restoreInterruptibleAnimationController === controller) {
-      this.restoreInterruptibleAnimationController = null;
-    }
-    this.animationController = null;
-    this.animationTargetOffset = PaneExpansionUnspecified;
-    controller.abort();
-    const wasSettling = this.settling;
-    this.settling = false;
-    return wasSettling;
-  }
-
-  private cancelRestoreInterruptibleAnimation() {
-    const controller = this.restoreInterruptibleAnimationController;
-    if (controller === null || this.animationController !== controller) return false;
-    const targetOffset = this.animationTargetOffset;
-    this.restoreInterruptibleAnimationController = null;
-    this.animationController = null;
-    this.animationTargetOffset = PaneExpansionUnspecified;
+    const targetOffset = this.settleAnimationTargetOffset;
+    this.settleAnimationController = null;
+    this.settleAnimationTargetOffset = PaneExpansionUnspecified;
     controller.abort();
     if (targetOffset !== PaneExpansionUnspecified) {
       this.setAnimatedOffset(targetOffset);
@@ -414,7 +403,10 @@ export class PaneExpansionState {
       throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
     }
 
-    this.cancelRestoreInterruptibleAnimation();
+    // restore() owns the same drag mutex as settleToAnchorIfNeeded. Updating the
+    // anchor configuration therefore cancels an active settle, but not a public
+    // animateTo coroutine, and the canceled settle snaps its target in finally.
+    this.cancelSettlingAnimation();
     const nextAnchors = [...anchors];
     const matchedCurrentAnchor =
       this.currentAnchorState === null
@@ -466,7 +458,7 @@ export class PaneExpansionState {
   }
 
   beginDrag() {
-    const cancelledSettling = this.cancelAnimation();
+    const cancelledSettling = this.cancelSettlingAnimation();
     if (this.dragging && !cancelledSettling) return;
     this.dragging = true;
     this.notify();
@@ -502,20 +494,19 @@ export class PaneExpansionState {
     void this.settleToAnchorIfNeeded(velocity);
   }
 
-  private async animateToMatchedAnchor(
-    matched: PaneExpansionAnchor,
+  private async animateToAnchor(
+    anchor: PaneExpansionAnchor,
     initialVelocity: number,
-    restoreInterruptible: boolean,
+    mutexOwned: boolean,
   ) {
-    this.cancelAnimation();
-    this.currentAnchorState = matched;
+    this.currentAnchorState = anchor;
     if (this.maxExpansionWidth === PaneExpansionUnspecified) {
       this.notify();
       return;
     }
 
     const targetOffset = anchorPosition(
-      matched,
+      anchor,
       this.maxExpansionWidth,
       this.measuredDirection,
     );
@@ -528,10 +519,9 @@ export class PaneExpansionState {
     }
 
     const controller = new AbortController();
-    this.animationController = controller;
-    this.animationTargetOffset = targetOffset;
-    if (restoreInterruptible) {
-      this.restoreInterruptibleAnimationController = controller;
+    if (mutexOwned) {
+      this.settleAnimationController = controller;
+      this.settleAnimationTargetOffset = targetOffset;
     }
     this.settling = true;
     this.notify();
@@ -548,28 +538,27 @@ export class PaneExpansionState {
           this.notify();
         },
       });
-      if (controller.signal.aborted) return;
-      this.setAnimatedOffset(targetOffset);
     } finally {
-      if (this.animationController === controller) {
-        this.animationController = null;
-        if (this.restoreInterruptibleAnimationController === controller) {
-          this.restoreInterruptibleAnimationController = null;
-        }
-        this.animationTargetOffset = PaneExpansionUnspecified;
-        this.settling = false;
-        this.notify();
+      // AndroidX animateToInternal assigns the target in finally, including
+      // cancellation and animation exceptions.
+      this.setAnimatedOffset(targetOffset);
+      if (mutexOwned && this.settleAnimationController === controller) {
+        this.settleAnimationController = null;
+        this.settleAnimationTargetOffset = PaneExpansionUnspecified;
       }
+      this.settling = false;
+      this.notify();
     }
   }
 
   /** AndroidX PaneExpansionState.animateTo analogue. */
   async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
-    const matched = this.findAnchor(anchor);
-    if (matched === undefined) {
+    if (this.findAnchor(anchor) === undefined) {
       throw new RangeError('The provided anchor is not in the anchor list');
     }
-    await this.animateToMatchedAnchor(matched, initialVelocity, false);
+    // contains(anchor) is only validation upstream; currentAnchor receives the
+    // exact argument object rather than the equal anchor instance from the list.
+    await this.animateToAnchor(anchor, initialVelocity, false);
   }
 
   moveToNextAnchor() {
@@ -583,6 +572,10 @@ export class PaneExpansionState {
     const positions = this.getIndexedAnchorPositions();
     if (positions.length === 0) return;
 
+    // MutatorMutex starts this operation only after canceling the previous
+    // settle/drag mutation. The canceled anchor animation snaps its target in
+    // animateToInternal.finally before the next anchor is scored.
+    this.cancelSettlingAnimation();
     const currentPosition = this.currentMeasuredDraggingOffset;
     let bestAnchorPosition = positions[0]!;
     let bestScore = Number.POSITIVE_INFINITY;
@@ -604,7 +597,7 @@ export class PaneExpansionState {
       }
     }
 
-    await this.animateToMatchedAnchor(bestAnchorPosition.anchor, floatVelocity, true);
+    await this.animateToAnchor(bestAnchorPosition.anchor, floatVelocity, true);
   }
 
   getLayoutState(
