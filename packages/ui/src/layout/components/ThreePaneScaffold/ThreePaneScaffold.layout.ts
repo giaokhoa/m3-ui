@@ -214,12 +214,12 @@ export function calculateThreePaneScaffoldLayoutPass({
       reflowValue?.type === 'reflowed' &&
       paneScaffoldRolesEqual(reflowValue.reflowUnder, expandedRole)
     ) {
-      const availableHeight = rectHeight(bounds) - verticalGap;
+      const availableHeight = composeIntSubtract(rectHeight(bounds), verticalGap);
       const expandedRawHeight = Math.max(
-        availableHeight - preferredHeight(reflowed),
+        composeIntSubtract(availableHeight, preferredHeight(reflowed)),
         Math.trunc(availableHeight / 2),
       );
-      const reflowedRawHeight = availableHeight - expandedRawHeight;
+      const reflowedRawHeight = composeIntSubtract(availableHeight, expandedRawHeight);
       placePane(expandedRole, {
         left: bounds.left,
         top: bounds.top,
@@ -228,7 +228,7 @@ export function calculateThreePaneScaffoldLayoutPass({
       });
       placePane(reflowed, {
         left: bounds.left,
-        top: bounds.top + expandedRawHeight + verticalGap,
+        top: composeIntAdd(composeIntAdd(bounds.top, expandedRawHeight), verticalGap),
         width: rectWidth(bounds),
         height: reflowedRawHeight,
       });
