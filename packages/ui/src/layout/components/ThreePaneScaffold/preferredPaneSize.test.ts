@@ -49,6 +49,7 @@ describe('preferred pane size', () => {
 
   it('falls back to the directive preferred size when unspecified', () => {
     expect(resolvePanePreferredSize(undefined, 1000, 360, 'preferredWidth')).toBe(360);
+    expect(resolvePanePreferredSize(Number.NaN, 1000, 360, 'preferredWidth')).toBe(360);
   });
 
   it('accepts the AndroidX proportion edge values', () => {
