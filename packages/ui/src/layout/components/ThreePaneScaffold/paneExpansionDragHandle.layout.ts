@@ -274,7 +274,7 @@ export function updatePaneExpansionDragHandleFadeOffsets(
   targetOffsetX: number,
 ): PaneExpansionDragHandleFadeOffsets {
   if (targetOffsetX !== PaneExpansionUnspecified) {
-    finiteNonNegative(targetOffsetX, 'targetOffsetX');
+    finite(targetOffsetX, 'targetOffsetX');
   }
   if (current.targetOffsetX === targetOffsetX) return current;
   return {
@@ -298,8 +298,8 @@ export function calculatePaneExpansionDragHandleFadeFrame({
   targetOffsetX,
   progressFraction,
 }: PaneExpansionDragHandleFadeInput): PaneExpansionDragHandleFadeFrame {
-  finiteNonNegative(currentOffsetX, 'currentOffsetX');
-  finiteNonNegative(targetOffsetX, 'targetOffsetX');
+  finite(currentOffsetX, 'currentOffsetX');
+  finite(targetOffsetX, 'targetOffsetX');
   if (!Number.isFinite(progressFraction) || progressFraction < 0 || progressFraction > 1) {
     throw new RangeError(
       `progressFraction must be in [0, 1], received ${progressFraction}`,
