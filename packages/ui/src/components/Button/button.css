@@ -28,10 +28,6 @@
   --ripple-color: var(--_button-content-color);
 }
 
-.button > .elevation {
-  transition: var(--_button-elevation-transition, none);
-}
-
 .button[data-has-start-icon] {
   padding-inline-start: var(--_button-icon-padding-inline-start);
   padding-inline-end: var(--_button-icon-padding-inline-end);

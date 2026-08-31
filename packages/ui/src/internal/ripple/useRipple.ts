@@ -12,15 +12,44 @@ export interface UseRippleOptions {
   radius?: number;
 }
 
+export interface RipplePressHandlers<Event extends RipplePressEvent = RipplePressEvent> {
+  onPressStart?: (event: Event) => void;
+  onPressEnd?: (event: Event) => void;
+}
+
+export interface RipplePressProps<Event extends RipplePressEvent = RipplePressEvent> {
+  onPressStart(event: Event): void;
+  onPressEnd(event: Event): void;
+}
+
 export interface RippleController {
   readonly containerRef: RefObject<HTMLSpanElement | null>;
   readonly waves: readonly RippleWave[];
   onPressStart(event: RipplePressEvent): void;
   onPressEnd(): void;
+  getPressProps<Event extends RipplePressEvent>(
+    handlers?: RipplePressHandlers<Event>,
+  ): RipplePressProps<Event>;
 }
 
 const fadeOutDurationMs = msNumber(RippleFadeOutDuration);
 const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
+
+export function chainRipplePressHandlers<Event extends RipplePressEvent>(
+  controller: Pick<RippleController, 'onPressStart' | 'onPressEnd'>,
+  handlers: RipplePressHandlers<Event> = {},
+): RipplePressProps<Event> {
+  return {
+    onPressStart(event) {
+      controller.onPressStart(event);
+      handlers.onPressStart?.(event);
+    },
+    onPressEnd(event) {
+      controller.onPressEnd();
+      handlers.onPressEnd?.(event);
+    },
+  };
+}
 
 export function useRipple({
   origin = 'press',
@@ -97,5 +126,17 @@ export function useRipple({
     [],
   );
 
-  return { containerRef, waves, onPressStart, onPressEnd };
+  const controller: RippleController = {
+    containerRef,
+    waves,
+    onPressStart,
+    onPressEnd,
+    getPressProps<Event extends RipplePressEvent>(
+      handlers?: RipplePressHandlers<Event>,
+    ) {
+      return chainRipplePressHandlers(controller, handlers);
+    },
+  };
+
+  return controller;
 }

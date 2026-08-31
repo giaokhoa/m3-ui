@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -6,19 +6,11 @@ import {
 import '@m3-ui/tokens/button.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
+import { buttonElevationLevels } from './Button.elevation';
 import {
   getButtonStyle,
-  resolveButtonElevation,
-  type ButtonInteractionState,
   type ButtonShapes,
-} from './Button.defaults';
-import {
-  endButtonInteraction,
-  latestButtonInteraction,
-  latestButtonStateLayerInteraction,
-  startButtonInteraction,
-  type ButtonInteraction,
-} from './Button.interactions';
+} from './Button.runtime';
 import type { ButtonSize, ButtonVariant } from './Button.types';
 import './button.css';
 
@@ -54,63 +46,18 @@ function ButtonImpl({
   endIcon,
   size,
   shapes,
-  onBlur,
-  onFocus,
-  onHoverEnd,
-  onHoverStart,
   onPressStart,
   onPressEnd,
   ...props
 }: ButtonImplProps) {
   const ripple = useRipple();
-  const [activeInteractions, setActiveInteractions] = useState<ButtonInteraction[]>([]);
-  const startInteraction = (interaction: ButtonInteraction) => {
-    setActiveInteractions((active) => startButtonInteraction(active, interaction));
-  };
-  const endInteraction = (interaction: ButtonInteraction) => {
-    setActiveInteractions((active) => endButtonInteraction(active, interaction));
-  };
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    startInteraction('press');
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    endInteraction('press');
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
-  const handleHoverStart: AriaButtonProps['onHoverStart'] = (event) => {
-    startInteraction('hover');
-    onHoverStart?.(event);
-  };
-  const handleHoverEnd: AriaButtonProps['onHoverEnd'] = (event) => {
-    endInteraction('hover');
-    onHoverEnd?.(event);
-  };
-  const handleFocus: AriaButtonProps['onFocus'] = (event) => {
-    startInteraction('focus');
-    onFocus?.(event);
-  };
-  const handleBlur: AriaButtonProps['onBlur'] = (event) => {
-    endInteraction('focus');
-    onBlur?.(event);
-  };
-  const interaction = latestButtonInteraction(activeInteractions);
-  const previousInteractionRef = useRef<ButtonInteraction | null>(null);
-  const previousInteraction = previousInteractionRef.current;
-  useEffect(() => {
-    previousInteractionRef.current = interaction;
-  }, [interaction]);
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
   const variantClass = variantClassName(variant);
-
-  function interactionState(isDisabled: boolean): ButtonInteractionState {
-    return { isDisabled, interaction, previousInteraction };
-  }
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       data-has-end-icon={endIcon ? true : undefined}
       data-has-start-icon={startIcon ? true : undefined}
       data-size={size}
@@ -123,45 +70,46 @@ function ButtonImpl({
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return {
           ...getButtonStyle(
-            interactionState(renderProps.isDisabled),
-            { size, shapes },
+            {
+              isDisabled: renderProps.isDisabled,
+              isPressed: renderProps.isPressed,
+            },
+            { shapes },
           ),
           ...userStyle,
         };
       }}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onHoverEnd={handleHoverEnd}
-      onHoverStart={handleHoverStart}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
-      {(renderProps) => {
-        const state = interactionState(renderProps.isDisabled);
-        return (
-          <>
-            <Elevation level={resolveButtonElevation(variant, state)} />
-            <Ripple
-              controller={ripple}
-              focusRingRadius="var(--_button-container-radius)"
-              isFocusVisible={renderProps.isFocusVisible}
-              stateInteraction={latestButtonStateLayerInteraction(
-                activeInteractions,
-                renderProps.isFocusVisible,
-              )}
-            />
-            <span className="button__content">
-              {startIcon ? (
-                <span aria-hidden="true" className="button__icon">{startIcon}</span>
-              ) : null}
-              {typeof children === 'function' ? children(renderProps) : children}
-              {endIcon ? (
-                <span aria-hidden="true" className="button__icon">{endIcon}</span>
-              ) : null}
-            </span>
-          </>
-        );
-      }}
+      {(renderProps) => (
+        <>
+          <Elevation
+            levels={buttonElevationLevels[variant]}
+            state={{
+              isDisabled: renderProps.isDisabled,
+              isPressed: renderProps.isPressed,
+              isHovered: renderProps.isHovered,
+              isFocused: renderProps.isFocused,
+            }}
+          />
+          <Ripple
+            controller={ripple}
+            focusRingRadius="var(--_button-container-radius)"
+            state={{
+              isHovered: renderProps.isHovered,
+              isFocusVisible: renderProps.isFocusVisible,
+            }}
+          />
+          <span className="button__content">
+            {startIcon ? (
+              <span aria-hidden="true" className="button__icon">{startIcon}</span>
+            ) : null}
+            {typeof children === 'function' ? children(renderProps) : children}
+            {endIcon ? (
+              <span aria-hidden="true" className="button__icon">{endIcon}</span>
+            ) : null}
+          </span>
+        </>
+      )}
     </AriaButton>
   );
 }

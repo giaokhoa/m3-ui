@@ -1,38 +1,78 @@
 import '@m3-ui/tokens/elevation.css';
 import clsx from 'clsx';
-import type { CSSProperties, HTMLAttributes } from 'react';
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react';
+import {
+  resolveElevationInteraction,
+  resolveElevationLevel,
+  resolveElevationTransition,
+  type ElevationInteraction,
+  type ElevationInteractionState,
+  type ElevationLevels,
+} from './interaction';
 import type { ElevationLevel } from './tokens';
 import './elevation.css';
 
 type ElevationStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-export interface ElevationProps extends HTMLAttributes<HTMLSpanElement> {
-  level?: ElevationLevel;
+type ElevationBaseProps = HTMLAttributes<HTMLSpanElement> & {
   shadowColor?: string;
-}
+};
+
+type DirectElevationProps = {
+  level?: ElevationLevel;
+  levels?: never;
+  state?: never;
+};
+
+type InteractiveElevationProps = {
+  level?: never;
+  levels: ElevationLevels;
+  state: ElevationInteractionState;
+};
+
+export type ElevationProps = ElevationBaseProps &
+  (DirectElevationProps | InteractiveElevationProps);
 
 /**
- * Material elevation paint primitive.
+ * Material elevation paint primitive and shared RAC-state resolver.
  *
- * Component consumers select the semantic elevation level and let this
- * primitive own the paint layer. Do not add component-specific alias classes
- * merely to name <Elevation>; keep structural component styling on the owning
- * component boundary. Genuine runtime values such as shadowColor or a
- * runtime-selected transition style may still be passed when behavior needs
- * them. Existing alias callers are migration debt, not a reason to type-lock
- * the primitive API.
+ * Direct/static surfaces pass `level`. RAC-backed interactive controls pass a
+ * semantic `levels` set plus normalized current `state`; this primitive applies
+ * the repository-wide web precedence and owns any shared elevation-transition
+ * history. Shadow geometry remains generated CSS, never React serialization.
  */
 export function Elevation({
-  level = 'level0',
+  level,
+  levels,
+  state,
   shadowColor,
   className,
   style,
   ...props
 }: ElevationProps) {
+  const isInteractive = levels !== undefined;
+  const interaction = isInteractive
+    ? resolveElevationInteraction(state)
+    : null;
+  const previousInteractionRef = useRef<ElevationInteraction>(null);
+  const previousInteraction = previousInteractionRef.current;
+
+  useEffect(() => {
+    previousInteractionRef.current = isInteractive ? interaction : null;
+  }, [interaction, isInteractive]);
+
+  const resolvedLevel = isInteractive
+    ? resolveElevationLevel(levels, state)
+    : (level ?? 'level0');
+  const transition = isInteractive
+    ? resolveElevationTransition(state, interaction, previousInteraction)
+    : undefined;
+
   const elevationStyle: ElevationStyle = {
     ...(shadowColor === undefined
       ? {}
       : { '--_elevation-shadow-color': shadowColor }),
+    ...(transition === undefined ? {} : { transition }),
     ...style,
   };
 
@@ -41,7 +81,7 @@ export function Elevation({
       {...props}
       aria-hidden="true"
       className={clsx('elevation', className)}
-      data-elevation={level}
+      data-elevation={resolvedLevel}
       style={elevationStyle}
     />
   );
