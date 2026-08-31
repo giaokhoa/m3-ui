@@ -377,9 +377,13 @@ export class PaneExpansionState {
     return indexedAnchorPositions(this.anchors, this.maxExpansionWidth, this.measuredDirection);
   }
 
-  /** Mirrors the early-returning currentDraggingOffset setter in AndroidX. */
+  /** Mirrors currentDraggingOffset's coerceIn + redundant-write guard. */
   private setCurrentDraggingOffset(value: number) {
-    if (this.maxExpansionWidth === PaneExpansionUnspecified) return false;
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) {
+      // Kotlin coerceIn(0, -1) rejects the empty range. This is reachable when
+      // a measured handle offset is injected before the scaffold width exists.
+      throw new RangeError('Cannot coerce value to an empty range: [0, -1]');
+    }
     const offset = clamp(value, 0, this.maxExpansionWidth);
     if (offset === this.currentDraggingOffsetState) return false;
     this.currentDraggingOffsetState = offset;
@@ -526,10 +530,7 @@ export class PaneExpansionState {
 
   dispatchRawDelta(delta: number) {
     const remainingDelta = composeFloat(this.consumeDragDelta(composeFloat(delta)));
-    if (
-      this.maxExpansionWidth === PaneExpansionUnspecified ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
+    if (this.currentMeasuredDraggingOffset === PaneExpansionUnspecified) {
       return;
     }
     const nextOffset = composeFloatToInt(
