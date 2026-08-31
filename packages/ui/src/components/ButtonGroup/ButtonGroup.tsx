@@ -1,10 +1,12 @@
 import '@m3-ui/tokens/elevation.css';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes, type Key, type ReactNode, type RefObject } from 'react';
 import { Button as AriaButton, Radio as AriaRadio, RadioGroup as AriaRadioGroup, ToggleButton as AriaToggleButton, type ButtonProps as AriaButtonProps, type ToggleButtonProps as AriaToggleButtonProps } from 'react-aria-components';
+import { resolveElevationInteraction, resolveElevationLevel, resolveElevationTransition, type ElevationInteractionState } from '../../internal/elevation';
 import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { Button, ElevatedButton, FilledTonalButton, OutlinedButton, TextButton, type ButtonProps } from '../Button';
-import { getButtonStyle, resolveButtonElevation, resolveButtonElevationTransition, type ButtonInteractionState } from '../Button/Button.defaults';
+import { buttonElevationLevels } from '../Button/Button.elevation';
+import { getButtonStyle } from '../Button/Button.runtime';
 import { FilledIconButton } from '../IconButton';
 import { buttonGroupOverflowMenuTokens, buttonGroupStyle, defaultButtonGroupExpandedRatio, distributePressedWidths, visiblePrefixCount, type ButtonGroupSize } from './ButtonGroup.defaults';
 import './button-group.css';
@@ -38,22 +40,24 @@ function Measure({ items, size, rowRef, overflowRef }: { items: readonly ButtonG
 
 function OverflowItem({ item, onAction }: { item: ButtonGroupActionItem; onAction: () => void }) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps();
   return (
     <AriaButton
+      {...ripplePressProps}
       className="button-group__menu-item"
       isDisabled={item.isDisabled}
       type="button"
       render={(domProps) => <button {...domProps} role="menuitem" />}
       onPress={onAction}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           {item.startIcon ? <span aria-hidden="true" className="button-group__menu-icon">{item.startIcon}</span> : null}
           <span className="button-group__menu-label">{item.menuLabel ?? item.label}</span>
@@ -84,25 +88,28 @@ function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpande
 
 interface ConnectedInteractionRenderProps {
   isDisabled: boolean;
+  isFocused: boolean;
   isFocusVisible: boolean;
   isHovered: boolean;
   isPressed: boolean;
 }
 
-function connectedButtonState(p: ConnectedInteractionRenderProps): ButtonInteractionState {
+function connectedElevationState(p: ConnectedInteractionRenderProps): ElevationInteractionState {
   return {
     isDisabled: p.isDisabled,
-    interaction: p.isPressed ? 'press' : p.isHovered ? 'hover' : p.isFocusVisible ? 'focus' : null,
+    isPressed: p.isPressed,
+    isHovered: p.isHovered,
+    isFocused: p.isFocused,
   };
 }
 
 function ConnectedItem({ item,index,count,selected,mode,size,onChange }: { item:ConnectedButtonGroupItem;index:number;count:number;selected:boolean;mode:ButtonGroupSelectionMode;size:ButtonGroupSize;onChange:(v:boolean)=>void }) {
-  const ripple=useRipple(), position=count===1?'only':index===0?'leading':index===count-1?'trailing':'middle';
+  const ripple=useRipple(), ripplePressProps=ripple.getPressProps(), position=count===1?'only':index===0?'leading':index===count-1?'trailing':'middle';
   const data={ 'aria-label':typeof item.label==='string'?item.label:undefined,'data-position':position,'data-selected':selected||undefined,'data-button-group-item':String(item.id),'data-item-index':index,'data-size':size,isDisabled:item.isDisabled,className:'button button-group__connected-item elevation-host' } as const;
-  const content=(p:{isFocusVisible:boolean;isHovered:boolean})=><><Ripple controller={ripple} focusRingRadius="inherit" isFocusVisible={p.isFocusVisible} isHovered={p.isHovered}/><span className="button__content">{item.startIcon?<span aria-hidden="true" className="button__icon">{item.startIcon}</span>:null}{item.label}{item.endIcon?<span aria-hidden="true" className="button__icon">{item.endIcon}</span>:null}</span></>;
-  const style=(p:ConnectedInteractionRenderProps)=>{const state=connectedButtonState(p);return({...getButtonStyle(state,{size}),transition:resolveButtonElevationTransition(state),'--_button-container-color':selected?'var(--_button-group-selected-container)':'var(--_button-group-unselected-container)','--_button-content-color':selected?'var(--_button-group-selected-content)':'var(--_button-group-unselected-content)'}) as CSSProperties;};
-  if(mode==='single')return <AriaRadio {...data} value={String(index)} style={style} render={(props,p)=><label {...props} data-elevation={resolveButtonElevation('filled',connectedButtonState(p))}/>} onPressStart={e=>ripple.onPressStart(e)} onPressEnd={()=>ripple.onPressEnd()}>{content}</AriaRadio>;
-  const tp:AriaToggleButtonProps={...data,isSelected:selected,onChange,style,children:content,render:(props,p)=><button {...props} data-elevation={resolveButtonElevation('filled',connectedButtonState(p))}/>,onPressStart:e=>ripple.onPressStart(e),onPressEnd:()=>ripple.onPressEnd()};return <AriaToggleButton {...tp}/>;
+  const content=(p:{isFocusVisible:boolean;isHovered:boolean})=><><Ripple controller={ripple} focusRingRadius="inherit" state={{isFocusVisible:p.isFocusVisible,isHovered:p.isHovered}}/><span className="button__content">{item.startIcon?<span aria-hidden="true" className="button__icon">{item.startIcon}</span>:null}{item.label}{item.endIcon?<span aria-hidden="true" className="button__icon">{item.endIcon}</span>:null}</span></>;
+  const style=(p:ConnectedInteractionRenderProps)=>{const state=connectedElevationState(p), interaction=resolveElevationInteraction(state);return({...getButtonStyle({isDisabled:p.isDisabled,isPressed:p.isPressed}),transition:resolveElevationTransition(state,interaction,null),'--_button-container-color':selected?'var(--_button-group-selected-container)':'var(--_button-group-unselected-container)','--_button-content-color':selected?'var(--_button-group-selected-content)':'var(--_button-group-unselected-content)'}) as CSSProperties;};
+  if(mode==='single')return <AriaRadio {...data} {...ripplePressProps} value={String(index)} style={style} render={(props,p)=><label {...props} data-elevation={resolveElevationLevel(buttonElevationLevels.filled,connectedElevationState(p))}/>}>{content}</AriaRadio>;
+  const tp:AriaToggleButtonProps={...data,...ripplePressProps,isSelected:selected,onChange,style,children:content,render:(props,p)=><button {...props} data-elevation={resolveElevationLevel(buttonElevationLevels.filled,connectedElevationState(p))}/>};return <AriaToggleButton {...tp}/>;
 }
 
 function Connected(props: ConnectedButtonGroupProps) {
