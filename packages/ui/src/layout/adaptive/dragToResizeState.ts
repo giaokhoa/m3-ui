@@ -375,16 +375,20 @@ export class DragToResizeState {
     target: DragToResizeValue,
     animation: DragToResizeAnimation = this.defaultAnimation,
   ) {
-    if (this.valueInternal === target || Number.isNaN(this.sizeInternal)) return;
+    if (this.valueInternal === target) return;
 
     const sourceValue = this.valueInternal;
     const targetSize = this.targetSize(target);
     if (sourceValue === DragToResizeValue.Default) {
+      // AndroidX takes this branch before touching animation-core. Before the
+      // first measurement its size is NaN but the axis range is still 0f..0f,
+      // so Default -> Expanded/Collapsed snaps to 0f and updates state.
       this.setSize(targetSize);
       this.valueInternal = target;
       this.notify();
       return;
     }
+    if (Number.isNaN(this.sizeInternal)) return;
 
     const controller = new AbortController();
     this.animationControllers.add(controller);
