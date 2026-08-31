@@ -51,7 +51,7 @@ describe('PaneExpansionStateCache', () => {
     expect(state.getLayoutState(1000).firstPaneProportion).toBeNaN();
 
     cache.update(secondKey, { anchors, initialAnchoredIndex: 1 });
-    expect(state.currentAnchor).toBeNull();
+    expect(state.currentAnchor).toBe(anchors[3]);
     expect(state.getLayoutState(1000).firstPaneProportion).toBe(Math.fround(0.4));
   });
 
