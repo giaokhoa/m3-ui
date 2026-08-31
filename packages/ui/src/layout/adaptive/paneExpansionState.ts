@@ -377,11 +377,18 @@ export class PaneExpansionState {
     return indexedAnchorPositions(this.anchors, this.maxExpansionWidth, this.measuredDirection);
   }
 
-  private setAnimatedOffset(value: number) {
-    if (this.maxExpansionWidth === PaneExpansionUnspecified) return;
-    const offset = clamp(composeFloatToInt(value), 0, this.maxExpansionWidth);
+  /** Mirrors the early-returning currentDraggingOffset setter in AndroidX. */
+  private setCurrentDraggingOffset(value: number) {
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) return false;
+    const offset = clamp(value, 0, this.maxExpansionWidth);
+    if (offset === this.currentDraggingOffsetState) return false;
     this.currentDraggingOffsetState = offset;
     this.currentMeasuredDraggingOffset = offset;
+    return true;
+  }
+
+  private setAnimatedOffset(value: number) {
+    return this.setCurrentDraggingOffset(composeFloatToInt(value));
   }
 
   get currentAnchor() {
@@ -491,17 +498,11 @@ export class PaneExpansionState {
     this.maxExpansionWidth = nextWidth;
     this.measuredDirection = direction;
     if (!this.isDraggingOrSettling && this.currentAnchorState !== null) {
-      const offset = clamp(
+      this.setCurrentDraggingOffset(
         anchorPosition(this.currentAnchorState, nextWidth, direction),
-        0,
-        nextWidth,
       );
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
     } else if (this.currentDraggingOffsetState !== PaneExpansionUnspecified) {
-      const offset = clamp(this.currentDraggingOffsetState, 0, nextWidth);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
+      this.setCurrentDraggingOffset(this.currentDraggingOffsetState);
     }
     this.notify();
   }
@@ -526,16 +527,10 @@ export class PaneExpansionState {
     ) {
       return;
     }
-    const nextOffset = clamp(
-      composeFloatToInt(
-        composeFloat(composeFloat(this.currentMeasuredDraggingOffset) + remainingDelta),
-      ),
-      0,
-      this.maxExpansionWidth,
+    const nextOffset = composeFloatToInt(
+      composeFloat(composeFloat(this.currentMeasuredDraggingOffset) + remainingDelta),
     );
-    if (nextOffset === this.currentDraggingOffsetState) return;
-    this.currentDraggingOffsetState = nextOffset;
-    this.currentMeasuredDraggingOffset = nextOffset;
+    if (!this.setCurrentDraggingOffset(nextOffset)) return;
     this.notify();
   }
 
@@ -588,8 +583,7 @@ export class PaneExpansionState {
         signal: controller.signal,
         update: (offset) => {
           if (controller.signal.aborted) return;
-          this.setAnimatedOffset(offset);
-          this.notify();
+          if (this.setAnimatedOffset(offset)) this.notify();
         },
       });
     } finally {
