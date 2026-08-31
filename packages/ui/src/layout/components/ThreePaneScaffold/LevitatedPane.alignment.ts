@@ -17,10 +17,16 @@ function alignmentParts(alignment: LevitatedPaneAlignmentPreset): {
   return { vertical, horizontal };
 }
 
+function composeIntSubtract(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a - b) | 0 : a - b;
+}
+
 function composeBiasCoordinate(size: number, space: number, bias: -1 | 0 | 1): number {
-  // Compose BiasAlignment first converts the remaining Int space to Float,
-  // performs the bias arithmetic as Float, and only then fastRoundToInt().
-  const center = Math.fround(Math.fround(space - size) / Math.fround(2));
+  // Compose BiasAlignment subtracts Int space/size before converting the
+  // remaining space to Float. Preserve Int32 overflow for resize-state sizes,
+  // while leaving fractional browser-native geometry on its double path.
+  const remaining = composeIntSubtract(space, size);
+  const center = Math.fround(Math.fround(remaining) / Math.fround(2));
   const coordinate = Math.fround(center * Math.fround(1 + bias));
   return Math.round(coordinate);
 }
