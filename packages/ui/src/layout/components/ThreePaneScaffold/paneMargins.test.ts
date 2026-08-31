@@ -130,4 +130,15 @@ describe('applyPaneMargins', () => {
       ),
     ).toEqual({ left: 80, top: 90, width: 0, height: 0 });
   });
+
+  it('preserves IntRect edge overflow before applying margins', () => {
+    expect(
+      applyPaneMargins(
+        { left: 2147483647, top: 0, width: 360, height: 800 },
+        {},
+        1000,
+        800,
+      ),
+    ).toEqual({ left: 2147483647, top: 0, width: 360, height: 800 });
+  });
 });
