@@ -6,6 +6,7 @@ import {
   hasLivePaneTransitionInitialValueAnimation,
   retargetPaneTransitionTrack,
   samplePaneTransitionTrack,
+  type PaneTransitionRunningTimeline,
   type PaneTransitionTrack,
 } from './ThreePaneScaffold.interruption';
 import {
@@ -25,6 +26,7 @@ const MillisToNanos = 1_000_000;
 export interface ThreePaneScaffoldTransitionSnapshot {
   readonly layout: ThreePaneScaffoldTransitionLayoutOptions;
   readonly progressFraction: number;
+  readonly runningTimeline?: PaneTransitionRunningTimeline;
 }
 
 interface PaneTracks {
@@ -720,6 +722,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       toTrack: targetPane?.translateX,
       sourceTransitionDurationMs: source.durationMs,
       sourceTransitionProgressFraction: previousSnapshot.progressFraction,
+      sourceTransitionRunningTimeline: previousSnapshot.runningTimeline,
       fallbackVisibilityThreshold: 1,
       fallbackQuantizationStep: 1,
     });
@@ -736,6 +739,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       toTrack: targetPane?.opacity,
       sourceTransitionDurationMs: source.durationMs,
       sourceTransitionProgressFraction: previousSnapshot.progressFraction,
+      sourceTransitionRunningTimeline: previousSnapshot.runningTimeline,
       fallbackVisibilityThreshold: FloatVisibilityThreshold,
     });
 
@@ -760,6 +764,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
       toTrack: targetPane?.inlineSize,
       sourceTransitionDurationMs: source.durationMs,
       sourceTransitionProgressFraction: previousSnapshot.progressFraction,
+      sourceTransitionRunningTimeline: previousSnapshot.runningTimeline,
       fallbackVisibilityThreshold: 1,
       fallbackQuantizationStep: 1,
     });
@@ -774,6 +779,7 @@ export function createThreePaneScaffoldVisibilityInterruption({
     toTrack: destination.tracks.scrimOpacity,
     sourceTransitionDurationMs: source.durationMs,
     sourceTransitionProgressFraction: previousSnapshot.progressFraction,
+    sourceTransitionRunningTimeline: previousSnapshot.runningTimeline,
     fallbackVisibilityThreshold: FloatVisibilityThreshold,
   });
   const durationMs = transitionTracksDurationMs(panes, scrimOpacity, 0);
