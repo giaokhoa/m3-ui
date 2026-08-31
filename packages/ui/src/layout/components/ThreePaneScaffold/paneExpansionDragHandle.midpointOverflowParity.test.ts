@@ -7,8 +7,10 @@ import {
 } from '../../adaptive/threePaneScaffold';
 import { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
 import {
+  calculatePaneExpansionDragHandleFadeFrame,
   calculatePaneExpansionDragHandlePlacement,
   calculatePaneExpansionSpacerMiddleOffset,
+  updatePaneExpansionDragHandleFadeOffsets,
 } from './paneExpansionDragHandle.layout';
 
 const twoExpanded: ThreePaneScaffoldValue = {
@@ -28,19 +30,20 @@ const directive: PaneScaffoldDirective = {
   shouldAutoFocusCurrentDestination: true,
 };
 
+const overflowLayoutOptions = {
+  width: 2147483647,
+  height: 800,
+  directive,
+  value: twoExpanded,
+  paneOrder: listDetailPaneScaffoldOrder,
+  excludedBounds: [
+    { left: 2147483547, top: 0, right: 2147483597, bottom: 800 },
+  ],
+} as const;
+
 describe('pane-expansion spacer midpoint Int overflow parity', () => {
   it('wraps pane-position additions before Int division', () => {
-    const layoutOptions = {
-      width: 2147483647,
-      height: 800,
-      directive,
-      value: twoExpanded,
-      paneOrder: listDetailPaneScaffoldOrder,
-      excludedBounds: [
-        { left: 2147483547, top: 0, right: 2147483597, bottom: 800 },
-      ],
-    } as const;
-    const layout = calculateThreePaneScaffoldLayout(layoutOptions);
+    const layout = calculateThreePaneScaffoldLayout(overflowLayoutOptions);
 
     expect(layout.secondary).toEqual({
       left: 0,
@@ -56,7 +59,12 @@ describe('pane-expansion spacer midpoint Int overflow parity', () => {
     });
 
     // AndroidX: (0 + 2147483547 + 2147483597) wraps to -152, then Int / 2 = -76.
-    expect(calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions })).toBe(-76);
+    expect(
+      calculatePaneExpansionSpacerMiddleOffset({
+        layout,
+        layoutOptions: overflowLayoutOptions,
+      }),
+    ).toBe(-76);
   });
 
   it('coerces a negative overflowed midpoint into the handle placement bounds', () => {
@@ -68,5 +76,48 @@ describe('pane-expansion spacer midpoint Int overflow parity', () => {
         minTouchTargetSize: 48,
       }),
     ).toEqual({ centerX: 0, minWidth: 96 });
+  });
+
+  it('preserves a negative midpoint when a custom negative spacer allows it', () => {
+    const negativeSpacerDirective: PaneScaffoldDirective = {
+      ...directive,
+      horizontalPartitionSpacerSize: '-200px',
+    };
+    const layoutOptions = {
+      ...overflowLayoutOptions,
+      directive: negativeSpacerDirective,
+    };
+    const layout = calculateThreePaneScaffoldLayout(layoutOptions);
+    const midpoint = calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions });
+
+    expect(midpoint).toBe(-76);
+    expect(
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: midpoint,
+        contentWidth: 2147483647,
+        partitionSpacerSize: negativeSpacerDirective.horizontalPartitionSpacerSize,
+        minTouchTargetSize: 48,
+      }),
+    ).toEqual({ centerX: -76, minWidth: 248 });
+
+    const tracked = updatePaneExpansionDragHandleFadeOffsets(
+      { originalOffsetX: 0, targetOffsetX: -76 },
+      -50,
+    );
+    expect(tracked).toEqual({ originalOffsetX: -76, targetOffsetX: -50 });
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: tracked.originalOffsetX,
+        targetOffsetX: tracked.targetOffsetX,
+        progressFraction: 0,
+      }),
+    ).toEqual({ offsetX: -76, opacity: 1 });
+    expect(
+      calculatePaneExpansionDragHandleFadeFrame({
+        currentOffsetX: tracked.originalOffsetX,
+        targetOffsetX: tracked.targetOffsetX,
+        progressFraction: 1,
+      }),
+    ).toEqual({ offsetX: -50, opacity: 1 });
   });
 });
