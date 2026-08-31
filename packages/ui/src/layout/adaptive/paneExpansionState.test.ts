@@ -293,6 +293,33 @@ describe('PaneExpansionState', () => {
     expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
   });
 
+  it('rounds release velocity to Float before threshold scoring and anchor animation', async () => {
+    const anchors = [
+      PaneExpansionAnchor.proportion(0.25),
+      PaneExpansionAnchor.proportion(0.5),
+      PaneExpansionAnchor.proportion(0.75),
+    ];
+    let receivedVelocity = Number.NaN;
+    const animation: PaneExpansionAnimation = async ({ initialVelocity, to, update }) => {
+      receivedVelocity = initialVelocity;
+      update(to);
+    };
+    const state = new PaneExpansionState({ anchors, animation });
+    state.onMeasured(1000);
+    state.onExpansionOffsetMeasured(520);
+
+    const jsVelocity = 199.999999;
+    expect(jsVelocity).toBeLessThan(200);
+    expect(Math.fround(jsVelocity)).toBe(200);
+    await state.settleToAnchorIfNeeded(jsVelocity);
+
+    // The nearest anchor is 500, but AndroidX receives velocity as Float=200f,
+    // so the threshold is active and the next anchor in the release direction wins.
+    expect(state.currentAnchor).toBe(anchors[2]);
+    expect(receivedVelocity).toBe(200);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(750);
+  });
+
   it('uses animated anchor changes for semantic next-anchor activation', async () => {
     const anchors = [
       PaneExpansionAnchor.proportion(0.25),
