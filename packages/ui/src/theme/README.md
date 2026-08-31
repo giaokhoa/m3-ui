@@ -1,15 +1,17 @@
-# Theme foundation architecture
+# Theme runtime
 
-The theme layer owns Material foundations that apply across component families. It is the web equivalent of the **theme-resolution** responsibility of Compose `MaterialTheme`; it is not a registry of per-component defaults and it is not a replacement for the canonical component-token graph.
+`packages/ui/src/theme` contains the Material theme runtime used by `@m3-ui/ui`.
 
-Agents changing Material component/theme/token ownership must read `/.agents/skills/material3-parity/SKILL.md` first. Root `/AGENTS.md` defines the trigger scope for this mandatory entrypoint.
+This README documents the current theme data flow and files. Agent decisions about token ownership, Compose parity and static-versus-runtime boundaries live in `.agents/skills/material3-parity/SKILL.md`.
 
-The ownership boundary is deliberate:
+## Runtime flow
+
+Component semantic colors resolve through the canonical token graph to scoped CSS role variables owned by `ThemeProvider`:
 
 ```text
-canonical component token
-    -> canonical system/color role
-    -> CSS custom property endpoint
+component token
+    -> canonical color role
+    -> var(--role)
     -> ThemeProvider concrete runtime value
 ```
 
@@ -19,73 +21,28 @@ For example:
 component.button.variant.filled.containerColor
     -> color.role.primary
     -> var(--primary)
-    -> ThemeProvider sourceColor-derived primary
+    -> ThemeProvider primary
 ```
 
-Changing `sourceColor` must therefore update every color-bearing component through CSS inheritance/cascade. Components must not have to re-resolve their colors in React.
+A `sourceColor` change therefore propagates to component styling through the provider scope and CSS cascade.
 
-## Current color contract
+## ThemeProvider inputs
 
-`@m3-ui/ui` exposes Material 3 color roles as short, scoped CSS custom properties.
+`ThemeProvider` currently accepts:
 
-Examples:
+- `mode`: light or dark;
+- `sourceColor`: optional Material dynamic-color seed;
+- `contrastLevel`: dynamic scheme contrast input;
+- `rippleFocus`: global Material ripple focus treatment;
+- `style`: instance CSS/custom-property overrides.
 
-- `primary` -> `--primary`
-- `onPrimary` -> `--on-primary`
-- `surfaceContainerHigh` -> `--surface-container-high`
+When `sourceColor` is absent, the current implementation loads the repository's static baseline light/dark `ColorScheme`. When `sourceColor` is present, `createDynamicColorScheme()` uses Material Color Utilities `SchemeTonalSpot`.
 
-There is intentionally no `--md-sys-` prefix.
+## ThemeProvider outputs
 
-`ThemeProvider` uses the official static Material 3 baseline when no `sourceColor` is provided. When `sourceColor` is provided, it uses Material Color Utilities `SchemeTonalSpot` to generate a dynamic scheme.
+The provider exposes two surfaces:
 
-The static baseline is kept separate from dynamic generation because MCU output for a baseline-looking seed is not guaranteed to be byte-for-byte identical to the Material baseline used by the pinned Material references.
-
-## Responsibilities
-
-`ThemeProvider` may own:
-
-- the active light/dark mode;
-- a runtime `sourceColor` and contrast level;
-- the concrete runtime `ColorScheme` values derived from those inputs;
-- scoped system-role CSS variables such as `--primary`, `--surface`, and `--outline`;
-- behavioral theme data that JavaScript genuinely needs;
-- the matching themed portal scope.
-
-`ThemeProvider` must **not** own:
-
-- per-component semantic mappings such as "filled Button container uses Primary";
-- a MUI-style `theme.components.Button` defaults/override registry;
-- `ButtonDefaults.colors()`, `TextFieldDefaults.colors()`, or similar runtime facades whose only job is to return mappings already represented by canonical tokens;
-- static component dimensions, typography, shape, state opacity, motion, or color mappings that Style Dictionary can compile once;
-- React-time reserialization of immutable token data merely because Compose exposes a runtime `FooDefaults` API.
-
-Those component semantics belong to canonical component DTCG and reviewed generated platform adapters.
-
-## Why Compose `MaterialTheme` and `FooDefaults` do not map literally
-
-Compose has both `MaterialTheme` and component `FooDefaults`. `FooDefaults` commonly reads the active `MaterialTheme` and resolves defaults at Compose runtime because Compose does not have the browser CSS cascade plus this repository's token compiler boundary.
-
-On this web implementation, preserve the **Material semantic contract**, not the Kotlin mechanism:
-
-```text
-Compose runtime
-MaterialTheme -> FooDefaults -> component
-
-m3-ui web
-canonical component DTCG -> generated CSS -> component
-                         \
-                          -> var(--role) -> ThemeProvider runtime value
-```
-
-Therefore Compose `FooDefaults` is an audit oracle for which semantic defaults, states, variants, sizes, and customization capabilities exist. Its presence is **not** evidence that m3-ui should create a TypeScript `FooDefaults` object or resolve static colors/defaults in React.
-
-A component-local `*.defaults.ts` is valid only when it contains genuine runtime resolution. It must not become a handwritten token-to-CSS compiler.
-
-## CSS-first rule
-
-Visual theme values should flow through CSS whenever possible.
-
-Colors already use system variables such as:
+1. Scoped CSS custom properties for Material system roles such as:
 
 ```text
 --primary
@@ -94,53 +51,95 @@ Colors already use system variables such as:
 --surface-container-high
 --outline
 --error
+--shadow
 ```
 
-Typography, shape, motion, and elevation may use similarly clear system variables when runtime theme switching benefits from CSS inheritance.
+2. A typed React context for JavaScript consumers that need runtime theme information:
 
-Components should not call a theme hook just to obtain values that CSS can inherit. This is what keeps nested themes cheap and makes a `sourceColor` change propagate without component-specific React color work.
+```ts
+interface ThemeContextValue {
+  mode: ThemeMode;
+  sourceColor?: string;
+  contrastLevel: number;
+  rippleFocus: RippleFocusIndication;
+  scheme: ColorScheme;
+}
+```
 
-## Static baseline versus dynamic runtime theme
+`useTheme()` returns that context.
 
-The long-term boundary is:
+## Portal theming
+
+Material overlays rendered through portals need the same scoped theme as ordinary descendants. `ThemeProvider` creates a themed portal container under `document.body` and exposes it through `ThemePortalContainerContext`.
+
+The provider scope and portal scope receive the same `data-theme` and CSS-variable style object, so dialogs, menus, sheets and other portal surfaces resolve the same Material roles.
+
+## Current files
 
 ```text
-immutable baseline Material foundations
-    -> canonical DTCG
-    -> Style Dictionary
-    -> generated CSS / typed JS
-
-dynamic sourceColor / runtime overrides
-    -> ThemeProvider
-    -> scoped CSS role overrides
+theme/
+├── ThemeProvider.tsx          provider, context and themed portal scope
+├── ThemePortalContext.ts      portal-container context
+├── baseline.ts                current static Material baseline schemes
+├── dynamic.ts                 Material Color Utilities dynamic scheme generation
+├── cssVariables.ts            ColorScheme -> scoped CSS role variables
+├── types.ts                   ColorScheme / ThemeMode contracts
+├── colors/                    color foundation helpers/data
+├── typography/                type scale and current typography theme projection
+├── shapes/                    shape foundation
+├── motion/                    motion foundation
+├── elevation/                 elevation foundation
+└── README.md
 ```
 
-The current implementation still keeps baseline light/dark color maps in `theme/baseline.ts` and statically serializes baseline role/typography variables through React. Treat that as **migration debt, not an architectural precedent**. Immutable baseline light/dark and baseline typography should be generated once when the token migration tracker reaches that work; `ThemeProvider` remains responsible for selecting the active mode and for injecting dynamic `sourceColor`/runtime overrides.
+The package barrel in `theme/index.ts` exports the public theme contracts and helpers.
 
-This optimization must not change the observable contract: changing `sourceColor`, mode, or contrast must still update all descendants and themed portals through the same system-role variables.
+## Static baseline and dynamic schemes
 
-## React Context rule
+The current baseline path is:
 
-Use React Context only for data that must be consumed by JavaScript. Do not make every component read colors, radii, typography, or other visual defaults from Context.
+```text
+baseline.ts
+    -> getBaselineColorScheme(mode)
+    -> schemeToCssVariables()
+    -> ThemeProvider style
+```
 
-This keeps theme changes scoped, makes nested themes natural, reduces rerenders, and keeps component styling independent from React runtime state.
+The current dynamic path is:
 
-## Compose parity mapping
+```text
+sourceColor + mode + contrastLevel
+    -> Material Color Utilities
+    -> ColorScheme
+    -> schemeToCssVariables()
+    -> ThemeProvider style
+```
 
-Compose `MaterialTheme` is the conceptual source for what belongs in this layer, not the implementation template.
+Issue #150 tracks moving immutable baseline color/typography data into the canonical token/compiler pipeline while preserving the same public runtime behavior.
 
-Translate Compose mechanisms by responsibility:
+## Typography
 
-- visual `CompositionLocal` values usually become CSS inheritance;
-- JavaScript-required theme values may become typed Context values;
-- `ColorScheme`, `Typography`, `Shapes`, and motion/elevation foundations define theme-level semantics;
-- **static component-specific defaults belong to canonical component tokens and generated component adapters**;
-- component-local TypeScript keeps only runtime behavior/arithmetic/history/DOM data or real runtime overrides.
+The theme runtime currently applies the default Material typography foundation together with the color scheme. Public/docs typography consumers use the same generated Material type-scale data rather than a separate docs type system.
 
-The old wording "component-specific defaults stay with the component" must not be interpreted as "copy Compose `FooDefaults` into `Foo.defaults.ts`". It means component semantics do not leak into the global theme API; their immutable values stay in the component's canonical token namespace and generated adapter.
+The current typography implementation lives under `theme/typography/`.
 
-## Dependency rule
+## Testing
 
-`theme/` may consume foundation/generated token data, but must not import public components. Public components may consume theme contracts and CSS variables.
+Theme tests cover baseline scheme values, dynamic scheme generation and CSS-variable projection. Run them through the UI package:
 
-The full repository ownership contract and static/runtime decision procedure live in `/docs/architecture/README.md`; token/compiler details live in `/packages/tokens/README.md`.
+```bash
+pnpm --filter @m3-ui/ui test
+pnpm --filter @m3-ui/ui typecheck
+pnpm --filter @m3-ui/ui build
+```
+
+Visual behavior of theme-sensitive components is additionally covered through Storybook/Playwright visual regression.
+
+## Related docs
+
+- Token/compiler data flow: `packages/tokens/README.md`
+- Ripple runtime: `packages/ui/src/internal/ripple/README.md`
+- Elevation runtime: `packages/ui/src/internal/elevation/README.md`
+- Repository overview and commands: root `README.md`
+
+For agent implementation work, root `AGENTS.md` selects the required Material parity/compiler skills.
