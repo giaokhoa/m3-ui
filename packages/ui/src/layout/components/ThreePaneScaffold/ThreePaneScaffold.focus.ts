@@ -3,10 +3,25 @@ type FocusableElement = Element & {
   focus: (options?: FocusOptions) => void;
 };
 
+const ProgrammaticallyFocusableSelector = [
+  'a[href]',
+  'area[href]',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'iframe',
+  'summary',
+  'audio[controls]',
+  'video[controls]',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[tabindex]',
+].join(',');
+
 function isFocusableCandidate(element: Element): element is FocusableElement {
   if (!('tabIndex' in element) || typeof element.tabIndex !== 'number') return false;
   if (!('focus' in element) || typeof element.focus !== 'function') return false;
-  if (element.tabIndex < 0) return false;
+  if (!element.matches(ProgrammaticallyFocusableSelector)) return false;
   if (element.matches(':disabled')) return false;
   if (element.closest('[inert]') !== null) return false;
   return true;
@@ -60,6 +75,9 @@ function isBetterCandidate(
  * ThreePaneScaffold focusGroup. At the pinned Compose revision,
  * FocusRequester.requestFocus(Enter) maps Enter to a physical Right search
  * from the group's top-left point and focuses a descendant, never the group.
+ * Browser candidates are programmatically focusable descendants, including
+ * explicit tabindex="-1" targets that are intentionally outside sequential
+ * keyboard navigation.
  */
 export function requestPaneDestinationFocus(pane: HTMLElement): boolean {
   const candidates: FocusableElement[] = [];
