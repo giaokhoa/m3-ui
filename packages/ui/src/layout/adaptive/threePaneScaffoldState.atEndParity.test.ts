@@ -20,6 +20,7 @@ const primary: ThreePaneScaffoldValue = {
 describe('MutableThreePaneScaffoldState fraction-end parity', () => {
   it('commits a seeked target at fraction 1 without starting another animation', async () => {
     const state = new MutableThreePaneScaffoldState(hidden);
+    state.setTransitionDurationResolver({}, () => 0);
     state.seekTo(1, primary, true);
 
     const animation = vi.fn<ThreePaneScaffoldProgressAnimation>(async () => {});
