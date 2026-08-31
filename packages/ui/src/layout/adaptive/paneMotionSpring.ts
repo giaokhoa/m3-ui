@@ -220,16 +220,21 @@ export function samplePaneMotionVectorSpringAtProgress(
   progressFraction: number,
   visibilityThresholds: number | readonly number[] = 1,
 ): number[] {
-  const progress = clampProgress(progressFraction);
+  const progress = composeFloat(clampProgress(progressFraction));
   const duration = calculatePaneMotionVectorSpringDurationMs(
     initialValues,
     targetValues,
     visibilityThresholds,
   );
+  // AnimateBounds samples TargetBasedAnimation with
+  // (durationNanos * animateFraction).toLong(). Long * Float first converts the
+  // duration to Float, so keep that precision boundary before truncating nanos.
+  const durationNanos = composeFloat(duration * MillisToNanos);
+  const playTimeNanos = Math.trunc(composeFloat(durationNanos * progress));
   return samplePaneMotionVectorSpringAtPlayTime(
     initialValues,
     targetValues,
-    duration * progress,
+    playTimeNanos / MillisToNanos,
     visibilityThresholds,
   );
 }
