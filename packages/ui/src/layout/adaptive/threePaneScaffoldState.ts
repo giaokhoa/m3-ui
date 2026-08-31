@@ -283,7 +283,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.animationController = null;
   }
 
-  private updateSettledMetadata(
+  private updateSettledPredictiveBack(
     targetState: ThreePaneScaffoldValue,
     predictiveBack: boolean,
   ) {
@@ -293,18 +293,12 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     ) {
       return false;
     }
-    const destinationChanged =
-      this.currentStateValue.currentDestination !== targetState.currentDestination ||
-      this.targetStateValue.currentDestination !== targetState.currentDestination;
-    const predictiveBackChanged = this.predictiveBack !== predictiveBack;
-    if (destinationChanged) {
-      this.currentStateValue = targetState;
-      this.targetStateValue = targetState;
-    }
-    if (predictiveBackChanged) {
+    // SeekableTransitionState compares S with ==. ThreePaneScaffoldValue.equals
+    // deliberately ignores currentDestination, so a destination-only object is
+    // not installed into currentState/targetState. The Material wrapper still
+    // updates its predictive-back flag around seek/snap/animate calls.
+    if (this.predictiveBack !== predictiveBack) {
       this.predictiveBack = predictiveBack;
-    }
-    if (destinationChanged || predictiveBackChanged) {
       this.notify();
     }
     return true;
@@ -377,7 +371,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       if (predictiveBackChanged) this.notify();
       return;
     }
-    if (this.updateSettledMetadata(targetState, false)) return;
+    if (this.updateSettledPredictiveBack(targetState, false)) return;
     this.predictiveBack = false;
     this.currentStateValue = targetState;
     this.targetStateValue = targetState;
@@ -404,7 +398,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       if (predictiveBackChanged) this.notify();
       return;
     }
-    if (this.updateSettledMetadata(targetState, isPredictiveBackInProgress)) return;
+    if (this.updateSettledPredictiveBack(targetState, isPredictiveBackInProgress)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.predictiveBack = isPredictiveBackInProgress;
@@ -439,11 +433,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       if (predictiveBackChanged) this.notify();
       return;
     }
-    if (this.updateSettledMetadata(targetState, false)) return;
+    if (this.updateSettledPredictiveBack(targetState, false)) return;
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
-    const targetMetadataChanged =
-      oldTarget.currentDestination !== targetState.currentDestination;
 
     const runningAnimation = this.activeAnimation;
     if (
@@ -453,10 +445,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       runningAnimation.driver === animation &&
       threePaneScaffoldValuesEqual(runningAnimation.targetState, targetState)
     ) {
-      if (targetMetadataChanged) this.targetStateValue = targetState;
       const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
       this.predictiveBack = isPredictiveBackInProgress;
-      if (targetMetadataChanged || predictiveBackChanged) this.notify();
+      if (predictiveBackChanged) this.notify();
       await runningAnimation.completion;
       return;
     }
@@ -471,8 +462,6 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       this.currentStateValue = oldTarget;
       this.targetStateValue = targetState;
       this.progressFractionValue = 0;
-    } else {
-      this.targetStateValue = targetState;
     }
 
     const resolvedCurrent = this.currentStateValue;
@@ -498,7 +487,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       // wrapper state in finally even when SeekableTransitionState setup fails.
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
-      if (predictiveBackChanged || targetMetadataChanged) this.notify();
+      if (predictiveBackChanged) this.notify();
       throw error;
     }
 
