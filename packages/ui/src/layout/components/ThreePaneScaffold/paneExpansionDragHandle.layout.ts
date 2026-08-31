@@ -51,6 +51,12 @@ const Tau = Math.PI * 2;
 const floatBitsBuffer = new ArrayBuffer(4);
 const floatBitsView = new DataView(floatBitsBuffer);
 
+function finite(value: number, name: string) {
+  if (!Number.isFinite(value)) {
+    throw new RangeError(`${name} must be finite`);
+  }
+}
+
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
@@ -374,13 +380,14 @@ export function calculatePaneExpansionDragHandlePlacement({
   partitionSpacerSize,
   minTouchTargetSize,
 }: PaneExpansionDragHandlePlacementInput): PaneExpansionDragHandlePlacement {
-  finiteNonNegative(offsetX, 'offsetX');
+  finite(offsetX, 'offsetX');
   finiteNonNegative(contentWidth, 'contentWidth');
   const partitionSpacerPx = cssPxRoundToPx(partitionSpacerSize, 'partitionSpacerSize');
   const minTouchTargetPx = minTouchTargetRoundToPx(minTouchTargetSize);
 
-  // AndroidX passes verticalSpacerSize / 2 directly to Int.coerceIn. Do not
-  // shrink that margin to fit a narrow scaffold: an empty coerce range throws.
+  // AndroidX accepts any Int offset here and lets Int.coerceIn clamp it into
+  // the handle-placement range. Arithmetic overflow in the measured spacer
+  // midpoint can therefore legitimately produce a negative input.
   const minHorizontalMargin = Math.trunc(partitionSpacerPx / 2);
   const centerX = clamp(
     offsetX,
