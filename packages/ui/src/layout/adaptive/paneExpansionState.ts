@@ -511,7 +511,8 @@ export class PaneExpansionState {
       this.measuredDirection,
     );
     const from = this.currentMeasuredDraggingOffset;
-    if (from === targetOffset && initialVelocity === 0) {
+    const floatInitialVelocity = composeFloat(initialVelocity);
+    if (from === targetOffset && floatInitialVelocity === 0) {
       this.setAnimatedOffset(targetOffset);
       this.notify();
       return;
@@ -530,7 +531,7 @@ export class PaneExpansionState {
       await this.defaultAnimation({
         from,
         to: targetOffset,
-        initialVelocity,
+        initialVelocity: floatInitialVelocity,
         signal: controller.signal,
         update: (offset) => {
           if (controller.signal.aborted) return;
@@ -569,6 +570,7 @@ export class PaneExpansionState {
 
   async settleToAnchorIfNeeded(velocity: number) {
     finite(velocity, 'velocity');
+    const floatVelocity = composeFloat(velocity);
     const positions = this.getIndexedAnchorPositions();
     if (positions.length === 0) return;
 
@@ -578,10 +580,10 @@ export class PaneExpansionState {
 
     for (const anchorPosition of positions) {
       let score: number;
-      if (velocity >= AnchoringVelocityThreshold) {
+      if (floatVelocity >= AnchoringVelocityThreshold) {
         const delta = anchorPosition.position - currentPosition;
         score = delta < 0 ? this.maxExpansionWidth - delta : delta;
-      } else if (velocity <= -AnchoringVelocityThreshold) {
+      } else if (floatVelocity <= -AnchoringVelocityThreshold) {
         const delta = currentPosition - anchorPosition.position;
         score = delta < 0 ? this.maxExpansionWidth - delta : delta;
       } else {
@@ -593,7 +595,7 @@ export class PaneExpansionState {
       }
     }
 
-    await this.animateToMatchedAnchor(bestAnchorPosition.anchor, velocity, true);
+    await this.animateToMatchedAnchor(bestAnchorPosition.anchor, floatVelocity, true);
   }
 
   getLayoutState(
