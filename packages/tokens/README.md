@@ -31,6 +31,69 @@ Style Dictionary deep-merges these files into one graph. Duplicate canonical pat
 
 This is intentionally a **single-source build / multi-reference audit** architecture.
 
+## Closed ownership decision: Compose Defaults are not a second token layer
+
+This decision is repository architecture and should not be re-researched for every component migration.
+
+AndroidX Compose commonly has this runtime shape:
+
+```text
+MaterialTheme -> FooDefaults -> Foo component
+```
+
+That shape is appropriate for Compose runtime. It tells us important Material semantics: which default color roles, dimensions, shapes, typography, elevations, states, variants, and customization capabilities a component has. It does **not** require the web implementation to create a TypeScript `FooDefaults` object.
+
+m3-ui has a compile-time token/platform layer plus the browser CSS cascade:
+
+```text
+canonical component DTCG
+    -> Style Dictionary
+    -> generated component CSS
+    -> handwritten structural/state CSS
+    -> component
+
+component color DTCG
+    -> canonical runtime role
+    -> var(--role)
+    -> ThemeProvider concrete runtime value
+```
+
+For immutable values, this pipeline is the web equivalent of the static-default resolution that Compose performs through token objects/`FooDefaults` at runtime.
+
+Therefore:
+
+- do **not** add `FooDefaults.colors()`, `FooColors`, `Foo.tokens.ts`, or `Foo.defaults.ts` merely to reshape generated tokens into CSS variables;
+- do **not** duplicate a fact in TypeScript when the same fact is already represented by canonical DTCG;
+- do **not** treat a public Compose `FooDefaults` symbol as evidence that the same API shape must exist on the web;
+- do preserve the observable Material semantics and real customization capability represented by Compose, using the narrowest web-native mechanism that fits;
+- a component-local runtime helper is valid when it resolves genuine runtime information, not when it acts as a second token compiler.
+
+The default rendering path for immutable styling is always intended to avoid a React serialization hop.
+
+## Static-versus-runtime classification
+
+Before adding a token read to component TypeScript, classify the value with this procedure:
+
+1. **Is it an immutable Material/design fact?** Examples: variant/state color role, size, spacing, shape, typography, state opacity, static motion value, outline width, elevation recipe. If yes, it belongs in canonical DTCG.
+2. **Can the browser express the mapping without information that only exists at runtime?** If selectors, attributes, custom properties, `calc()`, `color-mix()`, or a reviewed CSS adapter can express it, Style Dictionary/generated CSS owns the platform binding.
+3. **Does JavaScript need the numeric/string token for runtime arithmetic or behavior?** Examples: DOM measurement, runtime geometry, interaction ordering/history, current/previous interaction selection, ripple wave lifetime, timers, user-supplied runtime override. If yes, TypeScript may consume the generated token value at that narrow boundary.
+4. **Is the value a concrete dynamic Material system color derived from `sourceColor`, mode, or contrast?** If yes, `ThemeProvider` owns that runtime value and components consume it through canonical role CSS variables.
+
+Examples:
+
+| Fact | Owner |
+| --- | --- |
+| Filled Button container uses Primary | canonical component DTCG + generated CSS |
+| Disabled Card container alpha/blend | canonical tokens + generated CSS when CSS can express it |
+| Slider size-to-static geometry matrix | canonical DTCG + generated CSS |
+| Current press/focus/hover precedence | React/React Aria runtime |
+| Previous interaction used to select outgoing elevation motion | TypeScript runtime |
+| Ripple origin/radius from pointer and DOM bounds | TypeScript runtime |
+| User-provided runtime shape override | TypeScript/runtime CSS override |
+| Concrete `primary` produced from runtime `sourceColor` | ThemeProvider |
+
+A file name such as `*.defaults.ts` or `*.tokens.ts` does not make static projection legitimate. Ownership is determined by whether the value truly needs runtime information.
+
 ## Runtime color architecture
 
 `ThemeProvider` owns the actual runtime Material color scheme. It emits scoped CSS custom properties such as `--primary`, `--on-primary`, `--surface`, `--outline`, and `--shadow` from the active baseline or dynamic Material Color Utilities scheme.
@@ -74,6 +137,12 @@ component/effect token
 
 This mirrors the Material 3 responsibility split: component defaults point to semantic/system roles while the active theme resolves those roles.
 
+### Why canonical roles currently terminate in `var(--role)`
+
+A CSS `var(...)` endpoint is web-specific, so it is a deliberate platform choice rather than an accidental DTCG convention. `@m3-ui/tokens` currently serves this web implementation, and terminating semantic color roles in CSS expressions gives the browser a direct, cascade-friendly runtime endpoint without adding another handwritten role-name mapping layer.
+
+Keep this choice while the token package is web-targeted. If the canonical token package later becomes a true multi-platform source that must emit independent Android/iOS/Flutter role bindings, reconsider separating platform-neutral role identity from the web CSS endpoint at that time. Do not add that abstraction preemptively.
+
 Do not replace runtime roles with static hex placeholders. Do not duplicate `var(--role)` in component/effect tokens when the role already exists. UI code must not decode `var(--role)` into a semantic name and reconstruct it later.
 
 ## Style Dictionary outputs
@@ -107,7 +176,9 @@ They are exported as:
 @m3-ui/tokens/ripple.css
 ```
 
-Generated adapters serialize immutable token-to-platform bindings. They do not generate the active theme/color scheme and must not define ThemeProvider-owned roles such as `--primary`, `--secondary`, or `--shadow`.
+Generated adapters serialize immutable token-to-platform bindings. They do not generate a dynamic Material color scheme and must not define the runtime value of ThemeProvider-owned roles such as `--primary`, `--secondary`, or `--shadow`.
+
+The reviewed adapter set is intentionally incomplete while the repository migrates older components. **Existing handwritten token/default serializers are migration debt, not examples to copy.** New or migrated components should follow Button/TextField unless they can demonstrate a genuine runtime need.
 
 The goal is to avoid this runtime-only projection pattern:
 
@@ -118,6 +189,27 @@ DTCG -> flat JS constants -> handwritten projection table -> inline CSS vars/box
 for values that can be compiled once into static platform CSS.
 
 JavaScript projections remain appropriate only when JavaScript genuinely needs the value for behavior, arithmetic, interaction history, DOM geometry, timers/lifecycle, or user-supplied runtime overrides.
+
+## Static baseline foundation target
+
+The same compile-once rule applies to immutable theme foundations. The current UI implementation still keeps the baseline light/dark Material color maps in `packages/ui/src/theme/baseline.ts` and constructs baseline typography CSS variables in TypeScript. Those are known migration debt.
+
+The target is:
+
+```text
+immutable baseline light/dark + baseline typography
+    -> canonical DTCG
+    -> Style Dictionary
+    -> generated baseline foundation CSS + typed JS
+
+runtime sourceColor/mode/contrast override
+    -> ThemeProvider
+    -> scoped runtime role overrides
+```
+
+This does **not** move dynamic theme generation into Style Dictionary. `ThemeProvider` remains the owner of concrete runtime dynamic colors. It only removes needless React serialization for immutable baseline data and ensures the baseline has the same canonical source/build discipline as component tokens.
+
+Do not use the current handwritten baseline files as precedent for adding more immutable theme tables in UI TypeScript.
 
 ## Button reference slice
 
@@ -215,6 +307,12 @@ Before changing a foundation, read the matching notes:
 
 If ownership, injection, generated output, runtime responsibilities, or an escape hatch changes, update the relevant notes in the same PR. These notes guide implementation and review; they do not require a source-regex guard for incidental DOM, class, wrapper, or paint choices.
 
+### Agent preflight
+
+Before researching upstream implementation for a component, first classify the task using the ownership rules above. Research AndroidX/Figma/Material Web for **Material facts, behavior, parity drift, and evidence**. Do not reopen the token/theme ownership model merely because an upstream implementation uses a different runtime abstraction.
+
+Only propose changing this ownership model when there is a concrete Material requirement or platform constraint that the documented model cannot satisfy. In that case, document the contradiction and its evidence explicitly before changing architecture.
+
 ## Upstream audit
 
 Upstreams remain audit oracles only:
@@ -240,13 +338,17 @@ Do not reintroduce:
 - `packages/tokens/src/` or handwritten token facades;
 - upstream files as Style Dictionary `source` / `include`;
 - generators that rewrite canonical DTCG from external sources;
-- static hex placeholders for ThemeProvider-owned roles;
+- static hex placeholders for ThemeProvider-owned runtime roles;
 - duplicated component/effect `var(--role)` strings instead of aliases;
 - decode/re-encode helpers for runtime color expressions;
 - generic global CSS-variable dumps for every immutable token without a real consumer;
-- new React serializers for static elevation shadow geometry or Ripple styling constants;
+- new React serializers for static component colors/dimensions/typography/motion, elevation shadow geometry, or Ripple styling constants;
+- `FooDefaults.colors()`/`FooColors` facades whose only purpose is to reproduce static canonical mappings;
+- handwritten `Foo.tokens.ts` projection tables for immutable defaults when generated adapters can express them;
+- a `ThemeProvider.components`/MUI-style component default registry;
 - handwritten design constants where a canonical token exists;
-- hand-edited generated output.
+- hand-edited generated output;
+- replacing runtime dynamic Material color generation with a build-time DTCG resolver.
 
 ## Validation and audit commands
 
