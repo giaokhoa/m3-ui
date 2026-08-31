@@ -268,7 +268,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   readonly subscribe = (listener: () => void) => {
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener());
+    return () => this.listeners.delete(listener);
   };
 
   readonly getSnapshot = () => this.revision;
