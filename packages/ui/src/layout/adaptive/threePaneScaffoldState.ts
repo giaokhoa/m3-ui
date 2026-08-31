@@ -15,6 +15,17 @@ export interface ThreePaneScaffoldState {
   readonly getSnapshot: () => number;
 }
 
+/**
+ * Renderer-facing analogue of SeekableTransitionState.initialValueAnimations.
+ * The previous logical transition keeps advancing toward its old target after
+ * a retarget so Transition children can use its moving values as new initials.
+ */
+export interface ThreePaneScaffoldInitialTransition {
+  readonly currentState: ThreePaneScaffoldValue;
+  readonly targetState: ThreePaneScaffoldValue;
+  readonly progressFraction: number;
+}
+
 export interface ThreePaneScaffoldProgressAnimationContext {
   from: number;
   to: number;
@@ -225,6 +236,8 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
       frame = requestFrame(tick);
     });
 
+const CompletedAnimation = Promise.resolve();
+
 /**
  * Seekable transition state equivalent of AndroidX MutableThreePaneScaffoldState.
  *
@@ -248,6 +261,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
         completion: Promise<void>;
       }
     | null = null;
+  private initialTransitionValue: ThreePaneScaffoldInitialTransition | null = null;
+  private initialAnimationController: AbortController | null = null;
+  private initialAnimationCompletion: Promise<void> | null = null;
   private readonly defaultAnimation: ThreePaneScaffoldProgressAnimation;
   private transitionOwner: object | null;
   private transitionDurationResolver: ThreePaneScaffoldTransitionDurationResolver | null;
@@ -281,6 +297,79 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private cancelAnimation() {
     this.animationController?.abort();
     this.animationController = null;
+  }
+
+  private cancelInitialAnimation() {
+    const controller = this.initialAnimationController;
+    this.initialAnimationController = null;
+    this.initialAnimationCompletion = null;
+    this.initialTransitionValue = null;
+    controller?.abort();
+  }
+
+  private moveAnimationToInitialState() {
+    const oldCurrent = this.currentStateValue;
+    const oldTarget = this.targetStateValue;
+    const oldFraction = this.progressFraction;
+    const oldDriver = this.activeAnimation?.driver ?? defaultThreePaneScaffoldProgressAnimation;
+
+    this.cancelAnimation();
+    this.cancelInitialAnimation();
+
+    if (
+      oldFraction === 1 ||
+      threePaneScaffoldValuesEqual(oldCurrent, oldTarget)
+    ) {
+      return CompletedAnimation;
+    }
+
+    const oldDurationMs = this.resolveTransitionDurationMs(oldCurrent, oldTarget);
+    if (oldDurationMs <= 0) return CompletedAnimation;
+
+    const controller = new AbortController();
+    this.initialAnimationController = controller;
+    this.initialTransitionValue = {
+      currentState: oldCurrent,
+      targetState: oldTarget,
+      progressFraction: oldFraction,
+    };
+
+    const completion = (async () => {
+      try {
+        await oldDriver({
+          from: oldFraction,
+          to: 1,
+          durationMs: oldDurationMs,
+          // Initial value animations keep the pre-retarget duration. AndroidX
+          // onTotalDurationChanged only updates currentAnimation.
+          getDurationMs: () => oldDurationMs,
+          signal: controller.signal,
+          update: (fraction) => {
+            if (controller.signal.aborted || this.initialAnimationController !== controller) {
+              return;
+            }
+            this.initialTransitionValue = {
+              currentState: oldCurrent,
+              targetState: oldTarget,
+              progressFraction: coerceAnimationFraction(fraction),
+            };
+            this.notify();
+          },
+        });
+      } catch {
+        // AndroidX animation specs are pure and do not throw. A web custom
+        // driver is allowed to fail without leaving a stale initial animation.
+      } finally {
+        if (this.initialAnimationController === controller) {
+          this.initialAnimationController = null;
+          this.initialAnimationCompletion = null;
+          this.initialTransitionValue = null;
+          this.notify();
+        }
+      }
+    })();
+    this.initialAnimationCompletion = completion;
+    return completion;
   }
 
   private updateSettledPredictiveBack(
@@ -331,6 +420,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       : this.progressFractionValue;
   }
 
+  get initialTransition(): ThreePaneScaffoldInitialTransition | null {
+    return this.initialTransitionValue;
+  }
+
   get isPredictiveBackInProgress() {
     return this.predictiveBack;
   }
@@ -365,6 +458,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   /** Snap current and target to the same value and cancel any active transition. */
   snapTo(targetState: ThreePaneScaffoldValue) {
     this.cancelAnimation();
+    this.cancelInitialAnimation();
     if (this.transitionOwner === null) {
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
@@ -381,9 +475,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   /**
    * Seek directly to a raw timeline fraction between currentState and targetState.
-   * Changing target advances currentState to the former target, matching
-   * SeekableTransitionState.seekTo. The renderer captures the current visual
-   * frame separately so this discrete state handoff does not imply a jump.
+   * Changing target advances currentState to the former target and keeps the
+   * previous transition moving toward that former target as an initial-value
+   * animation, matching SeekableTransitionState.seekTo.
    */
   seekTo(
     fraction: number,
@@ -391,8 +485,9 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     isPredictiveBackInProgress = false,
   ) {
     const resolvedFraction = clampFraction(fraction);
-    this.cancelAnimation();
     if (this.transitionOwner === null) {
+      this.cancelAnimation();
+      this.cancelInitialAnimation();
       const predictiveBackChanged = this.predictiveBack !== isPredictiveBackInProgress;
       this.predictiveBack = isPredictiveBackInProgress;
       if (predictiveBackChanged) this.notify();
@@ -403,8 +498,11 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.predictiveBack = isPredictiveBackInProgress;
     if (targetChanged) {
+      this.moveAnimationToInitialState();
       this.currentStateValue = oldTarget;
       this.targetStateValue = targetState;
+    } else {
+      this.cancelAnimation();
     }
     this.progressFractionValue = threePaneScaffoldValuesEqual(
       this.currentStateValue,
@@ -430,6 +528,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   ) {
     if (this.transitionOwner === null) {
       this.cancelAnimation();
+      this.cancelInitialAnimation();
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
       if (predictiveBackChanged) this.notify();
@@ -454,13 +553,12 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       return;
     }
 
-    this.cancelAnimation();
+    const initialCompletion = targetChanged
+      ? this.moveAnimationToInitialState()
+      : this.initialAnimationCompletion ?? CompletedAnimation;
+    if (!targetChanged) this.cancelAnimation();
 
     if (targetChanged) {
-      // SeekableTransitionState.animateTo retargets from the previous target,
-      // even when the requested target equals the pre-retarget current state.
-      // The React renderer separately captures the current visual frame so this
-      // discrete state change does not imply a visual jump.
       this.currentStateValue = oldTarget;
       this.targetStateValue = targetState;
       this.progressFractionValue = 0;
@@ -470,9 +568,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const resolvedTarget = this.targetStateValue;
     const startingFraction = this.progressFraction;
     if (!targetChanged && startingFraction === 1) {
-      // SeekableTransitionState only creates a new fraction animation when
-      // fraction < 1f. At the target fraction there is no animationSpec to run;
-      // the transition simply commits its target state.
+      await initialCompletion;
+      if (!threePaneScaffoldValuesEqual(this.targetStateValue, resolvedTarget)) return;
       this.currentStateValue = resolvedTarget;
       this.targetStateValue = resolvedTarget;
       this.progressFractionValue = 0;
@@ -485,8 +582,6 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     try {
       durationMs = this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget);
     } catch (error) {
-      // MutableThreePaneScaffoldState.animateTo clears its predictive-back
-      // wrapper state in finally even when SeekableTransitionState setup fails.
       const predictiveBackChanged = this.predictiveBack;
       this.predictiveBack = false;
       if (predictiveBackChanged) this.notify();
@@ -522,6 +617,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
           this.notify();
         },
       });
+      if (controller.signal.aborted) return;
+      await initialCompletion;
       if (controller.signal.aborted) return;
       const committedTarget = this.targetStateValue;
       this.currentStateValue = committedTarget;
