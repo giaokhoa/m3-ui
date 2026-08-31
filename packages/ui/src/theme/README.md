@@ -2,6 +2,8 @@
 
 The theme layer owns Material foundations that apply across component families. It is the web equivalent of the **theme-resolution** responsibility of Compose `MaterialTheme`; it is not a registry of per-component defaults and it is not a replacement for the canonical component-token graph.
 
+Agents changing Material component/theme/token ownership must read `/.agents/skills/material3-parity/SKILL.md` first. Root `/AGENTS.md` defines the trigger scope for this mandatory entrypoint.
+
 The ownership boundary is deliberate:
 
 ```text
