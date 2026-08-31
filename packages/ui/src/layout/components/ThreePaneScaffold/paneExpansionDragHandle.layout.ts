@@ -43,6 +43,7 @@ export interface PaneExpansionDragHandleFadeOffsets {
 
 const ComposeIntMax = 2147483647;
 const ComposeIntMin = -2147483648;
+const ComposeDefaultTweenDurationNanos = 300_000_000;
 const CubicDoubleEpsilon = 1e-7;
 const CubicFloatEpsilon = Math.fround(1.05e-6);
 const OneUlpAt1 = Math.fround(1.1920929e-7);
@@ -241,6 +242,19 @@ function fastOutSlowInEasing(fraction: number) {
 }
 
 /**
+ * Mirrors TargetBasedAnimation.getValue(progress) plus FloatTweenSpec sampling.
+ * AndroidX multiplies durationNanos by a Float progress, truncates that Float
+ * play time to Long, then divides the clamped Long by durationNanos.toFloat().
+ */
+function composeDefaultTweenFraction(progressFraction: number) {
+  const floatProgress = Math.fround(progressFraction);
+  const playTimeNanos = Math.trunc(
+    composeFloatMultiply(ComposeDefaultTweenDurationNanos, floatProgress),
+  );
+  return composeFloatDivide(playTimeNanos, ComposeDefaultTweenDurationNanos);
+}
+
+/**
  * Mirrors AnimateWithFadingNode.updateTargetOffset: a newly observed lookahead
  * offset becomes the target, while the previous target becomes the fade origin.
  * The first target therefore has an unspecified origin and does not fade.
@@ -285,10 +299,11 @@ export function calculatePaneExpansionDragHandleFadeFrame({
     return { offsetX: targetOffsetX, opacity: 1 };
   }
 
-  // TargetBasedAnimation<Float> keeps the easing and -1f..1f interpolation on Float.
+  // TargetBasedAnimation<Float> keeps both its time sampling and interpolation on Float.
+  const tweenFraction = composeDefaultTweenFraction(progressFraction);
   const animatedValue = composeFloatAdd(
     -1,
-    composeFloatMultiply(2, fastOutSlowInEasing(progressFraction)),
+    composeFloatMultiply(2, fastOutSlowInEasing(tweenFraction)),
   );
   return {
     offsetX: animatedValue > 0 ? targetOffsetX : currentOffsetX,
