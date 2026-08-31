@@ -87,6 +87,20 @@ const roles: readonly ThreePaneScaffoldRole[] = ['primary', 'secondary', 'tertia
 const zeroPlacement: PanePlacement = { left: 0, top: 0, width: 0, height: 0 };
 const intVectorThreshold = 1;
 const MillisToNanos = 1_000_000;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
+function isComposeInt(value: number) {
+  return Number.isInteger(value) && value >= ComposeIntMin && value <= ComposeIntMax;
+}
+
+function composeIntAdd(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a - b) | 0 : a - b;
+}
 
 function clampFraction(value: number) {
   if (!Number.isFinite(value) || value < 0 || value > 1) {
@@ -132,8 +146,8 @@ function placementToRect(placement: PanePlacement): [number, number, number, num
   return [
     placement.left,
     placement.top,
-    placement.left + placement.width,
-    placement.top + placement.height,
+    composeIntAdd(placement.left, placement.width),
+    composeIntAdd(placement.top, placement.height),
   ];
 }
 
@@ -141,8 +155,8 @@ function rectToPlacement(rect: readonly number[]): PanePlacement {
   return {
     left: rect[0]!,
     top: rect[1]!,
-    width: rect[2]! - rect[0]!,
-    height: rect[3]! - rect[1]!,
+    width: composeIntSubtract(rect[2]!, rect[0]!),
+    height: composeIntSubtract(rect[3]!, rect[1]!),
   };
 }
 
