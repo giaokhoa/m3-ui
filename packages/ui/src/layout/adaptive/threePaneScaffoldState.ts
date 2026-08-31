@@ -86,12 +86,16 @@ function composeFloatLerp(start: number, stop: number, fraction: number) {
   );
 }
 
+function composeDurationNanos(durationMs: number) {
+  return Math.max(0, Math.round(durationMs * MillisToNanos));
+}
+
 function composeLinearTransitionDurationMs(
   from: number,
   to: number,
   fullDurationMs: number,
 ) {
-  const totalDurationNanos = Math.round(fullDurationMs * MillisToNanos);
+  const totalDurationNanos = composeDurationNanos(fullDurationMs);
   const fractionDelta = Math.abs(composeFloat(to) - composeFloat(from));
   return Math.round(totalDurationNanos * fractionDelta) / MillisToNanos;
 }
@@ -104,13 +108,13 @@ function composeLinearTransitionFraction(
 ) {
   const floatFrom = composeFloat(from);
   const floatTo = composeFloat(to);
-  const totalDurationNanos = Math.round(fullDurationMs * MillisToNanos);
+  const totalDurationNanos = composeDurationNanos(fullDurationMs);
   const animationDurationNanos = Math.round(
     totalDurationNanos * Math.abs(floatTo - floatFrom),
   );
   if (animationDurationNanos <= 0) return floatTo;
 
-  const playTimeNanos = Math.max(0, Math.round(elapsedMs * MillisToNanos));
+  const playTimeNanos = composeDurationNanos(elapsedMs);
   if (playTimeNanos >= animationDurationNanos) return floatTo;
 
   const timelineFraction = composeFloat(
@@ -251,6 +255,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private clockOriginFrameTimeMs: number | null = null;
   private lastAnimationFrameTimeMs: number | null = null;
   private initialValueAnimationsClearRevisionValue = 0;
+  private clearedInitialValueAnimationController: AbortController | null = null;
 
   private activeAnimationStartedAtMs: number | null = null;
   private activeAnimationCompletionDurationMs = 0;
@@ -285,7 +290,11 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   }
 
   private cancelAnimation() {
-    this.animationController?.abort();
+    const controller = this.animationController;
+    controller?.abort();
+    if (this.clearedInitialValueAnimationController === controller) {
+      this.clearedInitialValueAnimationController = null;
+    }
     this.animationController = null;
   }
 
@@ -295,6 +304,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.activeDefaultAnimationStartFraction = null;
     this.activeDefaultAnimationProgressMs = 0;
     this.activeDefaultAnimationDurationMs = null;
+    this.clearedInitialValueAnimationController = null;
   }
 
   private clearInitialValueAnimations(resetPlayTime: boolean) {
@@ -303,6 +313,21 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     this.lastAnimationFrameTimeMs = null;
     if (resetPlayTime) this.animationPlayTimeMsValue = 0;
     this.initialValueAnimationsClearRevisionValue += 1;
+  }
+
+  private endAllAnimationsForDurationChange(
+    controller: AbortController | null = this.animationController,
+  ) {
+    this.progressFractionValue = 1;
+    this.initialValueCompletionPlayTimeMs = this.animationPlayTimeMsValue;
+    this.activeAnimationStartedAtMs = null;
+    this.activeAnimationCompletionDurationMs = 0;
+    this.activeDefaultAnimationStartFraction = null;
+    this.activeDefaultAnimationProgressMs = 0;
+    this.activeDefaultAnimationDurationMs = null;
+    this.clearedInitialValueAnimationController = controller;
+    this.initialValueAnimationsClearRevisionValue += 1;
+    this.notify();
   }
 
   private advanceAnimationClock(frameTimeMs: number) {
@@ -492,6 +517,30 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       throw new Error('MutableThreePaneScaffoldState can only be attached to one transition');
     }
     this.transitionDurationResolver = resolver;
+
+    if (
+      this.activeDefaultAnimationStartFraction !== null &&
+      this.activeDefaultAnimationDurationMs !== null &&
+      !threePaneScaffoldValuesEqual(this.currentStateValue, this.targetStateValue)
+    ) {
+      const previousDurationMs = this.activeDefaultAnimationDurationMs;
+      const currentDurationMs = this.resolveTransitionDurationMs(
+        this.currentStateValue,
+        this.targetStateValue,
+      );
+      if (currentDurationMs !== previousDurationMs) {
+        const progressNanos = composeDurationNanos(this.activeDefaultAnimationProgressMs);
+        const totalDurationNanos = composeDurationNanos(currentDurationMs);
+        if (progressNanos > totalDurationNanos) {
+          this.endAllAnimationsForDurationChange();
+        } else {
+          // AndroidX keeps the current fraction parked until runAnimations
+          // advances again; only the null-spec duration cache changes here.
+          this.activeDefaultAnimationDurationMs = currentDurationMs;
+        }
+      }
+    }
+
     return () => {
       if (this.transitionOwner === owner && this.transitionDurationResolver === resolver) {
         this.transitionDurationResolver = null;
@@ -678,7 +727,15 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
           to: 1,
           durationMs,
           getPlayTimeMs: (elapsedMs, frameTimeMs) => {
-            this.advanceAnimationClock(frameTimeMs);
+            if (this.clearedInitialValueAnimationController === controller) {
+              // endAllAnimations() emptied both animation collections between
+              // frames. AndroidX still receives the already-scheduled frame,
+              // but it must not advance the retained initial-value clock.
+              this.clearedInitialValueAnimationController = null;
+              this.lastAnimationFrameTimeMs = frameTimeMs;
+            } else {
+              this.advanceAnimationClock(frameTimeMs);
+            }
             const operationPlayTimeMs = Math.max(
               0,
               this.animationPlayTimeMsValue - clockBasePlayTimeMs,
@@ -686,20 +743,28 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
             this.activeDefaultAnimationProgressMs = operationPlayTimeMs;
             return operationPlayTimeMs;
           },
-          getDurationMs: (elapsedMs) => {
+          getDurationMs: () => {
             const currentDurationMs = this.resolveTransitionDurationMs(
               resolvedCurrent,
               this.targetStateValue,
             );
-            if (animation === defaultThreePaneScaffoldProgressAnimation) {
-              this.activeDefaultAnimationDurationMs = currentDurationMs;
+            if (
+              animation === defaultThreePaneScaffoldProgressAnimation &&
+              this.activeDefaultAnimationStartFraction !== null
+            ) {
+              const previousDurationMs = this.activeDefaultAnimationDurationMs;
               if (
-                elapsedMs !== undefined &&
-                elapsedMs > currentDurationMs &&
-                this.initialValueCompletionPlayTimeMs > this.animationPlayTimeMsValue
+                previousDurationMs !== null &&
+                currentDurationMs !== previousDurationMs &&
+                composeDurationNanos(this.activeDefaultAnimationProgressMs) >
+                  composeDurationNanos(currentDurationMs)
               ) {
-                this.initialValueCompletionPlayTimeMs = this.animationPlayTimeMsValue;
-                this.initialValueAnimationsClearRevisionValue += 1;
+                // Child duration can also change while runAnimations is already
+                // processing this frame. Mirror onTotalDurationChanged() after
+                // the shared progressNanos has consumed this frame's delta.
+                this.endAllAnimationsForDurationChange(controller);
+              } else {
+                this.activeDefaultAnimationDurationMs = currentDurationMs;
               }
             }
             return currentDurationMs;
