@@ -4,6 +4,7 @@ import {
   logWarningLevels,
   transformGroups,
 } from 'style-dictionary/enums';
+import { createThemeCss } from './style-dictionary/theme-css.mjs';
 
 const BUTTON_VARIANTS = ['filled', 'elevated', 'filledTonal', 'outlined', 'text'];
 const BUTTON_SIZES = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'];
@@ -366,6 +367,7 @@ export default {
       'm3/text-field-css': createTextFieldCss,
       'm3/elevation-css': createElevationCss,
       'm3/ripple-css': createRippleCss,
+      'm3/theme-css': createThemeCss,
     },
   },
   platforms: {
@@ -388,6 +390,7 @@ export default {
         { destination: 'text-field.css', format: 'm3/text-field-css' },
         { destination: 'elevation.css', format: 'm3/elevation-css' },
         { destination: 'ripple.css', format: 'm3/ripple-css' },
+        { destination: 'theme.css', format: 'm3/theme-css' },
       ],
     },
   },
