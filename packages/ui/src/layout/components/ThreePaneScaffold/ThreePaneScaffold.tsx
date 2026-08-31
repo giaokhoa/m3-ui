@@ -38,6 +38,11 @@ import {
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import { calculateLevitatedPaneResizePlacement } from './LevitatedPane.resizeLayout';
 import {
+  getLevitatedResizeStates,
+  getLevitatedResizeStatesSnapshot,
+  subscribeLevitatedResizeStates,
+} from './levitatedResizeStateStore';
+import {
   calculatePaneExpansionDragHandleFadeFrame,
   calculatePaneExpansionDragHandlePlacement,
   calculatePaneExpansionSpacerMiddleOffset,
@@ -151,8 +156,6 @@ const emptyGeometry: ScaffoldGeometry = {
   direction: 'ltr',
 };
 
-const noStoreSubscribe = () => () => {};
-const noStoreSnapshot = () => 0;
 // Browser gesture-arbitration threshold. This is a platform input adaptation,
 // not a Material layout metric or token.
 const BrowserPointerSlop = 4;
@@ -308,11 +311,7 @@ export function ThreePaneScaffold({
     ['secondary', secondaryPane],
     ['tertiary', tertiaryPane],
   ];
-  const activeResizeState = paneEntries
-    .map(([role]) => getPaneAdaptedValue(targetValue, role))
-    .find((paneValue) => paneValue.type === 'levitated' && paneValue.dragToResizeState != null);
-  const resizeState =
-    activeResizeState?.type === 'levitated' ? activeResizeState.dragToResizeState : undefined;
+  const resizeStates = getLevitatedResizeStates(targetValue);
 
   useSyncExternalStore(
     expansionState.subscribe,
@@ -320,9 +319,9 @@ export function ThreePaneScaffold({
     expansionState.getSnapshot,
   );
   useSyncExternalStore(
-    resizeState?.subscribe ?? noStoreSubscribe,
-    resizeState?.getSnapshot ?? noStoreSnapshot,
-    resizeState?.getSnapshot ?? noStoreSnapshot,
+    (listener) => subscribeLevitatedResizeStates(resizeStates, listener),
+    () => getLevitatedResizeStatesSnapshot(resizeStates),
+    () => getLevitatedResizeStatesSnapshot(resizeStates),
   );
 
   useLayoutEffect(() => {
