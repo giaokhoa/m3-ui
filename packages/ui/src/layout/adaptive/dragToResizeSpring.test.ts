@@ -31,4 +31,9 @@ describe('DragToResizeState default spring', () => {
     expect(calculateDragToResizeSpringDurationMs(48, 800)).toBe(359);
     expect(calculateDragToResizeSpringDurationMs(420, 420)).toBe(0);
   });
+
+  it('converts a NaN spring duration estimate to zero like Kotlin Double.toLong', () => {
+    expect(calculateDragToResizeSpringDurationMs(Number.NaN, 800)).toBe(0);
+    expect(calculateDragToResizeSpringDurationMs(48, Number.NaN)).toBe(0);
+  });
 });
