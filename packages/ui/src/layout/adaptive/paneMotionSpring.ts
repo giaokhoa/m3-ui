@@ -4,6 +4,8 @@ import { PaneMotionDefaults } from './paneMotion';
 export const PaneMotionDefaultDisplacementThreshold = 0.01;
 
 const MillisToNanos = 1_000_000;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
 
 function assertFinite(value: number, name: string) {
   if (!Number.isFinite(value)) throw new RangeError(`${name} must be finite`);
@@ -17,6 +19,14 @@ function assertThreshold(value: number) {
 
 function composeFloat(value: number) {
   return Math.fround(value);
+}
+
+function composeFastRoundToInt(value: number) {
+  const floatValue = composeFloat(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
 }
 
 function clampProgress(value: number) {
@@ -56,7 +66,7 @@ function convertPaneMotionVector(
   visibilityThresholds: number | readonly number[],
 ): number[] {
   return usesIntPaneMotionConverter(visibilityThresholds, values.length)
-    ? values.map((value) => Math.round(value))
+    ? values.map(composeFastRoundToInt)
     : [...values];
 }
 
