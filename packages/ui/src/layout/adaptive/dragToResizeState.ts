@@ -388,7 +388,6 @@ export class DragToResizeState {
       this.notify();
       return;
     }
-    if (Number.isNaN(this.sizeInternal)) return;
 
     const controller = new AbortController();
     this.animationControllers.add(controller);
