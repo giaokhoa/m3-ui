@@ -421,8 +421,13 @@ export class PaneExpansionState {
   }
 
   isUnspecified() {
+    const firstPaneWidth =
+      this.maxExpansionWidth === PaneExpansionUnspecified ||
+      this.firstPaneWidthState === PaneExpansionUnspecified
+        ? PaneExpansionUnspecified
+        : clamp(this.firstPaneWidthState, 0, this.maxExpansionWidth);
     return (
-      this.firstPaneWidthState === PaneExpansionUnspecified &&
+      firstPaneWidth === PaneExpansionUnspecified &&
       Number.isNaN(this.firstPaneProportionState) &&
       this.currentDraggingOffsetState === PaneExpansionUnspecified
     );
