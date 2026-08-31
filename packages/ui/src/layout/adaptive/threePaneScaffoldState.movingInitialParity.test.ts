@@ -20,14 +20,32 @@ const primarySecondary: ThreePaneScaffoldValue = {
   tertiary: PaneAdaptedValue.Hidden,
 };
 
+function installFrameHarness() {
+  let nextId = 1;
+  const callbacks = new Map<number, FrameRequestCallback>();
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    const id = nextId++;
+    callbacks.set(id, callback);
+    return id;
+  });
+  vi.stubGlobal('cancelAnimationFrame', (id: number) => {
+    callbacks.delete(id);
+  });
+  return {
+    flush(time: number) {
+      const current = [...callbacks.values()];
+      callbacks.clear();
+      current.forEach((callback) => callback(time));
+    },
+    get pending() {
+      return callbacks.size;
+    },
+  };
+}
+
 describe('MutableThreePaneScaffoldState moving initial transition parity', () => {
-  it('keeps the previous seek moving to its old target with the old duration', async () => {
-    const frames: FrameRequestCallback[] = [];
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      frames.push(callback);
-      return frames.length;
-    });
-    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  it('keeps retained initial values on the shared frame clock while seek is parked', async () => {
+    const frames = installFrameHarness();
 
     try {
       const state = new MutableThreePaneScaffoldState(hidden);
@@ -38,54 +56,50 @@ describe('MutableThreePaneScaffoldState moving initial transition parity', () =>
       expect(state.currentState).toBe(primary);
       expect(state.targetState).toBe(primarySecondary);
       expect(state.progressFraction).toBe(0);
-      expect(state.initialTransition?.currentState).toBe(hidden);
-      expect(state.initialTransition?.targetState).toBe(primary);
-      expect(state.initialTransition?.progressFraction).toBe(0.5);
+      expect(state.animationPlayTimeMs).toBe(0);
+      expect(frames.pending).toBe(1);
 
-      // First frame only captures the start time, exactly like runAnimations().
-      frames.shift()!(0);
-      frames.shift()!(80);
-      expect(state.initialTransition?.progressFraction).toBeCloseTo(
-        0.5 + (0.5 * 80) / 150,
-        6,
-      );
+      // First frame establishes the retained clock origin, matching runAnimations().
+      frames.flush(0);
+      expect(state.animationPlayTimeMs).toBe(0);
+      frames.flush(80);
+      expect(state.animationPlayTimeMs).toBe(80);
 
-      // Seeking the new transition does not stop the old initial-value motion.
+      // Seeking the new transition does not stop the retained initial-value clock.
       state.seekTo(0.5, primarySecondary);
-      frames.shift()!(96);
       expect(state.progressFraction).toBe(0.5);
-      expect(state.initialTransition?.progressFraction).toBeCloseTo(
-        0.5 + (0.5 * 96) / 150,
-        6,
-      );
+      expect(state.animationPlayTimeMs).toBe(80);
+      expect(frames.pending).toBe(1);
 
-      frames.shift()!(150);
+      frames.flush(96);
+      expect(state.progressFraction).toBe(0.5);
+      expect(state.animationPlayTimeMs).toBe(96);
+
+      frames.flush(150);
       await Promise.resolve();
-      expect(state.initialTransition).toBeNull();
+      expect(state.animationPlayTimeMs).toBe(150);
+      expect(frames.pending).toBe(0);
     } finally {
       vi.unstubAllGlobals();
     }
   });
 
-  it('snapTo clears a pending initial-value animation', () => {
-    const frames: FrameRequestCallback[] = [];
-    const cancelAnimationFrame = vi.fn();
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      frames.push(callback);
-      return 17;
-    });
-    vi.stubGlobal('cancelAnimationFrame', cancelAnimationFrame);
+  it('snapTo clears a pending retained initial-value clock', () => {
+    const frames = installFrameHarness();
 
     try {
       const state = new MutableThreePaneScaffoldState(hidden);
       state.setTransitionDurationResolver({}, () => 300);
       state.seekTo(0.5, primary);
       state.seekTo(0, primarySecondary);
-      expect(state.initialTransition).not.toBeNull();
+      const clearRevision = state.initialValueAnimationsClearRevision;
+      expect(frames.pending).toBe(1);
 
       state.snapTo(primarySecondary);
-      expect(state.initialTransition).toBeNull();
-      expect(cancelAnimationFrame).toHaveBeenCalledWith(17);
+
+      expect(state.animationPlayTimeMs).toBe(0);
+      expect(state.initialValueAnimationsClearRevision).toBe(clearRevision + 1);
+      expect(frames.pending).toBe(0);
     } finally {
       vi.unstubAllGlobals();
     }
