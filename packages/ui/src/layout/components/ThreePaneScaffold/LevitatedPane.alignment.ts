@@ -5,6 +5,9 @@ import type {
 
 export type ResolvableLevitatedPaneAlignment = LevitatedPaneAlignment;
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
 function alignmentParts(alignment: LevitatedPaneAlignmentPreset): {
   vertical: 'top' | 'center' | 'bottom';
   horizontal: 'start' | 'center' | 'end';
@@ -21,6 +24,15 @@ function composeIntSubtract(a: number, b: number) {
   return Number.isInteger(a) && Number.isInteger(b) ? (a - b) | 0 : a - b;
 }
 
+function composeFastRoundToInt(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  // Compose fastRoundToInt ties toward positive infinity, matching Math.round.
+  return Math.round(floatValue);
+}
+
 function composeBiasCoordinate(size: number, space: number, bias: -1 | 0 | 1): number {
   // Compose BiasAlignment subtracts Int space/size before converting the
   // remaining space to Float. Preserve Int32 overflow for resize-state sizes,
@@ -28,7 +40,7 @@ function composeBiasCoordinate(size: number, space: number, bias: -1 | 0 | 1): n
   const remaining = composeIntSubtract(space, size);
   const center = Math.fround(Math.fround(remaining) / Math.fround(2));
   const coordinate = Math.fround(center * Math.fround(1 + bias));
-  return Math.round(coordinate);
+  return composeFastRoundToInt(coordinate);
 }
 
 /**
