@@ -51,7 +51,7 @@ describe('DragToResizeState', () => {
         scaffoldWidth: 0,
         scaffoldHeight: 0,
       }),
-    ).toEqual({ width: 0, height: 0 });
+    ).toBeUndefined();
     expect(state.value).toBe(DragToResizeValue.Default);
     expect(Number.isNaN(state.size)).toBe(true);
 
