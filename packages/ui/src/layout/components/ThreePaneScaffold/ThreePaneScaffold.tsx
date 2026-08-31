@@ -499,15 +499,15 @@ export function ThreePaneScaffold({
     transitionFrame?.scrim != null && transitionFrame.scrimOpacity > 0;
   const hasBlockingScrim = transitionScrimBlocks || hasLevitatedPaneWithScrim(targetValue);
 
-  let targetDragHandleOffset = PaneExpansionUnspecified;
+  let measuredDragHandleOffset = PaneExpansionUnspecified;
   if (paneExpansionDragHandle != null) {
     if (
       expansionState.isDraggingOrSettling &&
       expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified
     ) {
-      targetDragHandleOffset = expansionLayout.currentDraggingOffset;
+      measuredDragHandleOffset = expansionLayout.currentDraggingOffset;
     } else {
-      targetDragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
+      measuredDragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
         layout,
         layoutOptions: {
           width: geometry.width,
@@ -525,6 +525,24 @@ export function ThreePaneScaffold({
       });
     }
   }
+
+  // AnimateWithFading observes the drag handle's lookahead placement offset,
+  // after measureAndPlaceDragHandleIfNeeded has coerced the raw spacer midpoint
+  // into the content bounds. Keep the raw midpoint separately for expansion
+  // state measurement, which happens before that placement clamp upstream.
+  const targetDragHandlePlacement =
+    paneExpansionDragHandle != null &&
+    measuredDragHandleOffset !== PaneExpansionUnspecified &&
+    geometry.width > 0
+      ? calculatePaneExpansionDragHandlePlacement({
+          offsetX: Math.max(measuredDragHandleOffset, 0),
+          contentWidth: geometry.width,
+          partitionSpacerSize: directive.horizontalPartitionSpacerSize,
+          minTouchTargetSize: paneExpansionDragHandleMinTouchTargetSize,
+        })
+      : undefined;
+  const targetDragHandleOffset =
+    targetDragHandlePlacement?.centerX ?? measuredDragHandleOffset;
 
   dragHandleFadeOffsetsRef.current = updatePaneExpansionDragHandleFadeOffsets(
     dragHandleFadeOffsetsRef.current,
@@ -550,7 +568,6 @@ export function ThreePaneScaffold({
   const dragHandleOffset =
     dragHandleFadeFrame?.offsetX ?? trackedDragHandleTargetOffset;
   const dragHandleOpacity = dragHandleFadeFrame?.opacity ?? 1;
-  const measuredDragHandleOffset = trackedDragHandleTargetOffset;
   const dragHandleInteractionBlocked = hasBlockingScrim;
 
   const dragHandlePlacement =
