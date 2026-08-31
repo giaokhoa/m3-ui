@@ -6,10 +6,9 @@ import {
 import '@m3-ui/tokens/button.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { resolveButtonElevation } from '../Button/Button.defaults';
+import { buttonElevationLevels } from '../Button/Button.elevation';
 import {
   getToggleButtonStyle,
-  resolveToggleButtonInteraction,
   type ToggleButtonState,
 } from './ToggleButton.defaults';
 import type { ToggleButtonSize, ToggleButtonVariant } from './ToggleButton.types';
@@ -47,14 +46,7 @@ function ToggleButtonImpl({
   ...props
 }: ToggleButtonImplProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaToggleButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaToggleButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   function stateFor(renderProps: {
     isDisabled: boolean;
@@ -75,6 +67,7 @@ function ToggleButtonImpl({
   return (
     <AriaToggleButton
       {...props}
+      {...ripplePressProps}
       isSelected={isSelected}
       onChange={onChange}
       data-has-start-icon={startIcon ? true : undefined}
@@ -92,33 +85,34 @@ function ToggleButtonImpl({
           ...userStyle,
         };
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
-      {(renderProps) => {
-        const state = stateFor(renderProps);
-        const elevationState = {
-          isDisabled: state.isDisabled,
-          interaction: resolveToggleButtonInteraction(state),
-        };
-        return (
-          <>
-            <Elevation level={resolveButtonElevation(variant, elevationState)} />
-            <Ripple
-              controller={ripple}
-              focusRingRadius="var(--_button-container-radius)"
-              isFocusVisible={renderProps.isFocusVisible}
-              isHovered={renderProps.isHovered}
-            />
-            <span className="button__content">
-              {startIcon ? (
-                <span aria-hidden="true" className="button__icon">{startIcon}</span>
-              ) : null}
-              {typeof children === 'function' ? children(renderProps) : children}
-            </span>
-          </>
-        );
-      }}
+      {(renderProps) => (
+        <>
+          <Elevation
+            levels={buttonElevationLevels[variant]}
+            state={{
+              isDisabled: renderProps.isDisabled,
+              isPressed: renderProps.isPressed,
+              isHovered: renderProps.isHovered,
+              isFocused: renderProps.isFocused,
+            }}
+          />
+          <Ripple
+            controller={ripple}
+            focusRingRadius="var(--_button-container-radius)"
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
+          />
+          <span className="button__content">
+            {startIcon ? (
+              <span aria-hidden="true" className="button__icon">{startIcon}</span>
+            ) : null}
+            {typeof children === 'function' ? children(renderProps) : children}
+          </span>
+        </>
+      )}
     </AriaToggleButton>
   );
 }
