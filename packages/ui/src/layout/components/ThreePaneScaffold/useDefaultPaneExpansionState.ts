@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { PaneExpansionState } from '../../adaptive/paneExpansionState';
-import { paneExpansionStateKeyId } from '../../adaptive/paneExpansionStateCache';
+import {
+  PaneExpansionStateCache,
+  paneExpansionStateKeyId,
+} from '../../adaptive/paneExpansionStateCache';
 import { getPaneExpansionStateKey } from '../../adaptive/paneExpansionStateKey';
 import type { ThreePaneScaffoldValue } from '../../adaptive/threePaneScaffold';
-
-const StubKey = 'stub';
 
 export function getPaneExpansionStateCacheKey(value: ThreePaneScaffoldValue): string {
   return paneExpansionStateKeyId(getPaneExpansionStateKey(value));
@@ -13,22 +14,25 @@ export function getPaneExpansionStateCacheKey(value: ThreePaneScaffoldValue): st
 /**
  * Browser equivalent of AndroidX rememberDefaultPaneExpansionState.
  *
- * A scaffold without a drag handle uses one cheap stub state. Once a default
- * drag handle is present, each two-pane combination gets an independent state
- * so a user-adjusted split is restored when that pane pair becomes active
- * again. Explicit paneExpansionState remains owned by the caller and bypasses
- * this cache in ThreePaneScaffold.
+ * Without a drag handle AndroidX uses one cheap stub state. With a handle it
+ * delegates to rememberPaneExpansionState(keyProvider()), which keeps one live
+ * PaneExpansionState while rememberPersistentlyWithKey swaps only its saved
+ * data bucket for each two-pane combination.
  */
 export function useDefaultPaneExpansionState(
   targetValue: ThreePaneScaffoldValue,
   mutable: boolean,
 ): PaneExpansionState {
-  const [states] = useState(() => new Map<string, PaneExpansionState>());
-  const key = mutable ? getPaneExpansionStateCacheKey(targetValue) : StubKey;
-  let state = states.get(key);
-  if (state === undefined) {
-    state = new PaneExpansionState();
-    states.set(key, state);
-  }
-  return state;
+  const [stubState] = useState(() => new PaneExpansionState());
+  const [cache] = useState(() => new PaneExpansionStateCache());
+  const key = getPaneExpansionStateKey(targetValue);
+  const keyId = paneExpansionStateKeyId(key);
+  const mutableState = mutable ? cache.getOrCreate(key) : stubState;
+
+  useLayoutEffect(() => {
+    if (!mutable) return;
+    cache.update(key);
+  }, [cache, keyId, mutable]);
+
+  return mutableState;
 }
