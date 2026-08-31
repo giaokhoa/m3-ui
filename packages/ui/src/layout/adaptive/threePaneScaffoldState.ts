@@ -20,12 +20,14 @@ export interface ThreePaneScaffoldProgressAnimationContext {
   to: number;
   /** Full transition duration at animation start. */
   durationMs: number;
-  /**
-   * Latest full transition duration. The default driver supplies its operation
-   * elapsed/frame timestamp so retained initial-value animations share the same
-   * frame clock as the current fraction animation.
-   */
+  /** Latest full transition duration. */
   getDurationMs?: (elapsedMs?: number, frameTimeMs?: number) => number;
+  /**
+   * Shared SeekableTransitionState play time. The default driver asks for this
+   * before sampling so a retarget can preserve lastFrameTimeNanos instead of
+   * losing the first frame delta to a fresh RAF start timestamp.
+   */
+  getPlayTimeMs?: (elapsedMs: number, frameTimeMs: number) => number;
   signal: AbortSignal;
   /** Optional play time lets a custom web driver participate in the shared clock. */
   update: (fraction: number, playTimeMs?: number) => void;
@@ -160,7 +162,7 @@ function nowMs() {
 }
 
 export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgressAnimation =
-  ({ from, to, durationMs, getDurationMs, signal, update }) =>
+  ({ from, to, durationMs, getDurationMs, getPlayTimeMs, signal, update }) =>
     new Promise<void>((resolve) => {
       const floatFrom = composeFloat(from);
       const floatTo = composeFloat(to);
@@ -190,15 +192,16 @@ export const defaultThreePaneScaffoldProgressAnimation: ThreePaneScaffoldProgres
           return;
         }
         startTime ??= time;
-        const elapsed = Math.max(0, time - startTime);
-        const fullDurationMs = getDurationMs?.(elapsed, time) ?? durationMs;
+        const localElapsed = Math.max(0, time - startTime);
+        const playTimeMs = getPlayTimeMs?.(localElapsed, time) ?? localElapsed;
+        const fullDurationMs = getDurationMs?.(playTimeMs, time) ?? durationMs;
         const fraction = composeLinearTransitionFraction(
           floatFrom,
           floatTo,
-          elapsed,
+          playTimeMs,
           fullDurationMs,
         );
-        update(fraction, elapsed);
+        update(fraction, playTimeMs);
         if (fraction === floatTo) {
           finish();
           return;
@@ -233,8 +236,6 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
   private transitionOwner: object | null;
   private transitionDurationResolver: ThreePaneScaffoldTransitionDurationResolver | null;
 
-  // SeekableTransitionState.runAnimations has one frame clock for both the
-  // current fraction animation and all retained initial-value animations.
   private animationPlayTimeMsValue = 0;
   private initialValueCompletionPlayTimeMs = 0;
   private clockOriginFrameTimeMs: number | null = null;
@@ -348,8 +349,11 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     oldCurrent: ThreePaneScaffoldValue,
     oldTarget: ThreePaneScaffoldValue,
     oldFraction: number,
+    includeCurrentAnimation: boolean,
   ) {
     const retainedRemaining = this.activeInitialValueRemainingMs();
+    if (!includeCurrentAnimation) return retainedRemaining;
+
     const runningRemaining =
       this.activeDefaultAnimationRemainingMs() ?? this.activeAnimationRemainingMs();
     if (runningRemaining > 0) return Math.max(retainedRemaining, runningRemaining);
@@ -451,12 +455,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       : this.progressFractionValue;
   }
 
-  /** Shared retained-initial/current-animation frame play time. */
   get animationPlayTimeMs() {
     return this.animationPlayTimeMsValue;
   }
 
-  /** Renderer reset signal equivalent to Transition.clearInitialAnimations(). */
   get initialValueAnimationsClearRevision() {
     return this.initialValueAnimationsClearRevisionValue;
   }
@@ -532,6 +534,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       oldCurrent,
       oldTarget,
       oldFraction,
+      targetChanged,
     );
 
     this.cancelAnimation();
@@ -603,6 +606,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       oldCurrent,
       oldTarget,
       oldFraction,
+      targetChanged,
     );
     this.cancelAnimation();
     this.resetCurrentAnimationTiming();
@@ -662,11 +666,16 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
           from: startingFraction,
           to: 1,
           durationMs,
-          getDurationMs: (elapsedMs, frameTimeMs) => {
-            if (elapsedMs !== undefined && frameTimeMs !== undefined) {
-              this.activeDefaultAnimationProgressMs = Math.max(0, elapsedMs);
-              this.advanceAnimationClock(frameTimeMs);
-            }
+          getPlayTimeMs: (elapsedMs, frameTimeMs) => {
+            this.advanceAnimationClock(frameTimeMs);
+            const operationPlayTimeMs = Math.max(
+              0,
+              this.animationPlayTimeMsValue - clockBasePlayTimeMs,
+            );
+            this.activeDefaultAnimationProgressMs = operationPlayTimeMs;
+            return operationPlayTimeMs;
+          },
+          getDurationMs: (elapsedMs) => {
             const currentDurationMs = this.resolveTransitionDurationMs(
               resolvedCurrent,
               this.targetStateValue,
