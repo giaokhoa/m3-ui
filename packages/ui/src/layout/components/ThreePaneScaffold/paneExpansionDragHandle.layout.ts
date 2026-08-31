@@ -65,7 +65,18 @@ function cssPxRoundToPx(value: string, name: string) {
   return composeRoundToPx(parsed);
 }
 
+function minTouchTargetRoundToPx(value: number) {
+  const floatValue = Math.fround(value);
+  // AndroidX stores Dp.Unspecified in parent data, then Measurable.minTouchTargetSize
+  // resolves an unspecified Dp to 0.dp before DragHandleMeasurable.roundToPx().
+  if (Number.isNaN(floatValue)) return 0;
+  return composeRoundToPx(floatValue);
+}
+
 function clamp(value: number, min: number, max: number) {
+  if (min > max) {
+    throw new RangeError(`Cannot coerce value to an empty range: [${min}, ${max}]`);
+  }
   return Math.min(max, Math.max(min, value));
 }
 
@@ -208,16 +219,12 @@ export function calculatePaneExpansionDragHandlePlacement({
 }: PaneExpansionDragHandlePlacementInput): PaneExpansionDragHandlePlacement {
   finiteNonNegative(offsetX, 'offsetX');
   finiteNonNegative(contentWidth, 'contentWidth');
-  finiteNonNegative(minTouchTargetSize, 'minTouchTargetSize');
   const partitionSpacerPx = cssPxRoundToPx(partitionSpacerSize, 'partitionSpacerSize');
-  const minTouchTargetPx = composeRoundToPx(minTouchTargetSize);
+  const minTouchTargetPx = minTouchTargetRoundToPx(minTouchTargetSize);
 
-  // AndroidX values are Ints after roundToPx()/measurement. Its `/ 2`
-  // operations therefore truncate for odd spacer and touch-target sizes.
-  const minHorizontalMargin = Math.min(
-    Math.trunc(partitionSpacerPx / 2),
-    contentWidth / 2,
-  );
+  // AndroidX passes verticalSpacerSize / 2 directly to Int.coerceIn. Do not
+  // shrink that margin to fit a narrow scaffold: an empty coerce range throws.
+  const minHorizontalMargin = Math.trunc(partitionSpacerPx / 2);
   const centerX = clamp(
     offsetX,
     minHorizontalMargin,
@@ -227,8 +234,14 @@ export function calculatePaneExpansionDragHandlePlacement({
   const halfMinTouchTargetSize = Math.trunc(minTouchTargetPx / 2);
   const minWidth =
     appliedHorizontalMargin < halfMinTouchTargetSize
-      ? 2 * (minTouchTargetPx - appliedHorizontalMargin)
+      ? Math.imul(2, minTouchTargetPx - appliedHorizontalMargin)
       : minTouchTargetPx;
+
+  // AndroidX feeds this Int into Constraints(minWidth = ...), which rejects
+  // negative minima. Math.imul preserves Kotlin Int overflow before that check.
+  if (minWidth < 0) {
+    throw new RangeError(`minWidth must be non-negative, received ${minWidth}`);
+  }
 
   return { centerX, minWidth };
 }
