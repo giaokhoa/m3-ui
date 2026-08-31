@@ -49,19 +49,25 @@ export interface MutableThreePaneScaffoldStateOptions {
 // The web state snaps by default while unbound; the mounted scaffold supplies the real duration.
 const DefaultUnboundTransitionDurationMs = 0;
 
+function composeFloat(value: number) {
+  return Math.fround(value);
+}
+
 function clampFraction(fraction: number) {
-  if (!Number.isFinite(fraction) || fraction < 0 || fraction > 1) {
+  const floatFraction = composeFloat(fraction);
+  if (!Number.isFinite(floatFraction) || floatFraction < 0 || floatFraction > 1) {
     throw new RangeError(`Expecting fraction between 0 and 1. Got ${fraction}`);
   }
-  return fraction;
+  return floatFraction;
 }
 
 function coerceAnimationFraction(fraction: number) {
-  // Kotlin Float.coerceIn keeps NaN unchanged because neither comparison is
-  // true, while finite overshoot is clamped to the transition interval.
-  if (fraction < 0) return 0;
-  if (fraction > 1) return 1;
-  return fraction;
+  // SeekableTransitionState.fraction is mutableFloatStateOf. Convert to Float
+  // before Float.coerceIn semantics; NaN remains NaN while finite overshoot clamps.
+  const floatFraction = composeFloat(fraction);
+  if (floatFraction < 0) return 0;
+  if (floatFraction > 1) return 1;
+  return floatFraction;
 }
 
 function levitatedPaneAlignmentsEqual(
@@ -313,7 +319,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     targetState: ThreePaneScaffoldValue = this.targetStateValue,
     isPredictiveBackInProgress = false,
   ) {
-    clampFraction(fraction);
+    const resolvedFraction = clampFraction(fraction);
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.cancelAnimation();
@@ -333,7 +339,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       this.targetStateValue,
     )
       ? 0
-      : fraction;
+      : resolvedFraction;
     this.notify();
   }
 
