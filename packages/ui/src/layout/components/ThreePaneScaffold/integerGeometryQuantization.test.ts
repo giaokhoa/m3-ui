@@ -75,6 +75,36 @@ describe('AndroidX integer geometry quantization', () => {
     ).toEqual({ centerX: 12, minWidth: 74 });
   });
 
+  it('resolves unspecified and tiny-negative drag-handle Dp like AndroidX', () => {
+    const unspecified = calculatePaneExpansionDragHandlePlacement({
+      offsetX: 0,
+      contentWidth: 1000,
+      partitionSpacerSize: '25px',
+      minTouchTargetSize: Number.NaN,
+    });
+    expect(unspecified).toEqual({ centerX: 12, minWidth: 0 });
+
+    const roundsToZero = calculatePaneExpansionDragHandlePlacement({
+      offsetX: 0,
+      contentWidth: 1000,
+      partitionSpacerSize: '25px',
+      minTouchTargetSize: -0.1,
+    });
+    expect(roundsToZero.centerX).toBe(12);
+    expect(roundsToZero.minWidth === 0).toBe(true);
+  });
+
+  it('does not normalize an empty drag-handle coerce range', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 0,
+        contentWidth: 11,
+        partitionSpacerSize: '25px',
+        minTouchTargetSize: 48,
+      }),
+    ).toThrow(RangeError);
+  });
+
   it('uses Int division for an odd pane-expansion spacer while dragging', () => {
     const paneExpansionState = new PaneExpansionState();
     paneExpansionState.onMeasured(1000);
