@@ -4,6 +4,8 @@ This repository ports Material 3 behavior and visuals from AndroidX Compose to R
 
 This document is the repository-level ownership contract. **Do not reopen the token/theme/runtime ownership model during ordinary component work.** Research upstream sources to discover Material facts, behavior, API capability, and parity drift; do not use differences in AndroidX implementation mechanics as a reason to redesign this boundary unless a concrete Material requirement or web-platform constraint cannot be satisfied by it.
 
+Agents performing Material component/theme/token parity work must start with `/.agents/skills/material3-parity/SKILL.md`; root `AGENTS.md` defines the mandatory trigger scope. This README remains the canonical rationale behind that operating skill.
+
 ## Hard architectural invariants
 
 These rules are intentionally strict where they define token source/build ownership. Component DOM shape, class names, wrapper choices, and paint plumbing are implementation details unless the Material contract itself requires a particular observable result.
@@ -187,6 +189,7 @@ Foundational subsystems keep research and ownership notes next to the code. Read
 
 Relevant local notes:
 
+- Material component/theme/token parity work: `/.agents/skills/material3-parity/SKILL.md`;
 - token/compiler changes: `/.agents/skills/style-dictionary/SKILL.md` and `/packages/tokens/README.md`;
 - elevation changes: `/packages/ui/src/internal/elevation/README.md`;
 - ripple/state-layer/focus-indication changes: `/packages/ui/src/internal/ripple/README.md`;
@@ -283,31 +286,6 @@ component semantic token
 
 Do not turn runtime semantic roles into fake concrete DTCG colors. Do not copy `var(--primary)` into component tokens when a canonical role exists. Do not decode a `var(--role)` string in TypeScript to recover semantic identity and then reconstruct it later.
 
-The `var(--role)` endpoint is deliberately web-specific while `@m3-ui/tokens` serves this web implementation. It preserves direct CSS cascade resolution without another handwritten role-binding table. Reconsider splitting platform-neutral role identity from the CSS endpoint only if the canonical token package becomes a genuine multi-platform source that must emit independent platform role bindings.
-
-## ThemeProvider boundary and baseline theme target
-
-`ThemeProvider` owns **concrete runtime system-role values**, not component semantic defaults.
-
-It may own mode, runtime `sourceColor`, contrast, the concrete dynamic `ColorScheme`, runtime behavior knobs, and themed portal propagation. It must not own a component-default registry or contain facts such as "OutlinedButton outline uses Outline"; those facts are component tokens.
-
-The target split is:
-
-```text
-immutable baseline light/dark + baseline typography
-    -> canonical DTCG
-    -> Style Dictionary
-    -> generated baseline foundation CSS + typed JS
-
-dynamic sourceColor/mode/contrast override
-    -> ThemeProvider
-    -> scoped runtime role overrides
-```
-
-The current handwritten `packages/ui/src/theme/baseline.ts` maps and TypeScript serialization of baseline typography/role variables are **known migration debt**. They are not permission to add more immutable theme tables outside canonical DTCG. Moving baseline data into generated outputs must preserve the same observable ThemeProvider contract and nested/portal behavior.
-
-Do not replace runtime Material Color Utilities generation with a build-time theme resolver: `sourceColor` is a runtime input.
-
 ## Static platform styling and runtime behavior
 
 Static visual defaults should reach the browser without a React serialization hop when a reviewed CSS adapter can express them:
@@ -325,7 +303,6 @@ React/TypeScript remains responsible for values that genuinely require runtime i
 - runtime transition precedence where previous interaction matters;
 - ripple wave geometry and lifecycle;
 - DOM measurements;
-- runtime arithmetic dependent on values/props/measurements;
 - user-supplied runtime shape or style overrides.
 
 React/TypeScript must not become a platform compiler for static box-shadow recipes, state-layer opacities, motion constants, focus-ring constants, component colors, dimensions, or typography when those can be generated once.
@@ -347,91 +324,53 @@ Do not create a second independent event state machine inside ripple when the ho
 | `@Composable` | React function component |
 | content lambda | `ReactNode` or typed render prop |
 | `MaterialTheme.colorScheme` | ThemeProvider + CSS custom properties |
-| generated component token objects | canonical DTCG + Style Dictionary outputs |
-| `FooDefaults` immutable visual mappings | canonical component DTCG + generated CSS adapters |
-| `FooDefaults` genuine runtime helper behavior | narrow TypeScript helper only where runtime is required |
 | visual `CompositionLocal` | CSS cascade where appropriate |
 | behavioral `CompositionLocal` | React Context only when JS access is required |
 | `Color` | CSS color string / semantic runtime role |
 | `Dp` | generated CSS length or UI-local numeric projection at arithmetic boundary |
-| `Shape` | generated shape token / CSS radius; runtime prop when user supplied |
+| `Shape` | generated shape token / CSS radius |
 | `TextStyle` | generated typography values mapped to CSS |
 | `Modifier` | props + class names + CSS layout |
 | `MutableInteractionSource` | React Aria/native interaction state plus a small shared coordinator only when ordering/history is required |
 | semantics / `Role` | native element semantics + ARIA |
 | `Color.Unspecified` | `undefined` |
-| Kotlin `copy(...)` | object spread / pure factory override only when a runtime value object is actually needed |
-
-## Agent preflight: research the right question
-
-Before implementing or auditing a component:
-
-1. Read this document, `/packages/tokens/README.md`, and the relevant subsystem/component README.
-2. Treat the ownership rules above as closed architecture unless the task explicitly asks to redesign them.
-3. Research pinned AndroidX/Figma/Material Web for:
-   - exact Material values and semantic identities;
-   - variants/defaults/states;
-   - behavior and interaction precedence;
-   - public customization capability;
-   - upstream drift and intentional web adaptations.
-4. Do **not** research upstream merely to decide whether static values should live in DTCG/generated CSS versus runtime TypeScript; that decision is already documented here.
-5. If upstream evidence appears to conflict with this architecture, identify the concrete unsatisfied Material requirement or web constraint before proposing an architecture change. A different Kotlin class/function shape is not a conflict.
-
-The purpose is to avoid repeating architecture research every time an older component is migrated.
+| Kotlin `copy(...)` | object spread / pure factory override |
 
 ## Component workflow
 
 Before implementing or substantially refactoring a component family:
 
-1. Read the applicable local implementation notes listed above.
+1. Read `/.agents/skills/material3-parity/SKILL.md` and the applicable local implementation notes listed above.
 2. Confirm the pinned AndroidX revision and inspect the relevant component, generated token files, Defaults/runtime resolution code, and tests.
-3. Apply the static-versus-runtime decision procedure above before writing component TypeScript.
+3. Identify which values are true immutable tokens versus runtime behavior or web-only adaptation.
 4. Add or update canonical DTCG manually under `packages/tokens/tokens/`; alias shared core tokens when semantic identity is genuinely shared.
 5. Extend read-only AndroidX/Figma/Material Web audit mappings where a meaningful upstream counterpart exists. Compare semantic color/elevation/shape/typography identity rather than unrelated serialized representations.
 6. Let Style Dictionary generate JS/`.d.ts` and any reviewed platform adapter; do not write a parallel TypeScript or ad-hoc CSS generator.
 7. Keep runtime TypeScript limited to behavior/arithmetic that requires runtime information. Prefer CSS for immutable visual mappings.
 8. Implement behavior with React Aria/native HTML and CSS-first visual states.
-9. Update the local implementation notes when the responsibility boundary changes. Add tests for Material/token semantics or observable behavior affected by the change; do not add a brittle source-regex guard merely to preserve an incidental implementation choice.
+9. Update the local implementation notes when the responsibility boundary changes. Add tests for Material/token semantics or observable behavior affected by the change; do not add a source-regex guard merely to preserve an incidental implementation choice.
 10. Add token/default/behavior/layout tests and Storybook visual regression coverage.
 11. Document intentional web differences.
 
 If an upstream value does not map cleanly to the web implementation, document the adaptation. Do not hide the mismatch by copying upstream structure into runtime code.
 
-## Forbidden architecture regressions
-
-Do not introduce any of the following without an explicit architecture change backed by a concrete requirement:
-
-- `FooDefaults.colors()`/`FooColors` whose only job is to restate static canonical color mappings;
-- handwritten `Foo.tokens.ts` or `Foo.defaults.ts` projection tables that only turn generated tokens into inline CSS variables;
-- a `ThemeProvider.components` or MUI-style global component-default registry;
-- component React code that resolves `sourceColor` or maps concrete dynamic colors itself;
-- component/effect tokens that copy `var(--role)` instead of aliasing the canonical role;
-- generic global CSS-variable dumps for every non-color token without a concrete consumer;
-- a second token generator or upstream-to-runtime snapshot generator;
-- build-time DTCG theme resolution as a replacement for runtime dynamic Material Color Utilities;
-- hand-edited generated output;
-- static design constants in UI TypeScript when a canonical token should own them.
-
 ## Testing layers
 
 Every substantial port should be covered by canonical validation, generated-output tests, read-only upstream audit where applicable, defaults/layout tests, interaction/accessibility tests, and Chromium Storybook visual regression. Expected test data must not be generated from the production resolver being tested.
-
-Architecture enforcement should test semantic/build boundaries rather than freeze incidental source layout. A useful guard may detect static token-to-inline-CSS projection debt, but it should avoid brittle assumptions about exact class names, wrapper DOM, file wording, or one temporary implementation shape.
 
 ## Review checklist
 
 A component/token change is not ready until reviewers can answer yes to all relevant questions:
 
-- Were this architecture document and applicable local implementation notes read before upstream research?
+- Was `/.agents/skills/material3-parity/SKILL.md` read for Material component/theme/token parity work?
+- Were the applicable local implementation notes read and updated if the boundary changed?
 - Is every immutable design value canonical DTCG or a deliberate runtime-derived value?
 - Does Style Dictionary remain the sole token/platform build engine?
 - Are generated CSS adapters explicit, consumer-driven, and centralized under token build output?
 - Are upstream sources read-only and pinned?
 - Do component colors alias canonical runtime roles rather than duplicate CSS expressions?
-- Does `ThemeProvider` remain the owner of concrete runtime Material colors rather than component semantic mappings?
-- Are React/TypeScript projections limited to genuine runtime behavior/arithmetic/history/DOM data/user overrides?
-- Did the change avoid adding a Compose-shaped Defaults layer merely for API/mechanical parity?
-- Can changing `sourceColor` propagate to component colors through system-role CSS variables without component-specific React color resolution?
+- Does `ThemeProvider` remain the owner of concrete runtime Material colors?
+- Are React/TypeScript projections limited to genuine runtime behavior/arithmetic?
 - Are React Aria/native semantics used where available?
 - Are audit/test fixtures independent from production output?
 - Are intentional web adaptations documented?
