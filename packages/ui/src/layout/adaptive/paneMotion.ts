@@ -84,6 +84,25 @@ export const PaneMotionDefaults = {
   delayedRatio: 0.1,
 } as const;
 
+const ComposeIntMin = -2147483648;
+const ComposeIntMax = 2147483647;
+
+function isComposeInt(value: number) {
+  return Number.isInteger(value) && value >= ComposeIntMin && value <= ComposeIntMax;
+}
+
+function composeIntAdd(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a - b) | 0 : a - b;
+}
+
+function composeIntNegate(value: number) {
+  return isComposeInt(value) ? -value | 0 : -value;
+}
+
 export function calculatePaneMotionType(
   previousValue: PaneAdaptedValue,
   currentValue: PaneAdaptedValue,
@@ -219,7 +238,7 @@ function currentLeft(data: PaneMotionData) {
 }
 
 function currentRight(data: PaneMotionData) {
-  return data.originPosition.x + data.originSize.width;
+  return composeIntAdd(data.originPosition.x, data.originSize.width);
 }
 
 function targetLeft(data: PaneMotionData) {
@@ -227,7 +246,7 @@ function targetLeft(data: PaneMotionData) {
 }
 
 function targetRight(data: PaneMotionData) {
-  return data.targetPosition.x + data.targetSize.width;
+  return composeIntAdd(data.targetPosition.x, data.targetSize.width);
 }
 
 /** Port of AndroidX PaneScaffoldMotionDataProvider.slideInFromLeftOffset. */
@@ -241,7 +260,7 @@ export function calculateSlideInFromLeftOffset(
       data.motion === PaneMotion.EnterFromLeft ||
       data.motion === PaneMotion.EnterFromLeftDelayed
     ) {
-      return -(previousPane === undefined ? targetRight(data) : targetLeft(previousPane));
+      return composeIntNegate(previousPane === undefined ? targetRight(data) : targetLeft(previousPane));
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
@@ -266,8 +285,10 @@ export function calculateSlideInFromRightOffset(
       data.motion === PaneMotion.EnterFromRight ||
       data.motion === PaneMotion.EnterFromRightDelayed
     ) {
-      return scaffoldWidth -
-        (previousPane === undefined ? targetLeft(data) : targetRight(previousPane));
+      return composeIntSubtract(
+        scaffoldWidth,
+        previousPane === undefined ? targetLeft(data) : targetRight(previousPane),
+      );
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
@@ -289,7 +310,7 @@ export function calculateSlideOutToLeftOffset(
   for (let index = paneData.length - 1; index >= 0; index -= 1) {
     const data = paneData[index]!;
     if (data.motion === PaneMotion.ExitToLeft) {
-      return -(previousPane === undefined ? currentRight(data) : currentLeft(previousPane));
+      return composeIntNegate(previousPane === undefined ? currentRight(data) : currentLeft(previousPane));
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
@@ -310,8 +331,10 @@ export function calculateSlideOutToRightOffset(
   let previousPane: PaneMotionData | undefined;
   for (const data of paneData) {
     if (data.motion === PaneMotion.ExitToRight) {
-      return scaffoldWidth -
-        (previousPane === undefined ? currentLeft(data) : currentRight(previousPane));
+      return composeIntSubtract(
+        scaffoldWidth,
+        previousPane === undefined ? currentLeft(data) : currentRight(previousPane),
+      );
     }
     if (
       data.motion === PaneMotion.AnimateBounds ||
