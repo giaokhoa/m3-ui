@@ -74,6 +74,19 @@ describe('pane motion spring parity', () => {
     ).toEqual([450, 90, 950, 190]);
   });
 
+  it('saturates Int converters after an extreme spring overshoot', () => {
+    const raw = samplePaneMotionSpring(-2147483648, 2147483647, 269);
+    expect(raw).toBe(2212613120);
+    expect(
+      samplePaneMotionVectorSpringAtPlayTime(
+        [-2147483648],
+        [2147483647],
+        269,
+        1,
+      ),
+    ).toEqual([2147483647]);
+  });
+
   it('rounds IntRect, IntOffset, and IntSize vector samples but keeps Float visibility continuous', () => {
     const raw = samplePaneMotionSpring(0, 500, 100);
     const intOffset = samplePaneMotionVectorSpringAtPlayTime([0, 0], [500, 0], 100, 1);
