@@ -11,6 +11,9 @@ export const generatedStyleDependencies = {
     '../tokens/dist/generated/button.css',
   ],
   'src/components/Chip/chip.css': ['../tokens/dist/generated/chip.css'],
+  'src/components/Checkbox/checkbox.css': [
+    '../tokens/dist/generated/checkbox.css',
+  ],
   'src/components/TextField/text-field.css': [
     '../tokens/dist/generated/text-field.css',
   ],

@@ -3,18 +3,14 @@ import {
   Checkbox as AriaCheckbox,
   type CheckboxProps as AriaCheckboxProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/checkbox.css';
 import { Ripple, useRipple, type RippleStateInteraction } from '../../internal/ripple';
-import { checkboxBaseStyle } from './Checkbox.defaults';
-import { checkboxTokens } from './Checkbox.tokens';
+import { checkboxGeometry } from './Checkbox.geometry';
 import './checkbox.css';
 
 export interface CheckboxProps extends AriaCheckboxProps {}
 
 type StateLayerInteraction = 'focus' | 'hover';
-
-const checkboxFocusRingInset =
-  (checkboxTokens.minimumInteractiveSize - checkboxTokens.containerSize) / 2;
-const checkboxFocusRingRadius = checkboxTokens.containerSize * 0.25;
 
 function startInteraction(
   active: readonly StateLayerInteraction[],
@@ -49,17 +45,9 @@ function resolveChildren(
   return typeof children === 'function' ? children(renderProps) : children;
 }
 
-function point(x: number, y: number): string {
-  return `${x * checkboxTokens.containerSize} ${y * checkboxTokens.containerSize}`;
-}
-
-const checkPath = `M ${point(checkboxTokens.checkPath.leftX, checkboxTokens.checkPath.leftY)} L ${point(checkboxTokens.checkPath.crossX, checkboxTokens.checkPath.crossY)} L ${point(checkboxTokens.checkPath.rightX, checkboxTokens.checkPath.rightY)}`;
-const indeterminatePath = `M ${point(checkboxTokens.checkPath.leftX, checkboxTokens.checkPath.leftY)} L ${point(checkboxTokens.checkPath.rightX, checkboxTokens.checkPath.leftY)}`;
-
 export function Checkbox({
   children,
   className,
-  style,
   onBlur,
   onFocus,
   onHoverEnd,
@@ -70,7 +58,7 @@ export function Checkbox({
 }: CheckboxProps) {
   const ripple = useRipple({
     origin: 'center',
-    radius: checkboxTokens.stateLayerSize / 2,
+    radius: checkboxGeometry.stateLayerRadius,
   });
   const [activeInteractions, setActiveInteractions] = useState<StateLayerInteraction[]>([]);
 
@@ -106,10 +94,6 @@ export function Checkbox({
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return userClassName ? `checkbox ${userClassName}` : 'checkbox';
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...checkboxBaseStyle, ...userStyle };
-      }}
       onBlur={handleBlur}
       onFocus={handleFocus}
       onHoverEnd={handleHoverEnd}
@@ -130,8 +114,8 @@ export function Checkbox({
               <span className="checkbox__state-layer">
                 <Ripple
                   controller={ripple}
-                  focusRingInset={checkboxFocusRingInset}
-                  focusRingRadius={checkboxFocusRingRadius}
+                  focusRingInset={checkboxGeometry.focusRingInset}
+                  focusRingRadius={checkboxGeometry.focusRingRadius}
                   isFocusVisible={renderProps.isFocusVisible}
                   stateInteraction={latestStateLayerInteraction(activeInteractions, renderProps.isFocusVisible)}
                 />
@@ -139,11 +123,11 @@ export function Checkbox({
               <span className="checkbox__box" data-state={state}>
                 <svg
                   className="checkbox__mark"
-                  viewBox={`0 0 ${checkboxTokens.containerSize} ${checkboxTokens.containerSize}`}
+                  viewBox={`0 0 ${checkboxGeometry.containerSize} ${checkboxGeometry.containerSize}`}
                   focusable="false"
                 >
-                  <path className="checkbox__check-path" pathLength="1" d={checkPath} />
-                  <path className="checkbox__indeterminate-path" pathLength="1" d={indeterminatePath} />
+                  <path className="checkbox__check-path" pathLength="1" d={checkboxGeometry.checkPath} />
+                  <path className="checkbox__indeterminate-path" pathLength="1" d={checkboxGeometry.indeterminatePath} />
                 </svg>
               </span>
             </span>

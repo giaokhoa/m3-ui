@@ -110,13 +110,13 @@
 
 .checkbox[data-disabled] .checkbox__box[data-state='checked'],
 .checkbox[data-disabled] .checkbox__box[data-state='indeterminate'] {
-  border-color: color-mix(in srgb, var(--_checkbox-disabled-selected-container) var(--_checkbox-disabled-selected-container-opacity), transparent);
-  background: color-mix(in srgb, var(--_checkbox-disabled-selected-container) var(--_checkbox-disabled-selected-container-opacity), transparent);
-  color: var(--_checkbox-disabled-selected-icon);
+  border-color: var(--_checkbox-disabled-selected-container-color);
+  background: var(--_checkbox-disabled-selected-container-color);
+  color: var(--_checkbox-disabled-selected-icon-color);
 }
 
 .checkbox[data-disabled] .checkbox__box[data-state='unchecked'] {
-  border-color: color-mix(in srgb, var(--_checkbox-disabled-unselected-outline) var(--_checkbox-disabled-unselected-outline-opacity), transparent);
+  border-color: var(--_checkbox-disabled-unselected-outline-color);
 }
 
 .checkbox[data-disabled] .checkbox__check-path,
@@ -125,11 +125,7 @@
 }
 
 .checkbox[data-disabled] .checkbox__label {
-  color: color-mix(
-    in srgb,
-    var(--_checkbox-label-color) var(--_checkbox-disabled-label-opacity),
-    transparent
-  );
+  color: var(--_checkbox-disabled-label-color);
 }
 
 @media (prefers-reduced-motion: reduce) {
