@@ -39,4 +39,23 @@ describe('calculateLevitatedPaneResizePlacement', () => {
       }),
     ).toEqual({ left: 0, top: 190, width: 0, height: 420 });
   });
+
+  it('passes raw resize size to custom alignment before measurement clamp', () => {
+    expect(
+      calculateLevitatedPaneResizePlacement({
+        rawWidth: 360,
+        rawHeight: -20,
+        scaffoldWidth: 1000,
+        scaffoldHeight: 800,
+        alignment: {
+          align(paneSize, scaffoldSize) {
+            return {
+              x: scaffoldSize.width - paneSize.width,
+              y: scaffoldSize.height - paneSize.height,
+            };
+          },
+        },
+      }),
+    ).toEqual({ left: 640, top: 820, width: 360, height: 0 });
+  });
 });
