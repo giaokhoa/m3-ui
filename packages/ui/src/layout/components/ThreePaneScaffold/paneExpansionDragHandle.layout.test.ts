@@ -185,20 +185,21 @@ describe('pane expansion drag-handle fading', () => {
       progressFraction: 0.25,
     });
     expect(quarter.offsetX).toBe(688);
-    expect(quarter.opacity).toBeCloseTo(0.52682528, 7);
+    expect(quarter.opacity).toBeCloseTo(0.52682525, 7);
   });
 
-  it('switches offsets at the tween zero crossing and then fades back in', () => {
-    // FastOutSlowInEasing(0.35) == 0.5, so the -1..1 animation reaches zero
-    // at progress 0.35. AndroidX uses `value > 0`, therefore the zero frame
-    // still occupies the original offset at alpha 0.
-    expect(
-      calculatePaneExpansionDragHandleFadeFrame({
-        currentOffsetX: 688,
-        targetOffsetX: 588,
-        progressFraction: 0.35,
-      }),
-    ).toEqual({ offsetX: 688, opacity: 0 });
+  it('uses the pinned Float cubic solver at the tween zero crossing', () => {
+    // Mathematically the curve crosses 0.5 at x=0.35, but pinned Compose
+    // CubicBezierEasing solves the Float cubic to 0.5000002384f. The -1f..1f
+    // tween value is therefore +4.7683716e-7f, so AndroidX has already switched
+    // to the target offset at this exact Float progress.
+    const crossing = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.35,
+    });
+    expect(crossing.offsetX).toBe(588);
+    expect(crossing.opacity).toBe(4.76837158203125e-7);
 
     const halfway = calculatePaneExpansionDragHandleFadeFrame({
       currentOffsetX: 688,
@@ -206,7 +207,7 @@ describe('pane expansion drag-handle fading', () => {
       progressFraction: 0.5,
     });
     expect(halfway.offsetX).toBe(588);
-    expect(halfway.opacity).toBeCloseTo(0.55112262, 7);
+    expect(halfway.opacity).toBeCloseTo(0.55112362, 7);
 
     expect(
       calculatePaneExpansionDragHandleFadeFrame({
