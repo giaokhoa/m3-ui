@@ -289,7 +289,7 @@ export function usePredictiveBackScale(
         frameRef.current = null;
       }
     };
-  }, [progressFraction]);
+  }, [state, progressFraction]);
 
   return animatedScale;
 }
