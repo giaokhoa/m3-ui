@@ -171,6 +171,17 @@ export class PaneExpansionStateCache {
     if (keyChanged && this.activeKeyId !== null) {
       const previousEntry = this.entries.get(this.activeKeyId);
       if (previousEntry !== undefined) {
+        if (state.isSettling && this.rememberedAnchors !== null) {
+          // restore() acquires the same PreventUserInput MutatorMutex as
+          // settleToAnchorIfNeeded. A mutex-owned settle is canceled first and
+          // animateToInternal.finally snaps the old data bucket to its target.
+          // Public animateTo also reports isSettling, but setAnchors only owns a
+          // controller for mutex settling, so public animation remains running.
+          state.setAnchors(
+            this.rememberedAnchors,
+            this.fallbackInitialAnchoredIndex,
+          );
+        }
         previousEntry.data = state.capturePersistentData();
       }
     }
