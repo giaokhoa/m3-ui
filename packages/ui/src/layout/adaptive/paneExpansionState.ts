@@ -102,6 +102,14 @@ export interface PaneExpansionLayoutState {
   isDraggingOrSettling: boolean;
 }
 
+/** The fields saved by AndroidX PaneExpansionStateDataSaver for each persistent key. */
+export interface PaneExpansionPersistentData {
+  firstPaneWidth: number;
+  firstPaneProportion: number;
+  currentDraggingOffset: number;
+  currentAnchor: PaneExpansionAnchor | null;
+}
+
 export interface PaneExpansionStateOptions {
   anchors?: readonly PaneExpansionAnchor[];
   initialAnchoredIndex?: number;
@@ -293,6 +301,51 @@ export class PaneExpansionState {
   private notify() {
     this.revision += 1;
     this.listeners.forEach((listener) => listener());
+  }
+
+  /** Snapshot only the fields persisted by rememberPersistentlyWithKey. */
+  capturePersistentData(): PaneExpansionPersistentData {
+    return {
+      firstPaneWidth: this.firstPaneWidthState,
+      firstPaneProportion: this.firstPaneProportionState,
+      currentDraggingOffset: this.currentDraggingOffsetState,
+      currentAnchor: this.currentAnchorState,
+    };
+  }
+
+  /**
+   * Restore one key's PaneExpansionStateData into this live state instance.
+   * Measurement, direction, drag runtime and listeners intentionally stay on
+   * the live object, matching AndroidX's remembered PaneExpansionState.
+   */
+  restorePersistentData(
+    data: PaneExpansionPersistentData,
+    anchors: readonly PaneExpansionAnchor[],
+    initialAnchoredIndex = this.initialAnchoredIndexState,
+  ) {
+    if (initialAnchoredIndex < -1 || initialAnchoredIndex >= anchors.length) {
+      throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
+    }
+
+    this.cancelSettlingAnimation();
+    this.firstPaneWidthState = data.firstPaneWidth;
+    this.firstPaneProportionState = data.firstPaneProportion;
+    this.currentDraggingOffsetState = data.currentDraggingOffset;
+    this.currentAnchorState = data.currentAnchor;
+
+    const nextAnchors = [...anchors];
+    const currentAnchorStillPresent =
+      this.currentAnchorState !== null &&
+      nextAnchors.some((anchor) => anchorEquals(anchor, this.currentAnchorState!));
+    const initialAnchorForCurrentAnchors =
+      initialAnchoredIndex === -1 ? null : nextAnchors[initialAnchoredIndex] ?? null;
+
+    this.anchors = nextAnchors;
+    this.initialAnchoredIndexState = initialAnchoredIndex;
+    if (!currentAnchorStillPresent) {
+      this.currentAnchorState = initialAnchorForCurrentAnchors;
+    }
+    this.notify();
   }
 
   /**
