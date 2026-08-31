@@ -1,3 +1,5 @@
+const themeFoundationCss = '../tokens/dist/generated/theme.css';
+
 export const generatedStyleDependencies = {
   'src/internal/elevation/elevation.css': [
     '../tokens/dist/generated/elevation.css',
@@ -55,7 +57,7 @@ export const generatedStyleDependencies = {
 };
 
 export function expandStyleSources(sources) {
-  const expanded = [];
+  const expanded = [themeFoundationCss];
   for (const source of sources) {
     for (const dependency of generatedStyleDependencies[source] ?? []) {
       if (!expanded.includes(dependency)) expanded.push(dependency);
