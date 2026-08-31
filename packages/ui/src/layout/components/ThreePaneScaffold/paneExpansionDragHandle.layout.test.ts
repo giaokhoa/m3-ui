@@ -188,6 +188,20 @@ describe('pane expansion drag-handle fading', () => {
     expect(quarter.opacity).toBeCloseTo(0.52682525, 7);
   });
 
+  it('samples the tween through Compose Float play-time quantization', () => {
+    const frame = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.1234567,
+    });
+
+    // TargetBasedAnimation computes (durationNanos * progress).toLong() first.
+    // FloatTweenSpec then divides that clamped Long by durationNanos.toFloat(),
+    // so this fraction becomes 0.1234567091f rather than the input Float value.
+    expect(frame.offsetX).toBe(688);
+    expect(frame.opacity).toBe(0.9164954423904419);
+  });
+
   it('uses the pinned Float cubic solver at the tween zero crossing', () => {
     // Mathematically the curve crosses 0.5 at x=0.35, but pinned Compose
     // CubicBezierEasing solves the Float cubic to 0.5000002384f. The -1f..1f
