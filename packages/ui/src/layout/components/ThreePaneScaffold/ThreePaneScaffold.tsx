@@ -127,6 +127,8 @@ interface PointerDrag {
   lastX: number;
   lastTime: number;
   velocity: number;
+  accumulated: number;
+  dragging: boolean;
 }
 
 interface ResizePointerDrag {
@@ -135,6 +137,8 @@ interface ResizePointerDrag {
   lastX: number;
   lastY: number;
   accumulated: number;
+  clickMovementX: number;
+  clickMovementY: number;
   dragging: boolean;
   canClickToResize: boolean;
 }
@@ -149,7 +153,9 @@ const emptyGeometry: ScaffoldGeometry = {
 
 const noStoreSubscribe = () => () => {};
 const noStoreSnapshot = () => 0;
-const ResizePointerSlop = 4;
+// Browser gesture-arbitration threshold. This is a platform input adaptation,
+// not a Material layout metric or token.
+const BrowserPointerSlop = 4;
 const ResizeInteractiveSelector = [
   'a[href]',
   'button',
@@ -574,16 +580,14 @@ export function ThreePaneScaffold({
     ) {
       return;
     }
-    event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
-    expansionState.beginDrag();
     pointerDragRef.current = {
       pointerId: event.pointerId,
       lastX: event.clientX,
       lastTime: event.timeStamp,
       velocity: 0,
+      accumulated: 0,
+      dragging: false,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -594,14 +598,31 @@ export function ThreePaneScaffold({
     drag.velocity = (delta / elapsed) * 1000;
     drag.lastX = event.clientX;
     drag.lastTime = event.timeStamp;
+
+    if (!drag.dragging) {
+      drag.accumulated += delta;
+      if (Math.abs(drag.accumulated) < BrowserPointerSlop) return;
+      drag.dragging = true;
+      expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
+      expansionState.beginDrag();
+      if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+      expansionState.dispatchRawDelta(drag.accumulated);
+      drag.accumulated = 0;
+      event.preventDefault();
+      return;
+    }
+
     expansionState.dispatchRawDelta(delta);
+    event.preventDefault();
   };
 
   const finishPointerDrag = (event: ReactPointerEvent<HTMLDivElement>, velocity: number) => {
     const drag = pointerDragRef.current;
     if (drag === null || drag.pointerId !== event.pointerId) return;
     pointerDragRef.current = null;
-    expansionState.endDrag(velocity);
+    if (drag.dragging) expansionState.endDrag(velocity);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -639,6 +660,8 @@ export function ThreePaneScaffold({
       lastX: event.clientX,
       lastY: event.clientY,
       accumulated: 0,
+      clickMovementX: 0,
+      clickMovementY: 0,
       dragging: false,
       canClickToResize: !isInteractiveResizeDescendant(event.target, event.currentTarget),
     };
@@ -652,11 +675,18 @@ export function ThreePaneScaffold({
     const deltaY = event.clientY - drag.lastY;
     drag.lastX = event.clientX;
     drag.lastY = event.clientY;
+    drag.clickMovementX += deltaX;
+    drag.clickMovementY += deltaY;
+    if (
+      Math.hypot(drag.clickMovementX, drag.clickMovementY) >= BrowserPointerSlop
+    ) {
+      drag.canClickToResize = false;
+    }
     const axisDelta = drag.state.orientation === 'horizontal' ? deltaX : deltaY;
 
     if (!drag.dragging) {
       drag.accumulated += axisDelta;
-      if (Math.abs(drag.accumulated) < ResizePointerSlop) return;
+      if (Math.abs(drag.accumulated) < BrowserPointerSlop) return;
       drag.dragging = true;
       if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.setPointerCapture(event.pointerId);
