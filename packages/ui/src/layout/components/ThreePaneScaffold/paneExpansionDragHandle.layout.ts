@@ -97,6 +97,10 @@ function composeIntAdd(a: number, b: number) {
   return Number.isInteger(a) && Number.isInteger(b) ? (a + b) | 0 : a + b;
 }
 
+function composeIntSubtract(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a - b) | 0 : a - b;
+}
+
 function composeFloatAdd(a: number, b: number) {
   return Math.fround(Math.fround(a) + Math.fround(b));
 }
@@ -392,13 +396,16 @@ export function calculatePaneExpansionDragHandlePlacement({
   const centerX = clamp(
     offsetX,
     minHorizontalMargin,
-    contentWidth - minHorizontalMargin,
+    composeIntSubtract(contentWidth, minHorizontalMargin),
   );
-  const appliedHorizontalMargin = Math.min(centerX, contentWidth - centerX);
+  const appliedHorizontalMargin = Math.min(
+    centerX,
+    composeIntSubtract(contentWidth, centerX),
+  );
   const halfMinTouchTargetSize = Math.trunc(minTouchTargetPx / 2);
   const minWidth =
     appliedHorizontalMargin < halfMinTouchTargetSize
-      ? Math.imul(2, minTouchTargetPx - appliedHorizontalMargin)
+      ? Math.imul(2, composeIntSubtract(minTouchTargetPx, appliedHorizontalMargin))
       : minTouchTargetPx;
 
   // AndroidX feeds this Int into Constraints(minWidth = ...), which rejects
