@@ -347,8 +347,8 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
 
   /**
    * Attach the duration resolver for one rendering Transition owner. Resolver
-   * updates from that same owner are allowed, but the owner itself is retained
-   * for the state's lifetime even after cleanup, matching transitionRemoved().
+   * updates from that same owner are allowed. Cleanup releases the owner so the
+   * state can later attach to another Transition, matching transitionRemoved().
    */
   setTransitionDurationResolver(
     owner: object,
@@ -363,6 +363,7 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     return () => {
       if (this.transitionOwner === owner && this.transitionDurationResolver === resolver) {
         this.transitionDurationResolver = null;
+        this.transitionOwner = null;
       }
     };
   }
