@@ -11,6 +11,7 @@
   "exports": {
     ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
     "./button.css": "./dist/generated/button.css",
+    "./card.css": "./dist/generated/card.css",
     "./chip.css": "./dist/generated/chip.css",
     "./checkbox.css": "./dist/generated/checkbox.css",
     "./text-field.css": "./dist/generated/text-field.css",

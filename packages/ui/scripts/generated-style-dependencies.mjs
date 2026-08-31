@@ -10,6 +10,11 @@ export const generatedStyleDependencies = {
     'src/internal/elevation/elevation.css',
     '../tokens/dist/generated/button.css',
   ],
+  'src/components/Card/card.css': [
+    '../tokens/dist/generated/elevation.css',
+    'src/internal/elevation/elevation.css',
+    '../tokens/dist/generated/card.css',
+  ],
   'src/components/Chip/chip.css': ['../tokens/dist/generated/chip.css'],
   'src/components/Checkbox/checkbox.css': [
     '../tokens/dist/generated/checkbox.css',

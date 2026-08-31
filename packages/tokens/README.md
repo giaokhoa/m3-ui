@@ -60,6 +60,8 @@ Current reviewed CSS adapter exports include:
 ```text
 @m3-ui/tokens/theme.css
 @m3-ui/tokens/button.css
+@m3-ui/tokens/card.css
+@m3-ui/tokens/checkbox.css
 @m3-ui/tokens/chip.css
 @m3-ui/tokens/text-field.css
 @m3-ui/tokens/elevation.css
@@ -131,6 +133,8 @@ Reference slices currently in the repository:
 
 - Theme: generated baseline system roles and typeface foundation, with dynamic color overrides in `ThemeProvider`.
 - Button: generated size/variant/typography/color geometry plus runtime interaction/elevation logic in UI code.
+- Card: generated static shape/minimum-size/variant paint/disabled composite/outlined-border bindings plus runtime interaction/elevation and instance shape overrides.
+- Checkbox: generated dimensions/colors/disabled blends/motion with JS limited to ripple and SVG mark geometry.
 - Chip: generated static color/state mappings with runtime interaction and slot-dependent behavior in UI code.
 - TextField: generated shared + filled/outlined static default matrix.
 - Elevation: generated immutable shadow recipes selected by semantic runtime elevation level.

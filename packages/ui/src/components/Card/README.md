@@ -1,6 +1,6 @@
 # Card parity notes
 
-The React Card family ports the Material 3 Compose Card runtime defaults while preserving web-safe DOM structure for rich card content.
+The React Card family preserves the Material 3 Compose Card semantic defaults while translating immutable paint/geometry through canonical DTCG and generated CSS, and keeping interaction/elevation behavior in narrow runtime TypeScript.
 
 ## Pinned AndroidX baseline
 
@@ -18,6 +18,12 @@ The React Card family ports the Material 3 Compose Card runtime defaults while p
 - `src/commonMain/kotlin/androidx/compose/material3/tokens/OutlinedCardTokens.kt`
 - `src/androidDeviceTest/kotlin/androidx/compose/material3/CardTest.kt`
 - `src/androidDeviceTest/kotlin/androidx/compose/material3/CardScreenshotTest.kt`
+
+## Static/runtime split
+
+Immutable Card shape, minimum interactive size, variant colors, disabled composites and outlined border defaults live in canonical Card DTCG and are serialized by the generated `@m3-ui/tokens/card.css` adapter. `card.css` owns structural rendering and state selectors.
+
+Runtime TypeScript is limited to interaction ordering, semantic elevation selection, elevation transition selection, ripple lifecycle and real per-instance overrides such as the `shape` prop or caller `style`.
 
 ## Default variants
 
@@ -60,7 +66,7 @@ The shared elevation primitive uses the pinned Material 3 internal tween selecti
 - outgoing hover: 120ms, cubic-bezier(0.4, 0, 0.6, 1);
 - disabled/unknown baseline transitions snap.
 
-Drag elevation remains represented in the canonical Card tokens and their UI-local projection, but there is no invented public drag interaction state. Compose exposes drag elevation through `InteractionSource`; the web library does not yet expose an equivalent interaction-source API.
+Drag elevation remains represented in canonical Card tokens and the runtime elevation resolver, but there is no invented public drag interaction state. Compose exposes drag elevation through `InteractionSource`; the web library does not yet expose an equivalent interaction-source API.
 
 ## Clickable surface translation
 
@@ -79,6 +85,6 @@ The clickable surface uses the shared bounded Ripple. Opacity focus is rendered 
 ## Remaining differences
 
 - Compose `LocalMinimumInteractiveComponentSize` is not configurable from ThemeProvider yet. Clickable web cards enforce the default 48px minimum on the visual surface rather than maintaining a separately laid-out outer hit target for pathological cards smaller than 48px.
-- Compose `CardColors`, arbitrary `Shape`, custom `CardElevation`, and hoisted `MutableInteractionSource` have no one-to-one public objects yet. CSS variables / `style`, the `shape` radius prop, and ThemeProvider cover the current web customization surface.
+- Compose `CardColors`, arbitrary `Shape`, custom `CardElevation`, and hoisted `MutableInteractionSource` have no one-to-one public objects yet. Generated role-backed CSS, the `shape` radius prop, caller `style`, and the runtime elevation resolver cover the current web surface without duplicating Compose runtime objects.
 - Arbitrary non-rounded Compose shapes cannot be represented by CSS `border-radius` alone.
-- AndroidX has binary screenshot goldens for Card states. This branch adds Storybook and Chromium behavior/computed-style regression coverage but does not claim new Card PNG goldens.
+- AndroidX has binary screenshot goldens for Card states. Storybook and Chromium behavior/computed-style regression coverage provide the web visual gate but do not claim AndroidX PNG identity.
