@@ -86,12 +86,25 @@ export interface ThreePaneScaffoldTransitionTiming {
 const roles: readonly ThreePaneScaffoldRole[] = ['primary', 'secondary', 'tertiary'];
 const zeroPlacement: PanePlacement = { left: 0, top: 0, width: 0, height: 0 };
 const intVectorThreshold = 1;
+const MillisToNanos = 1_000_000;
 
 function clampFraction(value: number) {
   if (!Number.isFinite(value) || value < 0 || value > 1) {
     throw new RangeError(`progressFraction must be in [0, 1], received ${value}`);
   }
   return value;
+}
+
+function calculateSeekPlayTimeMs(durationMs: number, progressFraction: number) {
+  // SeekableTransitionState.seekToFraction converts its Float fraction to
+  // Double, multiplies Transition.totalDurationNanos, and roundToLong()s before
+  // child specs see the playtime. Preserve that nanosecond rounding boundary;
+  // sampling durationMs * fraction directly can fall on the previous whole
+  // millisecond when FloatSpringSpec later truncates nanos to milliseconds.
+  const durationNanos = Math.round(durationMs * MillisToNanos);
+  const fraction = Math.fround(progressFraction);
+  const playTimeNanos = Math.round(fraction * durationNanos);
+  return playTimeNanos / MillisToNanos;
 }
 
 function clampUnit(value: number) {
@@ -652,7 +665,7 @@ export function calculateThreePaneScaffoldTransitionFrame({
     slideOutRight,
     visibilityDurationMs,
   } = prepared;
-  const visibilityPlayTimeMs = visibilityDurationMs * progress;
+  const visibilityPlayTimeMs = calculateSeekPlayTimeMs(visibilityDurationMs, progress);
   const result: ThreePaneScaffoldTransitionFrame = { scrimOpacity: 0 };
 
   roles.forEach((role) => {
