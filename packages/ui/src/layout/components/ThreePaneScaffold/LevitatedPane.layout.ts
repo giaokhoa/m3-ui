@@ -1,6 +1,9 @@
 import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
-import type { LevitatedPaneAlignment } from '../../adaptive/threePaneScaffold';
 import type { PanePlacement } from './ThreePaneScaffold.layout';
+import {
+  resolveLevitatedPaneAlignment,
+  type ResolvableLevitatedPaneAlignment,
+} from './LevitatedPane.alignment';
 import {
   resolvePanePreferredSize,
   type PanePreferredSize,
@@ -10,7 +13,7 @@ export interface LevitatedPaneLayoutOptions {
   width: number;
   height: number;
   directive: PaneScaffoldDirective;
-  alignment: LevitatedPaneAlignment;
+  alignment: ResolvableLevitatedPaneAlignment;
   direction?: 'ltr' | 'rtl';
   preferredWidth?: PanePreferredSize;
   preferredHeight?: PanePreferredSize;
@@ -34,18 +37,6 @@ function assertDimension(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
   }
-}
-
-function alignmentParts(alignment: LevitatedPaneAlignment): {
-  vertical: 'top' | 'center' | 'bottom';
-  horizontal: 'start' | 'center' | 'end';
-} {
-  if (alignment === 'center') return { vertical: 'center', horizontal: 'center' };
-  const [vertical, horizontal] = alignment.split('-') as [
-    'top' | 'center' | 'bottom',
-    'start' | 'center' | 'end',
-  ];
-  return { vertical, horizontal };
 }
 
 /**
@@ -81,25 +72,14 @@ export function calculateLevitatedPanePlacement({
   );
   const paneWidth = Math.min(resolvedPreferredWidth, width);
   const paneHeight = Math.min(resolvedPreferredHeight, height);
-  const { vertical, horizontal } = alignmentParts(alignment);
-
-  let left: number;
-  if (horizontal === 'center') {
-    // Compose Alignment.align returns IntOffset. For centered panes its bias
-    // calculation rounds the half-space to the nearest Int pixel.
-    left = Math.round((width - paneWidth) / 2);
-  } else {
-    const logicalStart = horizontal === 'start';
-    const physicalLeft = direction === 'ltr' ? logicalStart : !logicalStart;
-    left = physicalLeft ? 0 : width - paneWidth;
-  }
-
-  const top =
-    vertical === 'top'
-      ? 0
-      : vertical === 'bottom'
-        ? height - paneHeight
-        : Math.round((height - paneHeight) / 2);
+  const { left, top } = resolveLevitatedPaneAlignment(
+    alignment,
+    paneWidth,
+    paneHeight,
+    width,
+    height,
+    direction,
+  );
 
   return { left, top, width: paneWidth, height: paneHeight };
 }
