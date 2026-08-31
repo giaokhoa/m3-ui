@@ -23,46 +23,12 @@
 .surface[data-interactive] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-
-.surface[data-interactive]::after {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  background: currentColor;
-  content: '';
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 120ms linear;
-}
-
-.surface[data-interactive]:hover::after {
-  opacity: 0.08;
-}
-
-.surface[data-interactive]:active::after {
-  opacity: 0.12;
-}
-
-.surface[data-interactive]:focus-visible {
-  outline: 3px solid currentColor;
-  outline-offset: 2px;
+  --ripple-color: currentColor;
 }
 
 .surface[data-disabled] {
   cursor: default;
   opacity: 0.38;
-}
-
-.surface[data-disabled]::after {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .surface[data-interactive]::after {
-    transition: none;
-  }
 }
 
 @media (forced-colors: active) {
@@ -72,7 +38,8 @@
   }
 
   .surface[data-interactive]:focus-visible {
-    outline-color: Highlight;
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 
   .surface[data-disabled] {

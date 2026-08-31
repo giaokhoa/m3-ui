@@ -75,6 +75,7 @@
 }
 
 .button-group__menu-item {
+  position: relative;
   display: flex;
   box-sizing: border-box;
   align-items: center;
@@ -89,16 +90,18 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
-}
-
-.button-group__menu-item:hover,
-.button-group__menu-item:focus-visible {
-  background: color-mix(in srgb, var(--_button-group-menu-item-color) var(--_button-group-menu-item-hover-opacity), var(--_button-group-menu-item-container-color));
+  --ripple-color: currentColor;
 }
 
 .button-group__menu-item:disabled {
   color: color-mix(in srgb, var(--_button-group-menu-item-disabled-color) var(--_button-group-menu-item-disabled-opacity), transparent);
   cursor: default;
+}
+
+.button-group__menu-icon,
+.button-group__menu-label {
+  position: relative;
+  z-index: 1;
 }
 
 .button-group__menu-icon {

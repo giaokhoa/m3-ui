@@ -36,12 +36,39 @@ function Measure({ items, size, rowRef, overflowRef }: { items: readonly ButtonG
   return <div aria-hidden="true" className="button-group__measure" ref={rowRef}>{items.map(i => <span className="button-group__measure-item" key={i.id}><Action item={i} size={size}/></span>)}<span className="button-group__measure-overflow" ref={overflowRef}><FilledIconButton aria-label="More options" size={size}><MoreIcon/></FilledIconButton></span></div>;
 }
 
+function OverflowItem({ item, onAction }: { item: ButtonGroupActionItem; onAction: () => void }) {
+  const ripple = useRipple();
+  return (
+    <AriaButton
+      className="button-group__menu-item"
+      isDisabled={item.isDisabled}
+      type="button"
+      render={(domProps) => <button {...domProps} role="menuitem" />}
+      onPress={onAction}
+      onPressStart={(event) => ripple.onPressStart(event)}
+      onPressEnd={() => ripple.onPressEnd()}
+    >
+      {(renderProps) => (
+        <>
+          <Ripple
+            controller={ripple}
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+          {item.startIcon ? <span aria-hidden="true" className="button-group__menu-icon">{item.startIcon}</span> : null}
+          <span className="button-group__menu-label">{item.menuLabel ?? item.label}</span>
+        </>
+      )}
+    </AriaButton>
+  );
+}
+
 function Overflow({ items, label, size, triggerRef }: { items: readonly ButtonGroupActionItem[]; label: string; size: ButtonGroupSize; triggerRef: RefObject<HTMLSpanElement | null> }) {
   const [open, setOpen] = useState(false); const menuRef = useRef<HTMLDivElement>(null);
   const focusTrigger = () => triggerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
   useEffect(() => { if (!open) return; const pointer = (e: PointerEvent) => { const n=e.target as Node|null; if (!menuRef.current?.contains(n) && !triggerRef.current?.contains(n)) setOpen(false); }; const key=(e:KeyboardEvent)=>{ if(e.key==='Escape'){e.preventDefault();setOpen(false);focusTrigger();}}; document.addEventListener('pointerdown',pointer);document.addEventListener('keydown',key);return()=>{document.removeEventListener('pointerdown',pointer);document.removeEventListener('keydown',key);}; }, [open]);
   useEffect(() => { if (open) menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')?.focus(); }, [open]);
-  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuTokens.containerElevation} role="menu" ref={menuRef}>{items.map(i=><button className="button-group__menu-item" disabled={i.isDisabled} key={i.id} role="menuitem" type="button" onClick={()=>{i.onAction();setOpen(false);focusTrigger();}}>{i.startIcon?<span aria-hidden="true" className="button-group__menu-icon">{i.startIcon}</span>:null}<span>{i.menuLabel??i.label}</span></button>)}</div>:null}</span>;
+  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuTokens.containerElevation} role="menu" ref={menuRef}>{items.map(i=><OverflowItem item={i} key={i.id} onAction={()=>{i.onAction();setOpen(false);focusTrigger();}}/>)}</div>:null}</span>;
 }
 
 function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpandedRatio, overflowLabel='More options', className, style, ...props }: StandardButtonGroupProps) {

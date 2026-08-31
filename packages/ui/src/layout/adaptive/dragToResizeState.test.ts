@@ -35,10 +35,10 @@ describe('DragToResizeState', () => {
     state.measure(measurement);
 
     state.snapTo(DragToResizeValue.Collapsed);
-    expect(state.measure(measurement).height).toBe(49);
+    expect(state.measure(measurement)).toMatchObject({ height: 49 });
 
     state.snapTo(DragToResizeValue.Expanded);
-    expect(state.measure(measurement).height).toBe(601);
+    expect(state.measure(measurement)).toMatchObject({ height: 601 });
   });
 
   it('ignores transient zero-size scaffold measurements before real layout', () => {
@@ -51,7 +51,7 @@ describe('DragToResizeState', () => {
         scaffoldWidth: 0,
         scaffoldHeight: 0,
       }),
-    ).toEqual({ width: 0, height: 0 });
+    ).toBeUndefined();
     expect(state.value).toBe(DragToResizeValue.Default);
     expect(Number.isNaN(state.size)).toBe(true);
 
@@ -68,19 +68,19 @@ describe('DragToResizeState', () => {
     state.measure(measurement);
     state.snapTo(DragToResizeValue.Expanded);
 
-    expect(state.measure(measurement).height).toBe(600);
+    expect(state.measure(measurement)).toMatchObject({ height: 600 });
   });
 
   it('reverses drag delta for bottom and right physical edges', () => {
     const bottom = new DragToResizeState({ dockedEdge: DockedEdge.Bottom });
     bottom.measure(measurement);
     bottom.dispatchRawDelta(100);
-    expect(bottom.measure(measurement).height).toBe(320);
+    expect(bottom.measure(measurement)).toMatchObject({ height: 320 });
 
     const end = new DragToResizeState({ dockedEdge: DockedEdge.End });
     end.measure(measurement);
     end.dispatchRawDelta(100, 'ltr');
-    expect(end.measure(measurement).width).toBe(260);
+    expect(end.measure(measurement)).toMatchObject({ width: 260 });
   });
 
   it('keeps subpixel physics internally but truncates the measured pane size', () => {
@@ -90,19 +90,19 @@ describe('DragToResizeState', () => {
     state.dispatchRawDelta(0.75);
 
     expect(state.size).toBe(419.25);
-    expect(state.measure(measurement).height).toBe(419);
+    expect(state.measure(measurement)).toMatchObject({ height: 419 });
   });
 
   it('mirrors logical start and end drag direction in RTL', () => {
     const start = new DragToResizeState({ dockedEdge: DockedEdge.Start });
     start.measure({ ...measurement, direction: 'rtl' });
     start.dispatchRawDelta(100, 'rtl');
-    expect(start.measure({ ...measurement, direction: 'rtl' }).width).toBe(260);
+    expect(start.measure({ ...measurement, direction: 'rtl' })).toMatchObject({ width: 260 });
 
     const end = new DragToResizeState({ dockedEdge: DockedEdge.End });
     end.measure({ ...measurement, direction: 'rtl' });
     end.dispatchRawDelta(100, 'rtl');
-    expect(end.measure({ ...measurement, direction: 'rtl' }).width).toBe(460);
+    expect(end.measure({ ...measurement, direction: 'rtl' })).toMatchObject({ width: 460 });
   });
 
   it('snaps Default -> Expanded without invoking the spring driver', async () => {
@@ -141,13 +141,13 @@ describe('DragToResizeState', () => {
     const transition = state.animateTo(DragToResizeValue.Collapsed);
     expect(state.value).toBe(DragToResizeValue.Collapsed);
     expect(state.size).toBe(800);
-    expect(state.measure(measurement).height).toBe(800);
+    expect(state.measure(measurement)).toMatchObject({ height: 800 });
     expect(state.value).toBe(DragToResizeValue.Collapsed);
 
     updateAnimation!(424.75);
     expect(state.value).toBe(DragToResizeValue.Collapsed);
     expect(state.size).toBe(424.75);
-    expect(state.measure(measurement).height).toBe(424);
+    expect(state.measure(measurement)).toMatchObject({ height: 424 });
     expect(state.value).toBe(DragToResizeValue.Collapsed);
 
     finishAnimation!();

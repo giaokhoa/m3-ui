@@ -31,12 +31,10 @@
 }
 
 .pull-to-refresh__indicator-surface {
+  position: relative;
   align-items: center;
   background: var(--surface-container-high, Canvas);
   border-radius: 999px;
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--shadow, #000) 30%, transparent),
-    0 2px 6px color-mix(in srgb, var(--shadow, #000) 15%, transparent);
   box-sizing: border-box;
   color: var(--primary, currentColor);
   display: flex;

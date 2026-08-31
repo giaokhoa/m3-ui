@@ -50,8 +50,7 @@
     var(--_bottom-sheet-drag-handle-height) +
       2 * var(--_bottom-sheet-drag-handle-padding-block)
   );
-  padding-block: var(--_bottom-sheet-drag-handle-padding-block);
-  padding-inline: 0;
+  padding: 0;
   border: 0;
   outline: 0;
   background: transparent;
@@ -69,13 +68,19 @@
   cursor: default;
 }
 
-.bottom-sheet__drag-handle:focus-visible {
-  outline: var(--_bottom-sheet-focus-indicator-width) solid
-    var(--_bottom-sheet-focus-indicator-color);
-  outline-offset: calc(-1 * var(--_bottom-sheet-focus-indicator-width));
+.bottom-sheet__drag-handle-indication {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--_bottom-sheet-drag-handle-height);
+  padding-block: var(--_bottom-sheet-drag-handle-padding-block);
+  --ripple-color: currentColor;
 }
 
 .bottom-sheet__drag-handle-bar {
+  position: relative;
+  z-index: 1;
   display: block;
   inline-size: var(--_bottom-sheet-drag-handle-width);
   block-size: var(--_bottom-sheet-drag-handle-height);
@@ -120,5 +125,13 @@
   .bottom-sheet[data-ready][data-state='hidden']:not([data-dragging]),
   .modal-bottom-sheet-overlay::before {
     transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .bottom-sheet__drag-handle:focus-visible
+    .bottom-sheet__drag-handle-indication {
+    outline: var(--_bottom-sheet-focus-indicator-width) solid Highlight;
+    outline-offset: calc(-1 * var(--_bottom-sheet-focus-indicator-width));
   }
 }
