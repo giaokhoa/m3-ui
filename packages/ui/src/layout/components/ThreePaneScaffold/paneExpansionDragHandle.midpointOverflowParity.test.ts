@@ -6,7 +6,10 @@ import {
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
 import { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
-import { calculatePaneExpansionSpacerMiddleOffset } from './paneExpansionDragHandle.layout';
+import {
+  calculatePaneExpansionDragHandlePlacement,
+  calculatePaneExpansionSpacerMiddleOffset,
+} from './paneExpansionDragHandle.layout';
 
 const twoExpanded: ThreePaneScaffoldValue = {
   primary: PaneAdaptedValue.Expanded,
@@ -54,5 +57,16 @@ describe('pane-expansion spacer midpoint Int overflow parity', () => {
 
     // AndroidX: (0 + 2147483547 + 2147483597) wraps to -152, then Int / 2 = -76.
     expect(calculatePaneExpansionSpacerMiddleOffset({ layout, layoutOptions })).toBe(-76);
+  });
+
+  it('coerces a negative overflowed midpoint into the handle placement bounds', () => {
+    expect(
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: -76,
+        contentWidth: 2147483647,
+        partitionSpacerSize: '0px',
+        minTouchTargetSize: 48,
+      }),
+    ).toEqual({ centerX: 0, minWidth: 96 });
   });
 });
