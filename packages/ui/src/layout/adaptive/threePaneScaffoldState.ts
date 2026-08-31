@@ -402,8 +402,10 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
     const oldTarget = this.targetStateValue;
     const targetChanged = !threePaneScaffoldValuesEqual(targetState, oldTarget);
     this.predictiveBack = isPredictiveBackInProgress;
-    if (targetChanged) this.currentStateValue = oldTarget;
-    this.targetStateValue = targetState;
+    if (targetChanged) {
+      this.currentStateValue = oldTarget;
+      this.targetStateValue = targetState;
+    }
     this.progressFractionValue = threePaneScaffoldValuesEqual(
       this.currentStateValue,
       this.targetStateValue,
