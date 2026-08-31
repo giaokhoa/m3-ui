@@ -1,3 +1,4 @@
+import { paneScaffoldRolesEqual } from './paneScaffoldRole';
 import type { ThreePaneScaffoldHorizontalOrder } from './threePaneScaffold';
 
 /**
@@ -10,7 +11,11 @@ export function assertThreePaneScaffoldHorizontalOrder(
   paneOrder: ThreePaneScaffoldHorizontalOrder,
 ): void {
   const [first, second, third] = paneOrder;
-  if (first === second || second === third || first === third) {
+  if (
+    paneScaffoldRolesEqual(first, second) ||
+    paneScaffoldRolesEqual(second, third) ||
+    paneScaffoldRolesEqual(first, third)
+  ) {
     throw new RangeError(
       `invalid ThreePaneScaffoldHorizontalOrder(${first}, ${second}, ${third}) - panes must be unique`,
     );
