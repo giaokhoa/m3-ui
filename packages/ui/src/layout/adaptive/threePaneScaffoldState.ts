@@ -457,7 +457,18 @@ export class MutableThreePaneScaffoldState implements ThreePaneScaffoldState {
       this.notify();
       return;
     }
-    const durationMs = this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget);
+
+    let durationMs: number;
+    try {
+      durationMs = this.resolveTransitionDurationMs(resolvedCurrent, resolvedTarget);
+    } catch (error) {
+      // MutableThreePaneScaffoldState.animateTo clears its predictive-back
+      // wrapper state in finally even when SeekableTransitionState setup fails.
+      const predictiveBackChanged = this.predictiveBack;
+      this.predictiveBack = false;
+      if (predictiveBackChanged) this.notify();
+      throw error;
+    }
 
     this.predictiveBack = isPredictiveBackInProgress;
     const controller = new AbortController();
