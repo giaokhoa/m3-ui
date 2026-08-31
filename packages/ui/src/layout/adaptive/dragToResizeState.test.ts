@@ -165,6 +165,18 @@ describe('DragToResizeState', () => {
     expect(end.measure({ ...measurement, direction: 'rtl' })?.width).toBe(460);
   });
 
+  it('keeps the remembered physical edge when layout direction later changes', () => {
+    const start = new DragToResizeState({ dockedEdge: DockedEdge.Start });
+    start.measure({ ...measurement, direction: 'ltr' });
+
+    // AndroidX remembers a concrete Left state for Start in LTR. A later
+    // layout-direction change does not replace that state with Right.
+    start.measure({ ...measurement, direction: 'rtl' });
+    start.dispatchRawDelta(100, 'rtl');
+
+    expect(start.measure({ ...measurement, direction: 'rtl' })?.width).toBe(460);
+  });
+
   it('snaps Default -> Expanded without invoking the spring driver', async () => {
     let animationCalled = false;
     const state = new DragToResizeState({
