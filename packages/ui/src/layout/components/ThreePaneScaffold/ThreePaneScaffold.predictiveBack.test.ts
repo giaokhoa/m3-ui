@@ -3,6 +3,7 @@ import {
   PredictiveBackMinScale,
   calculatePredictiveBackReturnSpringDurationMs,
   calculatePredictiveBackScale,
+  collectPredictiveBackScaleEmission,
   getPredictiveBackLayerStyle,
   getPredictiveBackScale,
   samplePredictiveBackReturnSpring,
@@ -23,6 +24,37 @@ describe('predictive-back scaffold scale', () => {
       expect(samples[index]).toBeLessThan(samples[index - 1]!);
       expect(samples[index]).toBeGreaterThan(PredictiveBackMinScale);
     }
+  });
+
+  it('collects only progress-fraction changes like snapshotFlow', () => {
+    let previousProgress = 0;
+
+    const predictive = collectPredictiveBackScaleEmission(previousProgress, {
+      progressFraction: 0.5,
+      isPredictiveBackInProgress: true,
+    });
+    expect(predictive).toEqual({
+      type: 'snap',
+      progressFraction: 0.5,
+      scale: 0.9523809552192688,
+    });
+    previousProgress = predictive.progressFraction;
+
+    // CollectPredictiveBackScale observes snapshotFlow { progressFraction }.
+    // A flag-only change therefore emits nothing and leaves Animatable untouched.
+    expect(
+      collectPredictiveBackScaleEmission(previousProgress, {
+        progressFraction: 0.5,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'none', progressFraction: 0.5 });
+
+    expect(
+      collectPredictiveBackScaleEmission(previousProgress, {
+        progressFraction: 0.6,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'return', progressFraction: Math.fround(0.6) });
   });
 
   it('exposes no seek scale outside predictive back', () => {
