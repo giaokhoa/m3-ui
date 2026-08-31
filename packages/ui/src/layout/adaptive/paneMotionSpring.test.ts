@@ -53,6 +53,27 @@ describe('pane motion spring parity', () => {
     expect(halfway[1]).toBeGreaterThan(90);
   });
 
+  it('quantizes AnimateBounds progress through Float nanoseconds before spring sampling', () => {
+    const initialRect = [0, 0, 500, 100];
+    const targetRect = [500, 100, 1000, 200];
+    expect(calculatePaneMotionVectorSpringDurationMs(initialRect, targetRect)).toBe(431);
+
+    // AndroidX BoundsTracker evaluates
+    // (431_000_000L * 0.354988396f).toLong() as 153_000_000ns because the
+    // Long duration is first converted to Float. Sampling durationMs * progress
+    // in Double instead lands just below 153ms and truncates to 152ms.
+    const progress = Math.fround(0.3549883961677551);
+    expect(
+      samplePaneMotionVectorSpringAtPlayTime(initialRect, targetRect, 152),
+    ).toEqual([449, 90, 949, 190]);
+    expect(
+      samplePaneMotionVectorSpringAtPlayTime(initialRect, targetRect, 153),
+    ).toEqual([450, 90, 950, 190]);
+    expect(
+      samplePaneMotionVectorSpringAtProgress(initialRect, targetRect, progress),
+    ).toEqual([450, 90, 950, 190]);
+  });
+
   it('rounds IntRect, IntOffset, and IntSize vector samples but keeps Float visibility continuous', () => {
     const raw = samplePaneMotionSpring(0, 500, 100);
     const intOffset = samplePaneMotionVectorSpringAtPlayTime([0, 0], [500, 0], 100, 1);
