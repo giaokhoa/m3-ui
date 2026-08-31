@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import {
   buttonShapesForSize,
   getButtonStyle,
-} from '../Button/Button.defaults';
+} from '../Button/Button.runtime';
 import type { ToggleButtonSize, ToggleButtonVariant } from './ToggleButton.types';
 
 export type ToggleButtonStyle = CSSProperties & Record<`--${string}`, string | number>;
@@ -51,15 +51,6 @@ const variantColors = {
   },
 } as const;
 
-export function resolveToggleButtonInteraction(
-  state: ToggleButtonState,
-): 'press' | 'hover' | 'focus' | null {
-  if (state.isPressed) return 'press';
-  if (state.isHovered) return 'hover';
-  if (state.isFocused) return 'focus';
-  return null;
-}
-
 function outlineWidthForSize(size: ToggleButtonSize): string {
   if (size === 'large') return '2px';
   if (size === 'extraLarge') return '3px';
@@ -80,7 +71,6 @@ export function getToggleButtonStyle(
   state: ToggleButtonState,
   size: ToggleButtonSize = 'small',
 ): ToggleButtonStyle {
-  const interaction = resolveToggleButtonInteraction(state);
   const shapes = buttonShapesForSize(size);
   const colors = variantColors[variant];
   const activeShape = state.isPressed
@@ -89,8 +79,8 @@ export function getToggleButtonStyle(
       ? selectedShape[size]
       : shapes.shape;
   const base = getButtonStyle(
-    { isDisabled: state.isDisabled, interaction },
-    { size, shapes },
+    { isDisabled: state.isDisabled, isPressed: state.isPressed },
+    { shapes },
   );
   const transition = state.isDisabled
     ? 'none'
