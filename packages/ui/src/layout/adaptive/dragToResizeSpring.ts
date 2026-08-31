@@ -54,6 +54,11 @@ export function calculateDragToResizeSpringDurationMs(
   initialValue: number,
   targetValue: number,
 ): number {
+  // FloatSpringSpec passes NaN displacement through SpringEstimation. Its
+  // Newton solve remains NaN and Kotlin Double.toLong() converts that duration
+  // to 0. TargetBasedAnimation then treats playTime=0 as finished and returns
+  // targetValue without querying SpringSimulation.
+  if (Number.isNaN(initialValue) || Number.isNaN(targetValue)) return 0;
   assertFinite(initialValue, 'initialValue');
   assertFinite(targetValue, 'targetValue');
 
