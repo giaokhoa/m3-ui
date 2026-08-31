@@ -56,14 +56,15 @@ describe('AnimateBounds retargeting', () => {
     });
     expect(result.primary?.placement.left).not.toBe(525);
 
-    // AnimatedVisibility interruption is intentionally left on the existing
-    // fallback path in this slice; only private BoundsTracker parity changes.
+    // This primitive still interpolates untracked scalar fields. Live
+    // AnimatedVisibility interruption is sampled separately by the child-track
+    // interruption engine; private AnimateBounds remains independent of it.
     expect(result.primary?.translateX).toBe(40);
     expect(result.primary?.opacity).toBe(0.8);
     expect(result.primary?.inlineClipFraction).toBe(0.875);
   });
 
-  it('keeps the existing linear placement fallback for non-bounds retargets', () => {
+  it('keeps linear placement interpolation for non-bounds frame primitives', () => {
     const captured = frame(
       pane(PaneMotion.ExitToLeft, { left: 100, top: 10, width: 300, height: 600 }),
     );
