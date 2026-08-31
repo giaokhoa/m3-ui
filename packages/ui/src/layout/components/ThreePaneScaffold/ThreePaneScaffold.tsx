@@ -608,21 +608,16 @@ export function ThreePaneScaffold({
   };
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (hasBlockingScrim || dragHandleOffset === PaneExpansionUnspecified) return;
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      if (expansionState.nextAnchor === null) return;
-      event.preventDefault();
-      expansionState.moveToNextAnchor();
+    if (
+      hasBlockingScrim ||
+      dragHandleOffset === PaneExpansionUnspecified ||
+      (event.key !== 'Enter' && event.key !== ' ')
+    ) {
       return;
     }
-
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (expansionState.nextAnchor === null) return;
     event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
-    expansionState.beginDrag();
-    expansionState.dispatchRawDelta(event.key === 'ArrowLeft' ? -16 : 16);
-    expansionState.endDrag(0);
+    expansionState.moveToNextAnchor();
   };
 
   const handleClick = (event: ReactMouseEvent<HTMLDivElement>) => {
