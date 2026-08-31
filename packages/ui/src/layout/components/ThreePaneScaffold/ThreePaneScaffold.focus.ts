@@ -21,10 +21,26 @@ const ProgrammaticallyFocusableSelector = [
 function isFocusableCandidate(element: Element): element is FocusableElement {
   if (!('tabIndex' in element) || typeof element.tabIndex !== 'number') return false;
   if (!('focus' in element) || typeof element.focus !== 'function') return false;
+  if (element.getClientRects().length === 0) return false;
   if (!element.matches(ProgrammaticallyFocusableSelector)) return false;
   if (element.matches(':disabled')) return false;
   if (element.closest('[inert]') !== null) return false;
   return true;
+}
+
+function collectAccessibleFocusTargets(
+  root: Element,
+  targets: FocusableElement[],
+) {
+  for (const child of Array.from(root.children)) {
+    if (isFocusableCandidate(child)) {
+      // Compose collectAccessibleChildren stops descending once the first
+      // focusable FocusTarget is reached on a branch.
+      targets.push(child);
+    } else {
+      collectAccessibleFocusTargets(child, targets);
+    }
+  }
 }
 
 function isRightCandidate(rect: DOMRect, originX: number) {
@@ -75,15 +91,14 @@ function isBetterCandidate(
  * ThreePaneScaffold focusGroup. At the pinned Compose revision,
  * FocusRequester.requestFocus(Enter) maps Enter to a physical Right search
  * from the group's top-left point and focuses a descendant, never the group.
- * Browser candidates are programmatically focusable descendants, including
- * explicit tabindex="-1" targets that are intentionally outside sequential
- * keyboard navigation.
+ * Browser candidates are rendered, programmatically focusable descendants,
+ * including explicit tabindex="-1" targets outside sequential keyboard
+ * navigation. Like Compose collectAccessibleChildren, traversal stops at the
+ * first focusable target on each DOM branch.
  */
 export function requestPaneDestinationFocus(pane: HTMLElement): boolean {
   const candidates: FocusableElement[] = [];
-  for (const candidate of pane.querySelectorAll('*')) {
-    if (isFocusableCandidate(candidate)) candidates.push(candidate);
-  }
+  collectAccessibleFocusTargets(pane, candidates);
 
   // AndroidX findChildCorrespondingToFocusEnter skips spatial search entirely
   // when zero or one accessible focus target exists.
