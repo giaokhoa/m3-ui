@@ -9,6 +9,7 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { assertThreePaneScaffoldHorizontalOrder } from '../../adaptive/threePaneScaffoldHorizontalOrder';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
 import {
   resolvePanePreferredSize,
@@ -136,6 +137,7 @@ export function calculateThreePaneScaffoldLayoutPass({
 }: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayoutPass {
   assertDimension(width, 'width');
   assertDimension(height, 'height');
+  assertThreePaneScaffoldHorizontalOrder(paneOrder);
 
   const horizontalGap = px(
     directive.horizontalPartitionSpacerSize,
