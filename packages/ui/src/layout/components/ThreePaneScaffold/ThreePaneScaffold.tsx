@@ -198,10 +198,10 @@ const defaultPaneAriaLabels: Record<ThreePaneScaffoldRole, string> = {
 
 function sameGeometry(a: ScaffoldGeometry, b: ScaffoldGeometry) {
   return (
-    Math.abs(a.width - b.width) < 0.5 &&
-    Math.abs(a.height - b.height) < 0.5 &&
-    Math.abs(a.viewportLeft - b.viewportLeft) < 0.5 &&
-    Math.abs(a.viewportTop - b.viewportTop) < 0.5 &&
+    a.width === b.width &&
+    a.height === b.height &&
+    a.viewportLeft === b.viewportLeft &&
+    a.viewportTop === b.viewportTop &&
     a.direction === b.direction
   );
 }
@@ -357,8 +357,12 @@ export function ThreePaneScaffold({
 
     measure();
     window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
     if (typeof ResizeObserver === 'undefined') {
-      return () => window.removeEventListener('resize', measure);
+      return () => {
+        window.removeEventListener('resize', measure);
+        window.removeEventListener('scroll', measure, true);
+      };
     }
 
     const observer = new ResizeObserver(measure);
@@ -366,8 +370,9 @@ export function ThreePaneScaffold({
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
     };
-  }, []);
+  }, [className, style?.direction]);
 
   useLayoutEffect(() => {
     expansionState.onMeasured(geometry.width, geometry.direction);
