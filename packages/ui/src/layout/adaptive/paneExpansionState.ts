@@ -66,6 +66,15 @@ function composeFloatToInt(value: number) {
   return Math.trunc(floatValue);
 }
 
+function composeIntSubtract(a: number, b: number) {
+  return (a - b) | 0;
+}
+
+function composeIntAbs(value: number) {
+  const intValue = value | 0;
+  return intValue === ComposeIntMin ? ComposeIntMin : Math.abs(intValue);
+}
+
 export const PaneExpansionAnchor = Object.freeze({
   proportion(proportion: number): PaneExpansionAnchor {
     return Object.freeze({ type: 'proportion', proportion: composeFloat(proportion) });
@@ -581,13 +590,13 @@ export class PaneExpansionState {
     for (const anchorPosition of positions) {
       let score: number;
       if (floatVelocity >= AnchoringVelocityThreshold) {
-        const delta = anchorPosition.position - currentPosition;
-        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
+        const delta = composeIntSubtract(anchorPosition.position, currentPosition);
+        score = delta < 0 ? composeIntSubtract(this.maxExpansionWidth, delta) : delta;
       } else if (floatVelocity <= -AnchoringVelocityThreshold) {
-        const delta = currentPosition - anchorPosition.position;
-        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
+        const delta = composeIntSubtract(currentPosition, anchorPosition.position);
+        score = delta < 0 ? composeIntSubtract(this.maxExpansionWidth, delta) : delta;
       } else {
-        score = Math.abs(currentPosition - anchorPosition.position);
+        score = composeIntAbs(composeIntSubtract(currentPosition, anchorPosition.position));
       }
       if (score < bestScore) {
         bestScore = score;
