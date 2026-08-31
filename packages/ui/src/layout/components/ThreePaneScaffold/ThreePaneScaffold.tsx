@@ -531,6 +531,10 @@ export function ThreePaneScaffold({
       ? {
           layout: transitionLayout,
           progressFraction: activeScaffoldState.progressFraction,
+          runningTimeline:
+            activeScaffoldState instanceof MutableThreePaneScaffoldState
+              ? activeScaffoldState.defaultAnimationTimeline
+              : undefined,
         }
       : undefined;
   const animationPlayTimeMs =
@@ -675,10 +679,6 @@ export function ThreePaneScaffold({
     }
   }
 
-  // AnimateWithFading observes the drag handle's lookahead placement offset,
-  // after measureAndPlaceDragHandleIfNeeded has coerced the raw spacer midpoint
-  // into the content bounds. Keep the raw midpoint separately for expansion
-  // state measurement, which happens before that placement clamp upstream.
   const targetDragHandlePlacement =
     paneExpansionDragHandle != null &&
     measuredDragHandleOffset !== PaneExpansionUnspecified &&
@@ -807,8 +807,6 @@ export function ThreePaneScaffold({
   };
 
   const handleClick = (event: ReactMouseEvent<HTMLDivElement>) => {
-    // Pointer clicks keep their drag behavior. Assistive technologies commonly
-    // synthesize a detail=0 click for the semantic activation action.
     if (hasBlockingScrim || event.detail !== 0 || expansionState.nextAnchor === null) return;
     event.preventDefault();
     expansionState.moveToNextAnchor();
@@ -940,9 +938,6 @@ export function ThreePaneScaffold({
           const frame = transitionFrame?.[role];
           if (content == null) return null;
 
-          // AndroidX disposes Hidden pane composition while SaveableStateProvider
-          // retains pane-local state. React 19.2 Activity is the native analogue:
-          // hidden children keep state/DOM identity but their Effects are cleaned up.
           const staticallyHidden = frame === undefined && adaptedValue.type === 'hidden';
 
           let placement: PanePlacement | undefined;
