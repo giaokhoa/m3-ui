@@ -1,4 +1,5 @@
 import { customLevitatedPaneAlignmentsEqual } from './levitatedPaneAlignment';
+import { paneScaffoldRolesEqual } from './paneScaffoldRole';
 import type {
   LevitatedPaneAlignment,
   PaneAdaptedValue,
@@ -84,7 +85,7 @@ function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boole
   if (a.type !== b.type) return false;
   if (a.type === 'expanded' || a.type === 'hidden') return true;
   if (a.type === 'reflowed' && b.type === 'reflowed') {
-    return a.reflowUnder === b.reflowUnder;
+    return paneScaffoldRolesEqual(a.reflowUnder, b.reflowUnder);
   }
   if (a.type === 'levitated' && b.type === 'levitated') {
     return (
