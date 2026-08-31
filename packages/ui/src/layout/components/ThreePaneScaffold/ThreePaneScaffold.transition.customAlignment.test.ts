@@ -3,11 +3,15 @@ import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective
 import {
   PaneAdaptedValue,
   ThreePaneScaffoldRole,
+  listDetailPaneScaffoldOrder,
   type LevitatedPaneCustomAlignment,
   type ThreePaneScaffoldHorizontalOrder,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
-import { calculateThreePaneScaffoldTransitionFrame } from './ThreePaneScaffold.transition';
+import {
+  calculateThreePaneScaffoldTransitionFrame,
+  calculateThreePaneScaffoldTransitionTiming,
+} from './ThreePaneScaffold.transition';
 
 const directive: PaneScaffoldDirective = {
   maxHorizontalPartitions: 1,
@@ -64,5 +68,47 @@ describe('ThreePaneScaffold custom levitated alignment transition', () => {
       width: 360,
       height: 420,
     });
+  });
+
+  it('wraps EnterWithExpand Int offset subtraction before spring timing and sampling', () => {
+    const extremeAlignment: LevitatedPaneCustomAlignment = {
+      align() {
+        return { x: 2147483287, y: 0 };
+      },
+    };
+    const overflowDirective: PaneScaffoldDirective = {
+      ...directive,
+      maxHorizontalPartitions: 3,
+      horizontalPartitionSpacerSize: '2147483647px',
+    };
+    const currentValue: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Hidden,
+      secondary: PaneAdaptedValue.Levitated(extremeAlignment),
+      tertiary: PaneAdaptedValue.Expanded,
+    };
+    const targetValue: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Expanded,
+      tertiary: PaneAdaptedValue.Expanded,
+    };
+    const layoutOptions = {
+      width: 1000,
+      height: 800,
+      directive: overflowDirective,
+      currentValue,
+      targetValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+    };
+
+    // AndroidX Int subtraction: Int.MAX_VALUE - (-2147483315) wraps to -334.
+    // The old JS-double path used 4294966962 and stretched this spring to 1455ms.
+    expect(calculateThreePaneScaffoldTransitionTiming(layoutOptions).visibilityDurationMs).toBe(405);
+
+    const frame = calculateThreePaneScaffoldTransitionFrame({
+      ...layoutOptions,
+      progressFraction: 0.5,
+    });
+    expect(frame.primary?.motion).toBe('enter-with-expand');
+    expect(frame.primary?.translateX).toBe(-3);
   });
 });
