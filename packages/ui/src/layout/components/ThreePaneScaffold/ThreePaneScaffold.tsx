@@ -244,7 +244,7 @@ export function ThreePaneScaffold({
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionDragHandleMinTouchTargetSize = 48,
-  paneExpansionHandleAriaLabel = 'Resize panes',
+  paneExpansionHandleAriaLabel = 'Pane expansion drag handle',
   paneExpansionHandleAriaStrings,
   paneAriaLabels,
   levitatedPaneDragHandles,
