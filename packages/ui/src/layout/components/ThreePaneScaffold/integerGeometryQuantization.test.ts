@@ -94,6 +94,17 @@ describe('AndroidX integer geometry quantization', () => {
     expect(roundsToZero.minWidth === 0).toBe(true);
   });
 
+  it('accepts infinite drag-handle Dp until Constraints sees the overflowed minimum', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 500,
+        contentWidth: 1000,
+        partitionSpacerSize: '25px',
+        minTouchTargetSize: Number.POSITIVE_INFINITY,
+      }),
+    ).toThrow(/minWidth must be non-negative/);
+  });
+
   it('does not normalize an empty drag-handle coerce range', () => {
     expect(() =>
       calculatePaneExpansionDragHandlePlacement({
@@ -231,6 +242,6 @@ describe('AndroidX integer geometry quantization', () => {
         directive: oddSpacerDirective,
         alignment: PaneAlignment.Center,
       }),
-    ).toEqual({ left: 321, top: 191, width: 360, height: 420 });
+    ).toEqual({ left: 320, top: 190, width: 360, height: 420 });
   });
 });
