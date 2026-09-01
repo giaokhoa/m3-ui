@@ -312,18 +312,12 @@ export function NavigationDrawerItem({
   ...props
 }: NavigationDrawerItemProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       data-selected={selected || undefined}
       render={(domProps, renderProps) => {
         const tabProps = {
@@ -348,18 +342,16 @@ export function NavigationDrawerItem({
           ...userStyle,
         };
       }}
-      onPressStart={handlePressStart}
-      onPressEnd={handlePressEnd}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
             focusRingRadius="var(--_navigation-drawer-item-radius)"
-            isFocusVisible={renderProps.isFocusVisible}
-            stateInteraction={
-              renderProps.isFocusVisible ? 'focus' : renderProps.isHovered ? 'hover' : null
-            }
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           {icon ? <span aria-hidden="true" className="navigation-drawer-item__icon">{icon}</span> : null}
           <span className="navigation-drawer-item__label">{children}</span>

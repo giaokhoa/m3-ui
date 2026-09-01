@@ -1,12 +1,12 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
   Switch as AriaSwitch,
   type SwitchProps as AriaSwitchProps,
 } from 'react-aria-components';
-import { Ripple, useRipple, type RippleStateInteraction } from '../../internal/ripple';
+import '@m3-ui/tokens/switch.css';
+import { Ripple, useRipple } from '../../internal/ripple';
 import { useTheme } from '../../theme/ThemeProvider';
 import {
-  switchBaseStyle,
   switchStateLayerRadius,
   switchTrackFocusRingRadius,
 } from './Switch.defaults';
@@ -15,39 +15,6 @@ import './switch.css';
 export interface SwitchProps extends AriaSwitchProps {
   /** Content rendered inside the Material thumb. Compose expects a 16dp icon-sized child. */
   thumbContent?: ReactNode;
-}
-
-type StateLayerInteraction = 'focus' | 'hover';
-
-function startInteraction(
-  active: readonly StateLayerInteraction[],
-  interaction: StateLayerInteraction,
-): StateLayerInteraction[] {
-  return [...active.filter((value) => value !== interaction), interaction];
-}
-
-function endInteraction(
-  active: readonly StateLayerInteraction[],
-  interaction: StateLayerInteraction,
-): StateLayerInteraction[] {
-  return active.filter((value) => value !== interaction);
-}
-
-function latestStateLayerInteraction(
-  active: readonly StateLayerInteraction[],
-  isFocusVisible: boolean,
-  allowFocus: boolean,
-): RippleStateInteraction | null {
-  for (let index = active.length - 1; index >= 0; index -= 1) {
-    const interaction = active[index];
-    if (interaction === 'hover') {
-      return 'hover';
-    }
-    if (interaction === 'focus' && allowFocus && isFocusVisible) {
-      return 'focus';
-    }
-  }
-  return null;
 }
 
 function resolveChildren(
@@ -66,10 +33,6 @@ export function Switch({
   thumbContent,
   className,
   style,
-  onBlur,
-  onFocus,
-  onHoverEnd,
-  onHoverStart,
   onPressEnd,
   onPressStart,
   ...props
@@ -80,67 +43,22 @@ export function Switch({
     radius: switchStateLayerRadius,
   });
   const trackRipple = useRipple();
-  const [activeInteractions, setActiveInteractions] = useState<
-    StateLayerInteraction[]
-  >([]);
-
-  const handleHoverStart: AriaSwitchProps['onHoverStart'] = (event) => {
-    setActiveInteractions((active) => startInteraction(active, 'hover'));
-    onHoverStart?.(event);
-  };
-
-  const handleHoverEnd: AriaSwitchProps['onHoverEnd'] = (event) => {
-    setActiveInteractions((active) => endInteraction(active, 'hover'));
-    onHoverEnd?.(event);
-  };
-
-  const handleFocus: AriaSwitchProps['onFocus'] = (event) => {
-    setActiveInteractions((active) => startInteraction(active, 'focus'));
-    onFocus?.(event);
-  };
-
-  const handleBlur: AriaSwitchProps['onBlur'] = (event) => {
-    setActiveInteractions((active) => endInteraction(active, 'focus'));
-    onBlur?.(event);
-  };
-
-  const handlePressStart: AriaSwitchProps['onPressStart'] = (event) => {
-    thumbRipple.onPressStart(event);
-    onPressStart?.(event);
-  };
-
-  const handlePressEnd: AriaSwitchProps['onPressEnd'] = (event) => {
-    thumbRipple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const thumbRipplePressProps = thumbRipple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaSwitch
       {...props}
+      {...thumbRipplePressProps}
       data-has-thumb-content={thumbContent != null ? true : undefined}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('switch', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...switchBaseStyle, ...userStyle };
-      }}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onHoverEnd={handleHoverEnd}
-      onHoverStart={handleHoverStart}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
+      style={style}
     >
       {(renderProps) => {
         const label = resolveChildren(children, renderProps);
-        const thumbStateInteraction = latestStateLayerInteraction(
-          activeInteractions,
-          renderProps.isFocusVisible,
-          rippleFocus === 'opacity',
-        );
 
         return (
           <>
@@ -149,18 +67,20 @@ export function Switch({
                 <Ripple
                   controller={trackRipple}
                   focusRingRadius={switchTrackFocusRingRadius}
-                  isFocusVisible={
-                    rippleFocus === 'inset-ring' && renderProps.isFocusVisible
-                  }
+                  state={{
+                    isFocusVisible:
+                      rippleFocus === 'inset-ring' && renderProps.isFocusVisible,
+                  }}
                 />
                 <span className="switch__thumb-shell">
                   <span className="switch__state-layer">
                     <Ripple
                       controller={thumbRipple}
-                      isFocusVisible={
-                        rippleFocus === 'opacity' && renderProps.isFocusVisible
-                      }
-                      stateInteraction={thumbStateInteraction}
+                      state={{
+                        isHovered: renderProps.isHovered,
+                        isFocusVisible:
+                          rippleFocus === 'opacity' && renderProps.isFocusVisible,
+                      }}
                     />
                   </span>
                   <span className="switch__thumb">

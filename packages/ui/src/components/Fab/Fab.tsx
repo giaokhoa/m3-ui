@@ -1,10 +1,5 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import '@m3-ui/tokens/fab.css';
+import type { CSSProperties, ReactNode } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -12,21 +7,9 @@ import {
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import {
-  getBrandedExtendedFabStyle,
-  getBrandedFabStyle,
-  getExtendedFabStyle,
-  getFabStyle,
-  type FabStyle,
+  fabElevationTokens,
+  getFabOverrideStyle,
 } from './Fab.defaults';
-import {
-  endFabInteraction,
-  getFabElevationMotion,
-  getFabInteractionElevationLevel,
-  latestFabInteraction,
-  latestFabStateLayerInteraction,
-  startFabInteraction,
-  type FabInteraction,
-} from './Fab.interactions';
 import type {
   ExtendedFabSize,
   FabElevation,
@@ -74,83 +57,6 @@ interface ExtendedFabImplProps extends ExtendedFloatingActionButtonProps {
   branded?: boolean;
 }
 
-type FabInteractionCallbacks = Pick<
-  AriaButtonProps,
-  'onBlur' | 'onFocus' | 'onHoverEnd' | 'onHoverStart' | 'onPressEnd' | 'onPressStart'
->;
-
-function elevationStyle(
-  motion: ReturnType<typeof getFabElevationMotion>,
-): FabStyle {
-  return {
-    '--_fab-elevation-duration': `${motion?.durationMs ?? 0}ms`,
-    '--_fab-elevation-easing': motion?.easing ?? 'linear',
-  };
-}
-
-function useFabInteractions({
-  onBlur,
-  onFocus,
-  onHoverEnd,
-  onHoverStart,
-  onPressEnd,
-  onPressStart,
-}: FabInteractionCallbacks) {
-  const ripple = useRipple();
-  const [activeInteractions, setActiveInteractions] = useState<FabInteraction[]>([]);
-  const startInteraction = (interaction: FabInteraction) => {
-    setActiveInteractions((active) => startFabInteraction(active, interaction));
-  };
-  const endInteraction = (interaction: FabInteraction) => {
-    setActiveInteractions((active) => endFabInteraction(active, interaction));
-  };
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    startInteraction('press');
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    endInteraction('press');
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
-  const handleHoverStart: AriaButtonProps['onHoverStart'] = (event) => {
-    startInteraction('hover');
-    onHoverStart?.(event);
-  };
-  const handleHoverEnd: AriaButtonProps['onHoverEnd'] = (event) => {
-    endInteraction('hover');
-    onHoverEnd?.(event);
-  };
-  const handleFocus: AriaButtonProps['onFocus'] = (event) => {
-    startInteraction('focus');
-    onFocus?.(event);
-  };
-  const handleBlur: AriaButtonProps['onBlur'] = (event) => {
-    endInteraction('focus');
-    onBlur?.(event);
-  };
-  const interaction = latestFabInteraction(activeInteractions);
-  const previousInteractionRef = useRef<FabInteraction | null>(null);
-  const previousInteraction = previousInteractionRef.current;
-  useEffect(() => {
-    previousInteractionRef.current = interaction;
-  }, [interaction]);
-
-  return {
-    activeInteractions,
-    interaction,
-    previousInteraction,
-    ripple,
-    handleBlur,
-    handleFocus,
-    handleHoverEnd,
-    handleHoverStart,
-    handlePressEnd,
-    handlePressStart,
-  };
-}
-
 function FabImpl({
   size,
   branded = false,
@@ -162,86 +68,61 @@ function FabImpl({
   contentColor,
   shape,
   elevation = 'default',
-  onBlur,
-  onFocus,
-  onHoverEnd,
-  onHoverStart,
   onPressStart,
   onPressEnd,
   ...props
 }: FabImplProps) {
-  const interactions = useFabInteractions({
-    onBlur,
-    onFocus,
-    onHoverEnd,
-    onHoverStart,
-    onPressStart,
-    onPressEnd,
-  });
+  const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       data-elevation={elevation}
-      data-interaction={interactions.interaction ?? undefined}
       data-size={size}
       data-variant={branded ? 'branded' : variant}
       className={(renderProps) => {
-        const userClassName = typeof className === 'function' ? className(renderProps) : className;
+        const userClassName =
+          typeof className === 'function' ? className(renderProps) : className;
         const baseClassName = branded ? 'fab fab--branded' : 'fab';
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        const tokenStyle = branded
-          ? getBrandedFabStyle({ elevation, containerColor, shape })
-          : getFabStyle(size, {
-              variant,
-              elevation,
-              containerColor,
-              contentColor,
-              shape,
-            });
         return {
-          ...tokenStyle,
+          ...getFabOverrideStyle({
+            containerColor,
+            contentColor: branded ? undefined : contentColor,
+            shape,
+          }),
           ...userStyle,
         };
       }}
-      onBlur={interactions.handleBlur}
-      onFocus={interactions.handleFocus}
-      onHoverEnd={interactions.handleHoverEnd}
-      onHoverStart={interactions.handleHoverStart}
-      onPressEnd={interactions.handlePressEnd}
-      onPressStart={interactions.handlePressStart}
     >
-      {(renderProps) => {
-        const level = getFabInteractionElevationLevel(
-          elevation,
-          interactions.interaction,
-        );
-        const motion = getFabElevationMotion(
-          interactions.interaction,
-          interactions.previousInteraction,
-        );
-
-        return (
-          <span className="fab__visual" style={elevationStyle(motion)}>
-            <Elevation level={level} />
-            <span className="fab__surface">
-              <Ripple
-                controller={interactions.ripple}
-                focusRingRadius="var(--_fab-container-radius)"
-                isFocusVisible={renderProps.isFocusVisible}
-                stateInteraction={latestFabStateLayerInteraction(
-                  interactions.activeInteractions,
-                  renderProps.isFocusVisible,
-                )}
-              />
-              <span aria-hidden="true" className="fab__icon">{children}</span>
-            </span>
+      {(renderProps) => (
+        <span className="fab__visual">
+          <Elevation
+            levels={fabElevationTokens[elevation]}
+            state={{
+              isPressed: renderProps.isPressed,
+              isHovered: renderProps.isHovered,
+              isFocused: renderProps.isFocused,
+            }}
+          />
+          <span className="fab__surface">
+            <Ripple
+              controller={ripple}
+              focusRingRadius="var(--_fab-container-radius)"
+              state={{
+                isHovered: renderProps.isHovered,
+                isFocusVisible: renderProps.isFocusVisible,
+              }}
+            />
+            <span aria-hidden="true" className="fab__icon">{children}</span>
           </span>
-        );
-      }}
+        </span>
+      )}
     </AriaButton>
   );
 }
@@ -259,10 +140,6 @@ function ExtendedFabImpl({
   contentColor,
   shape,
   elevation = 'default',
-  onBlur,
-  onFocus,
-  onHoverEnd,
-  onHoverStart,
   onPressStart,
   onPressEnd,
   'aria-label': ariaLabel,
@@ -272,28 +149,23 @@ function ExtendedFabImpl({
   const resolvedExpanded = hasIcon ? expanded : true;
   const collapsedLabel =
     hasIcon && !resolvedExpanded && typeof children === 'string' ? children : undefined;
-  const interactions = useFabInteractions({
-    onBlur,
-    onFocus,
-    onHoverEnd,
-    onHoverStart,
-    onPressStart,
-    onPressEnd,
-  });
+  const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       aria-label={ariaLabel ?? collapsedLabel}
       data-elevation={elevation}
       data-expanded={resolvedExpanded || undefined}
       data-extended="true"
       data-has-icon={hasIcon || undefined}
-      data-interaction={interactions.interaction ?? undefined}
       data-size={size}
       data-variant={branded ? 'branded' : variant}
       className={(renderProps) => {
-        const userClassName = typeof className === 'function' ? className(renderProps) : className;
+        const userClassName =
+          typeof className === 'function' ? className(renderProps) : className;
         const baseClassName = branded
           ? 'fab fab--extended fab--branded-extended'
           : 'fab fab--extended';
@@ -301,65 +173,49 @@ function ExtendedFabImpl({
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        const tokenStyle = branded
-          ? getBrandedExtendedFabStyle({ elevation, containerColor, shape })
-          : getExtendedFabStyle(size, {
-              variant,
-              elevation,
-              containerColor,
-              contentColor,
-              shape,
-            });
         return {
-          ...tokenStyle,
+          ...getFabOverrideStyle({
+            containerColor,
+            contentColor: branded ? undefined : contentColor,
+            shape,
+          }),
           ...userStyle,
         };
       }}
-      onBlur={interactions.handleBlur}
-      onFocus={interactions.handleFocus}
-      onHoverEnd={interactions.handleHoverEnd}
-      onHoverStart={interactions.handleHoverStart}
-      onPressEnd={interactions.handlePressEnd}
-      onPressStart={interactions.handlePressStart}
     >
-      {(renderProps) => {
-        const level = getFabInteractionElevationLevel(
-          elevation,
-          interactions.interaction,
-        );
-        const motion = getFabElevationMotion(
-          interactions.interaction,
-          interactions.previousInteraction,
-        );
-
-        return (
-          <span className="fab__visual" style={elevationStyle(motion)}>
-            <Elevation level={level} />
-            <span className="fab__surface">
-              <Ripple
-                controller={interactions.ripple}
-                focusRingRadius="var(--_fab-container-radius)"
-                isFocusVisible={renderProps.isFocusVisible}
-                stateInteraction={latestFabStateLayerInteraction(
-                  interactions.activeInteractions,
-                  renderProps.isFocusVisible,
-                )}
-              />
-              <span className="fab__content">
-                {hasIcon ? (
-                  <span aria-hidden="true" className="fab__icon">{icon}</span>
-                ) : null}
-                <span
-                  aria-hidden={hasIcon && !resolvedExpanded ? true : undefined}
-                  className="fab__label"
-                >
-                  {children}
-                </span>
+      {(renderProps) => (
+        <span className="fab__visual">
+          <Elevation
+            levels={fabElevationTokens[elevation]}
+            state={{
+              isPressed: renderProps.isPressed,
+              isHovered: renderProps.isHovered,
+              isFocused: renderProps.isFocused,
+            }}
+          />
+          <span className="fab__surface">
+            <Ripple
+              controller={ripple}
+              focusRingRadius="var(--_fab-container-radius)"
+              state={{
+                isHovered: renderProps.isHovered,
+                isFocusVisible: renderProps.isFocusVisible,
+              }}
+            />
+            <span className="fab__content">
+              {hasIcon ? (
+                <span aria-hidden="true" className="fab__icon">{icon}</span>
+              ) : null}
+              <span
+                aria-hidden={hasIcon && !resolvedExpanded ? true : undefined}
+                className="fab__label"
+              >
+                {children}
               </span>
             </span>
           </span>
-        );
-      }}
+        </span>
+      )}
     </AriaButton>
   );
 }

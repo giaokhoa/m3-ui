@@ -1,4 +1,9 @@
 .icon-button {
+  --_icon-button-target-size: max(48px, var(--_icon-button-container-height));
+  --_icon-button-container-width: calc(
+    var(--_icon-button-icon-size) + 2 * var(--_icon-button-inline-space)
+  );
+
   position: relative;
   box-sizing: border-box;
   display: inline-flex;

@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/split-button.css';
 import clsx from 'clsx';
 import type { ComponentType, CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import {
@@ -8,7 +9,6 @@ import {
   type ButtonProps,
   type ButtonShapes,
 } from '../Button';
-import { getSplitButtonStyle } from './SplitButton.defaults';
 import type { SplitButtonSize, SplitButtonVariant } from './SplitButton.types';
 import './split-button.css';
 
@@ -97,7 +97,7 @@ export function SplitButton({
       className={clsx('split-button', className)}
       data-size={size}
       data-variant={variant}
-      style={{ ...getSplitButtonStyle(size), ...style }}
+      style={style}
     >
       <div className="split-button__layout">
         <VariantButton

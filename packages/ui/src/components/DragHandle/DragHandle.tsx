@@ -4,17 +4,16 @@ import {
   type HTMLAttributes,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
+import '@m3-ui/tokens/drag-handle.css';
 import {
   Ripple,
   useRipple,
   type RippleController,
   type RipplePointerType,
   type RipplePressEvent,
-  type RippleStateInteraction,
 } from '../../internal/ripple';
 import {
-  getDragHandleRippleStyle,
-  getDragHandleStyle,
+  getDragHandleRuntimeStyle,
   type DragHandleStyleOptions,
 } from './DragHandle.defaults';
 import './drag-handle.css';
@@ -143,12 +142,6 @@ export function VerticalDragHandle({
     onBlur?.(event);
   };
 
-  const stateInteraction: RippleStateInteraction | null = isFocusVisible
-    ? 'focus'
-    : isHovered
-      ? 'hover'
-      : null;
-
   return (
     <span
       {...props}
@@ -159,7 +152,7 @@ export function VerticalDragHandle({
       data-pressed={isPressed || undefined}
       data-state={isDragged ? 'dragged' : isPressed ? 'pressed' : 'default'}
       style={{
-        ...getDragHandleStyle({
+        ...getDragHandleRuntimeStyle({
           color,
           pressedColor,
           draggedColor,
@@ -186,9 +179,7 @@ export function VerticalDragHandle({
         <Ripple
           controller={ripple}
           focusRingRadius="var(--_drag-handle-current-shape)"
-          isFocusVisible={isFocusVisible}
-          stateInteraction={stateInteraction}
-          style={getDragHandleRippleStyle()}
+          state={{ isFocusVisible, isHovered }}
         />
       </span>
     </span>

@@ -13,7 +13,7 @@
   position: absolute;
   inset: 0;
   background-color: var(--_scrim-container-color);
-  opacity: var(--_scrim-container-opacity);
+  opacity: calc(var(--_scrim-container-opacity) * var(--_scrim-alpha, 1));
   pointer-events: none;
 }
 

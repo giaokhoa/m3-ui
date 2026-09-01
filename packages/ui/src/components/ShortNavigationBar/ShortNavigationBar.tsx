@@ -99,8 +99,7 @@ function ItemContents({
         <Ripple
           controller={ripple}
           focusRingRadius="var(--_short-navigation-bar-indicator-radius)"
-          isFocusVisible={isFocusVisible}
-          stateInteraction={isFocusVisible ? 'focus' : isHovered ? 'hover' : null}
+          state={{ isFocusVisible, isHovered }}
         />
         <span
           aria-hidden={label !== undefined ? true : undefined}
@@ -144,15 +143,7 @@ export function ShortNavigationBarItem({
   unselectedLabelColor,
 }: ShortNavigationBarItemProps) {
   const ripple = useRipple({ origin: 'center' });
-
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
   const itemClassName = clsx('short-navigation-bar-item', className);
 
   const renderItem = (renderProps: {
@@ -202,8 +193,7 @@ export function ShortNavigationBarItem({
     'data-icon-position': iconPosition,
     isDisabled,
     onPress,
-    onPressStart: handlePressStart,
-    onPressEnd: handlePressEnd,
+    ...ripplePressProps,
     style: itemStyle,
   };
 

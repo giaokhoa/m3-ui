@@ -273,8 +273,10 @@ export function Surface({
           <Ripple
             controller={ripple}
             focusRingRadius={shape}
-            isFocusVisible={!isDisabled && isFocusVisible}
-            isHovered={!isDisabled && isHovered}
+            state={{
+              isFocusVisible: !isDisabled && isFocusVisible,
+              isHovered: !isDisabled && isHovered,
+            }}
           />
         ) : null}
         <div className="surface__content">{children}</div>

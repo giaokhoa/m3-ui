@@ -1,4 +1,5 @@
 import '@m3-ui/tokens/elevation.css';
+import '@m3-ui/tokens/list-item.css';
 import clsx from 'clsx';
 import {
   createContext,
@@ -14,11 +15,7 @@ import {
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  getListItemElevationLevel,
-  getListItemStyle,
-  type ListItemInteractionState,
-} from './ListItem.defaults';
+import { getListItemElevationLevel } from './ListItem.elevation';
 import './list-item.css';
 
 type ListItemLineCount = 1 | 2 | 3;
@@ -162,22 +159,21 @@ function ListItemContent({
   supportingText,
   ripple,
   isFocusVisible,
-  interaction,
+  isHovered,
 }: Pick<
   CommonListItemProps,
   'children' | 'leading' | 'trailing' | 'overline' | 'supportingText'
 > & {
   ripple?: ReturnType<typeof useRipple>;
   isFocusVisible?: boolean;
-  interaction?: 'hover' | 'focus' | null;
+  isHovered?: boolean;
 }) {
   return (
     <>
       {ripple ? (
         <Ripple
           controller={ripple}
-          isFocusVisible={isFocusVisible}
-          stateInteraction={interaction ?? null}
+          state={{ isFocusVisible, isHovered }}
         />
       ) : null}
       {leading != null ? (
@@ -199,29 +195,6 @@ function ListItemContent({
       ) : null}
     </>
   );
-}
-
-function interactiveStyle(
-  lineCount: ListItemLineCount,
-  selected: boolean,
-  isDragged: boolean,
-  renderProps: {
-    isHovered: boolean;
-    isPressed: boolean;
-    isFocusVisible: boolean;
-    isDisabled: boolean;
-  },
-  style?: CSSProperties,
-) {
-  const state: ListItemInteractionState = {
-    isHovered: renderProps.isHovered,
-    isPressed: renderProps.isPressed,
-    isFocusVisible: renderProps.isFocusVisible,
-    isDisabled: renderProps.isDisabled,
-    isSelected: selected,
-    isDragged,
-  };
-  return { ...getListItemStyle(lineCount, state), ...style };
 }
 
 export function ListItem(props: ListItemProps) {
@@ -249,7 +222,7 @@ export function ListItem(props: ListItemProps) {
     'selectionMode' in props ? props.selectionMode : undefined;
   const inSingleSelectionGroup = useContext(SingleSelectionGroupContext);
   const interactive = 'onPress' in props || selectionMode === 'multiple';
-  const elevationLevel = getListItemElevationLevel({ isDragged });
+  const elevationLevel = getListItemElevationLevel(isDragged);
 
   if (!interactive) {
     return (
@@ -257,14 +230,12 @@ export function ListItem(props: ListItemProps) {
         aria-disabled={isDisabled || undefined}
         aria-label={ariaLabel}
         className={clsx('list-item', 'elevation-host', className)}
+        data-disabled={isDisabled || undefined}
         data-dragged={isDragged || undefined}
         data-elevation={elevationLevel}
         data-lines={lineCount}
         data-testid={testId}
-        style={{
-          ...getListItemStyle(lineCount, { isDisabled, isDragged }),
-          ...style,
-        }}
+        style={style}
       >
         <ListItemContent
           children={children}
@@ -278,6 +249,7 @@ export function ListItem(props: ListItemProps) {
   }
 
   const ripple = useRipple({ origin: 'press' });
+  const ripplePressProps = ripple.getPressProps();
   const suppliedOnPress = 'onPress' in props ? props.onPress : undefined;
   const handlePress: AriaButtonProps['onPress'] = (event) => {
     if (
@@ -292,6 +264,7 @@ export function ListItem(props: ListItemProps) {
 
   return (
     <AriaButton
+      {...ripplePressProps}
       aria-label={ariaLabel}
       className={clsx(
         'list-item',
@@ -306,8 +279,6 @@ export function ListItem(props: ListItemProps) {
       data-testid={testId}
       isDisabled={isDisabled}
       onPress={handlePress}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
       render={(domProps) => {
         const semantics =
           selectionMode === 'single'
@@ -325,9 +296,7 @@ export function ListItem(props: ListItemProps) {
               : {};
         return <button {...domProps} {...semantics} />;
       }}
-      style={(renderProps) =>
-        interactiveStyle(lineCount, selected, isDragged, renderProps, style)
-      }
+      style={style}
     >
       {(renderProps) => (
         <ListItemContent
@@ -338,13 +307,7 @@ export function ListItem(props: ListItemProps) {
           supportingText={supportingText}
           ripple={ripple}
           isFocusVisible={renderProps.isFocusVisible}
-          interaction={
-            renderProps.isFocusVisible
-              ? 'focus'
-              : renderProps.isHovered
-                ? 'hover'
-                : null
-          }
+          isHovered={renderProps.isHovered}
         />
       )}
     </AriaButton>

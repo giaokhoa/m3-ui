@@ -130,15 +130,15 @@
   padding-inline-end: var(--_fab-text-only-trailing-space);
 }
 
-.fab--branded-extended[data-interaction='focus'] .fab__label {
+.fab--branded-extended[data-focused] .fab__label {
   color: var(--_fab-focus-label-color);
 }
 
-.fab--branded-extended[data-interaction='hover'] .fab__label {
+.fab--branded-extended[data-hovered] .fab__label {
   color: var(--_fab-hover-label-color);
 }
 
-.fab--branded-extended[data-interaction='press'] .fab__label {
+.fab--branded-extended[data-pressed] .fab__label {
   color: var(--_fab-pressed-label-color);
 }
 

@@ -10,5 +10,5 @@ export {
   buttonShapesForSize,
   type ButtonShapes,
   type ButtonShapeValue,
-} from './Button.defaults';
+} from './Button.runtime';
 export type { ButtonSize } from './Button.types';

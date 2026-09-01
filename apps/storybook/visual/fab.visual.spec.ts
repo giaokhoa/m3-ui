@@ -94,7 +94,7 @@ test.describe('Material 3 FAB visual parity', () => {
     expect(extendedVisualBox?.width ?? 0).toBeGreaterThanOrEqual(80);
 
     await extended.hover();
-    await expect(extended).toHaveAttribute('data-interaction', 'hover');
+    await expect(extended).toHaveAttribute('data-hovered', 'true');
     await page.mouse.move(0, 0);
 
     await expect(page.locator('#storybook-root')).toHaveScreenshot('fab-branded.png');
@@ -112,11 +112,11 @@ test.describe('Material 3 FAB visual parity', () => {
     await expect(loweredElevation).toHaveAttribute('data-elevation', 'level1');
 
     await normal.hover();
-    await expect(normal).toHaveAttribute('data-interaction', 'hover');
+    await expect(normal).toHaveAttribute('data-hovered', 'true');
     await expect(normalElevation).toHaveAttribute('data-elevation', 'level4');
 
     await lowered.hover();
-    await expect(lowered).toHaveAttribute('data-interaction', 'hover');
+    await expect(lowered).toHaveAttribute('data-hovered', 'true');
     await expect(loweredElevation).toHaveAttribute('data-elevation', 'level2');
 
     await page.mouse.move(0, 0);
@@ -208,7 +208,7 @@ test.describe('Material 3 FAB visual parity', () => {
     const button = await openDefaultFab(page);
     await page.keyboard.press('Tab');
     await expect(button).toBeFocused();
-    await expect(button).toHaveAttribute('data-interaction', 'focus');
+    await expect(button).toHaveAttribute('data-focused', 'true');
     await expect(button).toHaveScreenshot('fab-focus.png');
   });
 

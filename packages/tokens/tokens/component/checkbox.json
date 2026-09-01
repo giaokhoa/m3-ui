@@ -6,13 +6,14 @@
       "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
       "strokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "labelColor": { "$type": "string", "$value": "{color.role.onSurface}" },
       "colors": {
-        "selectedContainer": { "$type": "string", "$value": "var(--primary)" },
-        "selectedIcon": { "$type": "string", "$value": "var(--on-primary)" },
-        "unselectedOutline": { "$type": "string", "$value": "var(--on-surface-variant)" },
-        "disabledSelectedContainer": { "$type": "string", "$value": "var(--on-surface)" },
-        "disabledSelectedIcon": { "$type": "string", "$value": "var(--surface)" },
-        "disabledUnselectedOutline": { "$type": "string", "$value": "var(--on-surface)" }
+        "selectedContainer": { "$type": "string", "$value": "{color.role.primary}" },
+        "selectedIcon": { "$type": "string", "$value": "{color.role.onPrimary}" },
+        "unselectedOutline": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+        "disabledSelectedContainer": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledSelectedIcon": { "$type": "string", "$value": "{color.role.surface}" },
+        "disabledUnselectedOutline": { "$type": "string", "$value": "{color.role.onSurface}" }
       },
       "disabledOpacity": {
         "selectedContainer": { "$type": "number", "$value": 0.38 },

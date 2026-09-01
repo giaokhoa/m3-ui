@@ -1,12 +1,15 @@
+import '@m3-ui/tokens/button-group.css';
 import '@m3-ui/tokens/elevation.css';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes, type Key, type ReactNode, type RefObject } from 'react';
 import { Button as AriaButton, Radio as AriaRadio, RadioGroup as AriaRadioGroup, ToggleButton as AriaToggleButton, type ButtonProps as AriaButtonProps, type ToggleButtonProps as AriaToggleButtonProps } from 'react-aria-components';
+import { resolveElevationInteraction, resolveElevationLevel, resolveElevationTransition, type ElevationInteractionState } from '../../internal/elevation';
 import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { Button, ElevatedButton, FilledTonalButton, OutlinedButton, TextButton, type ButtonProps } from '../Button';
-import { getButtonStyle, resolveButtonElevation, resolveButtonElevationTransition, type ButtonInteractionState } from '../Button/Button.defaults';
+import { buttonElevationLevels } from '../Button/Button.elevation';
+import { getButtonStyle } from '../Button/Button.runtime';
 import { FilledIconButton } from '../IconButton';
-import { buttonGroupOverflowMenuTokens, buttonGroupStyle, defaultButtonGroupExpandedRatio, distributePressedWidths, visiblePrefixCount, type ButtonGroupSize } from './ButtonGroup.defaults';
+import { buttonGroupOverflowMenuElevation, defaultButtonGroupExpandedRatio, distributePressedWidths, visiblePrefixCount, type ButtonGroupSize } from './ButtonGroup.defaults';
 import './button-group.css';
 
 export type ButtonGroupSelectionMode = 'single' | 'multiple';
@@ -38,22 +41,24 @@ function Measure({ items, size, rowRef, overflowRef }: { items: readonly ButtonG
 
 function OverflowItem({ item, onAction }: { item: ButtonGroupActionItem; onAction: () => void }) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps();
   return (
     <AriaButton
+      {...ripplePressProps}
       className="button-group__menu-item"
       isDisabled={item.isDisabled}
       type="button"
       render={(domProps) => <button {...domProps} role="menuitem" />}
       onPress={onAction}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           {item.startIcon ? <span aria-hidden="true" className="button-group__menu-icon">{item.startIcon}</span> : null}
           <span className="button-group__menu-label">{item.menuLabel ?? item.label}</span>
@@ -68,7 +73,7 @@ function Overflow({ items, label, size, triggerRef }: { items: readonly ButtonGr
   const focusTrigger = () => triggerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
   useEffect(() => { if (!open) return; const pointer = (e: PointerEvent) => { const n=e.target as Node|null; if (!menuRef.current?.contains(n) && !triggerRef.current?.contains(n)) setOpen(false); }; const key=(e:KeyboardEvent)=>{ if(e.key==='Escape'){e.preventDefault();setOpen(false);focusTrigger();}}; document.addEventListener('pointerdown',pointer);document.addEventListener('keydown',key);return()=>{document.removeEventListener('pointerdown',pointer);document.removeEventListener('keydown',key);}; }, [open]);
   useEffect(() => { if (open) menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')?.focus(); }, [open]);
-  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuTokens.containerElevation} role="menu" ref={menuRef}>{items.map(i=><OverflowItem item={i} key={i.id} onAction={()=>{i.onAction();setOpen(false);focusTrigger();}}/>)}</div>:null}</span>;
+  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuElevation} role="menu" ref={menuRef}>{items.map(i=><OverflowItem item={i} key={i.id} onAction={()=>{i.onAction();setOpen(false);focusTrigger();}}/>)}</div>:null}</span>;
 }
 
 function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpandedRatio, overflowLabel='More options', className, style, ...props }: StandardButtonGroupProps) {
@@ -79,30 +84,33 @@ function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpande
   useEffect(()=>{const pi=pressed==null?-1:items.findIndex(i=>i.id===pressed);if(pi<0||pi>=visible)setPressed(null);if(focusOverflow.current&&visible<items.length){focusOverflow.current=false;overflowTrigger.current?.querySelector<HTMLButtonElement>('button')?.focus();focused.current=null;}},[items,pressed,visible]);
   const shown=items.slice(0,visible), overflow=items.slice(visible), vm=metrics.slice(0,visible), pi=pressed==null?-1:shown.findIndex(i=>i.id===pressed), ratio=Number.isFinite(expandedRatio)?Math.min(1,Math.max(0,expandedRatio)):defaultButtonGroupExpandedRatio;
   const widths=distributePressedWidths({widths:vm.map(m=>m.width),maxCompression:vm.map((m,i)=>pi<0?0:i<pi?m.end:i>pi?m.start:0),pressedIndex:pi>=0?pi:null,expandedRatio:ratio});
-  return <div {...props} className={cn('button-group','button-group--standard',className)} data-size={size} data-variant="standard" ref={root} role={props.role??'group'} style={{...buttonGroupStyle('standard',size),...style} as CSSProperties}><Measure items={items} size={size} rowRef={measure} overflowRef={overflowMeasure}/><div className="button-group__row">{shown.map((item,i)=><span className="button-group__item" data-item-id={String(item.id)} key={item.id} style={widths[i]!=null?{inlineSize:`${widths[i]}px`}:undefined}><Action item={item} size={size} onBlur={()=>{if(focused.current===item.id)focused.current=null;}} onFocus={()=>{focused.current=item.id;}} onPressStart={()=>setPressed(item.id)} onPressEnd={()=>setPressed(v=>v===item.id?null:v)}/></span>)}{overflow.length?<Overflow items={overflow} label={overflowLabel} size={size} triggerRef={overflowTrigger}/>:null}</div></div>;
+  return <div {...props} className={cn('button-group','button-group--standard',className)} data-size={size} data-variant="standard" ref={root} role={props.role??'group'} style={style}><Measure items={items} size={size} rowRef={measure} overflowRef={overflowMeasure}/><div className="button-group__row">{shown.map((item,i)=><span className="button-group__item" data-item-id={String(item.id)} key={item.id} style={widths[i]!=null?{inlineSize:`${widths[i]}px`}:undefined}><Action item={item} size={size} onBlur={()=>{if(focused.current===item.id)focused.current=null;}} onFocus={()=>{focused.current=item.id;}} onPressStart={()=>setPressed(item.id)} onPressEnd={()=>setPressed(v=>v===item.id?null:v)}/></span>)}{overflow.length?<Overflow items={overflow} label={overflowLabel} size={size} triggerRef={overflowTrigger}/>:null}</div></div>;
 }
 
 interface ConnectedInteractionRenderProps {
   isDisabled: boolean;
+  isFocused: boolean;
   isFocusVisible: boolean;
   isHovered: boolean;
   isPressed: boolean;
 }
 
-function connectedButtonState(p: ConnectedInteractionRenderProps): ButtonInteractionState {
+function connectedElevationState(p: ConnectedInteractionRenderProps): ElevationInteractionState {
   return {
     isDisabled: p.isDisabled,
-    interaction: p.isPressed ? 'press' : p.isHovered ? 'hover' : p.isFocusVisible ? 'focus' : null,
+    isPressed: p.isPressed,
+    isHovered: p.isHovered,
+    isFocused: p.isFocused,
   };
 }
 
 function ConnectedItem({ item,index,count,selected,mode,size,onChange }: { item:ConnectedButtonGroupItem;index:number;count:number;selected:boolean;mode:ButtonGroupSelectionMode;size:ButtonGroupSize;onChange:(v:boolean)=>void }) {
-  const ripple=useRipple(), position=count===1?'only':index===0?'leading':index===count-1?'trailing':'middle';
+  const ripple=useRipple(), ripplePressProps=ripple.getPressProps(), position=count===1?'only':index===0?'leading':index===count-1?'trailing':'middle';
   const data={ 'aria-label':typeof item.label==='string'?item.label:undefined,'data-position':position,'data-selected':selected||undefined,'data-button-group-item':String(item.id),'data-item-index':index,'data-size':size,isDisabled:item.isDisabled,className:'button button-group__connected-item elevation-host' } as const;
-  const content=(p:{isFocusVisible:boolean;isHovered:boolean})=><><Ripple controller={ripple} focusRingRadius="inherit" isFocusVisible={p.isFocusVisible} isHovered={p.isHovered}/><span className="button__content">{item.startIcon?<span aria-hidden="true" className="button__icon">{item.startIcon}</span>:null}{item.label}{item.endIcon?<span aria-hidden="true" className="button__icon">{item.endIcon}</span>:null}</span></>;
-  const style=(p:ConnectedInteractionRenderProps)=>{const state=connectedButtonState(p);return({...getButtonStyle(state,{size}),transition:resolveButtonElevationTransition(state),'--_button-container-color':selected?'var(--_button-group-selected-container)':'var(--_button-group-unselected-container)','--_button-content-color':selected?'var(--_button-group-selected-content)':'var(--_button-group-unselected-content)'}) as CSSProperties;};
-  if(mode==='single')return <AriaRadio {...data} value={String(index)} style={style} render={(props,p)=><label {...props} data-elevation={resolveButtonElevation('filled',connectedButtonState(p))}/>} onPressStart={e=>ripple.onPressStart(e)} onPressEnd={()=>ripple.onPressEnd()}>{content}</AriaRadio>;
-  const tp:AriaToggleButtonProps={...data,isSelected:selected,onChange,style,children:content,render:(props,p)=><button {...props} data-elevation={resolveButtonElevation('filled',connectedButtonState(p))}/>,onPressStart:e=>ripple.onPressStart(e),onPressEnd:()=>ripple.onPressEnd()};return <AriaToggleButton {...tp}/>;
+  const content=(p:{isFocusVisible:boolean;isHovered:boolean})=><><Ripple controller={ripple} focusRingRadius="inherit" state={{isFocusVisible:p.isFocusVisible,isHovered:p.isHovered}}/><span className="button__content">{item.startIcon?<span aria-hidden="true" className="button__icon">{item.startIcon}</span>:null}{item.label}{item.endIcon?<span aria-hidden="true" className="button__icon">{item.endIcon}</span>:null}</span></>;
+  const style=(p:ConnectedInteractionRenderProps)=>{const state=connectedElevationState(p), interaction=resolveElevationInteraction(state);return({...getButtonStyle({isDisabled:p.isDisabled,isPressed:p.isPressed}),transition:resolveElevationTransition(state,interaction,null),'--_button-container-color':selected?'var(--_button-group-selected-container)':'var(--_button-group-unselected-container)','--_button-content-color':selected?'var(--_button-group-selected-content)':'var(--_button-group-unselected-content)'}) as CSSProperties;};
+  if(mode==='single')return <AriaRadio {...data} {...ripplePressProps} value={String(index)} style={style} render={(props,p)=><label {...props} data-elevation={resolveElevationLevel(buttonElevationLevels.filled,connectedElevationState(p))}/>}>{content}</AriaRadio>;
+  const tp:AriaToggleButtonProps={...data,...ripplePressProps,isSelected:selected,onChange,style,children:content,render:(props,p)=><button {...props} data-elevation={resolveElevationLevel(buttonElevationLevels.filled,connectedElevationState(p))}/>};return <AriaToggleButton {...tp}/>;
 }
 
 function Connected(props: ConnectedButtonGroupProps) {
@@ -112,7 +120,7 @@ function Connected(props: ConnectedButtonGroupProps) {
   const change=useCallback((id:Key,on:boolean)=>{if(selectionMode==='single'){if(!on)return;if(!singleCtl)setSingle(id);props.onSelectionChange?.(id);}else{const n=new Set(multiValue);on?n.add(id):n.delete(id);if(!multiCtl)setMulti(n);props.onSelectionChange?.(new Set(n));}},[multiCtl,multiValue,props,selectionMode,singleCtl]);
   const html={...rest} as HTMLAttributes<HTMLDivElement>; for(const k of ['selectedKey','defaultSelectedKey','selectedKeys','defaultSelectedKeys','onSelectionChange'] as const) delete (html as Record<string,unknown>)[k];
   const ariaLabel=html['aria-label'], ariaLabelledBy=html['aria-labelledby']; delete html['aria-label']; delete html['aria-labelledby']; const userKey=html.onKeyDown; delete html.onKeyDown;
-  const root=<div {...html} className={cn('button-group','button-group--connected',className)} data-selection-mode={selectionMode} data-size={size} data-variant="connected" role={selectionMode==='multiple'?(html.role??'group'):undefined} style={{...buttonGroupStyle('connected',size),...style} as CSSProperties}/>;
+  const root=<div {...html} className={cn('button-group','button-group--connected',className)} data-selection-mode={selectionMode} data-size={size} data-variant="connected" role={selectionMode==='multiple'?(html.role??'group'):undefined} style={style}/>;
   if(selectionMode==='single'){
     const selectedIndex=items.findIndex(i=>i.id===singleValue);
     return <div {...root.props}><AriaRadioGroup aria-label={ariaLabel} aria-labelledby={ariaLabelledBy} className="button-group__row" orientation="horizontal" value={selectedIndex>=0?String(selectedIndex):''} onChange={value=>{const index=Number(value);const item=items[index];if(item&&!item.isDisabled)change(item.id,true);}}>{items.map((item,i)=><ConnectedItem item={item} index={i} count={items.length} selected={singleValue===item.id} key={item.id} mode="single" size={size} onChange={()=>{}}/>)}</AriaRadioGroup></div>;

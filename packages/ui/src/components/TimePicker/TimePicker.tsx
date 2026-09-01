@@ -13,7 +13,6 @@ import {
 import {
   Radio as AriaRadio,
   RadioGroup as AriaRadioGroup,
-  type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
 import { TextButton } from '../Button';
 import { Ripple, useRipple } from '../../internal/ripple';
@@ -273,27 +272,23 @@ function PeriodRadio({
   disabled?: boolean;
 }) {
   const ripple = useRipple({ origin: 'center' });
-  const handlePressStart: AriaRadioProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-  };
-  const handlePressEnd: AriaRadioProps['onPressEnd'] = () => {
-    ripple.onPressEnd();
-  };
+  const ripplePressProps = ripple.getPressProps();
 
   return (
     <AriaRadio
+      {...ripplePressProps}
       value={period}
       isDisabled={disabled}
       className="time-picker__period-button"
-      onPressStart={handlePressStart}
-      onPressEnd={handlePressEnd}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           <span className="time-picker__period-label">{period.toUpperCase()}</span>
         </>

@@ -6,14 +6,25 @@ import type { RippleController } from './useRipple';
 import './ripple.css';
 
 type RippleStyle = CSSProperties & Record<`--${string}`, string | number>;
-export type RippleStateInteraction = 'focus' | 'hover';
+
+export interface RippleInteractionState {
+  readonly isHovered?: boolean;
+  readonly isFocusVisible?: boolean;
+}
+
+export function resolveRippleStateInteraction(
+  state: RippleInteractionState,
+): 'focus' | 'hover' | null {
+  if (state.isHovered) return 'hover';
+  if (state.isFocusVisible) return 'focus';
+  return null;
+}
 
 export interface RippleProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   controller: RippleController;
-  stateInteraction?: RippleStateInteraction | null;
-  isHovered?: boolean;
-  isFocusVisible?: boolean;
+  /** Normalized current state from the RAC/native interaction host. */
+  state?: RippleInteractionState;
   /** CSS length that maps the component's Compose focusRingShape corner radius. */
   focusRingRadius?: string | number;
   /**
@@ -29,9 +40,7 @@ function cssLength(value: string | number): string {
 
 export function Ripple({
   controller,
-  stateInteraction,
-  isHovered = false,
-  isFocusVisible = false,
+  state,
   focusRingRadius,
   focusRingInset,
   className,
@@ -39,15 +48,8 @@ export function Ripple({
   ...props
 }: RippleProps) {
   const { rippleFocus } = useTheme();
-  const resolvedStateInteraction =
-    stateInteraction === undefined
-      ? isFocusVisible
-        ? 'focus'
-        : isHovered
-          ? 'hover'
-          : null
-      : stateInteraction;
-  const hasFocus = isFocusVisible || resolvedStateInteraction === 'focus';
+  const resolvedStateInteraction = resolveRippleStateInteraction(state ?? {});
+  const hasFocus = state?.isFocusVisible ?? false;
 
   const runtimeStyle: RippleStyle = {
     ...(focusRingRadius === undefined
@@ -67,9 +69,7 @@ export function Ripple({
       className={clsx('ripple', className)}
       data-focus-ring-radius={focusRingRadius === undefined ? undefined : true}
       data-focus-visible={
-        rippleFocus === 'opacity' && resolvedStateInteraction === 'focus'
-          ? true
-          : undefined
+        rippleFocus === 'opacity' && hasFocus ? true : undefined
       }
       data-hovered={resolvedStateInteraction === 'hover' || undefined}
       data-inset-focus-visible={

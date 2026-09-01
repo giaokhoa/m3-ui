@@ -1,130 +1,16 @@
 import * as token from '@m3-ui/tokens';
-import type { CSSProperties } from 'react';
 import type { ElevationLevel } from '../../internal/elevation';
 import type { ButtonSize } from '../Button/Button.types';
 
 export type ButtonGroupSize = ButtonSize;
-export type ButtonGroupVariant = 'standard' | 'connected';
-export type ButtonGroupStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-export interface ButtonGroupSizeTokenSet {
-  readonly gap: string;
-  readonly height: string;
-}
+/** Shared Elevation needs the overflow surface level at runtime; paint is generated CSS. */
+export const buttonGroupOverflowMenuElevation =
+  token.ComponentMenuBaseContainerElevation as ElevationLevel;
 
-export interface ConnectedButtonGroupSizeTokenSet extends ButtonGroupSizeTokenSet {
-  readonly innerCorner: string;
-  readonly pressedInnerCorner: string;
-}
-
-export const buttonGroupSizeTokens = {
-  extraSmall: { gap: token.ComponentButtonGroupXSmallBetweenSpace, height: token.ComponentButtonGroupXSmallContainerHeight },
-  small: { gap: token.ComponentButtonGroupSmallBetweenSpace, height: token.ComponentButtonGroupSmallContainerHeight },
-  medium: { gap: token.ComponentButtonGroupMediumBetweenSpace, height: token.ComponentButtonGroupMediumContainerHeight },
-  large: { gap: token.ComponentButtonGroupLargeBetweenSpace, height: token.ComponentButtonGroupLargeContainerHeight },
-  extraLarge: { gap: token.ComponentButtonGroupXLargeBetweenSpace, height: token.ComponentButtonGroupXLargeContainerHeight },
-} as const satisfies Record<ButtonGroupSize, ButtonGroupSizeTokenSet>;
-
-export const connectedButtonGroupSizeTokens = {
-  extraSmall: {
-    gap: token.ComponentButtonGroupConnectedXSmallBetweenSpace,
-    height: token.ComponentButtonGroupConnectedXSmallContainerHeight,
-    innerCorner: token.ComponentButtonGroupConnectedXSmallInnerCornerSize,
-    pressedInnerCorner: token.ComponentButtonGroupConnectedXSmallPressedInnerCornerSize,
-  },
-  small: {
-    gap: token.ComponentButtonGroupConnectedSmallBetweenSpace,
-    height: token.ComponentButtonGroupConnectedSmallContainerHeight,
-    innerCorner: token.ComponentButtonGroupConnectedSmallInnerCornerSize,
-    pressedInnerCorner: token.ComponentButtonGroupConnectedSmallPressedInnerCornerSize,
-  },
-  medium: {
-    gap: token.ComponentButtonGroupConnectedMediumBetweenSpace,
-    height: token.ComponentButtonGroupConnectedMediumContainerHeight,
-    innerCorner: token.ComponentButtonGroupConnectedMediumInnerCornerSize,
-    pressedInnerCorner: token.ComponentButtonGroupConnectedMediumPressedInnerCornerSize,
-  },
-  large: {
-    gap: token.ComponentButtonGroupConnectedLargeBetweenSpace,
-    height: token.ComponentButtonGroupConnectedLargeContainerHeight,
-    innerCorner: token.ComponentButtonGroupConnectedLargeInnerCornerSize,
-    pressedInnerCorner: token.ComponentButtonGroupConnectedLargePressedInnerCornerSize,
-  },
-  extraLarge: {
-    gap: token.ComponentButtonGroupConnectedXLargeBetweenSpace,
-    height: token.ComponentButtonGroupConnectedXLargeContainerHeight,
-    innerCorner: token.ComponentButtonGroupConnectedXLargeInnerCornerSize,
-    pressedInnerCorner: token.ComponentButtonGroupConnectedXLargePressedInnerCornerSize,
-  },
-} as const satisfies Record<ButtonGroupSize, ConnectedButtonGroupSizeTokenSet>;
-
-export const buttonGroupMotionTokens = {
-  duration: token.MotionSpringFastSpatialDuration,
-  easing: token.MotionSpringFastSpatialEasing,
-  dampingRatio: token.ComponentButtonGroupSmallPressedItemWidthMotionSpringDampingRatio,
-  stiffness: token.ComponentButtonGroupSmallPressedItemWidthMotionSpringStiffness,
-} as const;
-
-export const buttonGroupOverflowMenuTokens = {
-  containerColor: token.ComponentMenuBaseContainerColor,
-  containerRadius: token.ShapeExtraSmall,
-  containerElevation: token.ComponentMenuBaseContainerElevation as ElevationLevel,
-  itemContainerColor: token.ComponentMenuStandardItemContainerColor,
-  itemLabelColor: token.ComponentMenuStandardItemLabelTextColor,
-  itemDisabledLabelColor: token.ComponentMenuStandardItemDisabledLabelTextColor,
-  itemDisabledLabelOpacity: token.ComponentMenuStandardItemDisabledLabelTextOpacity,
-  itemHeight: token.ComponentListBaseItemOneLineContainerHeight,
-  itemPaddingInlineStart: token.ComponentListBaseItemLeadingSpace,
-  itemPaddingInlineEnd: token.ComponentListBaseItemTrailingSpace,
-  itemGap: token.ComponentListBaseItemBetweenSpace,
-  itemIconSize: token.ComponentListBaseItemLeadingIconSize,
-  hoverOpacity: token.StateLayerOpacityHover,
-} as const;
-
-export const connectedButtonGroupColorTokens = {
-  unselectedContainer: token.ComponentButtonVariantFilledUnselectedContainerColor,
-  unselectedContent: token.ComponentButtonVariantFilledUnselectedLabelTextColor,
-  selectedContainer: token.ComponentButtonVariantFilledSelectedContainerColor,
-  selectedContent: token.ComponentButtonVariantFilledSelectedLabelTextColor,
-} as const;
-
+/** Runtime width redistribution ratio consumed by DOM measurement arithmetic. */
 export const defaultButtonGroupExpandedRatio =
   token.ComponentButtonGroupSmallPressedItemWidthMultiplierPercent / 100;
-
-export function buttonGroupStyle(
-  variant: ButtonGroupVariant,
-  size: ButtonGroupSize = 'small',
-): ButtonGroupStyle {
-  const sizeTokens = variant === 'connected'
-    ? connectedButtonGroupSizeTokens[size]
-    : buttonGroupSizeTokens[size];
-  const connected = connectedButtonGroupSizeTokens[size];
-  return {
-    '--_button-group-gap': sizeTokens.gap,
-    '--_button-group-height': sizeTokens.height,
-    '--_button-group-motion-duration': buttonGroupMotionTokens.duration,
-    '--_button-group-motion-easing': buttonGroupMotionTokens.easing,
-    '--_button-group-inner-corner': connected.innerCorner,
-    '--_button-group-pressed-inner-corner': connected.pressedInnerCorner,
-    '--_button-group-full-corner': token.ShapeFull,
-    '--_button-group-unselected-container': connectedButtonGroupColorTokens.unselectedContainer,
-    '--_button-group-unselected-content': connectedButtonGroupColorTokens.unselectedContent,
-    '--_button-group-selected-container': connectedButtonGroupColorTokens.selectedContainer,
-    '--_button-group-selected-content': connectedButtonGroupColorTokens.selectedContent,
-    '--_button-group-menu-container-color': buttonGroupOverflowMenuTokens.containerColor,
-    '--_button-group-menu-container-radius': buttonGroupOverflowMenuTokens.containerRadius,
-    '--_button-group-menu-item-color': buttonGroupOverflowMenuTokens.itemLabelColor,
-    '--_button-group-menu-item-container-color': buttonGroupOverflowMenuTokens.itemContainerColor,
-    '--_button-group-menu-item-disabled-color': buttonGroupOverflowMenuTokens.itemDisabledLabelColor,
-    '--_button-group-menu-item-disabled-opacity': `${buttonGroupOverflowMenuTokens.itemDisabledLabelOpacity * 100}%`,
-    '--_button-group-menu-item-height': buttonGroupOverflowMenuTokens.itemHeight,
-    '--_button-group-menu-item-padding-start': buttonGroupOverflowMenuTokens.itemPaddingInlineStart,
-    '--_button-group-menu-item-padding-end': buttonGroupOverflowMenuTokens.itemPaddingInlineEnd,
-    '--_button-group-menu-item-gap': buttonGroupOverflowMenuTokens.itemGap,
-    '--_button-group-menu-item-icon-size': buttonGroupOverflowMenuTokens.itemIconSize,
-    '--_button-group-menu-item-hover-opacity': `${buttonGroupOverflowMenuTokens.hoverOpacity * 100}%`,
-  };
-}
 
 export interface WidthDistributionInput {
   readonly widths: readonly number[];

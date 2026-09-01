@@ -39,7 +39,8 @@ test.describe('Material 3 Card parity', () => {
           role: element.getAttribute('role'),
           radius: surfaceStyle.borderRadius,
           container: surfaceStyle.backgroundColor,
-          outlineWidth: rootStyle.getPropertyValue('--_card-outline-width').trim(),
+          outlineWidth:
+            rootStyle.getPropertyValue('--_card-outline-width').trim() || null,
           elevation: elevation.dataset.elevation,
         };
       }),
@@ -50,14 +51,16 @@ test.describe('Material 3 Card parity', () => {
       tabIndex: -1,
       role: null,
       radius: '12px',
-      outlineWidth: '0px',
+      outlineWidth: null,
       elevation: 'level0',
     });
-    expect(values[1]).toMatchObject({ elevation: 'level1', outlineWidth: '0px' });
+    expect(values[1]).toMatchObject({ elevation: 'level1', outlineWidth: null });
     expect(values[2]).toMatchObject({ elevation: 'level0', outlineWidth: '1px' });
   });
 
-  test('clickable cards are keyboard focusable without inventing a Compose role', async ({ page }) => {
+  test('clickable cards are keyboard focusable without inventing a Compose role', async ({
+    page,
+  }) => {
     await openStory(page, 'components-card--clickable');
     const cards = page.locator('.card');
     const count = page.getByTestId('card-press-count');

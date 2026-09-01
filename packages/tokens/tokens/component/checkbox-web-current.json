@@ -5,18 +5,18 @@
       "outline": {
         "selectedWidth": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } }
       },
-      "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+      "focusIndicatorColor": { "$type": "string", "$value": "{color.role.secondary}" },
       "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
       "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
       "stateLayerShape": { "$type": "dimension", "$value": "{shape.full}" },
-      "selectedPressedStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
-      "unselectedInteractiveOutlineColor": { "$type": "string", "$value": "var(--on-surface)" },
-      "unselectedPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "selectedPressedStateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedInteractiveOutlineColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedPressedStateLayerColor": { "$type": "string", "$value": "{color.role.primary}" },
       "error": {
-        "selectedContainerColor": { "$type": "string", "$value": "var(--error)" },
-        "selectedIconColor": { "$type": "string", "$value": "var(--on-error)" },
-        "unselectedOutlineColor": { "$type": "string", "$value": "var(--error)" },
-        "stateLayerColor": { "$type": "string", "$value": "var(--error)" }
+        "selectedContainerColor": { "$type": "string", "$value": "{color.role.error}" },
+        "selectedIconColor": { "$type": "string", "$value": "{color.role.onError}" },
+        "unselectedOutlineColor": { "$type": "string", "$value": "{color.role.error}" },
+        "stateLayerColor": { "$type": "string", "$value": "{color.role.error}" }
       }
     }
   }

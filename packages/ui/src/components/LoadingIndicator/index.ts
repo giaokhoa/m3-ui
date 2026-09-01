@@ -1,3 +1,5 @@
+import '@m3-ui/tokens/loading-indicator.css';
+
 export {
   ContainedLoadingIndicator,
   LoadingIndicator,

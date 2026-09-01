@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import {
   Checkbox as AriaCheckbox,
   Radio as AriaRadio,
@@ -7,12 +7,8 @@ import {
   type RadioGroupProps as AriaRadioGroupProps,
   type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/segmented-button.css';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  segmentedButtonRowStyle,
-  segmentedButtonStyle,
-  type SegmentedButtonStyle,
-} from './SegmentedButton.defaults';
 import './segmented-button.css';
 
 interface SegmentVisualProps {
@@ -92,8 +88,7 @@ function SegmentVisual({
       <Ripple
         controller={ripple}
         focusRingRadius="inherit"
-        isFocusVisible={isFocusVisible}
-        isHovered={isHovered}
+        state={{ isFocusVisible, isHovered }}
       />
       <span
         className="segmented-button__content"
@@ -130,10 +125,7 @@ export function SingleChoiceSegmentedButtonRow({
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button-row', 'segmented-button-row--single', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonRowStyle, ...userStyle };
-      }}
+      style={style}
     >
       {children}
     </AriaRadioGroup>
@@ -151,7 +143,7 @@ export function MultiChoiceSegmentedButtonRow({
       {...props}
       role="group"
       className={joinClassNames('segmented-button-row', 'segmented-button-row--multi', className)}
-      style={{ ...(segmentedButtonRowStyle as CSSProperties), ...style }}
+      style={style}
     >
       {children}
     </div>
@@ -169,29 +161,18 @@ export function SingleChoiceSegmentedButton({
   ...props
 }: SingleChoiceSegmentedButtonProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaRadioProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaRadioProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaRadio
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
-      }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
+      style={style}
     >
       {(renderProps) => (
         <SegmentVisual
@@ -220,29 +201,18 @@ export function MultiChoiceSegmentedButton({
   ...props
 }: MultiChoiceSegmentedButtonProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaCheckboxProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaCheckboxProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaCheckbox
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
-      }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
+      style={style}
     >
       {(renderProps) => (
         <SegmentVisual

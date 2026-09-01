@@ -16,7 +16,7 @@ export {
   type IconButtonShapes,
   type IconButtonShapeValue,
   type IconToggleButtonShapes,
-} from './IconButton.defaults';
+} from './IconButton.runtime';
 export type {
   IconButtonShape,
   IconButtonSize,

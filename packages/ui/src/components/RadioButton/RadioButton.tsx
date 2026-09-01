@@ -9,9 +9,9 @@ import {
   type RadioGroupProps as AriaRadioGroupProps,
   type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/radio-button.css';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { radioButtonBaseStyle, radioGroupBaseStyle } from './RadioButton.defaults';
-import { radioButtonTokens } from './RadioButton.tokens';
+import { radioButtonRippleGeometry } from './RadioButton.runtime';
 import './radio-button.css';
 
 export interface RadioButtonProps extends AriaRadioProps {}
@@ -22,10 +22,6 @@ export interface RadioGroupProps extends Omit<AriaRadioGroupProps, 'children'> {
   description?: ReactNode;
   errorMessage?: FieldErrorProps['children'];
 }
-
-const radioIndicationSize = radioButtonTokens.iconSize + radioButtonTokens.padding * 2;
-const radioFocusRingInset = (radioButtonTokens.minimumInteractiveSize - radioIndicationSize) / 2;
-const radioFocusRingRadius = radioIndicationSize / 2;
 
 function joinClassNames(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
@@ -41,34 +37,21 @@ function resolveChildren(
 export function RadioButton({
   children,
   className,
-  style,
   onPressStart,
   onPressEnd,
   ...props
 }: RadioButtonProps) {
-  const ripple = useRipple({ origin: 'center', radius: radioButtonTokens.stateLayerSize / 2 });
-  const handlePressStart: AriaRadioProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaRadioProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripple = useRipple({ origin: 'center', radius: radioButtonRippleGeometry.radius });
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaRadio
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('radio-button', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...radioButtonBaseStyle, ...userStyle };
-      }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => {
         const label = resolveChildren(children, renderProps);
@@ -78,10 +61,12 @@ export function RadioButton({
               <span className="radio-button__state-layer">
                 <Ripple
                   controller={ripple}
-                  focusRingInset={radioFocusRingInset}
-                  focusRingRadius={radioFocusRingRadius}
-                  isFocusVisible={renderProps.isFocusVisible}
-                  isHovered={renderProps.isHovered}
+                  focusRingInset={radioButtonRippleGeometry.focusRingInset}
+                  focusRingRadius={radioButtonRippleGeometry.focusRingRadius}
+                  state={{
+                    isFocusVisible: renderProps.isFocusVisible,
+                    isHovered: renderProps.isHovered,
+                  }}
                 />
               </span>
               <span className="radio-button__control">
@@ -105,7 +90,6 @@ export function RadioGroup({
   errorMessage,
   orientation = 'vertical',
   className,
-  style,
   ...props
 }: RadioGroupProps) {
   return (
@@ -119,10 +103,6 @@ export function RadioGroup({
           orientation === 'horizontal' ? 'radio-group--horizontal' : null,
           userClassName,
         );
-      }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...radioGroupBaseStyle, ...userStyle };
       }}
     >
       {label != null ? <Label className="radio-group__label">{label}</Label> : null}

@@ -3,6 +3,22 @@ import { join } from 'node:path';
 
 export const ALIAS_PATTERN = /^\{([A-Za-z0-9_.-]+)\}$/;
 
+const tokenProperties = new Set([
+  '$value',
+  '$type',
+  '$description',
+  '$extensions',
+  '$deprecated',
+]);
+const groupProperties = new Set([
+  '$type',
+  '$description',
+  '$extensions',
+  '$deprecated',
+  '$extends',
+  '$root',
+]);
+
 function isObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -57,6 +73,76 @@ export async function readCanonicalDirectory(directory) {
   return root;
 }
 
+function validateName(name, path, errors) {
+  if (name.startsWith('$')) {
+    errors.push(`${[...path, name].join('.')}: token/group names must not begin with $`);
+  }
+  if (/[.{}]/.test(name)) {
+    errors.push(`${[...path, name].join('.')}: token/group names must not contain ., {, or }`);
+  }
+}
+
+function validateMetadata(node, allowed, path, errors) {
+  for (const [key, value] of Object.entries(node)) {
+    if (!key.startsWith('$')) continue;
+    if (!allowed.has(key)) {
+      errors.push(`${path || '<root>'}: unsupported DTCG property ${key}`);
+      continue;
+    }
+    if ((key === '$description' || key === '$type' || key === '$extends') && typeof value !== 'string') {
+      errors.push(`${path || '<root>'}: ${key} must be a string`);
+    }
+    if (key === '$extensions' && !isObject(value)) {
+      errors.push(`${path || '<root>'}: $extensions must be an object`);
+    }
+    if (key === '$deprecated' && typeof value !== 'boolean' && typeof value !== 'string') {
+      errors.push(`${path || '<root>'}: $deprecated must be a boolean or string`);
+    }
+  }
+}
+
+export function validateDtcgStableStructure(root) {
+  const errors = [];
+  if (!isObject(root)) return ['<root>: DTCG document must be an object'];
+
+  function visit(node, path = []) {
+    const label = path.join('.') || '<root>';
+    if (!isObject(node)) {
+      errors.push(`${label}: token/group must be an object`);
+      return;
+    }
+
+    const isToken = Object.hasOwn(node, '$value');
+    validateMetadata(node, isToken ? tokenProperties : groupProperties, label, errors);
+
+    if (isToken) {
+      for (const key of Object.keys(node)) {
+        if (!key.startsWith('$')) {
+          errors.push(`${label}: token cannot also contain child token/group ${key}`);
+        }
+      }
+      return;
+    }
+
+    for (const [key, value] of Object.entries(node)) {
+      if (key === '$root') {
+        if (!isObject(value) || !Object.hasOwn(value, '$value')) {
+          errors.push(`${label}: $root must be a design token with $value`);
+        } else {
+          visit(value, [...path, '$root']);
+        }
+        continue;
+      }
+      if (key.startsWith('$')) continue;
+      validateName(key, path, errors);
+      visit(value, [...path, key]);
+    }
+  }
+
+  visit(root);
+  return errors;
+}
+
 export function collectTokens(root) {
   const tokens = new Map();
 
@@ -72,6 +158,10 @@ export function collectTokens(root) {
     }
 
     for (const [key, value] of Object.entries(node)) {
+      if (key === '$root') {
+        visit(value, [...path, '$root'], type);
+        continue;
+      }
       if (key.startsWith('$')) continue;
       visit(value, [...path, key], type);
     }
@@ -82,7 +172,7 @@ export function collectTokens(root) {
 }
 
 export function validateCanonical(root) {
-  const errors = [];
+  const errors = [...validateDtcgStableStructure(root)];
   const tokens = collectTokens(root);
   if (tokens.size === 0) errors.push('canonical source contains no tokens');
 

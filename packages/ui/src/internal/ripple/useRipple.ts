@@ -12,15 +12,55 @@ export interface UseRippleOptions {
   radius?: number;
 }
 
+export interface RipplePressHandlers<Event extends RipplePressEvent = RipplePressEvent> {
+  onPressStart?: (event: Event) => void;
+  onPressEnd?: (event: Event) => void;
+}
+
+export interface RipplePressProps<Event extends RipplePressEvent = RipplePressEvent> {
+  onPressStart(event: Event): void;
+  onPressEnd(event: Event): void;
+}
+
 export interface RippleController {
   readonly containerRef: RefObject<HTMLSpanElement | null>;
   readonly waves: readonly RippleWave[];
   onPressStart(event: RipplePressEvent): void;
   onPressEnd(): void;
+  getPressProps<Event extends RipplePressEvent>(
+    handlers?: RipplePressHandlers<Event>,
+  ): RipplePressProps<Event>;
 }
 
 const fadeOutDurationMs = msNumber(RippleFadeOutDuration);
 const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
+
+export function chainRipplePressHandlers<Event extends RipplePressEvent>(
+  controller: Pick<RippleController, 'onPressStart' | 'onPressEnd'>,
+  handlers: RipplePressHandlers<Event> = {},
+): RipplePressProps<Event> {
+  return {
+    onPressStart(event) {
+      controller.onPressStart(event);
+      handlers.onPressStart?.(event);
+    },
+    onPressEnd(event) {
+      controller.onPressEnd();
+      handlers.onPressEnd?.(event);
+    },
+  };
+}
+
+export function getRippleReleaseDelay(startedAt: number, now: number): number {
+  return Math.max(0, minimumPressDurationMs - (now - startedAt));
+}
+
+export function clearRippleTimers(
+  timers: Set<ReturnType<typeof setTimeout>>,
+): void {
+  for (const timer of timers) clearTimeout(timer);
+  timers.clear();
+}
 
 export function useRipple({
   origin = 'press',
@@ -84,18 +124,29 @@ export function useRipple({
     if (id === null) return;
 
     activeWaveId.current = null;
-    const elapsed = Date.now() - (startedAt.current.get(id) ?? Date.now());
-    const remaining = Math.max(0, minimumPressDurationMs - elapsed);
+    const now = Date.now();
+    const remaining = getRippleReleaseDelay(startedAt.current.get(id) ?? now, now);
     schedule(() => releaseWave(id), remaining);
   }, [releaseWave, schedule]);
 
   useEffect(
     () => () => {
-      for (const timer of timers.current) clearTimeout(timer);
-      timers.current.clear();
+      clearRippleTimers(timers.current);
     },
     [],
   );
 
-  return { containerRef, waves, onPressStart, onPressEnd };
+  const controller: RippleController = {
+    containerRef,
+    waves,
+    onPressStart,
+    onPressEnd,
+    getPressProps<Event extends RipplePressEvent>(
+      handlers?: RipplePressHandlers<Event>,
+    ) {
+      return chainRipplePressHandlers(controller, handlers);
+    },
+  };
+
+  return controller;
 }

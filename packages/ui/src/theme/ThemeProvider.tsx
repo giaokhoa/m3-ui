@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/theme.css';
 import {
   createContext,
   useContext,
@@ -12,7 +13,6 @@ import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
 import { ThemePortalContainerContext } from './ThemePortalContext';
-import { defaultTypographyThemeStyle } from './typography/cssVariables';
 import type { ColorScheme, ThemeMode } from './types';
 
 const defaultFontStylesheet =
@@ -68,12 +68,10 @@ export function ThemeProvider({
 
   const themeStyle = useMemo<ThemeStyle>(
     () => ({
-      ...schemeToCssVariables(scheme),
-      ...defaultTypographyThemeStyle,
-      colorScheme: mode,
+      ...(sourceColor ? schemeToCssVariables(scheme) : {}),
       ...style,
     }),
-    [scheme, mode, style],
+    [sourceColor, scheme, style],
   );
 
   const value = useMemo(
@@ -90,7 +88,7 @@ export function ThemeProvider({
           precedence="m3-font"
           rel="stylesheet"
         />
-        <div {...props} data-theme={mode} style={themeStyle}>
+        <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
         {typeof document === 'undefined'
@@ -98,6 +96,7 @@ export function ThemeProvider({
           : createPortal(
               <div
                 ref={setPortalContainer}
+                data-m3-theme=""
                 data-m3-theme-portal=""
                 data-theme={mode}
                 style={themeStyle}

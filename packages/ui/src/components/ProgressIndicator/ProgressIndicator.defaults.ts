@@ -1,4 +1,5 @@
 import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/progress-indicator.css';
 import type { CSSProperties } from 'react';
 import { pxNumber } from '../../internal/tokenValues';
 
@@ -13,19 +14,9 @@ export interface ProgressIndicatorStyleOptions {
   waveSpeed?: number;
 }
 
-const shapeRadius = {
-  full: token.ShapeFull,
-} as const;
-
-type ShapeName = keyof typeof shapeRadius;
-
+// Numeric canonical geometry stays in TypeScript only where SVG/path arithmetic
+// requires live numbers. Paint, shapes and default CSS sizing are generated.
 export const progressIndicatorTokens = {
-  activeColor: token.ComponentProgressIndicatorBaseActiveIndicatorColor,
-  activeShape: token.ComponentProgressIndicatorBaseActiveShape as ShapeName,
-  stopColor: token.ComponentProgressIndicatorBaseStopColor,
-  stopShape: token.ComponentProgressIndicatorBaseStopShape as ShapeName,
-  trackColor: token.ComponentProgressIndicatorBaseTrackColor,
-  trackShape: token.ComponentProgressIndicatorBaseTrackShape as ShapeName,
   circular: {
     activeThickness: pxNumber(token.ComponentProgressIndicatorCircularActiveThickness),
     waveAmplitude: pxNumber(token.ComponentProgressIndicatorCircularActiveWaveAmplitude),
@@ -51,7 +42,7 @@ export const progressIndicatorTokens = {
   },
 } as const;
 
-// Runtime renderer constants from the pinned implementation references. They are
+// Renderer mechanics from the pinned implementation references. They are
 // intentionally not canonical DTCG tokens.
 export const progressIndicatorRuntime = {
   linearWidth: 240,
@@ -59,7 +50,6 @@ export const progressIndicatorRuntime = {
   webLinearDeterminateDuration: '250ms',
   webLinearDeterminateEasing: 'cubic-bezier(0.4, 0, 0.6, 1)',
   webCircularDeterminateDuration: '500ms',
-  webCircularDeterminateEasing: token.MotionEasingLegacyDecelerate,
   webCircularFourColorDuration: '5332ms',
   webLinearIndeterminateDuration: '2000ms',
   composeLinearIndeterminateDuration: '1750ms',
@@ -70,13 +60,6 @@ export const progressIndicatorRuntime = {
   composeCircularMaxProgress: 0.87,
 } as const;
 
-export const progressIndicatorFourColors = [
-  token.ColorRolePrimary,
-  token.ColorRolePrimaryContainer,
-  token.ColorRoleTertiary,
-  token.ColorRoleTertiaryContainer,
-] as const;
-
 function waveDuration(wavelength: number, waveSpeed: number): string {
   if (wavelength <= 0 || waveSpeed <= 0) return '0s';
   return `${wavelength / waveSpeed}s`;
@@ -84,7 +67,7 @@ function waveDuration(wavelength: number, waveSpeed: number): string {
 
 export function getProgressIndicatorStyle(
   kind: 'linear' | 'circular',
-  wavy: boolean,
+  _wavy: boolean,
   options: ProgressIndicatorStyleOptions = {},
 ): ProgressIndicatorStyle {
   const isIndeterminate = options.isIndeterminate ?? false;
@@ -96,59 +79,33 @@ export function getProgressIndicatorStyle(
       : progressIndicatorTokens.circular.waveWavelength;
   const wavelength = options.wavelength ?? defaultWavelength;
   const speed = options.waveSpeed ?? wavelength;
-
-  return {
-    '--_progress-active-color':
-      options.color ?? progressIndicatorTokens.activeColor,
-    '--_progress-track-color':
-      options.trackColor ?? progressIndicatorTokens.trackColor,
-    '--_progress-stop-color': progressIndicatorTokens.stopColor,
-    '--_progress-active-radius': shapeRadius[progressIndicatorTokens.activeShape],
-    '--_progress-track-radius': shapeRadius[progressIndicatorTokens.trackShape],
-    '--_progress-stop-radius': shapeRadius[progressIndicatorTokens.stopShape],
+  const style: ProgressIndicatorStyle = {
     '--_progress-linear-width': `${progressIndicatorRuntime.linearWidth}px`,
     '--_progress-linear-min-width': `${progressIndicatorRuntime.webLinearMinWidth}px`,
-    '--_progress-linear-height': `${
-      wavy
-        ? progressIndicatorTokens.linear.waveHeight
-        : progressIndicatorTokens.linear.height
-    }px`,
-    '--_progress-linear-active-thickness': `${progressIndicatorTokens.linear.activeThickness}px`,
-    '--_progress-linear-track-thickness': `${progressIndicatorTokens.linear.trackThickness}px`,
-    '--_progress-linear-gap': `${progressIndicatorTokens.linear.trackActiveSpace}px`,
-    '--_progress-linear-stop-size': `${progressIndicatorTokens.linear.stopSize}px`,
-    '--_progress-circular-size': `${
-      wavy
-        ? progressIndicatorTokens.circular.waveSize
-        : progressIndicatorTokens.circular.size
-    }px`,
-    '--_progress-circular-active-thickness': `${progressIndicatorTokens.circular.activeThickness}px`,
-    '--_progress-circular-track-thickness': `${progressIndicatorTokens.circular.trackThickness}px`,
-    '--_progress-circular-gap': `${progressIndicatorTokens.circular.trackActiveSpace}px`,
     '--_progress-wave-wavelength': `${wavelength}px`,
     '--_progress-wave-duration': waveDuration(wavelength, speed),
     '--_progress-determinate-duration':
       kind === 'linear'
         ? progressIndicatorRuntime.webLinearDeterminateDuration
         : progressIndicatorRuntime.webCircularDeterminateDuration,
-    '--_progress-determinate-easing':
-      kind === 'linear'
-        ? progressIndicatorRuntime.webLinearDeterminateEasing
-        : progressIndicatorRuntime.webCircularDeterminateEasing,
     '--_progress-circular-four-color-duration':
       progressIndicatorRuntime.webCircularFourColorDuration,
     '--_progress-linear-indeterminate-duration':
       progressIndicatorRuntime.webLinearIndeterminateDuration,
     '--_progress-circular-duration':
       progressIndicatorRuntime.composeCircularProgressDuration,
-    '--_progress-easing-standard': token.MotionEasingStandard,
-    '--_progress-easing-emphasized-accelerate':
-      token.MotionEasingEmphasizedAccelerate,
-    '--_progress-easing-emphasized-decelerate':
-      token.MotionEasingEmphasizedDecelerate,
-    '--_progress-four-color-1': progressIndicatorFourColors[0],
-    '--_progress-four-color-2': progressIndicatorFourColors[1],
-    '--_progress-four-color-3': progressIndicatorFourColors[2],
-    '--_progress-four-color-4': progressIndicatorFourColors[3],
   };
+
+  if (kind === 'linear') {
+    style['--_progress-determinate-easing'] =
+      progressIndicatorRuntime.webLinearDeterminateEasing;
+  }
+  if (options.color !== undefined) {
+    style['--_progress-active-color'] = options.color;
+  }
+  if (options.trackColor !== undefined) {
+    style['--_progress-track-color'] = options.trackColor;
+  }
+
+  return style;
 }
