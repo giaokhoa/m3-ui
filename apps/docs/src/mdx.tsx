@@ -44,6 +44,7 @@ import {
   DynamicColorPreview,
   TypeScaleSamples,
 } from './foundationDemos';
+import { MaterialSpecTable } from './materialSpecTable';
 import {
   CheckboxPreview,
   RadioButtonPreview,
@@ -273,6 +274,7 @@ export const materialMdxComponents = {
   MaterialParity,
   ParitySummary: MaterialParity,
   ApiReference,
+  MaterialSpecTable,
   ColorRoleGrid,
   DynamicColorPreview,
   TypeScaleSamples,
