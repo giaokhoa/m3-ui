@@ -13,7 +13,6 @@ export {
 } from './WavyProgressIndicator';
 export {
   getProgressIndicatorStyle,
-  progressIndicatorFourColors,
   progressIndicatorRuntime,
   progressIndicatorTokens,
   type ProgressIndicatorStyle,
