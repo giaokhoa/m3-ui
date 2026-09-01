@@ -1,25 +1,19 @@
 ---
 title: Tabs
-description: Primary and secondary Material tab lists with fixed or scrollable presentation and React Aria keyboard semantics.
+description: Primary and secondary Material tab-list surfaces with fixed/scrollable presentation, explicit selection state, and React Aria keyboard semantics.
 ---
 
-<MaterialParity component="tabs" />
+Tabs organize peer destinations or content categories within a shared context. `Tabs` renders the Material tab-list surface; the application owns the selected content, route, or panel relationship unless it composes those semantics separately.
 
-## Overview
-
-`Tabs` renders the Material tab-list surface: primary or secondary tabs, fixed or horizontally scrollable, with optional icons, disabled items, indicator motion, and divider.
-
-The component intentionally does not render tab panels. The selected key is application state; route/content rendering stays outside the visual tab list.
-
-## Live example
+[Material 3 tabs](https://m3.material.io/components/tabs/overview)
 
 <ComponentPreview>
   <TabsPreview />
 </ComponentPreview>
 
-## Items and selection
-
 ```tsx
+import { Tabs } from '@m3-ui/ui';
+
 <Tabs
   aria-label="Project sections"
   defaultSelectedKey="overview"
@@ -31,18 +25,39 @@ The component intentionally does not render tab panels. The selected key is appl
 />
 ```
 
-Use `selectedKey` + `onSelectionChange` for controlled routing or content state. `defaultSelectedKey` is the uncontrolled form.
+## When to use
 
-`iconPlacement="start"` maps the AndroidX leading-icon tab form. The default icon-plus-label arrangement places the icon above the label.
+Use tabs for a small set of peer views that users may switch between without leaving the broader context. Do not use tabs as a substitute for global destination navigation or for unrelated actions.
 
-## Primary and secondary
+## Selection and content ownership
 
-`variant="primary"` is the default and sizes its indicator to the selected tab content. `variant="secondary"` uses the secondary Material tab geometry and selected-item indicator contract.
+Use `selectedKey` with `onSelectionChange` when route/content state is controlled by the application, or `defaultSelectedKey` for uncontrolled tab-list state.
 
-`mode="fixed"` distributes the available row according to the audited Material tokens. `mode="scrollable"` keeps intrinsic tab widths and scrolls the selected tab into view. Smooth scrolling is disabled when `prefers-reduced-motion` requests reduced motion.
+`Tabs` intentionally stops at the tab-list surface. It does not create hidden panels, routes, browser history, or URL state. If the selected key drives routing, keep that mapping in the router/application and connect any panel semantics explicitly.
 
-## Accessibility
+## Primary and secondary variants
 
-React Aria `Tabs`, `TabList`, and `Tab` own tab semantics, roving keyboard focus, disabled state, and automatic keyboard activation. Supply an accessible label for every tab list.
+`variant="primary"` is the primary Material tab family; `variant="secondary"` uses the secondary indicator/geometry contract. Optional icons follow the public Material placement options.
 
-Because this package stops at the tab-list surface, applications must connect selection to their own panel, route, or content semantics rather than assuming hidden panels exist inside `Tabs`.
+`mode="fixed"` distributes the tab row according to the audited Material layout. `mode="scrollable"` keeps intrinsic tab widths and locally scrolls the selected tab into view. Reduced-motion preference disables smooth scrolling without changing selection.
+
+## Behavior and accessibility
+
+React Aria `Tabs`, `TabList`, and `Tab` own tab roles, roving focus, arrow-key behavior, disabled state, and automatic keyboard activation. Every tab list needs an accessible name.
+
+Do not add custom arrow-key handlers or make tabs behave like generic buttons. When panels are composed by the application, preserve the corresponding tab/panel relationship rather than relying only on visual selection.
+
+## API reference
+
+<ApiReference name="Tabs" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="tabs" />
+
+Material supplies primary/secondary hierarchy, indicator geometry, icon/label composition, fixed/scrollable presentation, and motion. React Aria supplies browser tab-list semantics; route/panel rendering remains application-owned.
+
+## Related components
+
+- [Navigation bar](/docs/components/navigation-bar) — global destination navigation.
+- [Segmented buttons](/docs/components/segmented-button) — compact selection controls rather than tab navigation.
