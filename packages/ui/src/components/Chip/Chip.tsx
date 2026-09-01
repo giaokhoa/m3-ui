@@ -9,7 +9,6 @@ import '@m3-ui/tokens/chip.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import {
-  getChipRootStyle,
   getChipStyle,
   type ChipShapeValue,
   type ChipShapes,
@@ -175,10 +174,7 @@ function ActionChipImpl({
       data-has-leading={leadingIcon != null || undefined}
       data-has-trailing={trailingIcon != null || undefined}
       data-variant={variant}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...getChipRootStyle(variant), ...userStyle };
-      }}
+      style={style}
     >
       {(renderProps) => (
         <ChipVisual
@@ -226,14 +222,12 @@ function SelectableChipImpl({
           typeof className === 'function' ? className(renderProps) : className;
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
+      data-expressive-shapes={shapes ? true : undefined}
       data-has-avatar={avatar != null || undefined}
       data-has-leading={leadingIcon != null || undefined}
       data-has-trailing={trailingIcon != null || undefined}
       data-variant={variant}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...getChipRootStyle(variant), ...userStyle };
-      }}
+      style={style}
     >
       {(renderProps) => (
         <ChipVisual
