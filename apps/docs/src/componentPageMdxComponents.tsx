@@ -145,7 +145,8 @@ function FidelitySummary({
   knownGaps?: readonly string[];
 }) {
   const metadata = allComponentDocs[component];
-  const referenceUrl = metadata.referenceUrl ?? metadata.materialUrl;
+  const referenceUrl =
+    'referenceUrl' in metadata ? metadata.referenceUrl : metadata.materialUrl;
 
   return (
     <Surface
