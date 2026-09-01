@@ -22,6 +22,20 @@ async function sourceFiles(directory) {
   return files;
 }
 
+function resolvePackageExport(exportsMap, subpath) {
+  if (Object.hasOwn(exportsMap, subpath)) return exportsMap[subpath];
+
+  for (const [pattern, target] of Object.entries(exportsMap)) {
+    if (!pattern.includes('*') || typeof target !== 'string') continue;
+    const [prefix, suffix] = pattern.split('*');
+    if (!subpath.startsWith(prefix) || !subpath.endsWith(suffix)) continue;
+    const matched = subpath.slice(prefix.length, subpath.length - suffix.length);
+    return target.replace('*', matched);
+  }
+
+  return undefined;
+}
+
 test('handwritten token runtime and upstream-sync layers stay deleted', async () => {
   await assert.rejects(access(new URL('src/', packageRoot)));
   await assert.rejects(access(new URL('scripts/compose-sync/', repoRoot)));
@@ -68,7 +82,7 @@ test('generated CSS outputs and package exports stay internally consistent', asy
   for (const file of config.platforms.css?.files ?? []) {
     const exportName = `./${file.destination}`;
     assert.equal(
-      manifest.exports?.[exportName],
+      resolvePackageExport(manifest.exports ?? {}, exportName),
       `./dist/generated/${file.destination}`,
       `generated CSS ${file.destination} must be exported at ${exportName}`,
     );
@@ -79,20 +93,16 @@ test('UI token CSS subpath imports resolve through package exports', async () =>
   const manifest = JSON.parse(
     await readFile(new URL('package.json', packageRoot), 'utf8'),
   );
-  const exportedSubpaths = new Set(
-    Object.keys(manifest.exports ?? {})
-      .filter((specifier) => specifier.endsWith('.css'))
-      .map((specifier) => `@m3-ui/tokens/${specifier.slice(2)}`),
-  );
 
   for (const file of await sourceFiles(uiSourceRoot)) {
     const source = await readFile(file, 'utf8');
-    const imports = [...source.matchAll(/['"](@m3-ui\/tokens\/[^'"]+\.css)['"]/g)].map(
+    const imports = [...source.matchAll(/['\"](@m3-ui\/tokens\/[^'\"]+\.css)['\"]/g)].map(
       (match) => match[1],
     );
     for (const specifier of imports) {
+      const subpath = `./${specifier.slice('@m3-ui/tokens/'.length)}`;
       assert.ok(
-        exportedSubpaths.has(specifier),
+        resolvePackageExport(manifest.exports ?? {}, subpath),
         `${file.pathname} imports unexported token CSS subpath ${specifier}`,
       );
     }
