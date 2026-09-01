@@ -23,7 +23,7 @@ describe('PaneExpansionStateCache settle restore parity', () => {
     ] as const;
     const animation: PaneExpansionAnimation = ({ signal }) =>
       new Promise<void>((resolve) => {
-        signal.addEventListener('abort', resolve, { once: true });
+        signal.addEventListener('abort', () => resolve(), { once: true });
       });
     const firstKey = getPaneExpansionStateKey(value(true, true, false));
     const secondKey = getPaneExpansionStateKey(value(false, true, true));
