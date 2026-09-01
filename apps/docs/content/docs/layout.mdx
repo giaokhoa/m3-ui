@@ -18,6 +18,53 @@ function Screen() {
 
 `m3-ui` maps Material logical `dp` thresholds to logical CSS pixels on the web. Width classes remain compact `< 600`, medium `>= 600`, expanded `>= 840`, large `>= 1200`, and extra-large `>= 1600`. Height classes remain compact `< 480`, medium `>= 480`, and expanded `>= 900`.
 
+## Adaptive navigation suite
+
+`NavigationSuiteScaffold` is the screen-level Material navigation orchestrator. It uses the same canonical `WindowAdaptiveInfo`; it does not introduce MUI breakpoints, a second media-query scale, or pane-allocation rules.
+
+The default selection is audited against AndroidX Material3 Adaptive Navigation Suite `androidx-main`:
+
+- compact width → `ShortNavigationBarCompact`;
+- otherwise tabletop or compact height → `ShortNavigationBarMedium`;
+- otherwise → `WideNavigationRailCollapsed`.
+
+The compact-width rule intentionally has precedence over tabletop/compact-height. `WideNavigationRailExpanded`, legacy `NavigationBar` / `NavigationRail` / `NavigationDrawer`, and `None` remain semantic explicit overrides rather than additional automatic breakpoints.
+
+```tsx
+import {
+  FloatingActionButton,
+  NavigationSuiteScaffold,
+} from '@m3-ui/ui';
+
+const items = [
+  { selected: true, icon: <HomeIcon />, label: 'Home' },
+  { selected: false, icon: <SearchIcon />, label: 'Search' },
+];
+
+function AppShell() {
+  return (
+    <NavigationSuiteScaffold
+      items={items}
+      primaryAction={
+        <FloatingActionButton aria-label="Create">
+          <AddIcon />
+        </FloatingActionButton>
+      }
+    >
+      <AppContent />
+    </NavigationSuiteScaffold>
+  );
+}
+```
+
+The suite reuses the public `ShortNavigationBar`, `WideNavigationRail`, `NavigationBar`, `NavigationRail`, and navigation-drawer families. It does not own private copies of destination items. `primaryAction` is placed above horizontal navigation and inside vertical navigation headers; `primaryActionAlignment="start" | "center" | "end"` controls logical horizontal placement and defaults to `end` like current AndroidX.
+
+`NavigationSuiteScaffoldState` exposes observable `show()`, `hide()`, `toggle()`, and `snapTo()` behavior without porting Compose coroutine/state internals. `navigationSuiteType` can override the automatic selection when a product intentionally needs a different Material form.
+
+The suite owns navigation-edge geometry only. Bottom navigation removes its occupied bottom edge from nested `Scaffold` safe-area handling; start-side navigation mirrors in RTL and consumes only the logical start edge for nested content. Top/bottom safe areas remain available to screen content while vertical navigation protects its own system-bar edges.
+
+This is separate from `ThreePaneScaffold`. Navigation-suite selection decides which global navigation component frames the screen; pane scaffolds decide how destination content is allocated inside the remaining content area. The suite also does not own router history, destination back stacks, or navigable-pane behavior.
+
 ## Container adaptive info is an opt-in web helper
 
 Reusable web UI can be constrained by a dashboard cell, split view, docs canvas, side panel, or embedded preview even when the browser window is much wider. `useContainerAdaptiveInfo(ref)` observes that local element and classifies its size with the same Material 3 size-class calculator.
