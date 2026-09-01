@@ -33,7 +33,7 @@ RAC onPressStart/onPressEnd
 
 ## Native and special adapters
 
-`RippleController.onPressStart/onPressEnd` remains a narrow adapter surface for hosts that do not have a RAC normalized PressEvent or that must preserve host-owned DOM coordinates/lifecycle. Audited examples are Card, DragHandle, Surface, and the DatePicker calendar-cell DOM adapter.
+`RippleController.onPressStart/onPressEnd` remains a narrow adapter surface for hosts that do not have a RAC normalized PressEvent or that must preserve host-owned DOM coordinates/lifecycle. Audited examples are Card, BottomSheet, DragHandle, Surface, and the DatePicker calendar-cell DOM adapter.
 
 Those hosts keep pointer/keyboard/nested-interactive semantics at the component boundary and only translate an already-owned interaction into Ripple geometry/lifecycle. Shared Ripple must not grow a generic native pointer/keyboard engine or a second interaction state machine.
 
