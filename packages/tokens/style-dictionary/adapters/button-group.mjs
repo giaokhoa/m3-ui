@@ -21,7 +21,7 @@ export function createButtonGroupCss(context) {
     line('--_button-group-menu-item-color', get('component.menu.standard.itemLabelTextColor')),
     line('--_button-group-menu-item-container-color', get('component.menu.standard.itemContainerColor')),
     line('--_button-group-menu-item-disabled-color', get('component.menu.standard.itemDisabledLabelTextColor')),
-    line('--_button-group-menu-item-disabled-opacity', percent(get('component.menu.standard.itemDisabledLabelTextOpacity')),
+    line('--_button-group-menu-item-disabled-opacity', percent(get('component.menu.standard.itemDisabledLabelTextOpacity'))),
     line('--_button-group-menu-item-height', get('component.list.base.itemOneLineContainerHeight')),
     line('--_button-group-menu-item-padding-start', get('component.list.base.itemLeadingSpace')),
     line('--_button-group-menu-item-padding-end', get('component.list.base.itemTrailingSpace')),
