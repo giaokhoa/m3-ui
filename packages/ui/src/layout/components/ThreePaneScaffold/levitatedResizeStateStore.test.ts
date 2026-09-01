@@ -41,7 +41,7 @@ describe('levitated resize state store', () => {
   });
 
   it('ignores the nullable AndroidX no-state representation', () => {
-    const structural: ThreePaneScaffoldValue = {
+    const structural = {
       primary: {
         type: 'levitated',
         alignment: PaneAlignment.Center,
@@ -49,7 +49,7 @@ describe('levitated resize state store', () => {
       },
       secondary: PaneAdaptedValue.Hidden,
       tertiary: PaneAdaptedValue.Hidden,
-    };
+    } as unknown as ThreePaneScaffoldValue;
 
     const states = getLevitatedResizeStates(structural);
     expect(states).toEqual([]);
