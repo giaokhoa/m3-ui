@@ -1,1 +1,21 @@
-{"component":{"slider":{"webCurrent":{"activeStopIndicatorContainerOpacity":{"$type":"number","$value":1},"activeStopIndicatorContainerColor":{"$type":"string","$value":"{color.role.onPrimary}"},"inactiveStopIndicatorContainerOpacity":{"$type":"number","$value":1},"inactiveStopIndicatorContainerColor":{"$type":"string","$value":"{color.role.onSecondaryContainer}"},"disabledActiveStopIndicatorContainerColor":{"$type":"string","$value":"{color.role.inverseOnSurface}"},"disabledInactiveStopIndicatorContainerColor":{"$type":"string","$value":"{color.role.onSurface}"},"activeTrackInnerCornerCornerSize":{"$type":"string","$value":"0 2px 2px 0"},"activeTrackOuterCornerCornerSize":{"$type":"string","$value":"full"},"stopIndicatorColor":{"$type":"string","$value":"{color.role.onSecondaryContainer}"},"stopIndicatorColorSelected":{"$type":"string","$value":"{color.role.onPrimary}"},"stopIndicatorTrailingSpace":{"$type":"dimension","$value":{"value":4,"unit":"px"}},"valueIndicatorLabelTextTracking":{"$type":"dimension","$value":"{typography.bodyLarge.letterSpacing}"},"valueIndicatorLabelTextWeight":{"$type":"number","$value":"{typography.bodyLarge.fontWeight}"}}}}}
+{
+  "component": {
+    "slider": {
+      "webCurrent": {
+        "activeStopIndicatorContainerOpacity": { "$type": "number", "$value": 1 },
+        "activeStopIndicatorContainerColor": { "$type": "string", "$value": "{color.role.onPrimary}" },
+        "inactiveStopIndicatorContainerOpacity": { "$type": "number", "$value": 1 },
+        "inactiveStopIndicatorContainerColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+        "disabledActiveStopIndicatorContainerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
+        "disabledInactiveStopIndicatorContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "activeTrackInnerCornerCornerSize": { "$type": "string", "$value": "0 2px 2px 0" },
+        "activeTrackOuterCornerCornerSize": { "$type": "string", "$value": "full" },
+        "stopIndicatorColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+        "stopIndicatorColorSelected": { "$type": "string", "$value": "{color.role.onPrimary}" },
+        "stopIndicatorTrailingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "valueIndicatorLabelTextTracking": { "$type": "dimension", "$value": "{typography.bodyLarge.letterSpacing}" },
+        "valueIndicatorLabelTextWeight": { "$type": "number", "$value": "{typography.bodyLarge.fontWeight}" }
+      }
+    }
+  }
+}
