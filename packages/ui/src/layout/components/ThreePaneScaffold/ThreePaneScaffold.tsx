@@ -822,7 +822,7 @@ export function ThreePaneScaffold({
     event: ReactPointerEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (!event.isPrimary || event.button !== 0 || transitionActive) return;
+    if (!event.isPrimary || event.button !== 0) return;
     resizePointerDragRef.current = {
       pointerId: event.pointerId,
       state,
@@ -886,7 +886,7 @@ export function ThreePaneScaffold({
     event: ReactKeyboardEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (transitionActive || (event.key !== 'Enter' && event.key !== ' ')) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     state.moveToNextState();
   };
@@ -895,7 +895,7 @@ export function ThreePaneScaffold({
     event: ReactMouseEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (transitionActive || event.detail !== 0) return;
+    if (event.detail !== 0) return;
     event.preventDefault();
     state.moveToNextState();
   };
@@ -1013,10 +1013,8 @@ export function ThreePaneScaffold({
               : typeof resizeHandleSpec === 'function'
                 ? resizeHandleSpec(paneResizeState)
                 : resizeHandleSpec;
-          const hasResizeHandle =
-            !transitionActive && paneResizeState !== undefined && resizeHandle != null;
-          const hasPaneResizeAction =
-            !transitionActive && paneResizeState !== undefined && !hasResizeHandle;
+          const hasResizeHandle = paneResizeState !== undefined && resizeHandle != null;
+          const hasPaneResizeAction = paneResizeState !== undefined && !hasResizeHandle;
           const paneResizeHandlers =
             hasPaneResizeAction && paneResizeState !== undefined
               ? {
