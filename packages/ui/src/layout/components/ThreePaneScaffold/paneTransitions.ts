@@ -62,12 +62,11 @@ export interface PaneVisibilityTransitionSpec {
 /**
  * Web-native equivalent of AnimatedPane.boundsAnimationSpec.
  * Providing this object replaces the Material bounds spring with direct bounds
- * interpolation; `easing` controls the interpolation fraction.
- *
- * Like AndroidX AnimateBounds, this private bounds animation does not extend the
- * shared scaffold visibility timeline.
+ * interpolation; `durationMs` gives web callers an explicit animation clock for
+ * bounds-only changes that would otherwise have no AnimatedVisibility child.
  */
 export interface PaneBoundsTransitionSpec {
+  durationMs: number;
   easing?: PaneTransitionEasing;
 }
 
@@ -111,15 +110,6 @@ function visibilityKind(
   if (currentHidden && !targetHidden) return 'enter';
   if (!currentHidden && targetHidden) return 'exit';
   return undefined;
-}
-
-function visibilitySpec(
-  layout: ThreePaneScaffoldTransitionLayoutOptions,
-  specs: PaneTransitionSpecs | undefined,
-  role: ThreePaneScaffoldRole,
-) {
-  const kind = visibilityKind(layout, role);
-  return kind === undefined ? undefined : specs?.[role]?.[kind];
 }
 
 function validateDuration(durationMs: number) {
@@ -222,18 +212,26 @@ export function calculateThreePaneScaffoldTransitionDurationWithSpecs(
 
   for (const role of roles) {
     const kind = visibilityKind(layout, role);
-    if (kind === undefined) continue;
-    visibilityChanges += 1;
-    const spec = specs?.[role]?.[kind];
-    if (spec === undefined) continue;
-    customizedVisibilityChanges += 1;
-    customDurationMs = Math.max(customDurationMs, validateDuration(spec.durationMs));
+    if (kind !== undefined) {
+      visibilityChanges += 1;
+      const spec = specs?.[role]?.[kind];
+      if (spec !== undefined) {
+        customizedVisibilityChanges += 1;
+        customDurationMs = Math.max(customDurationMs, validateDuration(spec.durationMs));
 
-    const motion = end[role]?.motion ?? start[role]?.motion;
-    if (isModalMotion(motion) && (start.scrim !== undefined || end.scrim !== undefined)) {
-      // AnimatedPane customization does not own the scaffold scrim. Keep the
-      // Material scrim child on the shared timeline when a modal has a scrim.
-      retainMaterialTimeline = true;
+        const motion = end[role]?.motion ?? start[role]?.motion;
+        if (isModalMotion(motion) && (start.scrim !== undefined || end.scrim !== undefined)) {
+          // AnimatedPane customization does not own the scaffold scrim. Keep the
+          // Material scrim child on the shared timeline when a modal has a scrim.
+          retainMaterialTimeline = true;
+        }
+      }
+    }
+
+    const bounds = specs?.[role]?.bounds;
+    const paneMotion = end[role]?.motion ?? start[role]?.motion;
+    if (bounds !== undefined && paneMotion === PaneMotion.AnimateBounds) {
+      customDurationMs = Math.max(customDurationMs, validateDuration(bounds.durationMs));
     }
   }
 
@@ -323,7 +321,10 @@ export function calculateThreePaneScaffoldTransitionFrameWithSpecs(
     const startPane = start[role];
     const endPane = end[role];
     if (startPane === undefined || endPane === undefined) continue;
-    const easedProgress = sampleEasing(boundsSpec.easing, clampUnit(progressFraction));
+    const boundsDurationMs = validateDuration(boundsSpec.durationMs);
+    const localProgress =
+      boundsDurationMs <= 0 ? 1 : clampUnit(playTimeMs / boundsDurationMs);
+    const easedProgress = sampleEasing(boundsSpec.easing, localProgress);
     result[role] = {
       ...materialPane,
       placement: interpolatePlacement(
