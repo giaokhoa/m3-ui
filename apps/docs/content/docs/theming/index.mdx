@@ -1,57 +1,94 @@
 ---
 title: Theming
-description: Material 3 color, typography, ripple focus, and portal propagation through ThemeProvider.
+description: Material 3 schemes and foundation roles projected into applications through ThemeProvider.
 ---
 
-## ThemeProvider
+## Material theming
 
-`ThemeProvider` is the runtime boundary that projects the implemented Material foundations into a React subtree. It owns the active light or dark `ColorScheme`, theme CSS variables, typeface variables, ripple focus configuration, and a theme-aware portal container.
+Material 3 theming coordinates foundations rather than styling each component in isolation. Color supplies semantic roles such as primary and surface, typography supplies named text roles, shape supplies reusable corner families, and component tokens map those foundation roles into the visuals of a specific component.
+
+`m3-ui` keeps the same separation. Components consume canonical tokens and semantic roles; applications choose the active runtime theme through `ThemeProvider` instead of copying component constants into app CSS.
+
+- [Material 3 color](https://m3.material.io/styles/color/overview)
+- [Color](/docs/foundations/color) covers baseline schemes, semantic roles, dynamic color, and contrast.
+- [Typography](/docs/foundations/typography) covers the Material type scale and typeface roles.
+- Shape, motion, and elevation remain canonical component/foundation data, but they are not currently global mutable `ThemeProvider` inputs.
+
+## ThemeProvider as the application theme boundary
+
+`ThemeProvider` projects the current Material runtime values into a React subtree. It owns the resolved light or dark color scheme, optional dynamic source color, contrast input for dynamic schemes, global ripple focus treatment, scoped theme CSS variables, default Material typeface variables, and a matching theme scope for portaled surfaces.
 
 ```tsx
 import { ThemeProvider } from '@m3-ui/ui';
 
-<ThemeProvider mode="light">
+export function AppRoot() {
+  return (
+    <ThemeProvider mode="light">
+      <App />
+    </ThemeProvider>
+  );
+}
+```
+
+The provider renders a normal themed wrapper marked with `data-m3-theme` and `data-theme`. Generated theme CSS supplies the baseline Material variables for that scope. Runtime dynamic color values and explicit `style` overrides are written after those baseline declarations.
+
+## Public theme inputs
+
+| Prop | Contract | Default |
+| --- | --- | --- |
+| `mode` | Resolved Material scheme mode: `light | dark` | `light` |
+| `sourceColor` | Optional source color for runtime Material dynamic color generation | baseline scheme |
+| `contrastLevel` | Dynamic-scheme contrast input from `-1` through `1` | `0` |
+| `rippleFocus` | Global Material ripple focus treatment: `opacity | inset-ring` | `opacity` |
+| `style` | CSS and custom-property overrides applied after generated/runtime theme values | — |
+
+Normal `div` attributes such as `className`, `id`, and data attributes are forwarded to the provider wrapper.
+
+## Baseline schemes
+
+When `sourceColor` is omitted, `ThemeProvider` uses the generated Material baseline light or dark scheme selected by `mode`.
+
+```tsx
+<ThemeProvider mode="dark">
   <App />
 </ThemeProvider>
 ```
 
-## Props
+The baseline role values come from the canonical token graph. `ThemeProvider` does not rebuild a second handwritten palette at runtime.
 
-| Prop | Contract | Default |
-| --- | --- | --- |
-| `mode` | `light | dark` Material color mode | `light` |
-| `sourceColor` | Optional color used to derive a dynamic `SchemeTonalSpot` scheme | baseline scheme |
-| `contrastLevel` | Material dynamic-color contrast level from `-1` to `1` | `0` |
-| `rippleFocus` | `opacity | inset-ring` global Material ripple focus treatment | `opacity` |
-| `style` | CSS and custom-property overrides applied after generated theme values | — |
+## Dynamic color and contrast
 
-Normal `div` attributes such as `className` are also forwarded to the themed wrapper.
-
-## Baseline and dynamic schemes
-
-Without `sourceColor`, the provider resolves the baseline Material scheme for the selected mode. With a source color, it generates the complete Material color role set through Material Color Utilities.
+When `sourceColor` is present, `m3-ui` converts that color to HCT and creates a Material Color Utilities `SchemeTonalSpot` scheme. The generated role set replaces the baseline color-role variables within the provider scope.
 
 ```tsx
 <ThemeProvider
   mode="dark"
   sourceColor="#0061a4"
-  contrastLevel={0}
+  contrastLevel={0.5}
 >
   <App />
 </ThemeProvider>
 ```
 
-See [Color](/docs/foundations/color) for the semantic roles and dynamic-color preview.
+`contrastLevel` accepts values from `-1` through `1`; values outside that range throw. It is an input to runtime dynamic scheme generation, so changing `contrastLevel` without a `sourceColor` does not alter the baseline scheme.
 
-## Typography
+Dynamic color changes semantic roles, not component token definitions. A button that resolves its container through the primary role continues to reference the same component token; only the concrete primary color changes inside the active theme.
 
-The same wrapper installs the theme typeface variables consumed by the public Material type-scale helpers and components. See [Typography](/docs/foundations/typography) for the standard and M3 Expressive emphasized roles.
+See [Color](/docs/foundations/color) for the role model and dynamic-color details.
 
-## System preference belongs to the app
+## Typography and shape ownership
 
-`ThemeMode` intentionally contains only `light | dark`. A browser application can resolve `prefers-color-scheme`, persistence, or a user preference and then pass the resolved Material mode into `ThemeProvider`.
+Material theming includes typography and shape as foundations, but their runtime ownership is not identical in the current package.
 
-The docs application follows exactly that pattern: its local `DocsThemeProvider` owns `system | light | dark`, listens to `prefers-color-scheme`, persists the preference, and passes only the resolved `light | dark` value to the public provider.
+`ThemeProvider` installs the generated Material typeface variables used by the public type scale and by components. The actual type-scale values remain canonical generated data rather than provider props.
+
+Shape tokens are likewise part of the Material foundation/component-token system, but there is no global `ThemeProvider shapes={...}` contract today. Customize shape only through public component APIs or documented semantic/theme variables where such an override is intentionally exposed; do not copy internal component constants into application code.
+
+## `system` preference belongs to the application
+
+The public `ThemeMode` type is intentionally only `light | dark`. `system` is a preference policy, not a third Material color scheme.
+
+Applications can own browser or operating-system preference resolution, persistence, and user controls, then pass the resolved mode into `ThemeProvider`.
 
 ```tsx
 const resolvedMode =
@@ -62,17 +99,19 @@ const resolvedMode =
 </ThemeProvider>
 ```
 
-This keeps operating-system policy out of the Material theme contract.
+The documentation application uses this pattern in its own `DocsThemeProvider`: docs state may be `system | light | dark`, but only the resolved `light | dark` value crosses into the public `@m3-ui/ui` provider. That docs-only preference state is not part of the core theme API.
 
 ## Theme-aware portals
 
-The provider creates a themed portal container in `document.body` with the same generated style and `data-theme` value as the local wrapper. Components that need portals can obtain this container through the library theme context.
+Material overlays often render outside the normal DOM subtree. `ThemeProvider` therefore creates a second themed container under `document.body` and exposes it internally as the portal target for theme-aware components.
 
-That is why dialogs and other portaled Material surfaces retain the same color and typography variables instead of falling out of the theme when their DOM is moved under `body`.
+The normal provider wrapper and portal container receive the same `data-m3-theme`, `data-theme`, dynamic color variables, and `style` override object. Dialogs, menus, sheets, tooltips, and other library surfaces rendered through that container therefore resolve the same theme roles as nearby non-portaled content.
+
+A `className` passed to `ThemeProvider` belongs to the normal wrapper only. If a theme override must also reach library portals, put the semantic custom-property override in the provider `style` object rather than relying on a wrapper-only class selector.
 
 ## Ripple focus treatment
 
-`rippleFocus="opacity"` matches the default AndroidX ripple-theme configuration. `inset-ring` selects the library mapping of AndroidX's inset focus-ring configuration while leaving browser focus semantics with the underlying interactive component.
+`rippleFocus` selects the global Material ripple focus presentation while leaving focus semantics with the underlying web control.
 
 ```tsx
 <ThemeProvider rippleFocus="inset-ring">
@@ -80,14 +119,47 @@ That is why dialogs and other portaled Material surfaces retain the same color a
 </ThemeProvider>
 ```
 
-## Style overrides
+`opacity` is the default Material ripple-theme mapping. `inset-ring` selects the library mapping of AndroidX's inset focus-ring configuration. This changes visual indication; it does not replace browser focus behavior or accessible interaction semantics.
 
-`style` is applied after the generated color and typography variables. This makes controlled application-level overrides possible without changing the canonical token graph.
+## Safe theme customization
 
-Prefer semantic custom-property overrides over component-specific hardcoded colors when the intention is genuinely theme-wide.
+Prefer semantic customization at the theme boundary. Public CSS custom properties let application styling change a role while components continue to consume their canonical token mapping.
 
-## Current foundation boundary
+```tsx
+<ThemeProvider
+  style={{
+    '--primary': '#315da8',
+    '--on-primary': '#ffffff',
+  }}
+>
+  <App />
+</ThemeProvider>
+```
 
-The reusable public theme contract currently covers color schemes, typography/typeface projection, ripple focus configuration, and portal propagation. Shape, motion, and elevation are not documented here as global theme APIs until equivalent reusable runtime contracts are implemented and audited.
+Those values are application overrides, not canonical Material token values. When replacing semantic colors manually, the application is responsible for maintaining appropriate contrast and coherent related roles.
 
-Adaptive layout is a separate subsystem and is not selected or configured by `ThemeProvider`.
+For larger color-system changes, prefer `sourceColor` and Material dynamic scheme generation over overriding a long list of roles by hand. For local component variation, prefer that component's documented public props before reaching for theme-wide variables.
+
+Avoid copying internal selectors, private token names, measured dimensions, or component implementation constants into application styles. Those are implementation details rather than a stable theming API.
+
+## Runtime data for JavaScript consumers
+
+`useTheme()` exposes the resolved runtime theme to code that genuinely needs JavaScript access:
+
+```ts
+interface ThemeContextValue {
+  mode: 'light' | 'dark';
+  sourceColor?: string;
+  contrastLevel: number;
+  rippleFocus: 'opacity' | 'inset-ring';
+  scheme: ColorScheme;
+}
+```
+
+Normal component styling should still prefer semantic CSS roles and the cascade. The React context is for runtime logic that cannot be expressed through CSS alone.
+
+## Current boundary
+
+`ThemeProvider` currently owns runtime color scheme selection/generation, generated theme projection, typeface application, ripple focus configuration, and theme-aware portal propagation.
+
+It does not own application preference persistence, a `system` mode, adaptive layout policy, or global mutable shape/motion/elevation objects. Those concerns remain with the application or their respective public foundation/component APIs until a dedicated runtime contract exists.
