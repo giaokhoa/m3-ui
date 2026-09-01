@@ -1,3 +1,4 @@
+import { hasReactNodeContent } from '../reactNode';
 import { customLevitatedPaneAlignmentsEqual } from './levitatedPaneAlignment';
 import { paneScaffoldRolesEqual } from './paneScaffoldRole';
 import type {
@@ -147,9 +148,12 @@ function paneAdaptedValuesEqual(a: PaneAdaptedValue, b: PaneAdaptedValue): boole
     return paneScaffoldRolesEqual(a.reflowUnder, b.reflowUnder);
   }
   if (a.type === 'levitated' && b.type === 'levitated') {
+    const aHasScrim = hasReactNodeContent(a.scrim);
+    const bHasScrim = hasReactNodeContent(b.scrim);
     return (
       levitatedPaneAlignmentsEqual(a.alignment, b.alignment) &&
-      a.scrim === b.scrim &&
+      aHasScrim === bHasScrim &&
+      (!aHasScrim || a.scrim === b.scrim) &&
       a.dragToResizeState === b.dragToResizeState
     );
   }
