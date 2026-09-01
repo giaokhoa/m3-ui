@@ -1,5 +1,5 @@
 {
   "title": "Foundations",
   "defaultOpen": true,
-  "pages": ["index", "color", "typography", "shape"]
+  "pages": ["index", "color", "typography", "shape", "motion"]
 }
