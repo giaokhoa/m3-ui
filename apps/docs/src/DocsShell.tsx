@@ -13,7 +13,10 @@ import {
   IconButton,
   ModalDrawerSheet,
   ModalNavigationDrawer,
+  NavigationDrawerButton,
   NavigationDrawerLink,
+  NavigationRail,
+  NavigationRailLink,
   PermanentDrawerSheet,
   PermanentNavigationDrawer,
   TopAppBar,
@@ -53,6 +56,7 @@ interface DocsNavSeparator {
 }
 
 type DocsNavNode = DocsNavPage | DocsNavFolder | DocsNavSeparator;
+type DocsNavDestinationNode = DocsNavPage | DocsNavFolder;
 
 interface DocsNavigation {
   name: string;
@@ -62,6 +66,13 @@ interface DocsNavigation {
 interface DocsTrailItem {
   name: string;
   url?: string;
+}
+
+interface TopLevelDestination {
+  key: string;
+  name: string;
+  node: DocsNavDestinationNode;
+  page: DocsNavPage;
 }
 
 export interface DocsShellProps {
@@ -90,6 +101,38 @@ function CloseGlyph() {
   return (
     <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
       <path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function BackGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function HomeGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="m12 3 9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FolderGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="M3 5h7l2 2h9v12H3V5Zm2 4v8h14V9H5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PageGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="M6 2h8l4 4v16H6V2Zm2 2v16h8V8h-4V4H8Zm6 .83V6h1.17L14 4.83Z" fill="currentColor" />
     </svg>
   );
 }
@@ -148,6 +191,35 @@ function uniquePages(nodes: readonly DocsNavNode[]): DocsNavPage[] {
     seen.add(path);
     return true;
   });
+}
+
+function destinationPage(node: DocsNavDestinationNode): DocsNavPage | undefined {
+  if (node.type === 'page') return node;
+  return node.index ?? flattenPages(node.children)[0];
+}
+
+function getTopLevelDestinations(nodes: readonly DocsNavNode[]): TopLevelDestination[] {
+  const destinations: TopLevelDestination[] = [];
+  nodes.forEach((node, index) => {
+    if (node.type === 'separator') return;
+    const page = destinationPage(node);
+    if (!page) return;
+    destinations.push({
+      key: `${node.type}-${normalizePath(page.url)}-${index}`,
+      name: normalizePath(page.url) === '/docs' ? 'Home' : node.name,
+      node,
+      page,
+    });
+  });
+  return destinations;
+}
+
+const topLevelDestinations = getTopLevelDestinations(docsNavigation.children);
+
+function findActiveDestination(currentPath: string): TopLevelDestination | undefined {
+  return topLevelDestinations.find((destination) =>
+    nodeContainsPath(destination.node, currentPath),
+  );
 }
 
 function findTrail(
@@ -318,41 +390,201 @@ function NavNodes({
   );
 }
 
-function DocsSidebar({
+function SidebarHeader({
+  subtitle,
+  onClose,
+  onNavigate,
+}: {
+  subtitle: string;
+  onClose?: () => void;
+  onNavigate?: () => void;
+}) {
+  return (
+    <div className="docs-sidebar__header">
+      <Link className="docs-sidebar__brand" href="/docs" onClick={onNavigate}>
+        <span style={getMaterialTypeCssProperties('titleLarge')}>m3-ui</span>
+        <span
+          className="docs-sidebar__brand-subtitle"
+          style={getMaterialTypeCssProperties('bodyMedium')}
+        >
+          {subtitle}
+        </span>
+      </Link>
+      {onClose ? (
+        <IconButton aria-label="Close navigation" onPress={onClose}>
+          <CloseGlyph />
+        </IconButton>
+      ) : null}
+    </div>
+  );
+}
+
+function ContextualNavigation({
+  section,
   currentPath,
   onNavigate,
-  onClose,
 }: {
+  section: DocsNavFolder;
   currentPath: string;
   onNavigate?: () => void;
-  onClose?: () => void;
+}) {
+  return (
+    <>
+      {section.index ? (
+        <NavLink
+          currentPath={currentPath}
+          onNavigate={onNavigate}
+          overview
+          page={section.index}
+        />
+      ) : null}
+      <NavNodes
+        currentPath={currentPath}
+        nodes={section.children}
+        onNavigate={onNavigate}
+      />
+    </>
+  );
+}
+
+function MainMenu({
+  activeDestination,
+  currentPath,
+  onNavigate,
+  onOpenSection,
+}: {
+  activeDestination?: TopLevelDestination;
+  currentPath: string;
+  onNavigate: () => void;
+  onOpenSection: (destination: TopLevelDestination) => void;
+}) {
+  return (
+    <>
+      {topLevelDestinations.map((destination) => {
+        if (destination.node.type === 'folder') {
+          return (
+            <NavigationDrawerButton
+              aria-label={`Open ${destination.name} navigation`}
+              key={destination.key}
+              onPress={() => onOpenSection(destination)}
+              selected={activeDestination?.key === destination.key}
+            >
+              {destination.name}
+            </NavigationDrawerButton>
+          );
+        }
+
+        return (
+          <NavigationDrawerLink
+            href={destination.page.url}
+            key={destination.key}
+            onPress={onNavigate}
+            selected={normalizePath(destination.page.url) === currentPath}
+          >
+            {destination.name}
+          </NavigationDrawerLink>
+        );
+      })}
+    </>
+  );
+}
+
+function ModalSidebar({
+  activeDestination,
+  currentPath,
+  sectionDestination,
+  onBack,
+  onClose,
+  onNavigate,
+  onOpenSection,
+}: {
+  activeDestination?: TopLevelDestination;
+  currentPath: string;
+  sectionDestination?: TopLevelDestination;
+  onBack: () => void;
+  onClose: () => void;
+  onNavigate: () => void;
+  onOpenSection: (destination: TopLevelDestination) => void;
+}) {
+  const section =
+    sectionDestination?.node.type === 'folder' ? sectionDestination.node : undefined;
+
+  return (
+    <div className="docs-sidebar__content">
+      <SidebarHeader
+        onClose={onClose}
+        onNavigate={onNavigate}
+        subtitle={section ? section.name : 'Documentation'}
+      />
+      <nav aria-label="Documentation" className="docs-nav">
+        {section ? (
+          <>
+            <NavigationDrawerButton icon={<BackGlyph />} onPress={onBack}>
+              Main menu
+            </NavigationDrawerButton>
+            <ContextualNavigation
+              currentPath={currentPath}
+              onNavigate={onNavigate}
+              section={section}
+            />
+          </>
+        ) : (
+          <MainMenu
+            activeDestination={activeDestination}
+            currentPath={currentPath}
+            onNavigate={onNavigate}
+            onOpenSection={onOpenSection}
+          />
+        )}
+      </nav>
+    </div>
+  );
+}
+
+function PersistentSidebar({
+  section,
+  currentPath,
+}: {
+  section: DocsNavFolder;
+  currentPath: string;
 }) {
   return (
     <div className="docs-sidebar__content">
-      <div className="docs-sidebar__header">
-        <Link className="docs-sidebar__brand" href="/docs" onClick={onNavigate}>
-          <span style={getMaterialTypeCssProperties('titleLarge')}>m3-ui</span>
-          <span
-            className="docs-sidebar__brand-subtitle"
-            style={getMaterialTypeCssProperties('bodyMedium')}
-          >
-            Documentation
-          </span>
-        </Link>
-        {onClose ? (
-          <IconButton aria-label="Close navigation" onPress={onClose}>
-            <CloseGlyph />
-          </IconButton>
-        ) : null}
-      </div>
-      <nav aria-label="Documentation" className="docs-nav">
-        <NavNodes
-          currentPath={currentPath}
-          nodes={docsNavigation.children}
-          onNavigate={onNavigate}
-        />
+      <SidebarHeader subtitle={section.name} />
+      <nav aria-label={`${section.name} navigation`} className="docs-nav">
+        <ContextualNavigation currentPath={currentPath} section={section} />
       </nav>
     </div>
+  );
+}
+
+function DestinationIcon({ destination }: { destination: TopLevelDestination }) {
+  if (normalizePath(destination.page.url) === '/docs') return <HomeGlyph />;
+  if (destination.node.type === 'folder') return <FolderGlyph />;
+  return <PageGlyph />;
+}
+
+function GlobalNavigationRail({
+  activeDestination,
+}: {
+  activeDestination?: TopLevelDestination;
+}) {
+  return (
+    <NavigationRail
+      aria-label="Documentation sections"
+      className="docs-global-rail"
+      itemSemantics="links"
+    >
+      {topLevelDestinations.map((destination) => (
+        <NavigationRailLink
+          href={destination.page.url}
+          icon={<DestinationIcon destination={destination} />}
+          key={destination.key}
+          label={destination.name}
+          selected={activeDestination?.key === destination.key}
+        />
+      ))}
+    </NavigationRail>
   );
 }
 
@@ -364,7 +596,9 @@ function Breadcrumbs({ currentPath }: { currentPath: string }) {
   return (
     <nav aria-label="Breadcrumb" className="docs-breadcrumbs">
       <ol>
-        <li><Link href="/docs" style={typeStyle}>Docs</Link></li>
+        <li>
+          <Link href="/docs" style={typeStyle}>Docs</Link>
+        </li>
         {trail.map((item, index) => {
           const current = index === trail.length - 1;
           return (
@@ -508,24 +742,52 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
   const { windowSizeClass } = useWindowAdaptiveInfo();
   const currentPath = normalizePath(usePathname());
   const widthClass = windowSizeClass.width;
-  const permanentSidebar =
+  const showRail =
     widthClass === 'expanded' ||
     widthClass === 'large' ||
     widthClass === 'extra-large';
-  const showToc = widthClass === 'large' || widthClass === 'extra-large';
+  const persistentContext =
+    widthClass === 'large' || widthClass === 'extra-large';
+  const showToc = widthClass === 'extra-large';
+  const activeDestination = findActiveDestination(currentPath);
+  const activeSection =
+    activeDestination?.node.type === 'folder' ? activeDestination.node : undefined;
+  const [modalSectionKey, setModalSectionKey] = useState<string | null>(
+    activeSection ? activeDestination?.key ?? null : null,
+  );
+  const modalSectionDestination = topLevelDestinations.find(
+    (destination) => destination.key === modalSectionKey,
+  );
+  const hasPersistentContext = Boolean(persistentContext && activeSection);
 
   useEffect(() => {
-    if (permanentSidebar) drawerState.close();
-  }, [drawerState, permanentSidebar]);
+    if (activeSection && activeDestination) {
+      setModalSectionKey(activeDestination.key);
+    } else {
+      setModalSectionKey(null);
+    }
+  }, [activeDestination, activeSection, currentPath]);
+
+  useEffect(() => {
+    if (hasPersistentContext) drawerState.close();
+  }, [drawerState, hasPersistentContext]);
+
+  const closeNavigation = () => drawerState.close();
+  const openNavigation = () => {
+    setModalSectionKey(activeSection && activeDestination ? activeDestination.key : null);
+    drawerState.open();
+  };
+
+  const showNavigationAction = !showRail || (widthClass === 'expanded' && activeSection);
 
   const appBar = (
     <TopAppBar
       navigationIcon={
-        permanentSidebar ? undefined : (
-          <IconButton aria-label="Open navigation" onPress={() => drawerState.open()}>
+        showNavigationAction ? (
+          <IconButton aria-label="Open navigation" onPress={openNavigation}>
             <MenuGlyph />
           </IconButton>
-        )
+        ) : undefined
       }
       title={<Link className="docs-app-bar__brand" href="/docs">m3-ui</Link>}
       actions={
@@ -554,6 +816,45 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
     </Workspace>
   );
 
+  const navigationStage = hasPersistentContext && activeSection ? (
+    <PermanentNavigationDrawer
+      className="docs-permanent-drawer"
+      drawerContent={
+        <PermanentDrawerSheet
+          aria-label={`${activeSection.name} navigation`}
+          className="docs-sidebar"
+        >
+          <PersistentSidebar currentPath={currentPath} section={activeSection} />
+        </PermanentDrawerSheet>
+      }
+    >
+      {workspace}
+    </PermanentNavigationDrawer>
+  ) : (
+    <ModalNavigationDrawer
+      className="docs-modal-drawer"
+      drawerContent={
+        <ModalDrawerSheet
+          aria-label="Documentation navigation"
+          className="docs-sidebar"
+        >
+          <ModalSidebar
+            activeDestination={activeDestination}
+            currentPath={currentPath}
+            onBack={() => setModalSectionKey(null)}
+            onClose={closeNavigation}
+            onNavigate={closeNavigation}
+            onOpenSection={(destination) => setModalSectionKey(destination.key)}
+            sectionDestination={modalSectionDestination}
+          />
+        </ModalDrawerSheet>
+      }
+      state={drawerState}
+    >
+      {workspace}
+    </ModalNavigationDrawer>
+  );
+
   return (
     <Scaffold className="docs-scaffold" topBar={appBar}>
       {(innerPadding) => (
@@ -566,39 +867,13 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
             paddingInlineEnd: innerPadding.end,
           }}
         >
-          {permanentSidebar ? (
-            <PermanentNavigationDrawer
-              className="docs-permanent-drawer"
-              drawerContent={
-                <PermanentDrawerSheet
-                  aria-label="Documentation navigation"
-                  className="docs-sidebar"
-                >
-                  <DocsSidebar currentPath={currentPath} />
-                </PermanentDrawerSheet>
-              }
-            >
-              {workspace}
-            </PermanentNavigationDrawer>
+          {showRail ? (
+            <div className="docs-multi-pane">
+              <GlobalNavigationRail activeDestination={activeDestination} />
+              <div className="docs-navigation-stage">{navigationStage}</div>
+            </div>
           ) : (
-            <ModalNavigationDrawer
-              className="docs-modal-drawer"
-              drawerContent={
-                <ModalDrawerSheet
-                  aria-label="Documentation navigation"
-                  className="docs-sidebar"
-                >
-                  <DocsSidebar
-                    currentPath={currentPath}
-                    onClose={() => drawerState.close()}
-                    onNavigate={() => drawerState.close()}
-                  />
-                </ModalDrawerSheet>
-              }
-              state={drawerState}
-            >
-              {workspace}
-            </ModalNavigationDrawer>
+            navigationStage
           )}
         </div>
       )}
