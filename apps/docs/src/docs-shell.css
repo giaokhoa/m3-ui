@@ -62,11 +62,6 @@
   padding-inline: 16px;
   border-radius: 999px;
   color: var(--on-surface-variant);
-  font-family: var(--md-sys-typescale-label-large-font-family, inherit);
-  font-size: var(--md-sys-typescale-label-large-font-size, 0.875rem);
-  font-weight: var(--md-sys-typescale-label-large-font-weight, 500);
-  line-height: var(--md-sys-typescale-label-large-line-height, 1.25rem);
-  letter-spacing: var(--md-sys-typescale-label-large-letter-spacing, 0.00625rem);
   text-decoration: none;
 }
 
@@ -112,7 +107,6 @@
   margin-inline-start: auto;
   color: var(--on-surface-variant);
   transform: rotate(90deg);
-  transition: transform 150ms ease;
 }
 
 .docs-nav__folder:not([open]) > .docs-nav__folder-summary::after {
@@ -188,11 +182,6 @@
 .docs-breadcrumbs a,
 .docs-breadcrumbs span {
   color: inherit;
-  font-family: var(--md-sys-typescale-label-medium-font-family, inherit);
-  font-size: var(--md-sys-typescale-label-medium-font-size, 0.75rem);
-  font-weight: var(--md-sys-typescale-label-medium-font-weight, 500);
-  line-height: var(--md-sys-typescale-label-medium-line-height, 1rem);
-  letter-spacing: var(--md-sys-typescale-label-medium-letter-spacing, 0.03125rem);
 }
 
 .docs-breadcrumbs a {
@@ -230,12 +219,16 @@
 }
 
 .docs-page-navigation {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-block-start: 64px;
   padding-block-start: 24px;
   border-block-start: 1px solid var(--outline-variant);
+}
+
+.docs-page-navigation > * {
+  flex: 1 1 240px;
 }
 
 .docs-page-navigation__link {
