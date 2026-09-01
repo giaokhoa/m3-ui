@@ -1,0 +1,74 @@
+---
+title: Adaptive layout
+description: Canonical Material 3 window adaptive state plus opt-in container-scoped web helpers.
+---
+
+## Window adaptive info is canonical
+
+Material 3 adaptive screen layouts are window-based. `useWindowAdaptiveInfo()` measures the browser layout viewport and remains the default/source-of-truth API for canonical pane and screen-level behavior.
+
+```tsx
+import { useWindowAdaptiveInfo } from '@m3-ui/ui/layout';
+
+function Screen() {
+  const adaptiveInfo = useWindowAdaptiveInfo();
+  return <div>{adaptiveInfo.windowSizeClass.width}</div>;
+}
+```
+
+`m3-ui` maps Material logical `dp` thresholds to logical CSS pixels on the web. Width classes remain compact `< 600`, medium `>= 600`, expanded `>= 840`, large `>= 1200`, and extra-large `>= 1600`. Height classes remain compact `< 480`, medium `>= 480`, and expanded `>= 900`.
+
+## Container adaptive info is an opt-in web helper
+
+Reusable web UI can be constrained by a dashboard cell, split view, docs canvas, side panel, or embedded preview even when the browser window is much wider. `useContainerAdaptiveInfo(ref)` observes that local element and classifies its size with the same Material 3 size-class calculator.
+
+This API is a web-specific convenience. AndroidX Material3 does **not** define container-scoped window size classes, and container scope does not replace or change the canonical `useWindowAdaptiveInfo()` behavior.
+
+```tsx
+import { useRef } from 'react';
+import { useContainerAdaptiveInfo } from '@m3-ui/ui/layout';
+
+function EmbeddedSurface() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { containerSizeClass } = useContainerAdaptiveInfo(ref);
+
+  return (
+    <section ref={ref}>
+      {containerSizeClass.width === 'compact' ? <CompactView /> : <WideView />}
+    </section>
+  );
+}
+```
+
+The hook uses `ResizeObserver`, handles target replacement when the ref points at a different element after a React commit, disconnects when no longer subscribed, and avoids publishing duplicate width/height snapshots. An unmounted or zero-size target classifies as compact. On the server the default snapshot is `0 × 0`; applications that know a stable server-side container size can provide `serverSize`.
+
+```tsx
+const info = useContainerAdaptiveInfo(ref, {
+  serverSize: { width: 840, height: 900 },
+});
+```
+
+The measured size is the target element's border box in CSS pixels. Direction does not affect classification, so the same thresholds work naturally in LTR and RTL layouts.
+
+## Prefer native CSS container queries for styling
+
+When only CSS presentation needs to adapt, use native container queries instead of subscribing React to size changes. Keep the Material thresholds rather than introducing a second breakpoint scale.
+
+```css
+.card-region {
+  container-type: inline-size;
+}
+
+.card-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@container (min-width: 840px) {
+  .card-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+```
+
+Use `useContainerAdaptiveInfo()` when JavaScript behavior or rendered state genuinely depends on the local size class. Use `useWindowAdaptiveInfo()` for canonical Material screen adaptation and pane-scaffold decisions unless the application is deliberately building a container-scoped web experience.
