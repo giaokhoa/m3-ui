@@ -53,7 +53,7 @@ function normalizeNode(node) {
       index: node.index ? normalizePage(node.index) : undefined,
       defaultOpen: node.defaultOpen,
       collapsible: node.collapsible,
-      children: node.children.map(normalizeNode),
+      children: node.children.map(normalizeNode).filter(Boolean),
     };
   }
 
@@ -73,17 +73,21 @@ if (!searchResponse.ok) {
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const appDir = resolve(scriptDir, '..');
-const outputDir = resolve(appDir, process.argv[2] ?? 'public');
-await mkdir(outputDir, { recursive: true });
+const generatedDir = resolve(appDir, 'src/generated');
+const publicDir = resolve(appDir, 'public');
+await Promise.all([
+  mkdir(generatedDir, { recursive: true }),
+  mkdir(publicDir, { recursive: true }),
+]);
 
 await Promise.all([
   writeFile(
-    resolve(outputDir, 'docs-navigation.json'),
+    resolve(generatedDir, 'docs-navigation.json'),
     `${JSON.stringify(navigation, null, 2)}\n`,
     'utf8',
   ),
   writeFile(
-    resolve(outputDir, 'search-index.json'),
+    resolve(publicDir, 'search-index.json'),
     await searchResponse.text(),
     'utf8',
   ),
