@@ -5,19 +5,22 @@ description: Implemented Material 3 foundations shared by every m3-ui component.
 
 ## Implemented foundations
 
-The public docs only describe foundation contracts that are already represented in runtime code and canonical tokens.
+The public docs describe foundation contracts that are represented in canonical tokens or runtime behavior and have been audited against their Material sources.
 
 - [Color](/docs/foundations/color) — semantic Material color roles, baseline schemes, dynamic color, and contrast level.
 - [Typography](/docs/foundations/typography) — the full Material type scale plus M3 Expressive emphasized roles.
-- [Theming](/docs/theming) — how `ThemeProvider` projects those foundations into an application and theme-aware portals.
+- [Shape](/docs/foundations/shape) — the Material shape scale, semantic corner roles, component token mapping, and expressive-shape provenance.
+- [Theming](/docs/theming) — how `ThemeProvider` projects supported foundations into an application and theme-aware portals.
 
 ## Source of truth
 
-Foundation values are not defined in the docs application. Canonical design values live in `@m3-ui/tokens`, while `@m3-ui/ui` exposes runtime projections such as color CSS variables and the Material type-scale helpers.
+Foundation values are not defined in the docs application. Canonical design values live in `packages/tokens`, while `@m3-ui/ui` exposes the runtime contracts that consumers actually import.
 
-## Deliberately not listed yet
+Shape follows the same rule: component tokens alias canonical shape roles instead of duplicating radius values in documentation or component prose.
 
-Shape, motion, and elevation should get public foundation pages only when their reusable runtime contracts are implemented and audited. Component-local token usage is not enough reason to publish a parallel global theme API from documentation.
+## Still tracked separately
+
+Motion and elevation have dedicated documentation work tracked by the Material-first docs program. Their future guides should describe audited foundation contracts without inventing a global theme API that the public package does not expose.
 
 ## Layout is separate
 
