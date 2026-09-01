@@ -12,26 +12,7 @@ Use this guide for cross-component form composition. Component-specific anatomy,
 A real `<form>` gives controls a submission owner and preserves browser behavior such as Enter-to-submit, autofill, password-manager integration, and `FormData` collection.
 
 <ComponentPreview>
-  <form
-    onSubmit={(event) => event.preventDefault()}
-    style={{ display: 'grid', gap: '1rem', width: 'min(100%, 32rem)' }}
-  >
-    <TextField
-      label="Email"
-      name="email"
-      type="email"
-      autoComplete="email"
-      isRequired
-      isMultiline={false}
-    />
-    <SecureTextField
-      label="Password"
-      name="password"
-      autoComplete="current-password"
-      isRequired
-    />
-    <Button type="submit">Sign in</Button>
-  </form>
+  <NativeSignInFormPreview />
 </ComponentPreview>
 
 ```tsx
