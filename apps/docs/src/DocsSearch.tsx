@@ -11,7 +11,9 @@ import {
 } from '@m3-ui/ui';
 import './docs-search.css';
 
-const searchClient = staticClient({ from: '/search-index.json' });
+const searchClient = staticClient({
+  from: `${import.meta.env.BASE_URL}search-index.json`,
+});
 
 function SearchGlyph() {
   return (

@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "api:generate": "node scripts/build-api-reference.mjs",
-    "dev": "pnpm api:generate && node scripts/build-search-index.mjs public/search-index.json && vite --host 0.0.0.0 --port 4173 --strictPort",
-    "build": "pnpm api:generate && vite build && node scripts/build-search-index.mjs",
+    "dev": "pnpm api:generate && node scripts/build-docs-data.mjs && vite --host 0.0.0.0 --port 4173 --strictPort",
+    "build": "pnpm api:generate && node scripts/build-docs-data.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
     "test": "pnpm api:generate && node --test scripts/*.test.mjs",
-    "typecheck": "pnpm api:generate && tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist public/search-index.json src/generated/api-reference.generated.json"
+    "typecheck": "pnpm api:generate && node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist src/generated/docs-navigation.json src/generated/api-reference.generated.json public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",

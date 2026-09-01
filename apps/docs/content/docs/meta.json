@@ -1,0 +1,11 @@
+{
+  "title": "m3-ui",
+  "pages": [
+    "index",
+    "foundations",
+    "theming",
+    "layout",
+    "components",
+    "parity"
+  ]
+}
