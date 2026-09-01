@@ -2,6 +2,7 @@ import type { MDXComponents } from 'mdx/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Surface, getMaterialTypeCssProperties } from '@m3-ui/ui';
 import { allComponentDocs, type AllComponentDocId } from './allComponentDocs';
+import './componentPageMdxComponents.css';
 
 type SourceKind = 'spec' | 'compose' | 'web' | 'adaptation';
 
