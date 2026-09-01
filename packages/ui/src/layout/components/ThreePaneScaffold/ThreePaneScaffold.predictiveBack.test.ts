@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   PredictiveBackMinScale,
+  PredictiveBackScaleCollector,
   calculatePredictiveBackReturnSpringDurationMs,
   calculatePredictiveBackScale,
+  collectPredictiveBackScaleEmission,
   getPredictiveBackLayerStyle,
   getPredictiveBackScale,
   samplePredictiveBackReturnSpring,
@@ -23,6 +25,119 @@ describe('predictive-back scaffold scale', () => {
       expect(samples[index]).toBeLessThan(samples[index - 1]!);
       expect(samples[index]).toBeGreaterThan(PredictiveBackMinScale);
     }
+  });
+
+  it('collects only progress-fraction changes like snapshotFlow', () => {
+    let previousProgress = 0;
+
+    const predictive = collectPredictiveBackScaleEmission(previousProgress, {
+      progressFraction: 0.5,
+      isPredictiveBackInProgress: true,
+    });
+    expect(predictive).toEqual({
+      type: 'snap',
+      progressFraction: 0.5,
+      scale: 0.9523809552192688,
+    });
+    previousProgress = predictive.progressFraction;
+
+    // CollectPredictiveBackScale observes snapshotFlow { progressFraction }.
+    // A flag-only change therefore emits nothing and leaves Animatable untouched.
+    expect(
+      collectPredictiveBackScaleEmission(previousProgress, {
+        progressFraction: 0.5,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'none', progressFraction: 0.5 });
+
+    expect(
+      collectPredictiveBackScaleEmission(previousProgress, {
+        progressFraction: 0.6,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'return', progressFraction: Math.fround(0.6) });
+  });
+
+  it('serializes return animation and conflates pending snapshotFlow changes', () => {
+    const collector = new PredictiveBackScaleCollector();
+
+    expect(
+      collector.collect({
+        progressFraction: 0.5,
+        isPredictiveBackInProgress: true,
+      }),
+    ).toEqual({
+      type: 'snap',
+      progressFraction: 0.5,
+      scale: 0.9523809552192688,
+    });
+
+    expect(
+      collector.collect({
+        progressFraction: 0.6,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'return', progressFraction: Math.fround(0.6) });
+
+    // Flow collection is suspended inside Animatable.animateTo(1f). The
+    // one-slot snapshotFlow channel only records that another read is needed;
+    // intermediate fractions do not restart the in-flight spring.
+    expect(
+      collector.collect({
+        progressFraction: 0.7,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'none', progressFraction: Math.fround(0.6) });
+    expect(
+      collector.collect({
+        progressFraction: 0.8,
+        isPredictiveBackInProgress: false,
+      }),
+    ).toEqual({ type: 'none', progressFraction: Math.fround(0.6) });
+
+    expect(collector.completeReturn(false)).toEqual({
+      type: 'return',
+      progressFraction: Math.fround(0.8),
+    });
+  });
+
+  it('reads the latest predictive flag when a pending flow value resumes', () => {
+    const collector = new PredictiveBackScaleCollector();
+    collector.collect({ progressFraction: 0.5, isPredictiveBackInProgress: true });
+    collector.collect({ progressFraction: 0.6, isPredictiveBackInProgress: false });
+    collector.collect({ progressFraction: 0.75, isPredictiveBackInProgress: false });
+
+    // The collect lambda reads isPredictiveBackInProgress only after the
+    // suspended return animation finishes, so a flag-only change in between is
+    // visible even though it did not itself trigger snapshotFlow.
+    expect(collector.completeReturn(true)).toEqual({
+      type: 'snap',
+      progressFraction: 0.75,
+      scale: calculatePredictiveBackScale(0.75),
+    });
+  });
+
+  it('drops pending flow work when LaunchedEffect state identity is cancelled', () => {
+    const collector = new PredictiveBackScaleCollector();
+    collector.collect({ progressFraction: 0.5, isPredictiveBackInProgress: true });
+    collector.collect({ progressFraction: 0.6, isPredictiveBackInProgress: false });
+    collector.collect({ progressFraction: 0.8, isPredictiveBackInProgress: false });
+
+    collector.cancelReturn();
+
+    // previousValue is remembered outside LaunchedEffect, but the old
+    // snapshotFlow channel is discarded. The replacement collector starts from
+    // the new state's current progress instead of replaying 0.8.
+    expect(
+      collector.collect({
+        progressFraction: 0.7,
+        isPredictiveBackInProgress: true,
+      }),
+    ).toEqual({
+      type: 'snap',
+      progressFraction: Math.fround(0.7),
+      scale: calculatePredictiveBackScale(0.7),
+    });
   });
 
   it('exposes no seek scale outside predictive back', () => {

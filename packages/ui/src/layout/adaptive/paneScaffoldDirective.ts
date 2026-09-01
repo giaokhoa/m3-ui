@@ -57,9 +57,9 @@ export type HingePolicy =
   | 'never-avoid';
 
 export interface PaneScaffoldDirective {
-  maxHorizontalPartitions: 1 | 2 | 3;
+  maxHorizontalPartitions: number;
   horizontalPartitionSpacerSize: string;
-  maxVerticalPartitions: 1 | 2;
+  maxVerticalPartitions: number;
   verticalPartitionSpacerSize: string;
   defaultPanePreferredWidth: string;
   defaultPanePreferredHeight: string;

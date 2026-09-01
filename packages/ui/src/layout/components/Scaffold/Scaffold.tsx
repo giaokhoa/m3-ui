@@ -1,5 +1,10 @@
 import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { hasReactNodeContent } from '../../reactNode';
+import {
+  defaultScaffoldContainerColor,
+  getScaffoldContentColor,
+} from './Scaffold.defaults';
 import './scaffold.css';
 
 export type ScaffoldFabPosition = 'start' | 'center' | 'end' | 'end-overlay';
@@ -42,10 +47,11 @@ export function Scaffold({
   style,
   ...props
 }: ScaffoldProps) {
-  const hasTopBar = topBar !== undefined && topBar !== null;
-  const hasBottomBar = bottomBar !== undefined && bottomBar !== null;
-  const hasFab = floatingActionButton !== undefined && floatingActionButton !== null;
-  const hasSnackbar = snackbarHost !== undefined && snackbarHost !== null;
+  const hasTopBar = hasReactNodeContent(topBar);
+  const hasBottomBar = hasReactNodeContent(bottomBar);
+  const hasFab = hasReactNodeContent(floatingActionButton);
+  const hasSnackbar = hasReactNodeContent(snackbarHost);
+  const resolvedContentColor = getScaffoldContentColor(containerColor, contentColor);
 
   return (
     <div
@@ -57,8 +63,8 @@ export function Scaffold({
       data-has-snackbar={hasSnackbar || undefined}
       data-fab-position={floatingActionButtonPosition}
       style={{
-        '--scaffold-container-color': containerColor,
-        '--scaffold-content-color': contentColor,
+        '--scaffold-container-color': containerColor ?? defaultScaffoldContainerColor,
+        '--scaffold-content-color': resolvedContentColor,
         ...style,
       } as CSSProperties}
     >

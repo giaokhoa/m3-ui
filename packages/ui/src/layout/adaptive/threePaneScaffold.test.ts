@@ -123,6 +123,21 @@ describe('calculateThreePaneScaffoldValue', () => {
     );
   });
 
+  it('preserves stable scrim function identity through React normalization', () => {
+    const scrim = () => null;
+    const firstValue = PaneAdaptedValue.Levitated(PaneAlignment.Center, scrim);
+    const secondValue = PaneAdaptedValue.Levitated(PaneAlignment.Center, scrim);
+    const firstStrategy = PaneAdaptStrategy.Levitate({ scrim });
+    const secondStrategy = PaneAdaptStrategy.Levitate({ scrim });
+
+    expect(firstValue.type).toBe('levitated');
+    expect(secondValue.type).toBe('levitated');
+    if (firstValue.type === 'levitated' && secondValue.type === 'levitated') {
+      expect(firstValue.scrim).toBe(secondValue.scrim);
+    }
+    expect(firstStrategy.scrim).toBe(secondStrategy.scrim);
+  });
+
   it('keeps a non-current levitate-only pane hidden', () => {
     const value = calculateThreePaneScaffoldValue({
       maxHorizontalPartitions: 1,
@@ -187,15 +202,25 @@ describe('calculateThreePaneScaffoldValue', () => {
     }
   });
 
-  it('rejects invalid partition counts', () => {
-    expect(() =>
+  it('does not invent partition-count validation absent from AndroidX', () => {
+    expect(
       calculateThreePaneScaffoldValue({ maxHorizontalPartitions: 0 }),
-    ).toThrow(RangeError);
-    expect(() =>
+    ).toMatchObject({
+      primary: PaneAdaptedValue.Hidden,
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Hidden,
+    });
+
+    expect(
       calculateThreePaneScaffoldValue({
         maxHorizontalPartitions: 1,
-        maxVerticalPartitions: 1.5,
+        maxVerticalPartitions: 0,
+        adaptStrategies: supportingPaneScaffoldAdaptStrategies,
       }),
-    ).toThrow(RangeError);
+    ).toMatchObject({
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Hidden,
+    });
   });
 });

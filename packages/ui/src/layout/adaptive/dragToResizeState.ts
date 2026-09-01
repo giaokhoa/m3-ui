@@ -56,6 +56,8 @@ export interface DragToResizeSize {
 }
 
 const DefaultMinPaneSize = 48;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
 
 function finiteNonNegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) {
@@ -63,8 +65,25 @@ function finiteNonNegative(value: number, name: string) {
   }
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+function composeRoundToPx(value: number) {
+  const floatValue = Math.fround(value);
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
+}
+
+function composeFloatToInt(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
+function resolvedConstraint(value: number | undefined, unspecified: number) {
+  // AndroidX Dp.Unspecified is NaN and fails isSpecified. Undefined is the
+  // normal web representation, but preserve NaN as the same unspecified case.
+  return value === undefined || Number.isNaN(value) ? unspecified : composeRoundToPx(value);
 }
 
 function requestFrame(callback: FrameRequestCallback): number {
@@ -151,10 +170,11 @@ export class DragToResizeState {
   private rangeIsEmpty = false;
   private lastMeasuredSize = Number.NaN;
   private lastDraggedSize = Number.NaN;
+  private physicalEdgeInternal: 'top' | 'bottom' | 'left' | 'right' | undefined;
   private revision = 0;
   private readonly listeners = new Set<() => void>();
   private readonly defaultAnimation: DragToResizeAnimation;
-  private animationController: AbortController | null = null;
+  private readonly animationControllers = new Set<AbortController>();
 
   constructor({
     dockedEdge,
@@ -162,12 +182,13 @@ export class DragToResizeState {
     maxSize,
     animation = defaultDragToResizeAnimation,
   }: DragToResizeStateOptions) {
-    if (minSize !== undefined) finiteNonNegative(minSize, 'minSize');
-    if (maxSize !== undefined) finiteNonNegative(maxSize, 'maxSize');
     this.dockedEdge = dockedEdge;
     this.minSize = minSize;
     this.maxSize = maxSize;
     this.defaultAnimation = animation;
+    if (dockedEdge === DockedEdge.Top || dockedEdge === DockedEdge.Bottom) {
+      this.physicalEdgeInternal = dockedEdge;
+    }
   }
 
   readonly subscribe = (listener: () => void) => {
@@ -182,9 +203,9 @@ export class DragToResizeState {
     this.listeners.forEach((listener) => listener());
   }
 
-  private cancelAnimation() {
-    this.animationController?.abort();
-    this.animationController = null;
+  private cancelAnimations() {
+    this.animationControllers.forEach((controller) => controller.abort());
+    this.animationControllers.clear();
   }
 
   get value() {
@@ -212,28 +233,26 @@ export class DragToResizeState {
   }
 
   setMinSize(minSize?: number) {
-    if (minSize !== undefined) finiteNonNegative(minSize, 'minSize');
     this.minSize = minSize;
     this.notify();
   }
 
   setMaxSize(maxSize?: number) {
-    if (maxSize !== undefined) finiteNonNegative(maxSize, 'maxSize');
     this.maxSize = maxSize;
     this.notify();
   }
 
   private physicalEdge(direction: 'ltr' | 'rtl'): 'top' | 'bottom' | 'left' | 'right' {
-    switch (this.dockedEdge) {
-      case DockedEdge.Top:
-        return 'top';
-      case DockedEdge.Bottom:
-        return 'bottom';
-      case DockedEdge.Start:
-        return direction === 'ltr' ? 'left' : 'right';
-      case DockedEdge.End:
-        return direction === 'ltr' ? 'right' : 'left';
-    }
+    if (this.physicalEdgeInternal !== undefined) return this.physicalEdgeInternal;
+    this.physicalEdgeInternal =
+      this.dockedEdge === DockedEdge.Start
+        ? direction === 'ltr'
+          ? 'left'
+          : 'right'
+        : direction === 'ltr'
+          ? 'right'
+          : 'left';
+    return this.physicalEdgeInternal;
   }
 
   private convertDelta(delta: number, direction: 'ltr' | 'rtl') {
@@ -242,29 +261,20 @@ export class DragToResizeState {
   }
 
   private setSize(value: number) {
-    if (this.animationController !== null) {
-      this.setAnimatedSize(value);
-      return;
-    }
+    const floatValue = Math.fround(value);
     if (!this.rangeIsEmpty) {
-      if (value <= this.rangeStart) {
+      if (floatValue <= this.rangeStart) {
         this.valueInternal = DragToResizeValue.Collapsed;
         this.sizeInternal = this.rangeStart;
         return;
       }
-      if (value >= this.rangeEnd) {
+      if (floatValue >= this.rangeEnd) {
         this.valueInternal = DragToResizeValue.Expanded;
         this.sizeInternal = this.rangeEnd;
         return;
       }
     }
-    this.sizeInternal = value;
-  }
-
-  private setAnimatedSize(value: number) {
-    this.sizeInternal = this.rangeIsEmpty
-      ? value
-      : clamp(value, this.rangeStart, this.rangeEnd);
+    this.sizeInternal = floatValue;
   }
 
   private get defaultSize() {
@@ -279,9 +289,10 @@ export class DragToResizeState {
   }
 
   /**
-   * Measure/re-coerce the resizable axis and return the pane size for layout.
-   * This mirrors AndroidX getDraggedWidth/getDraggedHeight. Before the scaffold
-   * has a real resizable-axis constraint, no drag override is available yet.
+   * Measure/re-coerce the resizable axis and return the raw pane size used by
+   * AndroidX for levitated alignment before PaneMeasurable clamps measurement
+   * bounds to non-negative dimensions. Before the scaffold has a real
+   * resizable-axis constraint, no drag override is available yet.
    */
   measure({
     measuringWidth,
@@ -300,38 +311,39 @@ export class DragToResizeState {
     const scaffoldSize = horizontal ? scaffoldWidth : scaffoldHeight;
 
     // React can render once before the scaffold has measurable geometry. Do not
-    // let that transient zero constraint initialize or coerce persistent resize
-    // state, and do not expose it as a measured preferred-size override.
+    // let that transient zero constraint initialize/coerce persistent resize
+    // state or lock logical Start/End to the placeholder LTR geometry.
     if (scaffoldSize === 0) {
       return undefined;
     }
 
-    // rememberDragToResizeState resolves specified Dp constraints with
-    // roundToPx() before getDraggedWidth/getDraggedHeight builds the Float
-    // range. Keep drag/spring physics as Float, but quantize these constraints
-    // at the same measurement boundary.
-    const minimum = this.minSize === undefined ? DefaultMinPaneSize : Math.round(this.minSize);
+    // DragToResizeState selects a physical Left/Right implementation from the
+    // logical Start/End edge when the state is remembered. The web state learns
+    // the real layout direction at its first non-zero measurement and keeps the
+    // same physical edge for its lifetime.
+    this.physicalEdge(direction);
+
+    const minimum = resolvedConstraint(this.minSize, DefaultMinPaneSize);
     const maximum = Math.min(
-      this.maxSize === undefined ? Number.POSITIVE_INFINITY : Math.round(this.maxSize),
+      resolvedConstraint(this.maxSize, ComposeIntMax),
       scaffoldSize,
     );
 
-    this.rangeStart = minimum;
-    this.rangeEnd = maximum;
-    this.rangeIsEmpty = minimum > maximum;
-    this.lastMeasuredSize = measuringSize;
+    // AndroidX converts the IntRange produced by measurement into a Float
+    // range, so keep both boundaries at Float32 precision before coercion.
+    this.rangeStart = Math.fround(minimum);
+    this.rangeEnd = Math.fround(maximum);
+    this.rangeIsEmpty = this.rangeStart > this.rangeEnd;
+    this.lastMeasuredSize = Math.fround(measuringSize);
 
     const nextSize = Number.isNaN(this.sizeInternal)
       ? this.targetSize(this.valueInternal)
       : this.sizeInternal;
     this.setSize(nextSize);
 
-    // AndroidX keeps the state size as Float for drag/spring physics but returns
-    // size.toInt() from getAndUpdateDraggedSize for actual pane measurement.
-    const resolvedSize = Math.trunc(this.sizeInternal);
-    // Direction is intentionally consumed here so callers can use one measure
-    // path for logical Start/End states before dispatching drag deltas.
-    void direction;
+    // AndroidX keeps the state size as Float for drag/spring physics and uses
+    // Float.toInt() for the raw IntSize that participates in alignment.
+    const resolvedSize = composeFloatToInt(this.sizeInternal);
 
     return horizontal
       ? { width: resolvedSize, height: measuringHeight }
@@ -339,11 +351,12 @@ export class DragToResizeState {
   }
 
   dispatchRawDelta(delta: number, direction: 'ltr' | 'rtl' = 'ltr') {
-    if (!Number.isFinite(delta) || Number.isNaN(this.sizeInternal)) return;
-    this.cancelAnimation();
-    const actualDelta = this.convertDelta(delta, direction);
+    // AndroidX only ignores a drag while the state itself is still NaN. Raw
+    // deltas then flow through the Float range setter without extra validation.
+    if (Number.isNaN(this.sizeInternal)) return;
+    const actualDelta = Math.fround(this.convertDelta(Math.fround(delta), direction));
     this.valueInternal = DragToResizeValue.Dragged;
-    this.setSize(this.sizeInternal + actualDelta);
+    this.setSize(Math.fround(this.sizeInternal + actualDelta));
     this.lastDraggedSize = this.sizeInternal;
     this.notify();
   }
@@ -351,7 +364,7 @@ export class DragToResizeState {
   /** Snap immediately to a target and cancel any active click-to-resize motion. */
   snapTo(target: DragToResizeValue) {
     if (this.valueInternal === target || Number.isNaN(this.sizeInternal)) return;
-    this.cancelAnimation();
+    this.cancelAnimations();
     this.setSize(this.targetSize(target));
     this.valueInternal = target;
     this.notify();
@@ -362,12 +375,14 @@ export class DragToResizeState {
     target: DragToResizeValue,
     animation: DragToResizeAnimation = this.defaultAnimation,
   ) {
-    if (this.valueInternal === target || Number.isNaN(this.sizeInternal)) return;
-    this.cancelAnimation();
+    if (this.valueInternal === target) return;
 
     const sourceValue = this.valueInternal;
     const targetSize = this.targetSize(target);
     if (sourceValue === DragToResizeValue.Default) {
+      // AndroidX takes this branch before touching animation-core. Before the
+      // first measurement its size is NaN but the axis range is still 0f..0f,
+      // so Default -> Expanded/Collapsed snaps to 0f and updates state.
       this.setSize(targetSize);
       this.valueInternal = target;
       this.notify();
@@ -375,7 +390,7 @@ export class DragToResizeState {
     }
 
     const controller = new AbortController();
-    this.animationController = controller;
+    this.animationControllers.add(controller);
     const from = this.sizeInternal;
     this.valueInternal = target;
     this.notify();
@@ -387,18 +402,15 @@ export class DragToResizeState {
         signal: controller.signal,
         update: (size) => {
           if (controller.signal.aborted) return;
-          this.setAnimatedSize(size);
+          this.setSize(size);
           this.notify();
         },
       });
       if (controller.signal.aborted) return;
-      this.setAnimatedSize(targetSize);
-      this.valueInternal = target;
+      this.setSize(targetSize);
     } finally {
-      if (this.animationController === controller) {
-        this.animationController = null;
-        this.notify();
-      }
+      this.animationControllers.delete(controller);
+      this.notify();
     }
   }
 

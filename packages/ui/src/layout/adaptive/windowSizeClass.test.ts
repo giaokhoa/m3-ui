@@ -48,6 +48,22 @@ describe('Material 3 window size classes', () => {
     expect(calculateWindowHeightSizeClass(height)).toBe(expected);
   });
 
+  it('converts the public Float dimensions before truncating to Int breakpoints', () => {
+    // AndroidX's Float overload first receives these as Float values, where
+    // they round to the exact breakpoint, and only then calls Float.toInt().
+    expect(Math.fround(599.99999)).toBe(600);
+    expect(calculateWindowWidthSizeClass(599.99999)).toBe('medium');
+
+    expect(Math.fround(839.99999)).toBe(840);
+    expect(calculateWindowWidthSizeClass(839.99999)).toBe('expanded');
+
+    expect(Math.fround(479.99999)).toBe(480);
+    expect(calculateWindowHeightSizeClass(479.99999)).toBe('medium');
+
+    expect(Math.fround(899.99999)).toBe(900);
+    expect(calculateWindowHeightSizeClass(899.99999)).toBe('expanded');
+  });
+
   it('calculates width and height independently', () => {
     expect(calculateWindowSizeClass({ width: 1280, height: 720 })).toEqual({
       width: 'large',
@@ -55,11 +71,15 @@ describe('Material 3 window size classes', () => {
     });
   });
 
-  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(
-    'rejects invalid dimensions: %s',
-    (value) => {
-      expect(() => calculateWindowWidthSizeClass(value)).toThrow(RangeError);
-      expect(() => calculateWindowHeightSizeClass(value)).toThrow(RangeError);
-    },
-  );
+  it('falls back to compact for non-matching dimensions like the AndroidX selector', () => {
+    expect(calculateWindowWidthSizeClass(-1)).toBe('compact');
+    expect(calculateWindowHeightSizeClass(-1)).toBe('compact');
+    expect(calculateWindowWidthSizeClass(Number.NaN)).toBe('compact');
+    expect(calculateWindowHeightSizeClass(Number.NaN)).toBe('compact');
+  });
+
+  it('classifies positive infinity in the largest bucket', () => {
+    expect(calculateWindowWidthSizeClass(Number.POSITIVE_INFINITY)).toBe('extra-large');
+    expect(calculateWindowHeightSizeClass(Number.POSITIVE_INFINITY)).toBe('expanded');
+  });
 });

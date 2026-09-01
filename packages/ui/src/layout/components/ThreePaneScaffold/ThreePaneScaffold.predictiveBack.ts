@@ -15,6 +15,11 @@ export interface PredictiveBackScaffoldState {
   readonly isPredictiveBackInProgress: boolean;
 }
 
+export type PredictiveBackScaleCollection =
+  | { readonly type: 'none'; readonly progressFraction: number }
+  | { readonly type: 'snap'; readonly progressFraction: number; readonly scale: number }
+  | { readonly type: 'return'; readonly progressFraction: number };
+
 function requestFrame(callback: FrameRequestCallback): number {
   if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
   return setTimeout(() => callback(performance.now()), 16) as unknown as number;
@@ -56,6 +61,88 @@ export function getPredictiveBackScale(
   return state?.isPredictiveBackInProgress
     ? calculatePredictiveBackScale(state.progressFraction)
     : undefined;
+}
+
+/**
+ * Mirrors CollectPredictiveBackScale's snapshotFlow collector. The flow only
+ * observes progressFraction; changing isPredictiveBackInProgress without a new
+ * fraction emission does not snap or return the Animatable. previousValue also
+ * starts at 0f upstream, so an initial zero fraction is ignored.
+ */
+export function collectPredictiveBackScaleEmission(
+  previousProgressFraction: number,
+  state: PredictiveBackScaffoldState | undefined,
+): PredictiveBackScaleCollection {
+  const previous = composeFloat(previousProgressFraction);
+  const progressFraction = composeFloat(state?.progressFraction ?? 0);
+  if (progressFraction === previous) {
+    return { type: 'none', progressFraction: previous };
+  }
+  if (state?.isPredictiveBackInProgress === true) {
+    return {
+      type: 'snap',
+      progressFraction,
+      scale: calculatePredictiveBackScale(progressFraction),
+    };
+  }
+  return { type: 'return', progressFraction };
+}
+
+/**
+ * Sequential collector bookkeeping for CollectPredictiveBackScale.
+ *
+ * snapshotFlow uses a one-slot change channel and Flow collection is
+ * sequential. While Animatable.animateTo(1f) is suspended, progress changes
+ * therefore collapse into one pending rerun; they do not restart the spring.
+ * When the spring completes the flow re-reads the latest progress value, while
+ * the collect lambda reads the then-current predictive-back flag.
+ */
+export class PredictiveBackScaleCollector {
+  private previousProgressFraction = 0;
+  private returnInProgress = false;
+  private pendingProgressFraction: number | null = null;
+
+  collect(state: PredictiveBackScaffoldState | undefined): PredictiveBackScaleCollection {
+    const progressFraction = composeFloat(state?.progressFraction ?? 0);
+    if (this.returnInProgress) {
+      this.pendingProgressFraction = progressFraction;
+      return {
+        type: 'none',
+        progressFraction: this.previousProgressFraction,
+      };
+    }
+
+    const emission = collectPredictiveBackScaleEmission(this.previousProgressFraction, {
+      progressFraction,
+      isPredictiveBackInProgress: state?.isPredictiveBackInProgress ?? false,
+    });
+    if (emission.type === 'none') return emission;
+
+    this.previousProgressFraction = emission.progressFraction;
+    if (emission.type === 'return') this.returnInProgress = true;
+    return emission;
+  }
+
+  completeReturn(isPredictiveBackInProgress: boolean): PredictiveBackScaleCollection {
+    this.returnInProgress = false;
+    const pendingProgressFraction = this.pendingProgressFraction;
+    this.pendingProgressFraction = null;
+    if (pendingProgressFraction === null) {
+      return {
+        type: 'none',
+        progressFraction: this.previousProgressFraction,
+      };
+    }
+    return this.collect({
+      progressFraction: pendingProgressFraction,
+      isPredictiveBackInProgress,
+    });
+  }
+
+  cancelReturn() {
+    this.returnInProgress = false;
+    this.pendingProgressFraction = null;
+  }
 }
 
 /**
@@ -191,53 +278,44 @@ export function samplePredictiveBackReturnSpring(
 /**
  * Renderer-owned equivalent of AndroidX PredictiveBackScaleState.
  *
- * Active predictive-back progress snaps directly to the decay curve. When the
- * gesture ends, the last snapped value returns to 1 with Animatable's default
- * Float spring. A new gesture cancels that return immediately and snaps to its
- * new predictive value.
+ * CollectPredictiveBackScale observes progressFraction through snapshotFlow.
+ * A new fraction snaps to the predictive decay curve while predictive back is
+ * active, or starts the Animatable return spring otherwise. Flag-only changes
+ * with an unchanged fraction intentionally do not produce a collector event.
  */
 export function usePredictiveBackScale(
   state: PredictiveBackScaffoldState | undefined,
 ): number {
-  const predictiveScale = getPredictiveBackScale(state);
-  const scaleRef = useRef(predictiveScale ?? 1);
-  const wasPredictiveRef = useRef(predictiveScale !== undefined);
+  const progressFraction = composeFloat(state?.progressFraction ?? 0);
+  const isPredictiveBackInProgress = state?.isPredictiveBackInProgress ?? false;
+  const predictiveBackRef = useRef(isPredictiveBackInProgress);
+  predictiveBackRef.current = isPredictiveBackInProgress;
+  const collectorRef = useRef<PredictiveBackScaleCollector | null>(null);
+  collectorRef.current ??= new PredictiveBackScaleCollector();
+  const scaleRef = useRef(1);
   const frameRef = useRef<number | null>(null);
-  const [animatedScale, setAnimatedScale] = useState(scaleRef.current);
+  const processEmissionRef = useRef<(emission: PredictiveBackScaleCollection) => void>(() => {});
+  const [animatedScale, setAnimatedScale] = useState(1);
 
-  let renderedScale = animatedScale;
-  if (predictiveScale !== undefined) {
-    // Render the seeked scale immediately rather than waiting for an effect;
-    // AndroidX snapTo likewise exposes the new scale in the same frame.
-    scaleRef.current = predictiveScale;
-    wasPredictiveRef.current = true;
-    renderedScale = predictiveScale;
-  } else if (wasPredictiveRef.current) {
-    // Preserve the last predictive frame until the layout effect starts the
-    // return spring, avoiding a one-frame snap to 1.
-    renderedScale = scaleRef.current;
-  }
+  const processEmission = (emission: PredictiveBackScaleCollection) => {
+    if (emission.type === 'none') return;
 
-  useLayoutEffect(() => {
-    if (frameRef.current !== null) {
-      cancelFrame(frameRef.current);
-      frameRef.current = null;
-    }
-
-    if (predictiveScale !== undefined) {
-      scaleRef.current = predictiveScale;
-      wasPredictiveRef.current = true;
-      setAnimatedScale(predictiveScale);
+    if (emission.type === 'snap') {
+      scaleRef.current = emission.scale;
+      setAnimatedScale(emission.scale);
       return;
     }
 
-    if (!wasPredictiveRef.current) return;
-    wasPredictiveRef.current = false;
     const initialScale = scaleRef.current;
     const durationMs = calculatePredictiveBackReturnSpringDurationMs(initialScale);
+    const completeReturn = () => {
+      const nextEmission = collectorRef.current!.completeReturn(predictiveBackRef.current);
+      processEmissionRef.current(nextEmission);
+    };
     if (durationMs === 0) {
       scaleRef.current = 1;
       setAnimatedScale(1);
+      completeReturn();
       return;
     }
 
@@ -253,21 +331,37 @@ export function usePredictiveBackScale(
         scaleRef.current = 1;
         setAnimatedScale(1);
         frameRef.current = null;
+        completeReturn();
         return;
       }
       frameRef.current = requestFrame(tick);
     };
     frameRef.current = requestFrame(tick);
+  };
+  processEmissionRef.current = processEmission;
 
+  // LaunchedEffect(this) cancels an in-flight return animation only when the
+  // scaffold-state identity changes or the composable leaves the tree. Progress
+  // emissions on the same state stay inside the sequential snapshotFlow collect.
+  useLayoutEffect(() => {
     return () => {
       if (frameRef.current !== null) {
         cancelFrame(frameRef.current);
         frameRef.current = null;
       }
+      collectorRef.current!.cancelReturn();
     };
-  }, [predictiveScale]);
+  }, [state]);
 
-  return renderedScale;
+  useLayoutEffect(() => {
+    const emission = collectorRef.current!.collect({
+      progressFraction,
+      isPredictiveBackInProgress: predictiveBackRef.current,
+    });
+    processEmissionRef.current(emission);
+  }, [state, progressFraction]);
+
+  return animatedScale;
 }
 
 /**

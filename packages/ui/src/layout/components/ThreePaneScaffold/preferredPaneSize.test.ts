@@ -5,8 +5,23 @@ import {
 } from './preferredPaneSize';
 
 describe('preferred pane size', () => {
-  it('keeps positive absolute CSS-pixel sizes unchanged', () => {
+  it('rounds positive absolute sizes like AndroidX Dp.roundToPx()', () => {
     expect(resolvePanePreferredSize(320, 1000, 360, 'preferredWidth')).toBe(320);
+    expect(resolvePanePreferredSize(320.5, 1000, 360, 'preferredWidth')).toBe(321);
+    expect(resolvePanePreferredSize(0.4, 1000, 360, 'preferredWidth')).toBe(0);
+  });
+
+  it('validates absolute sizes after the AndroidX Dp Float boundary', () => {
+    expect(Math.fround(1e-50)).toBe(0);
+    expect(() => resolvePanePreferredSize(1e-50, 1000, 360, 'preferredWidth')).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts the AndroidX Dp.Infinity case as Constraints.Infinity', () => {
+    expect(
+      resolvePanePreferredSize(Number.POSITIVE_INFINITY, 1000, 360, 'preferredWidth'),
+    ).toBe(2147483647);
   });
 
   it('resolves proportions against the full scaffold dimension', () => {
@@ -30,6 +45,17 @@ describe('preferred pane size', () => {
     expect(resolvePanePreferredSize({ proportion: 0.58 }, 50, 20, 'preferredHeight')).toBe(29);
   });
 
+  it('saturates proportional Float.toInt at the Compose Int boundary', () => {
+    expect(
+      resolvePanePreferredSize(
+        preferredPaneSizeProportion(1),
+        2147483647,
+        360,
+        'preferredWidth',
+      ),
+    ).toBe(2147483647);
+  });
+
   it('validates the Float value seen by the AndroidX proportion overload', () => {
     const roundsToOne = 1 + Number.EPSILON;
     expect(preferredPaneSizeProportion(roundsToOne).proportion).toBe(1);
@@ -41,6 +67,7 @@ describe('preferred pane size', () => {
 
   it('falls back to the directive preferred size when unspecified', () => {
     expect(resolvePanePreferredSize(undefined, 1000, 360, 'preferredWidth')).toBe(360);
+    expect(resolvePanePreferredSize(Number.NaN, 1000, 360, 'preferredWidth')).toBe(360);
   });
 
   it('accepts the AndroidX proportion edge values', () => {

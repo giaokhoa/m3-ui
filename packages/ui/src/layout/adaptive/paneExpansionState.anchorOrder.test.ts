@@ -77,4 +77,27 @@ describe('PaneExpansionState physical anchor ordering', () => {
 
     expect(state.currentAnchor).toBe(anchors[0]);
   });
+
+  it('preserves AndroidX Int overflow while scoring opposite-direction anchors', async () => {
+    const overflowAnchor = PaneExpansionAnchor.fromEnd(Number.POSITIVE_INFINITY);
+    const currentAnchor = PaneExpansionAnchor.proportion(1);
+    const anchors = [overflowAnchor, currentAnchor];
+    const state = new PaneExpansionState({
+      anchors,
+      initialAnchoredIndex: 1,
+      animation: instantAnimation,
+    });
+    state.onMeasured(1000);
+
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(1000);
+
+    await state.settleToAnchorIfNeeded(200);
+
+    // Offset.fromEnd(+Infinity) resolves to 1000 - Int.MAX_VALUE. For positive
+    // velocity AndroidX computes maxExpansionWidth - delta with Int arithmetic;
+    // that score overflows negative and therefore wins minBy against the anchor
+    // at the current position. The selected raw target is then clamped to zero.
+    expect(state.currentAnchor).toBe(overflowAnchor);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(0);
+  });
 });

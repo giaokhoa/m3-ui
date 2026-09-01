@@ -7,7 +7,7 @@ import {
 } from './paneExpansionState';
 import {
   PaneExpansionStateCache,
-  paneExpansionAnchorsId,
+  paneExpansionAnchorsEqual,
   paneExpansionStateKeyId,
 } from './paneExpansionStateCache';
 import {
@@ -54,7 +54,18 @@ export function usePaneExpansionState({
 
   const resolvedKey = keyProvider?.paneExpansionStateKey ?? key ?? PaneExpansionStateKey.Default;
   const keyId = paneExpansionStateKeyId(resolvedKey);
-  const anchorsId = paneExpansionAnchorsId(anchors);
+  const anchorsDependencyRef = useRef<{
+    anchors: readonly PaneExpansionAnchor[];
+    token: object;
+  } | null>(null);
+  if (
+    anchorsDependencyRef.current === null ||
+    !paneExpansionAnchorsEqual(anchorsDependencyRef.current.anchors, anchors)
+  ) {
+    anchorsDependencyRef.current = { anchors, token: {} };
+  }
+  const anchorsDependency = anchorsDependencyRef.current.token;
+
   const cacheRef = useRef<PaneExpansionStateCache | null>(null);
   cacheRef.current ??= new PaneExpansionStateCache();
   const cache = cacheRef.current;
@@ -72,9 +83,9 @@ export function usePaneExpansionState({
       consumeDragDelta,
       animation,
     });
-    // keyId/anchorsId intentionally provide structural dependencies. AndroidX
-    // List/PaneExpansionStateKey equality is structural as well.
-  }, [cache, state, keyId, anchorsId, consumeDragDelta, animation]);
+    // AndroidX remember/LaunchedEffect compare anchor lists structurally using
+    // PaneExpansionAnchor.equals, including its identity fast path for NaN.
+  }, [cache, state, keyId, anchorsDependency, consumeDragDelta, animation]);
 
   return state;
 }

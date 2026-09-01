@@ -24,14 +24,25 @@ export const defaultPaneExpansionHandleAriaStrings: PaneExpansionHandleAriaStrin
     changeSplit: (anchorDescription: string) => `Change pane split to ${anchorDescription}`,
   });
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
+function composeFloatToInt(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
 export function describePaneExpansionAnchor(
   anchor: PaneExpansionAnchor,
   strings: PaneExpansionHandleAriaStrings = defaultPaneExpansionHandleAriaStrings,
 ): string {
   if (anchor.type === 'proportion') {
-    return strings.proportionAnchor(Math.trunc(Math.fround(anchor.proportion * 100)));
+    return strings.proportionAnchor(composeFloatToInt(Math.fround(anchor.proportion * 100)));
   }
-  const offset = Math.trunc(anchor.offset);
+  const offset = composeFloatToInt(anchor.offset);
   return anchor.direction === 'start'
     ? strings.startOffsetAnchor(offset)
     : strings.endOffsetAnchor(offset);

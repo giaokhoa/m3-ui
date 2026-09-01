@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import {
+  DockedEdge,
+  DragToResizeState,
+  DragToResizeValue,
+} from '../../adaptive/dragToResizeState';
 import { PaneMotion } from '../../adaptive/paneMotion';
 import { samplePaneMotionVectorSpringAtPlayTime } from '../../adaptive/paneMotionSpring';
 import type { PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
@@ -109,6 +114,55 @@ describe('calculateThreePaneScaffoldTransitionFrame', () => {
     expect(timing.durationMs).toBe(0);
     expect(calculateThreePaneScaffoldTransitionDuration(options(current, target))).toBe(0);
     expect(halfway.primary?.placement.width ?? 1000).toBeLessThan(1000);
+  });
+
+  it('keeps raw drag-resize geometry through levitated transition measurement', () => {
+    const resizeState = new DragToResizeState({
+      dockedEdge: DockedEdge.Bottom,
+      minSize: -20,
+    });
+    resizeState.measure({
+      measuringWidth: 360,
+      measuringHeight: 420,
+      scaffoldWidth: 1000,
+      scaffoldHeight: 800,
+    });
+    resizeState.snapTo(DragToResizeValue.Collapsed);
+
+    const current = value(true, false, false);
+    const target: ThreePaneScaffoldValue = {
+      ...current,
+      primary: PaneAdaptedValue.Levitated('center', undefined, resizeState),
+    };
+    const result = frame(current, target, 1);
+
+    // AndroidX Alignment sees raw IntSize(360, -20), placing its center at y=410,
+    // then PaneMeasurable clamps only the actual measured height to zero.
+    expect(result.primary?.motion).toBe(PaneMotion.AnimateBounds);
+    expect(result.primary?.placement.top).toBe(410);
+    expect(result.primary?.placement.width).toBe(360);
+    expect(result.primary?.placement.height).toBe(0);
+  });
+
+  it('uses raw negative measured widths for edge motion offsets', () => {
+    const current = value(true, true, false);
+    const target = value(true, false, false);
+    const result = calculateThreePaneScaffoldTransitionFrame({
+      width: 10,
+      height: 800,
+      directive,
+      currentValue: current,
+      targetValue: target,
+      paneOrder: order,
+      progressFraction: 1,
+    });
+
+    // allocatableWidth = 10 - 24 = -14, so AndroidX records -7px raw widths.
+    // Primary's raw right edge is therefore -7 and the adjacent secondary pane
+    // exits right by 10 - (-7) = 17px, even though both child widths measure at 0.
+    expect(result.secondary?.motion).toBe(PaneMotion.ExitToRight);
+    expect(result.secondary?.placement).toEqual({ left: 17, top: 0, width: 0, height: 800 });
+    expect(result.secondary?.translateX).toBeCloseTo(17);
   });
 
   it('uses spring-sampled size and offset for expand/shrink', () => {

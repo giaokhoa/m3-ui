@@ -28,25 +28,48 @@ export interface PaneMargins {
   insetBounds?: readonly PaneMarginInsetBounds[];
 }
 
-function finiteNonNegative(value: number | undefined, name: string) {
-  if (value === undefined) return 0;
-  if (!Number.isFinite(value) || value < 0) {
-    throw new RangeError(`${name} must be a finite, non-negative CSS pixel value`);
-  }
-  // AndroidX resolves fixed PaddingValues with roundToPx() before the pane
-  // edge clamp. At the browser's 1:1 CSS-pixel analogue, Math.round matches
-  // Kotlin's nearest-Int / positive-infinity tie behavior.
-  return Math.round(value);
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
+function isComposeInt(value: number) {
+  return Number.isInteger(value) && value >= ComposeIntMin && value <= ComposeIntMax;
 }
 
-function finiteEdge(value: number | undefined, fallback: number, name: string) {
-  if (value === undefined) return fallback;
-  if (!Number.isFinite(value)) {
-    throw new RangeError(`${name} must be a finite scaffold-local CSS pixel coordinate`);
+function composeIntAdd(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a - b) | 0 : a - b;
+}
+
+function composeRoundToInt(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) {
+    throw new RangeError('Cannot round NaN value');
   }
-  // RectRuler.current() is Float in Compose, but PaneMargins immediately calls
-  // roundToInt() before taking the union of ruler edges.
-  return Math.round(value);
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
+}
+
+function nonNegativeMargin(value: number | undefined, name: string) {
+  if (value === undefined) return 0;
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue) || floatValue < 0) {
+    throw new RangeError(`${name} must be a non-negative CSS pixel value`);
+  }
+  // AndroidX stores Dp as Float, then resolves fixed PaddingValues with
+  // roundToPx() before the pane-edge clamp. Positive infinity is valid Dp and
+  // becomes Int.MAX_VALUE.
+  return composeRoundToInt(floatValue);
+}
+
+function roundedEdge(value: number | undefined, fallback: number) {
+  if (value === undefined) return fallback;
+  // RectRuler.current() is Float in Compose, and PaneMargins immediately calls
+  // roundToInt(). Preserve that Float32 boundary before integer rounding.
+  return composeRoundToInt(value);
 }
 
 /**
@@ -73,10 +96,10 @@ export function applyPaneMargins(
     throw new RangeError('scaffoldHeight must be a finite, non-negative CSS pixel value');
   }
 
-  const inlineStart = finiteNonNegative(margins.inlineStart, 'inlineStart');
-  const inlineEnd = finiteNonNegative(margins.inlineEnd, 'inlineEnd');
-  const blockStart = finiteNonNegative(margins.blockStart, 'blockStart');
-  const blockEnd = finiteNonNegative(margins.blockEnd, 'blockEnd');
+  const inlineStart = nonNegativeMargin(margins.inlineStart, 'inlineStart');
+  const inlineEnd = nonNegativeMargin(margins.inlineEnd, 'inlineEnd');
+  const blockStart = nonNegativeMargin(margins.blockStart, 'blockStart');
+  const blockEnd = nonNegativeMargin(margins.blockEnd, 'blockEnd');
   const fixedLeft = direction === 'ltr' ? inlineStart : inlineEnd;
   const fixedRight = direction === 'ltr' ? inlineEnd : inlineStart;
 
@@ -84,36 +107,37 @@ export function applyPaneMargins(
   let insetTop = 0;
   let insetRight = scaffoldWidth;
   let insetBottom = scaffoldHeight;
-  for (const [index, bounds] of (margins.insetBounds ?? []).entries()) {
-    insetLeft = Math.max(
-      insetLeft,
-      finiteEdge(bounds.left, 0, `insetBounds[${index}].left`),
-    );
-    insetTop = Math.max(
-      insetTop,
-      finiteEdge(bounds.top, 0, `insetBounds[${index}].top`),
-    );
-    insetRight = Math.min(
-      insetRight,
-      finiteEdge(bounds.right, scaffoldWidth, `insetBounds[${index}].right`),
-    );
-    insetBottom = Math.min(
-      insetBottom,
-      finiteEdge(bounds.bottom, scaffoldHeight, `insetBounds[${index}].bottom`),
-    );
+  for (const bounds of margins.insetBounds ?? []) {
+    insetLeft = Math.max(insetLeft, roundedEdge(bounds.left, 0));
+    insetTop = Math.max(insetTop, roundedEdge(bounds.top, 0));
+    insetRight = Math.min(insetRight, roundedEdge(bounds.right, scaffoldWidth));
+    insetBottom = Math.min(insetBottom, roundedEdge(bounds.bottom, scaffoldHeight));
   }
 
-  const measuredRight = placement.left + placement.width;
-  const measuredBottom = placement.top + placement.height;
+  // Upstream measuredBounds is an IntRect before PaneMargins is applied. Its
+  // right/bottom construction, parent-edge margin subtraction, and resulting
+  // IntRect width/height all use wrapping Kotlin Int arithmetic. Preserve those
+  // boundaries for integer Compose geometry while leaving fractional browser
+  // measurements on their native number path.
+  const measuredRight = composeIntAdd(placement.left, placement.width);
+  const measuredBottom = composeIntAdd(placement.top, placement.height);
   const left = Math.max(placement.left, fixedLeft, insetLeft);
   const top = Math.max(placement.top, blockStart, insetTop);
-  const right = Math.min(measuredRight, scaffoldWidth - fixedRight, insetRight);
-  const bottom = Math.min(measuredBottom, scaffoldHeight - blockEnd, insetBottom);
+  const right = Math.min(
+    measuredRight,
+    composeIntSubtract(scaffoldWidth, fixedRight),
+    insetRight,
+  );
+  const bottom = Math.min(
+    measuredBottom,
+    composeIntSubtract(scaffoldHeight, blockEnd),
+    insetBottom,
+  );
 
   return {
     left,
     top,
-    width: Math.max(0, right - left),
-    height: Math.max(0, bottom - top),
+    width: Math.max(0, composeIntSubtract(right, left)),
+    height: Math.max(0, composeIntSubtract(bottom, top)),
   };
 }

@@ -31,11 +31,18 @@ import {
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldState,
 } from '../../adaptive/threePaneScaffoldState';
+import { hasReactNodeContent } from '../../reactNode';
 import {
   getDragToResizeHandleAriaState,
   type DragToResizeHandleAriaStrings,
 } from './dragToResizeSemantics';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
+import { calculateLevitatedPaneResizePlacement } from './LevitatedPane.resizeLayout';
+import {
+  getLevitatedResizeStates,
+  getLevitatedResizeStatesSnapshot,
+  subscribeLevitatedResizeStates,
+} from './levitatedResizeStateStore';
 import {
   calculatePaneExpansionDragHandleFadeFrame,
   calculatePaneExpansionDragHandlePlacement,
@@ -48,6 +55,7 @@ import {
 } from './paneExpansionSemantics';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
 import type { PanePreferredSize } from './preferredPaneSize';
+import { requestPaneDestinationFocus } from './ThreePaneScaffold.focus';
 import {
   calculateThreePaneScaffoldLayout,
   type PanePlacement,
@@ -57,14 +65,22 @@ import {
   getPredictiveBackLayerStyle,
   usePredictiveBackScale,
 } from './ThreePaneScaffold.predictiveBack';
+import { createThreePaneScaffoldSeekingRemeasureSource } from './ThreePaneScaffold.seekingRemeasure';
 import {
   calculateThreePaneScaffoldTransitionDuration,
   calculateThreePaneScaffoldTransitionFrame,
-  captureThreePaneScaffoldTransitionOrigin,
-  interpolateThreePaneScaffoldTransitionFrames,
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
+  type ThreePaneScaffoldTransitionLayoutOptions,
 } from './ThreePaneScaffold.transition';
+import {
+  calculateThreePaneScaffoldVisibilityInterruptionDurationMs,
+  createThreePaneScaffoldVisibilityInterruption,
+  sampleThreePaneScaffoldVisibilityInterruption,
+  updateThreePaneScaffoldVisibilityInterruptionLayout,
+  type ThreePaneScaffoldTransitionSnapshot,
+  type ThreePaneScaffoldVisibilityInterruption,
+} from './ThreePaneScaffold.visibilityInterruption';
 import { useDefaultPaneExpansionState } from './useDefaultPaneExpansionState';
 import './three-pane-scaffold.css';
 
@@ -75,7 +91,7 @@ export type LevitatedPaneDragHandle =
 export interface ThreePaneScaffoldProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   directive: PaneScaffoldDirective;
-  /** Static adapted value. Provide exactly one of value or scaffoldState. */
+  /** Adapted-value overload. Updates animate through internal state like AndroidX. */
   value?: ThreePaneScaffoldValue;
   /** Seekable/animated adapted value. Provide exactly one of value or scaffoldState. */
   scaffoldState?: ThreePaneScaffoldState;
@@ -106,6 +122,7 @@ export interface ThreePaneScaffoldProps
    * drag target like AndroidX AnimatedPane.
    */
   levitatedPaneDragHandles?: Partial<Record<ThreePaneScaffoldRole, LevitatedPaneDragHandle>>;
+  /** Optional web accessible-name override for the levitated resize action. */
   levitatedPaneDragHandleAriaLabel?: string;
   /** Localized formatters for levitated resize-handle state and next action text. */
   levitatedPaneDragHandleAriaStrings?: Partial<DragToResizeHandleAriaStrings>;
@@ -124,6 +141,8 @@ interface PointerDrag {
   lastX: number;
   lastTime: number;
   velocity: number;
+  accumulated: number;
+  dragging: boolean;
 }
 
 interface ResizePointerDrag {
@@ -132,7 +151,10 @@ interface ResizePointerDrag {
   lastX: number;
   lastY: number;
   accumulated: number;
+  clickMovementX: number;
+  clickMovementY: number;
   dragging: boolean;
+  canClickToResize: boolean;
 }
 
 const emptyGeometry: ScaffoldGeometry = {
@@ -143,9 +165,9 @@ const emptyGeometry: ScaffoldGeometry = {
   direction: 'ltr',
 };
 
-const noStoreSubscribe = () => () => {};
-const noStoreSnapshot = () => 0;
-const ResizePointerSlop = 4;
+// Browser gesture-arbitration threshold. This is a platform input adaptation,
+// not a Material layout metric or token.
+const BrowserPointerSlop = 4;
 const ResizeInteractiveSelector = [
   'a[href]',
   'button',
@@ -177,10 +199,10 @@ const defaultPaneAriaLabels: Record<ThreePaneScaffoldRole, string> = {
 
 function sameGeometry(a: ScaffoldGeometry, b: ScaffoldGeometry) {
   return (
-    Math.abs(a.width - b.width) < 0.5 &&
-    Math.abs(a.height - b.height) < 0.5 &&
-    Math.abs(a.viewportLeft - b.viewportLeft) < 0.5 &&
-    Math.abs(a.viewportTop - b.viewportTop) < 0.5 &&
+    a.width === b.width &&
+    a.height === b.height &&
+    a.viewportLeft === b.viewportLeft &&
+    a.viewportTop === b.viewportTop &&
     a.direction === b.direction
   );
 }
@@ -241,11 +263,11 @@ export function ThreePaneScaffold({
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionDragHandleMinTouchTargetSize = 48,
-  paneExpansionHandleAriaLabel = 'Resize panes',
+  paneExpansionHandleAriaLabel = 'Pane expansion drag handle',
   paneExpansionHandleAriaStrings,
   paneAriaLabels,
   levitatedPaneDragHandles,
-  levitatedPaneDragHandleAriaLabel = 'Resize pane',
+  levitatedPaneDragHandleAriaLabel,
   levitatedPaneDragHandleAriaStrings,
   className,
   style,
@@ -255,7 +277,14 @@ export function ThreePaneScaffold({
     throw new Error('ThreePaneScaffold requires exactly one of value or scaffoldState');
   }
 
+  const internalScaffoldStateRef = useRef<MutableThreePaneScaffoldState | null>(null);
+  if (value !== undefined && internalScaffoldStateRef.current === null) {
+    internalScaffoldStateRef.current = new MutableThreePaneScaffoldState(value);
+  }
+  const activeScaffoldState = scaffoldState ?? internalScaffoldStateRef.current!;
+
   const rootRef = useRef<HTMLDivElement>(null);
+  const transitionOwnerRef = useRef<object>({});
   const paneRefs = useRef<Partial<Record<ThreePaneScaffoldRole, HTMLDivElement>>>({});
   const pointerDragRef = useRef<PointerDrag | null>(null);
   const resizePointerDragRef = useRef<ResizePointerDrag | null>(null);
@@ -264,50 +293,67 @@ export function ThreePaneScaffold({
     targetOffsetX: PaneExpansionUnspecified,
   });
   const previousTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
+  const previousTransitionSnapshotRef = useRef<ThreePaneScaffoldTransitionSnapshot | undefined>(
+    undefined,
+  );
+  const previousAnimationPlayTimeMsRef = useRef(0);
+  const previousInitialValueAnimationsClearRevisionRef = useRef<number | null>(null);
   const renderedTransitionFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(
     undefined,
   );
-  const retargetOriginFrameRef = useRef<ThreePaneScaffoldTransitionFrame | undefined>(undefined);
+  const visibilityInterruptionRef = useRef<ThreePaneScaffoldVisibilityInterruption | undefined>(
+    undefined,
+  );
   const retargetTargetValueRef = useRef<ThreePaneScaffoldValue | null>(null);
   const [geometry, setGeometry] = useState<ScaffoldGeometry>(emptyGeometry);
 
   useSyncExternalStore(
-    scaffoldState?.subscribe ?? noStoreSubscribe,
-    scaffoldState?.getSnapshot ?? noStoreSnapshot,
-    scaffoldState?.getSnapshot ?? noStoreSnapshot,
+    activeScaffoldState.subscribe,
+    activeScaffoldState.getSnapshot,
+    activeScaffoldState.getSnapshot,
   );
 
-  const targetValue = scaffoldState?.targetState ?? value!;
+  const targetValue = activeScaffoldState.targetState;
+  const hasPaneExpansionDragHandleSpec =
+    typeof paneExpansionDragHandle === 'function' ||
+    hasReactNodeContent(paneExpansionDragHandle);
   const defaultExpansionState = useDefaultPaneExpansionState(
     targetValue,
-    paneExpansionDragHandle != null,
+    hasPaneExpansionDragHandleSpec,
   );
   const expansionState = paneExpansionState ?? defaultExpansionState;
-  const currentValue = scaffoldState?.currentState ?? targetValue;
-  const transitionActive =
-    scaffoldState !== undefined &&
-    !threePaneScaffoldValuesEqual(currentValue, targetValue);
+  const dragHandle =
+    typeof paneExpansionDragHandle === 'function'
+      ? paneExpansionDragHandle(expansionState)
+      : paneExpansionDragHandle;
+  const hasPaneExpansionDragHandle = hasReactNodeContent(dragHandle);
+  const currentValue = activeScaffoldState.currentState;
+  const transitionActive = !threePaneScaffoldValuesEqual(currentValue, targetValue);
 
+  const primaryPaneAvailable = hasReactNodeContent(primaryPane);
+  const secondaryPaneAvailable = hasReactNodeContent(secondaryPane);
+  const tertiaryPaneAvailable = hasReactNodeContent(tertiaryPane);
+  const paneAvailability = {
+    primary: primaryPaneAvailable,
+    secondary: secondaryPaneAvailable,
+    tertiary: tertiaryPaneAvailable,
+  } as const;
   const paneEntries: Array<[ThreePaneScaffoldRole, ReactNode]> = [
     ['primary', primaryPane],
     ['secondary', secondaryPane],
     ['tertiary', tertiaryPane],
   ];
-  const activeResizeState = paneEntries
-    .map(([role]) => getPaneAdaptedValue(targetValue, role))
-    .find((paneValue) => paneValue.type === 'levitated' && paneValue.dragToResizeState != null);
-  const resizeState =
-    activeResizeState?.type === 'levitated' ? activeResizeState.dragToResizeState : undefined;
+  const resizeStates = getLevitatedResizeStates(currentValue, targetValue);
 
-  useSyncExternalStore(
+  const expansionRevision = useSyncExternalStore(
     expansionState.subscribe,
     expansionState.getSnapshot,
     expansionState.getSnapshot,
   );
-  useSyncExternalStore(
-    resizeState?.subscribe ?? noStoreSubscribe,
-    resizeState?.getSnapshot ?? noStoreSnapshot,
-    resizeState?.getSnapshot ?? noStoreSnapshot,
+  const resizeRevision = useSyncExternalStore(
+    (listener) => subscribeLevitatedResizeStates(resizeStates, listener),
+    () => getLevitatedResizeStatesSnapshot(resizeStates),
+    () => getLevitatedResizeStatesSnapshot(resizeStates),
   );
 
   useLayoutEffect(() => {
@@ -328,8 +374,12 @@ export function ThreePaneScaffold({
 
     measure();
     window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
     if (typeof ResizeObserver === 'undefined') {
-      return () => window.removeEventListener('resize', measure);
+      return () => {
+        window.removeEventListener('resize', measure);
+        window.removeEventListener('scroll', measure, true);
+      };
     }
 
     const observer = new ResizeObserver(measure);
@@ -337,51 +387,92 @@ export function ThreePaneScaffold({
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
     };
-  }, []);
+  }, [className, props.dir, style?.direction]);
 
   useLayoutEffect(() => {
     expansionState.onMeasured(geometry.width, geometry.direction);
   }, [expansionState, geometry.direction, geometry.width]);
 
   useLayoutEffect(() => {
-    if (
-      !directive.shouldAutoFocusCurrentDestination ||
-      targetValue.currentDestination === undefined
-    ) {
+    if (!(activeScaffoldState instanceof MutableThreePaneScaffoldState) || geometry.width <= 0) {
       return;
     }
-    paneRefs.current[targetValue.currentDestination]?.focus({ preventScroll: true });
-  }, [directive.shouldAutoFocusCurrentDestination, targetValue.currentDestination]);
-
-  useLayoutEffect(() => {
-    if (!(scaffoldState instanceof MutableThreePaneScaffoldState) || geometry.width <= 0) {
-      return;
-    }
-    return scaffoldState.setTransitionDurationResolver((from, to) => {
-      const localExcludedBounds: LayoutBounds[] = directive.excludedBounds.map((bound) => ({
-        left: bound.left - geometry.viewportLeft,
-        top: bound.top - geometry.viewportTop,
-        right: bound.right - geometry.viewportLeft,
-        bottom: bound.bottom - geometry.viewportTop,
-      }));
-      return calculateThreePaneScaffoldTransitionDuration({
-        width: geometry.width,
-        height: geometry.height,
-        directive,
-        currentValue: from,
-        targetValue: to,
-        paneOrder,
-        direction: geometry.direction,
-        excludedBounds: localExcludedBounds,
-        preferredWidths,
-        preferredHeights,
-        paneMargins,
-        paneExpansionState: expansionState,
-      });
-    });
+    return activeScaffoldState.setTransitionDurationResolver(
+      transitionOwnerRef.current,
+      (from, to) => {
+        const localExcludedBounds: LayoutBounds[] = directive.excludedBounds.map((bound) => ({
+          left: bound.left - geometry.viewportLeft,
+          top: bound.top - geometry.viewportTop,
+          right: bound.right - geometry.viewportLeft,
+          bottom: bound.bottom - geometry.viewportTop,
+        }));
+        const destinationLayout: ThreePaneScaffoldTransitionLayoutOptions = {
+          width: geometry.width,
+          height: geometry.height,
+          directive,
+          currentValue: from,
+          targetValue: to,
+          paneOrder,
+          direction: geometry.direction,
+          excludedBounds: localExcludedBounds,
+          preferredWidths,
+          preferredHeights,
+          paneMargins,
+          paneExpansionState: expansionState,
+          paneAvailability: {
+            primary: primaryPaneAvailable,
+            secondary: secondaryPaneAvailable,
+            tertiary: tertiaryPaneAvailable,
+          },
+        };
+        const renderedClearRevision = previousInitialValueAnimationsClearRevisionRef.current;
+        if (
+          renderedClearRevision !== null &&
+          activeScaffoldState.initialValueAnimationsClearRevision !== renderedClearRevision
+        ) {
+          return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
+        }
+        const activeInterruption = visibilityInterruptionRef.current;
+        if (
+          activeInterruption !== undefined &&
+          retargetTargetValueRef.current !== null &&
+          threePaneScaffoldValuesEqual(retargetTargetValueRef.current, to) &&
+          threePaneScaffoldValuesEqual(activeScaffoldState.currentState, from) &&
+          threePaneScaffoldValuesEqual(activeScaffoldState.targetState, to)
+        ) {
+          return calculateThreePaneScaffoldVisibilityInterruptionDurationMs(
+            activeInterruption,
+            activeScaffoldState.animationPlayTimeMs,
+          );
+        }
+        const previousSnapshot = previousTransitionSnapshotRef.current;
+        const renderedFrame = renderedTransitionFrameRef.current;
+        if (
+          previousSnapshot !== undefined &&
+          renderedFrame !== undefined &&
+          threePaneScaffoldValuesEqual(previousSnapshot.layout.targetValue, from) &&
+          !threePaneScaffoldValuesEqual(from, to)
+        ) {
+          return createThreePaneScaffoldVisibilityInterruption({
+            renderedFrame,
+            previousSnapshot,
+            destinationLayout,
+            previousInterruption:
+              visibilityInterruptionRef.current === undefined
+                ? undefined
+                : {
+                    interruption: visibilityInterruptionRef.current,
+                    elapsedMs: previousAnimationPlayTimeMsRef.current,
+                  },
+          }).durationMs;
+        }
+        return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
+      },
+    );
   }, [
-    scaffoldState,
+    activeScaffoldState,
     geometry.width,
     geometry.height,
     geometry.viewportLeft,
@@ -393,7 +484,28 @@ export function ThreePaneScaffold({
     preferredHeights,
     paneMargins,
     expansionState,
+    expansionRevision,
+    resizeRevision,
+    primaryPaneAvailable,
+    secondaryPaneAvailable,
+    tertiaryPaneAvailable,
   ]);
+
+  useLayoutEffect(() => {
+    if (value === undefined || internalScaffoldStateRef.current === null) return;
+    void internalScaffoldStateRef.current.animateTo(value);
+  }, [geometry.width, value]);
+
+  useLayoutEffect(() => {
+    if (
+      !directive.shouldAutoFocusCurrentDestination ||
+      targetValue.currentDestination === undefined
+    ) {
+      return;
+    }
+    const pane = paneRefs.current[targetValue.currentDestination];
+    if (pane !== undefined) requestPaneDestinationFocus(pane);
+  }, [directive.shouldAutoFocusCurrentDestination, targetValue.currentDestination]);
 
   const excludedBounds: LayoutBounds[] = directive.excludedBounds.map((bound) => ({
     left: bound.left - geometry.viewportLeft,
@@ -414,78 +526,168 @@ export function ThreePaneScaffold({
     preferredHeights,
     paneMargins,
     paneExpansionState: expansionState,
+    paneAvailability,
   });
 
+  const transitionLayout: ThreePaneScaffoldTransitionLayoutOptions = {
+    width: geometry.width,
+    height: geometry.height,
+    directive,
+    currentValue,
+    targetValue,
+    paneOrder,
+    direction: geometry.direction,
+    excludedBounds,
+    preferredWidths,
+    preferredHeights,
+    paneMargins,
+    paneExpansionState: expansionState,
+    paneAvailability,
+  };
   const calculateTransitionFrameAt = (progressFraction: number) =>
     calculateThreePaneScaffoldTransitionFrame({
-      width: geometry.width,
-      height: geometry.height,
-      directive,
-      currentValue,
-      targetValue,
+      ...transitionLayout,
       progressFraction,
-      paneOrder,
-      direction: geometry.direction,
-      excludedBounds,
-      preferredWidths,
-      preferredHeights,
-      paneMargins,
-      paneExpansionState: expansionState,
     });
 
-  const rawTransitionFrame =
-    transitionActive && scaffoldState !== undefined
-      ? calculateTransitionFrameAt(scaffoldState.progressFraction)
+  const rawTransitionFrame = transitionActive
+    ? calculateTransitionFrameAt(activeScaffoldState.progressFraction)
+    : undefined;
+  const currentTransitionSnapshot: ThreePaneScaffoldTransitionSnapshot | undefined =
+    transitionActive
+      ? {
+          layout: transitionLayout,
+          progressFraction: activeScaffoldState.progressFraction,
+          runningTimeline:
+            activeScaffoldState instanceof MutableThreePaneScaffoldState
+              ? activeScaffoldState.defaultAnimationTimeline
+              : undefined,
+        }
       : undefined;
+  const animationPlayTimeMs =
+    activeScaffoldState instanceof MutableThreePaneScaffoldState
+      ? activeScaffoldState.animationPlayTimeMs
+      : transitionActive
+        ? calculateThreePaneScaffoldTransitionDuration(transitionLayout) *
+          activeScaffoldState.progressFraction
+        : 0;
+  const initialValueAnimationsClearRevision =
+    activeScaffoldState instanceof MutableThreePaneScaffoldState
+      ? activeScaffoldState.initialValueAnimationsClearRevision
+      : null;
+
+  if (initialValueAnimationsClearRevision === null) {
+    previousInitialValueAnimationsClearRevisionRef.current = null;
+  } else {
+    const previousClearRevision = previousInitialValueAnimationsClearRevisionRef.current;
+    if (
+      previousClearRevision !== null &&
+      previousClearRevision !== initialValueAnimationsClearRevision
+    ) {
+      previousTargetValueRef.current = null;
+      previousTransitionSnapshotRef.current = undefined;
+      previousAnimationPlayTimeMsRef.current = 0;
+      renderedTransitionFrameRef.current = undefined;
+      visibilityInterruptionRef.current = undefined;
+      retargetTargetValueRef.current = null;
+    }
+    previousInitialValueAnimationsClearRevisionRef.current =
+      initialValueAnimationsClearRevision;
+  }
+
   let transitionFrame = rawTransitionFrame;
 
-  if (transitionActive && scaffoldState !== undefined && rawTransitionFrame !== undefined) {
+  if (transitionActive && rawTransitionFrame !== undefined) {
     const previousTargetValue = previousTargetValueRef.current;
+    const previousSnapshot = previousTransitionSnapshotRef.current;
     if (
       previousTargetValue !== null &&
       !threePaneScaffoldValuesEqual(previousTargetValue, targetValue) &&
+      previousSnapshot !== undefined &&
       renderedTransitionFrameRef.current !== undefined
     ) {
-      retargetOriginFrameRef.current = captureThreePaneScaffoldTransitionOrigin(
-        renderedTransitionFrameRef.current,
-        calculateTransitionFrameAt(0),
-      );
+      visibilityInterruptionRef.current = createThreePaneScaffoldVisibilityInterruption({
+        renderedFrame: renderedTransitionFrameRef.current,
+        previousSnapshot,
+        destinationLayout: transitionLayout,
+        previousInterruption:
+          visibilityInterruptionRef.current === undefined
+            ? undefined
+            : {
+                interruption: visibilityInterruptionRef.current,
+                elapsedMs: previousAnimationPlayTimeMsRef.current,
+              },
+      });
       retargetTargetValueRef.current = targetValue;
     }
 
     if (
-      retargetOriginFrameRef.current !== undefined &&
+      visibilityInterruptionRef.current === undefined &&
+      previousTargetValue !== null &&
+      threePaneScaffoldValuesEqual(previousTargetValue, targetValue) &&
+      previousSnapshot !== undefined &&
+      renderedTransitionFrameRef.current !== undefined
+    ) {
+      const remeasureSource = createThreePaneScaffoldSeekingRemeasureSource(previousSnapshot);
+      const remeasured = updateThreePaneScaffoldVisibilityInterruptionLayout({
+        interruption: remeasureSource,
+        renderedFrame: renderedTransitionFrameRef.current,
+        destinationLayout: transitionLayout,
+        elapsedMs: animationPlayTimeMs,
+        progressFraction: activeScaffoldState.progressFraction,
+      });
+      if (remeasured !== remeasureSource) {
+        visibilityInterruptionRef.current = remeasured;
+        retargetTargetValueRef.current = targetValue;
+      }
+    }
+
+    const activeInterruption = visibilityInterruptionRef.current;
+    const renderedFrame = renderedTransitionFrameRef.current;
+    if (
+      activeInterruption !== undefined &&
+      renderedFrame !== undefined &&
       retargetTargetValueRef.current !== null &&
       threePaneScaffoldValuesEqual(retargetTargetValueRef.current, targetValue)
     ) {
-      transitionFrame = interpolateThreePaneScaffoldTransitionFrames(
-        retargetOriginFrameRef.current,
-        calculateTransitionFrameAt(1),
-        scaffoldState.progressFraction,
+      const updatedInterruption = updateThreePaneScaffoldVisibilityInterruptionLayout({
+        interruption: activeInterruption,
+        renderedFrame,
+        destinationLayout: transitionLayout,
+        elapsedMs: animationPlayTimeMs,
+        progressFraction: activeScaffoldState.progressFraction,
+      });
+      visibilityInterruptionRef.current = updatedInterruption;
+      transitionFrame = sampleThreePaneScaffoldVisibilityInterruption(
+        updatedInterruption,
+        animationPlayTimeMs,
+        activeScaffoldState.progressFraction,
       );
     }
   } else {
-    retargetOriginFrameRef.current = undefined;
+    visibilityInterruptionRef.current = undefined;
     retargetTargetValueRef.current = null;
   }
 
   previousTargetValueRef.current = targetValue;
+  previousTransitionSnapshotRef.current = currentTransitionSnapshot;
+  previousAnimationPlayTimeMsRef.current = animationPlayTimeMs;
   renderedTransitionFrameRef.current = transitionFrame;
 
   const expansionLayout = expansionState.getLayoutState(geometry.width, geometry.direction);
   const transitionScrimBlocks =
-    transitionFrame?.scrim != null && transitionFrame.scrimOpacity > 0;
+    hasReactNodeContent(transitionFrame?.scrim) && transitionFrame!.scrimOpacity > 0;
   const hasBlockingScrim = transitionScrimBlocks || hasLevitatedPaneWithScrim(targetValue);
 
-  let targetDragHandleOffset = PaneExpansionUnspecified;
-  if (paneExpansionDragHandle != null) {
+  let measuredDragHandleOffset = PaneExpansionUnspecified;
+  if (hasPaneExpansionDragHandle) {
     if (
       expansionState.isDraggingOrSettling &&
       expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified
     ) {
-      targetDragHandleOffset = expansionLayout.currentDraggingOffset;
+      measuredDragHandleOffset = expansionLayout.currentDraggingOffset;
     } else {
-      targetDragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
+      measuredDragHandleOffset = calculatePaneExpansionSpacerMiddleOffset({
         layout,
         layoutOptions: {
           width: geometry.width,
@@ -499,10 +701,29 @@ export function ThreePaneScaffold({
           preferredHeights,
           paneMargins,
           paneExpansionState: expansionState,
+          paneAvailability,
         },
       });
     }
   }
+
+  // AnimateWithFading observes the drag handle's lookahead placement offset,
+  // after measureAndPlaceDragHandleIfNeeded has coerced the raw spacer midpoint
+  // into the content bounds. Keep the raw midpoint separately for expansion
+  // state measurement, which happens before that placement clamp upstream.
+  const targetDragHandlePlacement =
+    hasPaneExpansionDragHandle &&
+    measuredDragHandleOffset !== PaneExpansionUnspecified &&
+    geometry.width > 0
+      ? calculatePaneExpansionDragHandlePlacement({
+          offsetX: measuredDragHandleOffset,
+          contentWidth: geometry.width,
+          partitionSpacerSize: directive.horizontalPartitionSpacerSize,
+          minTouchTargetSize: paneExpansionDragHandleMinTouchTargetSize,
+        })
+      : undefined;
+  const targetDragHandleOffset =
+    targetDragHandlePlacement?.centerX ?? measuredDragHandleOffset;
 
   dragHandleFadeOffsetsRef.current = updatePaneExpansionDragHandleFadeOffsets(
     dragHandleFadeOffsetsRef.current,
@@ -513,23 +734,21 @@ export function ThreePaneScaffold({
     targetOffsetX: trackedDragHandleTargetOffset,
   } = dragHandleFadeOffsetsRef.current;
   const showDragHandle =
-    paneExpansionDragHandle != null &&
+    hasPaneExpansionDragHandle &&
     trackedDragHandleTargetOffset !== PaneExpansionUnspecified;
   const dragHandleFadeFrame =
     transitionActive &&
-    scaffoldState !== undefined &&
     dragHandleOriginalOffset !== PaneExpansionUnspecified &&
     trackedDragHandleTargetOffset !== PaneExpansionUnspecified
       ? calculatePaneExpansionDragHandleFadeFrame({
           currentOffsetX: dragHandleOriginalOffset,
           targetOffsetX: trackedDragHandleTargetOffset,
-          progressFraction: scaffoldState.progressFraction,
+          progressFraction: activeScaffoldState.progressFraction,
         })
       : undefined;
   const dragHandleOffset =
     dragHandleFadeFrame?.offsetX ?? trackedDragHandleTargetOffset;
   const dragHandleOpacity = dragHandleFadeFrame?.opacity ?? 1;
-  const measuredDragHandleOffset = trackedDragHandleTargetOffset;
   const dragHandleInteractionBlocked = hasBlockingScrim;
 
   const dragHandlePlacement =
@@ -558,16 +777,14 @@ export function ThreePaneScaffold({
     ) {
       return;
     }
-    event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
-    expansionState.beginDrag();
     pointerDragRef.current = {
       pointerId: event.pointerId,
       lastX: event.clientX,
       lastTime: event.timeStamp,
       velocity: 0,
+      accumulated: 0,
+      dragging: false,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -578,35 +795,47 @@ export function ThreePaneScaffold({
     drag.velocity = (delta / elapsed) * 1000;
     drag.lastX = event.clientX;
     drag.lastTime = event.timeStamp;
+
+    if (!drag.dragging) {
+      drag.accumulated += delta;
+      if (Math.abs(drag.accumulated) < BrowserPointerSlop) return;
+      drag.dragging = true;
+      expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
+      expansionState.beginDrag();
+      if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+      expansionState.dispatchRawDelta(drag.accumulated);
+      drag.accumulated = 0;
+      event.preventDefault();
+      return;
+    }
+
     expansionState.dispatchRawDelta(delta);
+    event.preventDefault();
   };
 
   const finishPointerDrag = (event: ReactPointerEvent<HTMLDivElement>, velocity: number) => {
     const drag = pointerDragRef.current;
     if (drag === null || drag.pointerId !== event.pointerId) return;
     pointerDragRef.current = null;
-    expansionState.endDrag(velocity);
+    if (drag.dragging) expansionState.endDrag(velocity);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
   };
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (hasBlockingScrim || dragHandleOffset === PaneExpansionUnspecified) return;
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      if (expansionState.nextAnchor === null) return;
-      event.preventDefault();
-      expansionState.moveToNextAnchor();
+    if (
+      hasBlockingScrim ||
+      dragHandleOffset === PaneExpansionUnspecified ||
+      (event.key !== 'Enter' && event.key !== ' ')
+    ) {
       return;
     }
-
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (expansionState.nextAnchor === null) return;
     event.preventDefault();
-    expansionState.onExpansionOffsetMeasured(measuredDragHandleOffset);
-    expansionState.beginDrag();
-    expansionState.dispatchRawDelta(event.key === 'ArrowLeft' ? -16 : 16);
-    expansionState.endDrag(0);
+    expansionState.moveToNextAnchor();
   };
 
   const handleClick = (event: ReactMouseEvent<HTMLDivElement>) => {
@@ -621,23 +850,18 @@ export function ThreePaneScaffold({
     event: ReactPointerEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (
-      !event.isPrimary ||
-      event.button !== 0 ||
-      transitionActive ||
-      isInteractiveResizeDescendant(event.target, event.currentTarget)
-    ) {
-      return;
-    }
+    if (!event.isPrimary || event.button !== 0) return;
     resizePointerDragRef.current = {
       pointerId: event.pointerId,
       state,
       lastX: event.clientX,
       lastY: event.clientY,
       accumulated: 0,
+      clickMovementX: 0,
+      clickMovementY: 0,
       dragging: false,
+      canClickToResize: !isInteractiveResizeDescendant(event.target, event.currentTarget),
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const moveResize = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -648,12 +872,22 @@ export function ThreePaneScaffold({
     const deltaY = event.clientY - drag.lastY;
     drag.lastX = event.clientX;
     drag.lastY = event.clientY;
+    drag.clickMovementX += deltaX;
+    drag.clickMovementY += deltaY;
+    if (
+      Math.hypot(drag.clickMovementX, drag.clickMovementY) >= BrowserPointerSlop
+    ) {
+      drag.canClickToResize = false;
+    }
     const axisDelta = drag.state.orientation === 'horizontal' ? deltaX : deltaY;
 
     if (!drag.dragging) {
       drag.accumulated += axisDelta;
-      if (Math.abs(drag.accumulated) < ResizePointerSlop) return;
+      if (Math.abs(drag.accumulated) < BrowserPointerSlop) return;
       drag.dragging = true;
+      if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
       drag.state.dispatchRawDelta(drag.accumulated, geometry.direction);
       drag.accumulated = 0;
       event.preventDefault();
@@ -668,7 +902,9 @@ export function ThreePaneScaffold({
     const drag = resizePointerDragRef.current;
     if (drag === null || drag.pointerId !== event.pointerId) return;
     resizePointerDragRef.current = null;
-    if (!cancelled && !drag.dragging) drag.state.moveToNextState();
+    if (!cancelled && !drag.dragging && drag.canClickToResize) {
+      drag.state.moveToNextState();
+    }
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -678,7 +914,7 @@ export function ThreePaneScaffold({
     event: ReactKeyboardEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (transitionActive || (event.key !== 'Enter' && event.key !== ' ')) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     state.moveToNextState();
   };
@@ -687,7 +923,7 @@ export function ThreePaneScaffold({
     event: ReactMouseEvent<HTMLDivElement>,
     state: DragToResizeState,
   ) => {
-    if (transitionActive || event.detail !== 0) return;
+    if (event.detail !== 0) return;
     event.preventDefault();
     state.moveToNextState();
   };
@@ -696,28 +932,28 @@ export function ThreePaneScaffold({
   if (!transitionActive) {
     for (const [role] of paneEntries) {
       const adaptedValue = getPaneAdaptedValue(targetValue, role);
-      if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
+      if (
+        adaptedValue.type === 'levitated' &&
+        hasReactNodeContent(adaptedValue.scrim)
+      ) {
         staticScrim = adaptedValue.scrim;
         break;
       }
     }
   }
   const renderedScrim = transitionFrame?.scrim ?? staticScrim;
-  const scrimOpacity = transitionFrame?.scrimOpacity ?? (staticScrim == null ? 0 : 1);
+  const scrimOpacity =
+    transitionFrame?.scrimOpacity ?? (hasReactNodeContent(staticScrim) ? 1 : 0);
 
-  const dragHandle =
-    typeof paneExpansionDragHandle === 'function'
-      ? paneExpansionDragHandle(expansionState)
-      : paneExpansionDragHandle;
-  const dragHandlePercent =
-    measuredDragHandleOffset === PaneExpansionUnspecified || geometry.width <= 0
-      ? 0
-      : Math.round((measuredDragHandleOffset / geometry.width) * 100);
   const dragHandleAriaState = getPaneExpansionHandleAriaState(
     expansionState,
     paneExpansionHandleAriaStrings,
   );
-  const predictiveBackScale = usePredictiveBackScale(scaffoldState);
+  const dragHandleAriaDescription =
+    [dragHandleAriaState.valueText, dragHandleAriaState.description]
+      .filter((value): value is string => value !== undefined)
+      .join('. ') || undefined;
+  const predictiveBackScale = usePredictiveBackScale(activeScaffoldState);
 
   return (
     <div
@@ -734,7 +970,7 @@ export function ThreePaneScaffold({
         {paneEntries.map(([role, content]) => {
           const adaptedValue = getPaneAdaptedValue(targetValue, role);
           const frame = transitionFrame?.[role];
-          if (content == null) return null;
+          if (!hasReactNodeContent(content)) return null;
 
           // AndroidX disposes Hidden pane composition while SaveableStateProvider
           // retains pane-local state. React 19.2 Activity is the native analogue:
@@ -764,14 +1000,13 @@ export function ThreePaneScaffold({
             const unmarginedPlacement =
               resized === undefined
                 ? basePlacement
-                : calculateLevitatedPanePlacement({
-                    width: geometry.width,
-                    height: geometry.height,
-                    directive,
+                : calculateLevitatedPaneResizePlacement({
+                    rawWidth: resized.width,
+                    rawHeight: resized.height,
+                    scaffoldWidth: geometry.width,
+                    scaffoldHeight: geometry.height,
                     alignment: adaptedValue.alignment,
                     direction: geometry.direction,
-                    preferredWidth: resized.width,
-                    preferredHeight: resized.height,
                   });
             placement = applyPaneMargins(
               unmarginedPlacement,
@@ -786,10 +1021,7 @@ export function ThreePaneScaffold({
           if (placement === undefined && !staticallyHidden) return null;
 
           const frameLevitated = frame?.levitated ?? adaptedValue.type === 'levitated';
-          const interactable =
-            !staticallyHidden &&
-            isPaneInteractable(targetValue, role) &&
-            !(transitionScrimBlocks && adaptedValue.type !== 'levitated');
+          const interactable = !staticallyHidden && isPaneInteractable(targetValue, role);
           const paneAriaLabel = paneAriaLabels?.[role] ?? defaultPaneAriaLabels[role];
           const paneResizeState =
             adaptedValue.type === 'levitated' ? adaptedValue.dragToResizeState : undefined;
@@ -800,6 +1032,8 @@ export function ThreePaneScaffold({
                   paneResizeState,
                   levitatedPaneDragHandleAriaStrings,
                 );
+          const paneResizeActionLabel =
+            levitatedPaneDragHandleAriaLabel ?? paneResizeAriaState?.actionDescription;
           const resizeHandleSpec = levitatedPaneDragHandles?.[role];
           const resizeHandle =
             paneResizeState === undefined
@@ -808,9 +1042,8 @@ export function ThreePaneScaffold({
                 ? resizeHandleSpec(paneResizeState)
                 : resizeHandleSpec;
           const hasResizeHandle =
-            !transitionActive && paneResizeState !== undefined && resizeHandle != null;
-          const hasPaneResizeAction =
-            !transitionActive && paneResizeState !== undefined && !hasResizeHandle;
+            paneResizeState !== undefined && hasReactNodeContent(resizeHandle);
+          const hasPaneResizeAction = paneResizeState !== undefined && !hasResizeHandle;
           const paneResizeHandlers =
             hasPaneResizeAction && paneResizeState !== undefined
               ? {
@@ -833,10 +1066,12 @@ export function ThreePaneScaffold({
                   if (node === null) delete paneRefs.current[role];
                   else paneRefs.current[role] = node;
                 }}
-                className={clsx('three-pane-scaffold__pane',
+                className={clsx(
+                  'three-pane-scaffold__pane',
                   frameLevitated && 'three-pane-scaffold__pane--levitated',
                   hasResizeHandle && 'three-pane-scaffold__pane--has-resize-handle',
-                  hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',)}
+                  hasPaneResizeAction && 'three-pane-scaffold__pane--resize-target',
+                )}
                 role={interactable ? 'region' : undefined}
                 aria-label={interactable ? paneAriaLabel : undefined}
                 data-pane-role={role}
@@ -845,7 +1080,6 @@ export function ThreePaneScaffold({
                 data-pane-motion={frame?.motion}
                 data-resize-state={paneResizeState?.value}
                 inert={!interactable || undefined}
-                tabIndex={-1}
                 style={frame === undefined ? paneStyle(placement) : transitionPaneStyle(frame)}
               >
                 {hasResizeHandle ? (
@@ -854,8 +1088,8 @@ export function ThreePaneScaffold({
                     data-orientation={paneResizeState.orientation}
                     data-resize-state={paneResizeState.value}
                     role="button"
-                    aria-label={levitatedPaneDragHandleAriaLabel}
-                    aria-description={paneResizeAriaState?.description}
+                    aria-label={paneResizeActionLabel}
+                    aria-description={paneResizeAriaState?.stateDescription}
                     tabIndex={0}
                     onClick={(event) => resizeClick(event, paneResizeState)}
                     onKeyDown={(event) => resizeKeyDown(event, paneResizeState)}
@@ -874,15 +1108,15 @@ export function ThreePaneScaffold({
                     className="three-pane-scaffold__levitated-resize-action"
                     data-orientation={paneResizeState.orientation}
                     data-resize-state={paneResizeState.value}
-                    aria-label={levitatedPaneDragHandleAriaLabel}
-                    aria-description={paneResizeAriaState?.description}
+                    aria-label={paneResizeActionLabel}
+                    aria-description={paneResizeAriaState?.stateDescription}
                     onClick={(event) => {
                       event.stopPropagation();
                       paneResizeState.moveToNextState();
                     }}
                     onPointerDown={(event) => event.stopPropagation()}
                   >
-                    {levitatedPaneDragHandleAriaLabel}
+                    {paneResizeActionLabel}
                   </button>
                 ) : null}
                 {hasResizeHandle ? (
@@ -897,14 +1131,9 @@ export function ThreePaneScaffold({
         {showDragHandle && dragHandleOffset !== PaneExpansionUnspecified ? (
           <div
             className="three-pane-scaffold__drag-handle"
-            role="separator"
+            role="button"
             aria-label={paneExpansionHandleAriaLabel}
-            aria-description={dragHandleAriaState.description}
-            aria-orientation="vertical"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={dragHandlePercent}
-            aria-valuetext={dragHandleAriaState.valueText}
+            aria-description={dragHandleAriaDescription}
             inert={dragHandleInteractionBlocked || undefined}
             tabIndex={dragHandleInteractionBlocked ? -1 : 0}
             style={{
@@ -923,11 +1152,8 @@ export function ThreePaneScaffold({
             {dragHandle}
           </div>
         ) : null}
-        {renderedScrim != null ? (
-          <div
-            className="three-pane-scaffold__scrim"
-            style={{ opacity: scrimOpacity }}
-          >
+        {hasReactNodeContent(renderedScrim) ? (
+          <div className="three-pane-scaffold__scrim" style={{ opacity: scrimOpacity }}>
             {renderedScrim}
           </div>
         ) : null}

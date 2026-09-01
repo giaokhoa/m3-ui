@@ -29,6 +29,21 @@ describe('pane expansion semantics', () => {
     );
   });
 
+  it('uses Kotlin Float.toInt semantics for non-finite anchor descriptions', () => {
+    expect(describePaneExpansionAnchor(PaneExpansionAnchor.proportion(Number.NaN))).toBe(
+      '0 percent',
+    );
+    expect(describePaneExpansionAnchor(PaneExpansionAnchor.proportion(Number.POSITIVE_INFINITY))).toBe(
+      '2147483647 percent',
+    );
+    expect(describePaneExpansionAnchor(PaneExpansionAnchor.proportion(Number.NEGATIVE_INFINITY))).toBe(
+      '-2147483648 percent',
+    );
+    expect(describePaneExpansionAnchor(PaneExpansionAnchor.fromStart(Number.POSITIVE_INFINITY))).toBe(
+      '2147483647 DPs from start',
+    );
+  });
+
   it('describes the current anchor and the next accessibility action', () => {
     const state = new PaneExpansionState({
       anchors: [

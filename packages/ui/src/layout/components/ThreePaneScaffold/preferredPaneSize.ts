@@ -9,8 +9,26 @@ export interface PanePreferredSizeProportion {
  */
 export type PanePreferredSize = number | PanePreferredSizeProportion;
 
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
 function composeFloat(value: number) {
   return Math.fround(value);
+}
+
+function composeRoundToPx(value: number) {
+  const floatValue = composeFloat(value);
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
+}
+
+function composeFloatToInt(value: number) {
+  const floatValue = composeFloat(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
 }
 
 function normalizeProportion(proportion: number, name: string) {
@@ -35,17 +53,22 @@ export function resolvePanePreferredSize(
 ): number {
   if (preferredSize === undefined) return fallbackSize;
   if (typeof preferredSize === 'number') {
-    // AndroidX PaneScaffoldScope.preferredWidth/Height(Dp) accepts only a
-    // positive value or Dp.Unspecified. Undefined is the web equivalent of
-    // Unspecified; zero is valid only for the proportion overload.
-    if (!Number.isFinite(preferredSize) || preferredSize <= 0) {
+    // AndroidX receives this overload as a Dp, whose backing value is already
+    // Float. Apply the same Float boundary before both Unspecified/positivity
+    // validation and roundToPx().
+    const floatPreferredSize = composeFloat(preferredSize);
+    if (Number.isNaN(floatPreferredSize)) return fallbackSize;
+    if (!(floatPreferredSize > 0)) {
       throw new RangeError(
-        `${name} must be a finite, positive CSS pixel value, received ${preferredSize}`,
+        `${name} must be a positive CSS pixel value, received ${preferredSize}`,
       );
     }
-    return preferredSize;
+    return composeRoundToPx(floatPreferredSize);
   }
 
   const proportion = normalizeProportion(preferredSize.proportion, `${name} proportion`);
-  return Math.trunc(composeFloat(composeFloat(scaffoldSize) * proportion));
+  // AndroidX evaluates Int * Float as Float and then calls Float.toInt(), which
+  // saturates values outside the Int range. Int.MAX_VALUE itself first rounds
+  // up to 2147483648f, so a 1f proportion must still resolve back to Int.MAX.
+  return composeFloatToInt(composeFloat(composeFloat(scaffoldSize) * proportion));
 }

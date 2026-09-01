@@ -19,10 +19,13 @@ describe('PaneExpansionState Compose Float proportions', () => {
     state.onMeasured(1000);
     state.setAnchors([equivalent], -1);
 
-    expect(state.currentAnchor).toBe(equivalent);
+    // AndroidX restore() uses anchors.contains(currentAnchor) only as a
+    // presence check. An equal anchor in the new list keeps the persisted
+    // currentAnchor object rather than replacing it with the new list entry.
+    expect(state.currentAnchor).toBe(current);
   });
 
-  it('validates the Float value seen by the AndroidX API', () => {
+  it('matches runtime validation for proportion anchors and explicit pane proportions', () => {
     const roundsToOne = 1 + Number.EPSILON;
     const anchor = PaneExpansionAnchor.proportion(roundsToOne);
     if (anchor.type !== 'proportion') throw new Error('Expected proportion anchor');
@@ -32,7 +35,11 @@ describe('PaneExpansionState Compose Float proportions', () => {
     state.setFirstPaneProportion(roundsToOne);
     expect(state.getLayoutState(100).firstPaneProportion).toBe(1);
 
-    expect(() => PaneExpansionAnchor.proportion(1.0001)).toThrow(RangeError);
+    // AndroidX's Proportion constructor is annotated with @FloatRange but has
+    // no runtime require; setFirstPaneProportion does validate its Float input.
+    const outOfRangeAnchor = PaneExpansionAnchor.proportion(1.0001);
+    if (outOfRangeAnchor.type !== 'proportion') throw new Error('Expected proportion anchor');
+    expect(outOfRangeAnchor.proportion).toBe(Math.fround(1.0001));
     expect(() => state.setFirstPaneProportion(1.0001)).toThrow(RangeError);
   });
 

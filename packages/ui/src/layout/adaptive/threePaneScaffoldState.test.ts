@@ -6,6 +6,7 @@ import {
 } from './threePaneScaffold';
 import {
   MutableThreePaneScaffoldState,
+  defaultThreePaneScaffoldProgressAnimation,
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldProgressAnimation,
 } from './threePaneScaffoldState';
@@ -36,6 +37,18 @@ const instantAnimation: ThreePaneScaffoldProgressAnimation = async ({ update, to
   update(to);
 };
 
+function attachedState(
+  initialState: ThreePaneScaffoldValue,
+  animation?: ThreePaneScaffoldProgressAnimation,
+) {
+  const state = new MutableThreePaneScaffoldState(
+    initialState,
+    animation === undefined ? undefined : { animation },
+  );
+  state.setTransitionDurationResolver({}, () => 0);
+  return state;
+}
+
 describe('MutableThreePaneScaffoldState', () => {
   it('starts idle at the initial scaffold value', () => {
     const state = new MutableThreePaneScaffoldState(hidden);
@@ -46,19 +59,32 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
-  it('seeks raw timeline progress without replacing currentState when target changes', () => {
-    const state = new MutableThreePaneScaffoldState(hidden);
+  it('seeks raw timeline progress without replacing the initial currentState', () => {
+    const state = attachedState(hidden);
     state.seekTo(0.4, primary, true);
 
     expect(state.currentState).toBe(hidden);
     expect(state.targetState).toBe(primary);
-    expect(state.progressFraction).toBe(0.4);
+    expect(state.progressFraction).toBe(Math.fround(0.4));
+    expect(state.isTransitionActive).toBe(true);
+    expect(state.isPredictiveBackInProgress).toBe(true);
+  });
+
+  it('advances currentState to the former target when seekTo retargets', () => {
+    const state = attachedState(hidden);
+    state.seekTo(0.4, primary);
+
+    state.seekTo(0.2, primarySecondary, true);
+
+    expect(state.currentState).toBe(primary);
+    expect(state.targetState).toBe(primarySecondary);
+    expect(state.progressFraction).toBe(Math.fround(0.2));
     expect(state.isTransitionActive).toBe(true);
     expect(state.isPredictiveBackInProgress).toBe(true);
   });
 
   it('snaps current and target together and clears predictive back', () => {
-    const state = new MutableThreePaneScaffoldState(hidden);
+    const state = attachedState(hidden);
     state.seekTo(0.5, primary, true);
     state.snapTo(primarySecondary);
 
@@ -69,10 +95,42 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.isPredictiveBackInProgress).toBe(false);
   });
 
-  it('animates the fraction and commits the target', async () => {
-    const state = new MutableThreePaneScaffoldState(hidden, {
-      animation: instantAnimation,
+  it('ignores destination-only targets like ThreePaneScaffoldValue.equals', async () => {
+    const secondaryDestination: ThreePaneScaffoldValue = {
+      ...primary,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    const snapState = attachedState(primary);
+    snapState.snapTo(secondaryDestination);
+    expect(snapState.currentState).toBe(primary);
+    expect(snapState.targetState).toBe(primary);
+    expect(snapState.isTransitionActive).toBe(false);
+
+    const seekState = attachedState(primary);
+    seekState.seekTo(0.5, secondaryDestination, true);
+    expect(seekState.currentState).toBe(primary);
+    expect(seekState.targetState).toBe(primary);
+    expect(seekState.progressFraction).toBe(0);
+    expect(seekState.isTransitionActive).toBe(false);
+    expect(seekState.isPredictiveBackInProgress).toBe(true);
+
+    let animationCalled = false;
+    const animateState = attachedState(primary);
+    await animateState.animateTo(secondaryDestination, {
+      animation: async () => {
+        animationCalled = true;
+      },
     });
+    expect(animationCalled).toBe(false);
+    expect(animateState.currentState).toBe(primary);
+    expect(animateState.targetState).toBe(primary);
+    expect(animateState.isTransitionActive).toBe(false);
+    expect(animateState.isPredictiveBackInProgress).toBe(false);
+  });
+
+  it('animates the fraction and commits the target', async () => {
+    const state = attachedState(hidden, instantAnimation);
     const listener = vi.fn();
     state.subscribe(listener);
 
@@ -85,18 +143,67 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(listener).toHaveBeenCalled();
   });
 
-  it('uses zero duration while no renderer transition is attached', async () => {
+  it('coerces custom animation overshoot like SeekableTransitionState.animateTo', async () => {
+    const seen: number[] = [];
+    const state = attachedState(hidden);
+
+    await state.animateTo(primary, {
+      animation: async ({ update }) => {
+        update(-0.2);
+        seen.push(state.progressFraction);
+        update(1.2);
+        seen.push(state.progressFraction);
+        update(1);
+      },
+    });
+
+    expect(seen).toEqual([0, 1]);
+    expect(state.currentState).toBe(primary);
+  });
+
+  it('keeps transition state inert while no renderer Transition is attached', async () => {
+    let animationCalls = 0;
+    const animation: ThreePaneScaffoldProgressAnimation = async ({ update }) => {
+      animationCalls += 1;
+      update(1);
+    };
+    const state = new MutableThreePaneScaffoldState(hidden, { animation });
+
+    state.seekTo(0.5, primary, true);
+    expect(state.currentState).toBe(hidden);
+    expect(state.targetState).toBe(hidden);
+    expect(state.progressFraction).toBe(0);
+    expect(state.isPredictiveBackInProgress).toBe(true);
+
+    state.snapTo(primary);
+    expect(state.currentState).toBe(hidden);
+    expect(state.targetState).toBe(hidden);
+    expect(state.progressFraction).toBe(0);
+    expect(state.isPredictiveBackInProgress).toBe(false);
+
+    state.seekTo(0.5, primary, true);
+    await state.animateTo(primary, { isPredictiveBackInProgress: true });
+    expect(animationCalls).toBe(0);
+    expect(state.currentState).toBe(hidden);
+    expect(state.targetState).toBe(hidden);
+    expect(state.progressFraction).toBe(0);
+    expect(state.isPredictiveBackInProgress).toBe(false);
+  });
+
+  it('still runs an attached Transition whose resolved duration is zero', async () => {
     let observedDuration = -1;
     const animation: ThreePaneScaffoldProgressAnimation = async ({ durationMs, update }) => {
       observedDuration = durationMs;
       update(1);
     };
     const state = new MutableThreePaneScaffoldState(hidden, { animation });
+    const detach = state.setTransitionDurationResolver({}, () => 0);
 
     await state.animateTo(primary);
 
     expect(observedDuration).toBe(0);
     expect(state.currentState).toBe(primary);
+    detach();
   });
 
   it('passes the renderer-resolved full transition duration to animationSpec', async () => {
@@ -106,12 +213,73 @@ describe('MutableThreePaneScaffoldState', () => {
       update(1);
     };
     const state = new MutableThreePaneScaffoldState(hidden, { animation });
-    const detach = state.setTransitionDurationResolver(() => 475);
+    const owner = {};
+    const detach = state.setTransitionDurationResolver(owner, () => 475);
 
     await state.animateTo(primary);
     expect(observedDuration).toBe(475);
 
     detach();
+  });
+
+  it('exposes the latest renderer duration while an animation is running', async () => {
+    let durationMs = 475;
+    const state = new MutableThreePaneScaffoldState(hidden);
+    const owner = {};
+    const detach = state.setTransitionDurationResolver(owner, () => durationMs);
+
+    await state.animateTo(primary, {
+      animation: async ({ durationMs: initialDurationMs, getDurationMs, update }) => {
+        expect(initialDurationMs).toBe(475);
+        expect(getDurationMs?.()).toBe(475);
+        durationMs = 950;
+        expect(getDurationMs?.()).toBe(950);
+        update(1);
+      },
+    });
+
+    detach();
+  });
+
+  it('recomputes the remaining default linear duration when total duration changes', async () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+
+    let durationMs = 1000;
+    const seen: number[] = [];
+    const controller = new AbortController();
+
+    try {
+      const running = defaultThreePaneScaffoldProgressAnimation({
+        from: 0.25,
+        to: 1,
+        durationMs,
+        getDurationMs: () => durationMs,
+        signal: controller.signal,
+        update: (fraction) => seen.push(fraction),
+      });
+
+      frames.shift()!(0);
+      frames.shift()!(300);
+      expect(seen.at(-1)).toBeCloseTo(0.55);
+
+      durationMs = 2000;
+      frames.shift()!(600);
+      // AndroidX keeps the same accumulated playtime but recomputes the
+      // remaining null-spec duration from the original 0.25 start fraction.
+      expect(seen.at(-1)).toBeCloseTo(0.55);
+
+      durationMs = 500;
+      frames.shift()!(600);
+      await running;
+      expect(seen.at(-1)).toBe(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('continues an existing seek when animating to the same target', async () => {
@@ -120,19 +288,56 @@ describe('MutableThreePaneScaffoldState', () => {
       seen.push(from);
       update(1);
     };
-    const state = new MutableThreePaneScaffoldState(hidden, { animation });
+    const state = attachedState(hidden, animation);
     state.seekTo(0.35, primary);
 
     await state.animateTo(primary);
 
-    expect(seen).toEqual([0.35]);
+    expect(seen).toEqual([Math.fround(0.35)]);
     expect(state.currentState).toBe(primary);
   });
 
+  it('keeps an in-flight timeline when animateTo repeats the same target and driver', async () => {
+    let animationCalls = 0;
+    let updateRunning!: (fraction: number) => void;
+    let finishRunning!: () => void;
+    const animation: ThreePaneScaffoldProgressAnimation = ({ update }) => {
+      animationCalls += 1;
+      updateRunning = update;
+      return new Promise<void>((resolve) => {
+        finishRunning = () => {
+          update(1);
+          resolve();
+        };
+      });
+    };
+    const state = attachedState(hidden, animation);
+    const structurallyEqualPrimary: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Expanded,
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Hidden,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    const first = state.animateTo(primary);
+    updateRunning(0.4);
+    const repeated = state.animateTo(structurallyEqualPrimary);
+
+    expect(animationCalls).toBe(1);
+    expect(state.targetState).toBe(primary);
+    expect(state.progressFraction).toBe(Math.fround(0.4));
+
+    finishRunning();
+    await Promise.all([first, repeated]);
+
+    expect(animationCalls).toBe(1);
+    expect(state.currentState).toBe(primary);
+    expect(state.targetState).toBe(primary);
+    expect(state.progressFraction).toBe(0);
+  });
+
   it('retargets from the previous target like SeekableTransitionState.animateTo', async () => {
-    const state = new MutableThreePaneScaffoldState(hidden, {
-      animation: instantAnimation,
-    });
+    const state = attachedState(hidden, instantAnimation);
     state.seekTo(0.5, primary);
 
     let observedCurrent: ThreePaneScaffoldValue | undefined;
@@ -146,16 +351,39 @@ describe('MutableThreePaneScaffoldState', () => {
     expect(state.currentState).toBe(primarySecondary);
   });
 
-  it('allows only one attached transition duration resolver', () => {
-    const state = new MutableThreePaneScaffoldState(hidden);
-    const first = () => 300;
-    const detach = state.setTransitionDurationResolver(first);
-    expect(() => state.setTransitionDurationResolver(() => 400)).toThrow();
-    detach();
-    expect(() => state.setTransitionDurationResolver(() => 400)).not.toThrow();
+  it('retargets from the previous target even when the new target equals currentState', async () => {
+    const state = attachedState(hidden);
+    state.seekTo(0.5, primary);
+
+    let observedCurrent: ThreePaneScaffoldValue | undefined;
+    const animation: ThreePaneScaffoldProgressAnimation = async ({ update }) => {
+      observedCurrent = state.currentState;
+      update(1);
+    };
+    await state.animateTo(hidden, { animation });
+
+    expect(observedCurrent).toBe(primary);
+    expect(state.currentState).toBe(hidden);
+    expect(state.targetState).toBe(hidden);
   });
 
-  it('validates seek fractions', () => {
+  it('retains the active transition owner across resolver updates', () => {
+    const state = new MutableThreePaneScaffoldState(hidden);
+    const owner = {};
+    const otherOwner = {};
+    const first = () => 300;
+    const detachStale = state.setTransitionDurationResolver(owner, first);
+
+    expect(() => state.setTransitionDurationResolver(owner, () => 400)).not.toThrow();
+    expect(() => state.setTransitionDurationResolver(otherOwner, () => 500)).toThrow();
+
+    // The old cleanup is stale after the same owner installs a newer resolver.
+    detachStale();
+    expect(() => state.setTransitionDurationResolver(owner, () => 600)).not.toThrow();
+    expect(() => state.setTransitionDurationResolver(otherOwner, () => 700)).toThrow();
+  });
+
+  it('validates seek fractions even while unbound', () => {
     const state = new MutableThreePaneScaffoldState(hidden);
     expect(() => state.seekTo(-0.01, primary)).toThrow(RangeError);
     expect(() => state.seekTo(1.01, primary)).toThrow(RangeError);
@@ -173,6 +401,15 @@ describe('threePaneScaffoldValuesEqual', () => {
     };
     expect(threePaneScaffoldValuesEqual(primary, clone)).toBe(true);
     expect(threePaneScaffoldValuesEqual(primary, primarySecondary)).toBe(false);
+  });
+
+  it('ignores currentDestination like AndroidX ThreePaneScaffoldValue.equals', () => {
+    const secondaryDestination: ThreePaneScaffoldValue = {
+      ...primary,
+      currentDestination: ThreePaneScaffoldRole.Secondary,
+    };
+
+    expect(threePaneScaffoldValuesEqual(primary, secondaryDestination)).toBe(true);
   });
 
   it('compares reflow anchors', () => {

@@ -35,6 +35,87 @@ const twoPaneValue: ThreePaneScaffoldValue = {
 };
 
 describe('AndroidX integer geometry quantization', () => {
+  it('rounds directive Dp values before pane allocation', () => {
+    const fractionalDirective: PaneScaffoldDirective = {
+      ...oddSpacerDirective,
+      horizontalPartitionSpacerSize: '24.5px',
+      defaultPanePreferredWidth: '360.5px',
+      defaultPanePreferredHeight: '420.5px',
+    };
+    const layout = calculateThreePaneScaffoldLayout({
+      width: 1000,
+      height: 800,
+      directive: fractionalDirective,
+      value: twoPaneValue,
+      paneOrder: listDetailPaneScaffoldOrder,
+    });
+
+    // AndroidX roundToPx(): 24.5dp -> 25px and 360.5dp -> 361px.
+    expect(layout.secondary).toEqual({ left: 0, top: 0, width: 361, height: 800 });
+    expect(layout.primary).toEqual({ left: 386, top: 0, width: 614, height: 800 });
+
+    expect(
+      calculateLevitatedPanePlacement({
+        width: 1001,
+        height: 801,
+        directive: fractionalDirective,
+        alignment: PaneAlignment.Center,
+      }),
+    ).toEqual({ left: 320, top: 190, width: 361, height: 421 });
+  });
+
+  it('rounds drag-handle Dp values before Int edge geometry', () => {
+    expect(
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 0,
+        contentWidth: 1000,
+        partitionSpacerSize: '24.5px',
+        minTouchTargetSize: 48.5,
+      }),
+    ).toEqual({ centerX: 12, minWidth: 74 });
+  });
+
+  it('resolves unspecified and tiny-negative drag-handle Dp like AndroidX', () => {
+    const unspecified = calculatePaneExpansionDragHandlePlacement({
+      offsetX: 0,
+      contentWidth: 1000,
+      partitionSpacerSize: '25px',
+      minTouchTargetSize: Number.NaN,
+    });
+    expect(unspecified).toEqual({ centerX: 12, minWidth: 0 });
+
+    const roundsToZero = calculatePaneExpansionDragHandlePlacement({
+      offsetX: 0,
+      contentWidth: 1000,
+      partitionSpacerSize: '25px',
+      minTouchTargetSize: -0.1,
+    });
+    expect(roundsToZero.centerX).toBe(12);
+    expect(roundsToZero.minWidth === 0).toBe(true);
+  });
+
+  it('accepts infinite drag-handle Dp until Constraints sees the overflowed minimum', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 500,
+        contentWidth: 1000,
+        partitionSpacerSize: '25px',
+        minTouchTargetSize: Number.POSITIVE_INFINITY,
+      }),
+    ).toThrow(/minWidth must be non-negative/);
+  });
+
+  it('does not normalize an empty drag-handle coerce range', () => {
+    expect(() =>
+      calculatePaneExpansionDragHandlePlacement({
+        offsetX: 0,
+        contentWidth: 11,
+        partitionSpacerSize: '25px',
+        minTouchTargetSize: 48,
+      }),
+    ).toThrow(RangeError);
+  });
+
   it('uses Int division for an odd pane-expansion spacer while dragging', () => {
     const paneExpansionState = new PaneExpansionState();
     paneExpansionState.onMeasured(1000);

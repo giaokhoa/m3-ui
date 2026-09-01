@@ -93,15 +93,18 @@ describe('pane expansion drag-handle placement', () => {
     expect(placement.centerX + placement.minWidth / 2).toBe(64);
   });
 
-  it('preserves a valid clamp when the scaffold is narrower than its spacer', () => {
-    expect(
+  it('throws when spacer margins produce an empty placement range', () => {
+    // AndroidX Int.coerceIn throws when min > max. For a 16px scaffold and a
+    // 24px spacer this is coerceIn(12, 4), so preserving the empty range is the
+    // Compose behavior rather than normalizing it to the scaffold midpoint.
+    expect(() =>
       calculatePaneExpansionDragHandlePlacement({
         offsetX: 0,
         contentWidth: 16,
         partitionSpacerSize: '24px',
         minTouchTargetSize: 48,
       }),
-    ).toEqual({ centerX: 8, minWidth: 80 });
+    ).toThrow(RangeError);
   });
 
   it('measures the spacer midpoint before pane ruler margins clip an internal edge', () => {
@@ -185,20 +188,35 @@ describe('pane expansion drag-handle fading', () => {
       progressFraction: 0.25,
     });
     expect(quarter.offsetX).toBe(688);
-    expect(quarter.opacity).toBeCloseTo(0.52682528, 7);
+    expect(quarter.opacity).toBeCloseTo(0.52682525, 7);
   });
 
-  it('switches offsets at the tween zero crossing and then fades back in', () => {
-    // FastOutSlowInEasing(0.35) == 0.5, so the -1..1 animation reaches zero
-    // at progress 0.35. AndroidX uses `value > 0`, therefore the zero frame
-    // still occupies the original offset at alpha 0.
-    expect(
-      calculatePaneExpansionDragHandleFadeFrame({
-        currentOffsetX: 688,
-        targetOffsetX: 588,
-        progressFraction: 0.35,
-      }),
-    ).toEqual({ offsetX: 688, opacity: 0 });
+  it('samples the tween through Compose Float play-time quantization', () => {
+    const frame = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.1234567,
+    });
+
+    // TargetBasedAnimation computes (durationNanos * progress).toLong() first.
+    // FloatTweenSpec then divides that clamped Long by durationNanos.toFloat(),
+    // so this fraction becomes 0.1234567091f rather than the input Float value.
+    expect(frame.offsetX).toBe(688);
+    expect(frame.opacity).toBe(0.9164954423904419);
+  });
+
+  it('uses the pinned Float cubic solver at the tween zero crossing', () => {
+    // Mathematically the curve crosses 0.5 at x=0.35, but pinned Compose
+    // CubicBezierEasing solves the Float cubic to 0.5000002384f. The -1f..1f
+    // tween value is therefore +4.7683716e-7f, so AndroidX has already switched
+    // to the target offset at this exact Float progress.
+    const crossing = calculatePaneExpansionDragHandleFadeFrame({
+      currentOffsetX: 688,
+      targetOffsetX: 588,
+      progressFraction: 0.35,
+    });
+    expect(crossing.offsetX).toBe(588);
+    expect(crossing.opacity).toBe(4.76837158203125e-7);
 
     const halfway = calculatePaneExpansionDragHandleFadeFrame({
       currentOffsetX: 688,
@@ -206,7 +224,7 @@ describe('pane expansion drag-handle fading', () => {
       progressFraction: 0.5,
     });
     expect(halfway.offsetX).toBe(588);
-    expect(halfway.opacity).toBeCloseTo(0.55112262, 7);
+    expect(halfway.opacity).toBeCloseTo(0.55112362, 7);
 
     expect(
       calculatePaneExpansionDragHandleFadeFrame({

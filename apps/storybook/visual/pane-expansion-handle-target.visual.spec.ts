@@ -17,7 +17,7 @@ test('preserves the pane-expansion minimum hit target at the clipped scaffold ed
   await openStory(page);
 
   const scaffold = page.locator('#storybook-root .three-pane-scaffold');
-  const handle = page.getByRole('separator', { name: 'Resize panes' });
+  const handle = page.getByRole('button', { name: 'Pane expansion drag handle' });
   const [scaffoldBox, initialHandleBox] = await Promise.all([
     scaffold.boundingBox(),
     handle.boundingBox(),
@@ -35,7 +35,10 @@ test('preserves the pane-expansion minimum hit target at the clipped scaffold ed
   await page.mouse.down();
   await page.mouse.move(scaffoldBox.x, initialHandleBox.y + initialHandleBox.height / 2);
 
-  await expect(handle).toHaveAttribute('aria-valuenow', '0');
+  await expect.poll(async () => {
+    const box = await handle.boundingBox();
+    return box === null ? Number.NaN : box.x + box.width / 2 - scaffoldBox.x;
+  }).toBeCloseTo(12, 0);
   const edgeHandleBox = await handle.boundingBox();
   if (!edgeHandleBox) throw new Error('Edge drag handle has no visual bounds');
 
@@ -47,5 +50,9 @@ test('preserves the pane-expansion minimum hit target at the clipped scaffold ed
   expect(edgeHandleBox.x + edgeHandleBox.width - scaffoldBox.x).toBeCloseTo(48, 0);
 
   await page.mouse.up();
-  await expect(handle).toHaveAttribute('aria-valuenow', '30');
+  await expect.poll(async () => {
+    const box = await handle.boundingBox();
+    if (box === null) return Number.NaN;
+    return (box.x + box.width / 2 - scaffoldBox.x) / scaffoldBox.width;
+  }).toBeCloseTo(0.3, 2);
 });

@@ -271,6 +271,23 @@ describe('pane motion geometry', () => {
     expect(calculateSlideOutToRightOffset(motionData([EL, XR, XR]), 1000)).toBe(995);
   });
 
+  it('preserves Kotlin Int overflow in pane edge calculations', () => {
+    const overflow: PaneMotionData = {
+      motion: PaneMotion.ExitToLeft,
+      originPosition: { x: 2147483640, y: 0 },
+      originSize: { width: 20, height: 1 },
+      targetPosition: { x: 2147483640, y: 0 },
+      targetSize: { width: 20, height: 1 },
+    };
+
+    // currentRight = 2,147,483,640 + 20 wraps to -2,147,483,636 as Int;
+    // ExitToLeft then negates that wrapped edge.
+    expect(calculateSlideOutToLeftOffset([overflow])).toBe(2147483636);
+
+    const shown: PaneMotionData = { ...overflow, motion: PaneMotion.AnimateBounds };
+    expect(calculateHidingPaneTargetLeft([shown, overflow], 1)).toBe(-2147483636);
+  });
+
   it('matches AndroidX hidden and hiding pane anchor edges', () => {
     expect(calculateHiddenPaneCurrentLeft(motionData([XL, ER, EE]), 2)).toBe(4);
     expect(calculateHidingPaneTargetLeft(motionData([EL, XR, XS]), 2)).toBe(8);

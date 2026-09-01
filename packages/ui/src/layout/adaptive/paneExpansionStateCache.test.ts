@@ -3,7 +3,10 @@ import {
   PaneExpansionAnchor,
   type PaneExpansionAnimation,
 } from './paneExpansionState';
-import { PaneExpansionStateCache } from './paneExpansionStateCache';
+import {
+  PaneExpansionStateCache,
+  paneExpansionAnchorsEqual,
+} from './paneExpansionStateCache';
 import { getPaneExpansionStateKey, PaneExpansionStateKey } from './paneExpansionStateKey';
 import { PaneAdaptedValue, type ThreePaneScaffoldValue } from './threePaneScaffold';
 
@@ -24,22 +27,93 @@ function value(primary: boolean, secondary: boolean, tertiary: boolean): ThreePa
 }
 
 describe('PaneExpansionStateCache', () => {
-  it('remembers independent state for each structural two-pane key', () => {
+  it('keeps one live state object while restoring independent data for each key', async () => {
     const cache = new PaneExpansionStateCache();
     const firstKey = getPaneExpansionStateKey(value(true, true, false));
     const secondKey = getPaneExpansionStateKey(value(false, true, true));
 
-    const first = cache.getOrCreate(firstKey, { anchors, initialAnchoredIndex: 3 });
-    const second = cache.getOrCreate(secondKey, { anchors, initialAnchoredIndex: 1 });
+    const state = cache.getOrCreate(firstKey, { anchors, initialAnchoredIndex: 3 });
+    cache.update(firstKey, { anchors, initialAnchoredIndex: 3 });
+    await state.animateTo(anchors[4]);
+    expect(state.currentAnchor).toBe(anchors[4]);
 
-    expect(first).not.toBe(second);
-    expect(first.currentAnchor).toEqual(anchors[3]);
-    expect(second.currentAnchor).toEqual(anchors[1]);
+    const sameState = cache.getOrCreate(secondKey, { anchors, initialAnchoredIndex: 1 });
+    expect(sameState).toBe(state);
+    // restore is effect-driven, so the previous data remains visible until update().
+    expect(state.currentAnchor).toBe(anchors[4]);
 
-    first.snapToAnchor(anchors[4]);
-    const structurallyEqualFirstKey = getPaneExpansionStateKey(value(true, true, false));
-    expect(cache.getOrCreate(structurallyEqualFirstKey)).toBe(first);
-    expect(first.currentAnchor).toEqual(anchors[4]);
+    cache.update(secondKey, { anchors, initialAnchoredIndex: 1 });
+    expect(state.currentAnchor).toBe(anchors[1]);
+    state.setFirstPaneProportion(0.4);
+
+    cache.update(firstKey, { anchors, initialAnchoredIndex: 3 });
+    expect(state.currentAnchor).toBe(anchors[4]);
+    expect(state.getLayoutState(1000).firstPaneProportion).toBeNaN();
+
+    cache.update(secondKey, { anchors, initialAnchoredIndex: 1 });
+    expect(state.currentAnchor).toBe(anchors[3]);
+    expect(state.getLayoutState(1000).firstPaneProportion).toBe(Math.fround(0.4));
+  });
+
+  it('reruns restore when the persistent key changes and keeps the call-site fallback', () => {
+    const cache = new PaneExpansionStateCache();
+    const firstKey = getPaneExpansionStateKey(value(true, true, false));
+    const secondKey = getPaneExpansionStateKey(value(false, true, true));
+    const twoAnchors = [anchors[1], anchors[3]] as const;
+
+    const state = cache.getOrCreate(firstKey, {
+      anchors: twoAnchors,
+      initialAnchoredIndex: 0,
+    });
+    cache.update(firstKey, { anchors: twoAnchors, initialAnchoredIndex: 0 });
+    state.setFirstPaneWidth(320);
+    expect(state.currentAnchor).toBeNull();
+
+    expect(
+      cache.getOrCreate(secondKey, {
+        anchors: twoAnchors,
+        initialAnchoredIndex: 1,
+      }),
+    ).toBe(state);
+    cache.update(secondKey, { anchors: twoAnchors, initialAnchoredIndex: 1 });
+    expect(state.currentAnchor).toBe(twoAnchors[1]);
+
+    // initialAnchoredIndex changed while the structurally-equal anchor list did
+    // not, so remember(anchors) still owns index 0 as the restore fallback.
+    cache.update(firstKey, { anchors: [...twoAnchors], initialAnchoredIndex: 1 });
+    expect(state.currentAnchor).toBe(twoAnchors[0]);
+    expect(state.getLayoutState(1000).firstPaneWidth).toBe(320);
+  });
+
+  it('matches AndroidX identity-aware equality for NaN proportion anchors', () => {
+    const nanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
+    const otherNanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
+
+    expect(paneExpansionAnchorsEqual([nanAnchor], [nanAnchor])).toBe(true);
+    expect(paneExpansionAnchorsEqual([nanAnchor], [otherNanAnchor])).toBe(false);
+  });
+
+  it('reruns anchor restore for a distinct NaN anchor but not the same NaN object', () => {
+    const cache = new PaneExpansionStateCache();
+    const nanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
+    const fallback = PaneExpansionAnchor.proportion(0.5);
+    const state = cache.getOrCreate(PaneExpansionStateKey.Default, {
+      anchors: [nanAnchor, fallback],
+      initialAnchoredIndex: 0,
+    });
+
+    cache.update(PaneExpansionStateKey.Default, {
+      anchors: [nanAnchor, fallback],
+      initialAnchoredIndex: 1,
+    });
+    expect(state.currentAnchor).toBe(nanAnchor);
+
+    const distinctNanAnchor = PaneExpansionAnchor.proportion(Number.NaN);
+    cache.update(PaneExpansionStateKey.Default, {
+      anchors: [distinctNanAnchor, fallback],
+      initialAnchoredIndex: 1,
+    });
+    expect(state.currentAnchor).toBe(fallback);
   });
 
   it('ignores an initial index change until the anchors change', () => {

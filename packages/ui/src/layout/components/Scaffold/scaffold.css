@@ -11,7 +11,8 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-inline-size: 0;
-  overflow-x: clip;
+  block-size: 100%;
+  overflow: clip;
   background: var(--scaffold-container-color, var(--background, transparent));
   color: var(--scaffold-content-color, inherit);
 }

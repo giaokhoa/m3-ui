@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Surface, VerticalDragHandle } from '@m3-ui/ui';
 import {
@@ -177,11 +177,14 @@ function MotionHalfwayFixture({ predictiveBack = false }: { predictiveBack?: boo
     adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
     destinationHistory: [{ pane: ListDetailPaneScaffoldRole.List }],
   });
-  const [scaffoldState] = useState(() => {
-    const state = new MutableThreePaneScaffoldState(detailValue);
-    state.seekTo(0.5, listValue, predictiveBack);
-    return state;
-  });
+  const [scaffoldState] = useState(() => new MutableThreePaneScaffoldState(detailValue));
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      scaffoldState.seekTo(0.5, listValue, predictiveBack);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [listValue, predictiveBack, scaffoldState]);
 
   return (
     <div style={{ width, maxWidth: '100%', height, margin: '0 auto' }}>

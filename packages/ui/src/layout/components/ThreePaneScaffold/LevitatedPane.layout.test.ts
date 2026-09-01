@@ -73,4 +73,47 @@ describe('calculateLevitatedPanePlacement', () => {
       }),
     ).toEqual({ left: 0, top: 0, width: 320, height: 240 });
   });
+
+  it('uses Compose Float arithmetic for preset alignments', () => {
+    expect(
+      calculateLevitatedPanePlacement({
+        width: 16777218,
+        height: 100,
+        directive,
+        alignment: PaneAlignment.Center,
+        preferredWidth: 1,
+        preferredHeight: 1,
+      }),
+    ).toEqual({ left: 8388608, top: 50, width: 1, height: 1 });
+
+    expect(
+      calculateLevitatedPanePlacement({
+        width: 16777218,
+        height: 100,
+        directive,
+        alignment: PaneAlignment.TopEnd,
+        preferredWidth: 1,
+        preferredHeight: 1,
+      }),
+    ).toEqual({ left: 16777216, top: 0, width: 1, height: 1 });
+  });
+
+  it('accepts custom AndroidX-style alignment implementations', () => {
+    expect(
+      calculateLevitatedPanePlacement({
+        width: 1000,
+        height: 800,
+        directive,
+        direction: 'rtl',
+        alignment: {
+          align(paneSize, scaffoldSize, direction) {
+            return {
+              x: direction === 'rtl' ? 41 : 17,
+              y: scaffoldSize.height - paneSize.height - 11,
+            };
+          },
+        },
+      }),
+    ).toEqual({ left: 41, top: 369, width: 360, height: 420 });
+  });
 });

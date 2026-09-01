@@ -1,6 +1,16 @@
 import { createElement, type ReactNode } from 'react';
+import { hasReactNodeContent } from '../reactNode';
 import type { DragToResizeState } from './dragToResizeState';
+import type { LevitatedPaneCustomAlignment } from './levitatedPaneAlignment';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
+import type { PaneScaffoldRole } from './paneScaffoldRole';
+
+export type {
+  LevitatedPaneCustomAlignment,
+  LevitatedPaneOffset,
+  LevitatedPaneSize,
+} from './levitatedPaneAlignment';
+export type { PaneScaffoldRole } from './paneScaffoldRole';
 
 export type ThreePaneScaffoldRole = 'primary' | 'secondary' | 'tertiary';
 
@@ -16,7 +26,7 @@ export type ThreePaneScaffoldHorizontalOrder = readonly [
   ThreePaneScaffoldRole,
 ];
 
-export type LevitatedPaneAlignment =
+export type LevitatedPaneAlignmentPreset =
   | 'top-start'
   | 'top-center'
   | 'top-end'
@@ -26,6 +36,14 @@ export type LevitatedPaneAlignment =
   | 'bottom-start'
   | 'bottom-center'
   | 'bottom-end';
+
+/**
+ * AndroidX accepts any Alignment implementation for levitated panes. The web
+ * keeps the built-in presets and also accepts custom alignment objects.
+ */
+export type LevitatedPaneAlignment =
+  | LevitatedPaneAlignmentPreset
+  | LevitatedPaneCustomAlignment;
 
 /** Web equivalents of Compose Alignment presets used by levitated panes. */
 export const PaneAlignment = {
@@ -38,19 +56,30 @@ export const PaneAlignment = {
   BottomStart: 'bottom-start',
   BottomCenter: 'bottom-center',
   BottomEnd: 'bottom-end',
-} as const satisfies Record<string, LevitatedPaneAlignment>;
+} as const satisfies Record<string, LevitatedPaneAlignmentPreset>;
 
 /**
  * React input equivalent of the @Composable scrim carried by AndroidX
- * Levitate. Functions are normalized to React elements before entering the
- * adapted value so hooks execute in a real component render boundary.
+ * Levitate. Functions are normalized to React elements so hooks execute in a
+ * real component render boundary. The normalization is memoized by function
+ * identity because AndroidX Levitated.equals compares its composable scrim by
+ * identity as well.
  */
 export type LevitatedPaneScrimContent = ReactNode | (() => ReactNode);
+
+const normalizedLevitatedPaneScrims = new WeakMap<() => ReactNode, ReactNode>();
 
 function normalizeLevitatedPaneScrim(
   scrim: LevitatedPaneScrimContent | undefined,
 ): ReactNode | undefined {
-  return typeof scrim === 'function' ? createElement(scrim) : scrim;
+  if (typeof scrim !== 'function') {
+    return hasReactNodeContent(scrim) ? scrim : undefined;
+  }
+  const cached = normalizedLevitatedPaneScrims.get(scrim);
+  if (cached !== undefined) return cached;
+  const normalized = createElement(scrim);
+  normalizedLevitatedPaneScrims.set(scrim, normalized);
+  return normalized;
 }
 
 export interface HidePaneAdaptStrategy {
@@ -59,7 +88,7 @@ export interface HidePaneAdaptStrategy {
 
 export interface ReflowPaneAdaptStrategy {
   type: 'reflow';
-  reflowUnder: ThreePaneScaffoldRole;
+  reflowUnder: PaneScaffoldRole;
 }
 
 export interface LevitatePaneAdaptStrategy {
@@ -76,7 +105,7 @@ export interface LevitatePaneAdaptStrategy {
 export interface LevitatePaneAdaptStrategyOptions {
   alignment?: LevitatedPaneAlignment;
   scrim?: LevitatedPaneScrimContent;
-  dragToResizeState?: DragToResizeState;
+  dragToResizeState?: DragToResizeState | null;
 }
 
 export type PaneAdaptStrategy =
@@ -96,7 +125,7 @@ function createLevitatePaneAdaptStrategy({
     type: 'levitate',
     alignment,
     ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
-    ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
+    ...(dragToResizeState == null ? {} : { dragToResizeState }),
     onlyIf(condition) {
       return condition ? strategy : hidePaneAdaptStrategy;
     },
@@ -109,7 +138,7 @@ function createLevitatePaneAdaptStrategy({
 
 export const PaneAdaptStrategy = {
   Hide: hidePaneAdaptStrategy,
-  Reflow(reflowUnder: ThreePaneScaffoldRole): ReflowPaneAdaptStrategy {
+  Reflow(reflowUnder: PaneScaffoldRole): ReflowPaneAdaptStrategy {
     return { type: 'reflow', reflowUnder };
   },
   Levitate(options: LevitatePaneAdaptStrategyOptions = {}): LevitatePaneAdaptStrategy {
@@ -126,7 +155,7 @@ export interface ThreePaneScaffoldAdaptStrategies {
 export type PaneAdaptedValue =
   | { type: 'expanded' }
   | { type: 'hidden' }
-  | { type: 'reflowed'; reflowUnder: ThreePaneScaffoldRole }
+  | { type: 'reflowed'; reflowUnder: PaneScaffoldRole }
   | {
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
@@ -140,20 +169,20 @@ const hiddenPaneAdaptedValue = Object.freeze({ type: 'hidden' } as const);
 export const PaneAdaptedValue = {
   Expanded: expandedPaneAdaptedValue,
   Hidden: hiddenPaneAdaptedValue,
-  Reflowed(reflowUnder: ThreePaneScaffoldRole): PaneAdaptedValue {
+  Reflowed(reflowUnder: PaneScaffoldRole): PaneAdaptedValue {
     return { type: 'reflowed', reflowUnder };
   },
   Levitated(
     alignment: LevitatedPaneAlignment,
     scrim?: LevitatedPaneScrimContent,
-    dragToResizeState?: DragToResizeState,
+    dragToResizeState?: DragToResizeState | null,
   ): PaneAdaptedValue {
     const normalizedScrim = normalizeLevitatedPaneScrim(scrim);
     return {
       type: 'levitated',
       alignment,
       ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
-      ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
+      ...(dragToResizeState == null ? {} : { dragToResizeState }),
     };
   },
 } as const;
@@ -176,6 +205,14 @@ const rolesByPriority: readonly ThreePaneScaffoldRole[] = [
   ThreePaneScaffoldRole.Secondary,
   ThreePaneScaffoldRole.Tertiary,
 ];
+
+function isThreePaneScaffoldRole(role: PaneScaffoldRole): role is ThreePaneScaffoldRole {
+  return (
+    role === ThreePaneScaffoldRole.Primary ||
+    role === ThreePaneScaffoldRole.Secondary ||
+    role === ThreePaneScaffoldRole.Tertiary
+  );
+}
 
 export const threePaneScaffoldDefaultAdaptStrategies: ThreePaneScaffoldAdaptStrategies =
   Object.freeze({
@@ -218,12 +255,6 @@ export const SupportingPaneScaffoldRole = {
   Extra: ThreePaneScaffoldRole.Tertiary,
 } as const;
 
-function assertPartitionCount(value: number, name: string) {
-  if (!Number.isInteger(value) || value < 1) {
-    throw new RangeError(`${name} must be a positive integer`);
-  }
-}
-
 function strategyForRole(
   strategies: ThreePaneScaffoldAdaptStrategies,
   role: ThreePaneScaffoldRole,
@@ -254,9 +285,6 @@ export function calculateThreePaneScaffoldValue({
   adaptStrategies?: ThreePaneScaffoldAdaptStrategies;
   destinationHistory?: readonly ThreePaneScaffoldDestinationItem[];
 }): ThreePaneScaffoldValue {
-  assertPartitionCount(maxHorizontalPartitions, 'maxHorizontalPartitions');
-  assertPartitionCount(maxVerticalPartitions, 'maxVerticalPartitions');
-
   let expandedCount = 0;
   const adapted: Partial<Record<ThreePaneScaffoldRole, PaneAdaptedValue>> = {};
 
@@ -293,7 +321,7 @@ export function calculateThreePaneScaffoldValue({
 
     if (canReflow) {
       const strategy = strategyForRole(adaptStrategies, pane);
-      if (strategy.type === 'reflow') {
+      if (strategy.type === 'reflow' && isThreePaneScaffoldRole(strategy.reflowUnder)) {
         reflowedPane = pane;
         anchorPane = strategy.reflowUnder;
         anchorPaneValue = valueForRole(adapted, anchorPane);
@@ -346,13 +374,25 @@ export function getPaneAdaptedValue(
   value: ThreePaneScaffoldValue,
   role: ThreePaneScaffoldRole,
 ): PaneAdaptedValue {
-  return value[role];
+  const paneValue = value[role];
+  if (paneValue.type !== 'levitated') return paneValue;
+
+  const nullablePaneValue = paneValue as unknown as {
+    type: 'levitated';
+    alignment: LevitatedPaneAlignment;
+    scrim?: ReactNode;
+    dragToResizeState?: DragToResizeState | null;
+  };
+  if (nullablePaneValue.dragToResizeState !== null) return paneValue;
+
+  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = nullablePaneValue;
+  return normalizedPaneValue;
 }
 
 export function hasLevitatedPaneWithScrim(value: ThreePaneScaffoldValue): boolean {
   return rolesByPriority.some((role) => {
     const paneValue = getPaneAdaptedValue(value, role);
-    return paneValue.type === 'levitated' && paneValue.scrim != null;
+    return paneValue.type === 'levitated' && hasReactNodeContent(paneValue.scrim);
   });
 }
 

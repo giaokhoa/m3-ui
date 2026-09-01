@@ -26,9 +26,11 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { hasReactNodeContent } from '../../reactNode';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
+import { calculateLevitatedPaneResizePlacement } from './LevitatedPane.resizeLayout';
 import {
-  calculateThreePaneScaffoldLayout,
+  calculateThreePaneScaffoldLayoutPass,
   type PanePlacement,
 } from './ThreePaneScaffold.layout';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
@@ -66,6 +68,8 @@ export interface ThreePaneScaffoldTransitionOptions {
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
+  /** Mirrors which role slots produced real Measurables in AndroidX Layout. */
+  paneAvailability?: Partial<Record<ThreePaneScaffoldRole, boolean>>;
 }
 
 export type ThreePaneScaffoldTransitionLayoutOptions = Omit<
@@ -85,12 +89,39 @@ export interface ThreePaneScaffoldTransitionTiming {
 const roles: readonly ThreePaneScaffoldRole[] = ['primary', 'secondary', 'tertiary'];
 const zeroPlacement: PanePlacement = { left: 0, top: 0, width: 0, height: 0 };
 const intVectorThreshold = 1;
+const MillisToNanos = 1_000_000;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
+function isComposeInt(value: number) {
+  return Number.isInteger(value) && value >= ComposeIntMin && value <= ComposeIntMax;
+}
+
+function composeIntAdd(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return isComposeInt(a) && isComposeInt(b) ? (a - b) | 0 : a - b;
+}
 
 function clampFraction(value: number) {
   if (!Number.isFinite(value) || value < 0 || value > 1) {
     throw new RangeError(`progressFraction must be in [0, 1], received ${value}`);
   }
   return value;
+}
+
+function calculateSeekPlayTimeMs(durationMs: number, progressFraction: number) {
+  // SeekableTransitionState.seekToFraction converts its Float fraction to
+  // Double, multiplies Transition.totalDurationNanos, and roundToLong()s before
+  // child specs see the playtime. Preserve that nanosecond rounding boundary;
+  // sampling durationMs * fraction directly can fall on the previous whole
+  // millisecond when FloatSpringSpec later truncates nanos to milliseconds.
+  const durationNanos = Math.round(durationMs * MillisToNanos);
+  const fraction = Math.fround(progressFraction);
+  const playTimeNanos = Math.round(fraction * durationNanos);
+  return playTimeNanos / MillisToNanos;
 }
 
 function clampUnit(value: number) {
@@ -118,8 +149,8 @@ function placementToRect(placement: PanePlacement): [number, number, number, num
   return [
     placement.left,
     placement.top,
-    placement.left + placement.width,
-    placement.top + placement.height,
+    composeIntAdd(placement.left, placement.width),
+    composeIntAdd(placement.top, placement.height),
   ];
 }
 
@@ -127,8 +158,16 @@ function rectToPlacement(rect: readonly number[]): PanePlacement {
   return {
     left: rect[0]!,
     top: rect[1]!,
-    width: rect[2]! - rect[0]!,
-    height: rect[3]! - rect[1]!,
+    width: composeIntSubtract(rect[2]!, rect[0]!),
+    height: composeIntSubtract(rect[3]!, rect[1]!),
+  };
+}
+
+function clampMeasuredSize(placement: PanePlacement): PanePlacement {
+  return {
+    ...placement,
+    width: Math.max(placement.width, 0),
+    height: Math.max(placement.height, 0),
   };
 }
 
@@ -149,6 +188,7 @@ function calculateValuePlacements({
   preferredHeights,
   paneMargins,
   paneExpansionState,
+  paneAvailability,
 }: Omit<ThreePaneScaffoldTransitionOptions, 'currentValue' | 'targetValue' | 'progressFraction'> & {
   value: ThreePaneScaffoldValue;
 }): ValuePlacements {
@@ -156,7 +196,7 @@ function calculateValuePlacements({
   // applied by PaneMeasurable.doMeasureAndPlace. Keep those two geometries
   // separate here as well: measured drives motion offsets while placed drives
   // the actual browser bounds and AnimateBounds interpolation.
-  const staticLayout = calculateThreePaneScaffoldLayout({
+  const staticPass = calculateThreePaneScaffoldLayoutPass({
     width,
     height,
     directive,
@@ -166,14 +206,19 @@ function calculateValuePlacements({
     excludedBounds,
     preferredWidths,
     preferredHeights,
-    paneMargins: {},
+    paneMargins,
     paneExpansionState,
+    paneAvailability,
   });
   const measured: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
-    ...staticLayout,
+    ...staticPass.raw,
+  };
+  const placed: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
+    ...staticPass.placed,
   };
 
   for (const role of roles) {
+    if (paneAvailability?.[role] === false) continue;
     const adaptedValue = getPaneAdaptedValue(value, role);
     if (adaptedValue.type !== 'levitated') continue;
     const base = calculateLevitatedPanePlacement({
@@ -192,32 +237,36 @@ function calculateValuePlacements({
       scaffoldHeight: height,
       direction,
     });
-    measured[role] =
+    const rawPlacement =
       resized === undefined
         ? base
-        : calculateLevitatedPanePlacement({
-            width,
-            height,
-            directive,
-            alignment: adaptedValue.alignment,
-            direction,
-            preferredWidth: resized.width,
-            preferredHeight: resized.height,
-          });
-  }
-
-  const placed: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {};
-  for (const role of roles) {
-    const placement = measured[role];
-    if (placement === undefined) continue;
-    placed[role] = applyPaneMargins(
-      placement,
-      paneMargins?.[role],
-      width,
-      height,
-      direction,
+        : (() => {
+            const aligned = calculateLevitatedPaneResizePlacement({
+              rawWidth: resized.width,
+              rawHeight: resized.height,
+              scaffoldWidth: width,
+              scaffoldHeight: height,
+              alignment: adaptedValue.alignment,
+              direction,
+            });
+            return {
+              ...aligned,
+              width: resized.width,
+              height: resized.height,
+            };
+          })();
+    measured[role] = rawPlacement;
+    placed[role] = clampMeasuredSize(
+      applyPaneMargins(
+        rawPlacement,
+        paneMargins?.[role],
+        width,
+        height,
+        direction,
+      ),
     );
   }
+
   return { measured, placed };
 }
 
@@ -243,7 +292,10 @@ function toMotionData(
 function levitatedScrim(value: ThreePaneScaffoldValue): ReactNode | undefined {
   for (const role of roles) {
     const adaptedValue = getPaneAdaptedValue(value, role);
-    if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
+    if (
+      adaptedValue.type === 'levitated' &&
+      hasReactNodeContent(adaptedValue.scrim)
+    ) {
       return adaptedValue.scrim;
     }
   }
@@ -379,6 +431,7 @@ function prepareTransition({
   preferredHeights,
   paneMargins,
   paneExpansionState = null,
+  paneAvailability = {},
 }: ThreePaneScaffoldTransitionLayoutOptions): PreparedTransition {
   const physicalOrder: ThreePaneScaffoldHorizontalOrder =
     direction === 'rtl' ? [paneOrder[2], paneOrder[1], paneOrder[0]] : paneOrder;
@@ -394,6 +447,7 @@ function prepareTransition({
     preferredHeights,
     paneMargins,
     paneExpansionState,
+    paneAvailability,
   };
   const currentGeometry = calculateValuePlacements({ ...common, value: currentValue });
   const targetGeometry = calculateValuePlacements({ ...common, value: targetValue });
@@ -413,6 +467,7 @@ function prepareTransition({
   let visibilityDurationMs = 0;
   let boundsDurationMs = 0;
   for (const role of roles) {
+    if (paneAvailability[role] === false) continue;
     const paneMotion = motion[role];
     const currentPlacement = currentPlacements[role];
     const targetPlacement = targetPlacements[role];
@@ -464,7 +519,10 @@ function prepareTransition({
       case PaneMotion.EnterWithExpand:
         if (targetPlacement !== undefined) {
           const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
-          const initialOffset = hiddenLeft - roleMotionData.targetPosition.x;
+          const initialOffset = composeIntSubtract(
+            hiddenLeft,
+            roleMotionData.targetPosition.x,
+          );
           const collapsedPlacement = { ...targetPlacement, width: 0 };
           visibilityDurationMs = Math.max(
             visibilityDurationMs,
@@ -476,7 +534,10 @@ function prepareTransition({
       case PaneMotion.ExitWithShrink:
         if (currentPlacement !== undefined) {
           const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
-          const targetOffset = hidingLeft - roleMotionData.originPosition.x;
+          const targetOffset = composeIntSubtract(
+            hidingLeft,
+            roleMotionData.originPosition.x,
+          );
           visibilityDurationMs = Math.max(
             visibilityDurationMs,
             calculateRegularOffsetDuration(0, targetOffset),
@@ -636,7 +697,7 @@ export function calculateThreePaneScaffoldTransitionFrame({
     slideOutRight,
     visibilityDurationMs,
   } = prepared;
-  const visibilityPlayTimeMs = visibilityDurationMs * progress;
+  const visibilityPlayTimeMs = calculateSeekPlayTimeMs(visibilityDurationMs, progress);
   const result: ThreePaneScaffoldTransitionFrame = { scrimOpacity: 0 };
 
   roles.forEach((role) => {
@@ -679,7 +740,10 @@ export function calculateThreePaneScaffoldTransitionFrame({
       case PaneMotion.EnterWithExpand: {
         const paneIndex = physicalOrder.indexOf(role);
         const hiddenLeft = calculateHiddenPaneCurrentLeft(motionData, paneIndex);
-        const initialOffset = hiddenLeft - motionData[paneIndex]!.targetPosition.x;
+        const initialOffset = composeIntSubtract(
+          hiddenLeft,
+          motionData[paneIndex]!.targetPosition.x,
+        );
         translateX = sampleRegularOffset(initialOffset, 0, visibilityPlayTimeMs);
         const collapsedPlacement = { ...placement, width: 0 };
         const animatedWidth = sampleHorizontalSize(
@@ -695,7 +759,10 @@ export function calculateThreePaneScaffoldTransitionFrame({
         placement = currentPlacement!;
         const paneIndex = physicalOrder.indexOf(role);
         const hidingLeft = calculateHidingPaneTargetLeft(motionData, paneIndex);
-        const targetOffset = hidingLeft - motionData[paneIndex]!.originPosition.x;
+        const targetOffset = composeIntSubtract(
+          hidingLeft,
+          motionData[paneIndex]!.originPosition.x,
+        );
         translateX = sampleRegularOffset(0, targetOffset, visibilityPlayTimeMs);
         const animatedWidth = sampleHorizontalSize(placement, 0, visibilityPlayTimeMs);
         inlineClipFraction =

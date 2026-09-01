@@ -10,6 +10,10 @@ function assertFinite(value: number, name: string) {
   }
 }
 
+function composeFloat(value: number) {
+  return Math.fround(value);
+}
+
 /**
  * Port of the critically-damped branch of AndroidX SpringSimulation.updateValues.
  * DragToResizeState uses Compose animation-core's default spring():
@@ -23,19 +27,24 @@ export function sampleDragToResizeSpring(
   assertFinite(initialValue, 'initialValue');
   assertFinite(targetValue, 'targetValue');
   assertFinite(playTimeMs, 'playTimeMs');
-  if (playTimeMs <= 0 || initialValue === targetValue) return initialValue;
 
-  // FloatSpringSpec truncates animation-core nanos to whole milliseconds
-  // before querying SpringSimulation.
+  // FloatSpringSpec and SpringSimulation both receive Float state. Preserve
+  // those Float boundaries before any equality/zero-time fast path.
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  if (playTimeMs <= 0 || initial === target) return initial;
+
+  const stiffness = composeFloat(DragToResizeSpringDefaults.stiffness);
   const elapsedSeconds = Math.floor(playTimeMs) / 1000;
-  const naturalFrequency = Math.sqrt(DragToResizeSpringDefaults.stiffness);
-  const adjustedDisplacement = initialValue - targetValue;
+  const naturalFrequency = Math.sqrt(stiffness);
+  const adjustedDisplacement = composeFloat(initial - target);
   const coefficientA = adjustedDisplacement;
   const coefficientB = naturalFrequency * adjustedDisplacement;
   const exponential = Math.exp(-naturalFrequency * elapsedSeconds);
   const displacement =
     (coefficientA + coefficientB * elapsedSeconds) * exponential;
-  return displacement + targetValue;
+  // SpringSimulation packs the returned value as Float.
+  return composeFloat(displacement + target);
 }
 
 /**
@@ -46,14 +55,25 @@ export function calculateDragToResizeSpringDurationMs(
   initialValue: number,
   targetValue: number,
 ): number {
+  // FloatSpringSpec passes NaN displacement through SpringEstimation. Its
+  // Newton solve remains NaN and Kotlin Double.toLong() converts that duration
+  // to 0. TargetBasedAnimation then treats playTime=0 as finished and returns
+  // targetValue without querying SpringSimulation.
+  if (Number.isNaN(initialValue) || Number.isNaN(targetValue)) return 0;
   assertFinite(initialValue, 'initialValue');
   assertFinite(targetValue, 'targetValue');
 
-  const threshold = DragToResizeSpringDefaults.visibilityThreshold;
-  const normalizedDisplacement = Math.abs(initialValue - targetValue) / threshold;
+  const initial = composeFloat(initialValue);
+  const target = composeFloat(targetValue);
+  const threshold = composeFloat(DragToResizeSpringDefaults.visibilityThreshold);
+  const normalizedDisplacement = Math.abs(
+    composeFloat(composeFloat(initial - target) / threshold),
+  );
   if (normalizedDisplacement <= 1) return 0;
 
-  const root = -Math.sqrt(DragToResizeSpringDefaults.stiffness);
+  // FloatSpringSpec passes Float stiffness to SpringEstimation, which then
+  // promotes it to Double for root solving.
+  const root = -Math.sqrt(composeFloat(DragToResizeSpringDefaults.stiffness));
   const coefficient1 = normalizedDisplacement;
   const coefficient2 = -root * coefficient1;
   const delta = 1;

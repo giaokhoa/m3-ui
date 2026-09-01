@@ -6,6 +6,8 @@ import {
 export const PaneExpansionUnspecified = -1;
 const AnchoringVelocityThreshold = 200;
 const AnchoringVisibilityThreshold = 1;
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
 
 export type PaneExpansionAnchor =
   | { readonly type: 'proportion'; readonly proportion: number }
@@ -39,21 +41,57 @@ function composeFloat(value: number) {
   return Math.fround(value);
 }
 
+function nonNegativeAnchorOffset(value: number) {
+  const floatOffset = composeFloat(value);
+  if (Number.isNaN(floatOffset) || floatOffset < 0) {
+    throw new RangeError('Offset must larger than or equal to 0 CSS pixels.');
+  }
+  return floatOffset;
+}
+
+function composeRoundToInt(value: number) {
+  if (Number.isNaN(value)) {
+    throw new RangeError('Cannot round NaN value.');
+  }
+  if (value >= ComposeIntMax) return ComposeIntMax;
+  if (value <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(value);
+}
+
+function composeFloatToInt(value: number) {
+  const floatValue = composeFloat(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return (a - b) | 0;
+}
+
+function composeIntAbs(value: number) {
+  const intValue = value | 0;
+  return intValue === ComposeIntMin ? ComposeIntMin : Math.abs(intValue);
+}
+
 export const PaneExpansionAnchor = Object.freeze({
   proportion(proportion: number): PaneExpansionAnchor {
-    const floatProportion = composeFloat(proportion);
-    if (!Number.isFinite(floatProportion) || floatProportion < 0 || floatProportion > 1) {
-      throw new RangeError('Proportion value needs to be in [0, 1]');
-    }
-    return Object.freeze({ type: 'proportion', proportion: floatProportion });
+    return Object.freeze({ type: 'proportion', proportion: composeFloat(proportion) });
   },
   fromStart(offset: number): PaneExpansionAnchor {
-    finiteNonNegative(offset, 'offset');
-    return Object.freeze({ type: 'offset', direction: 'start', offset });
+    return Object.freeze({
+      type: 'offset',
+      direction: 'start',
+      offset: nonNegativeAnchorOffset(offset),
+    });
   },
   fromEnd(offset: number): PaneExpansionAnchor {
-    finiteNonNegative(offset, 'offset');
-    return Object.freeze({ type: 'offset', direction: 'end', offset });
+    return Object.freeze({
+      type: 'offset',
+      direction: 'end',
+      offset: nonNegativeAnchorOffset(offset),
+    });
   },
 });
 
@@ -62,6 +100,14 @@ export interface PaneExpansionLayoutState {
   firstPaneProportion: number;
   currentDraggingOffset: number;
   isDraggingOrSettling: boolean;
+}
+
+/** The fields saved by AndroidX PaneExpansionStateDataSaver for each persistent key. */
+export interface PaneExpansionPersistentData {
+  firstPaneWidth: number;
+  firstPaneProportion: number;
+  currentDraggingOffset: number;
+  currentAnchor: PaneExpansionAnchor | null;
 }
 
 export interface PaneExpansionStateOptions {
@@ -77,6 +123,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function anchorEquals(a: PaneExpansionAnchor, b: PaneExpansionAnchor) {
+  if (a === b) return true;
   if (a.type !== b.type) return false;
   if (a.type === 'proportion' && b.type === 'proportion') {
     return composeFloat(a.proportion) === composeFloat(b.proportion);
@@ -96,16 +143,19 @@ function anchorPosition(
 ) {
   let offset: number;
   if (anchor.type === 'proportion') {
-    offset = Math.round(
-      composeFloat(composeFloat(totalSize) * composeFloat(anchor.proportion)),
+    offset = clamp(
+      composeRoundToInt(
+        composeFloat(composeFloat(totalSize) * composeFloat(anchor.proportion)),
+      ),
+      0,
+      totalSize,
     );
   } else if (anchor.direction === 'start') {
-    offset = anchor.offset;
+    offset = composeRoundToInt(anchor.offset);
   } else {
-    offset = totalSize - anchor.offset;
+    offset = totalSize - composeRoundToInt(anchor.offset);
   }
-  const coerced = clamp(Math.round(offset), 0, totalSize);
-  return direction === 'rtl' ? totalSize - coerced : coerced;
+  return direction === 'rtl' ? totalSize - offset : offset;
 }
 
 interface IndexedAnchorPosition {
@@ -221,9 +271,8 @@ export class PaneExpansionState {
   private revision = 0;
   private readonly listeners = new Set<() => void>();
   private defaultAnimation: PaneExpansionAnimation;
-  private animationController: AbortController | null = null;
-  private restoreInterruptibleAnimationController: AbortController | null = null;
-  private animationTargetOffset = PaneExpansionUnspecified;
+  private settleAnimationController: AbortController | null = null;
+  private settleAnimationTargetOffset = PaneExpansionUnspecified;
 
   constructor({
     anchors = [],
@@ -254,27 +303,62 @@ export class PaneExpansionState {
     this.listeners.forEach((listener) => listener());
   }
 
-  private cancelAnimation() {
-    const controller = this.animationController;
-    if (controller === null) return false;
-    if (this.restoreInterruptibleAnimationController === controller) {
-      this.restoreInterruptibleAnimationController = null;
-    }
-    this.animationController = null;
-    this.animationTargetOffset = PaneExpansionUnspecified;
-    controller.abort();
-    const wasSettling = this.settling;
-    this.settling = false;
-    return wasSettling;
+  /** Snapshot only the fields persisted by rememberPersistentlyWithKey. */
+  capturePersistentData(): PaneExpansionPersistentData {
+    return {
+      firstPaneWidth: this.firstPaneWidthState,
+      firstPaneProportion: this.firstPaneProportionState,
+      currentDraggingOffset: this.currentDraggingOffsetState,
+      currentAnchor: this.currentAnchorState,
+    };
   }
 
-  private cancelRestoreInterruptibleAnimation() {
-    const controller = this.restoreInterruptibleAnimationController;
-    if (controller === null || this.animationController !== controller) return false;
-    const targetOffset = this.animationTargetOffset;
-    this.restoreInterruptibleAnimationController = null;
-    this.animationController = null;
-    this.animationTargetOffset = PaneExpansionUnspecified;
+  /**
+   * Restore one key's PaneExpansionStateData into this live state instance.
+   * Measurement, direction, drag runtime and listeners intentionally stay on
+   * the live object, matching AndroidX's remembered PaneExpansionState.
+   */
+  restorePersistentData(
+    data: PaneExpansionPersistentData,
+    anchors: readonly PaneExpansionAnchor[],
+    initialAnchoredIndex = this.initialAnchoredIndexState,
+  ) {
+    if (initialAnchoredIndex < -1 || initialAnchoredIndex >= anchors.length) {
+      throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
+    }
+
+    this.cancelSettlingAnimation();
+    this.firstPaneWidthState = data.firstPaneWidth;
+    this.firstPaneProportionState = data.firstPaneProportion;
+    this.currentDraggingOffsetState = data.currentDraggingOffset;
+    this.currentAnchorState = data.currentAnchor;
+
+    const nextAnchors = [...anchors];
+    const currentAnchorStillPresent =
+      this.currentAnchorState !== null &&
+      nextAnchors.some((anchor) => anchorEquals(anchor, this.currentAnchorState!));
+    const initialAnchorForCurrentAnchors =
+      initialAnchoredIndex === -1 ? null : nextAnchors[initialAnchoredIndex] ?? null;
+
+    this.anchors = nextAnchors;
+    this.initialAnchoredIndexState = initialAnchoredIndex;
+    if (!currentAnchorStillPresent) {
+      this.currentAnchorState = initialAnchorForCurrentAnchors;
+    }
+    this.notify();
+  }
+
+  /**
+   * Cancels only a drag-mutex-owned settle operation. Public animateTo calls are
+   * independent coroutines upstream and are deliberately left running.
+   * animateToInternal snaps its target in finally even when cancellation wins.
+   */
+  private cancelSettlingAnimation() {
+    const controller = this.settleAnimationController;
+    if (controller === null) return false;
+    const targetOffset = this.settleAnimationTargetOffset;
+    this.settleAnimationController = null;
+    this.settleAnimationTargetOffset = PaneExpansionUnspecified;
     controller.abort();
     if (targetOffset !== PaneExpansionUnspecified) {
       this.setAnimatedOffset(targetOffset);
@@ -293,11 +377,22 @@ export class PaneExpansionState {
     return indexedAnchorPositions(this.anchors, this.maxExpansionWidth, this.measuredDirection);
   }
 
-  private setAnimatedOffset(value: number) {
-    if (this.maxExpansionWidth === PaneExpansionUnspecified) return;
-    const offset = clamp(Math.trunc(value), 0, this.maxExpansionWidth);
+  /** Mirrors currentDraggingOffset's coerceIn + redundant-write guard. */
+  private setCurrentDraggingOffset(value: number) {
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) {
+      // Kotlin coerceIn(0, -1) rejects the empty range. This is reachable when
+      // a measured handle offset is injected before the scaffold width exists.
+      throw new RangeError('Cannot coerce value to an empty range: [0, -1]');
+    }
+    const offset = clamp(value, 0, this.maxExpansionWidth);
+    if (offset === this.currentDraggingOffsetState) return false;
     this.currentDraggingOffsetState = offset;
     this.currentMeasuredDraggingOffset = offset;
+    return true;
+  }
+
+  private setAnimatedOffset(value: number) {
+    return this.setCurrentDraggingOffset(composeFloatToInt(value));
   }
 
   get currentAnchor() {
@@ -323,7 +418,6 @@ export class PaneExpansionState {
       this.currentDraggingOffsetState === PaneExpansionUnspecified
         ? this.currentMeasuredDraggingOffset
         : this.currentDraggingOffsetState;
-    if (currentOffset === PaneExpansionUnspecified) return positions[0]!.anchor;
     for (const anchorPosition of positions) {
       if (currentOffset < anchorPosition.position) return anchorPosition.anchor;
     }
@@ -331,8 +425,13 @@ export class PaneExpansionState {
   }
 
   isUnspecified() {
+    const firstPaneWidth =
+      this.maxExpansionWidth === PaneExpansionUnspecified ||
+      this.firstPaneWidthState === PaneExpansionUnspecified
+        ? PaneExpansionUnspecified
+        : clamp(this.firstPaneWidthState, 0, this.maxExpansionWidth);
     return (
-      this.firstPaneWidthState === PaneExpansionUnspecified &&
+      firstPaneWidth === PaneExpansionUnspecified &&
       Number.isNaN(this.firstPaneProportionState) &&
       this.currentDraggingOffsetState === PaneExpansionUnspecified
     );
@@ -373,18 +472,22 @@ export class PaneExpansionState {
       throw new RangeError('initialAnchoredIndex must be -1 or a valid anchor index');
     }
 
-    this.cancelRestoreInterruptibleAnimation();
+    // restore() owns the same drag mutex as settleToAnchorIfNeeded. Updating the
+    // anchor configuration therefore cancels an active settle, but not a public
+    // animateTo coroutine, and the canceled settle snaps its target in finally.
+    this.cancelSettlingAnimation();
     const nextAnchors = [...anchors];
-    const matchedCurrentAnchor =
-      this.currentAnchorState === null
-        ? undefined
-        : nextAnchors.find((anchor) => anchorEquals(anchor, this.currentAnchorState!));
+    const currentAnchorStillPresent =
+      this.currentAnchorState !== null &&
+      nextAnchors.some((anchor) => anchorEquals(anchor, this.currentAnchorState!));
     const initialAnchorForCurrentAnchors =
       initialAnchoredIndex === -1 ? null : nextAnchors[initialAnchoredIndex] ?? null;
 
     this.anchors = nextAnchors;
     this.initialAnchoredIndexState = initialAnchoredIndex;
-    this.currentAnchorState = matchedCurrentAnchor ?? initialAnchorForCurrentAnchors;
+    if (!currentAnchorStillPresent) {
+      this.currentAnchorState = initialAnchorForCurrentAnchors;
+    }
     this.notify();
   }
 
@@ -404,13 +507,11 @@ export class PaneExpansionState {
     this.maxExpansionWidth = nextWidth;
     this.measuredDirection = direction;
     if (!this.isDraggingOrSettling && this.currentAnchorState !== null) {
-      const offset = anchorPosition(this.currentAnchorState, nextWidth, direction);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
+      this.setCurrentDraggingOffset(
+        anchorPosition(this.currentAnchorState, nextWidth, direction),
+      );
     } else if (this.currentDraggingOffsetState !== PaneExpansionUnspecified) {
-      const offset = clamp(this.currentDraggingOffsetState, 0, nextWidth);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
+      this.setCurrentDraggingOffset(this.currentDraggingOffsetState);
     }
     this.notify();
   }
@@ -421,32 +522,21 @@ export class PaneExpansionState {
   }
 
   beginDrag() {
-    const cancelledSettling = this.cancelAnimation();
+    const cancelledSettling = this.cancelSettlingAnimation();
     if (this.dragging && !cancelledSettling) return;
     this.dragging = true;
     this.notify();
   }
 
   dispatchRawDelta(delta: number) {
-    if (
-      this.maxExpansionWidth === PaneExpansionUnspecified ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
+    const remainingDelta = composeFloat(this.consumeDragDelta(composeFloat(delta)));
+    if (this.currentMeasuredDraggingOffset === PaneExpansionUnspecified) {
       return;
     }
-    const cancelledSettling = this.cancelAnimation();
-    const remainingDelta = this.consumeDragDelta(delta);
-    const nextOffset = clamp(
-      Math.trunc(this.currentMeasuredDraggingOffset + remainingDelta),
-      0,
-      this.maxExpansionWidth,
+    const nextOffset = composeFloatToInt(
+      composeFloat(composeFloat(this.currentMeasuredDraggingOffset) + remainingDelta),
     );
-    if (nextOffset === this.currentDraggingOffsetState) {
-      if (cancelledSettling) this.notify();
-      return;
-    }
-    this.currentDraggingOffsetState = nextOffset;
-    this.currentMeasuredDraggingOffset = nextOffset;
+    if (!this.setCurrentDraggingOffset(nextOffset)) return;
     this.notify();
   }
 
@@ -459,53 +549,34 @@ export class PaneExpansionState {
     void this.settleToAnchorIfNeeded(velocity);
   }
 
-  snapToAnchor(anchor: PaneExpansionAnchor) {
-    const matched = this.findAnchor(anchor);
-    if (matched === undefined) {
-      throw new RangeError('The provided anchor is not in the anchor list');
-    }
-    this.cancelAnimation();
-    this.currentAnchorState = matched;
-    if (this.maxExpansionWidth !== PaneExpansionUnspecified) {
-      const offset = anchorPosition(matched, this.maxExpansionWidth, this.measuredDirection);
-      this.currentDraggingOffsetState = offset;
-      this.currentMeasuredDraggingOffset = offset;
-    }
-    this.notify();
-  }
-
-  private async animateToMatchedAnchor(
-    matched: PaneExpansionAnchor,
+  private async animateToAnchor(
+    anchor: PaneExpansionAnchor,
     initialVelocity: number,
-    restoreInterruptible: boolean,
+    mutexOwned: boolean,
   ) {
-    this.cancelAnimation();
-    this.currentAnchorState = matched;
-    if (
-      this.maxExpansionWidth === PaneExpansionUnspecified ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
+    this.currentAnchorState = anchor;
+    if (this.maxExpansionWidth === PaneExpansionUnspecified) {
       this.notify();
       return;
     }
 
     const targetOffset = anchorPosition(
-      matched,
+      anchor,
       this.maxExpansionWidth,
       this.measuredDirection,
     );
     const from = this.currentMeasuredDraggingOffset;
-    if (from === targetOffset && initialVelocity === 0) {
+    const floatInitialVelocity = composeFloat(initialVelocity);
+    if (from === targetOffset && floatInitialVelocity === 0) {
       this.setAnimatedOffset(targetOffset);
       this.notify();
       return;
     }
 
     const controller = new AbortController();
-    this.animationController = controller;
-    this.animationTargetOffset = targetOffset;
-    if (restoreInterruptible) {
-      this.restoreInterruptibleAnimationController = controller;
+    if (mutexOwned) {
+      this.settleAnimationController = controller;
+      this.settleAnimationTargetOffset = targetOffset;
     }
     this.settling = true;
     this.notify();
@@ -514,37 +585,43 @@ export class PaneExpansionState {
       await this.defaultAnimation({
         from,
         to: targetOffset,
-        initialVelocity,
+        initialVelocity: floatInitialVelocity,
         signal: controller.signal,
         update: (offset) => {
           if (controller.signal.aborted) return;
-          this.setAnimatedOffset(offset);
-          this.notify();
+          if (this.setAnimatedOffset(offset)) this.notify();
         },
       });
-      if (controller.signal.aborted) return;
-      this.setAnimatedOffset(targetOffset);
     } finally {
-      if (this.animationController === controller) {
-        this.animationController = null;
-        if (this.restoreInterruptibleAnimationController === controller) {
-          this.restoreInterruptibleAnimationController = null;
-        }
-        this.animationTargetOffset = PaneExpansionUnspecified;
-        this.settling = false;
-        this.notify();
+      if (mutexOwned && this.settleAnimationController !== controller) {
+        // A competing drag/restore mutation already performed the cancellation
+        // finalization synchronously before taking ownership. The suspended
+        // animation promise may resume later; that stale finally must not write
+        // its old target into the new data bucket or clear a newer settle.
+        return;
       }
+
+      // AndroidX animateToInternal assigns the target in finally, including
+      // cancellation and animation exceptions. For mutex-owned cancellation,
+      // cancelSettlingAnimation() performs this before relinquishing ownership.
+      this.setAnimatedOffset(targetOffset);
+      if (mutexOwned) {
+        this.settleAnimationController = null;
+        this.settleAnimationTargetOffset = PaneExpansionUnspecified;
+      }
+      this.settling = false;
+      this.notify();
     }
   }
 
   /** AndroidX PaneExpansionState.animateTo analogue. */
   async animateTo(anchor: PaneExpansionAnchor, initialVelocity = 0) {
-    finite(initialVelocity, 'initialVelocity');
-    const matched = this.findAnchor(anchor);
-    if (matched === undefined) {
+    if (this.findAnchor(anchor) === undefined) {
       throw new RangeError('The provided anchor is not in the anchor list');
     }
-    await this.animateToMatchedAnchor(matched, initialVelocity, false);
+    // contains(anchor) is only validation upstream; currentAnchor receives the
+    // exact argument object rather than the equal anchor instance from the list.
+    await this.animateToAnchor(anchor, initialVelocity, false);
   }
 
   moveToNextAnchor() {
@@ -554,28 +631,28 @@ export class PaneExpansionState {
 
   async settleToAnchorIfNeeded(velocity: number) {
     finite(velocity, 'velocity');
+    const floatVelocity = composeFloat(velocity);
     const positions = this.getIndexedAnchorPositions();
-    if (
-      positions.length === 0 ||
-      this.currentMeasuredDraggingOffset === PaneExpansionUnspecified
-    ) {
-      return;
-    }
+    if (positions.length === 0) return;
 
+    // MutatorMutex starts this operation only after canceling the previous
+    // settle/drag mutation. The canceled anchor animation snaps its target in
+    // animateToInternal.finally before the next anchor is scored.
+    this.cancelSettlingAnimation();
     const currentPosition = this.currentMeasuredDraggingOffset;
     let bestAnchorPosition = positions[0]!;
     let bestScore = Number.POSITIVE_INFINITY;
 
     for (const anchorPosition of positions) {
       let score: number;
-      if (velocity >= AnchoringVelocityThreshold) {
-        const delta = anchorPosition.position - currentPosition;
-        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
-      } else if (velocity <= -AnchoringVelocityThreshold) {
-        const delta = currentPosition - anchorPosition.position;
-        score = delta < 0 ? this.maxExpansionWidth - delta : delta;
+      if (floatVelocity >= AnchoringVelocityThreshold) {
+        const delta = composeIntSubtract(anchorPosition.position, currentPosition);
+        score = delta < 0 ? composeIntSubtract(this.maxExpansionWidth, delta) : delta;
+      } else if (floatVelocity <= -AnchoringVelocityThreshold) {
+        const delta = composeIntSubtract(currentPosition, anchorPosition.position);
+        score = delta < 0 ? composeIntSubtract(this.maxExpansionWidth, delta) : delta;
       } else {
-        score = Math.abs(currentPosition - anchorPosition.position);
+        score = composeIntAbs(composeIntSubtract(currentPosition, anchorPosition.position));
       }
       if (score < bestScore) {
         bestScore = score;
@@ -583,7 +660,7 @@ export class PaneExpansionState {
       }
     }
 
-    await this.animateToMatchedAnchor(bestAnchorPosition.anchor, velocity, true);
+    await this.animateToAnchor(bestAnchorPosition.anchor, floatVelocity, true);
   }
 
   getLayoutState(
@@ -592,7 +669,15 @@ export class PaneExpansionState {
   ): PaneExpansionLayoutState {
     const width = Math.max(0, Math.round(measuredWidth));
     let draggingOffset = this.currentDraggingOffsetState;
-    if (draggingOffset === PaneExpansionUnspecified && this.currentAnchorState !== null) {
+    if (
+      draggingOffset === PaneExpansionUnspecified &&
+      this.currentAnchorState !== null &&
+      (width !== this.maxExpansionWidth || direction !== this.measuredDirection)
+    ) {
+      // React can render the next measured geometry before the layout effect
+      // delivers onMeasured(). Only predict the anchor in that pending-measure
+      // case. If geometry is unchanged, AndroidX onMeasured() returns early, so
+      // clear()/restore() must leave an unspecified drag offset unspecified.
       draggingOffset = anchorPosition(this.currentAnchorState, width, direction);
     }
     if (draggingOffset !== PaneExpansionUnspecified) {

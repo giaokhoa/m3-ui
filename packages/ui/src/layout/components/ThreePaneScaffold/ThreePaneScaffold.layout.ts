@@ -1,4 +1,5 @@
 import type { LayoutBounds, PaneScaffoldDirective } from '../../adaptive/paneScaffoldDirective';
+import { paneScaffoldRolesEqual } from '../../adaptive/paneScaffoldRole';
 import {
   PaneExpansionUnspecified,
   type PaneExpansionState,
@@ -9,6 +10,7 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { assertThreePaneScaffoldHorizontalOrder } from '../../adaptive/threePaneScaffoldHorizontalOrder';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
 import {
   resolvePanePreferredSize,
@@ -42,6 +44,19 @@ export interface ThreePaneScaffoldLayoutOptions {
   /** Outer pane margins applied after partition measurement, keyed by pane role. */
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
+  /**
+   * Whether each pane has an actual measurable/content node. AndroidX only
+   * creates PaneMeasurable entries for non-null pane measurables. Omitted roles
+   * default to available so standalone layout helpers preserve their contract.
+   */
+  paneAvailability?: Partial<Record<ThreePaneScaffoldRole, boolean>>;
+}
+
+export interface ThreePaneScaffoldLayoutPass {
+  /** Raw AndroidX measuredBounds recorded into PaneMotionData before margins/measurement clamp. */
+  raw: ThreePaneScaffoldLayout;
+  /** Browser-renderable bounds after PaneMargins and measured size clamp. */
+  placed: ThreePaneScaffoldLayout;
 }
 
 const panePriority: Record<ThreePaneScaffoldRole, number> = {
@@ -49,14 +64,44 @@ const panePriority: Record<ThreePaneScaffoldRole, number> = {
   secondary: 5,
   tertiary: 1,
 };
+const ComposeIntMax = 2147483647;
+const ComposeIntMin = -2147483648;
+
+function composeRoundToPx(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) throw new Error('Cannot round NaN value');
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.round(floatValue);
+}
+
+function composeFloatToInt(value: number) {
+  const floatValue = Math.fround(value);
+  if (Number.isNaN(floatValue)) return 0;
+  if (floatValue >= ComposeIntMax) return ComposeIntMax;
+  if (floatValue <= ComposeIntMin) return ComposeIntMin;
+  return Math.trunc(floatValue);
+}
+
+function composeIntAdd(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a + b) | 0 : a + b;
+}
+
+function composeIntSubtract(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? (a - b) | 0 : a - b;
+}
+
+function composeIntMultiply(a: number, b: number) {
+  return Number.isInteger(a) && Number.isInteger(b) ? Math.imul(a, b) : a * b;
+}
 
 function px(value: string, name: string): number {
   if (!value.endsWith('px')) {
     throw new Error(`${name} must resolve to CSS pixels, received ${value}`);
   }
   const parsed = Number.parseFloat(value);
-  if (!Number.isFinite(parsed)) throw new Error(`Invalid ${name}: ${value}`);
-  return parsed;
+  if (Number.isNaN(parsed)) throw new Error(`Invalid ${name}: ${value}`);
+  return composeRoundToPx(parsed);
 }
 
 function assertDimension(value: number, name: string) {
@@ -66,37 +111,37 @@ function assertDimension(value: number, name: string) {
 }
 
 function rectWidth(rect: LayoutBounds) {
-  return Math.max(0, rect.right - rect.left);
+  return rect.right - rect.left;
 }
 
 function rectHeight(rect: LayoutBounds) {
-  return Math.max(0, rect.bottom - rect.top);
+  return rect.bottom - rect.top;
 }
 
 function roundBounds(bounds: LayoutBounds): LayoutBounds {
   return {
-    left: Math.round(bounds.left),
-    top: Math.round(bounds.top),
-    right: Math.round(bounds.right),
-    bottom: Math.round(bounds.bottom),
+    left: composeRoundToPx(bounds.left),
+    top: composeRoundToPx(bounds.top),
+    right: composeRoundToPx(bounds.right),
+    bottom: composeRoundToPx(bounds.bottom),
   };
 }
 
-function clipBounds(bounds: LayoutBounds, width: number, height: number): LayoutBounds | null {
-  const clipped = {
-    left: Math.max(0, Math.min(width, bounds.left)),
-    top: Math.max(0, Math.min(height, bounds.top)),
-    right: Math.max(0, Math.min(width, bounds.right)),
-    bottom: Math.max(0, Math.min(height, bounds.bottom)),
+function clampMeasuredSize(placement: PanePlacement): PanePlacement {
+  return {
+    ...placement,
+    width: Math.max(placement.width, 0),
+    height: Math.max(placement.height, 0),
   };
-  return clipped.left < clipped.right && clipped.top < clipped.bottom ? clipped : null;
 }
 
 /**
- * Static measurement/placement port of AndroidX ThreePaneScaffold.
- * Pane animation lookahead and levitated overlays are separate concerns.
+ * Internal two-phase measurement pass matching AndroidX ThreePaneScaffold.
+ * `raw` is captured when measureAndPlacePane assigns measuredBounds and records
+ * PaneMotionData. `placed` mirrors doMeasureAndPlace: margins are applied later,
+ * then the actual child Constraints clamp negative measured sizes to zero.
  */
-export function calculateThreePaneScaffoldLayout({
+export function calculateThreePaneScaffoldLayoutPass({
   width,
   height,
   directive,
@@ -108,9 +153,11 @@ export function calculateThreePaneScaffoldLayout({
   preferredHeights = {},
   paneMargins = {},
   paneExpansionState = null,
-}: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayout {
+  paneAvailability = {},
+}: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayoutPass {
   assertDimension(width, 'width');
   assertDimension(height, 'height');
+  assertThreePaneScaffoldHorizontalOrder(paneOrder);
 
   const horizontalGap = px(
     directive.horizontalPartitionSpacerSize,
@@ -129,14 +176,17 @@ export function calculateThreePaneScaffoldLayout({
     'defaultPanePreferredHeight',
   );
 
+  const paneIsAvailable = (role: ThreePaneScaffoldRole) => paneAvailability[role] !== false;
   const physicalOrder = direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
   const expanded = physicalOrder.filter(
-    (role) => getPaneAdaptedValue(value, role).type === 'expanded',
+    (role) => paneIsAvailable(role) && getPaneAdaptedValue(value, role).type === 'expanded',
   );
   const reflowed = physicalOrder.find(
-    (role) => getPaneAdaptedValue(value, role).type === 'reflowed',
+    (role) => paneIsAvailable(role) && getPaneAdaptedValue(value, role).type === 'reflowed',
   );
-  const result: ThreePaneScaffoldLayout = {};
+  const raw: ThreePaneScaffoldLayout = {};
+  const placed: ThreePaneScaffoldLayout = {};
+  const finish = (): ThreePaneScaffoldLayoutPass => ({ raw, placed });
 
   const preferredWidth = (role: ThreePaneScaffoldRole) =>
     resolvePanePreferredSize(
@@ -153,12 +203,15 @@ export function calculateThreePaneScaffoldLayout({
       `${role} preferredHeight`,
     );
   const placePane = (role: ThreePaneScaffoldRole, placement: PanePlacement) => {
-    result[role] = applyPaneMargins(
-      placement,
-      paneMargins[role],
-      width,
-      height,
-      direction,
+    raw[role] = placement;
+    placed[role] = clampMeasuredSize(
+      applyPaneMargins(
+        placement,
+        paneMargins[role],
+        width,
+        height,
+        direction,
+      ),
     );
   };
 
@@ -167,26 +220,25 @@ export function calculateThreePaneScaffoldLayout({
     if (
       reflowed !== undefined &&
       reflowValue?.type === 'reflowed' &&
-      reflowValue.reflowUnder === expandedRole
+      paneScaffoldRolesEqual(reflowValue.reflowUnder, expandedRole)
     ) {
-      const availableHeight = Math.max(0, rectHeight(bounds) - verticalGap);
-      // AndroidX operates on IntRect bounds here, so Int / 2 truncates before
-      // max() chooses the minimum half-partition height.
-      const expandedHeight = Math.max(
-        availableHeight - preferredHeight(reflowed),
+      const availableHeight = composeIntSubtract(rectHeight(bounds), verticalGap);
+      const expandedRawHeight = Math.max(
+        composeIntSubtract(availableHeight, preferredHeight(reflowed)),
         Math.trunc(availableHeight / 2),
       );
+      const reflowedRawHeight = composeIntSubtract(availableHeight, expandedRawHeight);
       placePane(expandedRole, {
         left: bounds.left,
         top: bounds.top,
         width: rectWidth(bounds),
-        height: expandedHeight,
+        height: expandedRawHeight,
       });
       placePane(reflowed, {
         left: bounds.left,
-        top: bounds.top + expandedHeight + verticalGap,
+        top: composeIntAdd(composeIntAdd(bounds.top, expandedRawHeight), verticalGap),
         width: rectWidth(bounds),
-        height: availableHeight - expandedHeight,
+        height: reflowedRawHeight,
       });
       return;
     }
@@ -204,12 +256,13 @@ export function calculateThreePaneScaffoldLayout({
     roles: readonly ThreePaneScaffoldRole[],
   ) => {
     if (roles.length === 0) return;
-    const allocatableWidth = Math.max(0, rectWidth(bounds) - (roles.length - 1) * horizontalGap);
+    const spacerWidth = composeIntMultiply(roles.length - 1, horizontalGap);
+    const allocatableWidth = composeIntSubtract(rectWidth(bounds), spacerWidth);
     const widths = new Map<ThreePaneScaffoldRole, number>(
       roles.map((role) => [role, preferredWidth(role)]),
     );
     const totalPreferredWidth = roles.reduce(
-      (sum, role) => sum + (widths.get(role) ?? 0),
+      (sum, role) => composeIntAdd(sum, widths.get(role) ?? 0),
       0,
     );
 
@@ -219,23 +272,32 @@ export function calculateThreePaneScaffoldLayout({
       );
       widths.set(
         highestPriorityRole,
-        (widths.get(highestPriorityRole) ?? 0) + allocatableWidth - totalPreferredWidth,
+        composeIntAdd(
+          widths.get(highestPriorityRole) ?? 0,
+          composeIntSubtract(allocatableWidth, totalPreferredWidth),
+        ),
       );
-    } else if (allocatableWidth < totalPreferredWidth && totalPreferredWidth > 0) {
-      const scale = allocatableWidth / totalPreferredWidth;
+    } else if (allocatableWidth < totalPreferredWidth) {
+      const scale = Math.fround(
+        Math.fround(allocatableWidth) / Math.fround(totalPreferredWidth),
+      );
       roles.forEach((role) =>
-        widths.set(role, Math.trunc((widths.get(role) ?? 0) * scale)),
+        widths.set(
+          role,
+          composeFloatToInt(Math.fround(Math.fround(widths.get(role) ?? 0) * scale)),
+        ),
       );
     }
 
     let left = bounds.left;
     roles.forEach((role) => {
       const paneWidth = widths.get(role) ?? 0;
+      const right = composeIntAdd(left, paneWidth);
       placePartition(
-        { left, top: bounds.top, right: left + paneWidth, bottom: bounds.bottom },
+        { left, top: bounds.top, right, bottom: bounds.bottom },
         role,
       );
-      left += paneWidth + horizontalGap;
+      left = composeIntAdd(right, horizontalGap);
     });
   };
 
@@ -252,26 +314,44 @@ export function calculateThreePaneScaffoldLayout({
       const firstPane = expanded[0]!;
       const secondPane = expanded[1]!;
       if (expansion.currentDraggingOffset !== PaneExpansionUnspecified) {
-        // AndroidX horizontalPartitionSpacerSize is an Int after roundToPx(),
-        // and Int / 2 truncates for odd spacer widths.
         const halfGap = Math.trunc(horizontalGap / 2);
         if (expansion.currentDraggingOffset <= halfGap) {
           const bounds = expansion.isDraggingOrSettling
-            ? { ...outerBounds, left: expansion.currentDraggingOffset * 2 }
+            ? {
+                ...outerBounds,
+                left: composeIntAdd(
+                  composeIntMultiply(expansion.currentDraggingOffset, 2),
+                  outerBounds.left,
+                ),
+              }
             : outerBounds;
           placePartition(bounds, secondPane);
-        } else if (expansion.currentDraggingOffset >= width - halfGap) {
+        } else if (
+          expansion.currentDraggingOffset >= composeIntSubtract(width, halfGap)
+        ) {
           const bounds = expansion.isDraggingOrSettling
-            ? { ...outerBounds, right: expansion.currentDraggingOffset * 2 - width }
+            ? {
+                ...outerBounds,
+                right: composeIntSubtract(
+                  composeIntMultiply(expansion.currentDraggingOffset, 2),
+                  outerBounds.right,
+                ),
+              }
             : outerBounds;
           placePartition(bounds, firstPane);
         } else {
           placePartition(
-            { ...outerBounds, right: expansion.currentDraggingOffset - halfGap },
+            {
+              ...outerBounds,
+              right: composeIntSubtract(expansion.currentDraggingOffset, halfGap),
+            },
             firstPane,
           );
           placePartition(
-            { ...outerBounds, left: expansion.currentDraggingOffset + halfGap },
+            {
+              ...outerBounds,
+              left: composeIntAdd(expansion.currentDraggingOffset, halfGap),
+            },
             secondPane,
           );
         }
@@ -281,42 +361,39 @@ export function calculateThreePaneScaffoldLayout({
       ) {
         placePartition(outerBounds, secondPane);
       } else if (
-        expansion.firstPaneWidth >= width - horizontalGap ||
+        expansion.firstPaneWidth >= composeIntSubtract(width, horizontalGap) ||
         expansion.firstPaneProportion >= 1
       ) {
         placePartition(outerBounds, firstPane);
       } else {
+        const availableWidth = composeIntSubtract(width, horizontalGap);
         const firstPaneWidth =
           expansion.firstPaneWidth !== PaneExpansionUnspecified
             ? expansion.firstPaneWidth
-            : Math.trunc(
+            : composeFloatToInt(
                 Math.fround(
-                  Math.fround(expansion.firstPaneProportion) *
-                    Math.fround(width - horizontalGap),
+                  Math.fround(expansion.firstPaneProportion) * Math.fround(availableWidth),
                 ),
               );
-        const firstPaneRight = outerBounds.left + firstPaneWidth;
+        const firstPaneRight = composeIntAdd(outerBounds.left, firstPaneWidth);
         placePartition({ ...outerBounds, right: firstPaneRight }, firstPane);
         placePartition(
-          { ...outerBounds, left: firstPaneRight + horizontalGap },
+          { ...outerBounds, left: composeIntAdd(firstPaneRight, horizontalGap) },
           secondPane,
         );
       }
-      return result;
+      return finish();
     }
   }
 
-  const localExcluded = excludedBounds
-    // AndroidX converts window bounds to local coordinates and immediately
-    // calls roundToIntRect() before partitioning around hinges.
-    .map(roundBounds)
-    .map((bound) => clipBounds(bound, width, height))
-    .filter((bound): bound is LayoutBounds => bound !== null)
-    .sort((a, b) => a.left - b.left);
+  // AndroidX assumes excludedBounds are already sorted from left to right and
+  // non-overlapping. Preserve caller order and full rounded bounds here rather
+  // than silently sorting or clipping custom directives into a different one.
+  const localExcluded = excludedBounds.map(roundBounds);
 
   if (localExcluded.length === 0) {
     placePartitionsInBounds(outerBounds, expanded);
-    return result;
+    return finish();
   }
 
   const physicalPartitions: LayoutBounds[] = [];
@@ -328,7 +405,7 @@ export function calculateThreePaneScaffoldLayout({
       actualLeft = Math.max(actualLeft, excluded.right);
     } else if (excluded.right >= actualRight) {
       actualRight = Math.min(excluded.left, actualRight);
-      break;
+      continue;
     } else {
       physicalPartitions.push({
         left: actualLeft,
@@ -336,7 +413,10 @@ export function calculateThreePaneScaffoldLayout({
         right: excluded.left,
         bottom: outerBounds.bottom,
       });
-      actualLeft = Math.max(excluded.right, excluded.left + horizontalGap);
+      actualLeft = Math.max(
+        excluded.right,
+        composeIntAdd(excluded.left, horizontalGap),
+      );
     }
   }
   if (actualLeft < actualRight) {
@@ -348,10 +428,10 @@ export function calculateThreePaneScaffoldLayout({
     });
   }
 
-  if (physicalPartitions.length === 0) return result;
+  if (physicalPartitions.length === 0) return finish();
   if (physicalPartitions.length === 1) {
     placePartitionsInBounds(physicalPartitions[0], expanded);
-    return result;
+    return finish();
   }
 
   if (physicalPartitions.length < expanded.length) {
@@ -363,12 +443,22 @@ export function calculateThreePaneScaffoldLayout({
       if (expanded[0] !== undefined) placePartition(first, expanded[0]);
       placePartitionsInBounds(second, expanded.slice(1, 3));
     }
-    return result;
+    return finish();
   }
 
   expanded.forEach((role, index) => {
     const partition = physicalPartitions[index];
     if (partition !== undefined) placePartition(partition, role);
   });
-  return result;
+  return finish();
+}
+
+/**
+ * Static browser-renderable layout. Raw AndroidX measured bounds stay internal
+ * to the measurement pass so callers do not need a second layout contract.
+ */
+export function calculateThreePaneScaffoldLayout(
+  options: ThreePaneScaffoldLayoutOptions,
+): ThreePaneScaffoldLayout {
+  return calculateThreePaneScaffoldLayoutPass(options).placed;
 }
