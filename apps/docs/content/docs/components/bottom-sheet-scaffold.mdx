@@ -1,0 +1,111 @@
+---
+title: Bottom sheet scaffold
+description: Public Material 3 BottomSheetScaffold composition with persistent sheet state, Scaffold-owned screen chrome, and explicit non-modal web behavior.
+---
+
+`BottomSheetScaffold` is the public application-scaffold composition for a persistent Material bottom sheet that shares the screen with main content. It combines the existing `Scaffold`, `BottomSheet`, and `SheetState` contracts rather than introducing a second sheet implementation.
+
+The scaffold is intentionally **non-modal**. Main content remains part of the local composition and is not placed behind a modal focus scope or dismissing scrim.
+
+[Material 3 bottom sheets](https://m3.material.io/components/bottom-sheets/overview)
+
+```tsx
+import { BottomSheetScaffold } from '@m3-ui/ui';
+
+<BottomSheetScaffold
+  sheetContent={<QueueDetails />}
+  topBar={<AppTopBar />}
+>
+  <PlayerContent />
+</BottomSheetScaffold>
+```
+
+## When to use
+
+Use `BottomSheetScaffold` when a screen needs persistent supplemental content that can move between a partially expanded and expanded sheet state while the application body remains available.
+
+Use [`BottomSheet`](/docs/components/bottom-sheet) directly when the sheet belongs to a smaller local composition and you do not need screen-scaffold coordination. Use `ModalBottomSheet` when the sheet should own a modal overlay, focus containment, outside dismissal, and modal background treatment.
+
+Do not use this scaffold as an adaptive pane/navigation system. Window-size policy, pane allocation, and navigation-surface selection belong to the [Adaptive layout guide](/docs/layout).
+
+## Screen composition
+
+`BottomSheetScaffold` forwards screen-level slots such as `topBar` and `snackbarHost` into the shared `Scaffold`. The sheet is layered above that screen content while the body remains in the same application composition.
+
+The scaffold reserves the sheet's partial/peek region at the block end of scrollable body content so ordinary content is not hidden behind the persistent sheet edge. The current visible sheet height also moves the scaffold-owned snackbar host above the settled sheet edge.
+
+Those are layout responsibilities of this composition. The application still owns its content hierarchy, routing, and any nested scroll behavior inside body or sheet content.
+
+## Sheet state
+
+The scaffold reuses the public `SheetState` model from the bottom-sheet family. With the default internal state, the persistent sheet starts in its partially expanded presentation and supports the enabled persistent states.
+
+Provide a state when application logic needs explicit control:
+
+```tsx
+import {
+  BottomSheetScaffold,
+  SheetValue,
+  useSheetState,
+} from '@m3-ui/ui';
+
+function DetailsScreen() {
+  const sheetState = useSheetState({
+    enabledValues: [SheetValue.PartiallyExpanded, SheetValue.Expanded],
+    initialValue: SheetValue.PartiallyExpanded,
+  });
+
+  return (
+    <BottomSheetScaffold
+      state={sheetState}
+      sheetContent={<Details />}
+    >
+      <Content />
+    </BottomSheetScaffold>
+  );
+}
+```
+
+Use the same public state operations documented by the bottom-sheet family, such as expansion or partial expansion, rather than keeping a second boolean that can drift from the actual sheet state.
+
+## Peek height and sheet sizing
+
+`peekHeight` controls the visible sheet height associated with the partially expanded scaffold state. `maxSheetWidth` constrains the sheet's inline size. These are scaffold/sheet geometry inputs; they do not create window-size breakpoints.
+
+The canonical default geometry remains owned by the component implementation and generated token/runtime evidence rather than copied into this guide as a second numeric specification.
+
+## Swipe and drag-handle behavior
+
+Pointer swiping can be disabled with `isSwipeEnabled` without disabling programmatic state transitions or the standard handle action. `dragHandle` can replace the standard handle or be set to `null` when a product intentionally removes it.
+
+The scaffold delegates settling, anchors, drag behavior, and sheet accessibility semantics to the same `BottomSheet`/`SheetState` engine used by the standalone component.
+
+## Insets and app content
+
+The embedded `Scaffold` remains responsible for screen chrome and safe-area behavior. `BottomSheetScaffold` adds the persistent sheet reservation on top of that composition instead of redefining global window insets.
+
+If application content introduces another nested inset-aware scaffold, continue to follow the normal `Scaffold` consumed-inset rules. Do not compensate for the sheet with hard-coded page padding outside the scaffold unless the application intentionally overrides the composition.
+
+## Accessibility
+
+Because this scaffold is non-modal, main application content remains available to keyboard and assistive-technology users. The sheet must therefore be treated as a persistent complementary surface, not as a dialog that temporarily makes the rest of the screen inert.
+
+`BottomSheet` owns its handle and state semantics. Interactive controls inside `sheetContent` keep their own native/React Aria semantics. Give the sheet content a clear heading or local structure when users need context for what the persistent surface contains.
+
+If your interaction requires focus containment, modal outside dismissal, or a scrim that blocks interaction with the body, use `ModalBottomSheet` instead of layering those behaviors manually onto `BottomSheetScaffold`.
+
+## API reference
+
+<ApiReference name="BottomSheetScaffold" />
+
+## Material fidelity and web adaptation
+
+AndroidX Material3 `BottomSheetScaffold` is the reference evidence for the persistent sheet/scaffold composition and explicit peek-height relationship. `m3-ui` maps that model to the browser by composing its existing `Scaffold`, `BottomSheet`, and `SheetState` APIs.
+
+Browser scroll containers, CSS safe areas, focus behavior, and `ResizeObserver`-backed geometry are implementation mechanisms. They do not change the Material distinction between a persistent scaffold sheet and a modal bottom sheet.
+
+## Related components
+
+- [Bottom sheet](/docs/components/bottom-sheet) — standalone non-modal and modal sheet surfaces plus shared `SheetState`.
+- [Scrim](/docs/components/scrim) — visual overlay primitive; not required for this non-modal scaffold.
+- [Adaptive layout and navigation](/docs/layout) — window-level scaffold, pane, and navigation policy.
