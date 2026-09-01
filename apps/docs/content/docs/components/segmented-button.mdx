@@ -1,40 +1,46 @@
 ---
 title: Segmented buttons
-description: Single-choice and multi-choice Material segmented controls with radio and checkbox semantics kept distinct.
+description: Material segmented controls with single-choice radio semantics and multi-choice checkbox semantics kept distinct.
 ---
 
-<MaterialParity component="segmented-button" />
+Segmented buttons group a small set of related choices in one connected Material surface. `m3-ui` exposes separate single-choice and multi-choice primitives so the visual family does not blur two different selection models.
 
-## Overview
-
-The segmented-button family intentionally exposes separate single-choice and multi-choice primitives:
-
-- `SingleChoiceSegmentedButtonRow` + `SingleChoiceSegmentedButton`
-- `MultiChoiceSegmentedButtonRow` + `MultiChoiceSegmentedButton`
-
-This preserves the Material visual family without flattening radio selection and independent toggle selection into one ambiguous state API.
-
-## Live example
+[Material 3 segmented buttons](https://m3.material.io/components/segmented-buttons/overview)
 
 <ComponentPreview>
   <SegmentedButtonPreview />
 </ComponentPreview>
 
-## Single choice
-
-Single-choice rows use React Aria radio-group and radio semantics. Each segment needs a `value`, and exactly one current value represents the group selection.
-
 ```tsx
+import {
+  SingleChoiceSegmentedButton,
+  SingleChoiceSegmentedButtonRow,
+} from '@m3-ui/ui';
+
 <SingleChoiceSegmentedButtonRow aria-label="Density" defaultValue="standard">
   <SingleChoiceSegmentedButton value="compact">Compact</SingleChoiceSegmentedButton>
   <SingleChoiceSegmentedButton value="standard">Standard</SingleChoiceSegmentedButton>
-  <SingleChoiceSegmentedButton value="comfortable">Comfortable</SingleChoiceSegmentedButton>
+</SingleChoiceSegmentedButtonRow>
+```
+
+## When to use
+
+Use segmented buttons for a small set of closely related choices that benefit from visible connected alternatives. Prefer radio buttons when the option set is larger or clearer as a conventional form group, and prefer checkboxes when independent choices do not need a connected segmented presentation.
+
+## Single choice
+
+`SingleChoiceSegmentedButtonRow` with `SingleChoiceSegmentedButton` uses one-of-many radio-group/radio semantics. Every segment has a `value`, and the group owns exactly one current selection.
+
+```tsx
+<SingleChoiceSegmentedButtonRow aria-label="View" defaultValue="list">
+  <SingleChoiceSegmentedButton value="list">List</SingleChoiceSegmentedButton>
+  <SingleChoiceSegmentedButton value="grid">Grid</SingleChoiceSegmentedButton>
 </SingleChoiceSegmentedButtonRow>
 ```
 
 ## Multiple choice
 
-Multi-choice segments are independent React Aria checkboxes inside a semantic group. Use them when more than one option can be active.
+`MultiChoiceSegmentedButtonRow` groups independent selectable segments. Each `MultiChoiceSegmentedButton` uses checkbox/toggle selection semantics so multiple segments can be active simultaneously.
 
 ```tsx
 <MultiChoiceSegmentedButtonRow aria-label="Text formatting">
@@ -43,8 +49,32 @@ Multi-choice segments are independent React Aria checkboxes inside a semantic gr
 </MultiChoiceSegmentedButtonRow>
 ```
 
+Do not describe multi-choice rows as a radio group or single-choice rows as independent toggles. Their browser semantics intentionally differ.
+
 ## Icons and selected state
 
-Segments may provide an inactive `icon` and a `selectedIcon`. If no selected icon is supplied, the Material check mark is used. The icon slot is presentation-only; the segment label and React Aria control semantics remain the accessible source of meaning.
+Segments may provide an inactive `icon` and a `selectedIcon`. If no selected icon is supplied, the component can render the Material selected mark. Icons are presentation; the segment label and control semantics remain the accessible source of meaning.
 
-Canonical outline, shape, spacing, state layers, typography, and selected/unselected colors come from the component token layer rather than docs CSS.
+Canonical outline, connected shape, spacing, state layers, typography, and selected/unselected colors come from component tokens rather than docs-owned CSS values.
+
+## Behavior and accessibility
+
+React Aria provides the appropriate radio or checkbox/toggle keyboard and selection behavior. Keep the row's accessible label meaningful and let the selected state communicate through the correct semantic model rather than adding custom key handlers.
+
+Each segment should have a clear visible or accessible label. Do not rely on selected color or icon alone to convey the active choice.
+
+## API reference
+
+<ApiReference name="SingleChoiceSegmentedButtonRow" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="segmented-button" />
+
+Material provides the connected segmented visual/selection family. Browser semantics deliberately map single-choice to radios and multi-choice to independent checkbox/toggle controls so assistive technologies receive the actual selection model.
+
+## Related components
+
+- [Radio button](/docs/components/radio-button) — conventional single-choice groups.
+- [Checkbox](/docs/components/checkbox) — independent selections.
+- [Button group](/docs/components/button-group) — grouped actions and connected button selection.

@@ -1,13 +1,11 @@
 ---
 title: Checkbox
-description: Material 3 checkbox states and browser-native selection semantics.
+description: Material 3 checkbox guidance, checked and indeterminate states, browser form behavior, and accessibility.
 ---
 
-<MaterialParity component="checkbox" />
+Checkboxes represent independent binary choices and can also display an indeterminate state when a parent choice summarizes mixed child selections.
 
-## Usage
-
-Checkboxes represent independent binary choices. The public component keeps Material visual states while React Aria owns the web checkbox behavior.
+[Material 3 checkbox](https://m3.material.io/components/checkbox/overview)
 
 <ComponentPreview>
   <CheckboxPreview />
@@ -16,12 +14,18 @@ Checkboxes represent independent binary choices. The public component keeps Mate
 ```tsx
 import { Checkbox } from '@m3-ui/ui';
 
-<Checkbox defaultSelected>Remember this device</Checkbox>
+<Checkbox name="remember" defaultSelected>
+  Remember this device
+</Checkbox>
 ```
+
+## When to use
+
+Use checkboxes when each option can be selected independently. Use radio buttons when exactly one option in a set is allowed, and use a switch for an immediate on/off setting where changing the state takes effect directly.
 
 ## States
 
-The implementation distinguishes unchecked, checked, and indeterminate visual states and applies the Material disabled, hover, focus, and pressed treatments through canonical component tokens.
+The public component distinguishes unchecked, checked, indeterminate, and disabled states.
 
 ```tsx
 <Checkbox>Unchecked</Checkbox>
@@ -30,16 +34,32 @@ The implementation distinguishes unchecked, checked, and indeterminate visual st
 <Checkbox isDisabled>Disabled</Checkbox>
 ```
 
-`isIndeterminate` is a distinct presentation/state exposed by the underlying checkbox contract. Do not use it as a substitute for a selected value in application state.
+`isIndeterminate` communicates mixed/partial selection. It is not a substitute for the application's actual selected value; application logic remains responsible for resolving parent/child selection state.
 
-## Labeling and interaction
+## Behavior and form semantics
 
-Visible children act as the checkbox label. React Aria provides the checkbox semantics, keyboard behavior, focus visibility, pointer interaction, controlled/uncontrolled selection props, and accessible state exposure.
+React Aria owns checkbox semantics, keyboard activation, controlled/uncontrolled selection, focus-visible behavior, and native form-related props such as `name` and `value`.
 
-For a control without visible label text, provide an accessible name through the inherited React Aria props.
+Visible children act as the label. Material tokens own the box, check/indeterminate mark, state layers, ripple, colors, and minimum interaction geometry.
 
-## Material presentation
+## Accessibility
 
-The visible box and marks are implementation details of `@m3-ui/ui`; their geometry and minimum interactive target come from the audited Material token layer. Consumer code should not reproduce the check path or container measurements.
+Prefer a visible label. If a checkbox intentionally has no visible label, provide an accessible name through the inherited React Aria props.
 
-The shared ripple engine paints hover/focus/press indication around the Material control while the semantic checkbox remains the interaction owner.
+Do not use color or the checkmark alone to communicate a validation message; pair invalid form state with accessible text and the surrounding field/form relationships described in the Forms guide.
+
+## API reference
+
+<ApiReference name="Checkbox" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="checkbox" />
+
+Material supplies the visual states and selection intent. React Aria/browser semantics provide the accessible checkbox role, keyboard behavior, and native form participation.
+
+## Related components
+
+- [Radio button](/docs/components/radio-button) — one-of-many choices.
+- [Switch](/docs/components/switch) — immediate on/off settings.
+- [Forms and validation](/docs/forms) — cross-component form composition.

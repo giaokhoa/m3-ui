@@ -1,13 +1,11 @@
 ---
 title: Radio button
-description: Material 3 radio buttons grouped with accessible single-selection behavior.
+description: Material 3 radio-button guidance with accessible single-selection groups and browser form semantics.
 ---
 
-<MaterialParity component="radio-button" />
+Radio buttons let users select exactly one value from a mutually exclusive set. Group related options with `RadioGroup` so selection, labeling, validation, and keyboard behavior share one semantic boundary.
 
-## Usage
-
-Radio buttons choose one value from a mutually exclusive set. Use `RadioGroup` as the selection and labeling boundary and place `RadioButton` options inside it.
+[Material 3 radio button](https://m3.material.io/components/radio-button/overview)
 
 <ComponentPreview>
   <RadioButtonPreview />
@@ -16,25 +14,47 @@ Radio buttons choose one value from a mutually exclusive set. Use `RadioGroup` a
 ```tsx
 import { RadioButton, RadioGroup } from '@m3-ui/ui';
 
-<RadioGroup defaultValue="standard" label="Density">
+<RadioGroup name="density" defaultValue="standard" label="Density">
   <RadioButton value="compact">Compact</RadioButton>
   <RadioButton value="standard">Standard</RadioButton>
   <RadioButton value="comfortable">Comfortable</RadioButton>
 </RadioGroup>
 ```
 
+## When to use
+
+Use radio buttons when the user must choose one option from a visible set. Use checkboxes for independent choices and segmented single-choice controls when the compact connected Material presentation is more appropriate.
+
 ## Group contract
 
-`RadioGroup` adds a visible label plus optional description and validation error. It inherits React Aria group state, value, validation, and event props rather than introducing a second selection model.
+`RadioGroup` owns the selected value and shared label, plus optional description and error text. It inherits React Aria value, validation, form, and event props rather than introducing a separate selection model.
 
-The default orientation is vertical. `orientation="horizontal"` is supported when the application composition calls for a horizontal group; that arrangement is a web layout choice around the Material radio controls, not a new Material radio variant.
+The default vertical arrangement works for most sets. `orientation="horizontal"` is a layout choice for suitable short option sets; it does not define a new Material radio family.
 
-## Selection and keyboard behavior
+## Behavior and states
 
-React Aria owns radio semantics and group keyboard navigation, including the selected value and focus movement between options. Material styling owns the control geometry, selected dot, colors, ripple/state indication, and disabled treatment.
+React Aria owns radio-group/radio semantics, arrow-key focus/selection behavior, disabled state, controlled/uncontrolled values, and form participation. Material tokens own the control geometry, selected dot, colors, ripple/state indication, and interaction target.
 
-Keep every `RadioButton` inside a `RadioGroup` when the options are one logical choice set so the browser can expose the relationship correctly.
+Keep every option in its logical `RadioGroup` so the browser exposes the one-of-many relationship correctly.
 
-## Labels
+## Accessibility
 
-Visible children provide each option label. The group label describes the shared question or setting. Description and error text are attached through the React Aria field semantics used by the group primitive.
+The group needs a meaningful shared label or accessible name, while each `RadioButton` needs an option label. Description/error text should describe the group or option state rather than relying on color alone.
+
+Keyboard behavior follows the radio-group model; do not attach custom arrow-key handling that competes with React Aria selection/focus management.
+
+## API reference
+
+<ApiReference name="RadioGroup" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="radio-button" />
+
+Material provides the visual radio-selection pattern. React Aria/browser semantics provide group relationships, keyboard navigation, validation wiring, and native form behavior.
+
+## Related components
+
+- [Checkbox](/docs/components/checkbox) — independent selections.
+- [Segmented buttons](/docs/components/segmented-button) — connected single-choice or multi-choice controls.
+- [Forms and validation](/docs/forms) — native form composition.
