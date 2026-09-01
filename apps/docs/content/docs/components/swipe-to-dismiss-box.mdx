@@ -1,35 +1,17 @@
 ---
 title: Swipe to dismiss
-description: Compose Material3 swipe-to-dismiss behavior with logical directions, controlled settled state, foreground interaction, and browser gesture arbitration.
+description: Material swipe-to-dismiss behavior with logical RTL-aware directions, controlled settled state, foreground interactions, and application-owned dismissal effects.
 ---
 
-<ParitySummary component="swipe-to-dismiss-box" />
-
-## Overview
-
-`SwipeToDismissBox` reveals background content as the foreground is dragged toward a logical start-to-end or end-to-start dismissal anchor.
-
-The component owns drag recognition and Material settling. The application owns what dismissal means for its data model.
-
-## Live example
+Swipe to dismiss reveals background content while a foreground surface moves toward a logical dismissal anchor. The component owns gesture recognition and Material settling; the application owns what dismissal means for its data model.
 
 <ComponentPreview>
   <SwipeToDismissPreview />
 </ComponentPreview>
 
-The foreground still contains a normal button. Swipe recognition does not require replacing the row with a non-interactive gesture surface.
-
-## State
-
-The public values are:
-
-- `settled`
-- `start-to-end`
-- `end-to-start`
-
-Use `value` + `onValueChange` for controlled state or `defaultValue` for an uncontrolled interaction.
-
 ```tsx
+import { SwipeToDismissBox } from '@m3-ui/ui';
+
 <SwipeToDismissBox
   aria-label="Dismissible message"
   backgroundContent={<Actions />}
@@ -41,22 +23,45 @@ Use `value` + `onValueChange` for controlled state or `defaultValue` for an unco
 </SwipeToDismissBox>
 ```
 
-`onDismiss` fires after the interaction has settled at a dismissal anchor. Removing an item from an array, undo handling, or resetting it to `settled` remain application responsibilities.
+## When to use
+
+Use swipe-to-dismiss where a horizontal dismissal gesture is appropriate and discoverable for the item type. Keep an explicit action or equivalent recovery path when the product requires accessible non-gesture operation or undo.
+
+## State and dismissal ownership
+
+The public settled values are `settled`, `start-to-end`, and `end-to-start`. Use controlled `value`/`onValueChange` or `defaultValue` for local interaction state.
+
+`onDismiss` runs after settling at an enabled dismissal anchor. Removing an array item, persisting deletion, undo, or resetting the item to `settled` remains application logic.
 
 ## Logical directions and RTL
 
-Start/end directions follow the document reading direction. In RTL, start-to-end and end-to-start resolve to the opposite physical horizontal directions without changing the application state vocabulary.
-
-`enableDismissFromStartToEnd` and `enableDismissFromEndToStart` can independently disable either logical direction.
+Start/end directions follow reading direction. RTL reverses the physical direction while preserving the same logical state values. Either logical direction can be independently disabled.
 
 ## Gesture arbitration
 
-The pointer recognizer locks onto horizontal intent and rejects vertical gestures so parent/page scrolling can continue normally. `gesturesEnabled={false}` disables drag interaction without changing the rendered content or controlled state API.
+The pointer recognizer waits for horizontal intent and rejects vertical gestures so page/list scrolling can continue. Material threshold/velocity rules choose whether release returns to settled or advances to an enabled dismissal anchor. Reduced-motion changes animation, not the resulting state.
 
-The Material positional threshold and release velocity decide whether the foreground returns to `settled` or advances to the next enabled anchor. Reduced-motion preference removes unnecessary settling animation while preserving the state result.
+## Foreground interactions
 
-## Foreground accessibility
+The foreground remains normal content. Links, buttons, inputs, and other controls keep their own semantics and must not be flattened into one fake swipe/button surface. Background actions also remain independently named when interactive.
 
-`SwipeToDismissBox` does not flatten or replace its children with a single fake button. Links, buttons, inputs, and other controls inside the foreground retain their own semantics and interaction.
+## Accessibility
 
-Provide an accessible name for the dismissible container when the swipe action needs contextual identification. Background actions should also remain independently named if they are interactive.
+Provide contextual naming when the dismissible region itself needs identification. A swipe gesture alone is not a good sole mechanism for critical actions; applications should expose equivalent controls or undo where required by the workflow.
+
+Do not remove focus unexpectedly before the application has chosen where focus should move after an item is actually removed.
+
+## API reference
+
+<ApiReference name="SwipeToDismissBox" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="swipe-to-dismiss-box" />
+
+Material supplies dismissal anchors, threshold/settling intent, background/foreground relation, and logical-direction behavior. Browser pointer arbitration and RTL physical mapping implement that interaction while data removal remains application-owned.
+
+## Related components
+
+- [List item](/docs/components/list-item) — common foreground row semantics.
+- [Snackbar](/docs/components/snackbar) — common undo/result feedback surface.
