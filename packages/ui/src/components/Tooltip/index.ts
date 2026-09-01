@@ -1,3 +1,5 @@
+import '@m3-ui/tokens/tooltip.css';
+
 export {
   PlainTooltip,
   RichTooltip,
