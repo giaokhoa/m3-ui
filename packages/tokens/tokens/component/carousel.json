@@ -4,7 +4,7 @@
       "disabledContainerOpacity": { "$type": "number", "$value": 0.38 },
       "withOutlineDisabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
       "withOutlineOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
-      "containerColor": { "$type": "string", "$value": "var(--surface)" },
+      "containerColor": { "$type": "string", "$value": "{color.role.surface}" },
       "containerElevation": { "$type": "string", "$value": "level0" },
       "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
       "containerShape": { "$type": "string", "$value": "extraLarge" },

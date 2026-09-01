@@ -1,20 +1,12 @@
-import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import { pxNumber } from '../../internal/tokenValues';
 
 export type DividerThickness = number | string;
 
 export type DividerStyle = CSSProperties &
   Record<`--${string}`, string | number>;
 
-export const dividerTokens = {
-  color: token.ComponentDividerColor,
-  thickness: pxNumber(token.ComponentDividerThickness),
-} as const;
-
-function cssLength(value: DividerThickness | undefined): string {
-  const resolved = value ?? dividerTokens.thickness;
-  return typeof resolved === 'number' ? `${resolved}px` : resolved;
+function cssLength(value: DividerThickness): string {
+  return typeof value === 'number' ? `${value}px` : value;
 }
 
 export function getDividerStyle(
@@ -23,8 +15,14 @@ export function getDividerStyle(
     thickness?: DividerThickness;
   } = {},
 ): DividerStyle {
-  return {
-    '--_divider-color': options.color ?? dividerTokens.color,
-    '--_divider-thickness': cssLength(options.thickness),
-  };
+  const style: DividerStyle = {};
+
+  if (options.color !== undefined) {
+    style['--_divider-color'] = options.color;
+  }
+  if (options.thickness !== undefined) {
+    style['--_divider-thickness'] = cssLength(options.thickness);
+  }
+
+  return style;
 }
