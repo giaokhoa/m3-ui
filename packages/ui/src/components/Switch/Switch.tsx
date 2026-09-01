@@ -3,6 +3,7 @@ import {
   Switch as AriaSwitch,
   type SwitchProps as AriaSwitchProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/switch.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { useTheme } from '../../theme/ThemeProvider';
 import {
