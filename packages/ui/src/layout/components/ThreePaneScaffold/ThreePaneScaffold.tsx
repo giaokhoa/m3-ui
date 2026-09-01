@@ -321,6 +321,14 @@ export function ThreePaneScaffold({
   const currentValue = activeScaffoldState.currentState;
   const transitionActive = !threePaneScaffoldValuesEqual(currentValue, targetValue);
 
+  const primaryPaneAvailable = primaryPane != null;
+  const secondaryPaneAvailable = secondaryPane != null;
+  const tertiaryPaneAvailable = tertiaryPane != null;
+  const paneAvailability = {
+    primary: primaryPaneAvailable,
+    secondary: secondaryPaneAvailable,
+    tertiary: tertiaryPaneAvailable,
+  } as const;
   const paneEntries: Array<[ThreePaneScaffoldRole, ReactNode]> = [
     ['primary', primaryPane],
     ['secondary', secondaryPane],
@@ -404,6 +412,11 @@ export function ThreePaneScaffold({
           preferredHeights,
           paneMargins,
           paneExpansionState: expansionState,
+          paneAvailability: {
+            primary: primaryPaneAvailable,
+            secondary: secondaryPaneAvailable,
+            tertiary: tertiaryPaneAvailable,
+          },
         };
         const renderedClearRevision = previousInitialValueAnimationsClearRevisionRef.current;
         if (
@@ -464,6 +477,9 @@ export function ThreePaneScaffold({
     expansionState,
     expansionRevision,
     resizeRevision,
+    primaryPaneAvailable,
+    secondaryPaneAvailable,
+    tertiaryPaneAvailable,
   ]);
 
   useLayoutEffect(() => {
@@ -501,6 +517,7 @@ export function ThreePaneScaffold({
     preferredHeights,
     paneMargins,
     paneExpansionState: expansionState,
+    paneAvailability,
   });
 
   const transitionLayout: ThreePaneScaffoldTransitionLayoutOptions = {
@@ -516,6 +533,7 @@ export function ThreePaneScaffold({
     preferredHeights,
     paneMargins,
     paneExpansionState: expansionState,
+    paneAvailability,
   };
   const calculateTransitionFrameAt = (progressFraction: number) =>
     calculateThreePaneScaffoldTransitionFrame({
@@ -674,6 +692,7 @@ export function ThreePaneScaffold({
           preferredHeights,
           paneMargins,
           paneExpansionState: expansionState,
+          paneAvailability,
         },
       });
     }

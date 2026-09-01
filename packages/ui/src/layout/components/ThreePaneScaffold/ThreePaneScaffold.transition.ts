@@ -67,6 +67,8 @@ export interface ThreePaneScaffoldTransitionOptions {
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
+  /** Mirrors which role slots produced real Measurables in AndroidX Layout. */
+  paneAvailability?: Partial<Record<ThreePaneScaffoldRole, boolean>>;
 }
 
 export type ThreePaneScaffoldTransitionLayoutOptions = Omit<
@@ -185,6 +187,7 @@ function calculateValuePlacements({
   preferredHeights,
   paneMargins,
   paneExpansionState,
+  paneAvailability,
 }: Omit<ThreePaneScaffoldTransitionOptions, 'currentValue' | 'targetValue' | 'progressFraction'> & {
   value: ThreePaneScaffoldValue;
 }): ValuePlacements {
@@ -204,6 +207,7 @@ function calculateValuePlacements({
     preferredHeights,
     paneMargins,
     paneExpansionState,
+    paneAvailability,
   });
   const measured: Partial<Record<ThreePaneScaffoldRole, PanePlacement>> = {
     ...staticPass.raw,
@@ -213,6 +217,7 @@ function calculateValuePlacements({
   };
 
   for (const role of roles) {
+    if (paneAvailability?.[role] === false) continue;
     const adaptedValue = getPaneAdaptedValue(value, role);
     if (adaptedValue.type !== 'levitated') continue;
     const base = calculateLevitatedPanePlacement({
@@ -422,6 +427,7 @@ function prepareTransition({
   preferredHeights,
   paneMargins,
   paneExpansionState = null,
+  paneAvailability = {},
 }: ThreePaneScaffoldTransitionLayoutOptions): PreparedTransition {
   const physicalOrder: ThreePaneScaffoldHorizontalOrder =
     direction === 'rtl' ? [paneOrder[2], paneOrder[1], paneOrder[0]] : paneOrder;
@@ -437,6 +443,7 @@ function prepareTransition({
     preferredHeights,
     paneMargins,
     paneExpansionState,
+    paneAvailability,
   };
   const currentGeometry = calculateValuePlacements({ ...common, value: currentValue });
   const targetGeometry = calculateValuePlacements({ ...common, value: targetValue });
@@ -456,6 +463,7 @@ function prepareTransition({
   let visibilityDurationMs = 0;
   let boundsDurationMs = 0;
   for (const role of roles) {
+    if (paneAvailability[role] === false) continue;
     const paneMotion = motion[role];
     const currentPlacement = currentPlacements[role];
     const targetPlacement = targetPlacements[role];

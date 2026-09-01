@@ -44,6 +44,12 @@ export interface ThreePaneScaffoldLayoutOptions {
   /** Outer pane margins applied after partition measurement, keyed by pane role. */
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
   paneExpansionState?: PaneExpansionState | null;
+  /**
+   * Whether each pane has an actual measurable/content node. AndroidX only
+   * creates PaneMeasurable entries for non-null pane measurables. Omitted roles
+   * default to available so standalone layout helpers preserve their contract.
+   */
+  paneAvailability?: Partial<Record<ThreePaneScaffoldRole, boolean>>;
 }
 
 export interface ThreePaneScaffoldLayoutPass {
@@ -147,6 +153,7 @@ export function calculateThreePaneScaffoldLayoutPass({
   preferredHeights = {},
   paneMargins = {},
   paneExpansionState = null,
+  paneAvailability = {},
 }: ThreePaneScaffoldLayoutOptions): ThreePaneScaffoldLayoutPass {
   assertDimension(width, 'width');
   assertDimension(height, 'height');
@@ -169,12 +176,13 @@ export function calculateThreePaneScaffoldLayoutPass({
     'defaultPanePreferredHeight',
   );
 
+  const paneIsAvailable = (role: ThreePaneScaffoldRole) => paneAvailability[role] !== false;
   const physicalOrder = direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
   const expanded = physicalOrder.filter(
-    (role) => getPaneAdaptedValue(value, role).type === 'expanded',
+    (role) => paneIsAvailable(role) && getPaneAdaptedValue(value, role).type === 'expanded',
   );
   const reflowed = physicalOrder.find(
-    (role) => getPaneAdaptedValue(value, role).type === 'reflowed',
+    (role) => paneIsAvailable(role) && getPaneAdaptedValue(value, role).type === 'reflowed',
   );
   const raw: ThreePaneScaffoldLayout = {};
   const placed: ThreePaneScaffoldLayout = {};
