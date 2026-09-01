@@ -1,1 +1,35 @@
-{"component":{"outlinedSegmentedButton":{"containerHeight":{"$type":"dimension","$value":{"value":40,"unit":"px"}},"disabledIconColor":{"$type":"string","$value":"var(--on-surface)"},"disabledLabelTextColor":{"$type":"string","$value":"var(--on-surface)"},"disabledOutlineColor":{"$type":"string","$value":"var(--on-surface)"},"outlineColor":{"$type":"string","$value":"var(--outline)"},"selectedContainerColor":{"$type":"string","$value":"var(--secondary-container)"},"selectedFocusIconColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedFocusLabelTextColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedHoverIconColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedHoverLabelTextColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedLabelTextColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedPressedIconColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedPressedLabelTextColor":{"$type":"string","$value":"var(--on-secondary-container)"},"selectedIconColor":{"$type":"string","$value":"var(--on-secondary-container)"},"unselectedFocusIconColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedFocusLabelTextColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedHoverIconColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedHoverLabelTextColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedLabelTextColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedPressedIconColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedPressedLabelTextColor":{"$type":"string","$value":"var(--on-surface)"},"unselectedIconColor":{"$type":"string","$value":"var(--on-surface)"},"disabledIconOpacity":{"$type":"number","$value":0.38},"disabledLabelTextOpacity":{"$type":"number","$value":0.38},"disabledOutlineOpacity":{"$type":"number","$value":0.12},"labelTextFont":{"$type":"string","$value":"labelLarge"},"outlineWidth":{"$type":"dimension","$value":{"value":1,"unit":"px"}},"shape":{"$type":"string","$value":"full"},"iconSize":{"$type":"dimension","$value":{"value":18,"unit":"px"}}}}}
+{
+  "component": {
+    "outlinedSegmentedButton": {
+      "containerHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+      "disabledIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledOutlineColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "outlineColor": { "$type": "string", "$value": "{color.role.outline}" },
+      "selectedContainerColor": { "$type": "string", "$value": "{color.role.secondaryContainer}" },
+      "selectedFocusIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedFocusLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedHoverIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedHoverLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedPressedIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedPressedLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "unselectedFocusIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedFocusLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedHoverIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedHoverLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedPressedIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedPressedLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledIconOpacity": { "$type": "number", "$value": 0.38 },
+      "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+      "disabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
+      "labelTextFont": { "$type": "string", "$value": "labelLarge" },
+      "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "shape": { "$type": "string", "$value": "full" },
+      "iconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } }
+    }
+  }
+}

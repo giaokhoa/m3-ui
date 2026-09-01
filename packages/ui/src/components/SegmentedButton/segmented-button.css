@@ -1,4 +1,9 @@
 .segmented-button-row {
+  --_segmented-button-content-padding-inline: 12px;
+  --_segmented-button-icon-label-spacing: 8px;
+  --_segmented-button-checked-z-index: 5;
+  --_segmented-button-interaction-z-index: 10;
+
   display: flex;
   align-items: center;
   min-block-size: var(--_segmented-button-height);
