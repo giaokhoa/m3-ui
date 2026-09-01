@@ -7,6 +7,14 @@ export interface ModalWideNavigationRailStyleOptions {
   modalShape?: CSSProperties['borderRadius'];
 }
 
+/** Compatibility values consumed by the modal renderer; paint defaults stay CSS-owned. */
+export const modalWideNavigationRailTokens = {
+  modalContainerColor: undefined,
+  modalContainerElevation: 'level2',
+  scrimColor: undefined,
+  scrimOpacity: undefined,
+} as const;
+
 /** JS requires these durations to delay overlay unmount until CSS motion completes. */
 export const modalWideNavigationRailRuntime = {
   positionalThreshold: 0.5,
