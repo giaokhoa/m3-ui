@@ -15,7 +15,9 @@ Material 3 single-value and range sliders backed by React Aria Components.
 
 React Aria `Slider`, `SliderTrack` and `SliderThumb` own slider semantics, hidden native range inputs, focus, keyboard increments, dragging, controlled/uncontrolled values, min/max/step and multi-thumb constraints. The Material wrapper does not install a competing gesture engine.
 
-Canonical Style Dictionary tokens own the current five size families, handle/track colors, enabled/disabled opacity, handle widths, stop indicators and value-indicator styling. `packages/tokens/tokens/**` is not modified by this component.
+Canonical DTCG owns the current five size families, semantic handle/track/stop/value-indicator colors, enabled/disabled opacity, handle widths, stop indicators and value-indicator typography. The convention-discovered Style Dictionary Slider adapter compiles those immutable facts into `@m3-ui/tokens/slider.css`, while handwritten `slider.css` owns structural layout/state selectors and non-token renderer mechanics. React keeps only live value/range/tick/orientation arithmetic and real user overrides; it does not project a static token bag into inline CSS variables.
+
+Semantic colors alias `color.role.*`, so `ThemeProvider sourceColor` updates Slider paint through inherited system-role variables and the CSS cascade rather than a component-specific resolver.
 
 Pinned references:
 
@@ -29,11 +31,11 @@ Current Compose halves the thumb's cross-axis dimension whenever focus, press or
 
 Current Compose uses the Material ripple primitive in Slider only for the optional inset focus-ring configuration, with press, drag and hover ripple indication disabled. The web Slider therefore reuses the shared `Ripple` only for the same inset-focus responsibility and does not add a synthetic press wave.
 
-The track keeps the source-level 6px thumb gap and 2px inside corner. `48px` minimum thumb target and Material Web's `200px` minimum inline track are local renderer mechanics rather than fabricated DTCG tokens.
+The track keeps the canonical 6px thumb gap and the structural 2px inside corner. `48px` minimum thumb target and Material Web's `200px` minimum inline track are handwritten renderer mechanics rather than fabricated DTCG tokens or TypeScript defaults.
 
-Material Web 34.0.21 differs from Compose generated tokens for stop indicators. The wrapper deliberately consumes the canonical `webCurrent` projection: unselected `onSecondaryContainer`, selected `onPrimary`, active-disabled `inverseOnSurface`, inactive-disabled `onSurface`, and 4px trailing spacing. The drift remains documented in `audit/material-web-slider-drift.json` rather than being collapsed into one source.
+Material Web 34.0.21 differs from Compose generated tokens for stop indicators. The generated adapter deliberately consumes the canonical `webCurrent` projection: unselected `onSecondaryContainer`, selected `onPrimary`, active-disabled `inverseOnSurface`, inactive-disabled `onSurface`, and 4px trailing spacing. The drift remains documented in `audit/material-web-slider-drift.json` rather than being collapsed into one source.
 
-The value indicator is a Web public adaptation. Its current generated typography intentionally combines LabelLarge font/size/line-height with BodyLarge weight/tracking; the wrapper preserves that canonical split.
+The value indicator is a Web public adaptation. Its current generated typography intentionally combines LabelLarge font/size/line-height with BodyLarge weight/tracking; the generated adapter preserves that canonical split and resolves the LabelLarge typeface role through the shared typography CSS variables.
 
 ## Range and value scale
 
