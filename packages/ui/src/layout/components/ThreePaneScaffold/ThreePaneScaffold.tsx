@@ -54,6 +54,11 @@ import {
   type PaneExpansionHandleAriaStrings,
 } from './paneExpansionSemantics';
 import { applyPaneMargins, type PaneMargins } from './paneMargins';
+import {
+  calculateThreePaneScaffoldTransitionDurationWithSpecs,
+  calculateThreePaneScaffoldTransitionFrameWithSpecs,
+  type PaneTransitionSpecs,
+} from './paneTransitions';
 import type { PanePreferredSize } from './preferredPaneSize';
 import { requestPaneDestinationFocus } from './ThreePaneScaffold.focus';
 import {
@@ -67,8 +72,6 @@ import {
 } from './ThreePaneScaffold.predictiveBack';
 import { createThreePaneScaffoldSeekingRemeasureSource } from './ThreePaneScaffold.seekingRemeasure';
 import {
-  calculateThreePaneScaffoldTransitionDuration,
-  calculateThreePaneScaffoldTransitionFrame,
   type PaneTransitionFrame,
   type ThreePaneScaffoldTransitionFrame,
   type ThreePaneScaffoldTransitionLayoutOptions,
@@ -103,6 +106,11 @@ export interface ThreePaneScaffoldProps
   preferredHeights?: Partial<Record<ThreePaneScaffoldRole, PanePreferredSize>>;
   /** AndroidX PaneMargins analogue keyed by pane role. */
   paneMargins?: Partial<Record<ThreePaneScaffoldRole, PaneMargins>>;
+  /**
+   * Per-role web-native equivalents of AnimatedPane enter/exit/bounds specs.
+   * Omit this prop to retain the parity-tested Material motion engine exactly.
+   */
+  paneTransitions?: PaneTransitionSpecs;
   paneExpansionState?: PaneExpansionState;
   paneExpansionDragHandle?: ReactNode | ((state: PaneExpansionState) => ReactNode);
   /** Browser equivalent of paneExpansionDraggable minTouchTargetSize. */
@@ -260,6 +268,7 @@ export function ThreePaneScaffold({
   preferredWidths,
   preferredHeights,
   paneMargins,
+  paneTransitions,
   paneExpansionState,
   paneExpansionDragHandle,
   paneExpansionDragHandleMinTouchTargetSize = 48,
@@ -432,7 +441,10 @@ export function ThreePaneScaffold({
           renderedClearRevision !== null &&
           activeScaffoldState.initialValueAnimationsClearRevision !== renderedClearRevision
         ) {
-          return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
+          return calculateThreePaneScaffoldTransitionDurationWithSpecs(
+            destinationLayout,
+            paneTransitions,
+          );
         }
         const activeInterruption = visibilityInterruptionRef.current;
         if (
@@ -468,7 +480,10 @@ export function ThreePaneScaffold({
                   },
           }).durationMs;
         }
-        return calculateThreePaneScaffoldTransitionDuration(destinationLayout);
+        return calculateThreePaneScaffoldTransitionDurationWithSpecs(
+          destinationLayout,
+          paneTransitions,
+        );
       },
     );
   }, [
@@ -483,6 +498,7 @@ export function ThreePaneScaffold({
     preferredWidths,
     preferredHeights,
     paneMargins,
+    paneTransitions,
     expansionState,
     expansionRevision,
     resizeRevision,
@@ -545,10 +561,11 @@ export function ThreePaneScaffold({
     paneAvailability,
   };
   const calculateTransitionFrameAt = (progressFraction: number) =>
-    calculateThreePaneScaffoldTransitionFrame({
-      ...transitionLayout,
+    calculateThreePaneScaffoldTransitionFrameWithSpecs(
+      transitionLayout,
       progressFraction,
-    });
+      paneTransitions,
+    );
 
   const rawTransitionFrame = transitionActive
     ? calculateTransitionFrameAt(activeScaffoldState.progressFraction)
@@ -568,8 +585,10 @@ export function ThreePaneScaffold({
     activeScaffoldState instanceof MutableThreePaneScaffoldState
       ? activeScaffoldState.animationPlayTimeMs
       : transitionActive
-        ? calculateThreePaneScaffoldTransitionDuration(transitionLayout) *
-          activeScaffoldState.progressFraction
+        ? calculateThreePaneScaffoldTransitionDurationWithSpecs(
+            transitionLayout,
+            paneTransitions,
+          ) * activeScaffoldState.progressFraction
         : 0;
   const initialValueAnimationsClearRevision =
     activeScaffoldState instanceof MutableThreePaneScaffoldState
