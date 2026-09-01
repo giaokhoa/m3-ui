@@ -12,7 +12,6 @@ export {
   getPlainTooltipStyle,
   getRichTooltipStyle,
   plainTooltipRuntime,
-  plainTooltipTokens,
   richTooltipRuntime,
   richTooltipTokens,
   type PlainTooltipStyle,

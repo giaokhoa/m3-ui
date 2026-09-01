@@ -60,13 +60,8 @@
   user-select: none;
 }
 
-.bottom-sheet__drag-handle:active {
-  cursor: grabbing;
-}
-
-.bottom-sheet__drag-handle:disabled {
-  cursor: default;
-}
+.bottom-sheet__drag-handle:active { cursor: grabbing; }
+.bottom-sheet__drag-handle:disabled { cursor: default; }
 
 .bottom-sheet__drag-handle-indication {
   position: relative;
@@ -106,18 +101,14 @@
   position: absolute;
   inset: 0;
   background-color: var(--_scrim-container-color);
-  opacity: var(--_scrim-container-opacity);
+  opacity: calc(var(--_scrim-container-opacity) * var(--_scrim-alpha, 1));
   pointer-events: none;
   transition-property: opacity;
   transition-duration: var(--_modal-bottom-sheet-scrim-duration);
   transition-timing-function: var(--_modal-bottom-sheet-scrim-easing);
 }
 
-/* The RAC modal node owns focus scope while the positioned overlay remains the
- * sheet containing block and the only interactive outside-dismiss target. */
-.modal-bottom-sheet-modal {
-  display: contents;
-}
+.modal-bottom-sheet-modal { display: contents; }
 
 @media (prefers-reduced-motion: reduce) {
   .bottom-sheet,
@@ -129,8 +120,7 @@
 }
 
 @media (forced-colors: active) {
-  .bottom-sheet__drag-handle:focus-visible
-    .bottom-sheet__drag-handle-indication {
+  .bottom-sheet__drag-handle:focus-visible .bottom-sheet__drag-handle-indication {
     outline: var(--_bottom-sheet-focus-indicator-width) solid Highlight;
     outline-offset: calc(-1 * var(--_bottom-sheet-focus-indicator-width));
   }
