@@ -14,6 +14,7 @@ const expectedAdapters = [
   'chip',
   'elevation',
   'ripple',
+  'switch',
   'text-field',
 ];
 
