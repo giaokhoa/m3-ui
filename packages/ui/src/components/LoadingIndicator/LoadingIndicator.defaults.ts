@@ -1,23 +1,16 @@
 import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/loading-indicator.css';
 import type { CSSProperties } from 'react';
 import { pxNumber } from '../../internal/tokenValues';
 
 export type LoadingIndicatorStyle = CSSProperties &
   Record<`--${string}`, string | number>;
 
-const shapeRadius = {
-  full: token.ShapeFull,
-} as const;
-
-type ShapeName = keyof typeof shapeRadius;
-
+// Numeric canonical geometry remains in TypeScript only because the morph
+// renderer needs it for live path scaling and SVG view-box arithmetic.
 export const loadingIndicatorTokens = {
-  activeColor: token.ComponentLoadingIndicatorActiveIndicatorColor,
   activeSize: pxNumber(token.ComponentLoadingIndicatorActiveSize),
-  containedActiveColor: token.ComponentLoadingIndicatorContainedActiveColor,
-  containedContainerColor: token.ComponentLoadingIndicatorContainedContainerColor,
   containerHeight: pxNumber(token.ComponentLoadingIndicatorContainerHeight),
-  containerShape: token.ComponentLoadingIndicatorContainerShape as ShapeName,
   containerWidth: pxNumber(token.ComponentLoadingIndicatorContainerWidth),
 } as const;
 
@@ -41,19 +34,18 @@ export function getLoadingIndicatorStyle(
     containerColor?: CSSProperties['color'];
   } = {},
 ): LoadingIndicatorStyle {
-  const indicatorColor = contained
-    ? options.indicatorColor ?? loadingIndicatorTokens.containedActiveColor
-    : options.color ?? loadingIndicatorTokens.activeColor;
-  const containerColor = contained
-    ? options.containerColor ?? loadingIndicatorTokens.containedContainerColor
-    : 'transparent';
+  const style: LoadingIndicatorStyle = {};
 
-  return {
-    '--_loading-width': `${loadingIndicatorTokens.containerWidth}px`,
-    '--_loading-height': `${loadingIndicatorTokens.containerHeight}px`,
-    '--_loading-active-size': `${loadingIndicatorTokens.activeSize}px`,
-    '--_loading-container-radius': shapeRadius[loadingIndicatorTokens.containerShape],
-    '--_loading-indicator-color': indicatorColor,
-    '--_loading-container-color': containerColor,
-  };
+  if (contained) {
+    if (options.indicatorColor !== undefined) {
+      style['--_loading-indicator-color'] = options.indicatorColor;
+    }
+    if (options.containerColor !== undefined) {
+      style['--_loading-container-color'] = options.containerColor;
+    }
+  } else if (options.color !== undefined) {
+    style['--_loading-indicator-color'] = options.color;
+  }
+
+  return style;
 }

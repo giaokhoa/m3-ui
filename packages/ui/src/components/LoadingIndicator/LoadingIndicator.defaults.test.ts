@@ -5,24 +5,13 @@ import {
   loadingIndicatorTokens,
 } from './LoadingIndicator.defaults';
 
-describe('Material 3 Loading Indicator defaults', () => {
-  it('projects the canonical component geometry', () => {
-    expect(loadingIndicatorTokens).toMatchObject({
+describe('Material 3 Loading Indicator runtime defaults', () => {
+  it('keeps only canonical geometry required by morph arithmetic', () => {
+    expect(loadingIndicatorTokens).toEqual({
       activeSize: 38,
       containerHeight: 48,
-      containerShape: 'full',
       containerWidth: 48,
     });
-  });
-
-  it('projects canonical uncontained and contained colors', () => {
-    expect(loadingIndicatorTokens.activeColor).toBe('var(--primary)');
-    expect(loadingIndicatorTokens.containedActiveColor).toBe(
-      'var(--on-primary-container)',
-    );
-    expect(loadingIndicatorTokens.containedContainerColor).toBe(
-      'var(--primary-container)',
-    );
   });
 
   it('keeps Compose motion mechanics outside canonical DTCG', () => {
@@ -37,22 +26,23 @@ describe('Material 3 Loading Indicator defaults', () => {
     });
   });
 
-  it('emits the uncontained canonical style projection', () => {
-    const style = getLoadingIndicatorStyle(false);
-    expect(style['--_loading-width']).toBe('48px');
-    expect(style['--_loading-height']).toBe('48px');
-    expect(style['--_loading-active-size']).toBe('38px');
-    expect(style['--_loading-container-radius']).toBe('9999px');
-    expect(style['--_loading-indicator-color']).toBe('var(--primary)');
-    expect(style['--_loading-container-color']).toBe('transparent');
+  it('does not serialize immutable defaults for default rendering', () => {
+    expect(getLoadingIndicatorStyle(false)).toEqual({});
+    expect(getLoadingIndicatorStyle(true)).toEqual({});
   });
 
-  it('emits contained colors and allows explicit web overrides', () => {
-    const style = getLoadingIndicatorStyle(true, {
-      indicatorColor: 'hotpink',
-      containerColor: 'black',
+  it('serializes only explicit runtime color overrides', () => {
+    expect(getLoadingIndicatorStyle(false, { color: 'hotpink' })).toEqual({
+      '--_loading-indicator-color': 'hotpink',
     });
-    expect(style['--_loading-indicator-color']).toBe('hotpink');
-    expect(style['--_loading-container-color']).toBe('black');
+    expect(
+      getLoadingIndicatorStyle(true, {
+        indicatorColor: 'hotpink',
+        containerColor: 'black',
+      }),
+    ).toEqual({
+      '--_loading-indicator-color': 'hotpink',
+      '--_loading-container-color': 'black',
+    });
   });
 });
