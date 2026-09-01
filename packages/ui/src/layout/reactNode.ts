@@ -10,13 +10,20 @@ function isIterableReactNode(value: ReactNode): value is Iterable<ReactNode> {
   );
 }
 
+function isSingleUseIterable(value: Iterable<ReactNode>): boolean {
+  return value[Symbol.iterator]() === (value as Iterator<ReactNode>);
+}
+
 /**
  * Returns whether a ReactNode has concrete renderable content.
  *
  * React uses null, undefined and booleans as empty conditional nodes. Empty
- * strings and fragments/iterables containing only empty nodes likewise emit no
- * DOM content. Keep numeric zero and non-empty strings because React renders
- * them visibly.
+ * strings and fragments/re-iterable collections containing only empty nodes
+ * likewise emit no DOM content. Keep numeric zero and non-empty strings because
+ * React renders them visibly.
+ *
+ * Single-use iterators cannot be inspected without consuming content before
+ * React gets to render it, so conservatively treat them as present.
  */
 export function hasReactNodeContent(value: ReactNode): boolean {
   if (value == null || typeof value === 'boolean') return false;
@@ -30,6 +37,7 @@ export function hasReactNodeContent(value: ReactNode): boolean {
   }
 
   if (isIterableReactNode(value)) {
+    if (isSingleUseIterable(value)) return true;
     for (const child of value) {
       if (hasReactNodeContent(child)) return true;
     }

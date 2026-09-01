@@ -20,4 +20,14 @@ describe('hasReactNodeContent', () => {
     expect(hasReactNodeContent(<Fragment>{0}</Fragment>)).toBe(true);
     expect(hasReactNodeContent([false, <span key="visible">visible</span>])).toBe(true);
   });
+
+  it('does not consume single-use iterable content before React can render it', () => {
+    function* content() {
+      yield 0;
+    }
+
+    const iterator = content();
+    expect(hasReactNodeContent(iterator)).toBe(true);
+    expect(iterator.next()).toEqual({ value: 0, done: false });
+  });
 });
