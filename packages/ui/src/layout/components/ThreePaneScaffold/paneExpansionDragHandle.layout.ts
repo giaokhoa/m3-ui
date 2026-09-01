@@ -339,14 +339,22 @@ export function calculatePaneExpansionSpacerMiddleOffset({
   layout,
   layoutOptions,
 }: PaneExpansionSpacerMiddleOffsetInput): number {
-  const { paneMargins, direction = 'ltr', paneOrder, value } = layoutOptions;
+  const {
+    paneMargins,
+    direction = 'ltr',
+    paneOrder,
+    value,
+    paneAvailability = {},
+  } = layoutOptions;
   const hasPaneMargins = paneMargins !== undefined && Object.keys(paneMargins).length > 0;
   const measuredLayout = hasPaneMargins
     ? calculateThreePaneScaffoldLayout({ ...layoutOptions, paneMargins: {} })
     : layout;
   const physicalOrder = direction === 'rtl' ? [...paneOrder].reverse() : [...paneOrder];
   const expandedRoles = physicalOrder.filter(
-    (role) => getPaneAdaptedValue(value, role).type === 'expanded',
+    (role) =>
+      paneAvailability[role] !== false &&
+      getPaneAdaptedValue(value, role).type === 'expanded',
   );
   if (expandedRoles.length !== 2) return PaneExpansionUnspecified;
 
