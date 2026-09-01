@@ -5,16 +5,17 @@ import {
   type ButtonProps as AriaButtonProps,
   type ToggleButtonProps as AriaToggleButtonProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/icon-button.css';
 import {
   Ripple,
   useRipple,
   type RippleController,
 } from '../../internal/ripple';
 import {
-  getIconButtonStyle,
+  getIconButtonRuntimeStyle,
   type IconButtonShapes,
   type IconToggleButtonShapes,
-} from './IconButton.defaults';
+} from './IconButton.runtime';
 import type {
   IconButtonShape,
   IconButtonSize,
@@ -85,9 +86,9 @@ function ActionIconButtonImpl({
   children,
   className,
   style,
-  size,
-  width,
-  shape,
+  size = 'small',
+  width = 'default',
+  shape = 'round',
   shapes,
   onPressStart,
   onPressEnd,
@@ -100,6 +101,7 @@ function ActionIconButtonImpl({
     <AriaButton
       {...props}
       {...ripplePressProps}
+      data-shape={shape}
       data-size={size}
       data-variant={variant}
       data-width={width}
@@ -111,13 +113,9 @@ function ActionIconButtonImpl({
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return {
-          ...getIconButtonStyle(
-            variant,
-            {
-              isDisabled: renderProps.isDisabled,
-              isPressed: renderProps.isPressed,
-            },
-            { size, width, shape, shapes },
+          ...getIconButtonRuntimeStyle(
+            { isPressed: renderProps.isPressed },
+            shapes,
           ),
           ...userStyle,
         };
@@ -141,9 +139,9 @@ function ToggleIconButtonImpl({
   children,
   className,
   style,
-  size,
-  width,
-  shape,
+  size = 'small',
+  width = 'default',
+  shape = 'round',
   shapes,
   isSelected,
   onChange,
@@ -160,7 +158,9 @@ function ToggleIconButtonImpl({
       {...ripplePressProps}
       isSelected={isSelected}
       onChange={onChange}
+      data-shape={shape}
       data-size={size}
+      data-toggle
       data-variant={variant}
       data-width={width}
       className={(renderProps) => {
@@ -171,14 +171,12 @@ function ToggleIconButtonImpl({
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return {
-          ...getIconButtonStyle(
-            variant,
+          ...getIconButtonRuntimeStyle(
             {
-              isDisabled: renderProps.isDisabled,
               isPressed: renderProps.isPressed,
               isSelected: renderProps.isSelected,
             },
-            { size, width, shape, shapes },
+            shapes,
           ),
           ...userStyle,
         };
