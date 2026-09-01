@@ -19,7 +19,10 @@ describe('PaneExpansionState Compose Float proportions', () => {
     state.onMeasured(1000);
     state.setAnchors([equivalent], -1);
 
-    expect(state.currentAnchor).toBe(equivalent);
+    // AndroidX restore() uses anchors.contains(currentAnchor) only as a
+    // presence check. An equal anchor in the new list keeps the persisted
+    // currentAnchor object rather than replacing it with the new list entry.
+    expect(state.currentAnchor).toBe(current);
   });
 
   it('matches runtime validation for proportion anchors and explicit pane proportions', () => {
