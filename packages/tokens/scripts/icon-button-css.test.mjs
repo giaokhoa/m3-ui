@@ -35,6 +35,9 @@ test('generated IconButton CSS owns immutable size width shape and paint matrice
   assert.match(css, /\.icon-button--filled\[data-toggle\] \{[^}]*--_icon-button-container-color: var\(--surface-container\);/s);
   assert.match(css, /\.icon-button--filled-tonal\[data-toggle\]\[data-selected\] \{[^}]*--_icon-button-container-color: var\(--secondary\);[^}]*--_icon-button-content-color: var\(--on-secondary\);/s);
   assert.match(css, /\.icon-button--outlined\[data-toggle\]\[data-selected\] \{[^}]*--_icon-button-outline-color: transparent;/s);
+  assert.match(css, /\.icon-button--standard\[data-toggle\]\[data-selected\]\[data-disabled\] \{[^}]*--_icon-button-container-color: transparent;[^}]*--_icon-button-content-color: color-mix\(in srgb, var\(--on-surface\) 38%, transparent\);/s);
+  assert.match(css, /\.icon-button--filled\[data-toggle\]\[data-selected\]\[data-disabled\] \{[^}]*--_icon-button-container-color: color-mix\(in srgb, var\(--on-surface\) 10%, transparent\);[^}]*--_icon-button-content-color: color-mix\(in srgb, var\(--on-surface\) 38%, transparent\);/s);
+  assert.match(css, /\.icon-button--filled-tonal\[data-toggle\]\[data-selected\]\[data-disabled\] \{[^}]*--_icon-button-container-color: color-mix\(in srgb, var\(--on-surface\) 10%, transparent\);[^}]*--_icon-button-content-color: color-mix\(in srgb, var\(--on-surface\) 38%, transparent\);/s);
   assert.match(css, /\.icon-button--outlined\[data-toggle\]\[data-selected\]\[data-disabled\] \{[^}]*--_icon-button-container-color: color-mix\(in srgb, var\(--on-surface\) 10%, transparent\);/s);
   assert.doesNotMatch(css, /--_ripple-(?:hover|focus|pressed)-opacity:/);
   assert.doesNotMatch(css, /#[0-9a-f]{3,8}/i);
