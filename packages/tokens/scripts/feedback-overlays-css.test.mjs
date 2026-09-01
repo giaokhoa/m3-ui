@@ -34,6 +34,7 @@ test('feedback overlay generated CSS owns immutable Material defaults', async ()
   assert.match(tooltip, /--_rich-tooltip-scale-duration: 137ms;/);
   assert.match(tooltip, /\.rich-tooltip__action \.button\[data-pressed\]/);
 
+  assert.match(scrim, /\.scrim,\s*\.modal-navigation-drawer-overlay \{/);
   assert.match(scrim, /--_scrim-container-color: var\(--scrim\);/);
   assert.match(scrim, /--_scrim-container-opacity: 0\.32;/);
 
