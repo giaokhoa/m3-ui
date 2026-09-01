@@ -90,8 +90,12 @@ test('generated ListItem CSS owns immutable geometry typography paint and state 
   assert.match(css, /\.list-item\[data-selected\]\[data-focus-visible\] \{[^}]*--_list-item-leading-color: var\(--on-surface\);/s);
   assert.match(css, /\.list-item\[data-selected\]\[data-pressed\] \{[^}]*--_list-item-leading-color: var\(--on-surface\);/s);
   assert.match(css, /\.list-item\[data-selected\]\[data-dragged\] \{[^}]*--_list-item-leading-color: var\(--on-surface\);/s);
-  assert.match(css, /\.list-item\[data-disabled\] \{[^}]*--_list-item-label-opacity: 0\.38;/s);
+  assert.match(css, /\.list-item\[data-disabled\]:not\(\[data-selected\]\) \{[^}]*--_list-item-label-opacity: 0\.38;/s);
   assert.match(css, /\.list-item\[data-selected\]\[data-disabled\] \{[^}]*--_list-item-container-color: var\(--on-surface\);[^}]*--_list-item-container-opacity: 0\.38;/s);
+
+  const dragged = css.indexOf('.list-item[data-dragged]:not([data-selected])');
+  const disabled = css.indexOf('.list-item[data-disabled]:not([data-selected])');
+  assert.ok(dragged >= 0 && disabled > dragged, 'disabled paint must follow dragged paint at equal specificity');
 
   assert.doesNotMatch(css, /(^|\s)--surface\s*:/m);
   assert.doesNotMatch(css, /#[0-9a-f]{3,8}/i);

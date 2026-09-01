@@ -114,7 +114,7 @@ export function createListItemCss(context) {
     ...rule('.list-item[data-selected][data-focus-visible]', interactiveSelectedContent('Focus')),
     ...rule('.list-item[data-selected][data-pressed]', interactiveSelectedContent('Pressed')),
     ...rule('.list-item[data-selected][data-dragged]', interactiveSelectedContent('Dragged')),
-    ...rule('.list-item[data-disabled]', [
+    ...rule('.list-item[data-disabled]:not([data-selected])', [
       ...content({
         label: 'itemDisabledLabelTextColor',
         leading: 'itemDisabledLeadingIconColor',
