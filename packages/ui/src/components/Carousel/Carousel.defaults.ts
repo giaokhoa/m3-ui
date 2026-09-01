@@ -1,14 +1,5 @@
-import * as token from '@m3-ui/tokens';
-
-export const carouselTokens = {
-  containerColor: token.ComponentCarouselItemContainerColor,
-  disabledContainerOpacity: token.ComponentCarouselItemDisabledContainerOpacity,
-  outlineWidth: token.ComponentCarouselItemWithOutlineOutlineWidth,
-  outlineColor: token.ComponentCarouselItemWithOutlineOutlineColor,
-  disabledOutlineColor: token.ComponentCarouselItemWithOutlineDisabledOutlineColor,
-  disabledOutlineOpacity: token.ComponentCarouselItemWithOutlineDisabledOutlineOpacity,
-} as const;
-
+// Source-level AndroidX renderer mechanics used by Carousel.geometry.ts.
+// These are runtime layout algorithm inputs rather than canonical design tokens.
 export const carouselDefaults = {
   minSmallItemWidth: 40,
   maxSmallItemWidth: 56,

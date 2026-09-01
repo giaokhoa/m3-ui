@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { carouselTokens } from './Carousel.defaults';
+import '@m3-ui/tokens/carousel.css';
 import {
   getCarouselGeometry,
   getCarouselItemGeometry,
@@ -297,7 +297,6 @@ function Carousel({
       snapOrigin.current = null;
     }, 90);
   }, [itemCount, rtl, snapBase, state, stride, targetOffsetForItem, variant]);
-
   useEffect(() => () => {
     if (scrollingTimer.current) clearTimeout(scrollingTimer.current);
   }, []);
@@ -384,7 +383,6 @@ function Carousel({
         '--_carousel-item-spacing': `${itemSpacing}px`,
         '--_carousel-padding-start': `${padding.start}px`,
         '--_carousel-padding-end': `${padding.end}px`,
-        '--_carousel-container-color': carouselTokens.containerColor,
         ...style,
       } as CSSProperties}
     >
