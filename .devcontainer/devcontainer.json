@@ -8,14 +8,10 @@
     }
   },
   "remoteUser": "vscode",
-  "forwardPorts": [4173, 5173, 6006],
+  "forwardPorts": [4173, 6006],
   "portsAttributes": {
     "4173": {
       "label": "Docs",
-      "onAutoForward": "notify"
-    },
-    "5173": {
-      "label": "Playground",
       "onAutoForward": "notify"
     },
     "6006": {
