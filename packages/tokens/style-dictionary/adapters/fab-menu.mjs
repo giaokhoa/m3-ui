@@ -6,6 +6,12 @@ export function createFabMenuCss(context) {
   const get = tokenReader(context, 'FabMenu CSS');
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const shape = (path) => get(`shape.${get(path)}`);
+  const halfPx = (path) => {
+    const value = String(get(path));
+    const match = /^(\d+(?:\.\d+)?)px$/.exec(value);
+    if (!match) throw new TypeError(`FabMenu CSS: expected px dimension for ${path}, got ${value}`);
+    return `${Number(match[1]) / 2}px`;
+  };
   const role = get('component.fabMenu.listItem.labelTypography');
   const rules = [
     '.fab-menu {',
@@ -56,11 +62,14 @@ export function createFabMenuCss(context) {
     );
   }
 
+  // Keep a finite radius for the 56px close-button morph. The canonical
+  // `shape.full` remains appropriate for static pills, but 9999px produces a
+  // different interpolation path when border-radius itself is animated.
   rules.push(
     '.fab.fab-menu-toggle[data-toggle-size][data-checked] {',
     line('--_fab-container-width', get('component.fabMenu.closeButton.containerWidth')),
     line('--_fab-container-height', get('component.fabMenu.closeButton.containerHeight')),
-    line('--_fab-container-radius', shape('component.fabMenu.closeButton.containerShape')),
+    line('--_fab-container-radius', halfPx('component.fabMenu.closeButton.containerHeight')),
     line('--_fab-container-color', get('component.fabMenu.closeButton.role.primary.containerColor')),
     line('--_fab-content-color', get('component.fabMenu.closeButton.role.primary.contentColor')),
     line('--_fab-state-layer-color', get('component.fabMenu.closeButton.role.primary.contentColor')),
