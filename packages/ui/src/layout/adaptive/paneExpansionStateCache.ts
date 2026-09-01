@@ -156,44 +156,39 @@ export class PaneExpansionStateCache {
     state.setConsumeDragDelta(consumeDragDelta);
 
     const keyChanged = this.activeKeyId !== id;
+    const previousAnchors = this.rememberedAnchors;
+    const previousFallbackInitialAnchoredIndex = this.fallbackInitialAnchoredIndex;
     const anchorsChanged =
-      this.rememberedAnchors === null ||
-      !paneExpansionAnchorsEqual(this.rememberedAnchors, anchors);
+      previousAnchors === null ||
+      !paneExpansionAnchorsEqual(previousAnchors, anchors);
     const animationChanged = this.rememberedAnimation !== animation;
+
+    if (
+      state.isSettling &&
+      (keyChanged || anchorsChanged || animationChanged) &&
+      previousAnchors !== null
+    ) {
+      // LaunchedEffect restore() first acquires the old state's drag mutex. A
+      // mutex-owned settle therefore runs animateToInternal.finally against the
+      // old PaneExpansionStateData bucket before restore assigns the new data
+      // and anchor configuration. Cancel against the previously remembered
+      // anchors so a simultaneous key+anchors change cannot rewrite the old
+      // bucket's currentAnchor with the new call-site fallback.
+      state.setAnchors(previousAnchors, previousFallbackInitialAnchoredIndex);
+    }
+
+    if (keyChanged && this.activeKeyId !== null) {
+      const previousEntry = this.entries.get(this.activeKeyId);
+      if (previousEntry !== undefined) {
+        previousEntry.data = state.capturePersistentData();
+      }
+    }
 
     if (anchorsChanged) {
       // Mirrors:
       // val initialAnchorForCurrentAnchors = remember(anchors) { initialAnchor }
       this.rememberedAnchors = anchors;
       this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
-    }
-
-    if (!keyChanged && state.isSettling && (anchorsChanged || animationChanged)) {
-      // AndroidX restore() acquires the same PreventUserInput MutatorMutex as
-      // settleToAnchorIfNeeded. Cancellation runs animateToInternal.finally
-      // first, mutating the same PaneExpansionStateData object that restore()
-      // then keeps. Our cache snapshots data by value, so perform the settle
-      // cancellation before taking that snapshot or the snapped target would
-      // be overwritten by stale pre-cancellation data.
-      state.setAnchors(anchors, this.fallbackInitialAnchoredIndex);
-    }
-
-    if (keyChanged && this.activeKeyId !== null) {
-      const previousEntry = this.entries.get(this.activeKeyId);
-      if (previousEntry !== undefined) {
-        if (state.isSettling && this.rememberedAnchors !== null) {
-          // restore() acquires the same PreventUserInput MutatorMutex as
-          // settleToAnchorIfNeeded. A mutex-owned settle is canceled first and
-          // animateToInternal.finally snaps the old data bucket to its target.
-          // Public animateTo also reports isSettling, but setAnchors only owns a
-          // controller for mutex settling, so public animation remains running.
-          state.setAnchors(
-            this.rememberedAnchors,
-            this.fallbackInitialAnchoredIndex,
-          );
-        }
-        previousEntry.data = state.capturePersistentData();
-      }
     }
 
     if (keyChanged || anchorsChanged || animationChanged) {
