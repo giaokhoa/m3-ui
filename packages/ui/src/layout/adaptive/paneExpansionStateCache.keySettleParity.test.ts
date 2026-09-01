@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   PaneExpansionAnchor,
+  PaneExpansionUnspecified,
   type PaneExpansionAnimation,
 } from './paneExpansionState';
 import { PaneExpansionStateCache } from './paneExpansionStateCache';
@@ -52,13 +53,18 @@ describe('PaneExpansionStateCache settle restore parity', () => {
 
     expect(state.currentAnchor).toBe(anchors[0]);
     expect(state.isSettling).toBe(false);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(0);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(
+      PaneExpansionUnspecified,
+    );
 
     await settling;
     // The old settle's suspended finally must not write its 1000px target into
-    // the newly-restored key after the abort promise resumes.
+    // the newly-restored key after the abort promise resumes. The new bucket's
+    // anchor is semantic-only until a real measurement change reapplies it.
     expect(state.currentAnchor).toBe(anchors[0]);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(0);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(
+      PaneExpansionUnspecified,
+    );
 
     cache.update(firstKey, { anchors, initialAnchoredIndex: 0, animation });
     expect(state.currentAnchor).toBe(anchors[1]);

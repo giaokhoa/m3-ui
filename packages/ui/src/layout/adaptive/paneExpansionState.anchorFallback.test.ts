@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { PaneExpansionAnchor, PaneExpansionState } from './paneExpansionState';
+import {
+  PaneExpansionAnchor,
+  PaneExpansionState,
+  PaneExpansionUnspecified,
+} from './paneExpansionState';
 
 describe('PaneExpansionState anchor-list fallback', () => {
   it('uses the new initial anchor when the current anchor is removed without moving the split', () => {
@@ -83,7 +87,14 @@ describe('PaneExpansionState anchor-list fallback', () => {
     state.setAnchors(nextAnchors, 0);
 
     expect(state.currentAnchor).toBe(nextAnchors[0]);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(600);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(
+      PaneExpansionUnspecified,
+    );
+
+    // AndroidX restore() updates currentAnchor immediately but onMeasured()
+    // reapplies that anchor only when measurement inputs actually change.
+    state.onMeasured(1200);
+    expect(state.getLayoutState(1200).currentDraggingOffset).toBe(720);
   });
 
   it('rejects an invalid updated initial index without mutating state', () => {
