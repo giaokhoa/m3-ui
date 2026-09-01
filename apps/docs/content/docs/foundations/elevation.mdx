@@ -1,0 +1,118 @@
+---
+title: Elevation
+description: Material 3 elevation semantics, tonal and shadow elevation, and m3-ui's token-driven web rendering model.
+---
+
+Material 3 uses elevation to communicate visual hierarchy and separation between surfaces. Elevation is a semantic relationship between surfaces, not a synonym for a CSS shadow preset: Material 3 can express that relationship through tonal elevation, shadow elevation, or both.
+
+[Material 3 elevation overview](https://m3.material.io/styles/elevation/overview)
+
+## Material intent
+
+Elevation helps clarify which surface is above another, which surface is temporary or overlapping, and when an interactive component needs stronger separation from its surroundings. Material 3 makes tonal elevation a first-class part of that system rather than relying on progressively larger shadows alone.
+
+Use elevation when it explains hierarchy or separation. Do not add a higher level only to make a surface look more decorative, and do not treat every raised-looking effect as a new Material elevation rule.
+
+AndroidX Material 3 exposes the same distinction through `Surface`: tonal elevation changes the surface treatment, while shadow elevation controls the cast shadow. That implementation evidence reinforces the Material model without redefining it for the web.
+
+## Semantic levels
+
+`m3-ui` uses the canonical semantic vocabulary `level0` through `level5`. Components resolve their container or interaction state to one of these levels through canonical component tokens; they do not own raw shadow geometry.
+
+The concrete dimensional scale is intentionally not copied into this MDX page. It remains in the canonical token graph and generated token output so a token change cannot leave the guide with stale dp/px values.
+
+A semantic level is also **not** a browser stacking value. `level3`, for example, describes Material elevation; it does not imply `z-index: 3`, a third shadow layer, or a particular CSS stacking context.
+
+<ComponentPreview>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))',
+      gap: '1.25rem',
+      width: '100%',
+    }}
+  >
+    <Surface tonalElevation="level0" shadowElevation="level0" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level0</strong>
+    </Surface>
+    <Surface tonalElevation="level1" shadowElevation="level1" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level1</strong>
+    </Surface>
+    <Surface tonalElevation="level2" shadowElevation="level2" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level2</strong>
+    </Surface>
+    <Surface tonalElevation="level3" shadowElevation="level3" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level3</strong>
+    </Surface>
+    <Surface tonalElevation="level4" shadowElevation="level4" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level4</strong>
+    </Surface>
+    <Surface tonalElevation="level5" shadowElevation="level5" style={{ minHeight: '5rem', padding: '1rem' }}>
+      <strong>level5</strong>
+    </Surface>
+  </div>
+</ComponentPreview>
+
+The preview uses the public `Surface` implementation, so the visual result comes from the same theme roles and generated elevation adapter as application code rather than from docs-only shadow literals.
+
+## Tonal and shadow elevation
+
+`Surface` keeps the two Material channels explicit:
+
+```tsx
+<Surface tonalElevation="level2" shadowElevation="level2">
+  Content
+</Surface>
+```
+
+`tonalElevation` affects the canonical Material surface color. Nested surfaces accumulate tonal elevation before the surface tint is resolved, matching the idea that tonal treatment describes the surface's absolute relationship within a hierarchy. A caller-supplied custom background is left alone instead of receiving an invented overlay.
+
+`shadowElevation` selects the shared elevation paint layer. Component/runtime code supplies only the semantic level; generated `@m3-ui/tokens/elevation.css` owns immutable shadow geometry and opacity, while `ThemeProvider` supplies the active Material shadow color role.
+
+The two properties can differ when a component or application surface needs one channel without the other. Do not collapse them into one web-only `box-shadow` API because that would erase a distinction Material 3 makes explicitly.
+
+## Components consume semantic elevation
+
+Material components use component-specific elevation tokens for containers and state changes. Cards, dialogs, menus, sheets, FABs, app bars, snackbars, and dragged or interactive surfaces can therefore share the same elevation engine while selecting different semantic levels according to their own Material specifications.
+
+The exact component-to-level mapping belongs to canonical/generated spec data and each component guide. Foundation documentation should explain the level system, not duplicate a second table of component token values by hand.
+
+## Semantic level vs shadow recipe
+
+| Concept | Owns | Meaning |
+| --- | --- | --- |
+| Semantic elevation level | Material/component tokens | The hierarchy or separation a surface should communicate. |
+| Tonal elevation treatment | Material surface model and `Surface` runtime | How the canonical surface color changes with elevation. |
+| Shadow recipe | Generated elevation adapter | The renderer-specific paint used to express shadow elevation. |
+| Browser stacking/order | Component and application layout | Which DOM layer paints above another; independent from Material elevation level. |
+
+Keeping these layers separate lets `m3-ui` preserve Material semantics even when renderer evidence changes.
+
+## Cross-source evidence and known drift
+
+The current canonical semantic level scale is reconciled with the pinned AndroidX Compose evidence and the latest generated Material Web token corpus. That agreement is about **semantic elevation**, not about requiring every renderer to draw the same shadow implementation.
+
+Material Web's public elevation wrapper exposes ordinal level numbers for its web API even though its latest generated token data preserves the underlying Material semantic scale. `m3-ui` classifies that remapping as a platform/API adaptation, not as a new normative Material elevation model.
+
+Shadow rendering has a separate known drift. The pinned Material 3 Figma effect styles and the pinned Material Web renderer agree on a two-layer shadow representation for elevated levels, while the current `m3-ui` canonical token graph retains its reviewed three-layer generated shadow representation. This is tracked as cross-source shadow-recipe drift. The guide does not copy either geometry or opacity recipe, and `m3-ui` does not silently replace its canonical renderer data until normative Material evidence resolves the difference.
+
+Figma effect styles and Material Web renderer behavior are implementation evidence. They can identify drift and inform web rendering, but they do not outrank the Material 3 specification.
+
+## Web rendering considerations
+
+CSS is the paint mechanism, not the elevation model. In `m3-ui`:
+
+- generated CSS owns shadow geometry and opacity;
+- theme roles own `shadow`, `surface`, and `surfaceTint` colors;
+- semantic component tokens own which elevation level is selected;
+- browser stacking, portals, clipping, and overflow remain layout/renderer concerns.
+
+A CSS shadow does not change DOM order or `z-index`, and an ancestor with clipping can still cut off a valid Material shadow. Solve those as browser layout problems rather than changing semantic elevation values to compensate.
+
+For application-defined Material surfaces, prefer `Surface` with `tonalElevation` and/or `shadowElevation`. For library components, prefer the component's built-in Material elevation behavior instead of adding an extra author `box-shadow` that competes with the canonical token model.
+
+## Related foundations
+
+- [Color](/docs/foundations/color) — surface, surface tint, shadow, and content color roles.
+- [Theming](/docs/theming) — how `ThemeProvider` projects Material color roles into the web runtime.
+- [Surface](/docs/components/surface) — the public component that exposes separate tonal and shadow elevation channels.
