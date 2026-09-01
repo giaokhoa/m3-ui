@@ -43,25 +43,29 @@ const overflowLayoutOptions = {
 
 describe('pane-expansion spacer midpoint Int overflow parity', () => {
   it('wraps pane-position additions before Int division', () => {
-    const layout = calculateThreePaneScaffoldLayout(overflowLayoutOptions);
-
-    expect(layout.secondary).toEqual({
-      left: 0,
-      top: 0,
-      width: 2147483547,
-      height: 800,
-    });
-    expect(layout.primary).toEqual({
-      left: 2147483597,
-      top: 0,
-      width: 50,
-      height: 800,
-    });
+    // Exercise the Int midpoint arithmetic directly. A real excluded-bound
+    // fixture cannot preserve coordinates this close to Int.MAX_VALUE because
+    // AndroidX window geometry travels through Rect(Float) before roundToIntRect,
+    // so Float32 quantization collapses those synthetic hinge edges first.
+    const measuredLayout = {
+      secondary: {
+        left: 0,
+        top: 0,
+        width: 2147483547,
+        height: 800,
+      },
+      primary: {
+        left: 2147483597,
+        top: 0,
+        width: 50,
+        height: 800,
+      },
+    };
 
     // AndroidX: (0 + 2147483547 + 2147483597) wraps to -152, then Int / 2 = -76.
     expect(
       calculatePaneExpansionSpacerMiddleOffset({
-        layout,
+        layout: measuredLayout,
         layoutOptions: overflowLayoutOptions,
       }),
     ).toBe(-76);
