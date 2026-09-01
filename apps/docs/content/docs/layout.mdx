@@ -1,121 +1,197 @@
 ---
-title: Adaptive layout
-description: Canonical Material 3 window adaptive state plus opt-in container-scoped web helpers.
+title: Adaptive layout and navigation
+description: Use m3-ui's public Material 3 window, scaffold, pane, and navigation APIs without confusing component-local sizing with application adaptive layout.
 ---
 
-## Window adaptive info is canonical
+Material adaptive layout changes an application's screen composition in response to available **window** space and posture. In `m3-ui`, the public adaptive layout APIs live under `@m3-ui/ui/layout`; component-local measurement and overflow behavior are separate concerns.
 
-Material 3 adaptive screen layouts are window-based. `useWindowAdaptiveInfo()` measures the browser layout viewport and remains the default/source-of-truth API for canonical pane and screen-level behavior.
+This page describes the stable public application contract. It does not invent product breakpoints or navigation policies outside the Material/adaptive APIs exported by the library.
+
+## Window adaptive information
+
+`useWindowAdaptiveInfo()` is the canonical screen-level source of Material window information. It observes the browser layout viewport and exposes the library's `WindowAdaptiveInfo`, including the current Material window-size class and posture information used by adaptive layout primitives.
 
 ```tsx
 import { useWindowAdaptiveInfo } from '@m3-ui/ui/layout';
 
 function Screen() {
   const adaptiveInfo = useWindowAdaptiveInfo();
-  return <div>{adaptiveInfo.windowSizeClass.width}</div>;
+
+  return (
+    <main>
+      Current width class: {adaptiveInfo.windowSizeClass.width}
+    </main>
+  );
 }
 ```
 
-`m3-ui` maps Material logical `dp` thresholds to logical CSS pixels on the web. Width classes remain compact `< 600`, medium `>= 600`, expanded `>= 840`, large `>= 1200`, and extra-large `>= 1600`. Height classes remain compact `< 480`, medium `>= 480`, and expanded `>= 900`.
+Use the named size classes returned by the API rather than copying numeric thresholds into application code or documentation. The canonical thresholds and classifications belong to the layout implementation and token/spec evidence, not to a second docs-owned breakpoint table.
 
-## Adaptive navigation suite
+Window size class describes available screen space. It does not automatically decide every component variant in the application. A component or scaffold must explicitly consume that information or expose its own Material adaptation policy.
 
-`NavigationSuiteScaffold` is the screen-level Material navigation orchestrator. It uses the same canonical `WindowAdaptiveInfo`; it does not introduce MUI breakpoints, a second media-query scale, or pane-allocation rules.
+## `Scaffold` owns screen slots and insets
 
-The default selection is audited against AndroidX Material3 Adaptive Navigation Suite `androidx-main`:
+`Scaffold` is the general application shell for composing Material screen chrome and content. Use it when top/bottom app bars, floating actions, or other scaffold-owned slots need to participate in one inset-aware layout.
 
-- compact width → `ShortNavigationBarCompact`;
-- otherwise tabletop or compact height → `ShortNavigationBarMedium`;
-- otherwise → `WideNavigationRailCollapsed`.
+```tsx
+import { Scaffold } from '@m3-ui/ui/layout';
 
-The compact-width rule intentionally has precedence over tabletop/compact-height. `WideNavigationRailExpanded`, legacy `NavigationBar` / `NavigationRail` / `NavigationDrawer`, and `None` remain semantic explicit overrides rather than additional automatic breakpoints.
+function AppScreen() {
+  return (
+    <Scaffold
+      topBar={<AppTopBar />}
+      bottomBar={<AppBottomBar />}
+      floatingActionButton={<CreateFab />}
+    >
+      {(innerPadding) => (
+        <main style={innerPadding.style}>
+          <ScreenContent />
+        </main>
+      )}
+    </Scaffold>
+  );
+}
+```
+
+`Scaffold` is about composition and safe-area/inset ownership. It is not itself a breakpoint system, router, or automatic pane allocator. Nested scaffolds should consume only the edges already occupied by their parent composition instead of duplicating safe-area padding.
+
+## Adaptive pane scaffolds
+
+For applications that need list-detail or supporting-pane layouts, use the canonical pane scaffolds rather than hand-writing a second window-class-to-column algorithm.
+
+Public layout primitives include:
+
+- `ListDetailPaneScaffold` for list/detail flows;
+- `SupportingPaneScaffold` for main content plus contextual/supporting content;
+- `ThreePaneScaffold` for lower-level explicit pane composition;
+- navigable pane scaffold/navigator APIs for application-owned destination history and back behavior;
+- pane expansion and motion APIs when a product intentionally exposes resize or custom transition behavior.
 
 ```tsx
 import {
-  FloatingActionButton,
-  NavigationSuiteScaffold,
-} from '@m3-ui/ui';
+  ListDetailPaneScaffold,
+  ListDetailPaneScaffoldRole,
+  calculatePaneScaffoldDirective,
+  calculateThreePaneScaffoldValueFromDirective,
+  listDetailPaneScaffoldAdaptStrategies,
+  useWindowAdaptiveInfo,
+} from '@m3-ui/ui/layout';
 
-const items = [
-  { selected: true, icon: <HomeIcon />, label: 'Home' },
-  { selected: false, icon: <SearchIcon />, label: 'Search' },
-];
+function MailLayout() {
+  const adaptiveInfo = useWindowAdaptiveInfo();
+  const directive = calculatePaneScaffoldDirective(adaptiveInfo);
+  const value = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Detail }],
+  });
+
+  return (
+    <ListDetailPaneScaffold
+      directive={directive}
+      value={value}
+      listPane={<MessageList />}
+      detailPane={<MessageDetail />}
+    />
+  );
+}
+```
+
+Use the canonical scaffold directive and adapt strategies exposed by the library. Do not infer future pane behavior from a raw width value when the public adaptive contract already represents the Material decision.
+
+Pane allocation and pane navigation are related but separate. Layout decides which panes can be shown in the available space; a navigator can preserve logical destination history while compact and multi-pane presentations change around it. Browser URL ownership still belongs to the application or an explicit router adapter.
+
+## Adaptive navigation surfaces
+
+`NavigationSuiteScaffold` is the public screen-level Material navigation orchestrator. Its default selection consumes the canonical `WindowAdaptiveInfo` and current Material/AndroidX navigation-suite policy rather than introducing another breakpoint scale.
+
+```tsx
+import { NavigationSuiteScaffold } from '@m3-ui/ui';
 
 function AppShell() {
   return (
     <NavigationSuiteScaffold
-      items={items}
-      primaryAction={
-        <FloatingActionButton aria-label="Create">
-          <AddIcon />
-        </FloatingActionButton>
-      }
+      items={[
+        { selected: true, icon: <HomeIcon />, label: 'Home' },
+        { selected: false, icon: <SearchIcon />, label: 'Search' },
+      ]}
     >
-      <AppContent />
+      <AppRoutes />
     </NavigationSuiteScaffold>
   );
 }
 ```
 
-The suite reuses the public `ShortNavigationBar`, `WideNavigationRail`, `NavigationBar`, `NavigationRail`, and navigation-drawer families. It does not own private copies of destination items. `primaryAction` is placed above horizontal navigation and inside vertical navigation headers; `primaryActionAlignment="start" | "center" | "end"` controls logical horizontal placement and defaults to `end` like current AndroidX.
+The suite reuses the public navigation-bar, short-navigation-bar, navigation-rail, wide-navigation-rail, and drawer families. Its automatic choice is a Material adaptive policy; an application can use the documented semantic override when product requirements intentionally need a different navigation surface.
 
-`NavigationSuiteScaffoldState` exposes observable `show()`, `hide()`, `toggle()`, and `snapTo()` behavior without porting Compose coroutine/state internals. `navigationSuiteType` can override the automatic selection when a product intentionally needs a different Material form.
+Navigation-suite selection and pane allocation solve different problems:
 
-The suite owns navigation-edge geometry only. Bottom navigation removes its occupied bottom edge from nested `Scaffold` safe-area handling; start-side navigation mirrors in RTL and consumes only the logical start edge for nested content. Top/bottom safe areas remain available to screen content while vertical navigation protects its own system-bar edges.
+- the navigation suite chooses the global destination-navigation surface framing the screen;
+- pane scaffolds allocate destination/content panes inside the remaining application content area.
 
-This is separate from `ThreePaneScaffold`. Navigation-suite selection decides which global navigation component frames the screen; pane scaffolds decide how destination content is allocated inside the remaining content area. The suite also does not own router history, destination back stacks, or navigable-pane behavior.
+Neither layer owns your router. Route-to-destination mapping, URL synchronization, deep links, and browser-history integration remain application concerns.
 
-## Container adaptive info is an opt-in web helper
+## Window adaptation vs component-local measurement
 
-Reusable web UI can be constrained by a dashboard cell, split view, docs canvas, side panel, or embedded preview even when the browser window is much wider. `useContainerAdaptiveInfo(ref)` observes that local element and classifies its size with the same Material 3 size-class calculator.
+Not every responsive-looking behavior is adaptive application layout. Keep these boundaries explicit:
 
-This API is a web-specific convenience. AndroidX Material3 does **not** define container-scoped window size classes, and container scope does not replace or change the canonical `useWindowAdaptiveInfo()` behavior.
+| Behavior | Adaptive window layout? | Owner |
+| --- | --- | --- |
+| `useWindowAdaptiveInfo()` and canonical pane directives | Yes | Screen/application layout |
+| `NavigationSuiteScaffold` default surface selection | Yes | Material navigation suite policy |
+| `ListDetailPaneScaffold` / `SupportingPaneScaffold` pane allocation | Yes | Adaptive pane scaffold |
+| `ButtonGroup` overflow | No | The local button-group container |
+| `AppBarRow` / `AppBarColumn` overflow | No | The local action container |
+| `TimePicker layout="auto"` | No | The picker container/presentation |
+| Carousel viewport measurement | No | The carousel viewport |
+
+A local component may react to the space available to **it** without claiming to represent the application's Material window class. Calling all local sizing “adaptive layout” makes application policy harder to reason about and can cause nested components to fight the screen-level layout.
+
+## Container-scoped helper for web compositions
+
+`useContainerAdaptiveInfo(ref)` is an opt-in web helper for reusable regions that genuinely need Material-style size classification based on a local element rather than the browser window.
 
 ```tsx
 import { useRef } from 'react';
 import { useContainerAdaptiveInfo } from '@m3-ui/ui/layout';
 
-function EmbeddedSurface() {
+function EmbeddedWorkspace() {
   const ref = useRef<HTMLDivElement>(null);
-  const { containerSizeClass } = useContainerAdaptiveInfo(ref);
+  const info = useContainerAdaptiveInfo(ref);
 
   return (
     <section ref={ref}>
-      {containerSizeClass.width === 'compact' ? <CompactView /> : <WideView />}
+      Local width class: {info.containerSizeClass.width}
     </section>
   );
 }
 ```
 
-The hook uses `ResizeObserver`, handles target replacement when the ref points at a different element after a React commit, disconnects when no longer subscribed, and avoids publishing duplicate width/height snapshots. An unmounted or zero-size target classifies as compact. On the server the default snapshot is `0 × 0`; applications that know a stable server-side container size can provide `serverSize`.
+This is a deliberate web adaptation, not an AndroidX definition of container-scoped window size classes. Prefer native CSS container queries when only styling changes. Use the React helper when rendered JavaScript state or behavior actually depends on the local size classification.
 
-```tsx
-const info = useContainerAdaptiveInfo(ref, {
-  serverSize: { width: 840, height: 900 },
-});
-```
+Do not feed container-scoped information into canonical window-scaffold behavior unless the application is intentionally building a container-scoped embedded experience and accepts that adaptation.
 
-The measured size is the target element's border box in CSS pixels. Direction does not affect classification, so the same thresholds work naturally in LTR and RTL layouts.
+## Insets and nested composition
 
-## Prefer native CSS container queries for styling
+Adaptive navigation and scaffold components can occupy logical start or bottom edges. Let the public scaffold APIs propagate or consume those occupied edges instead of manually duplicating physical `left`, `right`, or `bottom` padding.
 
-When only CSS presentation needs to adapt, use native container queries instead of subscribing React to size changes. Keep the Material thresholds rather than introducing a second breakpoint scale.
+Logical edges matter for RTL: start-side navigation mirrors with writing direction, while the content layout should continue to reason in logical rather than hard-coded physical sides.
 
-```css
-.card-region {
-  container-type: inline-size;
-}
+For pane layouts, inset handling and pane allocation are separate. Insets describe usable screen geometry; pane directives and strategies decide how panes occupy that geometry.
 
-.card-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-}
+## Choosing an API
 
-@container (min-width: 840px) {
-  .card-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-```
+Use `useWindowAdaptiveInfo()` when screen composition changes with the browser window. Use `NavigationSuiteScaffold` when the application wants the library's Material navigation-surface selection. Use `ListDetailPaneScaffold` or `SupportingPaneScaffold` when content itself needs canonical adaptive pane allocation. Use lower-level `ThreePaneScaffold` APIs when you need explicit pane roles/strategies while preserving the shared layout engine.
 
-Use `useContainerAdaptiveInfo()` when JavaScript behavior or rendered state genuinely depends on the local size class. Use `useWindowAdaptiveInfo()` for canonical Material screen adaptation and pane-scaffold decisions unless the application is deliberately building a container-scoped web experience.
+Use `useContainerAdaptiveInfo()` only for intentional embedded/container-scoped web behavior. For purely visual local changes, prefer CSS container queries. For component-owned overflow/orientation such as ButtonGroup, app-bar actions, TimePicker, or Carousel, use that component's public API and do not couple it to window classes.
+
+## Material and web provenance
+
+Material 3 is the design source for adaptive screen concepts and navigation hierarchy. AndroidX Material3 Adaptive provides implementation/reference evidence for the current size-class, pane-scaffold, navigation-suite, and navigator vocabulary represented by the public library APIs.
+
+The browser supplies viewport measurement, `ResizeObserver`, CSS logical layout, safe-area behavior, and router/history integration boundaries. Those web mechanisms implement the Material intent; they are not new Material design rules.
+
+## Related documentation
+
+- [Navigation component guides](/docs/components) — individual navigation surfaces and their component-local behavior.
+- [Accessibility](/docs/accessibility) — focus, naming, keyboard, and modal semantics across components.
+- [Forms and validation](/docs/forms) — browser-native ownership boundaries for application forms.
