@@ -1,9 +1,9 @@
 .toggle-button {
-  transition-property: border-radius, background-color, color, box-shadow, border-color;
-}
-
-.toggle-button[data-selected] {
-  --ripple-color: var(--_button-content-color);
+  transition:
+    border-radius var(--_toggle-button-effects-duration) var(--_toggle-button-effects-easing),
+    background-color var(--_toggle-button-effects-duration) var(--_toggle-button-effects-easing),
+    color var(--_toggle-button-effects-duration) var(--_toggle-button-effects-easing),
+    border-color var(--_toggle-button-effects-duration) var(--_toggle-button-effects-easing);
 }
 
 .toggle-button[data-focus-visible] {
@@ -13,6 +13,7 @@
 
 .toggle-button[data-disabled] {
   pointer-events: none;
+  transition: none;
 }
 
 [dir='rtl'] .toggle-button .button__content {
