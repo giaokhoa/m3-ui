@@ -42,11 +42,14 @@ test('changing the rendered component changes generated source without a second 
 test('MDX fixture uses the runtime registry and copy UI exposes accessible status', () => {
   const fixture = readFileSync(resolve(appDir, 'fixtures/live-example.mdx'), 'utf8');
   const runtime = readFileSync(resolve(appDir, 'src/liveExample.tsx'), 'utf8');
-  const mdxRegistry = readFileSync(resolve(appDir, 'src/mdx.tsx'), 'utf8');
+  const serverRegistry = readFileSync(resolve(appDir, 'src/mdx.tsx'), 'utf8');
+  const clientRegistry = readFileSync(resolve(appDir, 'src/mdx-client.tsx'), 'utf8');
 
   assert.match(fixture, /<LiveExample example="button-basic" sourceInitiallyOpen \/>/);
   assert.doesNotMatch(fixture, /from ['"].*src\//);
-  assert.match(mdxRegistry, /LiveExample,/);
+  assert.match(serverRegistry, /LiveExample: clientComponent\('LiveExample'\)/);
+  assert.match(clientRegistry, /import \{ LiveExample \} from '\.\/liveExample';/);
+  assert.match(clientRegistry, /\bLiveExample,\s*\n/);
   assert.match(runtime, /navigator\.clipboard\.writeText\(source\)/);
   assert.match(runtime, /role="status"/);
   assert.match(runtime, /aria-live="polite"/);
