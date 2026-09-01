@@ -11,6 +11,7 @@ import {
 } from './ShortNavigationBar/ShortNavigationBar.defaults';
 import {
   getModalDrawerSheetStyle,
+  getModalNavigationDrawerOverlayStyle,
   getNavigationDrawerMotionStyle,
   navigationDrawerRuntime,
 } from './NavigationDrawer/NavigationDrawer.defaults';
@@ -52,11 +53,14 @@ describe('navigation runtime bridges', () => {
     (count, occupancy) => expect(getCenteredOccupancy(count)).toBe(occupancy),
   );
 
-  it('keeps drawer offsets dynamic while CSS owns its motion recipe', () => {
+  it('keeps drawer offsets and scrim alpha dynamic while CSS owns static defaults', () => {
     expect(getNavigationDrawerMotionStyle(-120, 360)).toEqual({
       '--_navigation-drawer-offset': '-120px',
       '--_navigation-drawer-closed-offset': '-360px',
       '--_navigation-drawer-content-offset': '240px',
+    });
+    expect(getModalNavigationDrawerOverlayStyle({ alpha: 0.25 })).toEqual({
+      '--_scrim-alpha': 0.25,
     });
   });
 
