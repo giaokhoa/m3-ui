@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/scrim.css';
 import type { CSSProperties } from 'react';
 
 export type ScrimStyle = CSSProperties & Record<`--${string}`, string | number>;
