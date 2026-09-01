@@ -37,6 +37,7 @@ import {
   allComponentDocs,
   type AllComponentDocId,
 } from './allComponentDocs';
+import { ApiReference } from './apiReference';
 import type { ComponentDocMetadata } from './componentDocs';
 import {
   ColorRoleGrid,
@@ -271,6 +272,7 @@ export const materialMdxComponents = {
   ComponentPreview,
   MaterialParity,
   ParitySummary: MaterialParity,
+  ApiReference,
   ColorRoleGrid,
   DynamicColorPreview,
   TypeScaleSamples,
