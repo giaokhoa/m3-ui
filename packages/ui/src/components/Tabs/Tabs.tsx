@@ -63,23 +63,17 @@ function MaterialTabItem({
   ...props
 }: MaterialTabItemProps) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
   const hasIconAndLabel = item.icon !== undefined && item.label !== undefined;
   const leading = hasIconAndLabel && item.iconPlacement === 'start';
 
   return (
     <AriaTab
       {...props}
+      {...ripplePressProps}
       id={item.id}
       isDisabled={item.disabled}
       className="tabs__tab"
-      onPressStart={(event) => {
-        ripple.onPressStart(event);
-        onPressStart?.(event);
-      }}
-      onPressEnd={(event) => {
-        ripple.onPressEnd();
-        onPressEnd?.(event);
-      }}
       style={(renderProps) =>
         getTabStyle(variant, {
           selected: renderProps.isSelected,
@@ -91,8 +85,10 @@ function MaterialTabItem({
         <>
           <Ripple
             controller={ripple}
-            isHovered={renderProps.isHovered}
-            isFocusVisible={renderProps.isFocusVisible}
+            state={{
+              isHovered: renderProps.isHovered,
+              isFocusVisible: renderProps.isFocusVisible,
+            }}
             focusRingRadius="0px"
           />
           <span

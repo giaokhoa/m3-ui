@@ -90,19 +90,12 @@ export function NavigationRailItem({
 }: NavigationRailItemProps) {
   const ripple = useRipple({ origin: 'center' });
   const hasLabel = label !== undefined;
-
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       isDisabled={isDisabled}
       data-selected={selected || undefined}
       data-has-label={hasLabel || undefined}
@@ -146,8 +139,6 @@ export function NavigationRailItem({
           ...userStyle,
         };
       }}
-      onPressStart={handlePressStart}
-      onPressEnd={handlePressEnd}
     >
       {(renderProps) => (
         <span className="navigation-rail-item__layout">
@@ -156,14 +147,10 @@ export function NavigationRailItem({
             <Ripple
               controller={ripple}
               focusRingRadius="var(--_navigation-rail-indicator-radius)"
-              isFocusVisible={renderProps.isFocusVisible}
-              stateInteraction={
-                renderProps.isFocusVisible
-                  ? 'focus'
-                  : renderProps.isHovered
-                    ? 'hover'
-                    : null
-              }
+              state={{
+                isFocusVisible: renderProps.isFocusVisible,
+                isHovered: renderProps.isHovered,
+              }}
             />
             <span
               aria-hidden={hasLabel ? true : undefined}
