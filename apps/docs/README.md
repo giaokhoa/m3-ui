@@ -4,9 +4,9 @@ This app is the public documentation host for `m3-ui`.
 
 ## Ownership
 
-Fumadocs is used headlessly:
+Next.js App Router owns route rendering, metadata, and server/client boundaries. Fumadocs is used headlessly for the documentation content model:
 
-- `fumadocs-mdx` compiles local Markdown/MDX content;
+- `fumadocs-mdx` compiles local Markdown/MDX content and integrates with Next.js;
 - `fumadocs-core` provides source, page-tree, TOC, and search APIs;
 - `fumadocs-ui`, its CSS presets, and Tailwind are intentionally not dependencies.
 
@@ -33,7 +33,7 @@ The public docs render as a documentation product rather than a centered MDX dem
 
 The app consumes `useWindowAdaptiveInfo()` from `@m3-ui/ui/layout`. It must not copy the Material window thresholds into CSS or JavaScript. The named Material classes may be mapped to docs-specific composition decisions, but their breakpoint values stay owned by the canonical layout subsystem.
 
-Sidebar ordering and grouping are source data, not JSX inventory. `content/docs/**/meta.json` configures the Fumadocs page tree. `scripts/build-docs-data.mjs` loads that tree through the official Fumadocs loader, normalizes runtime-safe text fields, and writes `src/generated/docs-navigation.json` before dev/build/typecheck. The generated file is ignored by Git and bundled statically by Vite, so the first rendered frame already contains navigation.
+Sidebar ordering and grouping are source data, not JSX inventory. `content/docs/**/meta.json` configures the Fumadocs page tree. `scripts/build-docs-data.mjs` loads the shared Fumadocs source, normalizes runtime-safe text fields, and writes `src/generated/docs-navigation.json` before dev/build/typecheck. The generated JSON is imported by the Next.js docs shell, so the first rendered frame already contains navigation.
 
 Documentation navigation uses semantic links. Do not force `NavigationDrawerItem` into this surface merely for its visual treatment: that component intentionally exposes tab-style selection semantics, while document navigation is a hierarchy of links.
 
@@ -105,11 +105,11 @@ Do not copy generated signatures or prop rows into MDX. If the generated output 
 
 `scripts/build-docs-data.mjs` is the single build-time Fumadocs data pass:
 
-- it loads the Macro collection through the official `fumadocs-mdx/node` loader;
-- `fumadocs-core/source` creates the same source/page model used by Fumadocs;
+- it registers the `fumadocs-mdx` macro loader needed to import the shared `src/lib/source.ts` definition in Node;
+- `src/lib/source.ts` defines the collection once and exposes the same `fumadocs-core/source` loader used by App Router routes and build-time data generation;
 - `source.getPageTree()` produces the navigation hierarchy consumed by `DocsShell`;
 - `createFromSource(source).staticGET()` exports the built-in ZBSearch database to `public/search-index.json`;
-- Vite bundles the generated navigation JSON and copies the search database into production output.
+- Next.js bundles the generated navigation JSON, while the static search database is served from `public/`.
 
 `DocsSearch` queries the static database with `useDocsSearch()` and `staticClient()` from `fumadocs-core`. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
 
@@ -125,7 +125,7 @@ Docs-only widths such as the readable article measure, sidebar presentation widt
 
 ## MDX mapping
 
-`src/mdx.tsx` maps semantic Markdown elements to Material type roles without copying typography literals. There is no public `Typography` or `Prose` component added solely for documentation.
+`src/mdx.tsx` is the server-facing MDX registry. It maps Markdown and docs primitives to named client proxies so App Router can keep page/content resolution server-side without passing non-serializable component functions across the RSC boundary. `src/mdx-client.tsx` owns the corresponding client implementations and Material type-role mappings.
 
 Code uses a monospace browser adaptation because Material does not define a code typography role; its surrounding color surfaces still use Material semantic roles and the `Surface` component.
 
@@ -141,4 +141,4 @@ pnpm --filter @m3-ui/docs test
 pnpm --filter @m3-ui/docs typecheck
 ```
 
-The Vite development server listens on port `4173`.
+The Next.js development server listens on port `4173`.
