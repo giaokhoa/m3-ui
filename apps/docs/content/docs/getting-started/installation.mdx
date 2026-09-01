@@ -1,0 +1,46 @@
+---
+title: Installation
+description: Add m3-ui to a React application and load its public styles.
+---
+
+`m3-ui` currently lives in this monorepo as the workspace package `@m3-ui/ui`. The package metadata is private today, so treat installation as a workspace/development flow until a published distribution is available.
+
+## In this repository
+
+Install the workspace dependencies from the repository root:
+
+```bash
+pnpm install
+```
+
+Applications in the workspace can depend on the package with the workspace protocol:
+
+```json
+{
+  "dependencies": {
+    "@m3-ui/ui": "workspace:*"
+  }
+}
+```
+
+The package declares React 19 and React DOM 19 as peer dependencies, so the consuming application must provide compatible versions.
+
+## Load styles
+
+For applications using several component families, import the full public stylesheet once near your application entrypoint:
+
+```tsx
+import '@m3-ui/ui/styles.css';
+```
+
+For a smaller CSS surface, use the public self-contained component style entries instead:
+
+```tsx
+import '@m3-ui/ui/styles/button.css';
+```
+
+Do not import files from `@m3-ui/ui/src`, generated token internals, or another repository-private path. Public examples in these docs use only package exports declared by `@m3-ui/ui`.
+
+## Next step
+
+Continue to [Quick start](/docs/getting-started/quick-start) to mount `ThemeProvider` and render a Material button.

@@ -1,0 +1,52 @@
+---
+title: Quick start
+description: Mount ThemeProvider and render your first public m3-ui component.
+---
+
+Start with one theme boundary and one component. Both `ThemeProvider` and `Button` are public exports from `@m3-ui/ui`.
+
+```tsx
+import { Button, ThemeProvider } from '@m3-ui/ui';
+import '@m3-ui/ui/styles.css';
+
+export function App() {
+  return (
+    <ThemeProvider>
+      <Button onPress={() => console.log('Continue')}>
+        Continue
+      </Button>
+    </ThemeProvider>
+  );
+}
+```
+
+`ThemeProvider` supplies Material system color roles to its subtree. Without a `sourceColor`, it uses the repository baseline light scheme by default. Components then consume semantic roles through the shared theme rather than resolving their own dynamic color values.
+
+## Choose a color source when needed
+
+Pass a source color when the application should derive a Material dynamic color scheme:
+
+```tsx
+import { Button, ThemeProvider } from '@m3-ui/ui';
+import '@m3-ui/ui/styles.css';
+
+export function App() {
+  return (
+    <ThemeProvider sourceColor="#6750A4">
+      <Button>Continue</Button>
+    </ThemeProvider>
+  );
+}
+```
+
+The source color is an application input. It is not a canonical `m3-ui` token.
+
+## Prefer web event semantics
+
+`Button` is backed by React Aria Components and exposes its public button contract rather than a Compose-style callback shape. For activation, use `onPress` as shown above instead of inventing an Android-specific interaction abstraction.
+
+## Where to go next
+
+- Read [Theming](/docs/theming) for the complete `ThemeProvider` contract.
+- Read the [Button guide](/docs/components/button) for variants and Material guidance.
+- Read [Material conformance](/docs/getting-started/material-conformance) before interpreting platform differences as parity bugs.
