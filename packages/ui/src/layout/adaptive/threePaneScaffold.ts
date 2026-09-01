@@ -95,7 +95,7 @@ export interface LevitatePaneAdaptStrategy {
   type: 'levitate';
   alignment: LevitatedPaneAlignment;
   scrim?: ReactNode;
-  dragToResizeState?: DragToResizeState | null;
+  dragToResizeState?: DragToResizeState;
   /** Equivalent of AndroidX AdaptStrategy.Levitate.onlyIf. */
   onlyIf(condition: boolean): PaneAdaptStrategy;
   /** AndroidX single-pane means maxHorizontalPartitions == 1. */
@@ -160,7 +160,7 @@ export type PaneAdaptedValue =
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
       scrim?: ReactNode;
-      dragToResizeState?: DragToResizeState | null;
+      dragToResizeState?: DragToResizeState;
     };
 
 const expandedPaneAdaptedValue = Object.freeze({ type: 'expanded' } as const);
@@ -375,10 +375,14 @@ export function getPaneAdaptedValue(
   role: ThreePaneScaffoldRole,
 ): PaneAdaptedValue {
   const paneValue = value[role];
-  if (paneValue.type !== 'levitated' || paneValue.dragToResizeState !== null) {
+  if (
+    paneValue.type !== 'levitated' ||
+    (paneValue as { dragToResizeState?: DragToResizeState | null }).dragToResizeState !== null
+  ) {
     return paneValue;
   }
-  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = paneValue;
+  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = paneValue as
+    PaneAdaptedValue & { dragToResizeState: null };
   return normalizedPaneValue;
 }
 
