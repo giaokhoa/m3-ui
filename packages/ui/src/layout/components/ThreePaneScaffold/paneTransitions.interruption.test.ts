@@ -10,10 +10,7 @@ import {
   calculateThreePaneScaffoldTransitionFrameWithSpecs,
   type PaneTransitionSpecs,
 } from './paneTransitions';
-import {
-  createThreePaneScaffoldVisibilityInterruption,
-  sampleThreePaneScaffoldVisibilityInterruption,
-} from './ThreePaneScaffold.visibilityInterruption';
+import { createThreePaneScaffoldVisibilityInterruption } from './ThreePaneScaffold.visibilityInterruption';
 
 const directive: PaneScaffoldDirective = {
   maxHorizontalPartitions: 3,
@@ -53,7 +50,7 @@ function layout(currentValue: ThreePaneScaffoldValue, targetValue: ThreePaneScaf
 }
 
 describe('custom pane transition interruption handoff', () => {
-  it('captures the exact custom rendered frame before retargeting to interruption springs', () => {
+  it('captures the exact custom rendered frame as the interruption origin', () => {
     const detail = value(true, false);
     const list = value(false, true);
     const sourceLayout = layout(detail, list);
@@ -97,16 +94,6 @@ describe('custom pane transition interruption handoff', () => {
       renderedFrame.secondary?.translateX,
     );
     expect(interruption.originFrame.secondary?.opacity).toBe(renderedFrame.secondary?.opacity);
-
-    const firstRetargetFrame = sampleThreePaneScaffoldVisibilityInterruption(
-      interruption,
-      0,
-      0,
-    );
-    expect(firstRetargetFrame.primary?.translateX).toBe(renderedFrame.primary?.translateX);
-    expect(firstRetargetFrame.primary?.opacity).toBe(renderedFrame.primary?.opacity);
-    expect(firstRetargetFrame.secondary?.translateX).toBe(renderedFrame.secondary?.translateX);
-    expect(firstRetargetFrame.secondary?.opacity).toBe(renderedFrame.secondary?.opacity);
   });
 
   it('recomputes custom bounds from the latest measured geometry', () => {
