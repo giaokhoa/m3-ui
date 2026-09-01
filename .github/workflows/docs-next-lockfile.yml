@@ -7,14 +7,16 @@ on:
       - .github/workflows/docs-next-lockfile.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   lockfile:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout pull request branch
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
@@ -27,10 +29,15 @@ jobs:
           cache: pnpm
       - name: Refresh lockfile
         run: pnpm install --lockfile-only --no-frozen-lockfile
-      - name: Upload lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: docs-next-lockfile
-          path: pnpm-lock.yaml
-          if-no-files-found: error
-          retention-days: 1
+      - name: Commit lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- pnpm-lock.yaml; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "chore(docs): refresh Next.js lockfile"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
