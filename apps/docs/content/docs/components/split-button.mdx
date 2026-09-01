@@ -1,27 +1,17 @@
 ---
 title: Split button
-description: Material split actions with independent leading and trailing buttons, expressive size geometry, and application-owned menu state.
+description: Material split actions with independent leading/trailing buttons, expressive sizes, and application-owned secondary surfaces.
 ---
 
-<MaterialParity component="split-button" />
-
-## Overview
-
-`SplitButton` composes two Material button actions into the audited split-button shape: a primary leading action and an independent trailing action.
-
-The trailing side may expose pressed or expanded state, but the component deliberately does **not** create a menu or popover. Applications own the secondary-action surface and its lifecycle.
-
-## Live example
+A split button combines a primary action with a related secondary trigger. The two halves remain independent buttons: the leading side performs the primary action, while the trailing side can disclose or toggle a related choice.
 
 <ComponentPreview>
   <SplitButtonPreview />
 </ComponentPreview>
 
-The example toggles `aria-expanded` state only. That state is the contract a separately composed menu can consume; the split button itself does not invent menu content.
-
-## Variants and sizes
-
 ```tsx
+import { SplitButton } from '@m3-ui/ui';
+
 <SplitButton
   leading="Create"
   trailing={<ChevronDownIcon />}
@@ -32,16 +22,50 @@ The example toggles `aria-expanded` state only. That state is the contract a sep
 />
 ```
 
-Available variants are `filled`, `tonal`, `elevated`, and `outlined`. Split-button sizes reuse the public Material button size family from extra-small through extra-large while applying the split-specific leading/trailing corner geometry.
+## When to use
+
+Use a split button when one action is the clear default and a compact secondary trigger exposes closely related alternatives. Prefer two ordinary buttons when the actions are peers. Prefer a standard menu trigger when there is no meaningful default action.
+
+## Menu ownership
+
+`SplitButton` does **not** create, position, or manage a menu/popover. `trailingExpanded` only communicates that the trailing control owns an external expandable surface. The application composes that surface and owns open/close state, focus scope, positioning, and dismissal.
+
+This boundary avoids inventing menu semantics when the public split-button component itself contains only two buttons.
+
+## Variants and sizes
+
+Available visual variants are `filled`, `tonal`, `elevated`, and `outlined`. Split-button sizes reuse the public Material button size family from extra-small through extra-large while applying split-specific connected shape geometry.
+
+Choose the semantic variant/size rather than copying corner or spacing values into application CSS.
 
 ## Trailing state
 
-Set `trailingExpanded` when the trailing action controls an external expandable surface. Set `trailingChecked` + `onTrailingCheckedChange` when it acts as a persistent toggle; this exposes `aria-pressed` on the real trailing button.
+Use `trailingExpanded` when the trailing action controls an expandable secondary surface. Use `trailingChecked` with `onTrailingCheckedChange` only when the trailing control is a real persistent toggle.
 
-Do not set toggle state merely to style a menu trigger. Use `trailingExpanded` for disclosure and reserve `trailingChecked` for a true pressed/toggled action.
+Do not use checked state merely to make a disclosure trigger look active: disclosure and pressed/toggled semantics represent different user contracts.
+
+## Behavior and states
+
+Both halves reuse the public Material button interaction engine. Press, hover, focus-visible, disabled, color, shape, and state-layer behavior stays local to each real button while the split geometry presents them as one Material control.
 
 ## Accessibility
 
-Both halves reuse the public Material button engine and therefore preserve React Aria keyboard, pointer, disabled, focus-visible, and press semantics.
+Each half needs a meaningful accessible name. Visible leading text normally supplies the primary name; icon-only trailing disclosure controls should use `trailingAriaLabel`.
 
-Provide `leadingAriaLabel` or `trailingAriaLabel` when a half's visual content does not already contain meaningful text. Icon-only trailing disclosure controls need an accessible name.
+When the trailing half controls an external expandable surface, keep `trailingExpanded` synchronized with that surface's actual open state. Do not label the split container as an ARIA menu when it is not one.
+
+## API reference
+
+<ApiReference name="SplitButton" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="split-button" />
+
+Material guidance supplies the split-action hierarchy and connected visual form. Browser semantics remain two independent buttons; popup/menu lifecycle is intentionally application-owned unless separately composed with a public overlay/menu component.
+
+## Related components
+
+- [Button](/docs/components/button) — independent actions.
+- [Menu](/docs/components/menu) — application-composed secondary choices.
+- [Button group](/docs/components/button-group) — multiple peer actions or connected selection.

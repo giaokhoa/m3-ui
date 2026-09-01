@@ -1,42 +1,44 @@
 ---
 title: Icon button
-description: Material 3 action and toggle icon buttons across the audited variant, size, width, and shape families.
+description: Material 3 icon-button guidance, action/toggle semantics, variants, expressive sizing, and accessibility.
 ---
 
-<MaterialParity component="icon-button" />
+Icon buttons provide compact actions where a familiar icon can communicate the action without a persistent text label. Material 3 separates ordinary action icon buttons from persistent toggle icon buttons; `m3-ui` preserves that semantic split in separate public components.
 
-## Variants
-
-Action and toggle icon buttons both support the Material visual families:
+[Material 3 icon buttons](https://m3.material.io/components/icon-buttons/overview)
 
 <ComponentPreview>
   <IconButtonPreview />
 </ComponentPreview>
 
-| Visual family | Action | Toggle |
+```tsx
+import { IconButton } from '@m3-ui/ui';
+
+<IconButton aria-label="Add item" onPress={addItem}>
+  <AddIcon />
+</IconButton>
+```
+
+## When to use
+
+Use an icon button when the icon is conventional in context and the action needs a compact target. Prefer a labeled `Button` when the icon would be ambiguous or when action hierarchy depends on visible text.
+
+Use toggle icon buttons only for persistent selected/pressed state such as favorite, mute, or pin. Do not use toggle state merely to style an action after it was pressed.
+
+## Variants
+
+| Material family | Action | Toggle |
 | --- | --- | --- |
 | Standard | `IconButton` | `IconToggleButton` |
 | Filled | `FilledIconButton` | `FilledIconToggleButton` |
 | Filled tonal | `FilledTonalIconButton` | `FilledTonalIconToggleButton` |
 | Outlined | `OutlinedIconButton` | `OutlinedIconToggleButton` |
 
-The public components keep action and toggle semantics separate rather than switching behavior from a visual variant prop.
+The visual family communicates hierarchy while action vs toggle determines semantics.
 
-## Accessible names are required
+## Toggle behavior
 
-The icon child is rendered as presentation-only content. For an icon-only action, put the accessible name on the button:
-
-```tsx
-<IconButton aria-label="Add item">
-  <AddIcon />
-</IconButton>
-```
-
-Do not rely on the SVG's own title or accessible name; `m3-ui` intentionally hides the icon container from accessibility so the control has one stable name.
-
-## Toggle buttons
-
-Toggle variants are controlled and require both `isSelected` and `onChange`:
+Toggle variants expose controlled selected state:
 
 ```tsx
 <FilledTonalIconToggleButton
@@ -48,19 +50,15 @@ Toggle variants are controlled and require both `isSelected` and `onChange`:
 </FilledTonalIconToggleButton>
 ```
 
-React Aria `ToggleButton` owns the pressed/selected semantics and interaction model. Material tokens own selected/unselected presentation.
+React Aria `ToggleButton` supplies the pressed/selected interaction contract. Material tokens control selected and unselected visual treatment.
 
 ## Size, width, and shape
 
-The audited Material options exposed by the component are:
+The audited expressive API uses named Material options rather than copied dimensions:
 
-| Dimension | Values |
-| --- | --- |
-| `size` | `extraSmall`, `small`, `medium`, `large`, `extraLarge` |
-| `width` | `narrow`, `default`, `wide` |
-| `shape` | `round`, `square` |
-
-These names map to component token families. Consumer code should select the semantic option instead of reproducing container or icon measurements in CSS.
+- `size`: `extraSmall`, `small`, `medium`, `large`, `extraLarge`;
+- `width`: `narrow`, `default`, `wide`;
+- `shape`: `round`, `square`.
 
 ```tsx
 <OutlinedIconButton
@@ -73,12 +71,32 @@ These names map to component token families. Consumer code should select the sem
 </OutlinedIconButton>
 ```
 
-## Expressive shape helpers
+Optional expressive `shapes` mappings can customize normal/pressed Material shape transitions. Omitting them keeps the standard audited shape path.
 
-`shapes` can provide the normal/pressed Material expressive shape mapping for action icon buttons; toggle icon buttons use their corresponding toggle-shape contract.
+## Behavior and states
 
-This is an opt-in behavior. Omitting it preserves the standard audited shape path.
+React Aria owns action/toggle semantics, keyboard and pointer activation, disabled state, hover, and focus visibility. The shared Material ripple and token layers own state indication, container geometry, color, shape, and motion.
 
-## Interaction ownership
+The icon child is presentation-only. The button remains the sole interaction and accessible-name owner.
 
-React Aria owns button/toggle semantics, disabled state, keyboard and pointer behavior, hover, focus visibility, and toggle selection. The shared Material ripple engine and canonical tokens own visual state indication, container geometry, content color, and expressive shape behavior.
+## Accessibility
+
+Icon-only controls need an explicit accessible name such as `aria-label="Add item"`. Do not rely on the SVG's title: the icon container is intentionally hidden from the accessibility tree so the control exposes one stable name.
+
+For toggle icon buttons, name the action or property consistently while pressed state communicates selection. Avoid changing the accessible name between unrelated verbs in a way that makes the control's identity unstable.
+
+## API reference
+
+<ApiReference name="IconButton" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="icon-button" />
+
+Material 3 provides the visual families, hierarchy, shape, state, and expressive sizing model. React Aria supplies browser-native button/toggle behavior and `aria-pressed` semantics where appropriate.
+
+## Related components
+
+- [Button](/docs/components/button) — labeled actions.
+- [Toggle button](/docs/components/toggle-button) — persistent selection with visible text.
+- [FAB](/docs/components/fab) — prominent floating actions.

@@ -1,47 +1,45 @@
 ---
 title: Button group
-description: Standard Material action groups with local overflow and connected single or multiple selection groups with distinct semantics.
+description: Material action groups, connected selection, local overflow, and distinct web semantics for independent vs selectable controls.
 ---
 
-<MaterialParity component="button-group" />
-
-## Overview
-
-`ButtonGroup` exposes two materially different contracts:
-
-- `variant="standard"` groups independent actions and applies expressive pressed-width redistribution. When the row runs out of local space it moves a suffix of actions into its own overflow menu.
-- `variant="connected"` joins selectable buttons into one connected shape and requires `selectionMode="single"` or `selectionMode="multiple"`.
-
-They share the Material button-group family but should not be treated as one generic selection API.
-
-## Live example
+Button groups organize related actions or connected selections while preserving the semantics of the controls inside them. `m3-ui` exposes two intentionally different contracts: standard independent actions and connected selectable buttons.
 
 <ComponentPreview>
   <ButtonGroupPreview />
 </ComponentPreview>
 
-The first example is intentionally width-constrained so the component can exercise its local overflow behavior. That is component-level overflow, not a Material window-size class or adaptive-pane rule.
-
-## Standard action group
-
 ```tsx
+import { ButtonGroup } from '@m3-ui/ui';
+
 <ButtonGroup
   aria-label="Document actions"
   items={[
     { id: 'share', label: 'Share', onAction: share },
     { id: 'export', label: 'Export', onAction: exportFile },
-    { id: 'archive', label: 'Archive', onAction: archive },
   ]}
 />
 ```
 
-Each item may select its own public Material button variant. The group measures rendered actions with `ResizeObserver`, keeps the largest visible prefix that fits, and exposes the remaining items through a menu trigger.
+## When to use
 
-The overflow menu restores focus to its trigger after Escape and closes after an item action or outside pointer interaction. This local overflow policy belongs to `ButtonGroup`; it does not choose navigation rails, drawers, panes, or window-size classes.
+Use a standard button group for a compact cluster of related but independent actions. Use connected selection when the grouped controls represent one selection model. Do not use a button group only to force unrelated controls into a shared shape.
+
+For destination navigation, use the navigation component families instead of treating button-group selection as page navigation.
+
+## Standard action group
+
+`variant="standard"` groups independent actions and applies the audited Material expressive press behavior. If the rendered row cannot fit its local container, the group moves a suffix of actions into its own overflow surface.
+
+Each item may select its supported Material button variant. The group measures the **local action container** with `ResizeObserver`; it does not consume `WindowAdaptiveInfo` or choose an application layout.
+
+The overflow trigger/surface owns its local focus and dismissal behavior. This is component-local overflow, not adaptive navigation.
 
 ## Connected selection
 
-Single selection uses React Aria radio-group/radio semantics:
+`variant="connected"` joins selectable buttons into a connected Material shape and requires an explicit `selectionMode`.
+
+Single selection uses one-of-many radio semantics:
 
 ```tsx
 <ButtonGroup
@@ -53,10 +51,33 @@ Single selection uses React Aria radio-group/radio semantics:
 />
 ```
 
-Multiple selection uses independent React Aria toggle-button semantics and `selectedKeys` / `defaultSelectedKeys`.
+Multiple selection uses independent toggle-button semantics with `selectedKeys` or `defaultSelectedKeys`. Do not collapse the two modes into one generic selected-state description: their accessibility and interaction models are different.
 
-## Expressive press behavior
+## Expressive behavior
 
-Standard groups mirror AndroidX pressed-width redistribution: the pressed item borrows available compression from adjacent items, with edge and middle items following the corresponding neighbor rules. Growth is clamped so neighboring content cannot collapse.
+For standard groups, pressed-width redistribution follows the audited Material/Compose behavior while clamping growth so neighboring content cannot collapse. Connected groups instead preserve their selected/unselected color and corner-state contract.
 
-Connected groups instead preserve connected selected/unselected color and corner-state behavior. All sizes reuse the audited Material button size family.
+All group sizes reuse the public Material button size vocabulary rather than introducing docs-owned dimensions.
+
+## Accessibility
+
+Give the group an accessible label when the relationship between controls is not already clear from surrounding content. Independent actions remain buttons. Single connected selection exposes radio-group/radio behavior; multiple connected selection exposes independent toggle-button pressed state.
+
+Overflowed actions must remain reachable by keyboard and return focus predictably to the trigger when the overflow surface closes.
+
+## API reference
+
+<ApiReference name="ButtonGroup" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="button-group" />
+
+Material defines grouping, connected shape, action hierarchy, and expressive press treatment. Local `ResizeObserver` overflow and the browser radio/toggle semantics are web implementation details; they are not Material window-adaptive policy.
+
+## Related components
+
+- [Button](/docs/components/button) — individual actions.
+- [Toggle button](/docs/components/toggle-button) — individual persistent pressed state.
+- [Segmented buttons](/docs/components/segmented-button) — explicit segmented selection family.
+- [Adaptive layout](/docs/layout) — screen/window adaptation, which is separate from local overflow.
