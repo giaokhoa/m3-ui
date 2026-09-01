@@ -33,9 +33,10 @@ test('generated Progress Indicator CSS owns immutable defaults', async () => {
   assert.match(css, /--_progress-circular-gap: 4px;/);
   assert.match(css, /--_progress-four-color-1: var\(--primary\);/);
   assert.match(css, /--_progress-four-color-4: var\(--tertiary-container\);/);
-  assert.match(css, /\.progress-indicator--linear\.progress-indicator--standard \{[^}]*--_progress-linear-height: 4px;/s);
+  assert.match(css, /\.progress-indicator--linear \{[^}]*--_progress-linear-height: 4px;/s);
   assert.match(css, /\.progress-indicator--linear\.progress-indicator--wavy \{[^}]*--_progress-linear-height: 10px;/s);
-  assert.match(css, /\.progress-indicator--circular\.progress-indicator--standard \{[^}]*--_progress-circular-size: 40px;/s);
+  assert.match(css, /\.progress-indicator--circular \{[^}]*--_progress-circular-size: 40px;/s);
+  assert.match(css, /--_progress-determinate-easing: cubic-bezier\(0, 0, 0\.2, 1\);/);
   assert.match(css, /\.progress-indicator--circular\.progress-indicator--wavy \{[^}]*--_progress-circular-size: 48px;/s);
   assert.doesNotMatch(css, /#[0-9a-f]{3,8}/i);
 });
