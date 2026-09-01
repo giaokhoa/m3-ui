@@ -7,15 +7,37 @@ This app is the public documentation host for `m3-ui`.
 Fumadocs is used headlessly:
 
 - `fumadocs-mdx` compiles local Markdown/MDX content;
-- `fumadocs-core` provides source, page-tree, and search APIs;
+- `fumadocs-core` provides source, page-tree, TOC, and search APIs;
 - `fumadocs-ui`, its CSS presets, and Tailwind are intentionally not dependencies.
 
 The visible product surface is owned by `m3-ui`:
 
 - `ThemeProvider` owns Material light/dark colors and typeface roles;
-- interactive UI uses public `@m3-ui/ui` components;
+- screen composition uses public `@m3-ui/ui/layout` APIs;
+- navigation, search and app-bar UI use public `@m3-ui/ui` components;
 - Markdown typography maps to the public Material type scale from `@m3-ui/ui`;
-- docs-only constructs such as code blocks, parity summaries, semantic tables, component previews, color swatches, and type-scale visualizers remain local adapters.
+- docs-only constructs such as code blocks, breadcrumbs, previous/next navigation, parity summaries, semantic tables, component previews, color swatches, and type-scale visualizers remain local adapters.
+
+## Documentation shell
+
+The public docs must render as a normal documentation product rather than a centered MDX demo host.
+
+`DocsShell` owns the persistent shell:
+
+- Material `Scaffold` owns the screen coordinate space, safe-area handling, and `TopAppBar` slot;
+- compact and medium Material width classes use `ModalNavigationDrawer` with an app-bar navigation action;
+- expanded, large, and extra-large Material width classes use a permanent `PermanentDrawerSheet` sidebar;
+- large and extra-large classes additionally show the current page TOC as a supporting documentation column;
+- the article remains a bounded readable column inside the remaining workspace;
+- breadcrumb and previous/next navigation are derived from the same page tree as the sidebar.
+
+The app consumes `useWindowAdaptiveInfo()` from `@m3-ui/ui/layout`. It must not copy the Material window thresholds into CSS or JavaScript. The named Material classes may be mapped to docs-specific composition decisions, but their breakpoint values stay owned by the canonical layout subsystem.
+
+Sidebar ordering and grouping are source data, not JSX inventory. `content/docs/**/meta.json` configures the Fumadocs page tree. `scripts/build-docs-data.mjs` loads that tree through the official Fumadocs loader, normalizes runtime-safe text fields, and writes `src/generated/docs-navigation.json` before dev/build/typecheck. The generated file is ignored by Git and bundled statically by Vite, so the first rendered frame already contains navigation.
+
+Documentation navigation uses semantic links. Do not force `NavigationDrawerItem` into this surface merely for its visual treatment: that component intentionally exposes tab-style selection semantics, while document navigation is a hierarchy of links.
+
+The page TOC comes from each MDX page's generated `toc` and Fumadocs `AnchorProvider`/`TOCItem`. Do not parse headings in the browser or maintain a second TOC list manually.
 
 ## Foundation documentation contract
 
@@ -46,30 +68,27 @@ Each page should cover, where applicable:
 
 Shared parity metadata lives in `src/componentDocs.ts` and is rendered through the docs-only `MaterialParity` MDX primitive. Keep canonical measurements, typography, colors, elevations and component shapes in the token/component layers; do not duplicate them in MDX prose or docs CSS.
 
-## Static search
+## Static docs data and search
 
-Documentation search uses the Fumadocs search pipeline rather than a docs-local title filter:
+`scripts/build-docs-data.mjs` is the single build-time Fumadocs data pass:
 
-- `scripts/build-search-index.mjs` loads the Macro collection through the official `fumadocs-mdx/node` loader;
-- `fumadocs-core/source` turns the collection into the same source/page model used by Fumadocs;
-- `createFromSource(source).staticGET()` exports the built-in ZBSearch database;
-- development writes the generated database to `public/search-index.json`, which Vite serves as a static asset;
-- production writes `dist/search-index.json` after `vite build`;
-- `DocsSearch` queries that file with `useDocsSearch()` and `staticClient()` from `fumadocs-core`.
+- it loads the Macro collection through the official `fumadocs-mdx/node` loader;
+- `fumadocs-core/source` creates the same source/page model used by Fumadocs;
+- `source.getPageTree()` produces the navigation hierarchy consumed by `DocsShell`;
+- `createFromSource(source).staticGET()` exports the built-in ZBSearch database to `public/search-index.json`;
+- Vite bundles the generated navigation JSON and copies the search database into production output.
 
-The visible search experience is still Material UI: the top-app-bar action uses `IconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
+`DocsSearch` queries the static database with `useDocsSearch()` and `staticClient()` from `fumadocs-core`. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
 
-Do not add a second client-side search implementation for titles or manually parsed MDX. If the Fumadocs static index cannot be generated, fix the source/index pipeline instead.
+Do not add a second client-side search implementation for titles or manually parsed MDX. If Fumadocs data cannot be generated, fix the source/data pipeline instead.
 
-The generated development index is ignored by Git and is refreshed when the docs dev command starts. Restart the docs dev server after content changes when search results need to be re-indexed.
+## Layout boundary
 
-## Adaptive layout boundary
+The docs app now consumes the public Material layout subsystem; it still does not reimplement it.
 
-Do not introduce a second responsive system here.
+Do not add docs-owned compact/medium/expanded numeric breakpoints, pane directives, window-class calculators, hinge policies, or alternate scaffold algorithms. `Scaffold`, Material window classification, canonical pane logic, and safe-area behavior stay owned by `@m3-ui/ui/layout`.
 
-The documentation app may compose public navigation components and `@m3-ui/ui/layout`, but it must not own Material window-size classes, compact/medium/expanded breakpoints, pane directives, canonical pane scaffolds, hinge avoidance, or equivalent adaptive algorithms.
-
-Until the current layout work provides the desired docs composition, this app deliberately remains a single-content surface with a Material `TopAppBar`. App-specific prose width, wrapping and spacing are readability concerns, not exported Material layout contracts.
+Docs-only widths such as the readable article measure, sidebar presentation width, and TOC column width are application composition values. They must not be exported or described as Material layout tokens.
 
 ## MDX mapping
 
