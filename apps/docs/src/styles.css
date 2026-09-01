@@ -17,8 +17,6 @@ body {
 .docs-theme {
   block-size: 100%;
   min-block-size: 100%;
-  background: var(--surface);
-  color: var(--on-surface);
 }
 
 .docs-page-header {
