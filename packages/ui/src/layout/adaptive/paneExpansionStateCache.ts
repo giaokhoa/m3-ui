@@ -168,6 +168,16 @@ export class PaneExpansionStateCache {
       this.fallbackInitialAnchoredIndex = initialAnchoredIndex;
     }
 
+    if (!keyChanged && state.isSettling && (anchorsChanged || animationChanged)) {
+      // AndroidX restore() acquires the same PreventUserInput MutatorMutex as
+      // settleToAnchorIfNeeded. Cancellation runs animateToInternal.finally
+      // first, mutating the same PaneExpansionStateData object that restore()
+      // then keeps. Our cache snapshots data by value, so perform the settle
+      // cancellation before taking that snapshot or the snapped target would
+      // be overwritten by stale pre-cancellation data.
+      state.setAnchors(anchors, this.fallbackInitialAnchoredIndex);
+    }
+
     if (keyChanged && this.activeKeyId !== null) {
       const previousEntry = this.entries.get(this.activeKeyId);
       if (previousEntry !== undefined) {
