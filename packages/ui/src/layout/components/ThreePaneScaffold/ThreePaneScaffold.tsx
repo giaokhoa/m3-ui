@@ -372,7 +372,7 @@ export function ThreePaneScaffold({
       window.removeEventListener('resize', measure);
       window.removeEventListener('scroll', measure, true);
     };
-  }, [className, style?.direction]);
+  }, [className, props.dir, style?.direction]);
 
   useLayoutEffect(() => {
     expansionState.onMeasured(geometry.width, geometry.direction);
