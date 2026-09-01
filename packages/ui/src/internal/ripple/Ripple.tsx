@@ -6,7 +6,6 @@ import type { RippleController } from './useRipple';
 import './ripple.css';
 
 type RippleStyle = CSSProperties & Record<`--${string}`, string | number>;
-export type RippleStateInteraction = 'focus' | 'hover';
 
 export interface RippleInteractionState {
   readonly isHovered?: boolean;
@@ -15,7 +14,7 @@ export interface RippleInteractionState {
 
 export function resolveRippleStateInteraction(
   state: RippleInteractionState,
-): RippleStateInteraction | null {
+): 'focus' | 'hover' | null {
   if (state.isHovered) return 'hover';
   if (state.isFocusVisible) return 'focus';
   return null;
@@ -26,12 +25,6 @@ export interface RippleProps
   controller: RippleController;
   /** Normalized current state from the RAC/native interaction host. */
   state?: RippleInteractionState;
-  /** @deprecated Migrate callers to `state`. */
-  stateInteraction?: RippleStateInteraction | null;
-  /** @deprecated Migrate callers to `state`. */
-  isHovered?: boolean;
-  /** @deprecated Migrate callers to `state`. */
-  isFocusVisible?: boolean;
   /** CSS length that maps the component's Compose focusRingShape corner radius. */
   focusRingRadius?: string | number;
   /**
@@ -48,9 +41,6 @@ function cssLength(value: string | number): string {
 export function Ripple({
   controller,
   state,
-  stateInteraction,
-  isHovered = false,
-  isFocusVisible = false,
   focusRingRadius,
   focusRingInset,
   className,
@@ -58,16 +48,8 @@ export function Ripple({
   ...props
 }: RippleProps) {
   const { rippleFocus } = useTheme();
-  const currentIsHovered = state?.isHovered ?? isHovered;
-  const currentIsFocusVisible = state?.isFocusVisible ?? isFocusVisible;
-  const resolvedStateInteraction =
-    stateInteraction === undefined
-      ? resolveRippleStateInteraction({
-          isHovered: currentIsHovered,
-          isFocusVisible: currentIsFocusVisible,
-        })
-      : stateInteraction;
-  const hasFocus = currentIsFocusVisible || resolvedStateInteraction === 'focus';
+  const resolvedStateInteraction = resolveRippleStateInteraction(state ?? {});
+  const hasFocus = state?.isFocusVisible ?? false;
 
   const runtimeStyle: RippleStyle = {
     ...(focusRingRadius === undefined
