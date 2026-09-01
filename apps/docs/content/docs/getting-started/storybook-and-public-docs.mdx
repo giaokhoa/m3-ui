@@ -1,0 +1,43 @@
+---
+title: Public docs and Storybook
+description: Understand which m3-ui documentation surface to use for guidance, API contracts, and exhaustive visual review.
+---
+
+The public docs and Storybook serve different jobs. They should reinforce each other without becoming duplicate inventories.
+
+## Public docs
+
+Use the public docs to learn how to build with `m3-ui`.
+
+They own:
+
+- task-oriented onboarding and installation;
+- Material usage guidance and alternatives;
+- public API examples;
+- foundation and theming guidance;
+- accessibility and browser-adaptation explanations;
+- generated public API reference;
+- Material provenance, fidelity, adaptations, and known gaps;
+- concise examples that represent supported consumer workflows.
+
+The public docs are curated. A page does not need to reproduce every visual state or fixture that exists in Storybook.
+
+## Storybook
+
+Use Storybook to inspect and regress the implementation itself.
+
+It is the primary visual-review surface for:
+
+- component variants and state combinations;
+- implementation-focused fixtures;
+- visual-regression scenarios;
+- edge cases that would make a public guide noisy;
+- review of changes before they are promoted into the public documentation contract.
+
+A Storybook story is evidence that an implementation scenario is exercised. It is not automatically a promise that the scenario is a stable public API.
+
+## Shared rule
+
+Both surfaces must describe the same public implementation and Material evidence. If they disagree, fix the source of the disagreement rather than documenting two competing contracts.
+
+Public docs lead with user tasks and Material guidance. Storybook remains exhaustive where exhaustiveness helps implementation review.

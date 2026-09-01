@@ -1,0 +1,38 @@
+---
+title: Introduction
+description: Start building with m3-ui, a React implementation of Material 3 for the web.
+---
+
+`m3-ui` is a React component library that translates Material 3 design intent into browser-native components, theme roles, layout APIs, and interaction semantics.
+
+Use these docs when you want to build a Material 3 interface with the public `@m3-ui/ui` API. Start with installation, mount `ThemeProvider`, render a component, and then move into the component and foundation guides you need.
+
+## What m3-ui is
+
+- A Material 3 component library for React 19.
+- A web implementation whose normative design source is Material Design 3.
+- A library that uses AndroidX Compose Material3 as current Material API vocabulary and implementation evidence where the Material specification does not answer an implementation question by itself.
+- A browser-native implementation that intentionally uses HTML, ARIA, CSS, React Aria Components, and web interaction conventions instead of reproducing Compose runtime mechanics literally.
+- A package whose documented examples are based on the public exports consumers can actually import.
+
+## What m3-ui is not
+
+- It is not a claim of complete Material parity across every component, state, platform behavior, or newly introduced Material API.
+- It is not a port of AndroidX Compose source code or Kotlin API shapes.
+- It is not a wrapper around Material Web.
+- It is not a documentation theme supplied by Fumadocs; Fumadocs provides the content pipeline while `m3-ui` renders the visible documentation UI.
+- It is not a promise that every Storybook story is part of the supported public API.
+
+## Start here
+
+1. [Install m3-ui](/docs/getting-started/installation).
+2. [Render your first component](/docs/getting-started/quick-start).
+3. Read the current [browser and support assumptions](/docs/getting-started/browser-support).
+4. Understand how the project describes [Material conformance](/docs/getting-started/material-conformance).
+5. Learn the different responsibilities of [public docs and Storybook](/docs/getting-started/storybook-and-public-docs).
+
+After that, use the [component guides](/docs/components), [foundation guides](/docs/foundations), and [parity catalog](/docs/parity) as needed.
+
+## The contract you should rely on
+
+Material Design 3 defines the design intent. The `m3-ui` public implementation defines what you can import and run today. The documentation connects those two boundaries and labels Compose evidence, browser adaptations, and known gaps instead of treating every difference from Android runtime structure as a failure.

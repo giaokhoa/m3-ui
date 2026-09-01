@@ -1,60 +1,33 @@
 ---
 title: m3-ui documentation
-description: Material 3 React components with canonical tokens, web semantics, and audited Compose parity.
+description: Build Material 3 React interfaces with public m3-ui components, theming, and explicit web conformance guidance.
 ---
 
-## Material 3 is the contract
+Build with `m3-ui` from the public API outward: install the package, mount a theme, render a component, then use the Material-led guides for the behavior and fidelity details you need.
 
-The documentation surface uses the same `@m3-ui/ui` components, theme roles, and generated typography tokens as consumer applications. Fumadocs provides the content pipeline; it does not define the visual language.
+## Get started
 
-<ComponentPreview>
-  <Button>Continue</Button>
-  <ElevatedButton>Elevated</ElevatedButton>
-  <FilledTonalButton>Learn more</FilledTonalButton>
-  <OutlinedButton>Details</OutlinedButton>
-  <TextButton>Cancel</TextButton>
-</ComponentPreview>
+- [Introduction](/docs/getting-started) — what `m3-ui` is, what it is not, and which contract to rely on.
+- [Installation](/docs/getting-started/installation) — current workspace installation and public CSS entrypoints.
+- [Quick start](/docs/getting-started/quick-start) — `ThemeProvider` plus a public `Button`.
+- [Browser support](/docs/getting-started/browser-support) — tested surfaces and modern-browser assumptions.
+- [Material conformance](/docs/getting-started/material-conformance) — source hierarchy, web mappings, adaptations, and gaps.
+- [Public docs and Storybook](/docs/getting-started/storybook-and-public-docs) — which surface to use for guidance versus exhaustive implementation review.
 
-## Foundations and theming
+## Then choose the guide you need
 
-The implemented Material foundation guides are deliberately narrower than the full Material specification:
+- [Foundations](/docs/foundations) for reusable Material color and typography contracts.
+- [Theming](/docs/theming) for `ThemeProvider`, dynamic color, typeface roles, ripple focus, and theme-aware portals.
+- [Layout](/docs/layout) for the dedicated Material adaptive-layout subsystem.
+- [Components](/docs/components) for Material-led component usage and public API examples.
+- [Parity catalog](/docs/parity) for structured provenance, fidelity dimensions, adaptations, and known gaps.
 
-- [Color](/docs/foundations/color) — semantic roles, baseline schemes, dynamic color, and contrast level.
-- [Typography](/docs/foundations/typography) — standard Material roles and M3 Expressive emphasized roles.
-- [Theming](/docs/theming) — `ThemeProvider`, app-level system preference, ripple focus, and theme-aware portals.
-- [Foundation index](/docs/foundations) — implemented scope and explicit omissions.
+## Material 3 is the normative design source
 
-Shape, motion, and elevation are not published as global theme docs until equivalent reusable runtime contracts exist in `m3-ui`.
+Material Design 3 defines the design intent. AndroidX Compose Material3 provides current Material API vocabulary and implementation evidence. Browser semantics and React Aria Components provide the web interaction and accessibility mapping. The `m3-ui` public implementation is the API that consumers can actually import today.
 
-## Component guides
+That hierarchy means a correct web adaptation is not automatically a parity failure, and an implementation detail from Compose is not automatically a public React API requirement. These docs call out adaptations and known gaps explicitly rather than claiming complete Material parity globally.
 
-Start with the first Material component pages:
+## Documentation boundary
 
-- [Button](/docs/components/button)
-- [Text field](/docs/components/text-field)
-- [Dialog](/docs/components/dialog)
-- [All component guides](/docs/components)
-- [Parity catalog](/docs/parity) — the data-driven Material/Compose contract index behind every parity summary.
-
-Each guide records the Material family, Compose mapping, implementation boundary, accessibility behavior, and intentional browser adaptation before documenting examples and API details.
-
-## Headless documentation engine
-
-`fumadocs-mdx` compiles the MDX source and provides browser-safe Macro collections. This app intentionally does not import `fumadocs-ui`, its preset CSS, or a parallel design system.
-
-```tsx
-const page = getDocsPage(slugs);
-const MDX = page.body;
-
-<MDX components={getMdxComponents()} />;
-```
-
-## Layout boundary
-
-> Documentation owns content composition, not Material adaptive-layout policy.
-
-The docs app does not define its own compact, medium, or expanded breakpoints; pane directives; navigation rail switching; or scaffold algorithms. Those concerns must compose the existing `@m3-ui/ui/layout` subsystem as that work lands.
-
-## Typography boundary
-
-Semantic Markdown remains semantic HTML. Headings and body content are mapped to Material type roles at the MDX boundary instead of introducing documentation-only typography components into the core library.
+Public docs are curated developer guidance. Storybook remains the exhaustive component visual-review and regression surface. Fumadocs supplies the content/page-tree/search pipeline, while the visible documentation product is rendered with `m3-ui` itself.
