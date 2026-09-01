@@ -13,7 +13,7 @@
     "start": "next start --hostname 0.0.0.0 --port 4173",
     "test": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && pnpm docs:lint && node --test scripts/*.test.mjs",
     "typecheck": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf .next dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json src/generated/live-examples.generated.json public/search-index.json"
+    "clean": "rm -rf .next .source dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json src/generated/live-examples.generated.json public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",
@@ -28,8 +28,6 @@
     "@types/mdx": "2.0.14",
     "@types/node": "22.20.1",
     "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "vite": "^7.0.0"
+    "@types/react-dom": "^19.0.0"
   }
 }
