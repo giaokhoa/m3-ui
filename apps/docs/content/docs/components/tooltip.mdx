@@ -1,28 +1,23 @@
 ---
 title: Tooltips
-description: Plain and rich Material tooltips with correct non-interactive tooltip versus interactive dialog semantics.
+description: Plain and rich Material tooltips with distinct non-interactive tooltip and actionable non-modal dialog semantics.
 ---
 
-<MaterialParity component="tooltip" />
+Tooltips provide contextual supporting information anchored to another control. Plain and rich Material tooltips share a visual family, but actionable rich content requires a different browser semantic model.
 
-## Overview
-
-The public family separates plain and rich Material tooltips because their browser semantics are different:
-
-- `TooltipTrigger` + `PlainTooltip` for short, non-interactive supporting text.
-- `RichTooltipTrigger` + `RichTooltip` for richer content that can include a title and action.
-
-## Live example
+[Material 3 tooltips](https://m3.material.io/components/tooltips/overview)
 
 <ComponentPreview>
   <TooltipPreview />
 </ComponentPreview>
 
-Hover or keyboard-focus the triggers. Rich tooltip actions remain keyboard reachable without turning the overlay into a modal dialog.
+## When to use
+
+Use a plain tooltip for short, supplemental text that clarifies an unfamiliar icon or control. Do not hide essential instructions only in hover content. Use a rich tooltip when the supporting content genuinely needs a title or action and should remain available long enough to interact with.
 
 ## Plain tooltip
 
-Plain tooltips use React Aria's tooltip pattern, including trigger relationship, hover/focus timing, placement, portal behavior, and accessible description wiring.
+`TooltipTrigger` + `PlainTooltip` follows the non-interactive tooltip pattern: trigger relationship, hover/focus timing, placement, portal behavior, and accessible description wiring are owned by React Aria.
 
 ```tsx
 <TooltipTrigger>
@@ -31,11 +26,11 @@ Plain tooltips use React Aria's tooltip pattern, including trigger relationship,
 </TooltipTrigger>
 ```
 
-Keep plain tooltip content non-interactive.
+Keep plain tooltip content non-interactive. If users must move focus into the overlay, it is no longer a plain tooltip interaction.
 
 ## Rich tooltip
 
-Rich tooltips may contain an action, so using the ARIA `tooltip` role would be incorrect. `RichTooltipTrigger` instead exposes `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` on the real trigger, while `RichTooltip` renders a non-modal dialog surface.
+`RichTooltip` may contain an action, so exposing it as ARIA `tooltip` would be incorrect. The rich trigger communicates popup/expanded/control relationships, while the rich surface uses non-modal dialog-style semantics.
 
 ```tsx
 <RichTooltipTrigger>
@@ -49,8 +44,30 @@ Rich tooltips may contain an action, so using the ARIA `tooltip` role would be i
 </RichTooltipTrigger>
 ```
 
-Actionable rich tooltips are persistent by default and can dismiss through their action, Escape, or outside interaction. Focus is allowed to travel into the action without enabling modal focus containment.
+Focus may move into the rich action without modal focus containment. Escape, outside interaction, or the explicit action can dismiss according to the public trigger/surface behavior.
 
-## Theme portals
+## Portals and theme context
 
-Tooltip surfaces are portalled. The implementation propagates public theme CSS variables from the anchor context into the portal while excluding component-private `--_` variables, so nested themes remain visually correct without leaking internal token implementation details.
+Tooltip surfaces are portalled. Public theme variables are projected into the portal so nested Material themes remain visually coherent without leaking component-private implementation variables.
+
+## Accessibility
+
+Ensure the trigger is reachable without hover and that plain tooltip text remains concise. Do not place links/buttons inside `PlainTooltip`.
+
+For rich tooltips, provide enough title/content to identify the non-modal dialog-like surface and keep actions keyboard reachable. Avoid treating an actionable overlay as `role="tooltip"`, which does not support interactive descendants as a user interaction model.
+
+## API reference
+
+<ApiReference name="PlainTooltip" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="tooltip" />
+
+Material supplies tooltip hierarchy, shape, typography, color, and plain/rich presentation. React Aria's plain tooltip semantics and the explicit non-modal dialog-style mapping for actionable rich content are browser accessibility adaptations.
+
+## Related components
+
+- [Menus](/docs/components/menu) — temporary action/choice collections.
+- [Dialog](/docs/components/dialog) — modal focused content.
+- [Icon button](/docs/components/icon-button) — common trigger that may need supplemental labeling/context.

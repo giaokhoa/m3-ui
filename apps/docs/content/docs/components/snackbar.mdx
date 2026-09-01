@@ -1,25 +1,23 @@
 ---
 title: Snackbar
-description: Material snackbar surface, actions, dismiss affordances, live-region semantics, and the explicit host-state boundary.
+description: Material snackbar surface, actions, dismiss affordances, status semantics, and explicit application-owned lifecycle policy.
 ---
 
-<MaterialParity component="snackbar" />
+Snackbars show brief messages about an application process or result. `Snackbar` is the Material message surface; queueing, replacement, duration, persistence, and host policy remain application-owned.
 
-## Overview
-
-`Snackbar` is the Material transient-message **surface**. It renders the message plus optional `SnackbarAction` and `SnackbarDismissAction`, including the long-action layout where the primary action moves to a new line.
-
-It deliberately does not own queueing, replacement, timeout, or host orchestration.
-
-## Live example
+[Material 3 snackbars](https://m3.material.io/components/snackbar/overview)
 
 <ComponentPreview>
   <SnackbarPreview />
 </ComponentPreview>
 
-## Composition
-
 ```tsx
+import {
+  Snackbar,
+  SnackbarAction,
+  SnackbarDismissAction,
+} from '@m3-ui/ui';
+
 <Snackbar
   action={<SnackbarAction onPress={undo}>Undo</SnackbarAction>}
   dismissAction={
@@ -32,16 +30,46 @@ It deliberately does not own queueing, replacement, timeout, or host orchestrati
 </Snackbar>
 ```
 
-Set `actionOnNewLine` when a longer action should use the Material long-action composition.
+## When to use
+
+Use a snackbar for brief, non-blocking feedback that does not require the user to stop their current task. Use dialogs when a decision must be made before continuing, and use persistent inline status/error content when users must retain or revisit the information.
+
+## Actions and layout
+
+A snackbar can include one primary action and an optional dismiss affordance. `actionOnNewLine` selects the Material long-action composition when the action needs more room.
+
+`SnackbarAction` reuses the Material text-button interaction engine. Icon-only dismiss actions require an accessible label because the icon is presentation-only.
+
+## Lifecycle ownership
+
+`Snackbar` deliberately does not create hidden timers, queues, replacement rules, or persistence. Application state or a dedicated host layer decides:
+
+- when a snackbar appears;
+- how long it remains;
+- whether a new message replaces or queues behind the current one;
+- how actions affect message state;
+- whether state survives navigation or reload.
+
+That keeps product policy outside the visual surface and avoids surprising timeouts embedded in a presentational component.
 
 ## Accessibility
 
-The message is exposed as `role="status"` with `aria-live="polite"` and `aria-atomic="true"`, so updates are announced without forcing focus into the snackbar.
+The message is exposed as polite atomic status content so it can be announced without moving focus into the snackbar. Actions remain ordinary reachable controls.
 
-`SnackbarAction` reuses the public Material text-button interaction engine. `SnackbarDismissAction` reuses the icon-button engine and requires an accessible label because its icon is presentation-only.
+Avoid rapidly replacing status text in a way that causes repeated announcements. A timeout should give users enough opportunity to perceive and operate any action, and product/accessibility policy should decide whether actionable snackbars require longer or user-controlled persistence.
 
-## Host boundary
+## API reference
 
-A Compose `SnackbarHost` coordinates lifecycle policy around snackbar content. The current React package intentionally stops at the surface primitive: applications decide how messages are queued, replaced, timed out, persisted, or restored.
+<ApiReference name="Snackbar" />
 
-Do not implement those policies with hidden timers inside `Snackbar`; keep them in application state or a dedicated host layer.
+## Material fidelity and web adaptation
+
+<MaterialParity component="snackbar" />
+
+Material supplies the surface, message/action hierarchy, shape, color, and layout. Browser status/live-region semantics expose transient feedback without focus theft; queue/timer/host orchestration remains outside the component.
+
+## Related components
+
+- [Dialog](/docs/components/dialog) — blocking focused decisions.
+- [Progress indicators](/docs/components/progress-indicator) — ongoing-process status.
+- [Tooltips](/docs/components/tooltip) — contextual supporting information.

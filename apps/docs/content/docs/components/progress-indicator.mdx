@@ -1,45 +1,65 @@
 ---
 title: Progress indicators
-description: Standard and M3 Expressive linear or circular progress indicators with React Aria progress semantics.
+description: Material standard and expressive linear/circular progress indicators with React Aria progress semantics and explicit web adaptations.
 ---
 
-<MaterialParity component="progress-indicator" />
+Progress indicators communicate the status of an ongoing process. Use determinate progress when completion can be measured and indeterminate progress when it cannot.
 
-## Overview
-
-The public family contains four Material progress indicators:
-
-- `LinearProgressIndicator`
-- `CircularProgressIndicator`
-- `LinearWavyProgressIndicator`
-- `CircularWavyProgressIndicator`
-
-The standard pair covers baseline Material progress. The wavy pair implements the current M3 Expressive waveform behavior audited against Compose.
-
-## Live example
+[Material 3 progress indicators](https://m3.material.io/components/progress-indicators/overview)
 
 <ComponentPreview>
   <ProgressIndicatorPreview />
 </ComponentPreview>
 
-## Determinate and indeterminate
-
-Pass `value` for known progress, or `isIndeterminate` when completion cannot be estimated. Material defaults to a `0..1` range, while the underlying React Aria progress semantics can also represent an explicit custom range.
-
 ```tsx
+import {
+  CircularProgressIndicator,
+  LinearProgressIndicator,
+} from '@m3-ui/ui';
+
 <LinearProgressIndicator aria-label="Upload progress" value={0.64} />
 <CircularProgressIndicator aria-label="Loading" isIndeterminate />
-<LinearWavyProgressIndicator aria-label="Import progress" value={0.42} />
 ```
 
-The visual drawing is accessibility-hidden. Always provide `aria-label` or `aria-labelledby` because Material progress indicators do not render a visible label themselves.
+## Families
+
+The public baseline family contains `LinearProgressIndicator` and `CircularProgressIndicator`. `LinearWavyProgressIndicator` and `CircularWavyProgressIndicator` expose the audited M3 Expressive waveform family.
+
+Choose the family that matches the product's Material language; do not use decorative progress motion when no process is actually being communicated.
+
+## Determinate and indeterminate
+
+Pass `value` for known progress or `isIndeterminate` when completion cannot be estimated. The component delegates progress range/value semantics to React Aria while Material owns the visual track/indicator geometry and motion.
+
+The rendered visual drawing is hidden from accessibility so SVG/path implementation details are not announced as duplicate content.
 
 ## Expressive waveform
 
-Wavy indicators preserve the Compose-derived amplitude lifecycle, canonical waveform geometry, circular continuity, and reduced-motion behavior. `amplitude`, `wavelength`, and `waveSpeed` are renderer controls rather than new Material design tokens.
+Wavy indicators preserve the audited waveform/amplitude/motion behavior. Renderer controls such as amplitude/wavelength/speed are implementation controls, not a new set of normative Material design tokens.
 
-## Web compatibility surface
+Reduced-motion preference removes or freezes motion while preserving a valid progress visual and unchanged progressbar semantics.
 
-`bufferValue` on standard linear progress and `fourColor` on standard indeterminate indicators are audited Material Web adaptations. They remain intentionally separate from the Compose-aligned wavy API instead of being promoted to universal Material behavior.
+## Web compatibility adaptations
 
-`prefers-reduced-motion: reduce` removes motion while preserving a valid progress visual and unchanged progressbar semantics.
+`bufferValue` on standard linear progress and `fourColor` on standard indeterminate indicators are audited Material Web compatibility surfaces. They remain explicitly classified as adaptations rather than generalized to every Material/Compose progress family.
+
+## Accessibility
+
+Every standalone indicator needs an accessible label via `aria-label` or `aria-labelledby` because the Material visual does not render a visible label. For determinate progress, let React Aria expose the current numeric value/range rather than duplicating it in the SVG.
+
+Do not move focus to a progress indicator merely because progress changes. Use surrounding status messaging when a process needs additional announcement.
+
+## API reference
+
+<ApiReference name="LinearProgressIndicator" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="progress-indicator" />
+
+Material supplies progress visual hierarchy, geometry, color, waveform, and motion. React Aria `ProgressBar` owns accessible progress semantics; buffer/four-color support remains explicitly audited Material Web adaptation.
+
+## Related components
+
+- [Loading indicator](/docs/components/loading-indicator) — expressive morphing loading affordance.
+- [Snackbar](/docs/components/snackbar) — transient status messaging.
