@@ -127,17 +127,35 @@ function ListItem({ style, ...props }: HTMLAttributes<HTMLLIElement>) {
   );
 }
 
-function Anchor({ href, style, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+function Anchor({
+  href,
+  style,
+  ...props
+}: AnchorHTMLAttributes<HTMLAnchorElement>) {
   const anchorStyle = {
     ...getMaterialTypeCssProperties('bodyLarge'),
     ...style,
   };
 
   if (typeof href === 'string' && href.startsWith('/')) {
-    return <Link {...props} className="docs-link" href={href} style={anchorStyle} />;
+    return (
+      <Link
+        {...props}
+        className="docs-link"
+        href={href}
+        style={anchorStyle}
+      />
+    );
   }
 
-  return <a {...props} className="docs-link" href={href} style={anchorStyle} />;
+  return (
+    <a
+      {...props}
+      className="docs-link"
+      href={href}
+      style={anchorStyle}
+    />
+  );
 }
 
 function InlineCode({ style, ...props }: HTMLAttributes<HTMLElement>) {
@@ -342,15 +360,15 @@ const docsMdxComponents = {
 } satisfies MDXComponents;
 
 export function MdxClientComponent({
-  name,
+  __mdxComponent,
   ...props
-}: { name: string } & Record<string, unknown>) {
-  const Component = docsMdxComponents[name as keyof typeof docsMdxComponents] as
-    | ComponentType<Record<string, unknown>>
-    | undefined;
+}: { __mdxComponent: string } & Record<string, unknown>) {
+  const Component = docsMdxComponents[
+    __mdxComponent as keyof typeof docsMdxComponents
+  ] as ComponentType<Record<string, unknown>> | undefined;
 
   if (!Component) {
-    throw new Error(`Unknown docs MDX component: ${name}`);
+    throw new Error(`Unknown docs MDX component: ${__mdxComponent}`);
   }
 
   return <Component {...props} />;
