@@ -74,7 +74,7 @@ describe('Ripple RAC press integration', () => {
   it('clears pending lifecycle timers during cleanup', () => {
     vi.useFakeTimers();
     const callback = vi.fn();
-    const timers = new Set<ReturnType<typeof window.setTimeout>>();
+    const timers = new Set<number>();
     timers.add(window.setTimeout(callback, 100));
     timers.add(window.setTimeout(callback, 200));
 
