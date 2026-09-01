@@ -41,7 +41,11 @@ Use `selectedKey` with `onSelectionChange` when route/content state is controlle
 
 `mode="fixed"` distributes the tab row according to the audited Material layout. `mode="scrollable"` keeps intrinsic tab widths and locally scrolls the selected tab into view. Reduced-motion preference disables smooth scrolling without changing selection.
 
-## Behavior and accessibility
+## Behavior
+
+Selection stays explicit through the controlled or uncontrolled React Aria collection state. Scrollable mode only adjusts the local tab-list viewport; it does not change window-adaptive layout or navigation policy.
+
+## Accessibility
 
 React Aria `Tabs`, `TabList`, and `Tab` own tab roles, roving focus, arrow-key behavior, disabled state, and automatic keyboard activation. Every tab list needs an accessible name.
 
