@@ -199,6 +199,57 @@ function MotionHalfwayFixture({ predictiveBack = false }: { predictiveBack?: boo
   );
 }
 
+function CustomTransitionsHalfwayFixture() {
+  const width = 480;
+  const height = 640;
+  const directive = calculatePaneScaffoldDirective(
+    calculateWindowAdaptiveInfo({ width, height }),
+  );
+  const detailValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Detail }],
+  });
+  const listValue = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.List }],
+  });
+  const [scaffoldState] = useState(() => new MutableThreePaneScaffoldState(detailValue));
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => scaffoldState.seekTo(0.5, listValue));
+    return () => cancelAnimationFrame(frame);
+  }, [listValue, scaffoldState]);
+
+  return (
+    <div style={{ width, maxWidth: '100%', height, margin: '0 auto' }}>
+      <ListDetailPaneScaffold
+        directive={directive}
+        scaffoldState={scaffoldState}
+        paneTransitions={{
+          primary: {
+            exit: {
+              durationMs: 420,
+              from: { opacity: 1, translateInline: 0 },
+              to: { opacity: 0, translateInline: -48 },
+              easing: (progress) => progress * progress,
+            },
+          },
+          secondary: {
+            enter: {
+              durationMs: 420,
+              from: { opacity: 0, translateInline: 48 },
+              to: { opacity: 1, translateInline: 0 },
+              easing: (progress) => 1 - (1 - progress) * (1 - progress),
+            },
+          },
+        }}
+        listPane={<Pane title="List">Custom enter transition</Pane>}
+        detailPane={<Pane title="Detail">Custom exit transition</Pane>}
+      />
+    </div>
+  );
+}
+
 function LevitatedDialogFixture() {
   const width = 720;
   const height = 640;
@@ -309,6 +360,10 @@ export const MotionHalfway: Story = {
 
 export const MotionHalfwayPredictiveBack: Story = {
   render: () => <MotionHalfwayFixture predictiveBack />,
+};
+
+export const CustomTransitionsHalfway: Story = {
+  render: () => <CustomTransitionsHalfwayFixture />,
 };
 
 export const LevitatedDialog: Story = {
