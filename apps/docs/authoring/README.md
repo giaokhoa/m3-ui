@@ -54,7 +54,7 @@ The component-page primitives are registered into the shared MDX runtime and mus
 - `<RelatedComponents items={[...]} />`
 - `<PageSectionNote>...</PageSectionNote>` for author-facing/temporary explanatory notes when needed
 
-`<FidelitySummary />` deliberately consumes the existing component metadata registry rather than creating another inventory. Issue #219 owns the future structured provenance/fidelity model; this contract should be able to consume that model later without changing public MDX page structure.
+`<FidelitySummary />` consumes `allComponentProvenance`, which is resolved from the existing component inventory. The optional `adaptations` and `knownGaps` props add page-specific evidence without creating a second component registry; existing `MaterialParity`/`ParitySummary` MDX usage resolves to the same structured renderer.
 
 `<GeneratedApiReferenceSlot />` is a stable document position, not a handwritten prop-table feature. Issue #220 can replace the runtime behind this slot with generated public TypeScript API data. Do not duplicate prop tables in MDX while waiting for that generator.
 

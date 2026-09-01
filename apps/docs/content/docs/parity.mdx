@@ -1,23 +1,23 @@
 ---
 title: Parity catalog
-description: A data-driven index of documented Material and Compose contracts, implementation boundaries, and intentional web adaptations.
+description: A data-driven index of Material provenance, fidelity dimensions, adaptations, and known gaps.
 ---
 
 ## What this catalog means
 
-This catalog is generated from the same component metadata used by every guide's parity summary. It is an index of **documented contracts**, not a percentage score and not a claim that every pixel or internal Compose mechanism is reproduced literally on the web.
+This catalog is generated from the same structured provenance model used by component fidelity summaries. It is an index of **documented evidence and fidelity claims**, not a percentage score and not a claim that every pixel or internal Compose mechanism is reproduced literally on the web.
 
 <ParityCatalog />
 
 ## How to read it
 
-Each entry links to its public `m3-ui` guide and, where available, the Material family page or Android Developers Material3 API used as the contract reference.
+Every entry separates provenance into `spec`, `compose`, `web`, and `adaptation` evidence. Material overview, guideline, and specification links are recorded independently when they are available; an Android Developers reference is treated as Compose evidence rather than silently promoted to Material-site guidance.
 
-The Compose mapping names the source API or composition being audited. Implementation describes what `m3-ui` currently owns. Web adaptation records intentional browser differences such as native controls, React Aria interaction semantics, portals, focus behavior, or platform-specific geometry.
+Visual, behavior, and semantics fidelity are independent fields. `aligned`, `adapted`, `partial`, and `not-applicable` are descriptive states, not percentages. Intentional adaptations and known gaps are separate queryable lists rather than being folded into an ambiguous parity sentence.
 
 ## Source-of-truth boundary
 
-This page contains no second component inventory. Adding or changing an entry in `allComponentDocs` updates the catalog automatically, so parity metadata stays centralized instead of drifting between overview pages.
+This page contains no second component inventory. `allComponentDocs` remains the documented component inventory, while `allComponentProvenance` resolves that inventory into the structured fidelity contract consumed by this catalog and the MDX fidelity renderer. Sparse overrides enrich individual entries without copying the full inventory.
 
 Canonical dimensions, typography, color roles, motion values, and component tokens continue to come from the generated token graph and audited component runtime rather than this documentation surface.
 

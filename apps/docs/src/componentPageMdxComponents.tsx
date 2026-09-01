@@ -1,10 +1,12 @@
 import type { MDXComponents } from 'mdx/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Surface, getMaterialTypeCssProperties } from '@m3-ui/ui';
-import { allComponentDocs, type AllComponentDocId } from './allComponentDocs';
+import { allComponentProvenance } from './allComponentProvenance';
+import type { AllComponentDocId } from './allComponentDocs';
+import type { ProvenanceClass } from './provenance';
 import './componentPageMdxComponents.css';
 
-type SourceKind = 'spec' | 'compose' | 'web' | 'adaptation';
+type SourceKind = ProvenanceClass;
 
 type SourceLink = {
   label: string;
@@ -135,18 +137,19 @@ function AnatomyBlock({ items }: { items: readonly AnatomyItem[] }) {
   );
 }
 
-function FidelitySummary({
+export function FidelitySummary({
   component,
-  adaptations = [],
-  knownGaps = [],
+  adaptations: pageAdaptations = [],
+  knownGaps: pageKnownGaps = [],
 }: {
   component: AllComponentDocId;
   adaptations?: readonly string[];
   knownGaps?: readonly string[];
 }) {
-  const metadata = allComponentDocs[component];
-  const referenceUrl =
-    'referenceUrl' in metadata ? metadata.referenceUrl : metadata.materialUrl;
+  const metadata = allComponentProvenance[component];
+  const familyUrl = metadata.material.overview ?? metadata.compose.url;
+  const adaptations = [...metadata.adaptations, ...pageAdaptations];
+  const knownGaps = [...metadata.knownGaps, ...pageKnownGaps];
 
   return (
     <Surface
@@ -159,29 +162,46 @@ function FidelitySummary({
           className="docs-fidelity__eyebrow"
           style={getMaterialTypeCssProperties('labelLarge')}
         >
-          Material fidelity
+          Material provenance and fidelity
         </div>
         <dl className="docs-fidelity__list">
           <FidelityRow label="Family">
-            {referenceUrl ? (
-              <a className="docs-link" href={referenceUrl}>
+            {familyUrl ? (
+              <a className="docs-link" href={familyUrl}>
                 {metadata.family}
               </a>
             ) : (
               metadata.family
             )}
           </FidelityRow>
-          <FidelityRow label="Compose evidence">
-            {metadata.composeMapping.join(' · ')}
+          <FidelityRow label="Provenance">
+            {metadata.evidence.map((source, index) => (
+              <span key={`${source.class}:${source.label}`}>
+                {index > 0 ? ' · ' : null}
+                {source.url ? (
+                  <a className="docs-link" href={source.url}>
+                    {source.class}: {source.label}
+                  </a>
+                ) : (
+                  `${source.class}: ${source.label}`
+                )}
+              </span>
+            ))}
           </FidelityRow>
-          <FidelityRow label="m3-ui implementation">
-            {metadata.implementation}
+          <FidelityRow label="Compose mapping">
+            {metadata.compose.apis.join(' · ')}
           </FidelityRow>
-          <FidelityRow label="Web semantics / adaptation">
-            {metadata.webAdaptation}
+          <FidelityRow label="Visual fidelity">
+            {metadata.fidelity.visual.status}: {metadata.fidelity.visual.summary}
+          </FidelityRow>
+          <FidelityRow label="Behavior fidelity">
+            {metadata.fidelity.behavior.status}: {metadata.fidelity.behavior.summary}
+          </FidelityRow>
+          <FidelityRow label="Semantics fidelity">
+            {metadata.fidelity.semantics.status}: {metadata.fidelity.semantics.summary}
           </FidelityRow>
           {adaptations.length > 0 ? (
-            <FidelityRow label="Page-specific adaptations">
+            <FidelityRow label="Adaptations">
               <CompactList items={adaptations} />
             </FidelityRow>
           ) : null}
