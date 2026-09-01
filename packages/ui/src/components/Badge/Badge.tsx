@@ -4,6 +4,7 @@ import type {
   HTMLAttributes,
   ReactNode,
 } from 'react';
+import '@m3-ui/tokens/badge.css';
 import { getBadgeStyle, getBadgedBoxStyle } from './Badge.defaults';
 import './badge.css';
 
