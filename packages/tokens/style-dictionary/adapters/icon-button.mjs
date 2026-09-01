@@ -48,6 +48,18 @@ export function createIconButtonCss(context) {
   const filled = variant('filled');
   const tonal = variant('filledTonal');
   const outlined = variant('outlined');
+  const standardDisabledPaint = paint(
+    transparent,
+    withOpacity(get(`${standard}.disabledColor`), get(`${standard}.disabledOpacity`)),
+  );
+  const filledDisabledPaint = paint(
+    withOpacity(get(`${filled}.disabledContainerColor`), get(`${filled}.disabledContainerOpacity`)),
+    withOpacity(get(`${filled}.disabledColor`), get(`${filled}.disabledOpacity`)),
+  );
+  const tonalDisabledPaint = paint(
+    withOpacity(get(`${tonal}.disabledContainerColor`), get(`${tonal}.disabledContainerOpacity`)),
+    withOpacity(get(`${tonal}.disabledColor`), get(`${tonal}.disabledOpacity`)),
+  );
 
   return [
     '.icon-button {',
@@ -92,23 +104,17 @@ export function createIconButtonCss(context) {
     ...rule('.icon-button--outlined', paint(transparent, get(`${outlined}.color`), get(`${outlined}.outlineColor`))),
     ...rule('.icon-button--outlined[data-toggle]', paint(transparent, get(`${outlined}.unselectedColor`), get(`${outlined}.unselectedOutlineColor`))),
     ...rule('.icon-button--outlined[data-toggle][data-selected]', paint(get(`${outlined}.selectedContainerColor`), get(`${outlined}.selectedColor`), transparent)),
-    ...rule('.icon-button--standard[data-disabled]', paint(
-      transparent,
-      withOpacity(get(`${standard}.disabledColor`), get(`${standard}.disabledOpacity`)),
-    )),
-    ...rule('.icon-button--filled[data-disabled]', paint(
-      withOpacity(get(`${filled}.disabledContainerColor`), get(`${filled}.disabledContainerOpacity`)),
-      withOpacity(get(`${filled}.disabledColor`), get(`${filled}.disabledOpacity`)),
-    )),
-    ...rule('.icon-button--filled-tonal[data-disabled]', paint(
-      withOpacity(get(`${tonal}.disabledContainerColor`), get(`${tonal}.disabledContainerOpacity`)),
-      withOpacity(get(`${tonal}.disabledColor`), get(`${tonal}.disabledOpacity`)),
-    )),
+    ...rule('.icon-button--standard[data-disabled]', standardDisabledPaint),
+    ...rule('.icon-button--filled[data-disabled]', filledDisabledPaint),
+    ...rule('.icon-button--filled-tonal[data-disabled]', tonalDisabledPaint),
     ...rule('.icon-button--outlined[data-disabled]', paint(
       transparent,
       withOpacity(get(`${outlined}.disabledColor`), get(`${outlined}.disabledOpacity`)),
       get(`${outlined}.disabledOutlineColor`),
     )),
+    ...rule('.icon-button--standard[data-toggle][data-selected][data-disabled]', standardDisabledPaint),
+    ...rule('.icon-button--filled[data-toggle][data-selected][data-disabled]', filledDisabledPaint),
+    ...rule('.icon-button--filled-tonal[data-toggle][data-selected][data-disabled]', tonalDisabledPaint),
     ...rule('.icon-button--outlined[data-toggle][data-selected][data-disabled]', paint(
       withOpacity(
         get(`${outlined}.selectedDisabledContainerColor`),
