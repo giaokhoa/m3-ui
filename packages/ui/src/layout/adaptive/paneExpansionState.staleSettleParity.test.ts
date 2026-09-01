@@ -18,7 +18,7 @@ describe('PaneExpansionState stale settle finalizers', () => {
     const animation: PaneExpansionAnimation = ({ signal }) =>
       new Promise<void>((resolve) => {
         animations.push({ signal, finish: resolve });
-        signal.addEventListener('abort', resolve, { once: true });
+        signal.addEventListener('abort', () => resolve(), { once: true });
       });
     const state = new PaneExpansionState({
       anchors,
