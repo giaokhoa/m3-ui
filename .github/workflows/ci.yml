@@ -139,7 +139,7 @@ jobs:
           trap cleanup EXIT
 
           for _ in {1..90}; do
-            if curl --fail --silent http://127.0.0.1:5173/ >/dev/null \
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null \
               && curl --fail --silent http://127.0.0.1:6006/ >/dev/null; then
               sleep 5
               if grep -Fq 'Failed to resolve entry for package "@m3-ui/ui"' /tmp/m3-ui-dev.log; then

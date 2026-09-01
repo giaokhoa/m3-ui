@@ -13,8 +13,7 @@ m3-ui/
 │   └── ui/           React Material components, theme, internal primitives and layout
 ├── apps/
 │   ├── docs/         Fumadocs-powered public documentation rendered with m3-ui
-│   ├── storybook/    component review and visual-regression surface
-│   └── playground/   small Vite app for manual testing
+│   └── storybook/    component review and visual-regression surface
 ├── .agents/skills/   repository agent operating rules
 └── AGENTS.md         agent skill entrypoints and scope rules
 ```
@@ -95,7 +94,7 @@ pnpm --filter @m3-ui/storybook dev
 pnpm --filter @m3-ui/storybook test:visual
 ```
 
-`pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port `4173`, the playground on `5173`, and Storybook on `6006`.
+`pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port `4173` and Storybook on `6006`.
 
 ## Documentation and visual review
 
