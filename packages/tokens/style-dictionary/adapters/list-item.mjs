@@ -68,9 +68,6 @@ export function createListItemCss(context) {
     line('--_list-item-shape-duration', get('motion.spring.fastSpatial.duration')),
     line('--_list-item-shape-easing', get('motion.spring.fastSpatial.easing')),
     line('--_ripple-color', get(`${base}.itemLabelTextColor`)),
-    line('--_ripple-hover-opacity', get('state.layer.opacity.hover')),
-    line('--_ripple-focus-opacity', get('state.layer.opacity.focus')),
-    line('--_ripple-pressed-opacity', get('state.layer.opacity.pressed')),
     '}',
     ...rule(".list-item[data-lines='1']", [
       line('--_list-item-min-height', get(`${base}.itemOneLineContainerHeight`)),
