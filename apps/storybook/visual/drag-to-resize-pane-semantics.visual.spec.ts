@@ -21,16 +21,14 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
   });
 
   const pane = page.getByRole('region', { name: 'Tertiary pane' });
-  const resizeAction = page.getByRole('button', { name: 'Resize pane' });
+  const resizeAction = pane.locator('.three-pane-scaffold__levitated-resize-action');
   const innerAction = page.getByTestId('inner-action');
 
   await expect(pane).toBeVisible({ timeout: 15_000 });
   await expect(pane).toHaveAttribute('data-resize-state', 'default');
   await expect(resizeAction).toHaveAttribute('data-resize-state', 'default');
-  await expect(resizeAction).toHaveAttribute(
-    'aria-description',
-    'partially expanded. expand',
-  );
+  await expect(resizeAction).toHaveAttribute('aria-label', 'expand');
+  await expect(resizeAction).toHaveAttribute('aria-description', 'partially expanded');
 
   // Pointer and keyboard activation owned by pane contents must not bubble
   // into the whole-pane resize gesture/click target.
@@ -47,17 +45,18 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
   await expect(resizeAction).toHaveCSS('pointer-events', 'none');
   await page.keyboard.press('Enter');
   await expect(pane).toHaveAttribute('data-resize-state', 'expanded');
-  await expect(resizeAction).toHaveAttribute('aria-description', 'expanded. collapse');
+  await expect(resizeAction).toHaveAttribute('aria-label', 'collapse');
+  await expect(resizeAction).toHaveAttribute('aria-description', 'expanded');
 
   await resizeAction.dispatchEvent('click');
   await expect(pane).toHaveAttribute('data-resize-state', 'collapsed');
-  await expect(resizeAction).toHaveAttribute(
-    'aria-description',
-    'collapsed. partially expand',
-  );
+  await expect(resizeAction).toHaveAttribute('aria-label', 'partially expand');
+  await expect(resizeAction).toHaveAttribute('aria-description', 'collapsed');
 
   // A pointer click on non-interactive pane content keeps AndroidX whole-pane
   // click-to-resize behavior.
   await pane.click({ position: { x: 8, y: 8 } });
   await expect(pane).toHaveAttribute('data-resize-state', 'default');
+  await expect(resizeAction).toHaveAttribute('aria-label', 'expand');
+  await expect(resizeAction).toHaveAttribute('aria-description', 'partially expanded');
 });

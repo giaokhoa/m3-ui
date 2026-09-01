@@ -11,11 +11,29 @@ async function openStory(page: Page) {
 }
 
 async function expansionPercent(page: Page) {
-  const value = await page
-    .locator('.three-pane-scaffold__drag-handle')
-    .getAttribute('aria-valuenow');
-  if (value == null) throw new Error('Pane expansion handle has no aria-valuenow');
-  return Number(value);
+  const scaffold = page.locator('#storybook-root .three-pane-scaffold');
+  const handle = page.locator('#storybook-root .three-pane-scaffold__drag-handle');
+  const [scaffoldBox, handleBox] = await Promise.all([
+    scaffold.boundingBox(),
+    handle.boundingBox(),
+  ]);
+  if (!scaffoldBox || !handleBox) {
+    throw new Error('Pane expansion scaffold or drag handle has no visual bounds');
+  }
+  return ((handleBox.x + handleBox.width / 2 - scaffoldBox.x) / scaffoldBox.width) * 100;
+}
+
+async function dragHandleBy(page: Page, deltaX: number) {
+  const handle = page.locator('#storybook-root .three-pane-scaffold__drag-handle');
+  const handleBox = await handle.boundingBox();
+  if (!handleBox) throw new Error('Pane expansion drag handle has no visual bounds');
+
+  const centerX = handleBox.x + handleBox.width / 2;
+  const centerY = handleBox.y + handleBox.height / 2;
+  await page.mouse.move(centerX, centerY);
+  await page.mouse.down();
+  await page.mouse.move(centerX + deltaX, centerY, { steps: 4 });
+  await page.mouse.up();
 }
 
 test.describe('Material 3 default PaneExpansionState keying', () => {
@@ -30,12 +48,9 @@ test.describe('Material 3 default PaneExpansionState keying', () => {
     await expect(handle).toBeVisible();
     const primarySecondaryInitial = await expansionPercent(page);
 
-    await handle.focus();
-    for (let index = 0; index < 5; index += 1) {
-      await page.keyboard.press('ArrowRight');
-    }
+    await dragHandleBy(page, 80);
+    await expect.poll(() => expansionPercent(page)).toBeGreaterThan(primarySecondaryInitial + 5);
     const primarySecondaryAdjusted = await expansionPercent(page);
-    expect(primarySecondaryAdjusted).toBeGreaterThan(primarySecondaryInitial);
 
     await primaryTertiary.click();
     await expect(root.locator('[data-pane-role="secondary"]')).toHaveAttribute(
@@ -47,23 +62,20 @@ test.describe('Material 3 default PaneExpansionState keying', () => {
       'expanded',
     );
     const primaryTertiaryInitial = await expansionPercent(page);
-    expect(primaryTertiaryInitial).not.toBe(primarySecondaryAdjusted);
+    expect(Math.abs(primaryTertiaryInitial - primarySecondaryAdjusted)).toBeGreaterThan(5);
 
-    await handle.focus();
-    for (let index = 0; index < 4; index += 1) {
-      await page.keyboard.press('ArrowLeft');
-    }
+    await dragHandleBy(page, -80);
+    await expect.poll(() => expansionPercent(page)).toBeLessThan(primaryTertiaryInitial - 5);
     const primaryTertiaryAdjusted = await expansionPercent(page);
-    expect(primaryTertiaryAdjusted).toBeLessThan(primaryTertiaryInitial);
 
     await primarySecondary.click();
     await expect(root.locator('[data-pane-role="secondary"]')).toHaveAttribute(
       'data-pane-adapted-value',
       'expanded',
     );
-    expect(await expansionPercent(page)).toBe(primarySecondaryAdjusted);
+    await expect.poll(() => expansionPercent(page)).toBeCloseTo(primarySecondaryAdjusted, 1);
 
     await primaryTertiary.click();
-    expect(await expansionPercent(page)).toBe(primaryTertiaryAdjusted);
+    await expect.poll(() => expansionPercent(page)).toBeCloseTo(primaryTertiaryAdjusted, 1);
   });
 });
