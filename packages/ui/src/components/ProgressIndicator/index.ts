@@ -1,3 +1,5 @@
+import '@m3-ui/tokens/progress-indicator.css';
+
 export {
   CircularProgressIndicator,
   LinearProgressIndicator,
