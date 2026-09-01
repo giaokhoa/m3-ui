@@ -1,13 +1,11 @@
 ---
 title: Switch
-description: Material 3 switch states with accessible on/off semantics and optional thumb content.
+description: Material 3 switch guidance with immediate on/off semantics, optional thumb content, focus treatment, and form behavior.
 ---
 
-<MaterialParity component="switch" />
+Switches represent an immediate on/off setting. Activating the control changes the setting directly; use a checkbox instead when the user is selecting options to submit or confirm later.
 
-## Usage
-
-Switches represent an immediate on/off setting. The public component uses React Aria switch semantics and the audited Material track, thumb, state-layer, and minimum-interaction geometry.
+[Material 3 switch](https://m3.material.io/components/switch/overview)
 
 <ComponentPreview>
   <SwitchPreview />
@@ -19,9 +17,13 @@ import { Switch } from '@m3-ui/ui';
 <Switch defaultSelected>Notifications</Switch>
 ```
 
+## When to use
+
+Use a switch for settings whose result takes effect as soon as the state changes, such as enabling automatic updates. Use checkboxes for independent form choices and toggle buttons for persistent button-like modes/actions.
+
 ## Selection state
 
-`Switch` inherits controlled and uncontrolled selection props from React Aria. Use the selected state as the source of truth instead of styling the track or thumb directly.
+`Switch` inherits controlled and uncontrolled React Aria selection props. Application state is the source of truth; do not style the track or thumb directly to simulate selection.
 
 ```tsx
 <Switch isSelected={enabled} onChange={setEnabled}>
@@ -31,7 +33,7 @@ import { Switch } from '@m3-ui/ui';
 
 ## Thumb content
 
-`thumbContent` renders content inside the Material thumb. The implementation maps the Compose icon-sized thumb-content slot into React content while keeping the switch itself as the only semantic control.
+`thumbContent` renders decorative/supporting content inside the Material thumb while the switch remains the only semantic control.
 
 ```tsx
 <Switch thumbContent={<CheckIcon />} defaultSelected>
@@ -39,14 +41,32 @@ import { Switch } from '@m3-ui/ui';
 </Switch>
 ```
 
-Decorative thumb content should not become a second interactive element.
+Do not place a second interactive control inside the thumb.
 
-## Focus treatment
+## Behavior and states
 
-Switch participates in the global `ThemeProvider` ripple focus configuration. The default `opacity` treatment applies the focus state layer at the thumb; `inset-ring` moves the visible focus treatment to the track mapping implemented by the shared ripple engine.
+React Aria supplies switch semantics, keyboard/pointer behavior, disabled state, form participation, and controlled/uncontrolled selection. Material tokens own track/thumb geometry, color, ripple/state layers, and minimum interaction size.
 
-The focus strategy changes Material presentation, not keyboard semantics or the underlying accessible switch state.
+The global `ThemeProvider` ripple-focus configuration can change the visual focus treatment without changing the underlying switch semantics.
 
-## Disabled state and labeling
+## Accessibility
 
-Use `isDisabled` for unavailable settings. Visible children act as the switch label; control-only usage needs an accessible name through the inherited React Aria props.
+Visible children should identify the setting. A control-only switch needs an explicit accessible name. Keep the label stable as state changes; the switch role communicates on/off state.
+
+Do not rely only on thumb color or icon to communicate state. Disabled switches should be used only when the setting is genuinely unavailable.
+
+## API reference
+
+<ApiReference name="Switch" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="switch" />
+
+Material provides the on/off visual contract and state treatment. React Aria supplies the browser switch role, accessible selected state, keyboard behavior, and form semantics.
+
+## Related components
+
+- [Checkbox](/docs/components/checkbox) — independent choices.
+- [Toggle button](/docs/components/toggle-button) — button-like persistent selection.
+- [Forms and validation](/docs/forms) — native form composition.

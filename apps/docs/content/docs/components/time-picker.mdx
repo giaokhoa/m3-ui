@@ -1,53 +1,81 @@
 ---
 title: Time pickers
-description: Material dial and keyboard time input with shared 24-hour state, 12/24-hour presentation, and component-local orientation switching.
+description: Material dial and keyboard time input with shared 24-hour state, 12/24-hour presentation, accessibility, and component-local orientation switching.
 ---
 
-<MaterialParity component="time-picker" />
+Time pickers let users choose a time of day with a Material clock dial or keyboard-friendly numeric input. `TimePicker` and `TimeInput` share the same normalized `TimeOfDay` state so applications can switch presentation without translating values.
 
-## Overview
-
-`TimePicker` renders the Material clock-dial interaction, while `TimeInput` renders keyboard-friendly hour and minute fields. Both consume the same `TimeOfDay` value shape, so an application can let people switch between dial and text entry without translating state.
-
-## Live example
+[Material 3 time pickers](https://m3.material.io/components/time-pickers/overview)
 
 <ComponentPreview>
   <TimePickerPreview />
 </ComponentPreview>
 
-## Shared time state
-
-`TimeOfDay` always stores a normalized 24-hour value:
-
 ```tsx
+import { TimeInput, TimePicker, type TimeOfDay } from '@m3-ui/ui';
+
 const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
 
 <TimePicker value={time} onChange={setTime} />
 <TimeInput value={time} onChange={setTime} />
 ```
 
-`hour` must be `0..23` and `minute` must be `0..59`. `normalizeTime`, `hour12`, `periodForHour`, and `withPeriod` expose the same normalization rules for application code.
+## When to use
 
-## Dial semantics
+Use the dial when spatial clock selection supports the task and `TimeInput` when direct keyboard entry is more efficient. Both represent a time of day, not a timezone-aware instant or scheduling object.
 
-The clock face exposes slider semantics for the active hour or minute selection. Arrow keys adjust the active value, while Enter or Space switches between hour and minute selection. In 12-hour mode, AM/PM uses radio-group semantics rather than an unrelated toggle abstraction.
+## Shared time state
 
-Pointer interaction maps position on the clock face to the selected hour or minute. After an hour pointer selection completes, the picker advances to minute selection.
+`TimeOfDay` always stores normalized 24-hour values: `hour` is `0..23` and `minute` is `0..59`. Twelve-hour presentation changes what users see and how AM/PM is selected; it does not change the application state model.
+
+Public normalization helpers expose the same conversion rules for application code instead of requiring duplicate 12/24-hour logic.
+
+## Dial behavior
+
+The active clock face uses slider-style semantics for hour or minute selection. Arrow keys adjust the active value; Enter/Space can advance the active selection according to the public interaction model. Pointer position maps to the corresponding hour/minute.
+
+In 12-hour mode, AM/PM is a mutually exclusive radio-group choice rather than a generic toggle. After an hour pointer selection completes, the picker advances to minute selection.
 
 ## Keyboard input
 
-`TimeInput` uses real numeric text inputs with explicit `Hour` and `Minute` accessible names. Values are validated against 12-hour or 24-hour limits, and invalid drafts expose `aria-invalid`. Entering a complete two-digit hour advances focus to the minute field.
+`TimeInput` uses real numeric text-input fields with explicit hour/minute accessible names. Draft values are validated against the current 12- or 24-hour presentation, and invalid drafts expose semantic invalid state.
+
+The input experience may move focus from a completed hour field to minutes; that is component-local form behavior, not global keyboard navigation policy.
 
 ## 12-hour and 24-hour presentation
 
-Set `is24Hour` to expose `00..23` hour selection and remove the AM/PM radio group. Without it, the UI presents 12-hour values while the application state remains normalized to `0..23`.
+Set `is24Hour` for `00..23` presentation and no AM/PM group. Without it, users interact with 12-hour values and AM/PM while the public value remains normalized to `0..23`.
+
+Do not store “2 PM” as a separate presentation-specific state shape when the component already provides the normalized model.
 
 ## Layout is component-local
 
-`layout` accepts `vertical`, `horizontal`, or `auto`. `auto` observes the picker's immediate container and switches orientation when that local space crosses the audited TimePicker threshold.
+`layout` accepts `vertical`, `horizontal`, or `auto`. `auto` observes the picker's **immediate container** and switches orientation at the audited picker threshold.
 
-This is **not** a Material adaptive window-size class and does not participate in pane directives, navigation switching, or `@m3-ui/ui/layout`. Applications can also force either orientation explicitly.
+This is not Material window-size classification, does not consume `WindowAdaptiveInfo`, and does not participate in pane or navigation adaptation. Applications may force either orientation explicitly.
 
 ## Visual variants
 
-`variant="standard"` uses the baseline picker shape family. `variant="vibrant"` exposes the audited expressive shape treatment while preserving the same value and accessibility semantics. The variant changes presentation, not the time-state contract.
+`variant="standard"` uses the baseline picker family. `variant="vibrant"` exposes the audited expressive visual treatment while preserving the same time value and accessibility semantics.
+
+## Accessibility
+
+Keep hour/minute fields clearly named and preserve the radio semantics of AM/PM in 12-hour mode. Do not add custom arrow-key handlers around the clock face that compete with the slider interaction contract.
+
+Validation feedback should be textual when users need to understand an invalid time; color or shape state alone is not sufficient.
+
+## API reference
+
+<ApiReference name="TimePicker" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="time-picker" />
+
+Material supplies dial/input hierarchy, 12/24-hour presentation, shape, color, and picker interaction intent. Normalized React state, numeric input fields, slider/radio accessibility semantics, and local ResizeObserver-style orientation behavior are web adaptations—not adaptive window policy.
+
+## Related components
+
+- [Date pickers](/docs/components/date-picker) — calendar-date selection.
+- [Text field](/docs/components/text-field) — general typed input.
+- [Adaptive layout](/docs/layout) — window-level adaptation, distinct from TimePicker's local `layout="auto"`.

@@ -1,0 +1,97 @@
+---
+title: Navigation bars
+description: Material navigation bar and short navigation bar surfaces with explicit destination selection, link/button web semantics, and no embedded adaptive switching policy.
+---
+
+Navigation bars provide persistent access to a small set of top-level destinations along the bottom edge of a screen. `m3-ui` exports both the baseline `NavigationBar` family and the expressive `ShortNavigationBar` family.
+
+[Material 3 navigation bar](https://m3.material.io/components/navigation-bar/overview)
+
+```tsx
+import {
+  NavigationBar,
+  NavigationBarItem,
+  ShortNavigationBar,
+  ShortNavigationBarItem,
+} from '@m3-ui/ui';
+```
+
+## When to use
+
+Use a navigation bar when a small set of primary destinations should remain visible in a horizontal bottom navigation surface. Use a rail or drawer when that Material surface better fits the screen composition.
+
+Do not add component-level breakpoints that automatically swap the bar for a rail/drawer. Cross-surface selection belongs to `NavigationSuiteScaffold` and the [Adaptive layout guide](/docs/layout).
+
+## Baseline navigation bar
+
+`NavigationBar` is a semantic `nav` containing a tab-like destination collection. `NavigationBarItem` receives explicit `selected` state plus icon/label content.
+
+```tsx
+<NavigationBar aria-label="Primary navigation">
+  <NavigationBarItem
+    selected={destination === 'home'}
+    icon={<HomeIcon />}
+    label="Home"
+    onPress={() => setDestination('home')}
+  />
+  <NavigationBarItem
+    selected={destination === 'search'}
+    icon={<SearchIcon />}
+    label="Search"
+    onPress={() => setDestination('search')}
+  />
+</NavigationBar>
+```
+
+Selection is application state. The component does not own routes, URLs, browser history, or page content.
+
+## Short navigation bar
+
+`ShortNavigationBar` exposes the audited expressive short-bar family. Its local presentation can use `arrangement="equal-weight"` or `"centered"`; items support top/start icon placement according to the public API.
+
+Unlike the baseline item, `ShortNavigationBarItem` can directly render link behavior when `href` is supplied, or button-style selection when `onPress` is used.
+
+```tsx
+<ShortNavigationBar aria-label="Primary navigation" arrangement="equal-weight">
+  <ShortNavigationBarItem
+    isSelected={pathname === '/home'}
+    href="/home"
+    icon={<HomeIcon />}
+    label="Home"
+  />
+  <ShortNavigationBarItem
+    isSelected={pathname === '/search'}
+    href="/search"
+    icon={<SearchIcon />}
+    label="Search"
+  />
+</ShortNavigationBar>
+```
+
+Use real links when destinations map to navigable URLs so open-in-new-tab, copy-link, history, and other browser behavior remains available.
+
+## Anatomy and state
+
+The Material surface owns container, selected indicator, icon/label geometry, state layers, ripple, typography, and safe-area presentation where documented. The application owns which destination is current and how destination activation changes application state.
+
+`alwaysShowLabel` on baseline items and short-bar icon placement/arrangement affect presentation only; they do not change route ownership.
+
+## Accessibility and keyboard behavior
+
+Both bars render a named navigation landmark. Give the bar a useful `aria-label` when more than one navigation landmark exists.
+
+Baseline navigation items expose selected tab-style destination state on real React Aria buttons. Short navigation items preserve real link semantics when `href` is provided and button semantics otherwise. Every icon-only destination still needs a meaningful accessible name; visible labels are preferred for primary navigation clarity.
+
+Do not implement a second custom arrow-key or focus model that conflicts with the public item semantics. Route focus management after navigation remains an application/router concern.
+
+## Fidelity, adaptations, and known boundaries
+
+Material supplies the bar hierarchy, destination indicator, labels/icons, state treatment, safe-area geometry, and expressive short-bar variants. Browser button/link behavior and explicit route state are web adaptations.
+
+The component pages intentionally contain **no numeric breakpoint or automatic bar-to-rail/drawer policy**. Use [Adaptive layout and navigation](/docs/layout) for the library's canonical cross-surface policy.
+
+## Related components
+
+- [Navigation rail](/docs/components/navigation-rail) — vertical primary navigation.
+- [Wide navigation rail](/docs/components/wide-navigation-rail) — collapsible/expanded expressive rail family.
+- [Navigation drawer](/docs/components/navigation-drawer) — permanent, dismissible, or modal drawer surfaces.

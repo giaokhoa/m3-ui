@@ -1,27 +1,24 @@
 ---
 title: Search bar
-description: Material search input and docked or full-screen search surfaces with explicit shared state and browser-native search semantics.
+description: Material 3 search input and docked/full-screen result surfaces with explicit shared state, browser search semantics, and application-owned data.
 ---
 
-<MaterialParity component="search-bar" />
+Search bars give users a prominent entry point for finding content. Material 3 defines the search surface and its collapsed/expanded presentation; the application still owns indexing, ranking, requests, result content, and navigation.
 
-## Overview
-
-`SearchBar` is the collapsed Material search surface. Pair it with `SearchBarInput` and either `ExpandedDockedSearchBar` or `ExpandedFullScreenSearchBar`, all sharing the same `SearchBarState` from `useSearchBarState()`.
-
-The component owns Material presentation and expansion behavior. It does **not** own indexing, ranking, network requests, or application navigation.
-
-## Live example
+[Material 3 search](https://m3.material.io/components/search/overview)
 
 <ComponentPreview>
   <SearchBarPreview />
 </ComponentPreview>
 
-Focus the field to expand the docked search view. The preview results are static application content; the public docs search itself uses Fumadocs' full-text index outside this component.
-
-## Composition
-
 ```tsx
+import {
+  ExpandedDockedSearchBar,
+  SearchBar,
+  SearchBarInput,
+  useSearchBarState,
+} from '@m3-ui/ui';
+
 const state = useSearchBarState();
 
 <SearchBar state={state}>
@@ -38,16 +35,60 @@ const state = useSearchBarState();
 </ExpandedDockedSearchBar>
 ```
 
-Use `ExpandedFullScreenSearchBar` when the result surface should be modal. Use the docked form when results should stay bounded near the input.
+## When to use
 
-## Input semantics
+Use a search bar when search is an important destination-level task and users benefit from a persistent or prominent search entry point. Use a normal text field for ordinary form filtering where the Material search surface and expanded result behavior are unnecessary.
 
-`SearchBarInput` renders a native `form` with `role="search"` and a search input. Submitting the form calls `onSearch`, while `onValueChange` handles text changes. `clearable` adds an explicit clear action and returns focus to the input.
+Choose docked or full-screen expanded presentation from the product context. `SearchBar` does not infer a window breakpoint or navigation policy by itself.
 
-The full-screen surface uses React Aria modal/dialog behavior for focus management, outside dismissal, and Escape. The docked surface remains non-modal and closes on outside pointer interaction or Escape.
+## Shared search state
 
-## Data boundary
+`SearchBar`, `SearchBarInput`, and an expanded search surface share one `SearchBarState` from `useSearchBarState()`. That keeps expansion/collapse behavior explicit instead of hiding application state in several disconnected components.
 
-Search data is deliberately application-owned. In this documentation app, Fumadocs builds a static full-text ZBSearch index and feeds results into the Material search surface. A product can replace that backend without changing `SearchBar`.
+The state controls the Material search-surface lifecycle; it does not own the search backend or result model.
 
-No adaptive breakpoint or pane rule lives in the search component; choosing docked versus full-screen presentation is a composition decision.
+## Docked and full-screen results
+
+`ExpandedDockedSearchBar` keeps results near the input and remains non-modal. It can dismiss on outside pointer interaction or Escape according to the public behavior.
+
+`ExpandedFullScreenSearchBar` owns the browser modal/dialog focus scope and dismissal behavior appropriate to the full-screen surface. Treat that modal behavior as a web interaction adaptation layered onto the Material presentation, not as a claim that every visual search expansion is a browser dialog.
+
+## Input and submission semantics
+
+`SearchBarInput` uses a native search form/search input boundary. `onValueChange` handles editing, while submit calls `onSearch`. A clear action can clear the current value and return focus to the input.
+
+Keep the user's query in application or shared search state as appropriate. Network requests, debouncing, caching, ranking, and route changes remain outside the component.
+
+## Search data boundary
+
+A product can connect the Material surface to a local static index, remote service, in-memory filter, or another search backend without changing the component contract.
+
+The docs application uses Fumadocs search data as one consumer example; that backend is not part of `SearchBar` and should not be described as a component requirement.
+
+## Behavior and states
+
+React/browser semantics own form submission, text editing, focus, and modal/docked dismissal behavior. Material tokens own the search container, expanded surface, state layers, typography, icon/action slots, and visual motion.
+
+Full-screen modal state should restore or preserve focus according to the public overlay contract. Docked dismissal should not masquerade as modal focus trapping.
+
+## Accessibility
+
+Give the search input a meaningful visible or accessible label. Result content needs its own semantics; the search bar does not automatically announce arbitrary network/result changes.
+
+If an application announces result counts or asynchronous status, use an appropriate status/live-region pattern and avoid repeatedly interrupting users on every keystroke. In full-screen mode, keep dialog naming/focus behavior consistent with the public modal surface.
+
+## API reference
+
+<ApiReference name="SearchBar" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="search-bar" />
+
+Material provides the search-surface hierarchy, anatomy, and docked/full-screen presentation intent. Native search form semantics, browser focus, outside dismissal, and full-screen dialog behavior are web adaptations. Search data/indexing/navigation remain application-owned.
+
+## Related components
+
+- [Text field](/docs/components/text-field) — general text entry.
+- [Dialog](/docs/components/dialog) — general modal surface semantics.
+- [Adaptive layout](/docs/layout) — application/window layout policy, separate from search-surface presentation.

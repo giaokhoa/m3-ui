@@ -44,6 +44,7 @@ import {
   DynamicColorPreview,
   TypeScaleSamples,
 } from './foundationDemos';
+import { LiveExample } from './liveExample';
 import { MaterialSpecTable } from './materialSpecTable';
 import {
   CheckboxPreview,
@@ -271,6 +272,7 @@ export const materialMdxComponents = {
   th: TableHeader,
   td: TableCell,
   ComponentPreview,
+  LiveExample,
   MaterialParity,
   ParitySummary: MaterialParity,
   ApiReference,

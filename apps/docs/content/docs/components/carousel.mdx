@@ -1,37 +1,20 @@
 ---
 title: Carousels
-description: Material multi-browse, uncontained, and centered-hero carousels with explicit state, focal geometry, keyboard navigation, and reduced-motion behavior.
+description: Material multi-browse, uncontained, and centered-hero carousels with shared state, focal geometry, local viewport measurement, and accessible navigation.
 ---
 
-<MaterialParity component="carousel" />
+Carousels present horizontally browsable content using Material keyline and focal-item geometry. The three public arrangements share one state/item contract while preserving different browsing behavior.
 
-## Overview
-
-The public carousel family contains three horizontal Material arrangements:
-
-- `HorizontalMultiBrowseCarousel` for browsing several differently masked items at once.
-- `HorizontalUncontainedCarousel` for a continuous row of fixed-width items.
-- `HorizontalCenteredHeroCarousel` for a dominant centered item with supporting neighbors.
-
-All three share the same carousel state and item-render contract. The component owns Material keyline geometry and scrolling behavior; application content remains normal React content.
-
-## Live example
+[Material 3 carousels](https://m3.material.io/components/carousel/overview)
 
 <ComponentPreview>
   <CarouselPreview />
 </ComponentPreview>
 
-Drag horizontally, use the keyboard arrow keys, or focus the carousel viewport and press Home or End.
-
-## State
-
-Use `useCarouselState` when application code needs the current item or imperative navigation:
-
 ```tsx
-const state = useCarouselState({
-  itemCount: 8,
-  defaultCurrentItem: 1,
-});
+import { HorizontalMultiBrowseCarousel, useCarouselState } from '@m3-ui/ui';
+
+const state = useCarouselState({ itemCount: albums.length, defaultCurrentItem: 0 });
 
 <HorizontalMultiBrowseCarousel
   aria-label="Featured albums"
@@ -42,26 +25,43 @@ const state = useCarouselState({
 </HorizontalMultiBrowseCarousel>
 ```
 
-`scrollToItem()` moves immediately and `animateScrollToItem()` requests smooth scrolling. Smooth movement resolves to immediate scrolling when the user prefers reduced motion.
+## When to use
 
-The convenience `currentItem`, `defaultCurrentItem`, and `onCurrentItemChange` props expose the same controlled/uncontrolled state model without creating a state object explicitly.
+Use `HorizontalMultiBrowseCarousel` to expose several differently masked items, `HorizontalUncontainedCarousel` for a continuous fixed-width row, and `HorizontalCenteredHeroCarousel` when one centered item should dominate. Prefer ordinary lists/grids when horizontal focal browsing does not add value.
+
+## State and navigation
+
+`useCarouselState` exposes current-item state plus immediate/animated item navigation. Controlled `currentItem` props expose the same state model without requiring the state object. Reduced-motion preference converts smooth movement to an immediate result while preserving the selected/current item.
 
 ## Item geometry
 
-A render function receives `index`, the current masked `size`, `minSize`, `maxSize`, and `isFocal`. These values describe the Material carousel geometry for that item; they are useful for content that needs to react to focal size without duplicating the keyline algorithm.
+The render callback exposes the current masked size and focal status so child content can react to the actual Material geometry without reimplementing the keyline algorithm.
 
-`preferredItemWidth`, `itemWidth`, `maxItemWidth`, spacing, and content padding configure the appropriate Material variant. The carousel measures its own viewport with `ResizeObserver` and recalculates local keyline geometry when that viewport changes.
+The carousel measures **its own viewport** and recalculates local geometry when that viewport changes. This is component-local layout; it does not define compact/medium/expanded window classes or participate in adaptive pane/navigation policy.
 
-That measurement is component-local. It does not define compact/medium/expanded window classes and is unrelated to `@m3-ui/ui/layout` pane behavior.
+## Interaction and snapping
 
-## Browser interaction and accessibility
+The named carousel region supports native horizontal scroll/pointer drag plus keyboard Left/Right, Home, and End behavior with RTL-aware logical direction. Multi-browse and centered-hero variants settle to their focal item; uncontained intentionally preserves continuous-row behavior.
 
-The outer component is a named `region` with `aria-roledescription="carousel"`. Provide `aria-label` or `aria-labelledby` so the region has a useful name.
+`userScrollEnabled={false}` disables user scrolling while keeping the programmatic state/navigation contract.
 
-The focusable viewport supports Left/Right arrows with RTL-aware logical direction plus Home and End. Pointer dragging and native horizontal scrolling update the same current-item state.
+## Accessibility
 
-Set `userScrollEnabled={false}` when an application needs a programmatically controlled presentation; the viewport remains visually clipped instead of accepting user scroll gestures.
+Provide `aria-label` or `aria-labelledby` so the carousel region has a useful name. Keep item content semantically normal React content; do not flatten links/buttons inside cards into one fake carousel control.
 
-## Snapping
+Keyboard navigation should update the same current-item state as pointer/native scrolling, and reduced-motion should change animation rather than navigation outcome.
 
-Multi-browse and centered-hero variants settle to the Material focal item after interaction. The uncontained variant intentionally preserves its continuous row behavior instead of forcing the same focal snapping rule onto every carousel family.
+## API reference
+
+<ApiReference name="HorizontalMultiBrowseCarousel" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="carousel" />
+
+Material supplies carousel families, focal/keyline geometry, masking, spacing, and settling intent. Native scrolling, keyboard region behavior, RTL normalization, and `ResizeObserver` viewport measurement are web implementations of that local component behavior—not application adaptive layout.
+
+## Related components
+
+- [Card](/docs/components/card) — common carousel item surface.
+- [Adaptive layout](/docs/layout) — window-level layout policy, separate from carousel viewport measurement.

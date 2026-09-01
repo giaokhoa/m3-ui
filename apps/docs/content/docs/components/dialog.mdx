@@ -1,13 +1,11 @@
 ---
 title: Dialog
-description: Material 3 dialog surface, scrim, content hierarchy, actions, and browser modal semantics.
+description: Material 3 dialog surface, content hierarchy, actions, scrim, dismissal, and browser modal semantics.
 ---
 
-<MaterialParity component="dialog" />
+Dialogs interrupt the current flow to present focused information or request a decision. Use them for short, high-priority interactions that benefit from modal attention rather than as general page containers.
 
-## Overview
-
-Dialogs interrupt the current flow to present focused information or request a decision. Use them for short, high-priority interactions that benefit from modal attention rather than as a general-purpose page container.
+[Material 3 dialogs](https://m3.material.io/components/dialogs/overview)
 
 <ComponentPreview>
   <DialogTrigger>
@@ -15,9 +13,7 @@ Dialogs interrupt the current flow to present focused information or request a d
     <DialogOverlay>
       <Dialog>
         <DialogTitle>Delete item?</DialogTitle>
-        <DialogDescription>
-          This action cannot be undone.
-        </DialogDescription>
+        <DialogDescription>This action cannot be undone.</DialogDescription>
         <DialogActions>
           <DialogCloseAction>Cancel</DialogCloseAction>
           <DialogCloseAction>Delete</DialogCloseAction>
@@ -27,25 +23,22 @@ Dialogs interrupt the current flow to present focused information or request a d
   </DialogTrigger>
 </ComponentPreview>
 
+## When to use
+
+Use a dialog when users must focus on a concise decision, confirmation, or short task before returning to the underlying flow. Prefer inline content, sheets, or full pages for longer tasks that do not need modal interruption.
+
 ## Composition
 
-The React API is intentionally decomposed so Material presentation and browser modal behavior remain explicit.
+The public primitives keep Material presentation and browser modal responsibilities explicit:
 
-| Primitive | Responsibility |
-| --- | --- |
-| `DialogTrigger` | Trigger state and focus restoration |
-| `DialogOverlay` | Modal underlay, Material scrim, dismissal, and portal placement |
-| `Dialog` | Material container surface and dialog semantics |
-| `DialogIcon` | Optional leading dialog icon region |
-| `DialogTitle` | Accessible headline |
-| `DialogDescription` | Supporting text associated with the dialog |
-| `DialogActions` | Material action row |
-| `DialogAction` | Material text action without implicit close behavior |
-| `DialogCloseAction` | Material text action wired to React Aria's close slot |
+- `DialogTrigger` owns trigger/open state and focus restoration;
+- `DialogOverlay` owns portal placement, modal underlay, Material scrim, outside/Escape dismissal policy, and browser focus containment;
+- `Dialog` owns the Material container and dialog semantics;
+- title/description/icon/action primitives compose the Material content hierarchy.
 
 ## Actions
 
-Keep the action set concise and directly related to the decision in the dialog. `DialogAction` reuses the Material text-button interaction engine with dialog action token roles. `DialogCloseAction` adds the close behavior without duplicating modal state.
+Keep action sets concise and directly related to the dialog decision. `DialogAction` performs an action without implicit close behavior; `DialogCloseAction` uses the close slot when activation should dismiss the dialog.
 
 ```tsx
 <DialogActions>
@@ -54,18 +47,29 @@ Keep the action set concise and directly related to the decision in the dialog. 
 </DialogActions>
 ```
 
-## Dismissal
+## Dismissal and modal behavior
 
-`DialogOverlay` is dismissable by default. React Aria owns outside dismissal and Escape behavior. Set `isDismissable={false}` only when the interaction genuinely must block dismissal and provide an explicit action path.
+`DialogOverlay` is dismissable by default. React Aria owns Escape/outside dismissal, modal focus containment, scroll interaction policy, and focus restoration. Set non-dismissable behavior only when the task genuinely requires an explicit action path.
 
-## Theme portals
-
-Dialogs render through the theme-aware portal container created by `ThemeProvider`. This keeps Material color variables and theme state available even though the modal is portaled outside the local DOM subtree.
+The Material scrim is presentation inside the overlay contract. It is not a second modal/focus manager.
 
 ## Accessibility
 
-React Aria owns modal focus containment, accessible dialog relationships, focus restoration, Escape handling, and portal behavior. Use `DialogTitle` and `DialogDescription` so the modal has a clear accessible name and supporting description.
+Use `DialogTitle` and, when useful, `DialogDescription` so the dialog has a clear accessible name and supporting relationship. Keep focusable content purposeful and ensure a non-dismissable dialog always offers a reachable way to complete or cancel the task.
 
-## Web adaptation
+Do not manually add a second focus trap or Escape handler around `DialogOverlay`; competing modal managers can break restoration and keyboard interaction.
 
-The web implementation does not recreate Compose dialog runtime mechanics. The Material surface, scrim, typography, colors, shape, and action styling are layered on React Aria's browser modal model. The underlay remains the single interactive backdrop while the Material scrim is presentation-only.
+## API reference
+
+<ApiReference name="Dialog" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="dialog" />
+
+Material supplies surface, scrim, typography, hierarchy, shape, and action presentation. React Aria's modal/dialog/portal model supplies browser focus containment, dismissal, and restoration rather than mechanically recreating Compose runtime behavior.
+
+## Related components
+
+- [Bottom sheets](/docs/components/bottom-sheet) — modal or non-modal bottom-anchored surfaces.
+- [Scrim](/docs/components/scrim) — lower-level obscuring/dismiss layer without modal lifecycle ownership.

@@ -1,51 +1,40 @@
 ---
 title: Floating toolbar
-description: Horizontal and vertical Material 3 Expressive floating toolbars with standard/vibrant color roles, optional FAB composition, and explicit expanded/exit state.
+description: Horizontal and vertical Material 3 Expressive floating toolbars with explicit expanded/exit state, optional FAB composition, and toolbar accessibility.
 ---
 
-<ParitySummary component="floating-toolbar" />
-
-## Overview
-
-`HorizontalFloatingToolbar` and `VerticalFloatingToolbar` expose the Material 3 Expressive floating-toolbar family as semantic web toolbars.
+Floating toolbars group contextual actions above content in a compact Material 3 Expressive surface. The public horizontal and vertical components own toolbar geometry and transition state; placement over the page and any adaptive choice of toolbar vs navigation surface remain composition-owned.
 
 <ComponentPreview>
   <FloatingToolbarPreview />
 </ComponentPreview>
 
-## Orientation and variants
-
-Use the orientation-specific components when possible:
-
 ```tsx
+import { HorizontalFloatingToolbar } from '@m3-ui/ui';
+
 <HorizontalFloatingToolbar aria-label="Editor tools" expanded>
   <IconButton aria-label="Search">...</IconButton>
   <IconButton aria-label="Edit">...</IconButton>
 </HorizontalFloatingToolbar>
 ```
 
-Both support `variant="standard" | "vibrant"`. The root renders `role="toolbar"` and publishes the corresponding `aria-orientation`.
+## When to use
 
-## Expanded content
+Use a floating toolbar for a compact group of contextual actions that should remain visually separated from underlying content. Use ordinary app bars or button groups when the actions belong in those persistent structures instead.
 
-`expanded` controls whether `leadingContent` and `trailingContent` participate visually. Core `children` remain the toolbar's central content.
+## Orientation and variants
 
-When a FAB is supplied, `floatingActionButtonPosition` is logical to the orientation: start/end for horizontal toolbars and top/bottom for vertical toolbars.
+`HorizontalFloatingToolbar` and `VerticalFloatingToolbar` expose the orientation directly and publish matching toolbar orientation semantics. Both support `standard` and `vibrant` Material visual variants.
 
-```tsx
-<HorizontalFloatingToolbar
-  aria-label="Creation tools"
-  expanded={expanded}
-  floatingActionButton={<FloatingActionButton aria-label="Create">...</FloatingActionButton>}
-  floatingActionButtonPosition="end"
->
-  {actions}
-</HorizontalFloatingToolbar>
-```
+## Expanded content and FABs
 
-## Exit state
+`expanded` explicitly controls whether `leadingContent` and `trailingContent` participate. Core children remain the central toolbar actions.
 
-Floating toolbar scroll translation is explicit state:
+An optional FAB can be placed at the logical start/end for horizontal toolbars or top/bottom for vertical toolbars. The FAB remains an independent button action; the toolbar does not merge it into one composite click target.
+
+## Exit state is explicit
+
+Scroll-driven exit translation is supplied through public state; the component does not subscribe to document scrolling on its own.
 
 ```tsx
 const state = createFloatingToolbarState(-64, offset, contentOffset);
@@ -60,16 +49,26 @@ const state = createFloatingToolbarState(-64, offset, contentOffset);
 </HorizontalFloatingToolbar>
 ```
 
-`offsetLimit`, `offset`, and `contentOffset` mirror the Compose state vocabulary. Helpers clamp, settle, and calculate collapsed fraction, but the React component does not subscribe to document scrolling on its own.
-
-`exitDirection` supports `top`, `bottom`, `start`, and `end`. Logical start/end translation follows RTL direction.
+`exitDirection` supports logical `start`/`end` as well as top/bottom, so direction-sensitive movement follows RTL. The surrounding application decides which scroll source updates the state.
 
 ## Accessibility
 
-Each toolbar needs an accessible name that describes the action collection. Toolbar children remain independent controls with their own names and pressed/selected state where applicable.
+Every toolbar needs an accessible name describing the action collection. Children remain independently named buttons/toggles. When a toolbar surface is visually collapsed/hidden, hidden actions must leave the accessibility tree while any still-visible FAB remains reachable.
 
-When a toolbar with a FAB is collapsed, the hidden toolbar surface is removed from the accessibility tree while the adjacent FAB remains the meaningful action.
+Do not implement a second roving-focus model unless the public toolbar contract explicitly requires it; ordinary toolbar children retain their own control semantics.
 
-## Layout boundary
+## API reference
 
-A floating toolbar may be positioned over content, but positioning, viewport anchoring, and adaptive choice between navigation/action patterns are composition concerns. This component owns only its Material toolbar geometry, expanded state, FAB relation, and exit translation.
+<ApiReference name="HorizontalFloatingToolbar" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="floating-toolbar" />
+
+Material supplies floating-toolbar orientation, variants, shape, action/FAB relation, expansion, and exit motion. Explicit React state and application placement/scroll wiring are web composition concerns, not automatic navigation or page-scroll policy.
+
+## Related components
+
+- [Top app bar](/docs/components/top-app-bar) — persistent top-edge actions/title.
+- [Button group](/docs/components/button-group) — local grouped actions.
+- [FAB](/docs/components/fab) — prominent action optionally composed with a toolbar.

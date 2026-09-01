@@ -3,23 +3,17 @@ title: Badges
 description: Material dot and content badges positioned with BadgedBox while accessible status wording remains application-owned.
 ---
 
-<MaterialParity component="badge" />
+Badges add compact status or count information to another element. Material defines the dot/content visual forms and anchor positioning; the application decides what the badge means to users and assistive technology.
 
-## Overview
-
-`Badge` renders either the Material small dot form or the content form. `BadgedBox` positions a badge at the logical top-end of its anchor without changing the anchor's interaction semantics.
-
-## Live example
+[Material 3 badges](https://m3.material.io/components/badges/overview)
 
 <ComponentPreview>
   <BadgePreview />
 </ComponentPreview>
 
-## Dot and content forms
-
-Omitting children selects the dot geometry. Supplying content selects the content badge geometry and typography.
-
 ```tsx
+import { Badge, BadgedBox, IconButton } from '@m3-ui/ui';
+
 <BadgedBox badge={<Badge aria-hidden="true">3</Badge>}>
   <IconButton aria-label="Notifications, 3 unread">
     <NotificationsIcon />
@@ -27,16 +21,39 @@ Omitting children selects the dot geometry. Supplying content selects the conten
 </BadgedBox>
 ```
 
-`containerColor` and `contentColor` override the rendered CSS colors. Their defaults remain the canonical Material error/on-error roles.
+## When to use
 
-## Accessibility boundary
+Use a badge for brief supplementary status/count information that belongs to an anchor. Do not use a badge as the only place to put important explanatory text or an action.
 
-A badge is often supplementary information attached to another control. The component does not guess whether a dot means “new”, whether a number is a count, or whether the badge should be announced independently.
+A dot can indicate a meaningful binary status only when surrounding context makes that meaning clear. The component does not guess that a dot means “new”, “online”, or “unread”.
 
-For an icon button with an unread count, include the meaning in the button's accessible name and hide a duplicated visual badge from assistive technology, as in the example above. If a standalone badge itself carries meaningful status, give that badge an appropriate accessible name instead.
+## Dot and content forms
 
-`BadgedBox` is positioning only: it does not merge accessibility trees or rewrite the anchor label.
+Omitting children selects the Material dot form. Supplying content selects the content badge form and typography. Canonical colors and geometry come from component tokens; `containerColor` and `contentColor` are deliberate overrides, not a second token source.
 
 ## Positioning
 
-The box uses logical top/end placement from the Material badge contract, so it remains direction-aware. Do not reproduce that offset with docs or application-specific absolute-position literals unless a deliberately custom composition is required.
+`BadgedBox` positions the badge at the logical top-end of its anchor, so directionality remains correct in LTR/RTL layouts. It is a positioning primitive only: it does not change the anchor's interaction semantics or merge accessibility trees.
+
+## Accessibility
+
+Decide whether the badge meaning should be exposed through the badge itself or through the anchor's accessible name/status relationship.
+
+When a visual count duplicates wording already included in an icon button's accessible name, hide the badge from assistive technology to avoid duplicate announcements. When the badge is standalone meaningful status, give it appropriate accessible text/semantics from the application context.
+
+Do not make `Badge` infer wording such as “unread notifications”; only the application knows the domain meaning.
+
+## API reference
+
+<ApiReference name="Badge" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="badge" />
+
+Material supplies badge geometry, color roles, typography, and logical anchor placement. Accessible wording and whether the status is announced independently remain application/browser composition concerns.
+
+## Related components
+
+- [Icon button](/docs/components/icon-button) — common badge anchor for compact actions.
+- [List item](/docs/components/list-item) — persistent rows that may display supplementary status.

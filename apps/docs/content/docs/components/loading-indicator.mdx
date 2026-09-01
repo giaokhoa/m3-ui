@@ -1,40 +1,55 @@
 ---
 title: Loading indicator
-description: M3 Expressive morphing loading indicators with contained and uncontained forms, determinate progress, and reduced-motion behavior.
+description: M3 Expressive morphing loading indicators with contained/uncontained forms, determinate progress, and accessible progress semantics.
 ---
 
-<MaterialParity component="loading-indicator" />
-
-## Overview
-
-`LoadingIndicator` and `ContainedLoadingIndicator` implement Material 3's expressive morphing loading component. Unlike the standard circular progress indicator, the visual cycles through Material shape geometry while preserving normal progress semantics.
-
-## Live example
+Loading indicators use the Material 3 expressive morphing shape sequence to communicate loading or progress. Use the standard progress-indicator family when the product calls for conventional linear/circular progress instead.
 
 <ComponentPreview>
   <LoadingIndicatorPreview />
 </ComponentPreview>
 
-## Modes
-
-Omit `value` for indeterminate loading. Provide a value from `0..1` for determinate loading.
-
 ```tsx
+import { ContainedLoadingIndicator, LoadingIndicator } from '@m3-ui/ui';
+
 <LoadingIndicator aria-label="Loading" />
 <ContainedLoadingIndicator aria-label="Preparing workspace" />
 <LoadingIndicator aria-label="Import progress" value={0.72} />
 ```
 
-Determinate values are safely coerced to the Material range. The contained variant uses its own canonical container and indicator color roles rather than wrapping the uncontained component in a docs-only surface.
+## When to use
 
-## Shape and motion contract
+Use the expressive loading indicator where the Material expressive loading affordance is appropriate. Do not use it as decorative looping animation unrelated to a process.
 
-The renderer follows the audited Compose Material shape sequence and motion timings. The internal Material Shapes port exists only to draw those paths; it is not a new public general-purpose shape API.
+`LoadingIndicator` is uncontained; `ContainedLoadingIndicator` uses its audited Material container and indicator color roles rather than a docs-only wrapper.
 
-In indeterminate mode the component cycles through the canonical shape sequence and rotation. Determinate mode morphs according to progress. With `prefers-reduced-motion: reduce`, animation freezes at a valid frame while the progress semantics remain intact.
+## Indeterminate and determinate modes
+
+Omit `value` for indeterminate loading. Provide a value for determinate progress. The public implementation safely maps determinate progress into the supported Material range while React Aria remains the semantic progress owner.
+
+## Shape and motion
+
+The renderer follows the audited Material/Compose shape sequence and motion timing. Internal Material Shapes code exists to draw the component and is not exposed as a general-purpose public shape API.
+
+With `prefers-reduced-motion: reduce`, the visual freezes at a valid frame while the accessible progress state remains unchanged.
 
 ## Accessibility
 
-React Aria `ProgressBar` is the semantic owner. The SVG is `aria-hidden`, so provide `aria-label` or `aria-labelledby` for every standalone loading indicator.
+React Aria `ProgressBar` owns the semantic progress contract. The SVG drawing is hidden from accessibility, so every standalone indicator needs `aria-label` or `aria-labelledby`.
 
-Use a progress indicator instead when the design calls for the standard linear/circular Material progress family rather than the expressive morphing loading affordance.
+Do not add a duplicate live region that announces every animation frame. If the application needs status text such as “Preparing workspace,” expose stable meaningful status separately.
+
+## API reference
+
+<ApiReference name="LoadingIndicator" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="loading-indicator" />
+
+Material supplies the expressive shapes, contained/uncontained presentation, colors, and motion. React Aria supplies browser progress semantics, and reduced-motion handling changes animation only—not the process state.
+
+## Related components
+
+- [Progress indicators](/docs/components/progress-indicator) — standard and expressive linear/circular progress families.
+- [Snackbar](/docs/components/snackbar) — transient process/result messaging.

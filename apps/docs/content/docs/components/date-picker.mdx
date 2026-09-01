@@ -1,49 +1,51 @@
 ---
 title: Date pickers
-description: Material single-date and date-range pickers with calendar and segmented date-input modes, date-only state, and explicit dialog composition.
+description: Material single-date and date-range pickers with calendar/input modes, timezone-free date-only state, validation, and explicit modal composition.
 ---
 
-<MaterialParity component="date-picker" />
+Date pickers let users choose a Gregorian calendar date or date range using Material calendar and segmented date-input surfaces. The public value model is date-only and intentionally avoids timezone-bearing JavaScript `Date` state.
 
-## Overview
-
-`DatePicker` and `DateRangePicker` implement the Material date-selection surfaces for a single Gregorian calendar date or an inclusive date range. Both support controlled or uncontrolled values, calendar navigation, year selection, unavailable dates, locale-aware presentation, and an optional text-input mode.
-
-## Live example
+[Material 3 date pickers](https://m3.material.io/components/date-pickers/overview)
 
 <ComponentPreview>
   <DatePickerPreview />
 </ComponentPreview>
 
-## Date-only state
-
-The public state is intentionally timezone-free:
-
 ```tsx
+import { DatePicker, type DatePickerDate } from '@m3-ui/ui';
+
 const [date, setDate] = useState<DatePickerDate | null>('2026-08-29');
 
 <DatePicker value={date} onChange={setDate} />
 ```
 
-`DatePickerDate` is an ISO calendar-date string such as `2026-08-29`. Selection state never becomes a JavaScript `Date`; UTC is used only internally as an `Intl.DateTimeFormat` transport when formatting a date for a locale.
+## When to use
 
-Helpers such as `isDatePickerDate`, `compareDatePickerDates`, `monthStart`, and `formatDatePickerDate` expose the same date-only contract to applications.
+Use `DatePicker` when users choose one calendar date and `DateRangePicker` when the task needs an inclusive start/end range. Prefer direct text fields only when the application does not benefit from calendar or segmented date interaction.
+
+## Date-only state
+
+`DatePickerDate` is an ISO calendar-date string such as `2026-08-29`. Selection state never becomes a JavaScript `Date`; UTC may be used internally only as an `Intl.DateTimeFormat` transport for locale formatting.
+
+This avoids accidental timezone shifts when a value represents a calendar date rather than an instant. Public date helpers preserve the same date-only contract.
 
 ## Single and range selection
 
-Use `DatePicker` for one date and `DateRangePicker` for `{ start, end }` state. Range input rejects an end date before its start date. `isDateUnavailable` keeps a calendar date focusable while preventing selection, and `yearRange` constrains both calendar and segmented input modes.
+`DateRangePicker` publishes `{ start, end }` date-only values. Range drafts that are incomplete or reversed remain local until valid rather than corrupting application state. `isDateUnavailable` can keep a date navigable/focusable while preventing selection, and `yearRange` constrains supported dates.
 
 ## Calendar and input modes
 
-The default `calendar` mode uses React Aria `Calendar` or `RangeCalendar` semantics. The optional `input` mode uses React Aria `DateField`, `DateInput`, and `DateSegment` primitives while preserving the same ISO date-only application state.
+Calendar mode uses React Aria Calendar/RangeCalendar semantics. Input mode uses React Aria DateField/DateInput/DateSegment primitives while preserving the same public ISO date-only state.
 
-React Aria owns segment ordering, keyboard editing, focus movement, placeholder state, and field validation. Material styling is applied to the field surface and segment interaction states instead of relying on the browser-specific UI of native `input type="date"` controls.
+React Aria owns segment ordering, keyboard editing, focus movement, placeholder behavior, and field validation. Material owns the calendar/input surface, typography, state treatment, and selection visuals.
 
-`locale` controls month, weekday, headline, and date-segment presentation. `firstDayOfWeek` can override the locale default when the product has an explicit calendar convention.
+`locale` controls date presentation; `firstDayOfWeek` can override the locale default when the product has an explicit convention.
 
-## Modal versus docked
+## Modal and docked presentation
 
-`variant="modal"` selects the Material modal-picker **surface style**. It does not create an overlay, focus trap, scrim, or dialog lifecycle by itself. Compose it with the public `Dialog` primitives when the picker should be modal.
+`variant="modal"` selects the Material **modal-picker surface style** only. It does not create a browser overlay, scrim, focus trap, Escape lifecycle, or focus restoration.
+
+Compose it with `Dialog` when the picker must behave as a real browser modal:
 
 ```tsx
 <DialogTrigger>
@@ -56,8 +58,30 @@ React Aria owns segment ordering, keyboard editing, focus movement, placeholder 
 </DialogTrigger>
 ```
 
-`variant="docked"` keeps the calendar presentation docked and intentionally disables the calendar/input mode toggle.
+`variant="docked"` keeps the picker in the local composition and follows its documented docked-mode behavior. Surface styling and modal lifecycle are deliberately separate concerns.
 
 ## Validation and errors
 
-Manual input uses React Aria field validation for year bounds and unavailable dates. In range mode, incomplete or reversed drafts are kept local and do not publish a corrupt public range value. Pass `errorMessage` for application-facing validation copy.
+Manual input validation uses the public React Aria-backed field contract plus application rules. Use `errorMessage` for user-facing validation text. Do not turn date-format parsing or unavailable-date rules into hidden timezone conversions.
+
+## Accessibility
+
+Calendar/date-field semantics, keyboard navigation, date segments, and unavailable states are owned by React Aria. A modal composition must additionally provide Dialog labeling and let Dialog own modal focus/dismissal behavior.
+
+Ensure validation errors are textual and connected to the relevant picker/input state. Do not rely only on selected color or disabled styling.
+
+## API reference
+
+<ApiReference name="DatePicker" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="date-picker" />
+
+Material supplies picker hierarchy, calendar/input presentation, shape, typography, selection states, and modal/docked surface treatments. Date-only ISO state and React Aria calendar/date-field semantics are web/API adaptations; a true browser modal exists only when composed with the overlay/dialog primitives.
+
+## Related components
+
+- [Time pickers](/docs/components/time-picker) — time-of-day selection.
+- [Dialog](/docs/components/dialog) — browser modal lifecycle for modal picker composition.
+- [Forms and validation](/docs/forms) — form ownership and application validation.

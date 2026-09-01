@@ -1,28 +1,17 @@
 ---
 title: Toggle button
-description: Controlled Material 3 toggle buttons across filled, elevated, tonal, and outlined variants with expressive sizes and native web pressed semantics.
+description: Material 3 toggle-button guidance, controlled selection, variants, expressive sizes, and web pressed semantics.
 ---
 
-<ParitySummary component="toggle-button" />
-
-## Overview
-
-Toggle buttons represent persistent on/off selection while retaining button interaction. `m3-ui` exposes four controlled variants:
-
-- `ToggleButton`
-- `ElevatedToggleButton`
-- `FilledTonalToggleButton`
-- `OutlinedToggleButton`
+Toggle buttons are button-shaped controls with persistent selected state. Use them when pressing the control changes an on/off choice that remains visible after activation; use an ordinary button when the action is momentary.
 
 <ComponentPreview>
   <ToggleButtonPreview />
 </ComponentPreview>
 
-## Controlled selection
-
-Selection is always explicit application state:
-
 ```tsx
+import { FilledTonalToggleButton } from '@m3-ui/ui';
+
 const [selected, setSelected] = useState(false);
 
 <FilledTonalToggleButton
@@ -33,22 +22,48 @@ const [selected, setSelected] = useState(false);
 </FilledTonalToggleButton>
 ```
 
-The component does not keep a second selected-state machine internally. Rapid updates therefore resolve directly to the supplied `isSelected` value.
+## When to use
 
-## Variants and sizes
+Use a toggle button for persistent toolbar-like or action-like selection such as pinning or enabling a mode. For independent form choices, prefer Checkbox or Switch according to the Material interaction model. For a mutually exclusive set of adjacent choices, use the appropriate segmented/connected selection component.
 
-All four variants support the same expressive size buckets used by the button family: `extraSmall`, `small`, `medium`, `large`, and `extraLarge`. An optional `startIcon` participates in the audited Material spacing and icon geometry.
+## Variants
 
-Checked, unchecked, pressed, hovered, focused, and disabled presentation come from the component token/runtime mapping rather than documentation CSS.
+The public family exposes `ToggleButton`, `ElevatedToggleButton`, `FilledTonalToggleButton`, and `OutlinedToggleButton`. Choose the visual variant from action hierarchy while keeping selection semantics unchanged.
 
-## Web semantics
+## Controlled selection
 
-Compose currently projects toggle buttons through checkbox-role semantics on a toggleable surface. On the web, `m3-ui` intentionally uses React Aria `ToggleButton`, producing native button interaction with `aria-pressed`.
+Selection is explicit application state through `isSelected` and `onChange`. The component does not maintain a competing selected-state machine, so the rendered Material state always follows the current controlled value.
 
-That gives browser-standard Enter/Space activation, focus-visible behavior, disabled handling, and a familiar accessibility model for pressable toggles without recreating those behaviors locally.
+Do not use `isSelected` merely to force a pressed-looking style after a normal action. It represents persistent selection.
 
-## Motion and shape
+## Sizes and icons
 
-Selected and pressed shapes follow the audited renderer mapping. Reduced-motion preference removes transition timing while preserving the final controlled state.
+All variants support the audited Material expressive size vocabulary: `extraSmall`, `small`, `medium`, `large`, and `extraLarge`. `startIcon` participates in the component's canonical icon/spacing geometry.
 
-CSS border radius represents the web projection of Material rounded/corner-based shapes; arbitrary Compose `Shape` path geometry is not exposed as a separate public shape runtime.
+Choose a semantic size rather than reproducing token dimensions in consumer CSS.
+
+## Behavior and states
+
+Checked, unchecked, pressed, hovered, focused, and disabled presentation comes from the component token/runtime mapping. Selected and pressed shape transitions follow the audited renderer path; reduced-motion preference removes transition timing without changing the controlled final state.
+
+## Accessibility
+
+On the web, `m3-ui` intentionally uses React Aria `ToggleButton`, which exposes native button interaction with `aria-pressed`. This differs from Compose's runtime projection while preserving the user-facing persistent toggle concept.
+
+Browser-standard Enter/Space activation, focus-visible behavior, and disabled handling come from React Aria. Visible text should identify the toggled property or action consistently.
+
+## API reference
+
+<ApiReference name="ToggleButton" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="toggle-button" />
+
+Material defines the visual/selection intent. React Aria button + `aria-pressed` semantics are the deliberate web adaptation; CSS rounded geometry is the web projection of the audited Material shape contract rather than an arbitrary path-shape API.
+
+## Related components
+
+- [Button](/docs/components/button) — momentary actions.
+- [Icon button](/docs/components/icon-button) — compact icon toggles.
+- [Button group](/docs/components/button-group) — grouped or connected actions/selections.
