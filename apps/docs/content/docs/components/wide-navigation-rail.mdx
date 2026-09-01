@@ -1,0 +1,92 @@
+---
+title: Wide navigation rail
+description: Material wide navigation rail and modal wide rail with explicit expanded/collapsed state, destination semantics, and browser modal boundaries.
+---
+
+Wide navigation rails extend the vertical navigation-rail family with collapsed and expanded presentations. `m3-ui` exports both the in-layout `WideNavigationRail` and `ModalWideNavigationRail` variants using the same destination item family.
+
+```tsx
+import {
+  ModalWideNavigationRail,
+  WideNavigationRail,
+  WideNavigationRailItem,
+  WideNavigationRailValue,
+  useWideNavigationRailState,
+} from '@m3-ui/ui';
+```
+
+## When to use
+
+Use a wide rail when a vertical primary-navigation surface benefits from an expanded label-rich state. Use the baseline rail when the narrower Material rail is the intended surface, and use a drawer when drawer behavior better matches the navigation hierarchy.
+
+Whether the application chooses a collapsed/expanded wide rail or another navigation family for a window class belongs to [Adaptive layout and navigation](/docs/layout), not this component page.
+
+## State and expanded presentation
+
+`useWideNavigationRailState` owns the rail's explicit collapsed/expanded target. The application may toggle or set that state; the rail does not install viewport breakpoint listeners.
+
+```tsx
+const railState = useWideNavigationRailState(WideNavigationRailValue.Collapsed);
+
+<WideNavigationRail
+  aria-label="Primary navigation"
+  state={railState}
+  header={<MenuButton onPress={() => railState.toggle()} />}
+>
+  <WideNavigationRailItem
+    selected={destination === 'home'}
+    icon={<HomeIcon />}
+    label="Home"
+    onPress={() => setDestination('home')}
+  />
+  <WideNavigationRailItem
+    selected={destination === 'explore'}
+    icon={<ExploreIcon />}
+    label="Explore"
+    onPress={() => setDestination('explore')}
+  />
+</WideNavigationRail>
+```
+
+The expanded rail can measure its own header/item content within the audited Material minimum/maximum width envelope. That is component-local content geometry, not Material window classification.
+
+## Destination items
+
+`WideNavigationRailItem` receives explicit `selected` state, icon, optional label, and action props. Icon placement defaults from the rail's current expanded state but can be supplied explicitly through the public item API when the composition requires it.
+
+Selection remains application/router state. The rail does not own URLs, browser history, destination content, or page focus after navigation.
+
+## Modal wide rail
+
+`ModalWideNavigationRail` uses the same rail state/items while layering expanded rail content over the surrounding composition. `hideOnCollapse` controls whether the collapsed rail remains in layout or the modal surface fully leaves the visual frame when collapsed.
+
+```tsx
+<ModalWideNavigationRail
+  aria-label="Primary navigation"
+  state={railState}
+  hideOnCollapse
+  header={<MenuButton onPress={() => railState.toggle()} />}
+>
+  {items}
+</ModalWideNavigationRail>
+```
+
+The modal variant owns its documented overlay/dismiss behavior; do not reproduce that with a second scrim/focus layer around it. It still does not decide *when* the application should choose modal-wide-rail navigation versus another family.
+
+## Accessibility and focus
+
+Both rail surfaces render a named navigation landmark and a vertical selected-destination collection. Destination items remain independently focusable React Aria-backed controls with selected state and meaningful labels.
+
+For modal expansion, keep the toggle/header action named and keep expanded/collapsed state synchronized with what users can actually interact with. Do not expose visually hidden destination copies as simultaneous duplicate navigation targets.
+
+## Fidelity, adaptations, and known boundaries
+
+Material supplies collapsed/expanded rail hierarchy, width envelopes, icon/label arrangements, selected indicators, colors, state treatment, and modal presentation. Explicit React state, local content measurement, and browser overlay/focus implementation are web adaptations.
+
+This page intentionally contains no numeric app breakpoint or automatic cross-surface switching rule. Use `NavigationSuiteScaffold` for the library-owned adaptive mapping.
+
+## Related components
+
+- [Navigation rail](/docs/components/navigation-rail) — baseline narrow rail.
+- [Navigation bars](/docs/components/navigation-bar) — horizontal navigation surfaces.
+- [Navigation drawer](/docs/components/navigation-drawer) — permanent/dismissible/modal drawer surfaces.

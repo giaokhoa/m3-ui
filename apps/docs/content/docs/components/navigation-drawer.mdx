@@ -1,0 +1,111 @@
+---
+title: Navigation drawer
+description: Material permanent, dismissible, and modal navigation drawers with explicit drawer state, selection semantics, gestures, and browser modal ownership.
+---
+
+Navigation drawers provide a vertical surface for primary destinations and related navigation content. `m3-ui` exposes permanent, dismissible, and modal drawer containers plus matching Material sheet primitives and shared destination items.
+
+[Material 3 navigation drawer](https://m3.material.io/components/navigation-drawer/overview)
+
+```tsx
+import {
+  DismissibleDrawerSheet,
+  DismissibleNavigationDrawer,
+  ModalDrawerSheet,
+  ModalNavigationDrawer,
+  NavigationDrawerItem,
+  PermanentDrawerSheet,
+  PermanentNavigationDrawer,
+  useDrawerState,
+} from '@m3-ui/ui';
+```
+
+## When to use
+
+Use a permanent drawer when navigation should stay in the layout. Use a dismissible drawer when opening/closing the drawer should alter the content layout without making the rest of the UI modal. Use a modal drawer when navigation temporarily overlays the content and should own modal interaction while open.
+
+Cross-surface selection between drawers, rails, and bars belongs to [Adaptive layout and navigation](/docs/layout). This page does not define breakpoints.
+
+## Permanent drawer
+
+`PermanentNavigationDrawer` keeps `drawerContent` and main content in one layout hierarchy. Compose the Material surface with `PermanentDrawerSheet`.
+
+```tsx
+<PermanentNavigationDrawer
+  drawerContent={
+    <PermanentDrawerSheet>
+      <NavigationDrawerItem
+        selected={destination === 'home'}
+        icon={<HomeIcon />}
+        onPress={() => setDestination('home')}
+      >
+        Home
+      </NavigationDrawerItem>
+    </PermanentDrawerSheet>
+  }
+>
+  <MainContent />
+</PermanentNavigationDrawer>
+```
+
+The permanent drawer does not create modal focus behavior or a scrim.
+
+## Dismissible drawer
+
+`DismissibleNavigationDrawer` uses explicit `DrawerState` and can be opened/closed programmatically or through its documented gesture behavior. Its sheet participates in layout rather than creating a modal overlay.
+
+```tsx
+const drawerState = useDrawerState();
+
+<DismissibleNavigationDrawer
+  state={drawerState}
+  drawerContent={<DismissibleDrawerSheet>{items}</DismissibleDrawerSheet>}
+>
+  <MainContent />
+</DismissibleNavigationDrawer>
+```
+
+The application owns when product/navigation actions call `open()` or `close()`. Gesture state follows logical start/end direction and mirrors correctly in RTL.
+
+## Modal drawer
+
+`ModalNavigationDrawer` combines the drawer state/gesture contract with React Aria modal overlay behavior and a Material scrim. Compose its content with `ModalDrawerSheet`.
+
+```tsx
+const drawerState = useDrawerState();
+
+<ModalNavigationDrawer
+  state={drawerState}
+  drawerContent={<ModalDrawerSheet>{items}</ModalDrawerSheet>}
+>
+  <MainContent />
+</ModalNavigationDrawer>
+```
+
+The modal variant owns its browser modal lifecycle while open: overlay/portal behavior, scrim, focus containment, outside/Escape dismissal as implemented, and focus restoration. Do not wrap it in a second independent modal/focus trap.
+
+## Destination items and selection
+
+`NavigationDrawerItem` is a React Aria-backed destination control with explicit `selected` state, optional icon/badge, and visible child label. Selection, URL state, browser history, and rendered destination content remain application/router responsibilities.
+
+If a navigation destination must be a real link, preserve native link semantics at the router/application boundary rather than assuming a selected button is equivalent to a URL.
+
+## Accessibility and keyboard/focus behavior
+
+Drawer destination groups should have a meaningful navigation/group label in the surrounding composition. Each destination needs a stable accessible name and selected state.
+
+Permanent and dismissible drawers do not trap focus. Modal drawers must let the public modal implementation own focus containment/restoration. Opening a modal drawer should make its navigation reachable; closing it should restore a predictable focus context.
+
+Gesture support must not be the only way to open or close navigation. Provide a named keyboard-operable trigger when the drawer can be hidden.
+
+## Fidelity, adaptations, and known boundaries
+
+Material supplies drawer families, sheet shapes/colors, destination rows, selected indicators, scrim/gesture intent, and open/closed motion. React Aria modal behavior, pointer gesture arbitration, logical RTL mapping, and explicit React `DrawerState` are web adaptations.
+
+No automatic window breakpoint or drawer-vs-rail-vs-bar selection is defined by these components. Use `NavigationSuiteScaffold` when the application wants the audited adaptive policy.
+
+## Related components
+
+- [Navigation bars](/docs/components/navigation-bar) — bottom horizontal navigation.
+- [Navigation rail](/docs/components/navigation-rail) — baseline vertical rail.
+- [Wide navigation rail](/docs/components/wide-navigation-rail) — collapsible/expanded rail family.

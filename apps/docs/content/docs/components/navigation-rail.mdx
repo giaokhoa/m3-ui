@@ -1,0 +1,86 @@
+---
+title: Navigation rail
+description: Material navigation rail guidance with vertical destination selection, optional header content, accessible navigation semantics, and explicit adaptive-layout boundaries.
+---
+
+Navigation rails provide persistent vertical access to a small set of primary destinations. `NavigationRail` is the baseline Material rail surface; it does not decide when an application should switch to or from another navigation family.
+
+[Material 3 navigation rail](https://m3.material.io/components/navigation-rail/overview)
+
+```tsx
+import { NavigationRail, NavigationRailItem } from '@m3-ui/ui';
+
+<NavigationRail aria-label="Primary navigation">
+  <NavigationRailItem
+    selected={destination === 'home'}
+    icon={<HomeIcon />}
+    label="Home"
+    onPress={() => setDestination('home')}
+  />
+  <NavigationRailItem
+    selected={destination === 'favorites'}
+    icon={<FavoriteIcon />}
+    label="Favorites"
+    onPress={() => setDestination('favorites')}
+  />
+</NavigationRail>
+```
+
+## When to use
+
+Use a rail when primary destinations should remain visible in a vertical navigation surface and the surrounding Material screen composition calls for that hierarchy. Use a bar, wide rail, or drawer when those surfaces better match the application layout.
+
+Cross-surface responsive/adaptive selection belongs to [Adaptive layout and navigation](/docs/layout), not to `NavigationRail` itself.
+
+## Anatomy
+
+`NavigationRail` renders a navigation landmark, an optional `header` region, and a vertical destination collection. Each `NavigationRailItem` owns a selected indicator, icon, optional label, ripple/state treatment, and explicit `selected` state.
+
+The header is composition content, commonly used for an action or brand/navigation affordance. It does not become part of the destination selection group automatically.
+
+## Selection and application state
+
+`selected` is explicit application state. Activating an item invokes its React Aria button behavior; route state, URL changes, destination content, and browser history remain application-owned.
+
+```tsx
+<NavigationRail
+  aria-label="Workspace"
+  header={<FloatingActionButton aria-label="Create"><AddIcon /></FloatingActionButton>}
+>
+  {destinations.map((item) => (
+    <NavigationRailItem
+      key={item.id}
+      selected={item.id === destination}
+      icon={item.icon}
+      label={item.label}
+      onPress={() => setDestination(item.id)}
+    />
+  ))}
+</NavigationRail>
+```
+
+Use actual link/navigation composition at the application/router boundary when native URL/link behavior is required; the rail component does not infer that from a destination id.
+
+## Labels and presentation
+
+`alwaysShowLabel` controls whether an available label remains visible when the destination is not selected. This is presentation; the accessible name still needs to identify the destination consistently.
+
+Container, indicator, icon/label geometry, colors, typography, state layers, and ripple remain Material/token-owned.
+
+## Accessibility and keyboard behavior
+
+The rail is a named `nav` landmark. Its destination collection exposes vertical tab-like selected state; individual items are React Aria-backed buttons with keyboard activation, disabled behavior, and focus-visible treatment.
+
+Do not make the rail itself one click target. Header actions and destinations remain independent controls with their own names. Avoid custom key handling that conflicts with the item's public keyboard semantics.
+
+## Fidelity, adaptations, and known boundaries
+
+Material supplies vertical navigation hierarchy, container/indicator geometry, labels/icons, state treatment, and header spacing. Browser button/focus semantics plus application-owned route state are web adaptations.
+
+No breakpoint or automatic bar/drawer switching is defined here. Use `NavigationSuiteScaffold` when the application wants the library's audited adaptive selection policy.
+
+## Related components
+
+- [Navigation bars](/docs/components/navigation-bar) — horizontal primary navigation.
+- [Wide navigation rail](/docs/components/wide-navigation-rail) — expanded/collapsed expressive rail family.
+- [Navigation drawer](/docs/components/navigation-drawer) — drawer navigation surfaces.
