@@ -32,7 +32,11 @@ async function dragHandleBy(page: Page, deltaX: number) {
   const centerY = handleBox.y + handleBox.height / 2;
   await page.mouse.move(centerX, centerY);
   await page.mouse.down();
-  await page.mouse.move(centerX + deltaX, centerY, { steps: 4 });
+  // Deliver the requested delta in one pointer-move event. The handle itself
+  // moves after dispatchRawDelta(), so splitting the move into Playwright steps
+  // makes later synthetic moves hit the shifted geometry instead of testing the
+  // raw delta consumed by PaneExpansionState.
+  await page.mouse.move(centerX + deltaX, centerY);
   await page.mouse.up();
 }
 

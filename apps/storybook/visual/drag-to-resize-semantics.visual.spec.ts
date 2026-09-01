@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, {
@@ -7,6 +7,12 @@ async function openStory(page: Page, id: string) {
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+}
+
+async function expectCollapsedPaneSettled(pane: Locator) {
+  await expect
+    .poll(async () => (await pane.boundingBox())?.height ?? Number.POSITIVE_INFINITY)
+    .toBeCloseTo(48, 0);
 }
 
 test.describe('Material 3 levitated drag-to-resize semantics', () => {
@@ -39,6 +45,10 @@ test.describe('Material 3 levitated drag-to-resize semantics', () => {
     await expect(pane).toHaveAttribute('data-resize-state', 'collapsed');
     await expect(handle).toHaveAttribute('aria-label', 'partially expand');
     await expect(handle).toHaveAttribute('aria-description', 'collapsed');
+    // Expanded -> Collapsed is spring-driven. The semantic state flips at the
+    // start of the spring, so wait for geometry to reach the collapsed 48dp
+    // boundary before exercising a second semantic activation.
+    await expectCollapsedPaneSettled(pane);
 
     // Assistive technologies commonly activate button semantics using a
     // synthetic click with no pointer detail.

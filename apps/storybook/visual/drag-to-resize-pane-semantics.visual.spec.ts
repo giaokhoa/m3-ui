@@ -1,4 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
+
+async function expectCollapsedPaneSettled(pane: Locator) {
+  await expect
+    .poll(async () => (await pane.boundingBox())?.height ?? Number.POSITIVE_INFINITY)
+    .toBeCloseTo(48, 0);
+}
 
 test('no-handle levitated pane exposes a semantic resize action without replacing its region', async ({
   page,
@@ -52,6 +58,10 @@ test('no-handle levitated pane exposes a semantic resize action without replacin
   await expect(pane).toHaveAttribute('data-resize-state', 'collapsed');
   await expect(resizeAction).toHaveAttribute('aria-label', 'partially expand');
   await expect(resizeAction).toHaveAttribute('aria-description', 'collapsed');
+  // The state label updates when the spring starts. Wait for the previous
+  // transition to finish before starting a second resize action so its spring
+  // cannot keep writing the old boundary state over the new target.
+  await expectCollapsedPaneSettled(pane);
 
   // A pointer click on non-interactive pane content keeps AndroidX whole-pane
   // click-to-resize behavior.
