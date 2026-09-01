@@ -1,71 +1,142 @@
 ---
 title: Typography
-description: Material 3 type roles with canonical metrics and M3 Expressive emphasized variants.
+description: Material 3 type roles, semantic hierarchy, and public m3-ui typography helpers.
 ---
 
-## Type scale
+Material typography is a system of semantic text roles. Choose a role for the job the text performs, then keep that role's typeface, size, line height, weight, and tracking together as one contract instead of treating the scale as a menu of unrelated CSS values.
 
-The Material type scale is organized into display, headline, title, body, and label families, each with large, medium, and small roles.
+<SourceLinks
+  links={[
+    {
+      kind: 'spec',
+      label: 'Material 3 typography overview',
+      href: 'https://m3.material.io/styles/typography/overview',
+    },
+    {
+      kind: 'compose',
+      label: 'AndroidX Material3 Typography',
+      href: 'https://developer.android.com/reference/kotlin/androidx/compose/material3/Typography',
+    },
+  ]}
+/>
 
-[Material 3 typography overview](https://m3.material.io/styles/typography/overview)
+## Type roles and hierarchy
+
+`m3-ui` exposes the complete 15-role baseline Material type scale: five role families, each with large, medium, and small variants.
+
+| Family | Intended use | Public roles |
+| --- | --- | --- |
+| Display | The largest, most prominent text for major moments in a layout. | `displayLarge`, `displayMedium`, `displaySmall` |
+| Headline | Short, important text that establishes section or content hierarchy. | `headlineLarge`, `headlineMedium`, `headlineSmall` |
+| Title | Shorter, medium-emphasis titles for named surfaces or content groups. | `titleLarge`, `titleMedium`, `titleSmall` |
+| Body | Reading text and longer-form content. | `bodyLarge`, `bodyMedium`, `bodySmall` |
+| Label | Compact action, annotation, and component-supporting text. | `labelLarge`, `labelMedium`, `labelSmall` |
+
+<GuidanceCallout title="Choose roles by meaning, not by pixel size">
+  Start with the content hierarchy and the role's intended use. Do not pick a role only because its current rendered size happens to fit a mockup; that couples the document hierarchy to one token value instead of the Material type system.
+</GuidanceCallout>
 
 <TypeScaleSamples />
 
-Every sample above is rendered with `getMaterialTypeCssProperties()`. Font size, line height, weight, letter spacing, and typeface role come from canonical generated `@m3-ui/tokens`; the docs application does not reproduce those measurements.
+Every sample above is rendered through the public typography helper. The docs page does not hand-copy font sizes, line heights, weights, or tracking values from the token graph.
 
-## Public roles
+## A type role is one contract
 
-| Family | Roles |
-| --- | --- |
-| Display | `displayLarge`, `displayMedium`, `displaySmall` |
-| Headline | `headlineLarge`, `headlineMedium`, `headlineSmall` |
-| Title | `titleLarge`, `titleMedium`, `titleSmall` |
-| Body | `bodyLarge`, `bodyMedium`, `bodySmall` |
-| Label | `labelLarge`, `labelMedium`, `labelSmall` |
+Each role resolves five coordinated properties:
 
-Use the semantic role appropriate to the content hierarchy rather than selecting a role only because its pixel size looks convenient.
+- **Typeface role** — a semantic `plain` or `brand` family reference supplied through the active theme.
+- **Font size** — the role's scale position.
+- **Line height** — vertical rhythm paired with that size.
+- **Font weight** — the intended emphasis within the role.
+- **Tracking** — letter spacing paired with the rest of the role metrics.
 
-## Runtime projection
+Treat those properties as a unit. Mixing, for example, the size from one Material role with the tracking or line height from another creates a new application-specific style rather than using the canonical role.
 
-Use `getMaterialTypeStyle()` when code needs the Material typography values as data, or `getMaterialTypeCssProperties()` when applying the result directly to a React `style` prop.
+Concrete metrics remain owned by `packages/tokens` and flow through generated `@m3-ui/tokens` output. Documentation intentionally names semantic roles instead of duplicating canonical numeric values in MDX.
 
-```tsx
-<h2 style={getMaterialTypeCssProperties('headlineMedium')}>
-  Account settings
-</h2>
-```
+## Standard and emphasized roles
 
-The typeface token is resolved through the theme variables `--font-family-plain` and `--font-family-brand`, so typography participates in the active theme instead of baking a font family into each component.
-
-## M3 Expressive emphasis
-
-The canonical token graph also contains the emphasized counterpart for every type role. Pass `emphasized` as the second argument to opt into that Material 3 Expressive role.
+The baseline Material hierarchy above is the default. Current AndroidX Material3 `Typography` also exposes an emphasized counterpart for every baseline role. `m3-ui` represents that capability with the same 15 public role names plus an explicit `emphasis` choice.
 
 <TypeScaleSamples emphasis="emphasized" />
 
+<GuidanceCallout title="Provenance of emphasized typography" kind="adaptation">
+  The baseline hierarchy is grounded in Material 3 typography guidance. The emphasized counterparts are tracked as current AndroidX Material3 / M3 Expressive API evidence and canonical repository token evidence. `m3-ui` does not silently treat Compose-only vocabulary as a separate normative Material role family, and cross-source differences should remain visible rather than being normalized in prose.
+</GuidanceCallout>
+
+Standard remains the default. Opt into `emphasized` only where the stronger style supports hierarchy or draws attention intentionally; availability of emphasized tokens is not a reason to replace the baseline scale globally.
+
+## Apply roles with the public helpers
+
+Use `getMaterialTypeCssProperties()` when a Material role should be applied directly to a React `style` prop. Use `getMaterialTypeStyle()` when application code needs the resolved Material role as data before applying or composing it.
+
 ```tsx
-<div
+import {
+  getMaterialTypeCssProperties,
+  getMaterialTypeStyle,
+} from '@m3-ui/ui';
+
+const leadStyle = getMaterialTypeStyle('bodyLarge');
+
+export function ArticleIntro() {
+  return (
+    <section>
+      <h2 style={getMaterialTypeCssProperties('headlineMedium')}>
+        Account settings
+      </h2>
+      <p style={leadStyle}>
+        Manage the settings that apply to your account.
+      </p>
+    </section>
+  );
+}
+```
+
+Pass `emphasized` as the second argument when the emphasized counterpart is intentional:
+
+```tsx
+<strong
   style={getMaterialTypeCssProperties(
-    'headlineLarge',
+    'labelLarge',
     'emphasized',
   )}
 >
-  Expressive headline
-</div>
+  New
+</strong>
 ```
 
-Standard remains the default so existing Material typography does not change merely because emphasized tokens are available.
+Both helpers consume public role names and generated token values. Application code does not need to import typography tokens directly or reproduce a role's metrics manually.
 
-## Theme typefaces
+## Typeface ownership and theming
 
-`ThemeProvider` supplies the plain and brand typeface variables and currently includes the default Roboto stylesheet used by the library. Components and docs type roles refer to those theme variables rather than importing their own font metrics.
+The resolved `fontFamily` points at the theme's semantic typeface variables, such as `--font-family-plain` and `--font-family-brand`. This keeps the role contract stable while the active theme owns the actual font family.
 
-## Semantic HTML
+Typography helpers therefore answer **which Material role to render**; theming answers **which typeface fulfills the semantic family role**. Component and foundation documentation should not bake a separate font stack into each usage example.
 
-Typography is a visual role, not a replacement for document semantics. The docs application keeps Markdown headings as `h1`–`h4`, paragraphs as `p`, and lists as native list elements, then maps those elements to appropriate Material type roles at the MDX boundary.
+## Typography is not document semantics
 
-There is intentionally no public `Typography` or `Prose` component created only to make the docs site look Material.
+Material type roles describe presentation and hierarchy; they do not replace HTML semantics. Keep headings as heading elements, paragraphs as paragraphs, form labels as labels, and interactive controls as their correct browser elements, then apply the appropriate Material type role to those elements.
 
-## Code text
+In particular, a Material `label*` role does not turn arbitrary text into an HTML `<label>`, and a `headline*` role does not determine the document heading level by itself.
 
-Material does not define a dedicated code type role. Documentation code uses a monospace browser adaptation while its surrounding surfaces and text colors still use Material semantic roles. That adaptation stays local to `apps/docs` and is not presented as part of the Material type scale.
+The docs application follows the same boundary: Markdown keeps native document structure while the MDX runtime maps those elements to Material type roles. There is intentionally no public `Typography` or `Prose` component created solely for documentation styling.
+
+## Code text is a web/docs adaptation
+
+Material does not define a dedicated code type role. Documentation code uses a monospace browser/docs adaptation while surrounding surfaces, hierarchy, and semantic text continue to use Material roles. That adaptation stays local to `apps/docs` and is not presented as part of the Material type scale.
+
+## Public API reference
+
+<ApiReference name="getMaterialTypeStyle" />
+
+<ApiReference name="getMaterialTypeCssProperties" />
+
+## Provenance and drift boundary
+
+- **Material 3 specification/guidance** defines the typography system, role hierarchy, and design intent used on this page.
+- **AndroidX Compose Material3** is implementation/reference evidence for the current `Typography` API vocabulary, including emphasized counterparts.
+- **`m3-ui`** exposes the web-facing `MaterialTypeRole`, `MaterialTypeEmphasis`, `getMaterialTypeStyle()`, and `getMaterialTypeCssProperties()` contract backed by canonical generated tokens.
+- **Web/document semantics** remain native HTML concerns and are composed with Material visual roles rather than replaced by them.
+- **Material Web or Figma evidence**, when audited elsewhere in the repository, is implementation evidence only; it does not override Material guidance or justify silently rewriting role definitions here.
+
+When these sources differ in vocabulary or availability, keep the difference explicit. Do not invent a merged typography model in documentation, and do not hand-copy concrete metrics to hide token or source drift.
