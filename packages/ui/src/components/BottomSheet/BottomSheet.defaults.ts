@@ -26,9 +26,9 @@ export interface ModalBottomSheetOverlayStyleOptions {
 }
 
 // Elevation level selection feeds the runtime elevation host. Visual defaults are generated CSS.
-export const bottomSheetTokens = {
-  modalContainerElevation: token.ComponentSheetBottomDockedModalContainerElevation as ElevationLevel,
-  standardContainerElevation: token.ComponentSheetBottomDockedStandardContainerElevation as ElevationLevel,
+const bottomSheetElevationLevels = {
+  modal: token.ComponentSheetBottomDockedModalContainerElevation as ElevationLevel,
+  standard: token.ComponentSheetBottomDockedStandardContainerElevation as ElevationLevel,
 } as const;
 
 export const bottomSheetRuntime = {
@@ -45,9 +45,7 @@ function cssLength(value: CssLength): string {
 }
 
 export function getBottomSheetElevationLevel(elevation: BottomSheetElevation = 'standard'): ElevationLevel {
-  return elevation === 'modal'
-    ? bottomSheetTokens.modalContainerElevation
-    : bottomSheetTokens.standardContainerElevation;
+  return bottomSheetElevationLevels[elevation];
 }
 
 /** Runtime-only visual overrides. Immutable defaults live in generated bottom-sheet.css. */
