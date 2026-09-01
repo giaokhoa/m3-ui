@@ -65,8 +65,13 @@ test.describe('Material 3 default PaneExpansionState keying', () => {
       'data-pane-adapted-value',
       'expanded',
     );
+    // targetState changes before the effect-driven default-state cache restore
+    // and drag-handle fade are visible. Wait for the new two-pane bucket instead
+    // of sampling the previous pair's adjusted split during that handoff.
+    await expect
+      .poll(async () => Math.abs((await expansionPercent(page)) - primarySecondaryAdjusted))
+      .toBeGreaterThan(5);
     const primaryTertiaryInitial = await expansionPercent(page);
-    expect(Math.abs(primaryTertiaryInitial - primarySecondaryAdjusted)).toBeGreaterThan(5);
 
     await dragHandleBy(page, -80);
     await expect.poll(() => expansionPercent(page)).toBeLessThan(primaryTertiaryInitial - 5);

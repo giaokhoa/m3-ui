@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 async function openStory(page: Page, id: string) {
   await page.goto(`/iframe.html?id=${id}&viewMode=story`, {
@@ -9,17 +9,12 @@ async function openStory(page: Page, id: string) {
   });
 }
 
-async function expectCollapsedPaneSettled(pane: Locator) {
-  await expect
-    .poll(async () => (await pane.boundingBox())?.height ?? Number.POSITIVE_INFINITY)
-    .toBeCloseTo(48, 0);
-}
-
 test.describe('Material 3 levitated drag-to-resize semantics', () => {
   test('announces the current state and next resize action while preserving activation paths', async ({
     page,
   }) => {
-    await openStory(page, 'layout-listdetailpanescaffold--levitated-bottom-sheet');
+    const storyId = 'layout-listdetailpanescaffold--levitated-bottom-sheet';
+    await openStory(page, storyId);
 
     const root = page.locator('#storybook-root');
     const pane = root.locator('[data-pane-role="tertiary"]');
@@ -45,17 +40,20 @@ test.describe('Material 3 levitated drag-to-resize semantics', () => {
     await expect(pane).toHaveAttribute('data-resize-state', 'collapsed');
     await expect(handle).toHaveAttribute('aria-label', 'partially expand');
     await expect(handle).toHaveAttribute('aria-description', 'collapsed');
-    // Expanded -> Collapsed is spring-driven. The semantic state flips at the
-    // start of the spring, so wait for geometry to reach the collapsed 48dp
-    // boundary before exercising a second semantic activation.
-    await expectCollapsedPaneSettled(pane);
+
+    // Remount before exercising the AT click path. DragToResizeState mirrors
+    // AndroidX by allowing prior click-to-resize springs to continue, so these
+    // independent activation contracts must not depend on spring completion.
+    await openStory(page, storyId);
+    await expect(pane).toHaveAttribute('data-resize-state', 'default');
+    await expect(handle).toHaveAttribute('data-resize-state', 'default');
 
     // Assistive technologies commonly activate button semantics using a
     // synthetic click with no pointer detail.
-    await handle.dispatchEvent('click');
-    await expect(pane).toHaveAttribute('data-resize-state', 'default');
-    await expect(handle).toHaveAttribute('data-resize-state', 'default');
-    await expect(handle).toHaveAttribute('aria-label', 'expand');
-    await expect(handle).toHaveAttribute('aria-description', 'partially expanded');
+    await handle.dispatchEvent('click', { detail: 0 });
+    await expect(pane).toHaveAttribute('data-resize-state', 'expanded');
+    await expect(handle).toHaveAttribute('data-resize-state', 'expanded');
+    await expect(handle).toHaveAttribute('aria-label', 'collapse');
+    await expect(handle).toHaveAttribute('aria-description', 'expanded');
   });
 });
