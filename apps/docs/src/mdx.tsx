@@ -6,7 +6,7 @@ type ClientMdxProps = Record<string, unknown>;
 
 function clientComponent(name: string): ComponentType<ClientMdxProps> {
   function ClientMdxProxy(props: ClientMdxProps) {
-    return <MdxClientComponent name={name} {...props} />;
+    return <MdxClientComponent {...props} __mdxComponent={name} />;
   }
 
   ClientMdxProxy.displayName = `DocsMdx(${name})`;
