@@ -51,6 +51,17 @@ export function chainRipplePressHandlers<Event extends RipplePressEvent>(
   };
 }
 
+export function getRippleReleaseDelay(startedAt: number, now: number): number {
+  return Math.max(0, minimumPressDurationMs - (now - startedAt));
+}
+
+export function clearRippleTimers(
+  timers: Set<ReturnType<typeof setTimeout>>,
+): void {
+  for (const timer of timers) clearTimeout(timer);
+  timers.clear();
+}
+
 export function useRipple({
   origin = 'press',
   radius,
@@ -113,15 +124,14 @@ export function useRipple({
     if (id === null) return;
 
     activeWaveId.current = null;
-    const elapsed = Date.now() - (startedAt.current.get(id) ?? Date.now());
-    const remaining = Math.max(0, minimumPressDurationMs - elapsed);
+    const now = Date.now();
+    const remaining = getRippleReleaseDelay(startedAt.current.get(id) ?? now, now);
     schedule(() => releaseWave(id), remaining);
   }, [releaseWave, schedule]);
 
   useEffect(
     () => () => {
-      for (const timer of timers.current) clearTimeout(timer);
-      timers.current.clear();
+      clearRippleTimers(timers.current);
     },
     [],
   );

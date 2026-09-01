@@ -281,22 +281,24 @@ function CalendarSync({
 
 function MonthYearButton({ children, onPress }: { children: ReactNode; onPress: () => void }) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps();
   return (
     <AriaButton
+      {...ripplePressProps}
       slot={null}
       aria-label="Choose year"
       className="date-picker__month-button"
       onPress={onPress}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
             focusRingRadius="9999px"
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           {children}
         </>
@@ -346,8 +348,10 @@ function YearOption({
   onPress: () => void;
 }) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps();
   return (
     <AriaButton
+      {...ripplePressProps}
       slot={null}
       ref={selected ? selectedRef : undefined}
       className="date-picker__year"
@@ -356,16 +360,16 @@ function YearOption({
         <button {...domProps} role="option" aria-selected={selected} />
       )}
       onPress={onPress}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
             focusRingRadius="9999px"
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           <span className="date-picker__year-label">{label}</span>
         </>
@@ -492,8 +496,10 @@ function DatePickerCalendarCell({ date }: { date: CalendarDate }) {
           <Ripple
             controller={ripple}
             focusRingRadius="9999px"
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           <span className="date-picker__day-label">{renderProps.formattedDate}</span>
         </span>
