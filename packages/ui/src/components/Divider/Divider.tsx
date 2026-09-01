@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { CSSProperties, HTMLAttributes } from 'react';
+import '@m3-ui/tokens/divider.css';
 import {
   getDividerStyle,
   type DividerThickness,
