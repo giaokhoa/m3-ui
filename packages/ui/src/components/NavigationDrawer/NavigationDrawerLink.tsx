@@ -12,6 +12,7 @@ export interface NavigationDrawerLinkProps
   selected: boolean;
   icon?: ReactNode;
   badge?: ReactNode;
+  title?: string;
   children: ReactNode;
 }
 
