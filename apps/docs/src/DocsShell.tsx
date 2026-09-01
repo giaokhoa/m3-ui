@@ -1,3 +1,7 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   useEffect,
   useMemo,
@@ -326,7 +330,7 @@ function DocsSidebar({
   return (
     <div className="docs-sidebar__content">
       <div className="docs-sidebar__header">
-        <a className="docs-sidebar__brand" href="/docs" onClick={onNavigate}>
+        <Link className="docs-sidebar__brand" href="/docs" onClick={onNavigate}>
           <span style={getMaterialTypeCssProperties('titleLarge')}>m3-ui</span>
           <span
             className="docs-sidebar__brand-subtitle"
@@ -334,7 +338,7 @@ function DocsSidebar({
           >
             Documentation
           </span>
-        </a>
+        </Link>
         {onClose ? (
           <IconButton aria-label="Close navigation" onPress={onClose}>
             <CloseGlyph />
@@ -360,7 +364,7 @@ function Breadcrumbs({ currentPath }: { currentPath: string }) {
   return (
     <nav aria-label="Breadcrumb" className="docs-breadcrumbs">
       <ol>
-        <li><a href="/docs" style={typeStyle}>Docs</a></li>
+        <li><Link href="/docs" style={typeStyle}>Docs</Link></li>
         {trail.map((item, index) => {
           const current = index === trail.length - 1;
           return (
@@ -370,7 +374,7 @@ function Breadcrumbs({ currentPath }: { currentPath: string }) {
                   {item.name}
                 </span>
               ) : (
-                <a href={item.url} style={typeStyle}>{item.name}</a>
+                <Link href={item.url} style={typeStyle}>{item.name}</Link>
               )}
             </li>
           );
@@ -394,17 +398,17 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
   return (
     <nav aria-label="Previous and next pages" className="docs-page-navigation">
       {previous ? (
-        <a className="docs-page-navigation__link" href={previous.url} rel="prev">
+        <Link className="docs-page-navigation__link" href={previous.url} rel="prev">
           <span style={getMaterialTypeCssProperties('bodyMedium')}>Previous</span>
           <strong style={getMaterialTypeCssProperties('titleMedium')}>
             {previous.name}
           </strong>
-        </a>
+        </Link>
       ) : (
         <span />
       )}
       {next ? (
-        <a
+        <Link
           className="docs-page-navigation__link docs-page-navigation__link--next"
           href={next.url}
           rel="next"
@@ -413,7 +417,7 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
           <strong style={getMaterialTypeCssProperties('titleMedium')}>
             {next.name}
           </strong>
-        </a>
+        </Link>
       ) : null}
     </nav>
   );
@@ -502,7 +506,7 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
   const { preference, cyclePreference } = useDocsTheme();
   const drawerState = useDrawerState();
   const { windowSizeClass } = useWindowAdaptiveInfo();
-  const currentPath = normalizePath(window.location.pathname);
+  const currentPath = normalizePath(usePathname());
   const widthClass = windowSizeClass.width;
   const permanentSidebar =
     widthClass === 'expanded' ||
@@ -523,7 +527,7 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
           </IconButton>
         )
       }
-      title={<a className="docs-app-bar__brand" href="/docs">m3-ui</a>}
+      title={<Link className="docs-app-bar__brand" href="/docs">m3-ui</Link>}
       actions={
         <>
           <DocsSearch />
