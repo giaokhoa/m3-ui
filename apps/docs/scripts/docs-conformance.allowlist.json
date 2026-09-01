@@ -1,33 +1,4 @@
 {
   "version": 1,
-  "entries": [
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/app-bar-column.mdx", "subject": "app-bar-column", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/app-bar-row.mdx", "subject": "app-bar-row", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/bottom-sheet.mdx", "subject": "bottom-sheet", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/button-group.mdx", "subject": "button-group", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/carousel.mdx", "subject": "carousel", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/checkbox.mdx", "subject": "checkbox", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/date-picker.mdx", "subject": "date-picker", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/divider.mdx", "subject": "divider", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/drag-handle.mdx", "subject": "vertical-drag-handle", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/fab-menu.mdx", "subject": "fab-menu", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/fab.mdx", "subject": "fab", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/icon-button.mdx", "subject": "icon-button", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/list-item.mdx", "subject": "list-item", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/menu.mdx", "subject": "menu", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/non-interactive-scrollbar.mdx", "subject": "non-interactive-scrollbar", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/progress-indicator.mdx", "subject": "progress-indicator", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/pull-to-refresh.mdx", "subject": "pull-to-refresh", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/radio-button.mdx", "subject": "radio-button", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/scrim.mdx", "subject": "scrim", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/search-bar.mdx", "subject": "search-bar", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/segmented-button.mdx", "subject": "segmented-button", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/slider.mdx", "subject": "slider", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/surface.mdx", "subject": "surface", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/swipe-to-dismiss-box.mdx", "subject": "swipe-to-dismiss-box", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/switch.mdx", "subject": "switch", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/time-picker.mdx", "subject": "time-picker", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/toggle-button.mdx", "subject": "toggle-button", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." },
-    { "rule": "accessibility-section", "file": "apps/docs/content/docs/components/tooltip.mdx", "subject": "tooltip", "issue": "#260", "reason": "Pre-existing guide debt; backfill tracked in #260." }
-  ]
+  "entries": []
 }
