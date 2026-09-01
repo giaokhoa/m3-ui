@@ -33,7 +33,9 @@ test('generated drawer and wide rail CSS own immutable paint motion and state', 
   assert.match(drawer, /--_navigation-drawer-open-duration:/);
   assert.match(wide, /\.wide-navigation-rail-item\[data-expanded\]/);
   assert.match(wide, /\.wide-navigation-rail-item\[data-selected\]/);
+  assert.match(modal, /\.modal-wide-navigation-rail-overlay\s*\{/);
   assert.match(modal, /--_modal-wide-navigation-rail-slide-duration:/);
+  assert.doesNotMatch(modal, /^\.modal-wide-navigation-rail\s*\{/m);
 });
 
 test('generated Tabs CSS owns variant and RAC state styling', async () => {
