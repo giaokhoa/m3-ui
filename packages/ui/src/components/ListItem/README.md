@@ -29,13 +29,13 @@ Canonical `component.list.base` tokens own immutable ListItem spacing, one/two/t
 - base, selected, disabled and selected-disabled paint;
 - hovered, focus-visible, pressed and dragged shapes;
 - selected interaction content colors;
-- typography, focus indicator, FastSpatial shape motion, and Ripple state-layer color/opacity.
+- typography, focus indicator, FastSpatial shape motion, and the ListItem-specific Ripple color binding.
 
 React Aria remains the source of truth for hover, focus-visible, press and disabled state. The component does not mirror those states into a TypeScript color/shape resolver. `data-selected`, `data-dragged`, line count and the narrow elevation level are component semantics layered onto the RAC host.
 
 ## Ripple boundary
 
-Interactive ListItems continue to use the shared RAC Ripple contract: RAC current render state drives hover/focus indication and normalized PressEvents drive runtime wave geometry/lifecycle. Generated ListItem CSS only supplies immutable Ripple color/state opacity bindings; it does not add another interaction engine.
+Interactive ListItems continue to use the shared RAC Ripple contract: RAC current render state drives hover/focus indication and normalized PressEvents drive runtime wave geometry/lifecycle. Generated ListItem CSS supplies only the component semantic Ripple color. Shared generated `ripple.css` remains the single owner of immutable hover/focus/pressed state-layer opacity and Ripple motion/focus styling; ListItem does not restate those primitive values.
 
 ## CSS packaging
 
