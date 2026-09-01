@@ -12,18 +12,28 @@ import {
 } from './DatePicker';
 
 describe('DatePicker runtime defaults and date-only helpers', () => {
-  it('keeps only the renderer-owned year range in TypeScript defaults', () => {
+  it('keeps renderer mechanics in TypeScript without static token projection', () => {
     expect(datePickerRuntime.defaultYearRange).toEqual([1900, 2100]);
+    expect(datePickerRuntime.minimumInteractiveSize).toBe(48);
+    expect(datePickerRuntime.horizontalPadding).toBe(12);
+    expect(datePickerRuntime.monthYearHeight).toBe(56);
+    expect(datePickerRuntime.modeParallaxDistance).toBe(48);
+
+    const style = getDatePickerStyle('modal', 'calendar', false);
+    expect(style).toEqual({
+      '--_date-picker-cell-size': '48px',
+      '--_date-picker-horizontal-padding': '12px',
+      '--_date-picker-month-year-height': '56px',
+      '--_date-picker-mode-parallax': '48px',
+    });
+    expect(style['--_date-picker-width']).toBeUndefined();
+    expect(style['--_date-picker-container-color']).toBeUndefined();
+    expect(style['--_date-picker-spatial-duration']).toBeUndefined();
   });
 
   it('keeps modal elevation in Dialog while docked uses level3', () => {
     expect(getDatePickerElevationLevel('modal')).toBe('level0');
     expect(getDatePickerElevationLevel('docked')).toBe('level3');
-  });
-
-  it('does not project immutable static defaults inline', () => {
-    expect(getDatePickerStyle('modal', 'calendar', false)).toEqual({});
-    expect(getDatePickerStyle('docked', 'calendar', false)).toEqual({});
   });
 
   it('accepts only real ISO Gregorian calendar dates', () => {
