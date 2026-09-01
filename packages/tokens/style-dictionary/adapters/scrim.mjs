@@ -3,7 +3,8 @@ import { cssValue, defineCssAdapter, tokenReader } from '../adapter-helpers.mjs'
 export function createScrimCss(context) {
   const get = tokenReader(context, 'Scrim CSS');
   return [
-    '.scrim {',
+    '.scrim,',
+    '.modal-navigation-drawer-overlay {',
     `  --_scrim-container-color: ${cssValue(get('scrim.containerColor'))};`,
     `  --_scrim-container-opacity: ${cssValue(get('scrim.containerOpacity'))};`,
     '  --_scrim-alpha: 1;',
