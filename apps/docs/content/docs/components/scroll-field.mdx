@@ -1,27 +1,17 @@
 ---
 title: Scroll field
-description: Material3 scroll-wheel selection with spinbutton semantics, controlled or uncontrolled indices, custom item text, and keyboard/pointer input.
+description: Material scroll-wheel selection with spinbutton semantics, controlled/uncontrolled indices, custom value text, and local wheel interaction.
 ---
 
-<ParitySummary component="scroll-field" />
-
-## Overview
-
-`ScrollField` is a compact wheel-style selector for ordered values such as hours, minutes, quantities, or units. It maps the current Compose Material3 ScrollField interaction to browser input semantics instead of rendering a purely visual infinite wheel.
-
-## Live example
+`ScrollField` is a compact wheel-style selector for ordered values such as hours, minutes, quantities, or units. The visual wheel maps to one browser value-adjustable control rather than exposing every repeated slot as an independent option.
 
 <ComponentPreview>
   <ScrollFieldPreview />
 </ComponentPreview>
 
-Use Arrow Up/Down, the mouse wheel, pointer dragging, or direct item interaction to change the selected value.
-
-## Selection state
-
-For a simple list, pass `items` and either controlled or uncontrolled selection:
-
 ```tsx
+import { ScrollField } from '@m3-ui/ui';
+
 <ScrollField
   aria-label="Minutes"
   items={['00', '15', '30', '45']}
@@ -30,26 +20,43 @@ For a simple list, pass `items` and either controlled or uncontrolled selection:
 />
 ```
 
-For generated or richer content, use `itemCount` with `renderItem`. `getItemText` supplies the accessible text when the rendered React content is not itself a useful plain-text value.
+## When to use
 
-## Accessibility
+Use a scroll field for a compact ordered sequence where incremental wheel-style adjustment supports the task. Prefer radio/segmented controls for a small categorical set and a text/number field when exact typed entry is more efficient.
 
-The root exposes `role="spinbutton"` with the selected index as its value range and `aria-valuetext` derived from `getItemText` or the item label. Provide `aria-label` or another accessible name describing what the wheel selects.
+## Selection state
 
-This differs intentionally from exposing every repeated visual slot as a separate selectable control. Assistive technology receives one value-adjustable field while sighted users see the wheel presentation.
+Use `items` for a simple finite list or `itemCount` with `renderItem` for generated/richer content. Controlled `selectedIndex` or uncontrolled defaults represent the single current value.
+
+`getItemText` supplies meaningful accessible value text when the rendered React content is not a useful plain string.
 
 ## Input behavior
 
-Arrow Up/Down changes the selected index from the keyboard. Wheel and pointer dragging update the same state, and clicking a visible item moves that option toward the selected position.
+Arrow Up/Down, wheel interaction, pointer dragging, and direct visible-item activation update the same selected index. `isDisabled` disables adjustment while preserving the current value semantics. Reduced-motion preference removes unnecessary smooth movement without changing selection.
 
-`isDisabled` disables the interaction while preserving the current value semantics. Reduced-motion preference removes unnecessary smooth movement without changing selection behavior.
+## Spinbutton semantics
 
-## Compose mapping
-
-Compose Material3 exposes `ScrollFieldState` and `rememberScrollFieldState` for hoisted selection and scrolling. The React API maps that state shape to normal controlled/uncontrolled props so callers do not need coroutine-based imperative scrolling.
-
-The component can render a fixed `items` array or an indexed item renderer, corresponding to Compose's generic field lambda. `getItemText` is the web accessibility counterpart to Compose's field accessibility description.
+The root exposes one `spinbutton` with a numeric range based on item indices and `aria-valuetext` for the human-readable selected item. This intentionally differs from exposing every decorative/repeated visual slot as a separate selectable control.
 
 ## Local measurement
 
-`ScrollField` measures its own rendered height to position the visible wheel slots. This is component-local presentation only and does not participate in adaptive window classes or pane layout.
+The component measures its own rendered height to position wheel slots. This is local presentation geometry only and is unrelated to Material window-size classes, pane directives, or application responsive policy.
+
+## Accessibility
+
+Provide a meaningful accessible label identifying what value the wheel controls. Ensure `getItemText` returns understandable value text for non-text content. Do not add a second keyboard-adjustment model around the spinbutton.
+
+## API reference
+
+<ApiReference name="ScrollField" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="scroll-field" />
+
+The public API maps the audited Compose Material3 ScrollField state/selection intent to normal React controlled/uncontrolled props. Browser spinbutton/value-text semantics replace a purely visual wheel for accessibility; local measurement remains presentation-only.
+
+## Related components
+
+- [Slider](/docs/components/slider) — continuous/bounded numeric adjustment.
+- [Time picker](/docs/components/time-picker) — higher-level time-of-day selection.
