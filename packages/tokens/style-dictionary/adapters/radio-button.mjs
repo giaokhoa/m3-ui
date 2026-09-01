@@ -22,7 +22,7 @@ export function createRadioButtonCss(context) {
     line('--_radio-disabled-selected-color', get('component.radioButton.colors.disabledSelected')),
     line('--_radio-disabled-unselected-color', get('component.radioButton.colors.disabledUnselected')),
     line('--_radio-disabled-opacity', get('component.radioButton.disabledOpacity')),
-    line('--_radio-disabled-label-opacity', percent(get('state.disabledContentOpacity'))),
+    line('--_radio-disabled-label-opacity', percent(get('state.disabled.contentOpacity'))),
     line('--_radio-color-duration', get('component.radioButton.motion.color.duration')),
     line('--_radio-color-easing', get('component.radioButton.motion.color.easing')),
     line('--_radio-dot-duration', get('component.radioButton.motion.dot.duration')),
