@@ -13,8 +13,36 @@ permissions:
   contents: read
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Upload Storybook build
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-dist
+          path: apps/storybook/dist
+          if-no-files-found: error
+          retention-days: 1
+
   verify:
-    name: Dev smoke, test, typecheck, build and visual regression
+    name: Audit, dev smoke, test and typecheck
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
@@ -161,18 +189,61 @@ jobs:
           exit 1
       - name: Test
         run: pnpm -r --if-present test
-      - name: Build
-        run: pnpm build
       - name: Typecheck
         run: pnpm -r --if-present typecheck
+
+  visual:
+    name: Visual regression (${{ matrix.shard }}/4)
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Download Storybook build
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-dist
+          path: apps/storybook/dist
       - name: Install Chromium headless shell
         run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
-      - name: Visual regression
-        run: pnpm --filter @m3-ui/storybook test:visual
+      - name: Visual regression shard
+        run: pnpm --filter @m3-ui/storybook exec playwright test --shard=${{ matrix.shard }}/4
       - name: Upload visual regression failures
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: visual-regression-failures
+          name: visual-regression-failures-${{ matrix.shard }}
           path: apps/storybook/test-results
           if-no-files-found: ignore
+
+  required:
+    name: Dev smoke, test, typecheck, build and visual regression
+    needs: [build, verify, visual]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all CI jobs
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          VISUAL_RESULT: ${{ needs.visual.result }}
+        run: |
+          test "$BUILD_RESULT" = "success"
+          test "$VERIFY_RESULT" = "success"
+          test "$VISUAL_RESULT" = "success"
