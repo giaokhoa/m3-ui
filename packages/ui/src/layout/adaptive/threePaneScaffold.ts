@@ -375,14 +375,17 @@ export function getPaneAdaptedValue(
   role: ThreePaneScaffoldRole,
 ): PaneAdaptedValue {
   const paneValue = value[role];
-  if (
-    paneValue.type !== 'levitated' ||
-    (paneValue as { dragToResizeState?: DragToResizeState | null }).dragToResizeState !== null
-  ) {
-    return paneValue;
-  }
-  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = paneValue as
-    PaneAdaptedValue & { dragToResizeState: null };
+  if (paneValue.type !== 'levitated') return paneValue;
+
+  const nullablePaneValue = paneValue as unknown as {
+    type: 'levitated';
+    alignment: LevitatedPaneAlignment;
+    scrim?: ReactNode;
+    dragToResizeState?: DragToResizeState | null;
+  };
+  if (nullablePaneValue.dragToResizeState !== null) return paneValue;
+
+  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = nullablePaneValue;
   return normalizedPaneValue;
 }
 
