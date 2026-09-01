@@ -94,9 +94,10 @@ test('generated FabMenu CSS owns list-item and toggle family defaults', async ()
   assert.match(css, /--_fab-menu-item-content-color: var\(--on-primary-container\);/);
   assert.match(css, /\.fab\.fab-menu-toggle\[data-toggle-size='medium'\]/);
   assert.match(css, /--_fab-target-size: 80px;/);
-  assert.match(css, /\.fab\.fab-menu-toggle\[data-toggle-size\]\[data-checked\] \{/);
-  assert.match(css, /--_fab-container-width: 56px;/);
-  assert.match(css, /--_fab-container-radius: 28px;/);
+  assert.match(
+    css,
+    /\.fab\.fab-menu-toggle\[data-toggle-size\]\[data-checked\] \{[^}]*--_fab-container-width: 56px;[^}]*--_fab-container-height: 56px;[^}]*--_fab-container-radius: 28px;/s,
+  );
   assert.match(css, /--_fab-icon-size: 20px;/);
   assert.match(css, /--_fab-toggle-effects-duration: 108ms;/);
 });
