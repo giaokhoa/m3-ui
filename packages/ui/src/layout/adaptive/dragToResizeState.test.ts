@@ -194,7 +194,7 @@ describe('DragToResizeState', () => {
     expect(state.size).toBe(800);
   });
 
-  it('animates non-default state changes while exposing the semantic target immediately', async () => {
+  it('lets range remeasurement override the semantic target until the spring reaches it', async () => {
     let updateAnimation: ((size: number) => void) | undefined;
     let finishAnimation: (() => void) | undefined;
     const animation: DragToResizeAnimation = ({ update }) => {
@@ -214,13 +214,13 @@ describe('DragToResizeState', () => {
     expect(state.value).toBe(DragToResizeValue.Collapsed);
     expect(state.size).toBe(800);
     expect(state.measure(measurement)?.height).toBe(800);
-    expect(state.value).toBe(DragToResizeValue.Collapsed);
+    expect(state.value).toBe(DragToResizeValue.Expanded);
 
     updateAnimation!(424.75);
-    expect(state.value).toBe(DragToResizeValue.Collapsed);
+    expect(state.value).toBe(DragToResizeValue.Expanded);
     expect(state.size).toBe(424.75);
     expect(state.measure(measurement)?.height).toBe(424);
-    expect(state.value).toBe(DragToResizeValue.Collapsed);
+    expect(state.value).toBe(DragToResizeValue.Expanded);
 
     finishAnimation!();
     await transition;
