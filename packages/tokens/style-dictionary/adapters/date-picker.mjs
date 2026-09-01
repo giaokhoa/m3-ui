@@ -22,6 +22,11 @@ export function createDatePickerCss(context) {
 
   return [
     '.date-picker {',
+    // Pinned Compose renderer mechanics. They are immutable CSS defaults, not runtime state.
+    line('--_date-picker-cell-size', '48px'),
+    line('--_date-picker-horizontal-padding', '12px'),
+    line('--_date-picker-month-year-height', '56px'),
+    line('--_date-picker-mode-parallax', '48px'),
     line('--_date-picker-state-layer-size', get(`${modal}.dateContainerWidth`)),
     line('--_date-picker-input-radius', shape('extraSmall')),
     line('--_date-picker-selected-color', get(`${modal}.dateSelectedContainerColor`)),
