@@ -29,7 +29,13 @@ RAC onPressStart/onPressEnd
     -> <Ripple controller={...} />
 ```
 
-`getPressProps()` chains Ripple lifecycle with caller handlers so a component does not need to manually invoke Ripple and then repeat the user's handler. Legacy direct `controller.onPressStart/onPressEnd` and legacy state props remain temporarily available while #151 migrates existing consumers.
+`getPressProps()` chains Ripple lifecycle with caller handlers so a RAC-backed component does not manually invoke Ripple and then repeat the user's handler. Ripple indication state is supplied only through the normalized `state` prop; the former `stateInteraction`, `isHovered`, and `isFocusVisible` compatibility props are not part of the contract.
+
+## Native and special adapters
+
+`RippleController.onPressStart/onPressEnd` remains a narrow adapter surface for hosts that do not have a RAC normalized PressEvent or that must preserve host-owned DOM coordinates/lifecycle. Audited examples are Card, DragHandle, Surface, and the DatePicker calendar-cell DOM adapter.
+
+Those hosts keep pointer/keyboard/nested-interactive semantics at the component boundary and only translate an already-owned interaction into Ripple geometry/lifecycle. Shared Ripple must not grow a generic native pointer/keyboard engine or a second interaction state machine.
 
 ## Runtime ownership
 
@@ -39,7 +45,7 @@ Runtime values include:
 - diameter/start scale derived from measured bounds;
 - active/releasing wave lifecycle and timers;
 - component-specific focus-ring radius/inset;
-- current RAC hover/focus-visible state;
+- current RAC/native-adapter hover/focus-visible state;
 - the theme-level `rippleFocus` choice.
 
 Immutable state-layer opacity, timings/easings, focus-ring stroke/inset/color and motion bindings come from generated token CSS.
@@ -73,7 +79,7 @@ Relevant checks cover:
 1. normalized press-event coordinates and wave geometry;
 2. minimum press lifetime/release cleanup;
 3. chained caller press handlers;
-4. RAC hover/focus-visible state-layer behavior;
+4. RAC/native-adapter hover/focus-visible state-layer behavior;
 5. generated Ripple token bindings and modular CSS order;
 6. focus-ring geometry for compact selection controls;
 7. unit/type/build and Chromium visual regression.
