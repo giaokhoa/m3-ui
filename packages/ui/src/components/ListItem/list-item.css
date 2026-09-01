@@ -136,7 +136,7 @@
 }
 
 .list-item--interactive:focus-visible {
-  outline: var(--_list-item-focus-indicator-thickness) solid var(--secondary);
+  outline: var(--_list-item-focus-indicator-thickness) solid var(--_list-item-focus-indicator-color);
   outline-offset: var(--_list-item-focus-indicator-outline-offset);
 }
 
