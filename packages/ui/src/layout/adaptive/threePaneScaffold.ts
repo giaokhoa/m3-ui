@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from 'react';
+import { hasReactNodeContent } from '../reactNode';
 import type { DragToResizeState } from './dragToResizeState';
 import type { LevitatedPaneCustomAlignment } from './levitatedPaneAlignment';
 import type { PaneScaffoldDirective } from './paneScaffoldDirective';
@@ -71,7 +72,9 @@ const normalizedLevitatedPaneScrims = new WeakMap<() => ReactNode, ReactNode>();
 function normalizeLevitatedPaneScrim(
   scrim: LevitatedPaneScrimContent | undefined,
 ): ReactNode | undefined {
-  if (typeof scrim !== 'function') return scrim;
+  if (typeof scrim !== 'function') {
+    return hasReactNodeContent(scrim) ? scrim : undefined;
+  }
   const cached = normalizedLevitatedPaneScrims.get(scrim);
   if (cached !== undefined) return cached;
   const normalized = createElement(scrim);

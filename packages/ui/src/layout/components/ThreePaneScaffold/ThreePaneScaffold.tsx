@@ -31,6 +31,7 @@ import {
   threePaneScaffoldValuesEqual,
   type ThreePaneScaffoldState,
 } from '../../adaptive/threePaneScaffoldState';
+import { hasReactNodeContent } from '../../reactNode';
 import {
   getDragToResizeHandleAriaState,
   type DragToResizeHandleAriaStrings,
@@ -313,17 +314,25 @@ export function ThreePaneScaffold({
   );
 
   const targetValue = activeScaffoldState.targetState;
+  const hasPaneExpansionDragHandleSpec =
+    typeof paneExpansionDragHandle === 'function' ||
+    hasReactNodeContent(paneExpansionDragHandle);
   const defaultExpansionState = useDefaultPaneExpansionState(
     targetValue,
-    paneExpansionDragHandle != null,
+    hasPaneExpansionDragHandleSpec,
   );
   const expansionState = paneExpansionState ?? defaultExpansionState;
+  const dragHandle =
+    typeof paneExpansionDragHandle === 'function'
+      ? paneExpansionDragHandle(expansionState)
+      : paneExpansionDragHandle;
+  const hasPaneExpansionDragHandle = hasReactNodeContent(dragHandle);
   const currentValue = activeScaffoldState.currentState;
   const transitionActive = !threePaneScaffoldValuesEqual(currentValue, targetValue);
 
-  const primaryPaneAvailable = primaryPane != null;
-  const secondaryPaneAvailable = secondaryPane != null;
-  const tertiaryPaneAvailable = tertiaryPane != null;
+  const primaryPaneAvailable = hasReactNodeContent(primaryPane);
+  const secondaryPaneAvailable = hasReactNodeContent(secondaryPane);
+  const tertiaryPaneAvailable = hasReactNodeContent(tertiaryPane);
   const paneAvailability = {
     primary: primaryPaneAvailable,
     secondary: secondaryPaneAvailable,
@@ -671,7 +680,7 @@ export function ThreePaneScaffold({
   const hasBlockingScrim = transitionScrimBlocks || hasLevitatedPaneWithScrim(targetValue);
 
   let measuredDragHandleOffset = PaneExpansionUnspecified;
-  if (paneExpansionDragHandle != null) {
+  if (hasPaneExpansionDragHandle) {
     if (
       expansionState.isDraggingOrSettling &&
       expansionLayout.currentDraggingOffset !== PaneExpansionUnspecified
@@ -703,7 +712,7 @@ export function ThreePaneScaffold({
   // into the content bounds. Keep the raw midpoint separately for expansion
   // state measurement, which happens before that placement clamp upstream.
   const targetDragHandlePlacement =
-    paneExpansionDragHandle != null &&
+    hasPaneExpansionDragHandle &&
     measuredDragHandleOffset !== PaneExpansionUnspecified &&
     geometry.width > 0
       ? calculatePaneExpansionDragHandlePlacement({
@@ -725,7 +734,7 @@ export function ThreePaneScaffold({
     targetOffsetX: trackedDragHandleTargetOffset,
   } = dragHandleFadeOffsetsRef.current;
   const showDragHandle =
-    paneExpansionDragHandle != null &&
+    hasPaneExpansionDragHandle &&
     trackedDragHandleTargetOffset !== PaneExpansionUnspecified;
   const dragHandleFadeFrame =
     transitionActive &&
@@ -932,10 +941,6 @@ export function ThreePaneScaffold({
   const renderedScrim = transitionFrame?.scrim ?? staticScrim;
   const scrimOpacity = transitionFrame?.scrimOpacity ?? (staticScrim == null ? 0 : 1);
 
-  const dragHandle =
-    typeof paneExpansionDragHandle === 'function'
-      ? paneExpansionDragHandle(expansionState)
-      : paneExpansionDragHandle;
   const dragHandleAriaState = getPaneExpansionHandleAriaState(
     expansionState,
     paneExpansionHandleAriaStrings,
@@ -961,7 +966,7 @@ export function ThreePaneScaffold({
         {paneEntries.map(([role, content]) => {
           const adaptedValue = getPaneAdaptedValue(targetValue, role);
           const frame = transitionFrame?.[role];
-          if (content == null) return null;
+          if (!hasReactNodeContent(content)) return null;
 
           // AndroidX disposes Hidden pane composition while SaveableStateProvider
           // retains pane-local state. React 19.2 Activity is the native analogue:
@@ -1032,7 +1037,8 @@ export function ThreePaneScaffold({
               : typeof resizeHandleSpec === 'function'
                 ? resizeHandleSpec(paneResizeState)
                 : resizeHandleSpec;
-          const hasResizeHandle = paneResizeState !== undefined && resizeHandle != null;
+          const hasResizeHandle =
+            paneResizeState !== undefined && hasReactNodeContent(resizeHandle);
           const hasPaneResizeAction = paneResizeState !== undefined && !hasResizeHandle;
           const paneResizeHandlers =
             hasPaneResizeAction && paneResizeState !== undefined
