@@ -20,6 +20,8 @@ export const AnimationCoreInterruptionSpringSpec: AnimationSpringSpec = Object.f
   stiffness: 1500,
 });
 
+const ComposeMaxLongMillis = 9_223_372_036_854;
+
 function finite(value: number, name: string) {
   if (!Number.isFinite(value)) throw new RangeError(`${name} must be finite`);
 }
@@ -289,7 +291,7 @@ export function calculateAnimationSpringDurationMs(
   );
   const normalizedVelocity = composeFloat(velocity / threshold);
   if (normalizedDisplacement === 0 && normalizedVelocity === 0) return 0;
-  if (dampingRatio === 0) return Number.MAX_SAFE_INTEGER;
+  if (dampingRatio === 0) return ComposeMaxLongMillis;
 
   const velocityForPositivePosition =
     normalizedDisplacement < 0 ? -normalizedVelocity : normalizedVelocity;
