@@ -5,7 +5,7 @@ export function createModalWideNavigationRailCss(context) {
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const rail = 'component.navigation.rail.expanded';
   return [
-    '.modal-wide-navigation-rail {',
+    '.modal-wide-navigation-rail-overlay {',
     line('--_modal-wide-navigation-rail-container-color', get(`${rail}.modalContainerColor`)),
     line('--_modal-wide-navigation-rail-content-color', get('color.role.onSurface')),
     line('--_modal-wide-navigation-rail-radius', get('shape.corner.large')),
