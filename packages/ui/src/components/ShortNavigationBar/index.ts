@@ -9,7 +9,6 @@ export {
   getShortNavigationBarItemStyle,
   getShortNavigationBarStyle,
   shortNavigationBarRuntime,
-  shortNavigationBarTokens,
   type ShortNavigationBarArrangement,
   type ShortNavigationBarIconPosition,
   type ShortNavigationBarItemInteractionState,
