@@ -72,9 +72,8 @@ test('generated ListItem CSS owns immutable geometry typography paint and state 
   assert.match(css, /--_list-item-headline-font-size: 16px;/);
   assert.match(css, /--_list-item-supporting-font-size: 14px;/);
   assert.match(css, /--_list-item-meta-font-size: 11px;/);
-  assert.match(css, /--_ripple-hover-opacity: 0\.08;/);
-  assert.match(css, /--_ripple-focus-opacity: 0\.1;/);
-  assert.match(css, /--_ripple-pressed-opacity: 0\.1;/);
+  assert.match(css, /--_ripple-color: var\(--on-surface\);/);
+  assert.doesNotMatch(css, /--_ripple-(?:hover|focus|pressed)-opacity:/);
 
   for (const [lines, height] of [[1, 56], [2, 72], [3, 88]]) {
     assert.match(css, new RegExp(`\\.list-item\\[data-lines='${lines}'\\] \\{[^}]*--_list-item-min-height: ${height}px;`, 's'));
