@@ -1,5 +1,6 @@
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentType } from 'react';
+import { NativeSignInFormPreview } from './formDemos';
 import { MdxClientComponent } from './mdx-client';
 
 type ClientMdxProps = Record<string, unknown>;
@@ -103,4 +104,5 @@ export const docsMdxComponents = {
   AppBarOverflowPreview: clientComponent('AppBarOverflowPreview'),
   ParityCatalog: clientComponent('ParityCatalog'),
   MaterialFidelity: clientComponent('MaterialFidelity'),
+  NativeSignInFormPreview,
 } satisfies MDXComponents;
