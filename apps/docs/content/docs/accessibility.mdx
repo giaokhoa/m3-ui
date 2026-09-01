@@ -1,0 +1,259 @@
+---
+title: Web accessibility
+description: How Material 3 visual contracts map to browser semantics, React Aria behavior, focus, keyboard interaction, forms, live regions, touch targets, and reduced motion in m3-ui.
+---
+
+# Web accessibility
+
+Material 3 defines the visual language and interaction intent of `m3-ui`. Browser semantics come from native HTML and React Aria. The library keeps those responsibilities separate: Material tokens and component structure define how a control looks, while the semantic host defines what the control is, how it is named, how keyboard and assistive-technology interaction works, and how state is exposed.
+
+This guide covers the cross-component rules. Individual component guides remain the source for component-specific details.
+
+## Material presentation does not replace semantics
+
+Do not infer accessibility behavior from a visual family alone. A rounded Material surface can be a button, link, checkbox, switch, slider, dialog, status message, or presentation-only container. Use the public component whose semantic contract matches the task.
+
+`m3-ui` generally follows this ownership model:
+
+- **Material 3**: visual hierarchy, geometry, state presentation, shape, color, typography, elevation, motion, and minimum interaction geometry.
+- **React Aria / native HTML**: role, accessible name, selection state, focus behavior, keyboard and pointer semantics, form relationships, overlay behavior, and browser interoperability.
+- **Application code**: domain state, routing, validation policy, async lifecycle, and content relationships outside the component's public contract.
+
+## Accessible names and visible labels
+
+Prefer visible labels when a Material component is designed to contain text. Visible text gives sighted and non-sighted users the same action vocabulary and avoids relying on icon recognition.
+
+```tsx
+import { Button, IconButton } from '@m3-ui/ui';
+
+<Button>Save changes</Button>
+
+<IconButton aria-label="Open navigation">
+  <MenuIcon />
+</IconButton>
+```
+
+Icon-only controls require an accessible name. Public icon-button families intentionally treat their icon child as presentation content so the control has one stable name supplied by the button.
+
+For labeled selection controls, visible children normally provide the accessible label:
+
+```tsx
+<Checkbox>Remember this device</Checkbox>
+<Switch>Automatic updates</Switch>
+```
+
+When visible text is intentionally absent, provide an accessible name through the inherited React Aria or native props instead of expecting a decorative SVG title to name the control.
+
+## Button and link semantics
+
+Use a button for an action and a link for navigation. Do not choose semantics from visual styling.
+
+A Material button that submits, confirms, expands, dismisses, or otherwise performs an action should remain a button. Navigation to another document or route should remain link semantics even when it is presented inside Material navigation chrome.
+
+Do not add `role="button"` to arbitrary elements when a real button component is available. Native and React Aria button hosts already provide keyboard activation, disabled behavior, focus handling, and press normalization.
+
+## Checkbox, radio, switch, and slider semantics
+
+These controls can all represent choices, but they are not interchangeable.
+
+### Checkbox
+
+Use `Checkbox` for an independent binary choice. Checked, unchecked, and indeterminate are distinct states. Indeterminate is not a replacement for application selection state.
+
+```tsx
+<Checkbox defaultSelected>Email me a receipt</Checkbox>
+```
+
+### Radio buttons
+
+Use `RadioGroup` and `RadioButton` when exactly one item in a logical group can be selected. The group owns the shared label and value relationship, while React Aria owns movement and selection between options.
+
+```tsx
+<RadioGroup label="Density" defaultValue="standard">
+  <RadioButton value="compact">Compact</RadioButton>
+  <RadioButton value="standard">Standard</RadioButton>
+  <RadioButton value="comfortable">Comfortable</RadioButton>
+</RadioGroup>
+```
+
+### Switch
+
+Use `Switch` for an immediate on/off setting. It exposes switch semantics instead of being documented as a generic checkbox merely because both have a boolean value.
+
+```tsx
+<Switch defaultSelected>Notifications</Switch>
+```
+
+### Slider and range slider
+
+Use `Slider` for one numeric value and `RangeSlider` for a numeric interval. React Aria owns slider/thumb roles, keyboard adjustment, dragging, orientation, and value semantics.
+
+For a range, provide useful names for both thumbs when the shared label is not sufficient:
+
+```tsx
+<RangeSlider
+  label="Price range"
+  defaultValue={[25, 75]}
+  thumbLabels={['Minimum price', 'Maximum price']}
+/>
+```
+
+Material ticks and value indicators are presentation. They do not replace the semantic value exposed by the slider thumbs.
+
+## Focus-visible and interaction state
+
+Keyboard focus must remain visible. `m3-ui` consumes React Aria focus-visible state and applies the Material focus treatment rather than maintaining a separate component-local focus model.
+
+Hover, focus, press, and disabled presentation may overlap visually, but the browser semantic host remains the source of truth. Shared Material effects use normalized current state with deterministic precedence instead of rebuilding an independent interaction state machine.
+
+Do not remove focus indication with consumer CSS unless an equally visible replacement is provided.
+
+## Focus restoration and modal focus scope
+
+Modal overlays have stronger focus requirements than ordinary floating surfaces.
+
+`DialogTrigger` and `DialogOverlay` use React Aria's modal behavior. Focus moves into the dialog, remains contained while the modal is active, Escape and dismissal follow the overlay contract, and focus returns to the trigger when the dialog closes.
+
+```tsx
+<DialogTrigger>
+  <Button>Delete item</Button>
+  <DialogOverlay>
+    <Dialog>
+      <DialogTitle>Delete item?</DialogTitle>
+      <DialogDescription>This action cannot be undone.</DialogDescription>
+      <DialogActions>
+        <DialogCloseAction>Cancel</DialogCloseAction>
+        <DialogCloseAction>Delete</DialogCloseAction>
+      </DialogActions>
+    </Dialog>
+  </DialogOverlay>
+</DialogTrigger>
+```
+
+Use `DialogTitle` and `DialogDescription` so the modal has an accessible name and supporting description. If dismissal is disabled, provide an explicit action path rather than trapping users in a surface they cannot close.
+
+## Keyboard interaction and roving focus
+
+Composite controls should use the keyboard model appropriate to their semantic pattern rather than making every child an unrelated tab stop.
+
+`Tabs` uses React Aria tab-list semantics, including roving keyboard focus, disabled state, and automatic keyboard activation. Supply an accessible label for each tab list.
+
+```tsx
+<Tabs
+  aria-label="Project sections"
+  defaultSelectedKey="overview"
+  items={[
+    { id: 'overview', label: 'Overview' },
+    { id: 'activity', label: 'Activity' },
+    { id: 'settings', label: 'Settings' },
+  ]}
+/>
+```
+
+The public `Tabs` component represents the tab-list surface only. Application code owns the corresponding route or panel semantics; do not assume hidden tab panels are created automatically.
+
+The same principle applies to grouped radio controls, menus, and other composites: preserve the semantic grouping and keyboard behavior supplied by the public primitive rather than layering custom arrow-key logic on top.
+
+## Live regions and status messages
+
+Transient information should be announced without stealing focus when it does not require immediate user action.
+
+`Snackbar` exposes its message as a polite atomic status region. Updating the snackbar can therefore announce a status change without moving focus away from the user's current task.
+
+```tsx
+<Snackbar action={<SnackbarAction onPress={undo}>Undo</SnackbarAction>}>
+  Message archived
+</Snackbar>
+```
+
+The snackbar surface does not own application queueing, replacement, or timeout policy. Keep those lifecycle decisions in application state so announcements correspond to actual message changes rather than hidden component timers.
+
+For other custom asynchronous status messages, use an appropriate live-region pattern only when the public component does not already provide one. Avoid duplicating announcements around a component that already exposes status semantics.
+
+## Touch targets and visual size
+
+Material components can have a visual container that is smaller than the minimum interactive target. Treat those as separate concerns.
+
+Do not shrink a control's hit target merely because the icon, handle, checkbox box, or other visible element is compact. The component's audited Material geometry includes its interaction target where applicable.
+
+This is especially important for icon buttons, selection controls, drag handles, sliders, and compact navigation destinations. Consumer CSS that clips or overrides the interactive bounds can create an accessibility regression even when the visible pixels still resemble the Material spec.
+
+## Reduced motion
+
+Respect the user's reduced-motion preference when motion is not essential to understanding state.
+
+`m3-ui` already applies reduced-motion behavior in audited components where browser motion is involved. For example, scrollable tabs avoid smooth scrolling when `prefers-reduced-motion` requests reduced motion.
+
+Application-authored transitions around `m3-ui` should follow the same rule: keep state changes understandable without requiring large translation, repeated animation, or decorative motion. Reduced motion changes presentation, not semantic state or keyboard behavior.
+
+## Tooltips and interactive floating content
+
+Plain and rich tooltips intentionally use different browser semantics.
+
+A plain tooltip contains short, non-interactive supporting text and uses the tooltip relationship supplied by React Aria.
+
+```tsx
+<TooltipTrigger>
+  <Button>Info</Button>
+  <PlainTooltip>Short supporting context</PlainTooltip>
+</TooltipTrigger>
+```
+
+A rich tooltip can contain an action. Interactive content must not be placed inside an ARIA tooltip, so `RichTooltip` uses a non-modal dialog-style semantic contract instead. The trigger exposes the expanded relationship and focus may move into the action without enabling modal focus containment.
+
+```tsx
+<RichTooltipTrigger>
+  <Button>Shortcuts</Button>
+  <RichTooltip
+    title="Keyboard shortcuts"
+    action={(close) => <TextButton onPress={close}>Got it</TextButton>}
+  >
+    Press Command K to open search.
+  </RichTooltip>
+</RichTooltipTrigger>
+```
+
+Do not convert actionable rich content into `role="tooltip"` merely because it is visually tooltip-shaped.
+
+## Forms and validation relationships
+
+Material styling does not replace native form relationships. Inputs should retain names, autocomplete hints, read-only/disabled state, browser input modes, and form submission behavior where those are part of the native control contract.
+
+`TextField` and `OutlinedTextField` use React Aria relationships for the field label, description, error message, input, and textarea. Validation should be semantic as well as visual:
+
+```tsx
+<OutlinedTextField
+  label="Email"
+  name="email"
+  autoComplete="email"
+  isMultiline={false}
+  isInvalid
+  errorMessage="Enter a valid email address"
+/>
+```
+
+Do not show an error only by changing color. Provide an error message and expose invalid state through the component API so the browser relationship remains synchronized with the Material error presentation.
+
+Secure text-field reveal controls change presentation only. They do not implement credential storage, password-manager policy, or validation rules. Keep native attributes such as `name` and `autoComplete` available for browser integration.
+
+## Decorative content and nested interaction
+
+Icons, marks, ripples, elevation layers, scrims, and other Material paint layers should not become competing semantic controls.
+
+When a public component marks an icon slot as presentation-only, do not rely on that icon as the control's accessible name. When a component exposes one semantic host, avoid placing a second hidden or overlapping interactive host on top solely to reproduce Material visual effects.
+
+Likewise, do not place independently interactive content into a slot that is documented as decorative. For example, a chip trailing icon that is not a public dismiss action should not be presented to users as a second button.
+
+## Component-specific guidance
+
+Use this page as the shared model, then consult the component guide for exact behavior. In particular:
+
+- [Button](/docs/components/button) and [Icon button](/docs/components/icon-button) for action naming and icon-only controls.
+- [Checkbox](/docs/components/checkbox), [Radio button](/docs/components/radio-button), [Switch](/docs/components/switch), and [Slider](/docs/components/slider) for selection/value semantics.
+- [Text field](/docs/components/text-field) for labels, descriptions, validation, native form behavior, and secure reveal controls.
+- [Dialog](/docs/components/dialog) for modal focus scope and restoration.
+- [Tabs](/docs/components/tabs) for tab-list keyboard behavior.
+- [Snackbar](/docs/components/snackbar) for polite status announcements.
+- [Tooltips](/docs/components/tooltip) for plain-tooltip versus interactive rich-tooltip semantics.
+
+The core rule is consistent across the library: choose the Material component for its design role, preserve the browser semantic primitive underneath it, and keep application-owned state and policy outside the visual component when the public API does not claim that responsibility.
