@@ -9,6 +9,7 @@ import '@m3-ui/ui/styles.css';
 import { actionOverflowMdxComponents } from './actionOverflowMdxComponents';
 import { appBarToolbarMdxComponents } from './appBarToolbarMdxComponents';
 import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
+import { componentPageMdxComponents } from './componentPageMdxComponents';
 import { composeUtilityMdxComponents } from './composeUtilityMdxComponents';
 import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
 import { DocsSearch } from './DocsSearch';
@@ -79,6 +80,7 @@ function DocsPage() {
 
   const MDX = page.body;
   const docsMdxComponents = {
+    ...componentPageMdxComponents,
     ...feedbackSearchMdxComponents,
     ...groupedControlMdxComponents,
     ...contentPrimitiveMdxComponents,
