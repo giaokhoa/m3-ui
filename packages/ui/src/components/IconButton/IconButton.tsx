@@ -71,8 +71,7 @@ function IconButtonSurface({
       <Ripple
         controller={ripple}
         focusRingRadius="var(--_icon-button-container-radius)"
-        isFocusVisible={isFocusVisible}
-        isHovered={isHovered}
+        state={{ isFocusVisible, isHovered }}
       />
       <span aria-hidden="true" className="icon-button__icon">
         {children}
@@ -95,18 +94,12 @@ function ActionIconButtonImpl({
   ...props
 }: IconButtonProps & { variant: IconButtonVariant }) {
   const ripple = useRipple({ origin: 'center' });
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       data-size={size}
       data-variant={variant}
       data-width={width}
@@ -129,8 +122,6 @@ function ActionIconButtonImpl({
           ...userStyle,
         };
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => (
         <IconButtonSurface
@@ -161,18 +152,12 @@ function ToggleIconButtonImpl({
   ...props
 }: IconToggleButtonProps & { variant: IconButtonVariant }) {
   const ripple = useRipple({ origin: 'center' });
-  const handlePressStart: AriaToggleButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaToggleButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaToggleButton
       {...props}
+      {...ripplePressProps}
       isSelected={isSelected}
       onChange={onChange}
       data-size={size}
@@ -198,8 +183,6 @@ function ToggleIconButtonImpl({
           ...userStyle,
         };
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => (
         <IconButtonSurface
