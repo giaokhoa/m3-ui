@@ -32,7 +32,7 @@ export const navigationDrawerRuntime = {
   velocityThreshold: 400,
   dragSlop: 4,
   motion: { close: { duration: '108ms' } },
-} as const;
+};
 
 function cssLength(value: CssLength): string {
   return typeof value === 'number' ? `${value}px` : value;
