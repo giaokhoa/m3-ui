@@ -16,11 +16,11 @@ The visible product surface is owned by `m3-ui`:
 - screen composition uses public `@m3-ui/ui/layout` APIs;
 - navigation, search and app-bar UI use public `@m3-ui/ui` components;
 - Markdown typography maps to the public Material type scale from `@m3-ui/ui`;
-- docs-only constructs such as code blocks, breadcrumbs, previous/next navigation, parity summaries, semantic tables, component previews, color swatches, and type-scale visualizers remain local adapters.
+- docs-only constructs such as code blocks, breadcrumbs, previous/next navigation, API reference tables, parity summaries, semantic tables, component previews, color swatches, and type-scale visualizers remain local adapters.
 
 ## Documentation shell
 
-The public docs must render as a normal documentation product rather than a centered MDX demo host.
+The public docs render as a documentation product rather than a centered MDX demo host.
 
 `DocsShell` owns the persistent shell:
 
@@ -68,6 +68,39 @@ Each page should cover, where applicable:
 
 Shared parity metadata lives in `src/componentDocs.ts` and is rendered through the docs-only `MaterialParity` MDX primitive. Keep canonical measurements, typography, colors, elevations and component shapes in the token/component layers; do not duplicate them in MDX prose or docs CSS.
 
+The reusable page-authoring primitives and canonical MDX template live under `authoring/` and `src/componentPageMdxComponents.tsx`. These are documentation adapters; they do not replace public component pages with TSX routes.
+
+## Generated API reference
+
+Public API tables are generated from the TypeScript surface reachable through `packages/ui/src/index.ts`. The docs app does not maintain a second handwritten prop inventory.
+
+`scripts/build-api-reference.mjs` uses the TypeScript checker to resolve the public entrypoint, aliases and component prop types. The generated model includes:
+
+- public component/function/type signatures;
+- public component props and statically knowable defaults;
+- inherited React Aria or other web props, with their origin kept separate from m3-ui-owned props;
+- JSDoc descriptions;
+- optional `@source`, `@provenance`, `@material`, `@compose`, `@web`, and `@adaptation` annotations when source metadata provides them;
+- repository-relative source locations.
+
+The generated JSON is written to `src/generated/api-reference.generated.json` before docs dev, build, test and typecheck. It is deterministic build output and is intentionally ignored by Git.
+
+Component MDX pages consume the runtime primitive directly without importing app TSX modules:
+
+```mdx
+## API reference
+
+<ApiReference name="Button" />
+```
+
+`name` must be an actual public export from `@m3-ui/ui`. Removed, renamed or internal-only symbols are not silently documented: generation/runtime validation fails loudly instead. Use `showInherited` only when the page should initially expand the inherited React/web prop table:
+
+```mdx
+<ApiReference name="TextField" showInherited />
+```
+
+Do not copy generated signatures or prop rows into MDX. If the generated output is wrong, fix the public type/JSDoc surface or the extractor rather than creating a local override table. The non-public fixture under `scripts/fixtures/api-reference.mdx` protects the MDX embedding contract without creating a user-facing TSX API route.
+
 ## Static docs data and search
 
 `scripts/build-docs-data.mjs` is the single build-time Fumadocs data pass:
@@ -84,7 +117,7 @@ Do not add a second client-side search implementation for titles or manually par
 
 ## Layout boundary
 
-The docs app now consumes the public Material layout subsystem; it still does not reimplement it.
+The docs app consumes the public Material layout subsystem; it does not reimplement it.
 
 Do not add docs-owned compact/medium/expanded numeric breakpoints, pane directives, window-class calculators, hinge policies, or alternate scaffold algorithms. `Scaffold`, Material window classification, canonical pane logic, and safe-area behavior stay owned by `@m3-ui/ui/layout`.
 
@@ -101,8 +134,10 @@ Semantic documentation tables are docs adapters rather than Material components.
 ## Development
 
 ```bash
+pnpm --filter @m3-ui/docs api:generate
 pnpm --filter @m3-ui/docs dev
 pnpm --filter @m3-ui/docs build
+pnpm --filter @m3-ui/docs test
 pnpm --filter @m3-ui/docs typecheck
 ```
 

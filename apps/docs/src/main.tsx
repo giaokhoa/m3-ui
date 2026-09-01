@@ -5,6 +5,7 @@ import '@m3-ui/ui/styles.css';
 import { actionOverflowMdxComponents } from './actionOverflowMdxComponents';
 import { appBarToolbarMdxComponents } from './appBarToolbarMdxComponents';
 import { carouselSheetMdxComponents } from './carouselSheetMdxComponents';
+import { componentPageMdxComponents } from './componentPageMdxComponents';
 import { composeUtilityMdxComponents } from './composeUtilityMdxComponents';
 import { contentPrimitiveMdxComponents } from './contentPrimitiveMdxComponents';
 import { DocsShell } from './DocsShell';
@@ -28,6 +29,7 @@ function currentSlugs(): string[] {
 function DocsPage() {
   const page = getDocsPage(currentSlugs());
   const docsMdxComponents = {
+    ...componentPageMdxComponents,
     ...feedbackSearchMdxComponents,
     ...groupedControlMdxComponents,
     ...contentPrimitiveMdxComponents,

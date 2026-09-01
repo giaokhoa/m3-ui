@@ -4,11 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/build-docs-data.mjs && vite --host 0.0.0.0 --port 4173 --strictPort",
-    "build": "node scripts/build-docs-data.mjs && vite build",
+    "api:generate": "node scripts/build-api-reference.mjs",
+    "dev": "pnpm api:generate && node scripts/build-docs-data.mjs && vite --host 0.0.0.0 --port 4173 --strictPort",
+    "build": "pnpm api:generate && node scripts/build-docs-data.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
-    "typecheck": "node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist src/generated/docs-navigation.json public/search-index.json"
+    "test": "pnpm api:generate && node --test scripts/*.test.mjs",
+    "typecheck": "pnpm api:generate && node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist src/generated/docs-navigation.json src/generated/api-reference.generated.json public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",
