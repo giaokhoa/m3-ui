@@ -16,6 +16,7 @@ const groupProperties = new Set([
   '$extensions',
   '$deprecated',
   '$extends',
+  '$root',
 ]);
 
 function isObject(value) {
