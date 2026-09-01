@@ -1,0 +1,15 @@
+{
+  "component": {
+    "menu": {
+      "web": {
+        "minWidth": { "$type": "dimension", "$value": { "value": 112, "unit": "px" } },
+        "maxWidth": { "$type": "dimension", "$value": { "value": 280, "unit": "px" } },
+        "itemMinHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+        "itemPaddingInline": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+        "contentPaddingBlock": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "iconGap": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }
+      }
+    }
+  }
+}
