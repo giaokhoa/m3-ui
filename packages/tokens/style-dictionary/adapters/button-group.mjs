@@ -13,15 +13,15 @@ export function createButtonGroupCss(context) {
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const rules = [
     '.button-group {',
-    line('--_button-group-motion-duration', get('motion.spring.standard.fastSpatial.duration')),
-    line('--_button-group-motion-easing', get('motion.spring.standard.fastSpatial.easing')),
+    line('--_button-group-motion-duration', get('motion.spring.fastSpatial.duration')),
+    line('--_button-group-motion-easing', get('motion.spring.fastSpatial.easing')),
     line('--_button-group-full-corner', get('shape.full')),
     line('--_button-group-menu-container-color', get('component.menu.base.containerColor')),
     line('--_button-group-menu-container-radius', get('shape.extraSmall')),
     line('--_button-group-menu-item-color', get('component.menu.standard.itemLabelTextColor')),
     line('--_button-group-menu-item-container-color', get('component.menu.standard.itemContainerColor')),
     line('--_button-group-menu-item-disabled-color', get('component.menu.standard.itemDisabledLabelTextColor')),
-    line('--_button-group-menu-item-disabled-opacity', percent(get('component.menu.standard.itemDisabledLabelTextOpacity'))),
+    line('--_button-group-menu-item-disabled-opacity', percent(get('component.menu.standard.itemDisabledLabelTextOpacity')),
     line('--_button-group-menu-item-height', get('component.list.base.itemOneLineContainerHeight')),
     line('--_button-group-menu-item-padding-start', get('component.list.base.itemLeadingSpace')),
     line('--_button-group-menu-item-padding-end', get('component.list.base.itemTrailingSpace')),
