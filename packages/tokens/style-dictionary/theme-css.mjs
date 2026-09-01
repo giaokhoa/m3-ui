@@ -1,3 +1,5 @@
+import { tokenReader } from './adapter-helpers.mjs';
+
 const COLOR_ROLES = [
   'background',
   'onBackground',
@@ -54,22 +56,8 @@ function camelToKebab(value) {
   return value.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
 }
 
-function tokenReader({ dictionary, options }) {
-  const valueOf = (token) => (options.usesDtcg ? token.$value : token.value);
-  const tokens = new Map(
-    dictionary.allTokens.map((token) => [token.path.join('.'), valueOf(token)]),
-  );
-
-  return (path) => {
-    if (!tokens.has(path)) throw new Error(`Missing token for Theme CSS: ${path}`);
-    const value = tokens.get(path);
-    if (value === undefined) throw new Error(`Undefined token for Theme CSS: ${path}`);
-    return value;
-  };
-}
-
 export function createThemeCss(context) {
-  const get = tokenReader(context);
+  const get = tokenReader(context, 'Theme CSS');
   const line = (name, value) => `  ${name}: ${String(value)};`;
   const scheme = (mode) => COLOR_ROLES.map((role) =>
     line(`--${camelToKebab(role)}`, get(`theme.baseline.${mode}.${role}`)),

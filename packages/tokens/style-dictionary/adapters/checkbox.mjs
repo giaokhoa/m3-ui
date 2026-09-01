@@ -1,34 +1,12 @@
-function cssValue(value) {
-  return String(value);
-}
-
-function percent(value) {
-  return `${Number(value) * 100}%`;
-}
-
-function tokenReader({ dictionary, options }) {
-  const valueOf = (token) => (options.usesDtcg ? token.$value : token.value);
-  const tokens = new Map(
-    dictionary.allTokens.map((token) => [token.path.join('.'), valueOf(token)]),
-  );
-
-  return (path) => {
-    if (!tokens.has(path)) throw new Error(`Missing token for Checkbox CSS: ${path}`);
-    const value = tokens.get(path);
-    if (value === undefined) throw new Error(`Undefined token for Checkbox CSS: ${path}`);
-    return value;
-  };
-}
-
-function withOpacity(color, opacity) {
-  const numericOpacity = Number(opacity);
-  if (color === 'transparent' || numericOpacity <= 0) return 'transparent';
-  if (numericOpacity >= 1) return color;
-  return `color-mix(in srgb, ${color} ${percent(numericOpacity)}, transparent)`;
-}
+import {
+  cssValue,
+  defineCssAdapter,
+  tokenReader,
+  withOpacity,
+} from '../adapter-helpers.mjs';
 
 export function createCheckboxCss(context) {
-  const get = tokenReader(context);
+  const get = tokenReader(context, 'Checkbox CSS');
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
 
   return [
@@ -72,3 +50,5 @@ export function createCheckboxCss(context) {
     '',
   ].join('\n');
 }
+
+export default defineCssAdapter('checkbox', createCheckboxCss);

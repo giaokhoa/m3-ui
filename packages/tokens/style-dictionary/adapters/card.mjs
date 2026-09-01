@@ -1,34 +1,12 @@
-function cssValue(value) {
-  return String(value);
-}
-
-function percent(value) {
-  return `${Number(value) * 100}%`;
-}
-
-function tokenReader({ dictionary, options }) {
-  const valueOf = (token) => (options.usesDtcg ? token.$value : token.value);
-  const tokens = new Map(
-    dictionary.allTokens.map((token) => [token.path.join('.'), valueOf(token)]),
-  );
-
-  return (path) => {
-    if (!tokens.has(path)) throw new Error(`Missing token for Card CSS: ${path}`);
-    const value = tokens.get(path);
-    if (value === undefined) throw new Error(`Undefined token for Card CSS: ${path}`);
-    return value;
-  };
-}
-
-function composite(color, opacity, over) {
-  const numericOpacity = Number(opacity);
-  if (numericOpacity <= 0) return over;
-  if (numericOpacity >= 1) return color;
-  return `color-mix(in srgb, ${color} ${percent(numericOpacity)}, ${over})`;
-}
+import {
+  composite,
+  cssValue,
+  defineCssAdapter,
+  tokenReader,
+} from '../adapter-helpers.mjs';
 
 export function createCardCss(context) {
-  const get = tokenReader(context);
+  const get = tokenReader(context, 'Card CSS');
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const base = 'component.card.base';
 
@@ -84,3 +62,5 @@ export function createCardCss(context) {
     '',
   ].join('\n');
 }
+
+export default defineCssAdapter('card', createCardCss);
