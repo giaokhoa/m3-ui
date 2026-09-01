@@ -1,60 +1,57 @@
-import { describe, expect, it, vi } from 'vitest';
+import { RippleMinimumPressDuration } from '@m3-ui/tokens';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { msNumber } from '../tokenValues';
 import {
   chainRipplePressHandlers,
   clearRippleTimers,
   getRippleReleaseDelay,
+  type RippleController,
 } from './useRipple';
 import type { RipplePressEvent } from './types';
 
-function pressEvent(pointerType: RipplePressEvent['pointerType']): RipplePressEvent {
-  return {
-    pointerType,
-    x: 12,
-    y: 18,
-    target: document.createElement('span'),
-  };
-}
+const event = {
+  pointerType: 'mouse',
+  target: {} as Element,
+  x: 12,
+  y: 18,
+} satisfies RipplePressEvent;
 
-describe('useRipple helpers', () => {
-  it('chains user press handlers after the ripple controller', () => {
-    const order: string[] = [];
+const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+describe('Ripple RAC press integration', () => {
+  it('chains Ripple lifecycle before caller handlers exactly once', () => {
+    const calls: string[] = [];
     const controller = {
-      onPressStart: vi.fn(() => order.push('ripple-start')),
-      onPressEnd: vi.fn(() => order.push('ripple-end')),
-    };
-    const handlers = chainRipplePressHandlers(controller, {
-      onPressStart: () => order.push('user-start'),
-      onPressEnd: () => order.push('user-end'),
+      onPressStart: vi.fn(() => calls.push('ripple-start')),
+      onPressEnd: vi.fn(() => calls.push('ripple-end')),
+    } satisfies Pick<RippleController, 'onPressStart' | 'onPressEnd'>;
+    const userStart = vi.fn(() => calls.push('user-start'));
+    const userEnd = vi.fn(() => calls.push('user-end'));
+    const props = chainRipplePressHandlers(controller, {
+      onPressStart: userStart,
+      onPressEnd: userEnd,
     });
-    const event = pressEvent('mouse');
 
-    handlers.onPressStart(event);
-    handlers.onPressEnd(event);
+    props.onPressStart(event);
+    props.onPressEnd(event);
 
-    expect(order).toEqual([
+    expect(calls).toEqual([
       'ripple-start',
       'user-start',
       'ripple-end',
       'user-end',
     ]);
+    expect(controller.onPressStart).toHaveBeenCalledOnce();
+    expect(controller.onPressEnd).toHaveBeenCalledOnce();
+    expect(userStart).toHaveBeenCalledWith(event);
+    expect(userEnd).toHaveBeenCalledWith(event);
   });
 
-  it('does not require user handlers', () => {
-    const controller = {
-      onPressStart: vi.fn(),
-      onPressEnd: vi.fn(),
-    };
-    const handlers = chainRipplePressHandlers(controller);
-    const event = pressEvent('touch');
-
-    handlers.onPressStart(event);
-    handlers.onPressEnd(event);
-
-    expect(controller.onPressStart).toHaveBeenCalledWith(event);
-    expect(controller.onPressEnd).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps a ripple pressed for the Material minimum duration', () => {
+  it('keeps a wave alive for the remaining minimum press lifetime', () => {
     const startedAt = 1_000;
 
     expect(getRippleReleaseDelay(startedAt, startedAt)).toBe(
