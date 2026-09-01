@@ -8,10 +8,10 @@
       "strokeWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
       "dotSize": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
       "colors": {
-        "selected": { "$type": "string", "$value": "var(--primary)" },
-        "unselected": { "$type": "string", "$value": "var(--on-surface-variant)" },
-        "disabledSelected": { "$type": "string", "$value": "var(--on-surface)" },
-        "disabledUnselected": { "$type": "string", "$value": "var(--on-surface)" }
+        "selected": { "$type": "string", "$value": "{color.role.primary}" },
+        "unselected": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+        "disabledSelected": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledUnselected": { "$type": "string", "$value": "{color.role.onSurface}" }
       },
       "disabledOpacity": { "$type": "number", "$value": 0.38 },
       "motion": {
