@@ -35,7 +35,10 @@ describe('PaneExpansionState stale settle finalizers', () => {
     const second = state.settleToAnchorIfNeeded(-250);
     expect(animations).toHaveLength(2);
     expect(animations[0]!.signal.aborted).toBe(true);
-    expect(state.currentAnchor).toBe(anchors[0]);
+    // MutatorMutex cancellation runs animateToInternal.finally first, snapping
+    // the canceled settle to 1000. With no intervening drag/fling displacement,
+    // the replacement scores that exact anchor at zero distance as well.
+    expect(state.currentAnchor).toBe(anchors[1]);
     expect(state.isSettling).toBe(true);
 
     // Let the canceled first animation resume into its finally block. AndroidX
@@ -44,11 +47,11 @@ describe('PaneExpansionState stale settle finalizers', () => {
     await Promise.resolve();
     await first;
     expect(state.isSettling).toBe(true);
-    expect(state.currentAnchor).toBe(anchors[0]);
+    expect(state.currentAnchor).toBe(anchors[1]);
 
     animations[1]!.finish();
     await second;
     expect(state.isSettling).toBe(false);
-    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(0);
+    expect(state.getLayoutState(1000).currentDraggingOffset).toBe(1000);
   });
 });
