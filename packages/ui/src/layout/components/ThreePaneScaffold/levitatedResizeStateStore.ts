@@ -15,7 +15,7 @@ export function getLevitatedResizeStates(
   for (const value of values) {
     for (const role of roles) {
       const paneValue = getPaneAdaptedValue(value, role);
-      if (paneValue.type === 'levitated' && paneValue.dragToResizeState !== undefined) {
+      if (paneValue.type === 'levitated' && paneValue.dragToResizeState != null) {
         states.add(paneValue.dragToResizeState);
       }
     }
