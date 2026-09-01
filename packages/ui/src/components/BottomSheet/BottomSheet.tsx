@@ -486,8 +486,10 @@ export function BottomSheet({
           <span className="bottom-sheet__drag-handle-indication">
             <Ripple
               controller={handleRipple}
-              isFocusVisible={handleFocusVisible}
-              isHovered={handleHovered}
+              state={{
+                isFocusVisible: handleFocusVisible,
+                isHovered: handleHovered,
+              }}
             />
             {dragHandle === undefined ? (
               <span aria-hidden="true" className="bottom-sheet__drag-handle-bar" />
