@@ -1,4 +1,4 @@
-import { cssValue, defineCssAdapter, percent, tokenReader } from '../adapter-helpers.mjs';
+import { cssValue, defineCssAdapter, tokenReader } from '../adapter-helpers.mjs';
 
 export function createMenuCss(context) {
   const get = tokenReader(context, 'Menu CSS');
@@ -23,8 +23,8 @@ export function createMenuCss(context) {
     line('--_menu-content-padding-block', get('component.menu.web.contentPaddingBlock')),
     line('--_menu-icon-size', get('component.menu.web.iconSize')),
     line('--_menu-icon-gap', get('component.menu.web.iconGap')),
-    line('--_menu-motion-duration', get('motion.spring.standard.fastSpatial.duration')),
-    line('--_menu-motion-easing', get('motion.spring.standard.fastSpatial.easing')),
+    line('--_menu-motion-duration', get('motion.spring.fastSpatial.duration')),
+    line('--_menu-motion-easing', get('motion.spring.fastSpatial.easing')),
     line('--_menu-segmented-padding', get('component.menu.segmented.groupPadding')),
     '}',
     '',
