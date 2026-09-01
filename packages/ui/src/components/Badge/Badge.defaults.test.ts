@@ -1,34 +1,11 @@
-import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
 import {
   badgeRuntime,
-  badgeTokens,
   getBadgeStyle,
   getBadgedBoxStyle,
 } from './Badge.defaults';
 
-describe('Badge defaults', () => {
-  it('projects canonical Material 3 badge tokens', () => {
-    expect(badgeTokens.small).toEqual({
-      color: token.ComponentBadgeSmallColor,
-      shape: token.ComponentBadgeSmallShape,
-      size: 6,
-    });
-    expect(badgeTokens.large).toMatchObject({
-      color: token.ComponentBadgeLargeColor,
-      contentColor: token.ComponentBadgeLargeLabelTextColor,
-      shape: token.ComponentBadgeLargeShape,
-      size: 16,
-    });
-    expect(badgeTokens.large.typography).toEqual({
-      fontFamily: token.TypographyLabelSmallFontFamily,
-      fontSize: token.TypographyLabelSmallFontSize,
-      lineHeight: token.TypographyLabelSmallLineHeight,
-      fontWeight: token.TypographyLabelSmallFontWeight,
-      letterSpacing: token.TypographyLabelSmallLetterSpacing,
-    });
-  });
-
+describe('Badge runtime defaults', () => {
   it('keeps current Compose-only layout mechanics beside the consumer', () => {
     expect(badgeRuntime).toEqual({
       contentHorizontalPadding: 4,
@@ -43,19 +20,12 @@ describe('Badge defaults', () => {
     });
   });
 
-  it('emits canonical dot and content styles', () => {
-    expect(getBadgeStyle(false)).toMatchObject({
-      '--_badge-container-color': token.ComponentBadgeSmallColor,
-      '--_badge-content-color': 'transparent',
-      '--_badge-size': '6px',
+  it('leaves immutable paint, size, shape and typography to generated CSS', () => {
+    expect(getBadgeStyle(false)).toEqual({
       '--_badge-padding-inline': '0px',
     });
-    expect(getBadgeStyle(true)).toMatchObject({
-      '--_badge-container-color': token.ComponentBadgeLargeColor,
-      '--_badge-content-color': token.ComponentBadgeLargeLabelTextColor,
-      '--_badge-size': '16px',
+    expect(getBadgeStyle(true)).toEqual({
       '--_badge-padding-inline': '4px',
-      '--_badge-font-size': token.TypographyLabelSmallFontSize,
     });
   });
 
@@ -65,9 +35,16 @@ describe('Badge defaults', () => {
         containerColor: 'rebeccapurple',
         contentColor: 'white',
       }),
-    ).toMatchObject({
+    ).toEqual({
+      '--_badge-padding-inline': '4px',
       '--_badge-container-color': 'rebeccapurple',
       '--_badge-content-color': 'white',
+    });
+  });
+
+  it('does not emit a content color override for dot badges', () => {
+    expect(getBadgeStyle(false, { contentColor: 'white' })).toEqual({
+      '--_badge-padding-inline': '0px',
     });
   });
 });
