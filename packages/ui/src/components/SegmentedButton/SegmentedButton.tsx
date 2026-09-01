@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import {
   Checkbox as AriaCheckbox,
   Radio as AriaRadio,
@@ -7,12 +7,8 @@ import {
   type RadioGroupProps as AriaRadioGroupProps,
   type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/segmented-button.css';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  segmentedButtonRowStyle,
-  segmentedButtonStyle,
-  type SegmentedButtonStyle,
-} from './SegmentedButton.defaults';
 import './segmented-button.css';
 
 interface SegmentVisualProps {
@@ -129,10 +125,7 @@ export function SingleChoiceSegmentedButtonRow({
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button-row', 'segmented-button-row--single', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonRowStyle, ...userStyle };
-      }}
+      style={style}
     >
       {children}
     </AriaRadioGroup>
@@ -150,7 +143,7 @@ export function MultiChoiceSegmentedButtonRow({
       {...props}
       role="group"
       className={joinClassNames('segmented-button-row', 'segmented-button-row--multi', className)}
-      style={{ ...(segmentedButtonRowStyle as CSSProperties), ...style }}
+      style={style}
     >
       {children}
     </div>
@@ -179,10 +172,7 @@ export function SingleChoiceSegmentedButton({
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
-      }}
+      style={style}
     >
       {(renderProps) => (
         <SegmentVisual
@@ -222,10 +212,7 @@ export function MultiChoiceSegmentedButton({
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('segmented-button', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
-      }}
+      style={style}
     >
       {(renderProps) => (
         <SegmentVisual

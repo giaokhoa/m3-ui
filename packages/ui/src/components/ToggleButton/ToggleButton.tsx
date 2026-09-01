@@ -4,13 +4,10 @@ import {
   type ToggleButtonProps as AriaToggleButtonProps,
 } from 'react-aria-components';
 import '@m3-ui/tokens/button.css';
+import '@m3-ui/tokens/toggle-button.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { buttonElevationLevels } from '../Button/Button.elevation';
-import {
-  getToggleButtonStyle,
-  type ToggleButtonState,
-} from './ToggleButton.defaults';
 import type { ToggleButtonSize, ToggleButtonVariant } from './ToggleButton.types';
 import '../Button/button.css';
 import './toggle-button.css';
@@ -48,22 +45,6 @@ function ToggleButtonImpl({
   const ripple = useRipple();
   const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
-  function stateFor(renderProps: {
-    isDisabled: boolean;
-    isSelected: boolean;
-    isPressed: boolean;
-    isHovered: boolean;
-    isFocused: boolean;
-  }): ToggleButtonState {
-    return {
-      isDisabled: renderProps.isDisabled,
-      isSelected: renderProps.isSelected,
-      isPressed: renderProps.isPressed,
-      isHovered: renderProps.isHovered,
-      isFocused: renderProps.isFocused,
-    };
-  }
-
   return (
     <AriaToggleButton
       {...props}
@@ -78,13 +59,7 @@ function ToggleButtonImpl({
         const baseClassName = `button toggle-button ${variantClassName(variant)}`;
         return userClassName ? `${baseClassName} ${userClassName}` : baseClassName;
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return {
-          ...getToggleButtonStyle(variant, stateFor(renderProps), size),
-          ...userStyle,
-        };
-      }}
+      style={style}
     >
       {(renderProps) => (
         <>
