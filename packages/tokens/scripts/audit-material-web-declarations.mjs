@@ -98,7 +98,13 @@ function normalizeRaw(raw) {
   if (/^-?\d+(?:\.\d+)?%$/.test(value)) return { kind: 'value', value };
 
   let match = value.match(/^md-sys-color\.\$([a-z0-9-]+)$/);
-  if (match) return { kind: 'value', value: `var(--${match[1]})` };
+  if (match) {
+    return {
+      kind: 'color',
+      value: `var(--${match[1]})`,
+      alias: `{color.role.${camel(match[1])}}`,
+    };
+  }
   match = value.match(/^md-sys-elevation\.\$([a-z0-9-]+)$/);
   if (match) return { kind: 'value', value: camel(match[1]) };
   match = value.match(/^md-sys-shape\.\$corner-([a-z0-9-]+)$/);
@@ -184,6 +190,21 @@ for (const module of modules) {
     }
 
     const expected = normalizeRaw(declaration.raw);
+    if (expected.kind === 'color') {
+      const token = canonical.get(path);
+      const actual = canonicalValue(token);
+      const direct = token && Object.is(actual, expected.value);
+      const alias = token && actual === expected.alias;
+      results.push({
+        module: module.module,
+        ...declaration,
+        path,
+        expected: expected.value,
+        actual,
+        status: direct ? 'reconciled-direct' : alias ? 'reconciled-color-alias' : token ? 'mismatch' : 'pending',
+      });
+      continue;
+    }
     if (expected.kind === 'alias') {
       const token = canonical.get(path);
       const alias = `{${expected.target}}`;
