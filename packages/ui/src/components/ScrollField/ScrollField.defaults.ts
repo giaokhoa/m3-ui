@@ -16,13 +16,29 @@ export interface ScrollFieldStyleOptions {
   disabledSelectedContentColor?: CSSProperties['color'];
 }
 
+/**
+ * Serializes only explicit instance color overrides. Immutable ScrollField
+ * role defaults and disabled composites live in `scroll-field.css`.
+ */
 export function getScrollFieldStyle(options: ScrollFieldStyleOptions = {}): CSSProperties {
-  return {
-    '--scroll-field-container': options.containerColor ?? 'var(--surface-container-lowest)',
-    '--scroll-field-content': options.contentColor ?? 'var(--outline)',
-    '--scroll-field-selected-content': options.selectedContentColor ?? 'var(--on-surface)',
-    '--scroll-field-disabled-container': options.disabledContainerColor ?? 'color-mix(in srgb, var(--surface-container-lowest) 38%, transparent)',
-    '--scroll-field-disabled-content': options.disabledContentColor ?? 'color-mix(in srgb, var(--on-surface) 38%, transparent)',
-    '--scroll-field-disabled-selected-content': options.disabledSelectedContentColor ?? 'color-mix(in srgb, var(--on-surface) 38%, transparent)',
-  } as CSSProperties;
+  const style = {} as CSSProperties & Record<`--${string}`, string | number>;
+  if (options.containerColor !== undefined) {
+    style['--scroll-field-container'] = options.containerColor as string;
+  }
+  if (options.contentColor !== undefined) {
+    style['--scroll-field-content'] = options.contentColor as string;
+  }
+  if (options.selectedContentColor !== undefined) {
+    style['--scroll-field-selected-content'] = options.selectedContentColor as string;
+  }
+  if (options.disabledContainerColor !== undefined) {
+    style['--scroll-field-disabled-container'] = options.disabledContainerColor as string;
+  }
+  if (options.disabledContentColor !== undefined) {
+    style['--scroll-field-disabled-content'] = options.disabledContentColor as string;
+  }
+  if (options.disabledSelectedContentColor !== undefined) {
+    style['--scroll-field-disabled-selected-content'] = options.disabledSelectedContentColor as string;
+  }
+  return style;
 }
