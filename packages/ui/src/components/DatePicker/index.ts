@@ -8,7 +8,7 @@ export {
 } from './DatePicker';
 export {
   datePickerRuntime,
-  datePickerTokens,
+  getDatePickerElevationLevel,
   getDatePickerStyle,
 } from './DatePicker.defaults';
 export type {
