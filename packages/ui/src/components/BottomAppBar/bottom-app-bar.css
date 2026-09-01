@@ -21,8 +21,8 @@
 }
 
 .bottom-app-bar[data-variant='regular'] .bottom-app-bar__content {
-  padding-block-start: var(--_bottom-app-bar-content-top-padding);
-  padding-inline: var(--_bottom-app-bar-content-horizontal-padding);
+  padding-block-start: 4px;
+  padding-inline: 4px;
 }
 
 .bottom-app-bar__actions {
@@ -41,8 +41,8 @@
   align-items: flex-start;
   justify-content: flex-start;
   block-size: 100%;
-  padding-block-start: var(--_bottom-app-bar-fab-vertical-padding);
-  padding-inline-end: var(--_bottom-app-bar-fab-horizontal-padding);
+  padding-block-start: 8px;
+  padding-inline-end: 12px;
 }
 
 .bottom-app-bar__flexible-content {

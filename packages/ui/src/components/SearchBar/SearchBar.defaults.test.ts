@@ -25,38 +25,31 @@ describe('SearchBar defaults', () => {
   });
 
   it('keeps AndroidX renderer constraints beside the consumer', () => {
-    expect(searchBarRuntime).toMatchObject({
+    expect(searchBarRuntime).toEqual({
       minWidth: 360,
       maxWidth: 720,
       dockedMinHeight: 240,
       dockedMaxHeightScreenRatio: 2 / 3,
       horizontalPadding: 16,
       iconSize: 24,
-      motion: {
-        expand: {
-          duration: token.MotionSpringDefaultSpatialDuration,
-          easing: token.MotionSpringDefaultSpatialEasing,
-        },
-      },
     });
   });
 
-  it('emits collapsed and expanded style variables', () => {
-    expect(getSearchBarStyle()).toMatchObject({
-      '--_search-container-color': token.ComponentSearchBarContainerColor,
-      '--_search-container-height': '56px',
+  it('emits only renderer mechanics after static defaults move to generated CSS', () => {
+    const bar = getSearchBarStyle();
+    const docked = getSearchViewStyle('docked');
+    const fullscreen = getSearchViewStyle('fullscreen');
+
+    expect(bar).toEqual({
       '--_search-min-width': '360px',
       '--_search-max-width': '720px',
-      '--_search-expand-duration': token.MotionSpringDefaultSpatialDuration,
-      '--_search-expand-easing': token.MotionSpringDefaultSpatialEasing,
+      '--_search-horizontal-padding': '16px',
+      '--_search-icon-size': '24px',
     });
-    expect(getSearchViewStyle('docked')).toMatchObject({
-      '--_search-view-header-height': '56px',
-      '--_search-min-width': '360px',
-    });
-    expect(getSearchViewStyle('fullscreen')).toMatchObject({
-      '--_search-view-header-height': '72px',
-      '--_search-view-radius': 0,
-    });
+    expect(docked).toEqual(bar);
+    expect(fullscreen).toEqual(bar);
+    expect(bar).not.toHaveProperty('--_search-container-color');
+    expect(bar).not.toHaveProperty('--_search-expand-duration');
+    expect(docked).not.toHaveProperty('--_search-view-header-height');
   });
 });

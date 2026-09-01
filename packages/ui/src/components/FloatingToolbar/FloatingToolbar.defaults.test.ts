@@ -24,27 +24,12 @@ describe('FloatingToolbar defaults', () => {
     expect(floatingToolbarRuntime.toolbarToFabGap).toBe(8);
   });
 
-  it('keeps pinned runtime colors separate from Web-only toolbar variants', () => {
-    expect(
-      getFloatingToolbarStyle('standard', true, false)[
-        '--_floating-toolbar-container-color'
-      ],
-    ).toBe('var(--surface-container)');
-    expect(
-      getFloatingToolbarStyle('standard', true, false)[
-        '--_floating-toolbar-content-color'
-      ],
-    ).toBe('var(--on-surface)');
-    expect(
-      getFloatingToolbarStyle('vibrant', true, false)[
-        '--_floating-toolbar-container-color'
-      ],
-    ).toBe('var(--primary-container)');
-    expect(
-      getFloatingToolbarStyle('vibrant', true, false)[
-        '--_floating-toolbar-content-color'
-      ],
-    ).toBe('var(--on-primary-container)');
+  it('does not re-emit immutable token defaults from runtime', () => {
+    const style = getFloatingToolbarStyle('standard', true, true);
+    expect(style).toEqual({ '--_floating-toolbar-fab-gap': '8px' });
+    expect(style).not.toHaveProperty('--_floating-toolbar-container-color');
+    expect(style).not.toHaveProperty('--_floating-toolbar-fab-size');
+    expect(style).not.toHaveProperty('--_floating-toolbar-motion-duration');
   });
 
   it('chooses Level0 without FAB and Level1 only for the expanded toolbar part with FAB', () => {
@@ -52,25 +37,6 @@ describe('FloatingToolbar defaults', () => {
     expect(resolveFloatingToolbarElevation(false, false)).toBe('level0');
     expect(resolveFloatingToolbarElevation(true, true)).toBe('level1');
     expect(resolveFloatingToolbarElevation(false, true)).toBe('level0');
-    expect(
-      getFloatingToolbarStyle('standard', true, true),
-    ).not.toHaveProperty('--_floating-toolbar-box-shadow');
-  });
-
-  it('uses the pinned FAB range with the FAB smallest when toolbar is expanded', () => {
-    expect(floatingToolbarTokens.fabBaselineSize).toBe('56px');
-    expect(floatingToolbarTokens.fabMediumSize).toBe('80px');
-    expect(
-      getFloatingToolbarStyle('standard', true, true)['--_floating-toolbar-fab-size'],
-    ).toBe('56px');
-    expect(
-      getFloatingToolbarStyle('standard', false, true)['--_floating-toolbar-fab-size'],
-    ).toBe('80px');
-    expect(
-      getFloatingToolbarStyle('standard', true, true)[
-        '--_floating-toolbar-fab-max-size'
-      ],
-    ).toBe('80px');
   });
 
   it('coerces the hoisted offset between offsetLimit and zero', () => {
@@ -117,7 +83,6 @@ describe('FloatingToolbar defaults', () => {
     expect(style['--_floating-toolbar-content-color']).toBe('white');
     expect(style['--_floating-toolbar-container-radius']).toBe('12px');
     expect(style['--_floating-toolbar-content-padding']).toBe('4px');
-    expect(style).not.toHaveProperty('--_floating-toolbar-box-shadow');
     expect(
       resolveFloatingToolbarElevation(true, false, {
         expandedElevation: 'level1',
