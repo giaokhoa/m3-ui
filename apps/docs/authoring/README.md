@@ -49,6 +49,7 @@ The component-page primitives are registered into the shared MDX runtime and mus
 - `<SourceLinks links={[...]} />`
 - `<GuidanceCallout title="..." kind="guidance|web|adaptation|caution">...</GuidanceCallout>`
 - `<AnatomyBlock items={[...]} />`
+- `<MaterialSpecTable family="button" groups={['size', 'shape']} />`
 - `<GeneratedApiReferenceSlot component="..." />`
 - `<FidelitySummary component="..." adaptations={[...]} knownGaps={[...]} />`
 - `<RelatedComponents items={[...]} />`
@@ -56,7 +57,28 @@ The component-page primitives are registered into the shared MDX runtime and mus
 
 `<FidelitySummary />` consumes `allComponentProvenance`, which is resolved from the existing component inventory. The optional `adaptations` and `knownGaps` props add page-specific evidence without creating a second component registry; existing `MaterialParity`/`ParitySummary` MDX usage resolves to the same structured renderer.
 
-`<GeneratedApiReferenceSlot />` is a stable document position, not a handwritten prop-table feature. Issue #220 can replace the runtime behind this slot with generated public TypeScript API data. Do not duplicate prop tables in MDX while waiting for that generator.
+`<GeneratedApiReferenceSlot />` is a stable document position for generated public TypeScript API data. Do not duplicate prop tables in MDX.
+
+## Generated Material specification tables
+
+`<MaterialSpecTable />` reads deterministic build output generated directly from the canonical DTCG graph under `packages/tokens/tokens/**`. Docs do not own a second table of Material dimensions, colors, typography, shapes, elevation, spacing, icon sizes, state values, or motion values.
+
+Use a spec table only when concrete canonical values help the reader understand a component/foundation contract. Prefer a focused subset instead of dumping a whole family:
+
+```mdx
+<MaterialSpecTable
+  family="button"
+  groups={['size', 'shape', 'typography', 'icon', 'spacing']}
+/>
+```
+
+Supported group labels are `size`, `shape`, `typography`, `icon`, `spacing`, `elevation`, `color`, `state`, `motion`, and `other`. The family name is resolved from the canonical token graph itself: top-level foundation families such as `shape`, `typography`, `elevation`, and `color`, plus component families under `component.*`. There is no docs-owned family-to-token-path mapping database.
+
+The generated table keeps a token's canonical alias visible (for example `{color.role.primary}`) and also shows the resolved terminal value when the alias is exact. This preserves semantic role names instead of silently flattening them into copied literals.
+
+Unknown families, ambiguous family names, broken/circular aliases, conflicting canonical definitions, and requested groups that do not exist in a family fail generation/runtime loudly. Fix the canonical token graph or the MDX request; do not add a local docs override.
+
+Do not hand-copy values from the table into prose. Token changes must propagate through `pnpm --filter @m3-ui/docs spec:generate` and the normal docs `dev`, `build`, `test`, and `typecheck` commands.
 
 ## Examples and generated widgets
 
