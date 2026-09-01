@@ -1,6 +1,11 @@
 import type { CSSProperties } from 'react';
 import { elevationLevels, type ElevationLevel } from '../../internal/elevation';
 
+// These role expressions intentionally remain runtime sentinels. Surface must
+// distinguish the canonical theme surface from an arbitrary caller-supplied
+// color before applying the absolute tonal-elevation overlay. Moving these
+// values to static CSS would not remove that runtime branch and would require a
+// second opt-out mechanism for custom colors.
 export const defaultSurfaceColor = 'var(--surface)';
 export const defaultSurfaceContentColor = 'var(--on-surface)';
 

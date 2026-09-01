@@ -1,9 +1,9 @@
 {
   "component": {
     "dragHandle": {
-      "focusStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+      "focusStateLayerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
       "focusStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
-      "hoverStateLayerColor": { "$type": "string", "$value": "var(--inverse-on-surface)" },
+      "hoverStateLayerColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
       "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
     },
     "radioButton": {
