@@ -14,6 +14,7 @@ interface CandidateOptions {
   disabled?: boolean;
   placed?: boolean;
   children?: HTMLElement[];
+  classes?: string[];
 }
 
 function rect({ left, top, width, height }: RectInput): DOMRect {
@@ -38,12 +39,16 @@ function candidate(
     disabled = false,
     placed = true,
     children = [],
+    classes = [],
   }: CandidateOptions = {},
 ) {
   const focus = vi.fn();
   return {
     tabIndex,
     children,
+    classList: {
+      contains: (className: string) => classes.includes(className),
+    },
     matches: (selector: string) =>
       selector === ':disabled' ? disabled : programmaticallyFocusable,
     closest: () => null,
@@ -103,6 +108,28 @@ describe('ThreePaneScaffold destination focus', () => {
 
     expect(requestPaneDestinationFocus(pane([programmaticOnly]))).toBe(true);
     expect(programmaticOnly.focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it('ignores the no-handle resize semantics proxy during pane autofocus', () => {
+    const resizeSemanticsProxy = candidate(
+      { left: 8, top: 8, width: 1, height: 1 },
+      { classes: ['three-pane-scaffold__levitated-resize-action'] },
+    );
+    const content = candidate({ left: 80, top: 40, width: 80, height: 40 });
+
+    expect(requestPaneDestinationFocus(pane([resizeSemanticsProxy, content]))).toBe(true);
+    expect(content.focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(resizeSemanticsProxy.focus).not.toHaveBeenCalled();
+  });
+
+  it('does not autofocus a sole no-handle resize semantics proxy', () => {
+    const resizeSemanticsProxy = candidate(
+      { left: 8, top: 8, width: 1, height: 1 },
+      { classes: ['three-pane-scaffold__levitated-resize-action'] },
+    );
+
+    expect(requestPaneDestinationFocus(pane([resizeSemanticsProxy]))).toBe(false);
+    expect(resizeSemanticsProxy.focus).not.toHaveBeenCalled();
   });
 
   it('ignores generic descendants that merely report the default tabIndex=-1', () => {
