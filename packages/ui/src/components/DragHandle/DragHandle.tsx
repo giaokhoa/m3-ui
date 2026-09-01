@@ -10,7 +10,6 @@ import {
   type RippleController,
   type RipplePointerType,
   type RipplePressEvent,
-  type RippleStateInteraction,
 } from '../../internal/ripple';
 import {
   getDragHandleRippleStyle,
@@ -143,12 +142,6 @@ export function VerticalDragHandle({
     onBlur?.(event);
   };
 
-  const stateInteraction: RippleStateInteraction | null = isFocusVisible
-    ? 'focus'
-    : isHovered
-      ? 'hover'
-      : null;
-
   return (
     <span
       {...props}
@@ -186,8 +179,7 @@ export function VerticalDragHandle({
         <Ripple
           controller={ripple}
           focusRingRadius="var(--_drag-handle-current-shape)"
-          isFocusVisible={isFocusVisible}
-          stateInteraction={stateInteraction}
+          state={{ isFocusVisible, isHovered }}
           style={getDragHandleRippleStyle()}
         />
       </span>
