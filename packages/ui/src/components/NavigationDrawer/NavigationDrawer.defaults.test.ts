@@ -73,10 +73,10 @@ describe('NavigationDrawer defaults', () => {
   });
 
   it('projects scrim alpha without copying Scrim token values', () => {
-    expect(getModalNavigationDrawerOverlayStyle({ alpha: 0.5 })).toMatchObject({
-      '--_scrim-container-color': token.ScrimContainerColor,
-      '--_scrim-container-opacity': token.ScrimContainerOpacity * 0.5,
-    });
+    const style = getModalNavigationDrawerOverlayStyle({ alpha: 0.5 });
+    expect(style).toMatchObject({ '--_scrim-alpha': 0.5 });
+    expect(style).not.toHaveProperty('--_scrim-container-color');
+    expect(style).not.toHaveProperty('--_scrim-container-opacity');
   });
 
   it('projects selected and inactive item states without fake CSS state classes', () => {

@@ -132,7 +132,7 @@
   position: absolute;
   inset: 0;
   background: var(--_scrim-container-color);
-  opacity: var(--_scrim-container-opacity);
+  opacity: calc(var(--_scrim-container-opacity) * var(--_scrim-alpha, 1));
   pointer-events: none;
   transition-property: opacity;
   transition-duration: var(--_navigation-drawer-open-duration);
