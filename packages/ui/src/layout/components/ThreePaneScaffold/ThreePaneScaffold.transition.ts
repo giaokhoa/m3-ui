@@ -26,6 +26,7 @@ import {
   type ThreePaneScaffoldRole,
   type ThreePaneScaffoldValue,
 } from '../../adaptive/threePaneScaffold';
+import { hasReactNodeContent } from '../../reactNode';
 import { calculateLevitatedPanePlacement } from './LevitatedPane.layout';
 import { calculateLevitatedPaneResizePlacement } from './LevitatedPane.resizeLayout';
 import {
@@ -291,7 +292,10 @@ function toMotionData(
 function levitatedScrim(value: ThreePaneScaffoldValue): ReactNode | undefined {
   for (const role of roles) {
     const adaptedValue = getPaneAdaptedValue(value, role);
-    if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
+    if (
+      adaptedValue.type === 'levitated' &&
+      hasReactNodeContent(adaptedValue.scrim)
+    ) {
       return adaptedValue.scrim;
     }
   }
