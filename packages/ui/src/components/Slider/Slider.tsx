@@ -191,8 +191,7 @@ function ThumbVisual({
         <Ripple
           controller={ripple}
           focusRingRadius="var(--_slider-handle-radius)"
-          isFocusVisible={renderProps.isFocusVisible}
-          stateInteraction={null}
+          state={{ isFocusVisible: renderProps.isFocusVisible }}
         />
         <span className="slider__handle-nub" />
       </span>
