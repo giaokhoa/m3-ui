@@ -1,4 +1,7 @@
 .slider {
+  --_slider-inner-radius: 2px;
+  --_slider-min-target: 48px;
+  --_slider-min-inline-size: 200px;
   display: inline-grid;
   gap: 4px;
   color: var(--_slider-handle-color);
@@ -51,7 +54,7 @@
 
 .slider[data-orientation='vertical'] .slider__track {
   inline-size: max(var(--_slider-min-target), var(--_slider-handle-length));
-  block-size: 200px;
+  block-size: var(--_slider-min-inline-size);
   min-block-size: var(--_slider-min-inline-size);
 }
 
@@ -165,7 +168,7 @@
   border-end-start-radius: var(--_slider-inactive-outer-radius);
   border-end-end-radius: var(--_slider-inactive-outer-radius);
   border-start-start-radius: var(--_slider-inner-radius);
-  border-start-end-radius: var(--_slider-inner-radius);
+  border-end-start-radius: var(--_slider-inner-radius);
 }
 
 .slider[data-orientation='vertical'] .slider__segment--trailing::before {
@@ -173,7 +176,7 @@
   border-end-start-radius: var(--_slider-inner-radius);
   border-end-end-radius: var(--_slider-inner-radius);
   border-start-start-radius: var(--_slider-inactive-outer-radius);
-  border-start-end-radius: var(--_slider-inactive-outer-radius);
+  border-end-start-radius: var(--_slider-inactive-outer-radius);
 }
 
 .slider__stop,
