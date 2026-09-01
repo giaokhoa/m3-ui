@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getScrollFieldStyle } from './ScrollField.defaults';
 import { clampScrollFieldDrag, normalizeScrollFieldIndex, settleScrollFieldSteps } from './ScrollField.logic';
 
 describe('ScrollField state math', () => {
@@ -18,5 +19,21 @@ describe('ScrollField state math', () => {
   it('caps visual drag without changing settle math', () => {
     expect(clampScrollFieldDrag(999, 50)).toBe(100);
     expect(clampScrollFieldDrag(-999, 50)).toBe(-100);
+  });
+
+  it('keeps immutable visual defaults out of the runtime style bag', () => {
+    expect(getScrollFieldStyle()).toEqual({});
+  });
+
+  it('serializes only explicit instance color overrides', () => {
+    expect(
+      getScrollFieldStyle({
+        containerColor: 'red',
+        disabledContentColor: 'blue',
+      }),
+    ).toEqual({
+      '--scroll-field-container': 'red',
+      '--scroll-field-disabled-content': 'blue',
+    });
   });
 });
