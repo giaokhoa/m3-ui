@@ -1,45 +1,64 @@
 ---
 title: Scrim
-description: Material scrim presentation with passive and dismissible forms while modal state, focus, portals, and stacking remain composition-owned.
+description: Material scrim presentation with passive and dismissible forms while modal state, focus, portals, and stacking remain overlay-owned.
 ---
 
-<ParitySummary component="scrim" />
-
-## Overview
-
-`Scrim` is the Material obscuring layer used behind modal or elevated content. It deliberately stops at the scrim contract: color, opacity, animation alpha, and an optional dismissal action.
+A scrim visually obscures content behind a modal or elevated surface. `Scrim` deliberately implements only that Material visual/dismiss layer; it is not a complete modal manager.
 
 <ComponentPreview>
   <ScrimPreview />
 </ComponentPreview>
 
-## Passive form
-
-Without `onDismiss`, the scrim is decorative and renders `aria-hidden="true"`. Use this when another control owns dismissal or when the layer only provides visual emphasis.
-
 ```tsx
+import { Scrim } from '@m3-ui/ui';
+
 <Scrim />
 ```
 
-## Dismissible form
+## When to use
 
-Supplying `onDismiss` requires an accessible name and changes the primitive to a native button removed from the tab sequence.
+Use `Scrim` inside a custom overlay composition when you need the Material obscuring layer and the overlay owner already handles focus, portals, stacking, scroll, and dismissal lifecycle. Prefer Dialog or ModalBottomSheet when their higher-level contracts match the UI.
+
+## Passive scrim
+
+Without `onDismiss`, the scrim is presentation-only and hidden from the accessibility tree. This is appropriate when another control owns dismissal or when the layer is purely visual.
+
+## Dismissible scrim
+
+Supplying `onDismiss` makes the layer an explicit dismissal action and requires an accessible name.
 
 ```tsx
-<Scrim
-  aria-label="Dismiss dialog"
-  onDismiss={closeDialog}
-/>
+<Scrim aria-label="Dismiss dialog" onDismiss={closeDialog} />
 ```
 
-The button semantics expose the dismissal action to assistive technology without inserting the full-screen layer into normal keyboard tab order.
+The full-screen dismiss action stays out of the normal tab sequence so it does not become an unexpected keyboard stop. The surrounding overlay still owns the actual modal relationship.
 
-## Ownership boundary
+## Modal ownership boundary
 
-`Scrim` does **not** create a portal, trap focus, lock document scroll, respond to Escape, restore focus, or decide z-index. A real modal composition must own those concerns. Components such as `Dialog` and `ModalBottomSheet` already compose the appropriate browser modal behavior around their Material surfaces.
+`Scrim` does not create a portal, trap focus, lock document scroll, handle Escape, restore focus, or choose stacking order. A real modal composition must own those responsibilities.
 
-For custom overlays, keep modal lifecycle and stacking in the overlay owner and use `Scrim` only as the visual/dismiss layer.
+Do not combine a custom scrim with a second independent modal/focus manager around Dialog or ModalBottomSheet. Those components already own their browser overlay lifecycle.
 
-## Styling
+## Styling and animation
 
-`containerColor`, `containerOpacity`, and `alpha` override the token-backed presentation. `alpha` is useful for animation progress; it does not change the semantic state of the surrounding modal surface.
+`containerColor`, `containerOpacity`, and `alpha` are presentation hooks. `alpha` can follow an animation progress value without changing whether the surrounding surface is semantically modal or dismissed.
+
+## Accessibility
+
+A passive scrim should remain hidden from assistive technology. A dismissible scrim needs a clear action name that identifies the surface it dismisses, while keyboard users must still have an explicit reachable dismissal path within the overlay content.
+
+## API reference
+
+<ApiReference name="Scrim" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="scrim" />
+
+Material supplies scrim color/opacity and obscuring-layer intent. Optional native button-style dismissal is a web interaction adaptation; portal, focus containment, Escape, scroll lock, restoration, and z-index remain the overlay owner's responsibility.
+
+## Related components
+
+- [Dialog](/docs/components/dialog) — complete browser modal dialog composition.
+- [Bottom sheets](/docs/components/bottom-sheet) — modal and non-modal sheet surfaces.
+- [Surface](/docs/components/surface) — general Material surface composition.
