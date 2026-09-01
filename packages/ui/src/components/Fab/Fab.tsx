@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/fab.css';
 import type { CSSProperties, ReactNode } from 'react';
 import {
   Button as AriaButton,
@@ -7,10 +8,7 @@ import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import {
   fabElevationTokens,
-  getBrandedExtendedFabStyle,
-  getBrandedFabStyle,
-  getExtendedFabStyle,
-  getFabStyle,
+  getFabOverrideStyle,
 } from './Fab.defaults';
 import type {
   ExtendedFabSize,
@@ -92,17 +90,12 @@ function FabImpl({
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        const tokenStyle = branded
-          ? getBrandedFabStyle({ elevation, containerColor, shape })
-          : getFabStyle(size, {
-              variant,
-              elevation,
-              containerColor,
-              contentColor,
-              shape,
-            });
         return {
-          ...tokenStyle,
+          ...getFabOverrideStyle({
+            containerColor,
+            contentColor: branded ? undefined : contentColor,
+            shape,
+          }),
           ...userStyle,
         };
       }}
@@ -180,17 +173,12 @@ function ExtendedFabImpl({
       }}
       style={(renderProps) => {
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        const tokenStyle = branded
-          ? getBrandedExtendedFabStyle({ elevation, containerColor, shape })
-          : getExtendedFabStyle(size, {
-              variant,
-              elevation,
-              containerColor,
-              contentColor,
-              shape,
-            });
         return {
-          ...tokenStyle,
+          ...getFabOverrideStyle({
+            containerColor,
+            contentColor: branded ? undefined : contentColor,
+            shape,
+          }),
           ...userStyle,
         };
       }}
