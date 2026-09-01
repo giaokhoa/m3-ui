@@ -48,8 +48,11 @@ export function createFabMenuCss(context) {
   for (const size of toggleSizes) {
     const base = `component.fab.size.${size}`;
     rules.push(
-      `.fab.fab-menu-toggle[data-toggle-size='${size}']:not([data-checked]) {`,
+      `.fab.fab-menu-toggle[data-toggle-size='${size}'][data-size] {`,
       line('--_fab-target-size', get(`${base}.containerHeight`)),
+      '}',
+      '',
+      `.fab.fab-menu-toggle[data-toggle-size='${size}']:not([data-checked]) {`,
       line('--_fab-container-width', get(`${base}.containerWidth`)),
       line('--_fab-container-height', get(`${base}.containerHeight`)),
       line('--_fab-container-radius', shape(`${base}.containerShape`)),
