@@ -61,8 +61,6 @@ export function createIconButtonCss(context) {
     line('--_icon-button-square-radius', shape(get(`${sizeRoot}.small.containerShapeSquare`))),
     line('--_icon-button-inline-space', 'var(--_icon-button-default-space)'),
     line('--_icon-button-container-radius', 'var(--_icon-button-round-radius)'),
-    line('--_icon-button-target-size', 'max(48px, var(--_icon-button-container-height))'),
-    line('--_icon-button-container-width', 'calc(var(--_icon-button-icon-size) + 2 * var(--_icon-button-inline-space))'),
     line('--_icon-button-shape-duration', get('motion.spring.fastSpatial.duration')),
     line('--_icon-button-shape-easing', get('motion.spring.fastSpatial.easing')),
     '}',
