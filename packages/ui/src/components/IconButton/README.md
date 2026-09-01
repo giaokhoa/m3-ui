@@ -20,7 +20,7 @@ Generated component geometry and colors are projected from the canonical DTCG gr
 - `LargeIconButtonTokens.kt`
 - `XLargeIconButtonTokens.kt`
 
-The React implementation consumes only the generated `@m3-ui/tokens` root API. It does not read the reference corpora directly and does not add handwritten canonical tokens.
+Default rendering consumes generated `@m3-ui/tokens/icon-button.css`; React does not serialize the static size/variant/state matrix. The narrow expressive-shape helper runtime reads generated token exports only because the public `shapes` API needs concrete per-instance shape values.
 
 ## Public variants
 
@@ -60,17 +60,17 @@ Five current size families are exposed:
 - `large`: 96px / 32px
 - `extraLarge`: 136px / 40px
 
-`narrow`, `default`, and `wide` widths are derived from the canonical icon size plus the corresponding leading/trailing spacing tokens. The 48px web minimum target is an accessibility/platform mechanic, not a fabricated canonical component token.
+`narrow`, `default`, and `wide` widths are derived in generated CSS from the canonical icon size plus the corresponding leading/trailing spacing tokens. The 48px web minimum target is an accessibility/platform mechanic, not a fabricated canonical component token.
 
 ## Colors and state layers
 
-Standard, filled, filled-tonal, and outlined action colors map the canonical IconButton token families. Toggle variants resolve selected/unselected container and content colors independently. Disabled container/content alpha is applied at runtime from the canonical values, and selected outlined buttons remove the unselected outline as AndroidX does.
+Standard, filled, filled-tonal, and outlined action colors map the canonical IconButton token families. Toggle variants resolve selected/unselected container and content colors independently. Generated CSS owns disabled container/content alpha, selected/unselected paint and outlined selection/disabled precedence; React keeps no component color resolver.
 
-Hover, focus, and press feedback is produced by the shared Material Ripple/state-layer primitive. Generated hover/focus/pressed color aliases are not promoted into a second competing component state machine.
+Hover, focus, and press feedback is produced by the shared Material Ripple/state-layer primitive. Generated hover/focus/pressed color aliases are not promoted into a second competing component state machine, and IconButton does not duplicate shared Ripple opacity/motion declarations.
 
 ## Baseline shapes versus expressive shapes
 
-The ordinary AndroidX overload accepts a single static `shape`. Therefore `shape="round"` and `shape="square"` stay static through press and selection.
+The ordinary AndroidX overload accepts a single static `shape`. Therefore `shape="round"` and `shape="square"` stay static through press and selection. Generated CSS owns that default size/shape matrix.
 
 Pressed/selected shape morphing is opt-in through the `shapes` prop, matching the expressive AndroidX overloads:
 
@@ -78,7 +78,7 @@ Pressed/selected shape morphing is opt-in through the `shapes` prop, matching th
 - `iconToggleButtonShapesForSize(size, shape)` provides normal + pressed + selected shapes for toggle buttons.
 - press takes precedence over selected shape while the press interaction is active.
 
-The CSS approximation uses the canonical FastSpatial motion projection already emitted by `@m3-ui/tokens`; no new motion constants are hardcoded in the component.
+Only this explicit `shapes` override crosses into TypeScript runtime styling; it emits the active border radius for that instance and user `style` still has final precedence. The CSS approximation uses the canonical FastSpatial motion projection already emitted by `@m3-ui/tokens`; no new motion constants are hardcoded in the component.
 
 ## Intentional web differences / remaining gaps
 
