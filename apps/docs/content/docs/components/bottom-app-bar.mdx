@@ -3,21 +3,17 @@ title: Bottom app bar
 description: Regular and flexible Material bottom app bars with actions, optional FAB composition, and explicit exit-always scroll state.
 ---
 
-<ParitySummary component="bottom-app-bar" />
+Bottom app bars place important actions near the bottom edge of a screen composition. `BottomAppBar` provides the regular Material form and `FlexibleBottomAppBar` provides the expressive flexible arrangement; neither chooses responsive navigation policy on its own.
 
-## Overview
-
-`BottomAppBar` places important actions at the bottom edge of a composition and can include an adjacent floating action button. `FlexibleBottomAppBar` exposes the expressive flexible arrangement separately.
+[Material 3 bottom app bars](https://m3.material.io/components/bottom-app-bar/overview)
 
 <ComponentPreview>
   <BottomAppBarPreview />
 </ComponentPreview>
 
-## Regular app bar
-
-Use `actions` or children for independently interactive controls. `floatingActionButton` composes a FAB into the Material bar geometry without changing the FAB's own semantics.
-
 ```tsx
+import { BottomAppBar, FloatingActionButton, IconButton } from '@m3-ui/ui';
+
 <BottomAppBar
   actions={
     <>
@@ -25,19 +21,25 @@ Use `actions` or children for independently interactive controls. `floatingActio
       <IconButton aria-label="Edit">...</IconButton>
     </>
   }
-  floatingActionButton={<FloatingActionButton aria-label="Create">...</FloatingActionButton>}
+  floatingActionButton={
+    <FloatingActionButton aria-label="Create">...</FloatingActionButton>
+  }
 />
 ```
 
-## Flexible app bar
+## When to use
 
-`FlexibleBottomAppBar` accepts arbitrary child actions and an explicit `horizontalArrangement`: `space-between`, `fixed`, `start`, `center`, or `end`.
+Use a bottom app bar when Material's bottom-edge action pattern fits the screen and the actions need persistent access. Adaptive selection between bottom app bars and other navigation/action surfaces belongs to the application layout/navigation owner, not this component.
 
-This arrangement is local row composition. It does not choose a different navigation component or respond to window-size classes.
+## Regular and flexible composition
 
-## Scroll state
+Actions remain independent controls with their own accessible names and state. An optional FAB is composed into the Material geometry without changing the FAB's semantics.
 
-The public state mirrors Compose's exit-always model:
+`FlexibleBottomAppBar` accepts an explicit local `horizontalArrangement` such as `space-between`, `fixed`, `start`, `center`, or `end`. This controls the row composition only; it is not a breakpoint API.
+
+## Scroll behavior is explicit state
+
+The exit-always behavior mirrors the audited Material/Compose state vocabulary:
 
 ```tsx
 const state = BottomAppBarDefaults.createState(collapsedFraction, contentOffset);
@@ -46,14 +48,26 @@ const behavior = BottomAppBarDefaults.exitAlwaysScrollBehavior(state);
 <BottomAppBar actions={actions} scrollBehavior={behavior} />
 ```
 
-`collapsedFraction` can also be supplied directly. `BottomAppBarDefaults.settleState` resolves a partial fraction to a shown or collapsed endpoint.
-
-The component never decides which page or nested scroller drives the state. Applications own scroll integration and feed the resulting state into the bar.
+`collapsedFraction` can also be supplied directly. The component does not subscribe to page/document scrolling or decide which nested scroller drives the state. Applications own that integration and feed the result into the bar.
 
 ## Accessibility
 
-The bar is a grouping surface; each action and FAB keeps its own button semantics and accessible name. Do not make the entire bar a single click target when it contains multiple independent actions.
+Treat the app bar as a grouping surface, not a single action. Every action/FAB needs its own meaningful name, focus behavior, and pressed/selected state where applicable.
 
-## Responsive boundary
+Do not hide an important action solely because the bar collapses unless the surrounding composition preserves an equivalent reachable control.
 
-Android describes bottom app bars as a small-screen pattern, but `BottomAppBar` itself does not implement responsive switching. If an application changes from a bottom app bar to another navigation/action surface at larger sizes, that policy belongs to the adaptive layout/navigation owner rather than this component.
+## API reference
+
+<ApiReference name="BottomAppBar" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="bottom-app-bar" />
+
+Material supplies bottom-app-bar hierarchy, action/FAB geometry, flexible arrangement, and exit behavior. React state supplies explicit scroll integration; local arrangement is not adaptive window policy.
+
+## Related components
+
+- [Top app bar](/docs/components/top-app-bar) — top-edge screen title/action surface.
+- [FAB](/docs/components/fab) — prominent action composed into the bar.
+- [Adaptive layout](/docs/layout) — screen-level component switching/policy.

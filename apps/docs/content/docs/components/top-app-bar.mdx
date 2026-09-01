@@ -1,32 +1,19 @@
 ---
 title: Top app bar
-description: Material top app bars across small, centered, medium, large, and flexible variants with explicit scroll-state ownership.
+description: Material top app bars across small, center-aligned, medium, large, and flexible variants with explicit scroll-state ownership.
 ---
 
-<ParitySummary component="top-app-bar" />
+Top app bars provide screen-level title, navigation, and action structure at the top edge of a composition. `TopAppBar` exposes the Material families through explicit variants and optional scroll state; it does not discover or subscribe to the page scroller itself.
 
-## Overview
-
-`TopAppBar` renders the Material top app bar family through one React component with explicit variant and scroll-state inputs.
+[Material 3 top app bars](https://m3.material.io/components/top-app-bar/overview)
 
 <ComponentPreview>
   <TopAppBarPreview />
 </ComponentPreview>
 
-## Variants
-
-The public `variant` values are:
-
-- `small`
-- `center-aligned`
-- `medium`
-- `medium-flexible`
-- `large`
-- `large-flexible`
-
-Flexible medium and large variants accept `subtitle`. Medium and large families render an expanded title row that collapses toward the top row as the supplied fraction approaches 1.
-
 ```tsx
+import { TopAppBar } from '@m3-ui/ui';
+
 <TopAppBar
   variant="large-flexible"
   title="Inbox"
@@ -36,29 +23,51 @@ Flexible medium and large variants accept `subtitle`. Medium and large families 
 />
 ```
 
-## Scroll state
+## When to use
 
-`scrollFraction`, `overlappedFraction`, `state`, and `scrollBehavior` are explicit inputs. The component does not install a document scroll listener or infer which scroller should drive it.
+Use a top app bar for screen identity and high-level actions. Choose small/center-aligned/medium/large/flexible treatment from Material hierarchy and available screen composition rather than using title size as arbitrary decoration.
 
-Helpers mirror Compose vocabulary:
+## Variants
+
+The public family includes `small`, `center-aligned`, `medium`, `medium-flexible`, `large`, and `large-flexible`. Flexible medium/large variants can include a subtitle and transition an expanded title region toward the collapsed row.
+
+## Scroll behavior is explicit state
+
+`scrollFraction`, `overlappedFraction`, `state`, and `scrollBehavior` are explicit inputs. The component never installs a document scroll listener or assumes which nested/virtualized scroller should control it.
 
 ```tsx
-const state = createTopAppBarState(collapsedFraction, contentOffset, overlappedFraction);
+const state = createTopAppBarState(
+  collapsedFraction,
+  contentOffset,
+  overlappedFraction,
+);
 const behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state);
 
 <TopAppBar title="Inbox" variant="large" scrollBehavior={behavior} />
 ```
 
-The surrounding scroll composition owns how offsets become fractions. This keeps page routing, nested scroll containers, virtualized lists, and framework scroll restoration outside the visual primitive.
+The surrounding scroll composition converts real scroll offsets into this public state. That keeps routing, scroll restoration, virtualized lists, and nested scrolling outside the visual primitive.
 
-## Center-aligned measurement
+## Center-aligned local measurement
 
-The center-aligned variant measures only its own navigation slot, action slot, title group, and container. `ResizeObserver` keeps the title visually centered without allowing it to overlap asymmetric leading/trailing actions.
-
-This measurement is component-local geometry, not Material window-size-class or adaptive-layout behavior.
+The center-aligned variant measures only its own navigation, action, and title slots to avoid overlap while maintaining visual centering. This is component-local geometry, not a window-size class or adaptive-layout rule.
 
 ## Accessibility
 
-The root is a semantic `header`. Navigation and action slots should contain independently named controls such as `IconButton`; the app bar does not merge those actions into one composite widget.
+The root is a semantic header. Navigation and action slots contain independently named controls; the app bar is not one composite click target. Collapsed/expanded duplicate title presentation is managed so hidden duplicate content does not compete with the visible title.
 
-Expanded duplicate title content is marked hidden once fully collapsed so the visible collapsed title remains the meaningful representation.
+## API reference
+
+<ApiReference name="TopAppBar" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="top-app-bar" />
+
+Material supplies top-app-bar variants, hierarchy, collapse behavior, shape/color, and motion. Explicit React scroll state and local `ResizeObserver`-style measurement are web composition details; no hidden global scroll listener or adaptive breakpoint is added.
+
+## Related components
+
+- [Bottom app bar](/docs/components/bottom-app-bar) — bottom-edge action surface.
+- [App bar row](/docs/components/app-bar-row) — action overflow within a local app-bar slot.
+- [Adaptive layout](/docs/layout) — screen/window adaptation outside the app-bar component.
