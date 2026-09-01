@@ -66,7 +66,9 @@ test('generated FAB CSS owns regular, extended, branded and variant defaults', a
   assert.match(css, /\.fab--extended\[data-size='baseline'\]/);
   assert.match(css, /--_fab-expanded-min-width: 80px;/);
   assert.match(css, /--_fab-text-only-leading-space: 20px;/);
-  assert.match(css, /\.fab--branded-extended \{/);
+  assert.match(css, /\.fab\.fab--branded:not\(\.fab--extended\) \{/);
+  assert.match(css, /\.fab--extended\.fab--branded-extended \{/);
+  assert.match(css, /--_fab-icon-size: 36px;/);
   assert.match(css, /--_fab-label-color: var\(--on-surface\);/);
   assert.match(css, /--_fab-expand-size-duration: 137ms;/);
   assert.match(css, /--_fab-expand-opacity-duration: 108ms;/);
@@ -90,10 +92,11 @@ test('generated FabMenu CSS owns list-item and toggle family defaults', async ()
   assert.match(css, /--_fab-menu-item-height: 56px;/);
   assert.match(css, /--_fab-menu-item-container-color: var\(--primary-container\);/);
   assert.match(css, /--_fab-menu-item-content-color: var\(--on-primary-container\);/);
-  assert.match(css, /\.fab-menu-toggle\[data-toggle-size='medium'\]/);
+  assert.match(css, /\.fab\.fab-menu-toggle\[data-toggle-size='medium'\]/);
   assert.match(css, /--_fab-target-size: 80px;/);
-  assert.match(css, /\.fab-menu-toggle\[data-checked\] \{/);
+  assert.match(css, /\.fab\.fab-menu-toggle\[data-toggle-size\]\[data-checked\] \{/);
   assert.match(css, /--_fab-container-width: 56px;/);
+  assert.match(css, /--_fab-container-radius: 28px;/);
   assert.match(css, /--_fab-icon-size: 20px;/);
   assert.match(css, /--_fab-toggle-effects-duration: 108ms;/);
 });
