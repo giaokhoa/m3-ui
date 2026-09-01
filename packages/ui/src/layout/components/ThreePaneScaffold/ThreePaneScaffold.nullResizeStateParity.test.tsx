@@ -22,7 +22,7 @@ const directive: PaneScaffoldDirective = {
 
 describe('ThreePaneScaffold nullable resize state parity', () => {
   it('treats structural null as no levitated resize state', () => {
-    const value: ThreePaneScaffoldValue = {
+    const value = {
       primary: {
         type: 'levitated',
         alignment: PaneAlignment.Center,
@@ -30,7 +30,7 @@ describe('ThreePaneScaffold nullable resize state parity', () => {
       },
       secondary: PaneAdaptedValue.Hidden,
       tertiary: PaneAdaptedValue.Hidden,
-    };
+    } as unknown as ThreePaneScaffoldValue;
 
     const markup = renderToStaticMarkup(
       <ThreePaneScaffold
