@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { Children, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
 import './scaffold.css';
 
 export type ScaffoldFabPosition = 'start' | 'center' | 'end' | 'end-overlay';
@@ -16,6 +16,14 @@ export interface ScaffoldProps
   contentColor?: CSSProperties['color'];
   contentClassName?: string;
   contentStyle?: CSSProperties;
+}
+
+function hasScaffoldSlotContent(content: ReactNode): boolean {
+  // AndroidX decides slot presence from the placeables emitted by subcompose.
+  // React conditionals commonly produce false/true/null, which render no node;
+  // Children.toArray drops those empty nodes while preserving visible values
+  // such as 0, so they must not suppress insets or reserve floating spacing.
+  return Children.toArray(content).length > 0;
 }
 
 /**
@@ -42,10 +50,10 @@ export function Scaffold({
   style,
   ...props
 }: ScaffoldProps) {
-  const hasTopBar = topBar !== undefined && topBar !== null;
-  const hasBottomBar = bottomBar !== undefined && bottomBar !== null;
-  const hasFab = floatingActionButton !== undefined && floatingActionButton !== null;
-  const hasSnackbar = snackbarHost !== undefined && snackbarHost !== null;
+  const hasTopBar = hasScaffoldSlotContent(topBar);
+  const hasBottomBar = hasScaffoldSlotContent(bottomBar);
+  const hasFab = hasScaffoldSlotContent(floatingActionButton);
+  const hasSnackbar = hasScaffoldSlotContent(snackbarHost);
 
   return (
     <div
