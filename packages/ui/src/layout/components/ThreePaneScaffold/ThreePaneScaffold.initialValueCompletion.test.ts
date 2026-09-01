@@ -54,9 +54,11 @@ describe('ThreePaneScaffold retained initial-value lifecycle', () => {
     // Transition completion clock, so it is intentionally a metadata copy
     // rather than the exact captured object.
     expect(retargeted?.initialValueAnimation).not.toBe(captured);
-    expect(retargeted?.initialValueAnimation).toMatchObject(captured);
+    expect(retargeted?.initialValueAnimation).toEqual({
+      ...captured,
+      retainedCompletionPlayTimeMs: 300,
+    });
     expect(retargeted?.initialValueAnimation?.initialValueAnimation).toBeUndefined();
-    expect(retargeted?.initialValueAnimation?.retainedCompletionPlayTimeMs).toBe(300);
   });
 
   it('keeps the older retained state when the active child is use-only', () => {
