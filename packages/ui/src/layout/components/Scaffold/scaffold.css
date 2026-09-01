@@ -1,15 +1,35 @@
 .scaffold {
   --scaffold-fab-spacing: 16px;
-  --scaffold-safe-top: env(safe-area-inset-top, 0px);
-  --scaffold-safe-right: env(safe-area-inset-right, 0px);
-  --scaffold-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --scaffold-safe-left: env(safe-area-inset-left, 0px);
+  --scaffold-top-bar-height: 0px;
+  --scaffold-bottom-bar-height: 0px;
+  --scaffold-effective-top: max(
+    0px,
+    calc(var(--scaffold-inset-top) - var(--scaffold-consumed-top))
+  );
+  --scaffold-effective-right: max(
+    0px,
+    calc(var(--scaffold-inset-right) - var(--scaffold-consumed-right))
+  );
+  --scaffold-effective-bottom: max(
+    0px,
+    calc(var(--scaffold-inset-bottom) - var(--scaffold-consumed-bottom))
+  );
+  --scaffold-effective-left: max(
+    0px,
+    calc(var(--scaffold-inset-left) - var(--scaffold-consumed-left))
+  );
+  --scaffold-effective-start: var(--scaffold-effective-left);
+  --scaffold-effective-end: var(--scaffold-effective-right);
+  --scaffold-inner-padding-top: var(--scaffold-effective-top);
+  --scaffold-inner-padding-bottom: var(--scaffold-effective-bottom);
+  --scaffold-inner-padding-start: var(--scaffold-effective-start);
+  --scaffold-inner-padding-end: var(--scaffold-effective-end);
 
   position: relative;
   isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
   min-inline-size: 0;
   block-size: 100%;
   overflow: clip;
@@ -17,78 +37,73 @@
   color: var(--scaffold-content-color, inherit);
 }
 
-.scaffold__top-bar {
-  position: relative;
-  z-index: 1;
+.scaffold:dir(rtl) {
+  --scaffold-effective-start: var(--scaffold-effective-right);
+  --scaffold-effective-end: var(--scaffold-effective-left);
+}
+
+.scaffold[data-has-top-bar] {
+  --scaffold-inner-padding-top: var(--scaffold-top-bar-height);
+}
+
+.scaffold[data-has-bottom-bar] {
+  --scaffold-inner-padding-bottom: var(--scaffold-bottom-bar-height);
+}
+
+.scaffold__content,
+.scaffold__top-bar,
+.scaffold__bottom-bar,
+.scaffold__floating-layer {
   grid-column: 1;
   grid-row: 1;
   min-inline-size: 0;
 }
 
 .scaffold__content {
-  grid-column: 1;
-  grid-row: 2;
-  min-inline-size: 0;
+  position: relative;
+  z-index: 0;
   min-block-size: 0;
   box-sizing: border-box;
-  padding-left: var(--scaffold-safe-left);
-  padding-right: var(--scaffold-safe-right);
-  padding-block-start: 0;
-  padding-block-end: 0;
 }
 
-.scaffold:not([data-has-top-bar]) .scaffold__content {
-  padding-block-start: var(--scaffold-safe-top);
-}
-
-.scaffold:not([data-has-bottom-bar]) .scaffold__content {
-  padding-block-end: var(--scaffold-safe-bottom);
+.scaffold__top-bar {
+  position: relative;
+  z-index: 2;
+  align-self: start;
 }
 
 .scaffold__bottom-bar {
   position: relative;
   z-index: 3;
-  grid-column: 1;
-  grid-row: 3;
-  min-inline-size: 0;
+  align-self: end;
 }
 
 .scaffold__floating-layer {
   position: relative;
-  grid-column: 1;
-  grid-row: 2;
-  align-self: end;
-  inline-size: 100%;
-  block-size: 0;
-  min-inline-size: 0;
-  pointer-events: none;
-}
-
-.scaffold[data-fab-position='end-overlay'] .scaffold__floating-layer {
-  grid-row: 1 / -1;
+  z-index: 4;
   align-self: stretch;
-  block-size: auto;
+  justify-self: stretch;
+  pointer-events: none;
 }
 
 .scaffold__floating-stack {
   position: absolute;
-  left: var(--scaffold-safe-left);
-  right: var(--scaffold-safe-right);
-  inset-block-end: var(--scaffold-fab-spacing);
+  inset-inline-start: var(--scaffold-effective-start);
+  inset-inline-end: var(--scaffold-effective-end);
+  inset-block-end: calc(var(--scaffold-bottom-bar-height) + var(--scaffold-fab-spacing));
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto auto;
-  row-gap: 0;
   align-items: end;
   pointer-events: none;
 }
 
 .scaffold:not([data-has-bottom-bar]) .scaffold__floating-stack {
-  inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
+  inset-block-end: calc(var(--scaffold-effective-bottom) + var(--scaffold-fab-spacing));
 }
 
 .scaffold[data-fab-position='end-overlay'] .scaffold__floating-stack {
-  inset-block-end: calc(var(--scaffold-safe-bottom) + var(--scaffold-fab-spacing));
+  inset-block-end: calc(var(--scaffold-effective-bottom) + var(--scaffold-fab-spacing));
 }
 
 .scaffold__snackbar {
@@ -125,10 +140,10 @@
 }
 
 .scaffold:not([data-has-fab]) .scaffold__floating-stack {
-  inset-block-end: 0;
+  inset-block-end: var(--scaffold-bottom-bar-height);
 }
 
 .scaffold:not([data-has-fab]):not([data-has-bottom-bar]) .scaffold__floating-stack,
 .scaffold[data-fab-position='end-overlay']:not([data-has-fab]) .scaffold__floating-stack {
-  inset-block-end: var(--scaffold-safe-bottom);
+  inset-block-end: var(--scaffold-effective-bottom);
 }

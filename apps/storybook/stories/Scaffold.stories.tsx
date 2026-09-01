@@ -7,6 +7,7 @@ import {
   Snackbar,
   TopAppBar,
   type ScaffoldFabPosition,
+  type ScaffoldWindowInsets,
 } from '@m3-ui/ui';
 
 const meta = {
@@ -61,6 +62,7 @@ function Example({
   position = 'end',
   dir,
   style,
+  contentWindowInsets,
 }: {
   top?: boolean;
   bottom?: boolean;
@@ -69,6 +71,7 @@ function Example({
   position?: ScaffoldFabPosition;
   dir?: 'ltr' | 'rtl';
   style?: CSSProperties;
+  contentWindowInsets?: ScaffoldWindowInsets;
 }) {
   return (
     <Frame dir={dir}>
@@ -79,6 +82,7 @@ function Example({
         snackbarHost={snack ? snackbar : undefined}
         floatingActionButton={showFab ? fab : undefined}
         floatingActionButtonPosition={position}
+        contentWindowInsets={contentWindowInsets}
         style={{ height: '100%', ...style }}
       >
         {body}
@@ -116,15 +120,115 @@ export const SafeArea: Story = {
     <Example
       snack
       showFab
-      style={{
-        '--scaffold-safe-top': '20px',
-        '--scaffold-safe-right': '14px',
-        '--scaffold-safe-bottom': '18px',
-        '--scaffold-safe-left': '12px',
-      } as CSSProperties}
+      contentWindowInsets={{ top: 20, right: 14, bottom: 18, left: 12 }}
     />
   ),
 };
 export const Resize: Story = {
   render: () => <Example top bottom snack showFab />,
+};
+
+export const ConventionalPaddedContent: Story = {
+  render: () => (
+    <Frame>
+      <Scaffold
+        data-testid="scaffold"
+        topBar={topBar}
+        bottomBar={bottomBar}
+        style={{ height: '100%' }}
+      >
+        {(innerPadding) => (
+          <div
+            data-testid="padded-content"
+            style={{ ...innerPadding.style, height: '100%', overflow: 'auto', paddingInline: 24 }}
+          >
+            <div style={{ paddingBlock: 24 }}>Conventional content consumes inner padding.</div>
+          </div>
+        )}
+      </Scaffold>
+    </Frame>
+  ),
+};
+
+export const ScrollBehindTopAppBar: Story = {
+  render: () => (
+    <Frame>
+      <Scaffold data-testid="scaffold" topBar={topBar} style={{ height: '100%' }}>
+        {(innerPadding) => (
+          <div data-testid="edge-scroll" style={{ height: '100%', overflow: 'auto' }}>
+            <div style={{ height: 180, background: 'var(--primary-container)' }} />
+            <div style={{ ...innerPadding.style, paddingInline: 24 }}>
+              Scroll content starts behind the top app bar, while interactive content consumes
+              the calculated top padding.
+            </div>
+          </div>
+        )}
+      </Scaffold>
+    </Frame>
+  ),
+};
+
+export const ContentBehindBottomBar: Story = {
+  render: () => (
+    <Frame>
+      <Scaffold data-testid="scaffold" bottomBar={bottomBar} style={{ height: '100%' }}>
+        {(innerPadding) => (
+          <div data-testid="bottom-edge-scroll" style={{ height: '100%', overflow: 'auto' }}>
+            <div style={{ minHeight: 560, padding: 24, paddingBlockEnd: innerPadding.bottom }}>
+              The scroll surface extends behind the bottom bar; only its interactive tail consumes
+              the bottom inner padding.
+            </div>
+          </div>
+        )}
+      </Scaffold>
+    </Frame>
+  ),
+};
+
+export const FullBleedEdgeToEdge: Story = {
+  render: () => (
+    <Frame>
+      <Scaffold
+        data-testid="scaffold"
+        topBar={topBar}
+        bottomBar={bottomBar}
+        contentWindowInsets={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        style={{ height: '100%' }}
+      >
+        <div
+          data-testid="full-bleed-content"
+          style={{ width: '100%', height: '100%', background: 'var(--tertiary-container)' }}
+        />
+      </Scaffold>
+    </Frame>
+  ),
+};
+
+export const NestedConsumedInsets: Story = {
+  render: () => (
+    <Frame>
+      <Scaffold
+        data-testid="outer-scaffold"
+        contentWindowInsets={{ top: 20, right: 14, bottom: 18, left: 12 }}
+        style={{ height: '100%' }}
+      >
+        {(outerPadding) => (
+          <div style={{ ...outerPadding.style, height: '100%' }}>
+            <Scaffold
+              data-testid="nested-scaffold"
+              contentWindowInsets={{ top: 20, right: 14, bottom: 18, left: 12 }}
+              consumedWindowInsets={{ top: 20, right: 14, bottom: 18, left: 12 }}
+              style={{ height: '100%' }}
+            >
+              {(innerPadding) => (
+                <div data-testid="nested-content" style={innerPadding.style}>
+                  Nested scaffold does not consume the same safe-area inset twice.
+                </div>
+              )}
+            </Scaffold>
+          </div>
+        )}
+      </Scaffold>
+    </Frame>
+  ),
 };
