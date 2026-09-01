@@ -42,23 +42,31 @@ export function createTabsCss(context) {
       line('--_tabs-icon-color', get(`${tab}.primary.inactiveIconColor`)),
       line('--_tabs-label-color', get(`${tab}.primary.inactiveLabelTextColor`)),
       line('--_tabs-content-opacity', 1),
-      line('--_ripple-color', get(`${tab}.primary.inactivePressedStateLayerColor`)),
-      line('--_ripple-hover-color', get(`${tab}.primary.inactiveHoverStateLayerColor`)),
-      line('--_ripple-focus-color', get(`${tab}.primary.inactiveFocusStateLayerColor`)),
+      line('--_ripple-color', get(`${tab}.primary.inactiveHoverStateLayerColor`)),
       line('--_ripple-hover-opacity', get(`${tab}.primary.inactiveHoverStateLayerOpacity`)),
       line('--_ripple-focus-opacity', get(`${tab}.primary.inactiveFocusStateLayerOpacity`)),
       line('--_ripple-pressed-opacity', get(`${tab}.primary.inactivePressedStateLayerOpacity`)),
       ...typography(get(`${tab}.primary.labelTextTypography`)),
     ]),
+    ...rule(".tabs[data-variant='primary'] .tabs__tab[data-focus-visible]:not([data-selected])", [
+      line('--_ripple-color', get(`${tab}.primary.inactiveFocusStateLayerColor`)),
+    ]),
+    ...rule(".tabs[data-variant='primary'] .tabs__tab[data-pressed]:not([data-selected])", [
+      line('--_ripple-color', get(`${tab}.primary.inactivePressedStateLayerColor`)),
+    ]),
     ...rule(".tabs[data-variant='primary'] .tabs__tab[data-selected]", [
       line('--_tabs-icon-color', get(`${tab}.primary.activeIconColor`)),
       line('--_tabs-label-color', get(`${tab}.primary.activeLabelTextColor`)),
-      line('--_ripple-color', get(`${tab}.primary.activePressedStateLayerColor`)),
-      line('--_ripple-hover-color', get(`${tab}.primary.activeHoverStateLayerColor`)),
-      line('--_ripple-focus-color', get(`${tab}.primary.activeFocusStateLayerColor`)),
+      line('--_ripple-color', get(`${tab}.primary.activeHoverStateLayerColor`)),
       line('--_ripple-hover-opacity', get(`${tab}.primary.activeHoverStateLayerOpacity`)),
       line('--_ripple-focus-opacity', get(`${tab}.primary.activeFocusStateLayerOpacity`)),
       line('--_ripple-pressed-opacity', get(`${tab}.primary.activePressedStateLayerOpacity`)),
+    ]),
+    ...rule(".tabs[data-variant='primary'] .tabs__tab[data-selected][data-focus-visible]", [
+      line('--_ripple-color', get(`${tab}.primary.activeFocusStateLayerColor`)),
+    ]),
+    ...rule(".tabs[data-variant='primary'] .tabs__tab[data-selected][data-pressed]", [
+      line('--_ripple-color', get(`${tab}.primary.activePressedStateLayerColor`)),
     ]),
     ...rule(".tabs[data-variant='secondary'] .tabs__tab", [
       line('--_tabs-tab-height', get(`${tab}.secondary.containerHeight`)),
@@ -66,13 +74,17 @@ export function createTabsCss(context) {
       line('--_tabs-icon-color', get(`${tab}.secondary.inactiveIconColor`)),
       line('--_tabs-label-color', get(`${tab}.secondary.inactiveLabelTextColor`)),
       line('--_tabs-content-opacity', 1),
-      line('--_ripple-color', get(`${tab}.secondary.pressedStateLayerColor`)),
-      line('--_ripple-hover-color', get(`${tab}.secondary.hoverStateLayerColor`)),
-      line('--_ripple-focus-color', get(`${tab}.secondary.focusStateLayerColor`)),
+      line('--_ripple-color', get(`${tab}.secondary.hoverStateLayerColor`)),
       line('--_ripple-hover-opacity', get(`${tab}.secondary.hoverStateLayerOpacity`)),
       line('--_ripple-focus-opacity', get(`${tab}.secondary.focusStateLayerOpacity`)),
       line('--_ripple-pressed-opacity', get(`${tab}.secondary.pressedStateLayerOpacity`)),
       ...typography(get(`${tab}.secondary.labelTextTypography`)),
+    ]),
+    ...rule(".tabs[data-variant='secondary'] .tabs__tab[data-focus-visible]", [
+      line('--_ripple-color', get(`${tab}.secondary.focusStateLayerColor`)),
+    ]),
+    ...rule(".tabs[data-variant='secondary'] .tabs__tab[data-pressed]", [
+      line('--_ripple-color', get(`${tab}.secondary.pressedStateLayerColor`)),
     ]),
     ...rule(".tabs[data-variant='secondary'] .tabs__tab[data-selected]", [
       line('--_tabs-icon-color', get(`${tab}.secondary.activeIconColor`)),
