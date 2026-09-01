@@ -1,27 +1,17 @@
 ---
 title: Pull to refresh
-description: Compose Material3 pull-to-refresh behavior with application-owned refresh lifecycle, top-edge gesture arbitration, and accessible indicator state.
+description: Material pull-to-refresh behavior with application-owned refresh lifecycle, top-edge gesture arbitration, and accessible status feedback.
 ---
 
-<ParitySummary component="pull-to-refresh" />
-
-## Overview
-
-`PullToRefresh` wraps scrollable content and requests a refresh when a downward gesture crosses the audited Material threshold while the content is already at its top edge.
-
-The component owns gesture progress and indicator presentation. The application owns the actual refresh operation and decides when refreshing is complete.
-
-## Live example
+Pull to refresh requests new data when users drag downward from the top edge of scrollable content. The component owns Material gesture progress and indicator presentation; the application owns the refresh operation and decides when it is complete.
 
 <ComponentPreview>
   <PullToRefreshPreview />
 </ComponentPreview>
 
-Scroll the feed back to the top, then drag downward. The controls also let you inspect the externally controlled refreshing state without requiring a gesture.
-
-## Refresh lifecycle
-
 ```tsx
+import { PullToRefresh } from '@m3-ui/ui';
+
 const [isRefreshing, setRefreshing] = useState(false);
 
 <PullToRefresh
@@ -35,26 +25,43 @@ const [isRefreshing, setRefreshing] = useState(false);
 </PullToRefresh>
 ```
 
-`onRefresh` is a request, not a promise contract or hidden network lifecycle. Keep `isRefreshing` true while application work is active, then set it to false when that work completes.
+## When to use
 
-The default indicator reports the refreshing state through a polite status region while its visual progress follows the pull distance.
+Use pull to refresh when the surrounding product already uses a scrollable refresh pattern and a top-edge drag is discoverable in context. Always keep another reasonable refresh path where product/accessibility requirements call for one; a gesture should not become the only possible data-reload mechanism.
+
+## Refresh lifecycle is application-owned
+
+`onRefresh` is a request callback, not a hidden promise/network contract. Keep `isRefreshing` true while application work is active, then set it false when that work finishes or fails.
+
+The component does not fetch data, choose retry policy, cancel requests, or infer completion from a timeout.
 
 ## Gesture arbitration
 
-A downward pointer gesture is claimed only when the pull-to-refresh root is at the top and the originating nested scrollable is not scrolled away from its own top edge. This preserves normal nested scrolling instead of stealing every downward gesture in the subtree.
+A downward pointer gesture is claimed only when the pull-to-refresh root and the originating nested scrollable are already at their top edge. Vertical scrolling therefore remains with nested/page content until the Material refresh gesture is actually eligible.
 
-Crossing the threshold arms the gesture. Releasing while armed calls `onRefresh` once. Releasing before the threshold returns to idle without requesting a refresh.
-
-`enabled={false}` disables the gesture while leaving the content usable.
+Crossing the threshold arms the request; releasing while armed calls `onRefresh` once. Releasing early returns to idle. `enabled={false}` disables the gesture without disabling the wrapped content.
 
 ## Indicator customization
 
-Pass `indicator={(state) => ...}` to replace the default visual. The render state exposes progress plus the logical `idle`, `pulling`, `armed`, and `refreshing` status so a custom indicator can preserve the same lifecycle.
+The default indicator communicates pull/refresh presentation and exposes polite refresh status. A custom `indicator` receives the logical lifecycle/progress state but must not take ownership of the refresh operation itself.
 
-Custom presentation should not move refresh ownership into the indicator itself; `isRefreshing` remains application state.
+## Accessibility
 
-## Compose mapping
+Do not require users to discover a pointer-only gesture to understand or operate critical refresh behavior. Keep the refreshing status stable enough to be announced meaningfully and avoid repeatedly toggling status during one request.
 
-The interaction follows the current Compose Material3 `PullToRefreshBox` contract: a scrollable container, externally supplied refreshing state, a threshold-triggered refresh request, and an indicator layered over content.
+Wrapped controls retain their own semantics; the refresh wrapper should not turn the entire scroll surface into a button.
 
-The web implementation translates the audited Material distance into CSS-pixel geometry and uses pointer/nested-scroll inspection appropriate for the browser rather than reproducing Compose nested-scroll internals literally.
+## API reference
+
+<ApiReference name="PullToRefresh" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="pull-to-refresh" />
+
+The interaction follows the audited Compose Material3 PullToRefresh contract: external refreshing state, a threshold request, and indicator progress. Browser pointer/nested-scroll inspection replaces Compose nested-scroll internals while application data lifecycle remains external.
+
+## Related components
+
+- [Loading indicator](/docs/components/loading-indicator) — standalone loading/progress presentation.
+- [Snackbar](/docs/components/snackbar) — transient result/error feedback after refresh.
