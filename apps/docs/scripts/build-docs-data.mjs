@@ -1,8 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createFromSource } from 'fumadocs-core/search/server';
-import { loader } from 'fumadocs-core/source';
 import { register } from 'fumadocs-mdx/node';
 
 register({
@@ -11,11 +10,7 @@ register({
   },
 });
 
-const { docs } = await import('../src/lib/source.ts');
-const source = loader({
-  baseUrl: '/docs',
-  source: docs.toFumadocsSource(),
-});
+const { source } = await import('../src/lib/source.ts');
 
 function textValue(value) {
   if (typeof value === 'string') return value;
