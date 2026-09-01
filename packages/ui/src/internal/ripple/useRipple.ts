@@ -57,7 +57,7 @@ export function getRippleReleaseDelay(startedAt: number, now: number): number {
 }
 
 export function clearRippleTimers(timers: Set<BrowserTimer>): void {
-  for (const timer of timers) clearTimeout(timer);
+  for (const timer of timers) window.clearTimeout(timer);
   timers.clear();
 }
 
@@ -73,7 +73,7 @@ export function useRipple({
   const timers = useRef(new Set<BrowserTimer>());
 
   const schedule = useCallback((callback: () => void, delay: number) => {
-    const timer: BrowserTimer = setTimeout(() => {
+    const timer: BrowserTimer = window.setTimeout(() => {
       timers.current.delete(timer);
       callback();
     }, delay);
