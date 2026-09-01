@@ -11,6 +11,13 @@ describe('preferred pane size', () => {
     expect(resolvePanePreferredSize(0.4, 1000, 360, 'preferredWidth')).toBe(0);
   });
 
+  it('validates absolute sizes after the AndroidX Dp Float boundary', () => {
+    expect(Math.fround(1e-50)).toBe(0);
+    expect(() => resolvePanePreferredSize(1e-50, 1000, 360, 'preferredWidth')).toThrow(
+      RangeError,
+    );
+  });
+
   it('accepts the AndroidX Dp.Infinity case as Constraints.Infinity', () => {
     expect(
       resolvePanePreferredSize(Number.POSITIVE_INFINITY, 1000, 360, 'preferredWidth'),

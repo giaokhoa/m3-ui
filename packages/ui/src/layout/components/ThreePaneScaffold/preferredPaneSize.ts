@@ -53,16 +53,17 @@ export function resolvePanePreferredSize(
 ): number {
   if (preferredSize === undefined) return fallbackSize;
   if (typeof preferredSize === 'number') {
-    // AndroidX accepts Dp.Unspecified or any value > 0.dp, then resolves the
-    // specified Dp with roundToPx() at pane measurement. Preserve NaN as the
-    // Dp.Unspecified sentinel in addition to undefined, the idiomatic web form.
-    if (Number.isNaN(preferredSize)) return fallbackSize;
-    if (preferredSize <= 0) {
+    // AndroidX receives this overload as a Dp, whose backing value is already
+    // Float. Apply the same Float boundary before both Unspecified/positivity
+    // validation and roundToPx().
+    const floatPreferredSize = composeFloat(preferredSize);
+    if (Number.isNaN(floatPreferredSize)) return fallbackSize;
+    if (!(floatPreferredSize > 0)) {
       throw new RangeError(
         `${name} must be a positive CSS pixel value, received ${preferredSize}`,
       );
     }
-    return composeRoundToPx(preferredSize);
+    return composeRoundToPx(floatPreferredSize);
   }
 
   const proportion = normalizeProportion(preferredSize.proportion, `${name} proportion`);
