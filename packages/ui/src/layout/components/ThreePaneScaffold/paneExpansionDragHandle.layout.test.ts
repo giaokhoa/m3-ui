@@ -93,15 +93,18 @@ describe('pane expansion drag-handle placement', () => {
     expect(placement.centerX + placement.minWidth / 2).toBe(64);
   });
 
-  it('preserves a valid clamp when the scaffold is narrower than its spacer', () => {
-    expect(
+  it('throws when spacer margins produce an empty placement range', () => {
+    // AndroidX Int.coerceIn throws when min > max. For a 16px scaffold and a
+    // 24px spacer this is coerceIn(12, 4), so preserving the empty range is the
+    // Compose behavior rather than normalizing it to the scaffold midpoint.
+    expect(() =>
       calculatePaneExpansionDragHandlePlacement({
         offsetX: 0,
         contentWidth: 16,
         partitionSpacerSize: '24px',
         minTouchTargetSize: 48,
       }),
-    ).toEqual({ centerX: 8, minWidth: 80 });
+    ).toThrow(RangeError);
   });
 
   it('measures the spacer midpoint before pane ruler margins clip an internal edge', () => {
