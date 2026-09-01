@@ -1,0 +1,53 @@
+---
+title: Material conformance
+description: How m3-ui evaluates Material 3 fidelity across design, Compose evidence, web semantics, and implementation gaps.
+---
+
+`m3-ui` treats Material Design 3 as the normative source for design intent. Conformance is evaluated against observable Material requirements, not by reproducing Android runtime structure line for line.
+
+## Source hierarchy
+
+Documentation and implementation decisions use this precedence:
+
+1. **Material Design 3** — normative design intent, usage guidance, anatomy, variants, behavior, and visual specification.
+2. **AndroidX Compose Material3** — current Material API vocabulary and implementation/reference evidence, including expressive APIs.
+3. **Web platform and React Aria Components** — browser semantics, focus, keyboard, pointer, touch, forms, internationalization, and accessibility behavior.
+4. **`m3-ui` public implementation** — the API consumers can actually import and the behavior currently shipped by the package.
+5. **Material Web and Figma evidence** — implementation/reference evidence and explicit web adaptations, never silently promoted to normative Material guidance.
+
+Presentation patterns from other documentation systems may influence how examples are explained, but they are not Material evidence.
+
+## What “aligned” means
+
+A component can be aligned with Material even when its internal web implementation differs from Compose. Examples include:
+
+- CSS inheritance replacing a visual `CompositionLocal`.
+- React Aria normalized press/focus state replacing `MutableInteractionSource` plumbing.
+- Native HTML and ARIA semantics replacing Android semantics objects.
+- CSS custom properties and generated styles replacing Kotlin defaults objects for immutable visual facts.
+
+Those are platform mappings. They are not parity failures by themselves.
+
+## What gets compared
+
+Conformance is best read as separate dimensions rather than a single percentage:
+
+- **Visual fidelity** — appearance, state styling, shape, typography, color roles, elevation, and relevant measurements.
+- **Behavior fidelity** — interaction, state transitions, selection, dismissal, layout behavior, and motion where applicable.
+- **Semantic fidelity** — role, labeling, keyboard behavior, focus model, form semantics, and accessibility contract.
+
+The parity catalog records these dimensions independently and distinguishes intentional adaptations from known gaps.
+
+## Adaptation versus gap
+
+An **adaptation** is an intentional browser-native mapping that preserves the Material contract while using the correct web primitive.
+
+A **known gap** is an observable Material capability or requirement that the current public implementation does not yet provide.
+
+The documentation should never hide a known gap behind vague “web differences,” and it should never label a correct browser adaptation as a failure simply because Compose uses a different runtime mechanism.
+
+## No global complete-parity claim
+
+`m3-ui` does not claim complete Material parity globally. Material evolves, component coverage differs by family, and individual fidelity dimensions can be aligned, adapted, partial, or not applicable.
+
+Use the [parity catalog](/docs/parity) and each component guide's fidelity section for the evidence available today.

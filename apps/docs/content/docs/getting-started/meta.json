@@ -1,0 +1,11 @@
+{
+  "title": "Getting started",
+  "pages": [
+    "index",
+    "installation",
+    "quick-start",
+    "browser-support",
+    "material-conformance",
+    "storybook-and-public-docs"
+  ]
+}

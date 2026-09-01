@@ -2,6 +2,7 @@
   "title": "m3-ui",
   "pages": [
     "index",
+    "getting-started",
     "foundations",
     "theming",
     "layout",
