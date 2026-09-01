@@ -78,6 +78,12 @@ describe('MutableThreePaneScaffoldState completed-fraction duration parity', () 
       expect(state.animationPlayTimeMs).toBe(80);
       const clearRevisionAtFractionEnd = state.initialValueAnimationsClearRevision;
 
+      // The progress driver's Promise continuation installs the retained-value
+      // frame waiter as a microtask. Browsers run that microtask before the next
+      // requestAnimationFrame callback, so mirror that ordering in this manual
+      // frame harness before advancing the retained timeline clock.
+      await Promise.resolve();
+
       // recalculateAnimationValue() sets currentAnimation = null as soon as its
       // value reaches 1f. A later total-duration observation must therefore use
       // seekToFraction() only; it must not call endAllAnimations() on the still-
