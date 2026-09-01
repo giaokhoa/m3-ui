@@ -9,6 +9,7 @@ import {
   IconButton,
   ModalDrawerSheet,
   ModalNavigationDrawer,
+  NavigationDrawerLink,
   PermanentDrawerSheet,
   PermanentNavigationDrawer,
   TopAppBar,
@@ -69,8 +70,8 @@ export interface DocsShellProps {
 const docsNavigation = docsNavigationData as unknown as DocsNavigation;
 
 function normalizePath(pathname: string): string {
-  const withoutTrailingSlash = pathname.replace(/\/+$/, '');
-  return withoutTrailingSlash || '/';
+  const normalized = pathname.replace(/\/+$/, '');
+  return normalized || '/';
 }
 
 function MenuGlyph() {
@@ -125,7 +126,9 @@ function flattenPages(nodes: readonly DocsNavNode[]): DocsNavPage[] {
   for (const node of nodes) {
     if (node.type === 'page') {
       pages.push(node);
-    } else if (node.type === 'folder') {
+      continue;
+    }
+    if (node.type === 'folder') {
       if (node.index) pages.push(node.index);
       pages.push(...flattenPages(node.children));
     }
@@ -176,18 +179,15 @@ function NavLink({
   onNavigate?: () => void;
   overview?: boolean;
 }) {
-  const active = normalizePath(page.url) === currentPath;
   return (
-    <a
-      aria-current={active ? 'page' : undefined}
-      className="docs-nav__link"
+    <NavigationDrawerLink
       href={page.url}
-      onClick={onNavigate}
-      style={getMaterialTypeCssProperties('labelLarge')}
+      onPress={onNavigate}
+      selected={normalizePath(page.url) === currentPath}
       title={page.description}
     >
       {overview ? 'Overview' : page.name}
-    </a>
+    </NavigationDrawerLink>
   );
 }
 
@@ -281,7 +281,7 @@ function NavNodes({
             <div
               className="docs-nav__separator"
               key={`separator-${depth}-${node.name}-${index}`}
-              style={getMaterialTypeCssProperties('labelSmall')}
+              style={getMaterialTypeCssProperties('titleSmall')}
             >
               {node.name}
             </div>
@@ -330,7 +330,7 @@ function DocsSidebar({
           <span style={getMaterialTypeCssProperties('titleLarge')}>m3-ui</span>
           <span
             className="docs-sidebar__brand-subtitle"
-            style={getMaterialTypeCssProperties('labelMedium')}
+            style={getMaterialTypeCssProperties('bodyMedium')}
           >
             Documentation
           </span>
@@ -355,27 +355,22 @@ function DocsSidebar({
 function Breadcrumbs({ currentPath }: { currentPath: string }) {
   if (currentPath === '/docs') return null;
   const trail = findTrail(docsNavigation.children, currentPath) ?? [];
-  const labelStyle = getMaterialTypeCssProperties('labelMedium');
+  const typeStyle = getMaterialTypeCssProperties('bodyMedium');
 
   return (
     <nav aria-label="Breadcrumb" className="docs-breadcrumbs">
       <ol>
-        <li>
-          <a href="/docs" style={labelStyle}>Docs</a>
-        </li>
+        <li><a href="/docs" style={typeStyle}>Docs</a></li>
         {trail.map((item, index) => {
           const current = index === trail.length - 1;
           return (
             <li key={`${item.name}-${index}`}>
               {current || !item.url ? (
-                <span
-                  aria-current={current ? 'page' : undefined}
-                  style={labelStyle}
-                >
+                <span aria-current={current ? 'page' : undefined} style={typeStyle}>
                   {item.name}
                 </span>
               ) : (
-                <a href={item.url} style={labelStyle}>{item.name}</a>
+                <a href={item.url} style={typeStyle}>{item.name}</a>
               )}
             </li>
           );
@@ -400,7 +395,7 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
     <nav aria-label="Previous and next pages" className="docs-page-navigation">
       {previous ? (
         <a className="docs-page-navigation__link" href={previous.url} rel="prev">
-          <span style={getMaterialTypeCssProperties('labelMedium')}>Previous</span>
+          <span style={getMaterialTypeCssProperties('bodyMedium')}>Previous</span>
           <strong style={getMaterialTypeCssProperties('titleMedium')}>
             {previous.name}
           </strong>
@@ -414,7 +409,7 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
           href={next.url}
           rel="next"
         >
-          <span style={getMaterialTypeCssProperties('labelMedium')}>Next</span>
+          <span style={getMaterialTypeCssProperties('bodyMedium')}>Next</span>
           <strong style={getMaterialTypeCssProperties('titleMedium')}>
             {next.name}
           </strong>
@@ -426,6 +421,7 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
 
 function PageToc({ toc }: { toc: readonly TOCItemType[] }) {
   if (toc.length === 0) return null;
+
   return (
     <aside aria-label="On this page" className="docs-toc">
       <div
@@ -443,7 +439,7 @@ function PageToc({ toc }: { toc: readonly TOCItemType[] }) {
             style={
               {
                 '--docs-toc-depth': Math.max(0, item.depth - 2),
-                ...getMaterialTypeCssProperties('bodySmall'),
+                ...getMaterialTypeCssProperties('bodyMedium'),
               } as CSSProperties
             }
           >
@@ -527,11 +523,7 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
           </IconButton>
         )
       }
-      title={
-        <a className="docs-app-bar__brand" href="/docs">
-          m3-ui
-        </a>
-      }
+      title={<a className="docs-app-bar__brand" href="/docs">m3-ui</a>}
       actions={
         <>
           <DocsSearch />
@@ -577,7 +569,6 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
                 <PermanentDrawerSheet
                   aria-label="Documentation navigation"
                   className="docs-sidebar"
-                  width={304}
                 >
                   <DocsSidebar currentPath={currentPath} />
                 </PermanentDrawerSheet>
@@ -592,7 +583,6 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
                 <ModalDrawerSheet
                   aria-label="Documentation navigation"
                   className="docs-sidebar"
-                  width="min(304px, calc(100vw - 32px))"
                 >
                   <DocsSidebar
                     currentPath={currentPath}
