@@ -290,8 +290,8 @@ export function calculateAnimationSpringDurationMs(
     composeFloat(initial - target) / threshold,
   );
   const normalizedVelocity = composeFloat(velocity / threshold);
-  if (normalizedDisplacement === 0 && normalizedVelocity === 0) return 0;
   if (dampingRatio === 0) return ComposeMaxLongMillis;
+  if (normalizedDisplacement === 0 && normalizedVelocity === 0) return 0;
 
   const velocityForPositivePosition =
     normalizedDisplacement < 0 ? -normalizedVelocity : normalizedVelocity;
