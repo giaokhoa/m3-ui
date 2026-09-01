@@ -34,6 +34,7 @@ export interface RippleController {
 
 const fadeOutDurationMs = msNumber(RippleFadeOutDuration);
 const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
+type BrowserTimer = ReturnType<typeof window.setTimeout>;
 
 export function chainRipplePressHandlers<Event extends RipplePressEvent>(
   controller: Pick<RippleController, 'onPressStart' | 'onPressEnd'>,
@@ -55,10 +56,8 @@ export function getRippleReleaseDelay(startedAt: number, now: number): number {
   return Math.max(0, minimumPressDurationMs - (now - startedAt));
 }
 
-export function clearRippleTimers(
-  timers: Set<ReturnType<typeof setTimeout>>,
-): void {
-  for (const timer of timers) clearTimeout(timer);
+export function clearRippleTimers(timers: Set<BrowserTimer>): void {
+  for (const timer of timers) window.clearTimeout(timer);
   timers.clear();
 }
 
@@ -71,10 +70,10 @@ export function useRipple({
   const nextId = useRef(0);
   const activeWaveId = useRef<number | null>(null);
   const startedAt = useRef(new Map<number, number>());
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const timers = useRef(new Set<BrowserTimer>());
 
   const schedule = useCallback((callback: () => void, delay: number) => {
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       timers.current.delete(timer);
       callback();
     }, delay);
@@ -136,17 +135,22 @@ export function useRipple({
     [],
   );
 
-  const controller: RippleController = {
+  const getPressProps = useCallback(
+    <Event extends RipplePressEvent>(
+      handlers: RipplePressHandlers<Event> = {},
+    ): RipplePressProps<Event> =>
+      chainRipplePressHandlers(
+        { onPressStart, onPressEnd },
+        handlers,
+      ),
+    [onPressEnd, onPressStart],
+  );
+
+  return {
     containerRef,
     waves,
     onPressStart,
     onPressEnd,
-    getPressProps<Event extends RipplePressEvent>(
-      handlers?: RipplePressHandlers<Event>,
-    ) {
-      return chainRipplePressHandlers(controller, handlers);
-    },
+    getPressProps,
   };
-
-  return controller;
 }
