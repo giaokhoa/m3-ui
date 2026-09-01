@@ -162,22 +162,21 @@ function ListItemContent({
   supportingText,
   ripple,
   isFocusVisible,
-  interaction,
+  isHovered,
 }: Pick<
   CommonListItemProps,
   'children' | 'leading' | 'trailing' | 'overline' | 'supportingText'
 > & {
   ripple?: ReturnType<typeof useRipple>;
   isFocusVisible?: boolean;
-  interaction?: 'hover' | 'focus' | null;
+  isHovered?: boolean;
 }) {
   return (
     <>
       {ripple ? (
         <Ripple
           controller={ripple}
-          isFocusVisible={isFocusVisible}
-          stateInteraction={interaction ?? null}
+          state={{ isFocusVisible, isHovered }}
         />
       ) : null}
       {leading != null ? (
@@ -278,6 +277,7 @@ export function ListItem(props: ListItemProps) {
   }
 
   const ripple = useRipple({ origin: 'press' });
+  const ripplePressProps = ripple.getPressProps();
   const suppliedOnPress = 'onPress' in props ? props.onPress : undefined;
   const handlePress: AriaButtonProps['onPress'] = (event) => {
     if (
@@ -292,6 +292,7 @@ export function ListItem(props: ListItemProps) {
 
   return (
     <AriaButton
+      {...ripplePressProps}
       aria-label={ariaLabel}
       className={clsx(
         'list-item',
@@ -306,8 +307,6 @@ export function ListItem(props: ListItemProps) {
       data-testid={testId}
       isDisabled={isDisabled}
       onPress={handlePress}
-      onPressStart={(event) => ripple.onPressStart(event)}
-      onPressEnd={() => ripple.onPressEnd()}
       render={(domProps) => {
         const semantics =
           selectionMode === 'single'
@@ -338,13 +337,7 @@ export function ListItem(props: ListItemProps) {
           supportingText={supportingText}
           ripple={ripple}
           isFocusVisible={renderProps.isFocusVisible}
-          interaction={
-            renderProps.isFocusVisible
-              ? 'focus'
-              : renderProps.isHovered
-                ? 'hover'
-                : null
-          }
+          isHovered={renderProps.isHovered}
         />
       )}
     </AriaButton>
