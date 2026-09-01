@@ -13,18 +13,7 @@ import {
 import '@m3-ui/tokens/card.css';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import {
-  getCardElevationLevel,
-  getCardElevationMotion,
-  type CardVariant,
-} from './Card.elevation';
-import {
-  endCardInteraction,
-  latestCardInteraction,
-  latestCardStateLayerInteraction,
-  startCardInteraction,
-  type CardInteraction,
-} from './Card.interactions';
+import { cardElevationTokens, type CardVariant } from './Card.elevation';
 import './card.css';
 
 export interface CardProps
@@ -82,25 +71,26 @@ function CardImpl({
   const interactive = onPress !== undefined;
   const disabled = interactive && isDisabled;
   const ripple = useRipple();
-  const [activeInteractions, setActiveInteractions] = useState<CardInteraction[]>([]);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const [isFocusVisible, setIsFocusVisible] = useState(false);
   const pointerPressRef = useRef(false);
   const keyboardPressRef = useRef<'Enter' | ' ' | null>(null);
-  const startInteraction = (interaction: CardInteraction) =>
-    setActiveInteractions((active) => startCardInteraction(active, interaction));
-  const endInteraction = (interaction: CardInteraction) =>
-    setActiveInteractions((active) => endCardInteraction(active, interaction));
+
   const endPress = () => {
-    endInteraction('press');
+    setIsPressed(false);
     ripple.onPressEnd();
   };
+
   const handlePointerEnter = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactive && !disabled) startInteraction('hover');
+    if (interactive && !disabled) setIsHovered(true);
     onPointerEnter?.(event);
   };
+
   const handlePointerLeave = (event: PointerEvent<HTMLDivElement>) => {
     if (interactive && !disabled) {
-      endInteraction('hover');
+      setIsHovered(false);
       if (pointerPressRef.current) {
         pointerPressRef.current = false;
         endPress();
@@ -108,6 +98,7 @@ function CardImpl({
     }
     onPointerLeave?.(event);
   };
+
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (
       interactive &&
@@ -116,7 +107,7 @@ function CardImpl({
       !isNestedInteractive(event.target, event.currentTarget)
     ) {
       pointerPressRef.current = true;
-      startInteraction('press');
+      setIsPressed(true);
       const bounds = event.currentTarget.getBoundingClientRect();
       ripple.onPressStart({
         pointerType:
@@ -130,6 +121,7 @@ function CardImpl({
     }
     onPointerDown?.(event);
   };
+
   const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
     if (pointerPressRef.current) {
       pointerPressRef.current = false;
@@ -137,6 +129,7 @@ function CardImpl({
     }
     onPointerUp?.(event);
   };
+
   const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
     if (pointerPressRef.current) {
       pointerPressRef.current = false;
@@ -144,22 +137,25 @@ function CardImpl({
     }
     onPointerCancel?.(event);
   };
+
   const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
     if (interactive && !disabled && event.target === event.currentTarget) {
-      startInteraction('focus');
+      setIsFocused(true);
       setIsFocusVisible(event.currentTarget.matches(':focus-visible'));
     }
     onFocus?.(event);
   };
+
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
-      endInteraction('focus');
+      setIsFocused(false);
       setIsFocusVisible(false);
       keyboardPressRef.current = null;
       endPress();
     }
     onBlur?.(event);
   };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (
       interactive &&
@@ -170,7 +166,7 @@ function CardImpl({
     ) {
       if (event.key === ' ') event.preventDefault();
       keyboardPressRef.current = event.key;
-      startInteraction('press');
+      setIsPressed(true);
       ripple.onPressStart({
         pointerType: 'keyboard',
         target: event.currentTarget,
@@ -181,6 +177,7 @@ function CardImpl({
     }
     onKeyDown?.(event);
   };
+
   const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
     if (keyboardPressRef.current === event.key) {
       if (event.key === ' ') {
@@ -193,15 +190,11 @@ function CardImpl({
     onKeyUp?.(event);
   };
 
-  const interaction = latestCardInteraction(activeInteractions);
-  const previousInteractionRef = useRef<CardInteraction | null>(null);
-  const previousInteraction = previousInteractionRef.current;
-  useEffect(() => {
-    previousInteractionRef.current = interaction;
-  }, [interaction]);
   useEffect(() => {
     if (disabled) {
-      setActiveInteractions([]);
+      setIsHovered(false);
+      setIsFocused(false);
+      setIsPressed(false);
       setIsFocusVisible(false);
       pointerPressRef.current = false;
       keyboardPressRef.current = null;
@@ -209,22 +202,15 @@ function CardImpl({
     }
   }, [disabled, ripple.onPressEnd]);
 
-  const elevationLevel = getCardElevationLevel(variant, disabled, interaction);
-  const elevationMotion = getCardElevationMotion(
-    disabled,
-    interaction,
-    previousInteraction,
-  );
   const shapeRadius = cssLength(shape);
   const resolvedStyle: CardStyle = {
     ...(shapeRadius === undefined
       ? {}
       : { '--_card-container-radius': shapeRadius }),
-    '--_card-elevation-duration': `${elevationMotion.durationMs}ms`,
-    '--_card-elevation-easing': elevationMotion.easing,
     ...style,
   };
   const resolvedClassName = clsx('card', variantClassName(variant), className);
+  const elevationLevels = cardElevationTokens[variant];
 
   return (
     <div
@@ -232,10 +218,10 @@ function CardImpl({
       aria-disabled={disabled || undefined}
       className={resolvedClassName}
       data-disabled={disabled || undefined}
-      data-focused={activeInteractions.includes('focus') || undefined}
-      data-hovered={activeInteractions.includes('hover') || undefined}
+      data-focused={isFocused || undefined}
+      data-hovered={isHovered || undefined}
       data-interactive={interactive || undefined}
-      data-pressed={activeInteractions.includes('press') || undefined}
+      data-pressed={isPressed || undefined}
       onBlur={handleBlur}
       onClick={(event) => {
         if (
@@ -267,17 +253,25 @@ function CardImpl({
       style={resolvedStyle}
       tabIndex={tabIndex ?? (interactive ? (disabled ? -1 : 0) : undefined)}
     >
-      <Elevation level={elevationLevel} />
+      {interactive ? (
+        <Elevation
+          levels={elevationLevels}
+          state={{
+            isDisabled: disabled,
+            isPressed,
+            isHovered,
+            isFocused,
+          }}
+        />
+      ) : (
+        <Elevation level={elevationLevels.default} />
+      )}
       <div className="card__surface">
         {interactive ? (
           <Ripple
             controller={ripple}
             focusRingRadius="var(--_card-container-radius)"
-            isFocusVisible={isFocusVisible}
-            stateInteraction={latestCardStateLayerInteraction(
-              activeInteractions,
-              isFocusVisible,
-            )}
+            state={{ isHovered, isFocusVisible }}
           />
         ) : null}
         <div className="card__content">{children}</div>

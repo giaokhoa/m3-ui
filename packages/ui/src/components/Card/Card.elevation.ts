@@ -1,10 +1,9 @@
 import * as token from '@m3-ui/tokens';
-import { elevationMotionTokens, type ElevationLevel } from '../../internal/elevation';
-import type { CardInteraction } from './Card.interactions';
+import type { ElevationLevel, ElevationLevels } from '../../internal/elevation';
 
 export type CardVariant = 'filled' | 'elevated' | 'outlined';
 
-interface CardElevationTokens {
+export interface CardElevationTokens extends ElevationLevels {
   readonly default: ElevationLevel;
   readonly pressed: ElevationLevel;
   readonly focused: ElevationLevel;
@@ -54,40 +53,4 @@ export const cardElevationTokens = {
     token.ComponentCardVariantOutlinedElevationDragged as ElevationLevel,
     token.ComponentCardVariantOutlinedElevationDisabled as ElevationLevel,
   ),
-} as const;
-
-function elevationFor(variant: CardVariant): CardElevationTokens {
-  return cardElevationTokens[variant];
-}
-
-export function getCardElevationLevel(
-  variant: CardVariant,
-  isDisabled: boolean,
-  interaction: CardInteraction | null,
-): ElevationLevel {
-  const levels = elevationFor(variant);
-  if (isDisabled) return levels.disabled;
-
-  switch (interaction) {
-    case 'press':
-      return levels.pressed;
-    case 'focus':
-      return levels.focused;
-    case 'hover':
-      return levels.hovered;
-    default:
-      return levels.default;
-  }
-}
-
-export function getCardElevationMotion(
-  isDisabled: boolean,
-  interaction: CardInteraction | null,
-  previousInteraction: CardInteraction | null,
-) {
-  if (isDisabled) return { durationMs: 0, easing: 'linear' } as const;
-  if (interaction !== null) return elevationMotionTokens.incoming;
-  if (previousInteraction === 'hover') return elevationMotionTokens.hoveredOutgoing;
-  if (previousInteraction !== null) return elevationMotionTokens.outgoing;
-  return { durationMs: 0, easing: 'linear' } as const;
-}
+} as const satisfies Record<CardVariant, CardElevationTokens>;
