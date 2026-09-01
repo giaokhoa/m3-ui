@@ -154,7 +154,7 @@ describe('ThreePaneScaffoldNavigator', () => {
     navigator.navigateTo(ListDetailPaneScaffoldRole.Extra);
 
     expect(navigator.scaffoldValue.tertiary.type).toBe('levitated');
-    expect(navigator.scaffoldValue.primary.type).toBe('expanded');
+    expect(navigator.scaffoldValue.primary.type).toBe('hidden');
   });
 
   it('does not pop when no destination satisfies the selected policy', () => {
