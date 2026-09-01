@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   Link as AriaLink,
   type LinkProps as AriaLinkProps,
@@ -9,9 +10,9 @@ import './navigation-drawer.css';
 export interface NavigationDrawerLinkProps
   extends Omit<AriaLinkProps, 'children'> {
   selected: boolean;
-  icon?: React.ReactNode;
-  badge?: React.ReactNode;
-  children: React.ReactNode;
+  icon?: ReactNode;
+  badge?: ReactNode;
+  children: ReactNode;
 }
 
 /**
