@@ -1,0 +1,14 @@
+{
+  "component": {
+    "fab": {
+      "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "extended": {
+        "baseline": {
+          "expandedMinWidth": { "$type": "dimension", "$value": { "value": 80, "unit": "px" } },
+          "textOnlyLeadingSpace": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+          "textOnlyTrailingSpace": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } }
+        }
+      }
+    }
+  }
+}

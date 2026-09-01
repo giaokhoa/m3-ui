@@ -1,26 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
+import { menuContainerElevation, menuRuntime } from './Menu.defaults';
 
-describe('Menu defaults', () => {
-  it('keeps AndroidX-owned geometry local to the renderer', () => {
-    expect(menuRuntime).toMatchObject({
-      minWidth: 112,
-      maxWidth: 280,
-      itemMinHeight: 48,
-      contentPaddingBlock: 8,
+describe('Menu runtime defaults', () => {
+  it('keeps only overlay mechanics beside the renderer', () => {
+    expect(menuRuntime).toEqual({
       viewportMargin: 8,
+      exposedMatchAnchorWidth: true,
     });
   });
 
-  it('projects canonical menu tokens into renderer variables without serializing elevation', () => {
-    const style = getMenuStyle();
-    expect(style['--_menu-container-color']).toBe(menuTokens.containerColor);
-    expect(style['--_menu-disabled-opacity']).toBe(menuTokens.disabledOpacity);
-    expect(style['--_menu-selected-container-color']).toBe(
-      menuTokens.selectedContainerColor,
-    );
-    expect(style['--_menu-item-min-height']).toBe('48px');
-    expect(menuTokens.containerElevation).toBe('level2');
-    expect(style['--_menu-shadow']).toBeUndefined();
+  it('keeps semantic elevation input for shared Elevation', () => {
+    expect(menuContainerElevation).toBe('level2');
   });
 });

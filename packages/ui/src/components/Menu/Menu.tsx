@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/menu.css';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -23,7 +24,7 @@ import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextField } from '../TextField';
-import { getMenuStyle, menuRuntime, menuTokens } from './Menu.defaults';
+import { menuContainerElevation, menuRuntime } from './Menu.defaults';
 import './menu.css';
 
 export interface MenuProps<T extends object>
@@ -43,7 +44,7 @@ export interface MenuProps<T extends object>
 function MenuSurface({ children }: { children: ReactNode }) {
   return (
     <div className="menu-surface">
-      <Elevation level={menuTokens.containerElevation} />
+      <Elevation level={menuContainerElevation} />
       <div className="menu-surface__clip">{children}</div>
     </div>
   );
@@ -83,7 +84,6 @@ export function Menu<T extends object>({
         containerPadding={menuRuntime.viewportMargin}
         UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className={clsx('menu-popover', popoverClassName)}
-        style={getMenuStyle()}
       >
         <MenuSurface>
           <AriaMenu
@@ -237,7 +237,7 @@ export function ExposedMenu<T extends object>({
     <div
       ref={anchorRef}
       className={clsx('exposed-menu', className)}
-      style={{ ...getMenuStyle(), ...style }}
+      style={style}
       onPointerDownCapture={(event) => {
         if (isDisabled || event.button !== 0) return;
         event.preventDefault();
@@ -278,12 +278,11 @@ export function ExposedMenu<T extends object>({
         containerPadding={menuRuntime.viewportMargin}
         UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-menu__popover"
-        style={{
-          ...getMenuStyle(),
-          ...(matchAnchorWidth && anchorRef.current
+        style={
+          matchAnchorWidth && anchorRef.current
             ? { minWidth: anchorRef.current.getBoundingClientRect().width }
-            : null),
-        }}
+            : undefined
+        }
       >
         <MenuSurface>
           <AriaMenu

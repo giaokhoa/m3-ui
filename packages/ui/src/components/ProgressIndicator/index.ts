@@ -1,3 +1,5 @@
+import '@m3-ui/tokens/progress-indicator.css';
+
 export {
   CircularProgressIndicator,
   LinearProgressIndicator,
@@ -13,7 +15,6 @@ export {
 } from './WavyProgressIndicator';
 export {
   getProgressIndicatorStyle,
-  progressIndicatorFourColors,
   progressIndicatorRuntime,
   progressIndicatorTokens,
   type ProgressIndicatorStyle,

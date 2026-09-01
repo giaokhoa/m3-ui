@@ -9,7 +9,7 @@
   padding: 0;
   border: 0;
   background-color: var(--_scrim-container-color);
-  opacity: var(--_scrim-container-opacity);
+  opacity: calc(var(--_scrim-container-opacity) * var(--_scrim-alpha, 1));
 }
 
 button.scrim {

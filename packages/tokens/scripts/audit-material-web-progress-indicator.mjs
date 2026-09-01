@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { collectTokens, readCanonicalDirectory } from './dtcg.mjs';
+import { ALIAS_PATTERN, collectTokens, readCanonicalDirectory } from './dtcg.mjs';
 import { material3Sources } from './sources.mjs';
 
 const source = material3Sources.materialWeb;
@@ -50,8 +50,18 @@ function pathFor(module, variable) {
   const name = mappings[module.module]?.[variable];
   return name ? `${module.root}.${name}` : undefined;
 }
-function canonicalValue(token) {
+function canonicalValue(path, resolving = new Set()) {
+  const token = canonical.get(path);
   if (!token) return undefined;
+  if (resolving.has(path)) throw new Error(`Progress Indicator audit alias cycle at ${path}`);
+
+  const alias = typeof token.value === 'string' ? token.value.match(ALIAS_PATTERN) : null;
+  if (alias) {
+    resolving.add(path);
+    const value = canonicalValue(alias[1], resolving);
+    resolving.delete(path);
+    return value;
+  }
   if (token.type === 'dimension' && token.value && typeof token.value === 'object') {
     return `${token.value.value}${token.value.unit}`;
   }
@@ -114,14 +124,14 @@ for (const module of modules) {
       continue;
     }
     const token = canonical.get(path);
-    const actual = canonicalValue(token);
+    const actual = canonicalValue(path);
     results.push({
       module: module.module,
       ...declaration,
       path,
       expected: expected.value,
       actual,
-      status: token && Object.is(actual, expected.value) ? 'reconciled-direct' : token ? 'mismatch' : 'pending',
+      status: token && Object.is(actual, expected.value) ? 'reconciled-resolved' : token ? 'mismatch' : 'pending',
     });
   }
 }

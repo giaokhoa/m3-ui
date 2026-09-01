@@ -20,11 +20,8 @@ export {
 } from './Dialog';
 export {
   dialogRuntime,
-  dialogTokens,
-  getDialogActionStyle,
   getDialogOverlayStyle,
   getDialogStyle,
-  type DialogActionInteractionState,
   type DialogOverlayStyleOptions,
   type DialogStyle,
   type DialogStyleOptions,
