@@ -50,7 +50,11 @@ describe('ThreePaneScaffold retained initial-value lifecycle', () => {
       fallbackQuantizationStep: 1,
     });
 
-    expect(retargeted?.initialValueAnimation).toBe(captured);
+    // Retargeting retains the captured child state but adds the owning
+    // Transition completion clock, so it is intentionally a metadata copy
+    // rather than the exact captured object.
+    expect(retargeted?.initialValueAnimation).not.toBe(captured);
+    expect(retargeted?.initialValueAnimation).toMatchObject(captured);
     expect(retargeted?.initialValueAnimation?.initialValueAnimation).toBeUndefined();
     expect(retargeted?.initialValueAnimation?.retainedCompletionPlayTimeMs).toBe(300);
   });
@@ -99,16 +103,21 @@ describe('ThreePaneScaffold retained initial-value lifecycle', () => {
       ...track(20, 100, 0, retained),
       useOnlyInitialValue: true,
     };
+    const retainedAtCompletion = samplePaneTransitionTrack(retained, 200).value;
     const before = samplePaneTransitionTrack(source, 0, 50);
 
     const captured = capturePaneTransitionTrack(source, 0, 50);
     const after = samplePaneTransitionTrack(captured);
 
-    expect(before.value).toBe(100);
+    // The retained Transition clock reaching completion means the moving
+    // initial-value wrapper is discarded. It does not retroactively force a
+    // synthetic child spring to its target; freeze the child sample at that
+    // exact play time (99 here after Int quantization).
+    expect(before.value).toBe(retainedAtCompletion);
     expect(captured.initialValueAnimation).toBeUndefined();
     expect(captured.useOnlyInitialValue).toBeUndefined();
-    expect(captured.initialValue).toBe(100);
-    expect(captured.targetValue).toBe(100);
+    expect(captured.initialValue).toBe(retainedAtCompletion);
+    expect(captured.targetValue).toBe(retainedAtCompletion);
     expect(after.value).toBe(before.value);
   });
 });
