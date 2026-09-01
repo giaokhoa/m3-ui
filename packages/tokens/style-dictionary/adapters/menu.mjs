@@ -6,7 +6,7 @@ export function createMenuCss(context) {
   const shape = get('component.menu.base.containerShape');
 
   return [
-    '.menu-popover, .exposed-menu {',
+    '.menu-popover, .exposed-menu, .exposed-dropdown-menu {',
     line('--_menu-container-color', get('component.menu.base.containerColor')),
     line('--_menu-color', get('component.menu.standard.itemLabelTextColor')),
     line('--_menu-icon-color', get('component.menu.standard.itemLeadingIconColor')),
