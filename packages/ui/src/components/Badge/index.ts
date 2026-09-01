@@ -6,7 +6,6 @@ export {
 } from './Badge';
 export {
   badgeRuntime,
-  badgeTokens,
   getBadgeStyle,
   getBadgedBoxStyle,
   type BadgeStyle,
