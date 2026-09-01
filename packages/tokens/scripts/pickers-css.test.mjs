@@ -8,14 +8,14 @@ async function generated(name) {
   return readFile(new URL(`dist/generated/${name}.css`, packageRoot), 'utf8');
 }
 
-test('generated DatePicker CSS owns immutable picker defaults', async () => {
+test('generated DatePicker CSS owns immutable picker token defaults', async () => {
   const css = await generated('date-picker');
 
   assert.match(css, /\.date-picker \{/);
-  assert.match(css, /--_date-picker-cell-size: 48px;/);
-  assert.match(css, /--_date-picker-horizontal-padding: 12px;/);
-  assert.match(css, /--_date-picker-month-year-height: 56px;/);
-  assert.match(css, /--_date-picker-mode-parallax: 48px;/);
+  assert.doesNotMatch(css, /--_date-picker-cell-size:/);
+  assert.doesNotMatch(css, /--_date-picker-horizontal-padding:/);
+  assert.doesNotMatch(css, /--_date-picker-month-year-height:/);
+  assert.doesNotMatch(css, /--_date-picker-mode-parallax:/);
   assert.match(css, /--_date-picker-state-layer-size: 40px;/);
   assert.match(css, /--_date-picker-selected-color: var\(--primary\);/);
   assert.match(css, /--_date-picker-range-color: var\(--secondary-container\);/);
@@ -45,10 +45,16 @@ test('generated DatePicker CSS owns immutable picker defaults', async () => {
   assert.doesNotMatch(css, /#[0-9a-f]{3,8}/i);
 });
 
-test('generated TimePicker CSS owns immutable picker and input defaults', async () => {
+test('generated TimePicker CSS owns immutable picker and input token defaults', async () => {
   const css = await generated('time-picker');
 
   assert.match(css, /\.time-picker,/);
+  assert.doesNotMatch(css, /--_tp-standard-display-dial-gap:/);
+  assert.doesNotMatch(css, /--_tp-vibrant-vertical-display-dial-gap:/);
+  assert.doesNotMatch(css, /--_tp-vibrant-horizontal-display-dial-gap:/);
+  assert.doesNotMatch(css, /--_tp-vertical-clock-face-bottom-space:/);
+  assert.doesNotMatch(css, /--_tp-vibrant-vertical-padding:/);
+  assert.doesNotMatch(css, /--_tp-vibrant-horizontal-padding:/);
   assert.match(css, /--_tp-dial-size: 256px;/);
   assert.match(css, /--_tp-selector-size: 48px;/);
   assert.match(css, /--_tp-selector-track-width: 2px;/);
@@ -67,8 +73,6 @@ test('generated TimePicker CSS owns immutable picker and input defaults', async 
   assert.match(css, /--_tp-standard-field-shape: 8px;/);
   assert.match(css, /--_tp-vibrant-field-shape: 16px;/);
   assert.match(css, /--_tp-vibrant-period-shape: 9999px;/);
-  assert.match(css, /--_tp-standard-display-dial-gap: 36px;/);
-  assert.match(css, /--_tp-vibrant-horizontal-display-dial-gap: 52px;/);
   assert.match(css, /--_tp-spatial-duration: 194ms;/);
   assert.match(css, /--_tp-effects-duration: 166ms;/);
   assert.match(css, /--_tp-dial-color: var\(--surface-container-highest\);/);
