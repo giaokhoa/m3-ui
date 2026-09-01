@@ -1,52 +1,55 @@
 ---
 title: Text field
-description: Filled, outlined, secure, and multiline Material 3 text fields with labels, supporting content, validation, and native form behavior.
+description: Material 3 filled, outlined, secure, and multiline text fields with labels, validation, browser form behavior, and accessible input semantics.
 ---
 
-<MaterialParity component="text-field" />
+Text fields let users enter and edit text. Material 3 defines the filled and outlined visual families; `m3-ui` layers that presentation over native input/textarea behavior and React Aria field semantics.
 
-## Overview
-
-Text fields let users enter and edit text. `m3-ui` provides filled and outlined Material containers, including secure single-line variants, while preserving native form behavior through React Aria.
+[Material 3 text fields](https://m3.material.io/components/text-fields/overview)
 
 <ComponentPreview>
   <TextField label="Name" isMultiline={false} />
-  <OutlinedTextField label="Email" isMultiline={false} />
+  <OutlinedTextField label="Email" type="email" isMultiline={false} />
 </ComponentPreview>
+
+```tsx
+import { TextField } from '@m3-ui/ui';
+
+<TextField
+  label="Email"
+  name="email"
+  type="email"
+  autoComplete="email"
+  isMultiline={false}
+/>
+```
+
+## When to use
+
+Use text fields for free-form text or structured values that benefit from direct keyboard entry. Choose filled or outlined presentation consistently within a form hierarchy instead of mixing variants arbitrarily.
+
+Use picker/selection components when constrained choices are clearer than typing. Use `SecureTextField` only when masking/revealing a single-line value is appropriate; it is part of the text-field family, not a separate Material component family.
 
 ## Variants
 
-| React component | Material role |
+| Public component | Material/web role |
 | --- | --- |
 | `TextField` | Filled text field |
 | `OutlinedTextField` | Outlined text field |
-| `SecureTextField` | Filled secure single-line text field |
-| `OutlinedSecureTextField` | Outlined secure single-line text field |
+| `SecureTextField` | Filled single-line secure field |
+| `OutlinedSecureTextField` | Outlined single-line secure field |
 
-Choose the container variant as part of a consistent form language rather than mixing filled and outlined fields without a hierarchy reason.
+`TextField` can also render multiline input through its public multiline/rows contract. Native browser attributes such as `type`, `name`, `autoComplete`, input mode, and refs remain available where applicable.
 
-## Labels and supporting text
+## Labels and supporting content
 
-A persistent label gives the field a stable identity. Supporting text can provide concise guidance without replacing the label.
+A visible `label` gives the field a stable identity. `supportingText` (or the documented `description` alias) adds guidance without replacing the label.
 
-<ComponentPreview>
-  <TextField
-    label="Username"
-    supportingText="Use 3–20 characters"
-    isMultiline={false}
-  />
-  <OutlinedTextField
-    label="Website"
-    placeholder="https://example.com"
-    isMultiline={false}
-  />
-</ComponentPreview>
+Prefix, suffix, leading-icon, and trailing-icon slots belong to the Material field composition. Do not use decorative slots as a substitute for a clear label.
 
-`description` is accepted as an alias for supporting text. When both are supplied, `supportingText` takes precedence.
+## Validation and errors
 
-## Validation
-
-Validation state is semantic, not only visual. Use `isInvalid` together with `errorMessage` so the browser accessibility relationship and the Material error treatment stay aligned.
+Validation state is semantic, not only visual. Drive `isInvalid` and `errorMessage` from native constraints or application validation state.
 
 <ComponentPreview>
   <OutlinedTextField
@@ -58,69 +61,48 @@ Validation state is semantic, not only visual. Use `isInvalid` together with `er
   />
 </ComponentPreview>
 
-## Prefixes, suffixes, and icons
-
-The field supports leading and trailing icons plus prefix and suffix content. These slots are part of the Material field composition; avoid using them as a substitute for a clear label.
-
-```tsx
-<TextField
-  label="Amount"
-  prefix="$"
-  suffix="USD"
-  isMultiline={false}
-/>
-```
-
-## Single-line and multiline input
-
-Set `isMultiline={false}` for a native single-line input. Multiline fields render a textarea and accept `rows`.
-
-<ComponentPreview>
-  <TextField label="Message" rows={3} />
-</ComponentPreview>
-
-For single-line fields, native browser capabilities such as input types, autocomplete, input modes, form names, and refs remain available instead of being recreated in a Material abstraction.
+The component renders the Material error treatment and exposes the field/error relationship; it does not invent business validation rules. Cross-field, server, and workflow validation remain application-owned.
 
 ## Secure text fields
 
-`SecureTextField` and `OutlinedSecureTextField` reuse the same filled/outlined field contract but always render a single-line native input. They default to `type="password"` and can expose a built-in reveal action that temporarily renders the same input as `type="text"`.
-
-<ComponentPreview>
-  <SecureTextField
-    label="Password"
-    autoComplete="current-password"
-    supportingText="Use at least 8 characters"
-  />
-  <OutlinedSecureTextField
-    label="New password"
-    autoComplete="new-password"
-  />
-</ComponentPreview>
-
-Reveal state can be uncontrolled with `defaultRevealed` or controlled with `isRevealed` and `onRevealChange`:
+`SecureTextField` and `OutlinedSecureTextField` use the same field composition but always render a single-line native input. They default to password presentation and can expose a reveal action.
 
 ```tsx
-const [revealed, setRevealed] = useState(false);
-
 <SecureTextField
   label="Password"
-  isRevealed={revealed}
-  onRevealChange={setRevealed}
+  name="password"
+  autoComplete="current-password"
 />
 ```
 
-Set `isRevealable={false}` when an application intentionally does not want the built-in reveal action. `revealLabel` and `hideLabel` let applications localize the accessible action names, and an application `trailingIcon` can coexist with the reveal control.
+Reveal state can be uncontrolled with `defaultRevealed` or controlled with `isRevealed` and `onRevealChange`. The reveal button uses pressed/toggle semantics and preserves input focus/selection where browser APIs allow.
 
-The reveal action is a native toggle button with `aria-pressed`. Pointer activation keeps focus on the input; when the input type changes, the implementation restores focus and preserves the current text selection where the browser supports the selection APIs.
+Reveal changes presentation only. It does not store credentials, encrypt the value, choose password-strength rules, implement a password manager, or define an application's security policy.
 
-Reveal behavior is presentation only. These components do not store credentials, choose validation rules, implement a password manager, or define an application's security policy. Use native form attributes such as `name` and `autoComplete` for browser/password-manager integration.
+## Behavior and states
+
+React Aria owns field, label, description, error, input/textarea relationships and interaction behavior. The browser owns editing, selection, autocomplete, form participation, and native input capabilities. Material tokens own container, indicator/outline, typography, icon slots, state layers, and error presentation.
+
+Disabled and read-only are different states: disabled controls are unavailable, while read-only values remain readable without permitting edits. Use the state that matches the actual workflow rather than a visual preference.
 
 ## Accessibility
 
-React Aria owns the field, label, description, error, input, and textarea relationships. Material styling does not replace those semantics. Keep labels meaningful, expose errors as text, and use native input attributes for browser-specific requirements.
+Keep labels meaningful and expose errors as text. Use native attributes for browser-specific input requirements. Do not rely on placeholder text as the only label.
 
-For secure fields, the reveal button has an explicit Show/Hide password label and pressed state. Custom localized labels should remain action-oriented and describe the state change rather than the icon appearance.
+For secure fields, localize reveal/hide action labels when needed and keep them action-oriented. The reveal icon is not the accessible name; the toggle button's label and pressed state communicate the control.
 
-## Web adaptation
+## API reference
 
-Compose text editing internals are not translated mechanically. The web implementation keeps native input and textarea elements and layers Material tokens, state styling, labels, indicators, outlines, supporting content, error presentation, and secure reveal behavior on top.
+<ApiReference name="TextField" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="text-field" />
+
+Material provides field hierarchy, variants, visual states, anatomy, and secure-field presentation intent. Native input/textarea editing and React Aria relationships are deliberate web semantics rather than parity failures.
+
+## Related components
+
+- [Search bar](/docs/components/search-bar) — search-specific input/surface composition.
+- [Date picker](/docs/components/date-picker) and [Time picker](/docs/components/time-picker) — constrained date/time selection.
+- [Forms and validation](/docs/forms) — cross-component form ownership and validation composition.
