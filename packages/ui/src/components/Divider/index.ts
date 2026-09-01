@@ -4,7 +4,6 @@ export {
   type DividerProps,
 } from './Divider';
 export {
-  dividerTokens,
   getDividerStyle,
   type DividerStyle,
   type DividerThickness,
