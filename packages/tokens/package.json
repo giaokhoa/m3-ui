@@ -10,14 +10,7 @@
   "types": "./dist/generated/tokens.d.ts",
   "exports": {
     ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
-    "./button.css": "./dist/generated/button.css",
-    "./card.css": "./dist/generated/card.css",
-    "./chip.css": "./dist/generated/chip.css",
-    "./checkbox.css": "./dist/generated/checkbox.css",
-    "./text-field.css": "./dist/generated/text-field.css",
-    "./elevation.css": "./dist/generated/elevation.css",
-    "./ripple.css": "./dist/generated/ripple.css",
-    "./theme.css": "./dist/generated/theme.css"
+    "./*.css": "./dist/generated/*.css"
   },
   "scripts": {
     "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
