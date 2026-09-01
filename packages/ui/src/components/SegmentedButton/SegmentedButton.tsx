@@ -92,8 +92,7 @@ function SegmentVisual({
       <Ripple
         controller={ripple}
         focusRingRadius="inherit"
-        isFocusVisible={isFocusVisible}
-        isHovered={isHovered}
+        state={{ isFocusVisible, isHovered }}
       />
       <span
         className="segmented-button__content"
@@ -169,18 +168,12 @@ export function SingleChoiceSegmentedButton({
   ...props
 }: SingleChoiceSegmentedButtonProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaRadioProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaRadioProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaRadio
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
@@ -190,8 +183,6 @@ export function SingleChoiceSegmentedButton({
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => (
         <SegmentVisual
@@ -220,18 +211,12 @@ export function MultiChoiceSegmentedButton({
   ...props
 }: MultiChoiceSegmentedButtonProps) {
   const ripple = useRipple();
-  const handlePressStart: AriaCheckboxProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaCheckboxProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaCheckbox
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
@@ -241,8 +226,6 @@ export function MultiChoiceSegmentedButton({
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return { ...segmentedButtonStyle, ...userStyle } as SegmentedButtonStyle;
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => (
         <SegmentVisual
