@@ -27,12 +27,13 @@ export function sampleDragToResizeSpring(
   assertFinite(initialValue, 'initialValue');
   assertFinite(targetValue, 'targetValue');
   assertFinite(playTimeMs, 'playTimeMs');
-  if (playTimeMs <= 0 || initialValue === targetValue) return initialValue;
 
   // FloatSpringSpec and SpringSimulation both receive Float state. Preserve
-  // those Float boundaries before the simulation promotes its math to Double.
+  // those Float boundaries before any equality/zero-time fast path.
   const initial = composeFloat(initialValue);
   const target = composeFloat(targetValue);
+  if (playTimeMs <= 0 || initial === target) return initial;
+
   const stiffness = composeFloat(DragToResizeSpringDefaults.stiffness);
   const elapsedSeconds = Math.floor(playTimeMs) / 1000;
   const naturalFrequency = Math.sqrt(stiffness);
