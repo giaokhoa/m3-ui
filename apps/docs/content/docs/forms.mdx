@@ -1,0 +1,209 @@
+---
+title: Forms and validation
+description: Compose m3-ui fields and selection controls with native browser forms, accessible validation, and application-owned state.
+---
+
+Material components define the visual and interaction pattern for each field or selection control. On the web, the browser still owns the form boundary: submission, names, autocomplete, disabled/read-only behavior, and native form participation should remain native instead of being recreated as a Compose-style form runtime.
+
+Use this guide for cross-component form composition. Component-specific anatomy, variants, and Material guidance remain in the individual component pages.
+
+## Start with a native form
+
+A real `<form>` gives controls a submission owner and preserves browser behavior such as Enter-to-submit, autofill, password-manager integration, and `FormData` collection.
+
+<ComponentPreview>
+  <form
+    onSubmit={(event) => event.preventDefault()}
+    style={{ display: 'grid', gap: '1rem', width: 'min(100%, 32rem)' }}
+  >
+    <TextField
+      label="Email"
+      name="email"
+      type="email"
+      autoComplete="email"
+      isRequired
+      isMultiline={false}
+    />
+    <SecureTextField
+      label="Password"
+      name="password"
+      autoComplete="current-password"
+      isRequired
+    />
+    <Button type="submit">Sign in</Button>
+  </form>
+</ComponentPreview>
+
+```tsx
+import { Button, SecureTextField, TextField } from '@m3-ui/ui';
+
+export function SignInForm() {
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        // Send or validate the application-owned values.
+        console.log(Object.fromEntries(data));
+      }}
+    >
+      <TextField
+        label="Email"
+        name="email"
+        type="email"
+        autoComplete="email"
+        isRequired
+        isMultiline={false}
+      />
+      <SecureTextField
+        label="Password"
+        name="password"
+        autoComplete="current-password"
+        isRequired
+      />
+      <Button type="submit">Sign in</Button>
+    </form>
+  );
+}
+```
+
+The `name` attribute is what makes a control appear in `FormData`; the Material label is not a replacement for a form name. `autoComplete` should describe the field's actual purpose so browsers and password managers can participate correctly.
+
+## Controlled and uncontrolled values
+
+Use uncontrolled values when the browser can own the current value until submission. Use controlled values when application logic needs to react to each change, synchronize multiple fields, or validate against external state.
+
+```tsx
+// Uncontrolled: browser owns the current value.
+<TextField
+  label="Display name"
+  name="displayName"
+  defaultValue="Ada"
+  isMultiline={false}
+/>
+
+// Controlled: application owns the current value.
+const [query, setQuery] = useState('');
+
+<OutlinedTextField
+  label="Search term"
+  name="query"
+  value={query}
+  onChange={setQuery}
+  isMultiline={false}
+/>
+```
+
+Do not make a field controlled only to mirror its value into redundant state. Native form submission works with uncontrolled controls and keeps the application simpler when no live coordination is needed.
+
+## Labels, descriptions, and errors
+
+A visible `label` identifies the field. Use `supportingText` or `description` for help text, and use `isInvalid` with `errorMessage` when validation fails. The component wires the browser accessibility relationships; do not replace them with color alone.
+
+<ComponentPreview>
+  <OutlinedTextField
+    label="Work email"
+    name="email"
+    defaultValue="not-an-email"
+    supportingText="Use the address your organization recognizes."
+    isInvalid
+    errorMessage="Enter a valid email address"
+    isMultiline={false}
+  />
+</ComponentPreview>
+
+Application validation state belongs outside the visual component. For example, a server response, cross-field rule, or business constraint should determine `isInvalid` and `errorMessage`; the field renders that state but does not invent the rule.
+
+```tsx
+const emailError = submitted && !isAllowedEmail(email)
+  ? 'Use your organization email address'
+  : undefined;
+
+<TextField
+  label="Work email"
+  name="email"
+  value={email}
+  onChange={setEmail}
+  isInvalid={Boolean(emailError)}
+  errorMessage={emailError}
+  isMultiline={false}
+/>
+```
+
+Native constraints such as `type="email"`, `isRequired`, `minLength`, `maxLength`, or numeric bounds can still be useful. Treat them as browser semantics, not as a substitute for application rules that the browser cannot know.
+
+## Disabled and read-only fields
+
+Disabled and read-only states have different form behavior.
+
+- `isDisabled` removes the control from normal interaction and native form submission. Use it when the value is not currently available for editing or submission.
+- `isReadOnly` keeps the value readable and focusable according to the underlying field semantics while preventing edits. Use it when the value still matters to the form or workflow.
+
+Do not use either state merely to make a field look visually muted.
+
+## Secure text fields
+
+`SecureTextField` and `OutlinedSecureTextField` participate in forms like their text-field counterparts. Give them a `name` and the appropriate autocomplete token such as `current-password` or `new-password`.
+
+The reveal control changes only how the same input value is presented. It does not store credentials, validate password strength, encrypt values, replace a password manager, or define an application's security policy.
+
+```tsx
+<SecureTextField
+  label="New password"
+  name="newPassword"
+  autoComplete="new-password"
+  supportingText="Use your application's documented password requirements."
+/>
+```
+
+## Selection controls in forms
+
+Selection controls keep their own Material choice models while participating in native form data through their public React Aria-backed props.
+
+```tsx
+import { Checkbox, RadioButton, RadioGroup, Switch } from '@m3-ui/ui';
+
+<Checkbox name="terms" value="accepted">
+  I accept the terms
+</Checkbox>
+
+<RadioGroup name="plan" defaultValue="standard" label="Plan">
+  <RadioButton value="standard">Standard</RadioButton>
+  <RadioButton value="pro">Pro</RadioButton>
+</RadioGroup>
+
+<Switch name="updates" value="enabled">
+  Product updates
+</Switch>
+```
+
+Use a checkbox for independent choices, a radio group for exactly one choice in a set, and a switch for an immediate on/off setting. Their form semantics should not be collapsed into one generic boolean abstraction merely because all can produce application state.
+
+For sliders and date/time pickers, keep the same ownership rule: the component owns its documented interaction model, while the application decides whether and how its value maps into submitted form data. When a component does not serialize directly to the exact backend format you need, transform the public value at the form boundary rather than changing the component's state model.
+
+## Validation timing
+
+Choose validation timing according to the task:
+
+- validate on submit when early feedback would be noisy or unnecessary;
+- validate on blur when leaving a field provides a useful checkpoint;
+- validate while editing only when the rule can provide stable, actionable feedback.
+
+Avoid showing an error before a user has had a reasonable chance to satisfy the field. Material error styling communicates state; it does not determine when your business rule should run.
+
+For asynchronous validation, keep request state in the application. Preserve the field's current value while the request is pending and avoid changing accessible error text repeatedly for every keystroke unless that feedback is genuinely useful.
+
+## Accessibility
+
+Keep visible labels meaningful and programmatically connected through the component API. Error messages should be text, not icon/color-only signals. When validation changes after submission or asynchronous work, move focus only when doing so helps the user recover; otherwise preserve their current editing context and ensure the error relationship is exposed by the field.
+
+A form-level summary can be useful when several fields fail at once, but it should complement each field's own error relationship rather than replace it. Native submit buttons should remain real submit buttons so keyboard and assistive-technology activation behave predictably.
+
+## Related guides
+
+- [Text field](/docs/components/text-field) — filled, outlined, secure, multiline, and field-local validation behavior.
+- [Checkbox](/docs/components/checkbox) — independent binary selection semantics.
+- [Radio button](/docs/components/radio-button) — single-choice groups.
+- [Switch](/docs/components/switch) — immediate on/off settings.
+- [Slider](/docs/components/slider) — scalar and range selection behavior.
+- [Date picker](/docs/components/date-picker) and [Time picker](/docs/components/time-picker) — picker-specific state and interaction contracts.
