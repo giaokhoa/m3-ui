@@ -117,27 +117,23 @@ export function MenuItem({
   ...props
 }: MenuItemProps) {
   const ripple = useRipple();
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaMenuItem
       {...props}
+      {...ripplePressProps}
       className={clsx('menu-item', className)}
       textValue={props.textValue ?? (typeof children === 'string' ? children : undefined)}
-      onPressStart={(event) => {
-        ripple.onPressStart(event);
-        onPressStart?.(event);
-      }}
-      onPressEnd={(event) => {
-        ripple.onPressEnd();
-        onPressEnd?.(event);
-      }}
     >
       {(renderProps) => (
         <>
           <Ripple
             controller={ripple}
-            isFocusVisible={renderProps.isFocusVisible}
-            isHovered={renderProps.isHovered}
+            state={{
+              isFocusVisible: renderProps.isFocusVisible,
+              isHovered: renderProps.isHovered,
+            }}
           />
           {leading != null ? <span className="menu-item__leading">{leading}</span> : null}
           <span className="menu-item__body">

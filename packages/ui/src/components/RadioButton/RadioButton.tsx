@@ -47,18 +47,12 @@ export function RadioButton({
   ...props
 }: RadioButtonProps) {
   const ripple = useRipple({ origin: 'center', radius: radioButtonTokens.stateLayerSize / 2 });
-  const handlePressStart: AriaRadioProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaRadioProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaRadio
       {...props}
+      {...ripplePressProps}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('radio-button', userClassName);
@@ -67,8 +61,6 @@ export function RadioButton({
         const userStyle = typeof style === 'function' ? style(renderProps) : style;
         return { ...radioButtonBaseStyle, ...userStyle };
       }}
-      onPressEnd={handlePressEnd}
-      onPressStart={handlePressStart}
     >
       {(renderProps) => {
         const label = resolveChildren(children, renderProps);
@@ -80,8 +72,10 @@ export function RadioButton({
                   controller={ripple}
                   focusRingInset={radioFocusRingInset}
                   focusRingRadius={radioFocusRingRadius}
-                  isFocusVisible={renderProps.isFocusVisible}
-                  isHovered={renderProps.isHovered}
+                  state={{
+                    isFocusVisible: renderProps.isFocusVisible,
+                    isHovered: renderProps.isHovered,
+                  }}
                 />
               </span>
               <span className="radio-button__control">
