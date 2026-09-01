@@ -17,7 +17,10 @@ interface PaneScaffoldRoleWithEquality {
 /** Mirrors Kotlin `PaneScaffoldRole == other` while defaulting to JS identity. */
 export function paneScaffoldRolesEqual(a: PaneScaffoldRole, b: PaneScaffoldRole): boolean {
   if (a === b) return true;
-  if (typeof a === 'string' || typeof b === 'string') return false;
+  // Kotlin `a == b` dispatches `a.equals(b)` on the left operand. Built-in web
+  // string roles have value equality only, while a custom object role may
+  // deliberately report equality with a built-in string role.
+  if (typeof a === 'string') return false;
   const equals = (a as PaneScaffoldRoleWithEquality).equals;
   return typeof equals === 'function' && equals.call(a, b) === true;
 }
