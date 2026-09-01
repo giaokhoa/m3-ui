@@ -25,8 +25,8 @@ test('generated IconButton CSS owns immutable size width shape and paint matrice
   const css = await readFile(new URL('dist/generated/icon-button.css', packageRoot), 'utf8');
 
   assert.match(css, /\.icon-button \{/);
-  assert.match(css, /--_icon-button-target-size: max\(48px, var\(--_icon-button-container-height\)\);/);
-  assert.match(css, /--_icon-button-container-width: calc\(var\(--_icon-button-icon-size\) \+ 2 \* var\(--_icon-button-inline-space\)\);/);
+  assert.doesNotMatch(css, /--_icon-button-target-size:/);
+  assert.doesNotMatch(css, /--_icon-button-container-width:/);
   assert.match(css, /\.icon-button\[data-size='extraSmall'\] \{[^}]*--_icon-button-container-height: 32px;[^}]*--_icon-button-icon-size: 20px;/s);
   assert.match(css, /\.icon-button\[data-size='large'\] \{[^}]*--_icon-button-default-space: 32px;/s);
   assert.match(css, /\.icon-button\[data-size='extraLarge'\] \{[^}]*--_icon-button-outline-width: 3px;/s);
