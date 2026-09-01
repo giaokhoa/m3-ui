@@ -236,7 +236,7 @@ describe('SeekableTransitionState child interruption', () => {
     expect(second.spec).toBe('interruption');
     expect(third.spec).toBe('interruption');
     expect(third.initialValueAnimation).toBe(capturedSecond);
-    expect(samplePaneTransitionTrack(third, 40, 40).value).toBeFinite();
+    expect(Number.isFinite(samplePaneTransitionTrack(third, 40, 40).value)).toBe(true);
   });
 
   it('saturates interrupted Int tracks through fastRoundToInt', () => {
