@@ -2,11 +2,11 @@
   "component": {
     "progressIndicator": {
       "base": {
-        "activeIndicatorColor": { "$type": "string", "$value": "var(--primary)" },
+        "activeIndicatorColor": { "$type": "string", "$value": "{color.role.primary}" },
         "activeShape": { "$type": "string", "$value": "full" },
-        "stopColor": { "$type": "string", "$value": "var(--primary)" },
+        "stopColor": { "$type": "string", "$value": "{color.role.primary}" },
         "stopShape": { "$type": "string", "$value": "full" },
-        "trackColor": { "$type": "string", "$value": "var(--secondary-container)" },
+        "trackColor": { "$type": "string", "$value": "{color.role.secondaryContainer}" },
         "trackShape": { "$type": "string", "$value": "full" }
       },
       "circular": {
