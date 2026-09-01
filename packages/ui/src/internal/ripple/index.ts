@@ -2,7 +2,6 @@ export {
   Ripple,
   type RippleInteractionState,
   type RippleProps,
-  type RippleStateInteraction,
 } from './Ripple';
 export {
   chainRipplePressHandlers,
