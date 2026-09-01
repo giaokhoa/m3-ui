@@ -11,7 +11,7 @@ function isIterableReactNode(value: ReactNode): value is Iterable<ReactNode> {
 }
 
 function isSingleUseIterable(value: Iterable<ReactNode>): boolean {
-  return value[Symbol.iterator]() === (value as Iterator<ReactNode>);
+  return Object.is(value[Symbol.iterator](), value);
 }
 
 /**
