@@ -1,4 +1,5 @@
 import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/floating-toolbar.css';
 import type { CSSProperties } from 'react';
 import type { ElevationLevel } from '../../internal/elevation';
 
@@ -25,10 +26,6 @@ export interface FloatingToolbarStyleOptions {
   collapsedElevation?: ElevationLevel;
 }
 
-const shapeRadius: Record<FloatingToolbarShape, string | number> = {
-  full: token.ShapeFull,
-};
-
 export const floatingToolbarTokens = {
   containerHeight: token.ComponentToolbarFloatingContainerHeight,
   leadingSpace: token.ComponentToolbarFloatingContainerLeadingSpace,
@@ -42,10 +39,8 @@ export const floatingToolbarTokens = {
   fabMediumSize: token.ComponentFabSizeMediumContainerWidth,
 } as const;
 
-// AndroidX FloatingToolbar.kt renderer mechanics at ff9a7111. These values are
-// runtime behavior, not new design tokens. ContainerBetweenSpace exists in the
-// generated token file but the pinned runtime does not consume it; Row/Column
-// uses Arrangement.Center with no spacing.
+// AndroidX FloatingToolbar.kt renderer mechanics at ff9a7111. Elevation and
+// scroll behavior remain runtime-owned; immutable token projections are CSS.
 export const floatingToolbarRuntime = {
   toolbarToFabGap: 8,
   scrollDistanceThreshold: 40,
@@ -54,14 +49,6 @@ export const floatingToolbarRuntime = {
   collapsedElevation: 'level0' as ElevationLevel,
   expandedElevationWithFab: 'level1' as ElevationLevel,
   collapsedElevationWithFab: 'level0' as ElevationLevel,
-  expandCollapseMotion: {
-    duration: token.MotionSpringFastSpatialDuration,
-    easing: token.MotionSpringFastSpatialEasing,
-  },
-  scrollSnapMotion: {
-    duration: token.MotionSpringDefaultEffectsDuration,
-    easing: token.MotionSpringDefaultEffectsEasing,
-  },
 } as const;
 
 function dimensionNumber(value: string | number): number {
@@ -72,11 +59,10 @@ function dimensionNumber(value: string | number): number {
   return numeric;
 }
 
-function cssLength(
+function explicitCssLength(
   value: CSSProperties['borderRadius'] | CSSProperties['padding'],
-  fallback: string | number,
-): string | number {
-  if (value === undefined) return fallback;
+): string | number | undefined {
+  if (value === undefined) return undefined;
   return typeof value === 'number' ? `${value}px` : value;
 }
 
@@ -157,42 +143,23 @@ export function resolveFloatingToolbarElevation(
 }
 
 export function getFloatingToolbarStyle(
-  variant: FloatingToolbarVariant,
-  expanded: boolean,
+  _variant: FloatingToolbarVariant,
+  _expanded: boolean,
   _withFab: boolean,
   options: FloatingToolbarStyleOptions = {},
 ): FloatingToolbarStyle {
-  const defaultContainerColor =
-    variant === 'standard'
-      ? floatingToolbarTokens.standardContainerColor
-      : floatingToolbarTokens.vibrantContainerColor;
-  const defaultContentColor =
-    variant === 'standard' ? 'var(--on-surface)' : 'var(--on-primary-container)';
-
-  return {
-    '--_floating-toolbar-container-size': floatingToolbarTokens.containerHeight,
-    '--_floating-toolbar-container-radius': cssLength(
-      options.shape,
-      shapeRadius[floatingToolbarTokens.shape],
-    ),
-    '--_floating-toolbar-content-padding': cssLength(
-      options.contentPadding,
-      floatingToolbarTokens.leadingSpace,
-    ),
-    '--_floating-toolbar-screen-offset': floatingToolbarTokens.externalPadding,
-    '--_floating-toolbar-container-color':
-      options.containerColor ?? defaultContainerColor,
-    '--_floating-toolbar-content-color': options.contentColor ?? defaultContentColor,
+  const style: FloatingToolbarStyle = {
     '--_floating-toolbar-fab-gap': `${floatingToolbarRuntime.toolbarToFabGap}px`,
-    '--_floating-toolbar-fab-size': expanded
-      ? floatingToolbarTokens.fabBaselineSize
-      : floatingToolbarTokens.fabMediumSize,
-    '--_floating-toolbar-fab-max-size': floatingToolbarTokens.fabMediumSize,
-    '--_floating-toolbar-motion-duration':
-      floatingToolbarRuntime.expandCollapseMotion.duration,
-    '--_floating-toolbar-motion-easing':
-      floatingToolbarRuntime.expandCollapseMotion.easing,
-    '--_floating-toolbar-snap-duration': floatingToolbarRuntime.scrollSnapMotion.duration,
-    '--_floating-toolbar-snap-easing': floatingToolbarRuntime.scrollSnapMotion.easing,
   };
+  if (options.containerColor !== undefined) {
+    style['--_floating-toolbar-container-color'] = options.containerColor as string | number;
+  }
+  if (options.contentColor !== undefined) {
+    style['--_floating-toolbar-content-color'] = options.contentColor as string | number;
+  }
+  const shape = explicitCssLength(options.shape);
+  if (shape !== undefined) style['--_floating-toolbar-container-radius'] = shape;
+  const padding = explicitCssLength(options.contentPadding);
+  if (padding !== undefined) style['--_floating-toolbar-content-padding'] = padding;
+  return style;
 }
