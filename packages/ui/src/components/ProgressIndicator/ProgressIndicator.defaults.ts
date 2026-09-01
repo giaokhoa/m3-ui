@@ -1,4 +1,5 @@
 import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/progress-indicator.css';
 import type { CSSProperties } from 'react';
 import { pxNumber } from '../../internal/tokenValues';
 
