@@ -5,6 +5,7 @@ export * from './paneMotion';
 export * from './paneMotionSpring';
 export * from './paneScaffoldDirective';
 export * from './threePaneScaffold';
+export * from './threePaneScaffoldNavigator';
 export * from './threePaneScaffoldState';
 export * from './useContainerAdaptiveInfo';
 export * from './usePaneExpansionState';
