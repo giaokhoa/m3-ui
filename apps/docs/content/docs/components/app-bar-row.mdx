@@ -1,62 +1,63 @@
 ---
 title: App bar row
-description: Material 3 app-bar action rows that keep fitting actions inline and move only the non-fitting suffix into an accessible overflow menu.
+description: Material app-bar action rows with local width-based overflow, action/toggle semantics, and accessible overflow menus.
 ---
 
-<ParitySummary component="app-bar-row" />
-
-## Overview
-
-`AppBarRow` lays out app-bar actions on the inline axis and measures only its own available width. When the current items no longer fit, the non-fitting suffix moves into an overflow menu.
+`AppBarRow` arranges app-bar actions on the inline axis and keeps the largest fitting prefix visible. When its own container becomes too narrow, only the non-fitting suffix moves into an overflow menu.
 
 <ComponentPreview>
   <AppBarOverflowPreview />
 </ComponentPreview>
 
-## Item model
-
-`items` accepts three public action shapes:
-
-- `type: "action"` for a regular action button
-- `type: "toggle"` for a controlled selected/unselected action
-- `type: "custom"` when the application must provide both inline and overflow renderers
-
 ```tsx
+import { AppBarRow, type AppBarAction } from '@m3-ui/ui';
+
 const items: AppBarAction[] = [
-  {
-    type: 'action',
-    id: 'share',
-    label: 'Share',
-    icon: <ShareIcon />,
-    onPress: share,
-  },
-  {
-    type: 'toggle',
-    id: 'pin',
-    label: 'Pin',
-    icon: <PinIcon />,
-    isSelected: pinned,
-    onChange: setPinned,
-  },
+  { type: 'action', id: 'share', label: 'Share', icon: <ShareIcon />, onPress: share },
+  { type: 'toggle', id: 'pin', label: 'Pin', icon: <PinIcon />, isSelected: pinned, onChange: setPinned },
 ];
 
 <AppBarRow aria-label="Document actions" items={items} />
 ```
 
-Built-in action labels become the accessible names for their inline and overflow representations.
+## When to use
 
-## Overflow resolution
+Use `AppBarRow` when a local app-bar/action slot must preserve important actions inline and move lower-priority suffix actions into overflow as that slot shrinks. It is not a substitute for application adaptive navigation or pane decisions.
 
-The row observes its own container and item widths with `ResizeObserver`. `maxItemCount` can impose an additional slot limit; the overflow trigger counts as one slot whenever overflow exists.
+## Item model
 
-A custom `overflowTrigger` may replace the default More actions icon button. React Aria Menu owns popup positioning, keyboard interaction, dismissal, and focus restoration.
+The public action union distinguishes ordinary actions, controlled toggles, and custom items. Built-in labels become the accessible names for both inline and overflow representations.
 
-## Custom items
+Custom items must provide explicit inline and overflow renderers so the application can preserve equivalent semantics in both placements. The overflow renderer receives `dismiss()` for closing the popup after an application-owned activation.
 
-Custom items require stable `id`, `renderInline`, and `renderOverflow`. The overflow renderer receives `dismiss()` so an application-owned menu item can close the popup after activation.
+## Local overflow behavior
 
-## Layout boundary
+The row measures its own container/item widths with `ResizeObserver`. `maxItemCount` can add a slot-count constraint; whenever overflow exists, the overflow trigger itself consumes a slot.
 
-`AppBarRow` is not a viewport or adaptive-navigation system. A narrower local action container can overflow even on a wide screen, and a wider local container can keep actions inline on a smaller screen.
+This means a narrow panel on a large monitor can overflow while a roomy slot on a smaller window can keep all actions inline. That is expected: the policy is local geometry, not window-size classification.
 
-Window-size classes, navigation switching, pane directives, and scaffold policy remain the responsibility of `@m3-ui/ui/layout` and the surrounding application composition.
+## Overflow menu
+
+The default overflow trigger is an accessible “More actions” control. A custom trigger may replace it while React Aria Menu continues to own popup positioning, keyboard navigation, dismissal, and focus restoration.
+
+Controlled toggle state remains application-owned whether an item is currently inline or overflowed.
+
+## Accessibility
+
+Give the action row an accessible label when its purpose is not obvious from context. Ensure custom inline/overflow renderers expose equivalent names and state. Do not duplicate an action in both visible and overflow surfaces at the same time.
+
+## API reference
+
+<ApiReference name="AppBarRow" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="app-bar-row" />
+
+Material supplies action grouping and overflow intent. Local `ResizeObserver` measurement plus React Aria menu semantics implement that behavior on the web. Window classes, navigation switching, and pane allocation remain outside this component.
+
+## Related components
+
+- [App bar column](/docs/components/app-bar-column) — block-axis counterpart.
+- [Top app bar](/docs/components/top-app-bar) — common host surface.
+- [Adaptive layout](/docs/layout) — window-level application adaptation.
