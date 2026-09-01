@@ -26,13 +26,6 @@ export function createTimePickerCss(context) {
   return [
     '.time-picker,',
     '.time-input {',
-    // Pinned Compose renderer spacing is immutable presentation, not runtime state.
-    line('--_tp-standard-display-dial-gap', '36px'),
-    line('--_tp-vibrant-vertical-display-dial-gap', '36px'),
-    line('--_tp-vibrant-horizontal-display-dial-gap', '52px'),
-    line('--_tp-vertical-clock-face-bottom-space', '24px'),
-    line('--_tp-vibrant-vertical-padding', '12px'),
-    line('--_tp-vibrant-horizontal-padding', '24px'),
     line('--_tp-dial-size', get(`${picker}.clockDialContainerSize`)),
     line('--_tp-dial-color', get(`${picker}.clockDialColor`)),
     line('--_tp-dial-label-color', get(`${picker}.clockDialUnselectedLabelTextColor`)),
