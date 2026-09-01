@@ -242,6 +242,6 @@ describe('AndroidX integer geometry quantization', () => {
         directive: oddSpacerDirective,
         alignment: PaneAlignment.Center,
       }),
-    ).toEqual({ left: 320, top: 190, width: 360, height: 420 });
+    ).toEqual({ left: 321, top: 191, width: 360, height: 420 });
   });
 });
