@@ -6,13 +6,14 @@
   "scripts": {
     "api:generate": "node scripts/build-api-reference.mjs",
     "spec:generate": "node scripts/build-material-spec.mjs",
+    "examples:generate": "node scripts/build-live-examples.mjs",
     "docs:lint": "node scripts/docs-conformance.mjs",
-    "dev": "pnpm api:generate && pnpm spec:generate && node scripts/build-docs-data.mjs && vite --host 0.0.0.0 --port 4173 --strictPort",
-    "build": "pnpm api:generate && pnpm spec:generate && node scripts/build-docs-data.mjs && vite build",
+    "dev": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && vite --host 0.0.0.0 --port 4173 --strictPort",
+    "build": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
-    "test": "pnpm api:generate && pnpm spec:generate && pnpm docs:lint && node --test scripts/*.test.mjs",
-    "typecheck": "pnpm api:generate && pnpm spec:generate && node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json public/search-index.json"
+    "test": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && pnpm docs:lint && node --test scripts/*.test.mjs",
+    "typecheck": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json src/generated/live-examples.generated.json public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",
