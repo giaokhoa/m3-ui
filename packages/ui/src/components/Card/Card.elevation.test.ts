@@ -1,40 +1,46 @@
 import { describe, expect, it } from 'vitest';
-import {
-  cardElevationTokens,
-  getCardElevationLevel,
-  getCardElevationMotion,
-} from './Card.elevation';
+import { resolveElevationLevel } from '../../internal/elevation';
+import { cardElevationTokens } from './Card.elevation';
 
-describe('Card elevation runtime', () => {
-  it('resolves elevation from enabled state and latest interaction like CardElevation', () => {
-    expect(getCardElevationLevel('filled', false, null)).toBe('level0');
-    expect(getCardElevationLevel('filled', false, 'hover')).toBe('level1');
-    expect(getCardElevationLevel('filled', false, 'press')).toBe('level0');
-    expect(getCardElevationLevel('filled', true, 'hover')).toBe('level0');
+describe('Card elevation semantics', () => {
+  it('keeps the pinned semantic level sets available to shared Elevation', () => {
+    expect(cardElevationTokens.filled.default).toBe('level0');
+    expect(cardElevationTokens.filled.hovered).toBe('level1');
+    expect(cardElevationTokens.filled.pressed).toBe('level0');
+    expect(cardElevationTokens.filled.disabled).toBe('level0');
 
-    expect(getCardElevationLevel('elevated', false, null)).toBe('level1');
-    expect(getCardElevationLevel('elevated', false, 'hover')).toBe('level2');
-    expect(getCardElevationLevel('elevated', false, 'focus')).toBe('level1');
-    expect(getCardElevationLevel('elevated', true, 'hover')).toBe('level1');
+    expect(cardElevationTokens.elevated.default).toBe('level1');
+    expect(cardElevationTokens.elevated.hovered).toBe('level2');
+    expect(cardElevationTokens.elevated.focused).toBe('level1');
+    expect(cardElevationTokens.elevated.disabled).toBe('level1');
 
-    expect(getCardElevationLevel('outlined', false, 'hover')).toBe('level1');
-    expect(getCardElevationLevel('outlined', false, 'press')).toBe('level0');
+    expect(cardElevationTokens.outlined.hovered).toBe('level1');
+    expect(cardElevationTokens.outlined.pressed).toBe('level0');
     expect(cardElevationTokens.outlined.dragged).toBe('level3');
   });
 
-  it('maps pinned incoming/outgoing elevation tween selection', () => {
-    expect(getCardElevationMotion(false, 'hover', null)).toEqual({
-      durationMs: 120,
-      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    });
-    expect(getCardElevationMotion(false, null, 'hover')).toEqual({
-      durationMs: 120,
-      easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
-    });
-    expect(getCardElevationMotion(false, null, 'press')).toEqual({
-      durationMs: 150,
-      easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
-    });
-    expect(getCardElevationMotion(true, 'hover', null).durationMs).toBe(0);
+  it('uses the shared current-state precedence instead of interaction history', () => {
+    expect(
+      resolveElevationLevel(cardElevationTokens.filled, {
+        isFocused: true,
+        isHovered: true,
+      }),
+    ).toBe('level1');
+
+    expect(
+      resolveElevationLevel(cardElevationTokens.elevated, {
+        isPressed: true,
+        isHovered: true,
+        isFocused: true,
+      }),
+    ).toBe('level1');
+
+    expect(
+      resolveElevationLevel(cardElevationTokens.elevated, {
+        isDisabled: true,
+        isPressed: true,
+        isHovered: true,
+      }),
+    ).toBe('level1');
   });
 });
