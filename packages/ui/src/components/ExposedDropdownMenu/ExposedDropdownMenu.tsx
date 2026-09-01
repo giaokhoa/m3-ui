@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/menu.css';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -13,7 +14,7 @@ import {
   type Ref,
 } from 'react';
 import { Popover as AriaPopover } from 'react-aria-components';
-import { getMenuStyle, menuRuntime } from '../Menu';
+import { menuRuntime } from '../Menu/Menu.defaults';
 import { OutlinedTextField, TextField } from '../TextField';
 import { calculateExposedDropdownMaxHeight } from './ExposedDropdownMenu.utils';
 import './exposed-dropdown-menu.css';
@@ -419,7 +420,7 @@ export function ExposedDropdownMenu<T = unknown>({
     <div
       ref={anchorRef}
       className={clsx('exposed-dropdown-menu', className)}
-      style={{ ...getMenuStyle(), ...style }}
+      style={style}
       data-open={effectiveOpen || undefined}
       data-readonly={isReadOnly || undefined}
     >
@@ -449,7 +450,6 @@ export function ExposedDropdownMenu<T = unknown>({
         shouldFlip
         className="menu-popover exposed-dropdown-menu__popover"
         style={{
-          ...getMenuStyle(),
           ...(matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : null),
           ...(maxHeight != null ? { maxHeight } : null),
         }}
