@@ -4,6 +4,7 @@ export * from './LevitatedPane.layout';
 export * from './LevitatedPaneScrim';
 export * from './paneExpansionSemantics';
 export * from './paneMargins';
+export * from './paneTransitions';
 export * from './preferredPaneSize';
 export * from './ThreePaneScaffold';
 export { calculateThreePaneScaffoldLayout } from './ThreePaneScaffold.layout';
