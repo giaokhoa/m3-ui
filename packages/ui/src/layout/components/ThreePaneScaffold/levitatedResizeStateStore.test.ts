@@ -40,6 +40,22 @@ describe('levitated resize state store', () => {
     expect(getLevitatedResizeStates(shared)).toEqual([first]);
   });
 
+  it('ignores the nullable AndroidX no-state representation', () => {
+    const structural: ThreePaneScaffoldValue = {
+      primary: {
+        type: 'levitated',
+        alignment: PaneAlignment.Center,
+        dragToResizeState: null,
+      },
+      secondary: PaneAdaptedValue.Hidden,
+      tertiary: PaneAdaptedValue.Hidden,
+    };
+
+    const states = getLevitatedResizeStates(structural);
+    expect(states).toEqual([]);
+    expect(getLevitatedResizeStatesSnapshot(states)).toBe('');
+  });
+
   it('notifies when any collected state changes', () => {
     const first = new DragToResizeState({ dockedEdge: DockedEdge.Bottom });
     const second = new DragToResizeState({ dockedEdge: DockedEdge.End });
