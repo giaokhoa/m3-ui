@@ -95,10 +95,11 @@ function classifyGroup(path, token) {
   if (/typography|font|labeltext|supportingtext|headline|titletext|bodytext/.test(searchable)) return 'typography';
   if (/shape|radius|corner/.test(searchable)) return 'shape';
   if (/elevation|shadow/.test(searchable)) return 'elevation';
+  if (/statelayer|hover|focus|pressed|dragged|selected|disabled|checked/.test(searchable)) return 'state';
   if (/color|colour|tint/.test(searchable)) return 'color';
-  if (/icon/.test(searchable)) return 'icon';
   if (/padding|spacing|space|gap|margin|offset/.test(searchable)) return 'spacing';
-  if (/opacity|state|hover|focus|pressed|dragged|selected|disabled|checked/.test(searchable)) return 'state';
+  if (/icon/.test(searchable)) return 'icon';
+  if (/opacity|state/.test(searchable)) return 'state';
   if (/motion|duration|easing|spring/.test(searchable)) return 'motion';
   if (/width|height|size|diameter|thickness|length|min|max/.test(searchable)) return 'size';
   return 'other';
@@ -110,14 +111,15 @@ function walkTokens(node, graph, rootPath, path = [], inheritedType = null, entr
     if (key.startsWith('$')) continue;
     const nextPath = [...path, key];
     if (isToken(value)) {
-      const tokenPath = [...rootPath, ...nextPath].join('.');
+      const absolutePath = [...rootPath, ...nextPath];
+      const tokenPath = absolutePath.join('.');
       const alias = exactAlias(value.$value);
       const resolved = resolveTokenValue(graph, tokenPath);
       entries.push({
         path: nextPath.join('.'),
         tokenPath,
         type: value.$type ?? groupType ?? 'unknown',
-        group: classifyGroup(nextPath, value),
+        group: classifyGroup(absolutePath, value),
         value: formatValue(value.$value),
         alias,
         resolvedValue: formatValue(resolved),
