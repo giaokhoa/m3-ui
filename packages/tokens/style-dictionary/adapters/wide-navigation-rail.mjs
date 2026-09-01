@@ -7,6 +7,7 @@ export function createWideNavigationRailCss(context) {
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const rail = 'component.navigation.rail';
   const color = `${rail}.color`;
+  const baseline = `${rail}.baseline`;
   const type = (role) => [
     line('--_wide-navigation-rail-label-font-family', `var(--font-family-${get(`typography.${role}.fontFamily`)})`),
     line('--_wide-navigation-rail-label-font-size', get(`typography.${role}.fontSize`)),
@@ -48,15 +49,15 @@ export function createWideNavigationRailCss(context) {
     line('--_wide-navigation-rail-indicator-color', `var(--_wide-navigation-rail-indicator-override, ${get(`${color}.itemActiveIndicator`)})`),
     line('--_wide-navigation-rail-content-opacity', 1),
     line('--_ripple-color', get(`${color}.itemInactiveHoveredStateLayer`)),
-    line('--_ripple-hover-opacity', get(`${rail}.baselineItem.hoverStateLayerOpacity`)),
-    line('--_ripple-focus-opacity', get(`${rail}.baselineItem.focusStateLayerOpacity`)),
-    line('--_ripple-pressed-opacity', get(`${rail}.baselineItem.pressedStateLayerOpacity`)),
+    line('--_ripple-hover-opacity', get(`${baseline}.hoverStateLayerOpacity`)),
+    line('--_ripple-focus-opacity', get(`${baseline}.focusStateLayerOpacity`)),
+    line('--_ripple-pressed-opacity', get(`${baseline}.pressedStateLayerOpacity`)),
     ...type(get(`${rail}.verticalItem.labelTextTypography`)),
     '}',
     ...rule('.wide-navigation-rail-item:not([data-has-label])', [
-      line('--_wide-navigation-rail-indicator-height', get(`${rail}.verticalItem.activeIndicatorWidth`)),
-      line('--_wide-navigation-rail-indicator-collapsed-height', get(`${rail}.verticalItem.activeIndicatorWidth`)),
-      line('--_wide-navigation-rail-indicator-expanded-height', get(`${rail}.verticalItem.activeIndicatorWidth`)),
+      line('--_wide-navigation-rail-indicator-height', get(`${baseline}.noLabelActiveIndicatorHeight`)),
+      line('--_wide-navigation-rail-indicator-collapsed-height', get(`${baseline}.noLabelActiveIndicatorHeight`)),
+      line('--_wide-navigation-rail-indicator-expanded-height', get(`${baseline}.noLabelActiveIndicatorHeight`)),
     ]),
     ...rule('.wide-navigation-rail-item[data-expanded]', type(get(`${rail}.horizontalItem.labelTextTypography`))),
     ...rule('.wide-navigation-rail-item[data-expanded][data-has-label]', [line('--_wide-navigation-rail-indicator-height', get(`${rail}.horizontalItem.activeIndicatorHeight`))]),
