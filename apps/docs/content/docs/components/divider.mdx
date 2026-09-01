@@ -1,41 +1,60 @@
 ---
 title: Dividers
-description: Horizontal and vertical Material separators with explicit separator semantics and token-backed color and thickness defaults.
+description: Material horizontal and vertical separators with explicit separator semantics and token-backed defaults.
 ---
 
-<MaterialParity component="divider" />
+Dividers separate related content regions when a visible boundary improves structure. Material defines the visual treatment; on the web, `m3-ui` exposes real separator semantics rather than using a decorative line with no relationship to content.
 
-## Overview
-
-`HorizontalDivider` and `VerticalDivider` render the Material divider visual while exposing real separator semantics. Orientation is part of the component contract rather than inferred from surrounding CSS.
-
-## Live example
+[Material 3 dividers](https://m3.material.io/components/divider/overview)
 
 <ComponentPreview>
   <DividerPreview />
 </ComponentPreview>
 
-## Orientation
-
 ```tsx
+import { HorizontalDivider, VerticalDivider } from '@m3-ui/ui';
+
 <HorizontalDivider />
 <VerticalDivider />
 ```
 
-Both variants render `role="separator"` and the matching `aria-orientation`. Use the horizontal form between vertically stacked regions and the vertical form between horizontally arranged regions when a semantic separation is actually useful.
+## When to use
 
-## Material defaults
+Use a divider when the boundary between adjacent groups is meaningful and should be perceivable beyond spacing alone. Prefer layout spacing when you only need visual breathing room.
 
-The default divider color is the Material `outline-variant` role and the default thickness comes from the audited divider token set. Those values remain owned by the component/token layer.
+Do not insert semantic separators merely to imitate margins or padding; unnecessary separator roles add noise for assistive technology.
 
-`color` and `thickness` are explicit web overrides for deliberate custom composition. Numeric thickness values are interpreted as CSS pixels; string values may use normal CSS lengths.
+## Orientation
+
+`HorizontalDivider` and `VerticalDivider` expose their orientation directly. Each renders separator semantics with the matching orientation instead of guessing from surrounding CSS.
+
+Use the horizontal form between vertically stacked regions and the vertical form between horizontally arranged regions when that separation is meaningful.
+
+## Material defaults and overrides
+
+Default color and thickness come from the audited Material divider/token contract. `color` and `thickness` are explicit web customization hooks for deliberate composition changes.
 
 ```tsx
 <HorizontalDivider thickness="2px" />
 ```
 
-An override does not create a new canonical Material token. Reusable design decisions should still live in the token system rather than being copied across application CSS.
+An override does not create a new canonical Material token. Reusable design decisions belong in the token/theme system instead of being copied across application CSS.
 
-## Semantics boundary
+## Accessibility
 
-Do not add dividers solely to reproduce spacing. A semantic separator communicates a boundary to assistive technology. When only visual spacing is needed, prefer layout spacing rather than inserting an unnecessary separator role.
+The divider is a separator, not interactive content. It should not receive focus or click behavior. Use it only when the semantic region boundary is useful; use spacing for decoration-only separation.
+
+## API reference
+
+<ApiReference name="HorizontalDivider" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="divider" />
+
+Material supplies divider color/thickness hierarchy and visual use. Browser separator role/orientation semantics are the web representation of the boundary; custom CSS lengths remain explicit application overrides rather than normative spec values.
+
+## Related components
+
+- [List item](/docs/components/list-item) — common persistent content rows.
+- [Surface](/docs/components/surface) — surface hierarchy that may separate content without a divider.

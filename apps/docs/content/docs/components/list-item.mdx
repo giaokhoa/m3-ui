@@ -1,44 +1,37 @@
 ---
 title: Lists and list items
-description: Material one-, two-, and three-line list items with passive, action, single-selection, and multiple-selection semantics kept distinct.
+description: Material list rows with passive, action, single-selection, and multiple-selection semantics kept explicitly distinct.
 ---
 
-<MaterialParity component="list-item" />
+List items organize related content into Material rows. The same visual family can represent passive content, an action, one-of-many selection, or independent multiple selection; those browser contracts must remain distinct.
 
-## Overview
-
-`ListItem` renders Material list-row geometry and content slots while preserving four different browser contracts:
-
-- passive content;
-- an action button through `onPress`;
-- single selection through radio semantics;
-- multiple selection through checkbox semantics.
-
-The visual family is shared, but these modes are not interchangeable accessibility patterns.
-
-## Live example
+[Material 3 lists](https://m3.material.io/components/lists/overview)
 
 <ComponentPreview>
   <ListItemPreview />
 </ComponentPreview>
 
-## Lines and slots
-
-The row infers one, two, or three Material lines from `overline` and `supportingText`, or accepts an explicit `lineCount`. `leading` and `trailing` are visual slots and are marked presentation-only by the component.
-
 ```tsx
-<ListItem
-  overline="Workspace"
-  supportingText="Last synced 2 minutes ago"
-  trailing="12 files"
->
+import { ListItem } from '@m3-ui/ui';
+
+<ListItem supportingText="Last synced 2 minutes ago">
   Material library
 </ListItem>
 ```
 
-## Action rows
+## When to use
 
-Supplying `onPress` turns the row into the public React Aria-backed button path with ripple, hover, press, focus-visible, and disabled states.
+Use list items for repeated rows with a shared content hierarchy. Do not turn every row into a button merely because it is clickable-looking; choose passive, action, or selection semantics from what activation actually means.
+
+Use native links for navigation when browser link behavior is required rather than modeling document navigation as a button action.
+
+## Anatomy and line count
+
+`overline` and `supportingText` determine one-, two-, or three-line Material arrangements, with `lineCount` available when the public composition needs an explicit line family. `leading` and `trailing` are visual slots; they should not become hidden duplicate controls.
+
+## Passive and action rows
+
+A passive `ListItem` is content only. Supplying `onPress` opts into the React Aria-backed button path with hover, press, focus-visible, ripple, and disabled behavior.
 
 ```tsx
 <ListItem onPress={openDetails} supportingText="View details">
@@ -46,14 +39,42 @@ Supplying `onPress` turns the row into the public React Aria-backed button path 
 </ListItem>
 ```
 
-Use a real link outside the list-item primitive when the semantic action is navigation and native link behavior is required.
+Do not nest independent interactive controls inside an action row in a way that creates invalid nested interaction.
 
-## Selection
+## Single selection
 
-`selectionMode="single"` exposes a radio item. Wrap related single-selection rows in `ListItemSelectionGroup`; the group supplies `radiogroup` semantics plus Arrow, Home, and End movement and keeps only the selected row in the normal tab sequence.
+`selectionMode="single"` exposes radio-item semantics. Related rows belong in `ListItemSelectionGroup`, which provides the group relationship and one-of-many keyboard/focus behavior.
 
-`selectionMode="multiple"` exposes checkbox semantics and calls `onSelectionChange` with the next selected state. Multiple-selection rows are independent controls and do not use the single-selection roving-focus group.
+Single selection is not an ordinary action button and not an independent checkbox.
+
+## Multiple selection
+
+`selectionMode="multiple"` exposes checkbox semantics and independent selected state. Multiple-selection rows do not use the single-selection roving-focus contract.
+
+Keep each selected state application-controlled/uncontrolled through the documented public API instead of styling selected rows directly.
 
 ## Drag presentation
 
-`isDragged` is a visual interaction state used by the audited Material list tokens. It does not implement drag-and-drop semantics or data transfer by itself; applications must supply the actual drag system when needed.
+`isDragged` is a Material visual state only. It does not implement HTML drag-and-drop, pointer reordering, data transfer, or application sorting by itself.
+
+## Accessibility
+
+Choose the semantic mode that matches the row's real behavior. Keep leading/trailing decorative content from becoming duplicate accessible names, and use real links when navigation semantics are needed.
+
+For selectable rows, preserve the radio vs checkbox distinction. For action rows, ensure the whole action has a clear accessible name and avoid nested interactive descendants.
+
+## API reference
+
+<ApiReference name="ListItem" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="list-item" />
+
+Material supplies row anatomy, line families, state presentation, and visual selection/action treatment. Browser semantics intentionally map action rows to buttons, single selection to radios, and multiple selection to checkboxes.
+
+## Related components
+
+- [Menus](/docs/components/menu) — temporary action/choice lists.
+- [Checkbox](/docs/components/checkbox) and [Radio button](/docs/components/radio-button) — explicit selection controls.
+- [Divider](/docs/components/divider) — semantic separation between content regions when appropriate.

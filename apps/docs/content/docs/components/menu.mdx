@@ -1,25 +1,19 @@
 ---
 title: Menus
-description: Material anchored menus, sections, items, and read-only exposed menus with React Aria focus and dismissal semantics.
+description: Material anchored menus, sections, menu items, and read-only exposed menus with browser focus and dismissal semantics.
 ---
 
-<MaterialParity component="menu" />
+Menus present a temporary list of actions or choices anchored to a trigger. Material defines the visual menu surface and item anatomy; React Aria supplies the browser menu interaction model.
 
-## Overview
-
-`Menu` renders an anchored Material menu around React Aria menu, menu-item, trigger, popover, and section semantics. Material owns geometry, tokens, spacing, state presentation, and viewport margins; React Aria owns the menu interaction model.
-
-`ExposedMenu` reuses the Material text-field anchor for a read-only select-style menu. It is intentionally **not** an editable combobox or autocomplete.
-
-## Live example
+[Material 3 menus](https://m3.material.io/components/menus/overview)
 
 <ComponentPreview>
   <MenuPreview />
 </ComponentPreview>
 
-## Anchored menu
-
 ```tsx
+import { Button, Menu, MenuItem, MenuSection } from '@m3-ui/ui';
+
 <Menu
   aria-label="Document actions"
   trigger={<Button>Actions</Button>}
@@ -34,17 +28,19 @@ description: Material anchored menus, sections, items, and read-only exposed men
 </Menu>
 ```
 
-`placement`, `offset`, and `crossOffset` configure browser overlay positioning without changing the Material menu token contract.
+## When to use
 
-## Interaction semantics
+Use a menu for a temporary list of actions or choices that should not occupy persistent screen space. Prefer visible buttons when actions are few and important enough to remain exposed. Use selection controls when choices should remain visible as form state.
 
-React Aria owns roving focus, Arrow/Home/End keyboard movement, typeahead through `textValue`, Escape, outside dismissal, and focus restoration. `MenuItem` exposes leading, supporting, and trailing visual slots while keeping the menu item itself as the semantic control.
+## Anchored menu behavior
 
-Sections use React Aria section/header relationships. The `segmented` section variant changes Material presentation; it does not create a separate selection model.
+`placement`, `offset`, and `crossOffset` configure browser overlay positioning without redefining Material menu geometry. React Aria owns roving focus, Arrow/Home/End navigation, typeahead, Escape/outside dismissal, and focus restoration.
+
+`MenuItem` keeps leading/supporting/trailing slots visual while the item itself remains the semantic action. Sections use real section/header relationships; visual section variants do not invent a new selection model.
 
 ## Exposed menu
 
-`ExposedMenu` presents a read-only Material `TextField` with `aria-haspopup="menu"` and `aria-expanded`. Pointer activation, Enter, Space, or ArrowDown opens the menu; Escape closes it and restores focus to the field anchor.
+`ExposedMenu` uses the Material text-field visual anchor for **read-only menu selection**.
 
 ```tsx
 <ExposedMenu
@@ -57,4 +53,26 @@ Sections use React Aria section/header relationships. The `segmented` section va
 </ExposedMenu>
 ```
 
-Use the dedicated autocomplete/exposed-dropdown family when users must type and filter options. Do not treat this read-only menu as an editable combobox merely because its anchor looks like a text field.
+The anchor communicates popup/expanded state and can open from pointer or keyboard activation. It is intentionally not an editable combobox or autocomplete. Do not describe users as typing into it or filtering options unless a separate editable public API is composed.
+
+## Accessibility
+
+Give menu triggers and menus meaningful names. Keep item labels usable for typeahead and accessible naming. Let the menu interaction model own arrow-key navigation and focus restoration rather than attaching competing keyboard handlers.
+
+For `ExposedMenu`, preserve its read-only menu relationship; a text-field appearance does not make it a text input.
+
+## API reference
+
+<ApiReference name="Menu" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="menu" />
+
+Material supplies surface, anatomy, spacing, state presentation, and visual hierarchy. React Aria supplies menu/menuitem focus, keyboard, popup positioning, dismissal, and restoration semantics. The exposed-menu text-field anchor is a deliberate read-only web composition.
+
+## Related components
+
+- [Text field](/docs/components/text-field) — editable text input.
+- [Search bar](/docs/components/search-bar) — editable search input/results.
+- [List item](/docs/components/list-item) — persistent content/action/selection rows.
