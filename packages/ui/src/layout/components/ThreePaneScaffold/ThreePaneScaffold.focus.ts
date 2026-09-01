@@ -18,6 +18,8 @@ const ProgrammaticallyFocusableSelector = [
   '[tabindex]',
 ].join(',');
 
+const PaneAutoFocusExcludedClass = 'three-pane-scaffold__levitated-resize-action';
+
 function isFocusableCandidate(element: Element): element is FocusableElement {
   if (!('tabIndex' in element) || typeof element.tabIndex !== 'number') return false;
   if (!('focus' in element) || typeof element.focus !== 'function') return false;
@@ -33,6 +35,13 @@ function collectAccessibleFocusTargets(
   targets: FocusableElement[],
 ) {
   for (const child of Array.from(root.children)) {
+    // The no-handle levitated resize action is a native-button proxy for
+    // Compose clickToResize semantics. AndroidX does not add a FocusTarget for
+    // that semantics action, so it must not participate in the focusGroup's
+    // automatic FocusRequester Enter traversal. Keep the proxy focusable for
+    // normal browser keyboard/assistive-technology access outside this search.
+    if (child.classList?.contains(PaneAutoFocusExcludedClass)) continue;
+
     if (isFocusableCandidate(child)) {
       // Compose collectAccessibleChildren stops descending once the first
       // focusable FocusTarget is reached on a branch.
