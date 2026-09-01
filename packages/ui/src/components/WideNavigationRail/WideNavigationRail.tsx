@@ -124,9 +124,7 @@ export function WideNavigationRail({
       {...props}
       ref={railRef}
       aria-label={ariaLabel}
-      className={
-        clsx('wide-navigation-rail', className)
-      }
+      className={clsx('wide-navigation-rail', className)}
       data-expanded={expanded || undefined}
       data-state={railState.targetValue}
       style={navigationStyle}
@@ -180,19 +178,12 @@ export function WideNavigationRailItem({
   const horizontal = effectiveIconPosition === 'start';
   const hasLabel = label !== undefined;
   const ripple = useRipple({ origin: 'center' });
-
-  const handlePressStart: AriaButtonProps['onPressStart'] = (event) => {
-    ripple.onPressStart(event);
-    onPressStart?.(event);
-  };
-  const handlePressEnd: AriaButtonProps['onPressEnd'] = (event) => {
-    ripple.onPressEnd();
-    onPressEnd?.(event);
-  };
+  const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
     <AriaButton
       {...props}
+      {...ripplePressProps}
       isDisabled={isDisabled}
       data-selected={selected || undefined}
       data-expanded={horizontal || undefined}
@@ -239,8 +230,6 @@ export function WideNavigationRailItem({
           ...userStyle,
         };
       }}
-      onPressStart={handlePressStart}
-      onPressEnd={handlePressEnd}
     >
       {(renderProps) => (
         <span className="wide-navigation-rail-item__layout">
@@ -249,14 +238,10 @@ export function WideNavigationRailItem({
             <Ripple
               controller={ripple}
               focusRingRadius="var(--_wide-navigation-rail-indicator-radius, 9999px)"
-              isFocusVisible={renderProps.isFocusVisible}
-              stateInteraction={
-                renderProps.isFocusVisible
-                  ? 'focus'
-                  : renderProps.isHovered
-                    ? 'hover'
-                    : null
-              }
+              state={{
+                isFocusVisible: renderProps.isFocusVisible,
+                isHovered: renderProps.isHovered,
+              }}
             />
           </span>
           <span
