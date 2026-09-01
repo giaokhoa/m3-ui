@@ -1,4 +1,5 @@
 import * as token from '@m3-ui/tokens';
+import '@m3-ui/tokens/top-app-bar.css';
 import type { CSSProperties } from 'react';
 import type { ElevationLevel } from '../../internal/elevation';
 
@@ -47,15 +48,14 @@ export const topAppBarTokens = {
     token.ComponentAppBarVariantLargeFlexibleLargeContainerHeight,
 } as const;
 
+// AndroidX renderer mechanics used for centered-title measurement and expanded
+// row placement. They are not design-token aliases and intentionally remain
+// beside the runtime consumer rather than becoming a second token source.
 export const topAppBarRuntime = {
   horizontalPadding: 4,
   titleInset: 16,
   mediumTitleBottomPadding: 24,
   largeTitleBottomPadding: 28,
-  motion: {
-    duration: token.MotionSpringDefaultEffectsDuration,
-    easing: token.MotionSpringDefaultEffectsEasing,
-  },
 } as const;
 
 export function dimensionNumber(value: string | number): number {
@@ -97,85 +97,12 @@ export function topAppBarExpandedHeight(
   }
 }
 
-function typographyVars(prefix: string, typography: string): TopAppBarStyle {
-  const typographyMap: Record<string, readonly [string, string, string, string | number, string]> = {
-    titleLarge: [
-      token.TypographyTitleLargeFontFamily,
-      token.TypographyTitleLargeFontSize,
-      token.TypographyTitleLargeLineHeight,
-      token.TypographyTitleLargeFontWeight,
-      token.TypographyTitleLargeLetterSpacing,
-    ],
-    headlineSmall: [
-      token.TypographyHeadlineSmallFontFamily,
-      token.TypographyHeadlineSmallFontSize,
-      token.TypographyHeadlineSmallLineHeight,
-      token.TypographyHeadlineSmallFontWeight,
-      token.TypographyHeadlineSmallLetterSpacing,
-    ],
-    headlineMedium: [
-      token.TypographyHeadlineMediumFontFamily,
-      token.TypographyHeadlineMediumFontSize,
-      token.TypographyHeadlineMediumLineHeight,
-      token.TypographyHeadlineMediumFontWeight,
-      token.TypographyHeadlineMediumLetterSpacing,
-    ],
-    displaySmall: [
-      token.TypographyDisplaySmallFontFamily,
-      token.TypographyDisplaySmallFontSize,
-      token.TypographyDisplaySmallLineHeight,
-      token.TypographyDisplaySmallFontWeight,
-      token.TypographyDisplaySmallLetterSpacing,
-    ],
-    labelMedium: [
-      token.TypographyLabelMediumFontFamily,
-      token.TypographyLabelMediumFontSize,
-      token.TypographyLabelMediumLineHeight,
-      token.TypographyLabelMediumFontWeight,
-      token.TypographyLabelMediumLetterSpacing,
-    ],
-    labelLarge: [
-      token.TypographyLabelLargeFontFamily,
-      token.TypographyLabelLargeFontSize,
-      token.TypographyLabelLargeLineHeight,
-      token.TypographyLabelLargeFontWeight,
-      token.TypographyLabelLargeLetterSpacing,
-    ],
-    titleMedium: [
-      token.TypographyTitleMediumFontFamily,
-      token.TypographyTitleMediumFontSize,
-      token.TypographyTitleMediumLineHeight,
-      token.TypographyTitleMediumFontWeight,
-      token.TypographyTitleMediumLetterSpacing,
-    ],
-  };
-  const values = typographyMap[typography] ?? typographyMap.titleLarge;
-  return {
-    [`--_${prefix}-font-family`]: values[0],
-    [`--_${prefix}-font-size`]: values[1],
-    [`--_${prefix}-line-height`]: values[2],
-    [`--_${prefix}-font-weight`]: values[3],
-    [`--_${prefix}-letter-spacing`]: values[4],
-  };
-}
-
-function expandedTitleTypography(variant: TopAppBarVariant): string {
-  switch (variant) {
-    case 'medium':
-      return 'headlineSmall';
-    case 'medium-flexible':
-      return 'headlineMedium';
-    case 'large':
-      return 'headlineMedium';
-    case 'large-flexible':
-      return 'displaySmall';
-    default:
-      return 'titleLarge';
-  }
-}
-
-function expandedSubtitleTypography(variant: TopAppBarVariant): string {
-  return variant === 'large-flexible' ? 'titleMedium' : 'labelLarge';
+function setOverride(
+  style: TopAppBarStyle,
+  name: `--${string}`,
+  value: CSSProperties['color'] | CSSProperties['backgroundColor'] | undefined,
+) {
+  if (value !== undefined) style[name] = value as string | number;
 }
 
 export function getTopAppBarStyle(
@@ -195,51 +122,31 @@ export function getTopAppBarStyle(
     variant === 'medium-flexible' ||
     variant === 'large' ||
     variant === 'large-flexible';
-  // Compose single-row bars switch once content overlaps (> 0.01), while
-  // two-row bars derive visual scroll state from collapsedFraction.
   const isScrolled = twoRow ? fraction > 0 : overlap > 0.01;
-  const isLarge = variant === 'large' || variant === 'large-flexible';
 
-  return {
+  const style: TopAppBarStyle = {
     '--_top-app-bar-height': `${currentHeight}px`,
-    '--_top-app-bar-collapsed-height': topAppBarTokens.smallHeight,
     '--_top-app-bar-expanded-height': `${expandedHeight}px`,
     '--_top-app-bar-scroll-fraction': fraction,
     '--_top-app-bar-overlapped-fraction': overlap,
-    '--_top-app-bar-expanded-alpha': variant === 'small' || variant === 'center-aligned' ? 1 : 1 - fraction,
-    '--_top-app-bar-collapsed-alpha': variant === 'small' || variant === 'center-aligned' ? 1 : fraction,
-    '--_top-app-bar-container-color': isScrolled
-      ? options.scrolledContainerColor ?? topAppBarTokens.scrolledContainerColor
-      : options.containerColor ?? topAppBarTokens.containerColor,
-    '--_top-app-bar-title-color': options.titleColor ?? topAppBarTokens.titleColor,
-    '--_top-app-bar-subtitle-color': options.subtitleColor ?? topAppBarTokens.subtitleColor,
-    '--_top-app-bar-navigation-icon-color':
-      options.navigationIconColor ?? topAppBarTokens.navigationIconColor,
-    '--_top-app-bar-action-icon-color':
-      options.actionIconColor ?? topAppBarTokens.actionIconColor,
-    '--_top-app-bar-leading-space': topAppBarTokens.leadingSpace,
-    '--_top-app-bar-trailing-space': topAppBarTokens.trailingSpace,
-    '--_top-app-bar-horizontal-padding': `${topAppBarRuntime.horizontalPadding}px`,
-    '--_top-app-bar-title-inset': `${topAppBarRuntime.titleInset}px`,
-    '--_top-app-bar-title-start-space': `${
-      topAppBarRuntime.titleInset - topAppBarRuntime.horizontalPadding
-    }px`,
-    '--_top-app-bar-title-bottom-padding': `${
-      isLarge
-        ? topAppBarRuntime.largeTitleBottomPadding
-        : topAppBarRuntime.mediumTitleBottomPadding
-    }px`,
-    '--_top-app-bar-motion-duration': topAppBarRuntime.motion.duration,
-    '--_top-app-bar-motion-easing': topAppBarRuntime.motion.easing,
-    ...typographyVars('top-app-bar-collapsed-title', 'titleLarge'),
-    ...typographyVars(
-      'top-app-bar-expanded-title',
-      expandedTitleTypography(variant),
-    ),
-    ...typographyVars('top-app-bar-collapsed-subtitle', 'labelMedium'),
-    ...typographyVars(
-      'top-app-bar-expanded-subtitle',
-      expandedSubtitleTypography(variant),
-    ),
+    '--_top-app-bar-expanded-alpha':
+      variant === 'small' || variant === 'center-aligned' ? 1 : 1 - fraction,
+    '--_top-app-bar-collapsed-alpha':
+      variant === 'small' || variant === 'center-aligned' ? 1 : fraction,
   };
+
+  setOverride(
+    style,
+    '--_top-app-bar-container-color',
+    isScrolled ? options.scrolledContainerColor : options.containerColor,
+  );
+  setOverride(style, '--_top-app-bar-title-color', options.titleColor);
+  setOverride(style, '--_top-app-bar-subtitle-color', options.subtitleColor);
+  setOverride(
+    style,
+    '--_top-app-bar-navigation-icon-color',
+    options.navigationIconColor,
+  );
+  setOverride(style, '--_top-app-bar-action-icon-color', options.actionIconColor);
+  return style;
 }

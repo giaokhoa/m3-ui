@@ -36,7 +36,7 @@ describe('TopAppBar defaults', () => {
     expect(topAppBarExpandedHeight('large-flexible', true)).toBe(152);
   });
 
-  it('interpolates height and switches to the canonical scrolled container', () => {
+  it('keeps interpolation runtime-owned without re-emitting static defaults', () => {
     const expanded = getTopAppBarStyle('large', 0);
     const halfway = getTopAppBarStyle('large', 0.5);
     const collapsed = getTopAppBarStyle('large', 1);
@@ -44,28 +44,26 @@ describe('TopAppBar defaults', () => {
     expect(expanded['--_top-app-bar-height']).toBe('152px');
     expect(halfway['--_top-app-bar-height']).toBe('108px');
     expect(collapsed['--_top-app-bar-height']).toBe('64px');
-    expect(expanded['--_top-app-bar-container-color']).toBe(
-      topAppBarTokens.containerColor,
-    );
-    expect(collapsed['--_top-app-bar-container-color']).toBe(
-      topAppBarTokens.scrolledContainerColor,
-    );
+    expect(expanded).not.toHaveProperty('--_top-app-bar-container-color');
+    expect(collapsed).not.toHaveProperty('--_top-app-bar-container-color');
+    expect(collapsed).not.toHaveProperty('--_top-app-bar-motion-duration');
   });
 
-  it('uses overlap, not collapse, for pinned/single-row scrolled visuals', () => {
-    const resting = getTopAppBarStyle('small', 0, false, {}, 0);
-    const tinyOverlap = getTopAppBarStyle('small', 0, false, {}, 0.01);
-    const overlapped = getTopAppBarStyle('small', 0, false, {}, 0.02);
-
-    expect(resting['--_top-app-bar-container-color']).toBe(
-      topAppBarTokens.containerColor,
-    );
-    expect(tinyOverlap['--_top-app-bar-container-color']).toBe(
-      topAppBarTokens.containerColor,
-    );
-    expect(overlapped['--_top-app-bar-container-color']).toBe(
-      topAppBarTokens.scrolledContainerColor,
-    );
+  it('projects only the active public color override', () => {
+    expect(
+      getTopAppBarStyle('small', 0, false, { containerColor: 'tomato' }, 0)[
+        '--_top-app-bar-container-color'
+      ],
+    ).toBe('tomato');
+    expect(
+      getTopAppBarStyle(
+        'small',
+        0,
+        false,
+        { containerColor: 'tomato', scrolledContainerColor: 'gold' },
+        0.02,
+      )['--_top-app-bar-container-color'],
+    ).toBe('gold');
   });
 
   it('clamps controlled state and preserves scroll-behavior concepts', () => {
