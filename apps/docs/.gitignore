@@ -1,3 +1,5 @@
+/.next/
+/.source/
 /public/search-index.json
 /src/generated/docs-navigation.json
 /src/generated/api-reference.generated.json
