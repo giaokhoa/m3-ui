@@ -75,12 +75,12 @@ export function createChipCss(context) {
 
     const inputPaddingRules = input ? [
       '', `${rootSelector} > .chip__visual {`,
-      line('--_chip-padding-inline-start', get('component.chip.input.paddingCompact')),
-      line('--_chip-padding-inline-end', get('component.chip.input.paddingCompact')),
+      line('--_chip-padding-inline-start', get('component.chip.inputPadding.compact')),
+      line('--_chip-padding-inline-end', get('component.chip.inputPadding.compact')),
       '}', '', `${rootSelector}[data-has-leading]:not([data-has-avatar]) > .chip__visual {`,
-      line('--_chip-padding-inline-start', get('component.chip.input.paddingWithIcon')),
+      line('--_chip-padding-inline-start', get('component.chip.inputPadding.withIcon')),
       '}', '', `${rootSelector}[data-has-trailing] > .chip__visual {`,
-      line('--_chip-padding-inline-end', get('component.chip.input.paddingWithIcon')),
+      line('--_chip-padding-inline-end', get('component.chip.inputPadding.withIcon')),
       '}',
     ] : [];
 
