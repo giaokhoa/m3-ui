@@ -1,6 +1,7 @@
 html,
 body,
 #root {
+  block-size: 100%;
   min-block-size: 100%;
 }
 
@@ -10,18 +11,14 @@ body,
 
 body {
   margin: 0;
+  overflow: hidden;
 }
 
 .docs-theme {
-  min-block-size: 100vh;
+  block-size: 100%;
+  min-block-size: 100%;
   background: var(--surface);
   color: var(--on-surface);
-}
-
-.docs-main {
-  inline-size: min(100%, 80ch);
-  margin-inline: auto;
-  padding: 48px 24px 80px;
 }
 
 .docs-page-header {
