@@ -95,7 +95,7 @@ export interface LevitatePaneAdaptStrategy {
   type: 'levitate';
   alignment: LevitatedPaneAlignment;
   scrim?: ReactNode;
-  dragToResizeState?: DragToResizeState;
+  dragToResizeState?: DragToResizeState | null;
   /** Equivalent of AndroidX AdaptStrategy.Levitate.onlyIf. */
   onlyIf(condition: boolean): PaneAdaptStrategy;
   /** AndroidX single-pane means maxHorizontalPartitions == 1. */
@@ -105,7 +105,7 @@ export interface LevitatePaneAdaptStrategy {
 export interface LevitatePaneAdaptStrategyOptions {
   alignment?: LevitatedPaneAlignment;
   scrim?: LevitatedPaneScrimContent;
-  dragToResizeState?: DragToResizeState;
+  dragToResizeState?: DragToResizeState | null;
 }
 
 export type PaneAdaptStrategy =
@@ -125,7 +125,7 @@ function createLevitatePaneAdaptStrategy({
     type: 'levitate',
     alignment,
     ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
-    ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
+    ...(dragToResizeState == null ? {} : { dragToResizeState }),
     onlyIf(condition) {
       return condition ? strategy : hidePaneAdaptStrategy;
     },
@@ -160,7 +160,7 @@ export type PaneAdaptedValue =
       type: 'levitated';
       alignment: LevitatedPaneAlignment;
       scrim?: ReactNode;
-      dragToResizeState?: DragToResizeState;
+      dragToResizeState?: DragToResizeState | null;
     };
 
 const expandedPaneAdaptedValue = Object.freeze({ type: 'expanded' } as const);
@@ -175,14 +175,14 @@ export const PaneAdaptedValue = {
   Levitated(
     alignment: LevitatedPaneAlignment,
     scrim?: LevitatedPaneScrimContent,
-    dragToResizeState?: DragToResizeState,
+    dragToResizeState?: DragToResizeState | null,
   ): PaneAdaptedValue {
     const normalizedScrim = normalizeLevitatedPaneScrim(scrim);
     return {
       type: 'levitated',
       alignment,
       ...(normalizedScrim === undefined ? {} : { scrim: normalizedScrim }),
-      ...(dragToResizeState === undefined ? {} : { dragToResizeState }),
+      ...(dragToResizeState == null ? {} : { dragToResizeState }),
     };
   },
 } as const;
@@ -374,7 +374,12 @@ export function getPaneAdaptedValue(
   value: ThreePaneScaffoldValue,
   role: ThreePaneScaffoldRole,
 ): PaneAdaptedValue {
-  return value[role];
+  const paneValue = value[role];
+  if (paneValue.type !== 'levitated' || paneValue.dragToResizeState !== null) {
+    return paneValue;
+  }
+  const { dragToResizeState: _nullableResizeState, ...normalizedPaneValue } = paneValue;
+  return normalizedPaneValue;
 }
 
 export function hasLevitatedPaneWithScrim(value: ThreePaneScaffoldValue): boolean {
