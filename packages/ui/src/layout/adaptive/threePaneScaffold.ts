@@ -380,7 +380,7 @@ export function getPaneAdaptedValue(
 export function hasLevitatedPaneWithScrim(value: ThreePaneScaffoldValue): boolean {
   return rolesByPriority.some((role) => {
     const paneValue = getPaneAdaptedValue(value, role);
-    return paneValue.type === 'levitated' && paneValue.scrim != null;
+    return paneValue.type === 'levitated' && hasReactNodeContent(paneValue.scrim);
   });
 }
 

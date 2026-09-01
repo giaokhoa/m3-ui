@@ -676,7 +676,7 @@ export function ThreePaneScaffold({
 
   const expansionLayout = expansionState.getLayoutState(geometry.width, geometry.direction);
   const transitionScrimBlocks =
-    transitionFrame?.scrim != null && transitionFrame.scrimOpacity > 0;
+    hasReactNodeContent(transitionFrame?.scrim) && transitionFrame!.scrimOpacity > 0;
   const hasBlockingScrim = transitionScrimBlocks || hasLevitatedPaneWithScrim(targetValue);
 
   let measuredDragHandleOffset = PaneExpansionUnspecified;
@@ -932,14 +932,18 @@ export function ThreePaneScaffold({
   if (!transitionActive) {
     for (const [role] of paneEntries) {
       const adaptedValue = getPaneAdaptedValue(targetValue, role);
-      if (adaptedValue.type === 'levitated' && adaptedValue.scrim != null) {
+      if (
+        adaptedValue.type === 'levitated' &&
+        hasReactNodeContent(adaptedValue.scrim)
+      ) {
         staticScrim = adaptedValue.scrim;
         break;
       }
     }
   }
   const renderedScrim = transitionFrame?.scrim ?? staticScrim;
-  const scrimOpacity = transitionFrame?.scrimOpacity ?? (staticScrim == null ? 0 : 1);
+  const scrimOpacity =
+    transitionFrame?.scrimOpacity ?? (hasReactNodeContent(staticScrim) ? 1 : 0);
 
   const dragHandleAriaState = getPaneExpansionHandleAriaState(
     expansionState,
@@ -1148,7 +1152,7 @@ export function ThreePaneScaffold({
             {dragHandle}
           </div>
         ) : null}
-        {renderedScrim != null ? (
+        {hasReactNodeContent(renderedScrim) ? (
           <div className="three-pane-scaffold__scrim" style={{ opacity: scrimOpacity }}>
             {renderedScrim}
           </div>

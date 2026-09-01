@@ -72,4 +72,51 @@ describe('ThreePaneScaffold rendered-content presence parity', () => {
     expect(markup).toContain('three-pane-scaffold__pane--resize-target');
     expect(markup).not.toContain('three-pane-scaffold__levitated-resize-handle');
   });
+
+  it('does not render or block for an empty structural scrim node', () => {
+    const value: ThreePaneScaffoldValue = {
+      primary: {
+        type: 'levitated',
+        alignment: PaneAlignment.Center,
+        scrim: false,
+      },
+      secondary: PaneAdaptedValue.Expanded,
+      tertiary: PaneAdaptedValue.Hidden,
+    };
+
+    const markup = renderToStaticMarkup(
+      <ThreePaneScaffold
+        directive={directive}
+        value={value}
+        paneOrder={listDetailPaneScaffoldOrder}
+        primaryPane={<span>Modal</span>}
+        secondaryPane={<span>Underlying</span>}
+      />,
+    );
+
+    expect(markup).not.toContain('three-pane-scaffold__scrim');
+    expect(markup).toContain('data-pane-role="secondary"');
+    expect(markup).toContain('data-pane-role="secondary" data-pane-adapted-value="expanded" data-pane-interactable="true"');
+  });
+
+  it('keeps a supplied scrim render function blocking even if it renders null', () => {
+    const value: ThreePaneScaffoldValue = {
+      primary: PaneAdaptedValue.Levitated(PaneAlignment.Center, () => null),
+      secondary: PaneAdaptedValue.Expanded,
+      tertiary: PaneAdaptedValue.Hidden,
+    };
+
+    const markup = renderToStaticMarkup(
+      <ThreePaneScaffold
+        directive={directive}
+        value={value}
+        paneOrder={listDetailPaneScaffoldOrder}
+        primaryPane={<span>Modal</span>}
+        secondaryPane={<span>Underlying</span>}
+      />,
+    );
+
+    expect(markup).toContain('three-pane-scaffold__scrim');
+    expect(markup).toContain('data-pane-role="secondary" data-pane-adapted-value="expanded" data-pane-interactable="false"');
+  });
 });
