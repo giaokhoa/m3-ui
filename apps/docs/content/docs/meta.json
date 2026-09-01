@@ -1,1 +1,14 @@
-{"title":"m3-ui","pages":["index","getting-started","foundations","theming","forms","layout","accessibility","components","parity"]}
+{
+  "title": "m3-ui",
+  "pages": [
+    "index",
+    "getting-started",
+    "foundations",
+    "theming",
+    "forms",
+    "layout",
+    "accessibility",
+    "components",
+    "parity"
+  ]
+}
