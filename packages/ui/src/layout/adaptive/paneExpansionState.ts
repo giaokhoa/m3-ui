@@ -669,7 +669,15 @@ export class PaneExpansionState {
   ): PaneExpansionLayoutState {
     const width = Math.max(0, Math.round(measuredWidth));
     let draggingOffset = this.currentDraggingOffsetState;
-    if (draggingOffset === PaneExpansionUnspecified && this.currentAnchorState !== null) {
+    if (
+      draggingOffset === PaneExpansionUnspecified &&
+      this.currentAnchorState !== null &&
+      (width !== this.maxExpansionWidth || direction !== this.measuredDirection)
+    ) {
+      // React can render the next measured geometry before the layout effect
+      // delivers onMeasured(). Only predict the anchor in that pending-measure
+      // case. If geometry is unchanged, AndroidX onMeasured() returns early, so
+      // clear()/restore() must leave an unspecified drag offset unspecified.
       draggingOffset = anchorPosition(this.currentAnchorState, width, direction);
     }
     if (draggingOffset !== PaneExpansionUnspecified) {
