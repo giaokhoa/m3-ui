@@ -65,7 +65,7 @@ describe('MutableThreePaneScaffoldState', () => {
 
     expect(state.currentState).toBe(hidden);
     expect(state.targetState).toBe(primary);
-    expect(state.progressFraction).toBe(0.4);
+    expect(state.progressFraction).toBe(Math.fround(0.4));
     expect(state.isTransitionActive).toBe(true);
     expect(state.isPredictiveBackInProgress).toBe(true);
   });
@@ -293,7 +293,7 @@ describe('MutableThreePaneScaffoldState', () => {
 
     await state.animateTo(primary);
 
-    expect(seen).toEqual([0.35]);
+    expect(seen).toEqual([Math.fround(0.35)]);
     expect(state.currentState).toBe(primary);
   });
 
@@ -325,7 +325,7 @@ describe('MutableThreePaneScaffoldState', () => {
 
     expect(animationCalls).toBe(1);
     expect(state.targetState).toBe(primary);
-    expect(state.progressFraction).toBe(0.4);
+    expect(state.progressFraction).toBe(Math.fround(0.4));
 
     finishRunning();
     await Promise.all([first, repeated]);
