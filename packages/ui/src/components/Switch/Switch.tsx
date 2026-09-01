@@ -6,7 +6,6 @@ import {
 import { Ripple, useRipple } from '../../internal/ripple';
 import { useTheme } from '../../theme/ThemeProvider';
 import {
-  switchBaseStyle,
   switchStateLayerRadius,
   switchTrackFocusRingRadius,
 } from './Switch.defaults';
@@ -55,10 +54,7 @@ export function Switch({
           typeof className === 'function' ? className(renderProps) : className;
         return joinClassNames('switch', userClassName);
       }}
-      style={(renderProps) => {
-        const userStyle = typeof style === 'function' ? style(renderProps) : style;
-        return { ...switchBaseStyle, ...userStyle };
-      }}
+      style={style}
     >
       {(renderProps) => {
         const label = resolveChildren(children, renderProps);
