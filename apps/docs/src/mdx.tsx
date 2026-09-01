@@ -2,6 +2,7 @@ import type { MDXComponents } from 'mdx/types';
 import type { ComponentType } from 'react';
 import { NativeSignInFormPreview } from './formDemos';
 import { MdxClientComponent } from './mdx-client';
+import { Surface } from './mdxDirectComponents';
 
 type ClientMdxProps = Record<string, unknown>;
 
@@ -105,4 +106,5 @@ export const docsMdxComponents = {
   ParityCatalog: clientComponent('ParityCatalog'),
   MaterialFidelity: clientComponent('MaterialFidelity'),
   NativeSignInFormPreview,
+  Surface,
 } satisfies MDXComponents;
