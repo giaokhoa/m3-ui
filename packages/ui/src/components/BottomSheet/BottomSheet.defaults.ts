@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/bottom-sheet.css';
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
 import type { ElevationLevel } from '../../internal/elevation';
