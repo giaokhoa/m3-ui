@@ -161,13 +161,15 @@ The reveal control changes only how the same input value is presented. It does n
 Selection controls keep their own Material choice models while participating in native form data through their public React Aria-backed props.
 
 ```tsx
+import { Checkbox, RadioButton, RadioGroup, Switch } from '@m3-ui/ui';
+
 <Checkbox name="terms" value="accepted">
   I accept the terms
 </Checkbox>
 
 <RadioGroup name="plan" defaultValue="standard" label="Plan">
-  <Radio value="standard">Standard</Radio>
-  <Radio value="pro">Pro</Radio>
+  <RadioButton value="standard">Standard</RadioButton>
+  <RadioButton value="pro">Pro</RadioButton>
 </RadioGroup>
 
 <Switch name="updates" value="enabled">
