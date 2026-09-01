@@ -1,25 +1,17 @@
 ---
 title: Vertical drag handle
-description: Material vertical drag-handle affordance with controlled dragged-state visuals and application-owned resize semantics.
+description: Material vertical drag-handle affordance with controlled dragged-state visuals while resize state, keyboard control, and layout policy remain owner-managed.
 ---
 
-<ParitySummary component="vertical-drag-handle" />
-
-## Overview
-
-`VerticalDragHandle` renders the Material resize affordance and its default, pressed, hover, focus, and dragged visual states. It is intentionally **not** a complete resize widget.
+`VerticalDragHandle` renders the Material resize affordance and its interaction-state presentation. It is intentionally not a complete splitter, pane controller, or drag state machine.
 
 <ComponentPreview>
   <VerticalDragHandlePreview />
 </ComponentPreview>
 
-The preview toggles `isDragged` explicitly. A real pane or splitter owner should set that value from its actual drag lifecycle.
-
-## Controlled drag state
-
-`isDragged` changes the handle's Material dragged-state shape and color. Pointer press feedback is internal, but moving a pane or changing a split position remains outside this primitive.
-
 ```tsx
+import { VerticalDragHandle } from '@m3-ui/ui';
+
 <VerticalDragHandle
   isDragged={isResizing}
   role="separator"
@@ -28,19 +20,43 @@ The preview toggles `isDragged` explicitly. A real pane or splitter owner should
 />
 ```
 
-## Accessible resizing
+## When to use
 
-When the handle represents an adjustable separator, the owner should provide the semantics that describe its actual resize model. That commonly includes:
+Use the handle as the visual/interaction affordance for an owner that already knows how a split or pane can resize. Prefer the higher-level pane/scaffold resize APIs when they already provide the state/constraints required by the application.
 
-- `role="separator"`
-- an accessible name
-- `aria-orientation="vertical"`
-- `aria-valuemin`, `aria-valuemax`, and `aria-valuenow` when the split has a numeric range
-- keyboard resizing such as Arrow keys
-- pointer movement that updates the same underlying split state
+## Controlled dragged state
 
-The primitive forwards DOM props so the resize owner can provide this contract without the visual component inventing a second state model.
+`isDragged` selects the Material dragged-state shape/color while pointer press feedback remains local to the handle. The owner decides when a resize session starts/ends and updates the actual split position.
 
-## Why drag logic is external
+Do not infer pane width, drag limits, or application layout policy from the handle itself.
 
-A drag handle can resize a pane, adjust a local split, or participate in a higher-level adaptive scaffold. Those owners have different constraints and state lifecycles. `VerticalDragHandle` therefore owns only Material interaction feedback and appearance; it does not define pane directives, window-size classes, or layout policy.
+## Accessible resizing contract
+
+When the handle is an adjustable separator, the resize owner should provide semantics describing the real control: separator role, orientation, accessible name, value range/current value when meaningful, and keyboard resizing that updates the same state as pointer dragging.
+
+The primitive forwards DOM props so this contract can be supplied without inventing a second state model inside the visual handle.
+
+## Layout boundary
+
+A handle may resize a local split or participate in an adaptive scaffold, but `VerticalDragHandle` itself does not calculate pane directives, window classes, anchors, or constraints. Those belong to the component that owns the resize model.
+
+## Accessibility
+
+A decorative handle that cannot be operated should not pretend to be an adjustable separator. An operable handle needs a non-pointer path—typically keyboard adjustment—and current/range semantics when the split has a meaningful numeric position.
+
+Keep `isDragged` as visual feedback, not the only communicated state of an adjustable control.
+
+## API reference
+
+<ApiReference name="VerticalDragHandle" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="vertical-drag-handle" />
+
+Material supplies the handle geometry, shape, color, minimum interaction target, and dragged/pressed/focus visuals. Resize semantics, keyboard changes, pointer coordinates, constraints, and pane/layout state remain the owner's web/application responsibilities.
+
+## Related components
+
+- [Adaptive layout](/docs/layout) — pane/scaffold state that may compose a handle.
+- [Surface](/docs/components/surface) — general container primitive.
