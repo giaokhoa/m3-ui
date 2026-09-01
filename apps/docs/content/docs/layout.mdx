@@ -43,7 +43,11 @@ function AppScreen() {
       bottomBar={<AppBottomBar />}
       floatingActionButton={<CreateFab />}
     >
-      <ScreenContent />
+      {(innerPadding) => (
+        <main style={innerPadding.style}>
+          <ScreenContent />
+        </main>
+      )}
     </Scaffold>
   );
 }
@@ -66,15 +70,25 @@ Public layout primitives include:
 ```tsx
 import {
   ListDetailPaneScaffold,
+  ListDetailPaneScaffoldRole,
+  calculatePaneScaffoldDirective,
+  calculateThreePaneScaffoldValueFromDirective,
+  listDetailPaneScaffoldAdaptStrategies,
   useWindowAdaptiveInfo,
 } from '@m3-ui/ui/layout';
 
 function MailLayout() {
   const adaptiveInfo = useWindowAdaptiveInfo();
+  const directive = calculatePaneScaffoldDirective(adaptiveInfo);
+  const value = calculateThreePaneScaffoldValueFromDirective(directive, {
+    adaptStrategies: listDetailPaneScaffoldAdaptStrategies,
+    destinationHistory: [{ pane: ListDetailPaneScaffoldRole.Detail }],
+  });
 
   return (
     <ListDetailPaneScaffold
-      directive={adaptiveInfo.paneScaffoldDirective}
+      directive={directive}
+      value={value}
       listPane={<MessageList />}
       detailPane={<MessageDetail />}
     />
