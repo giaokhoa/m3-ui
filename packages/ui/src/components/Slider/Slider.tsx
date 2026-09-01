@@ -8,6 +8,7 @@ import {
   type SliderThumbRenderProps,
   type SliderTrackRenderProps,
 } from 'react-aria-components';
+import '@m3-ui/tokens/slider.css';
 import { Ripple, useRipple } from '../../internal/ripple';
 import type { SliderRangeValue, SliderSize } from './Slider.types';
 import './slider.css';
