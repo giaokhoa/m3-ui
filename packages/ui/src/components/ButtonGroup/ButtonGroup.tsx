@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/button-group.css';
 import '@m3-ui/tokens/elevation.css';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes, type Key, type ReactNode, type RefObject } from 'react';
 import { Button as AriaButton, Radio as AriaRadio, RadioGroup as AriaRadioGroup, ToggleButton as AriaToggleButton, type ButtonProps as AriaButtonProps, type ToggleButtonProps as AriaToggleButtonProps } from 'react-aria-components';
@@ -8,7 +9,7 @@ import { Button, ElevatedButton, FilledTonalButton, OutlinedButton, TextButton, 
 import { buttonElevationLevels } from '../Button/Button.elevation';
 import { getButtonStyle } from '../Button/Button.runtime';
 import { FilledIconButton } from '../IconButton';
-import { buttonGroupOverflowMenuTokens, buttonGroupStyle, defaultButtonGroupExpandedRatio, distributePressedWidths, visiblePrefixCount, type ButtonGroupSize } from './ButtonGroup.defaults';
+import { buttonGroupOverflowMenuElevation, defaultButtonGroupExpandedRatio, distributePressedWidths, visiblePrefixCount, type ButtonGroupSize } from './ButtonGroup.defaults';
 import './button-group.css';
 
 export type ButtonGroupSelectionMode = 'single' | 'multiple';
@@ -72,7 +73,7 @@ function Overflow({ items, label, size, triggerRef }: { items: readonly ButtonGr
   const focusTrigger = () => triggerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
   useEffect(() => { if (!open) return; const pointer = (e: PointerEvent) => { const n=e.target as Node|null; if (!menuRef.current?.contains(n) && !triggerRef.current?.contains(n)) setOpen(false); }; const key=(e:KeyboardEvent)=>{ if(e.key==='Escape'){e.preventDefault();setOpen(false);focusTrigger();}}; document.addEventListener('pointerdown',pointer);document.addEventListener('keydown',key);return()=>{document.removeEventListener('pointerdown',pointer);document.removeEventListener('keydown',key);}; }, [open]);
   useEffect(() => { if (open) menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')?.focus(); }, [open]);
-  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuTokens.containerElevation} role="menu" ref={menuRef}>{items.map(i=><OverflowItem item={i} key={i.id} onAction={()=>{i.onAction();setOpen(false);focusTrigger();}}/>)}</div>:null}</span>;
+  return <span className="button-group__overflow"><span className="button-group__overflow-trigger" ref={triggerRef}><FilledIconButton aria-expanded={open} aria-haspopup="menu" aria-label={label} size={size} onPress={()=>setOpen(v=>!v)}><MoreIcon/></FilledIconButton></span>{open?<div className="button-group__menu elevation-host" data-elevation={buttonGroupOverflowMenuElevation} role="menu" ref={menuRef}>{items.map(i=><OverflowItem item={i} key={i.id} onAction={()=>{i.onAction();setOpen(false);focusTrigger();}}/>)}</div>:null}</span>;
 }
 
 function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpandedRatio, overflowLabel='More options', className, style, ...props }: StandardButtonGroupProps) {
@@ -83,7 +84,7 @@ function Standard({ items, size='small', expandedRatio=defaultButtonGroupExpande
   useEffect(()=>{const pi=pressed==null?-1:items.findIndex(i=>i.id===pressed);if(pi<0||pi>=visible)setPressed(null);if(focusOverflow.current&&visible<items.length){focusOverflow.current=false;overflowTrigger.current?.querySelector<HTMLButtonElement>('button')?.focus();focused.current=null;}},[items,pressed,visible]);
   const shown=items.slice(0,visible), overflow=items.slice(visible), vm=metrics.slice(0,visible), pi=pressed==null?-1:shown.findIndex(i=>i.id===pressed), ratio=Number.isFinite(expandedRatio)?Math.min(1,Math.max(0,expandedRatio)):defaultButtonGroupExpandedRatio;
   const widths=distributePressedWidths({widths:vm.map(m=>m.width),maxCompression:vm.map((m,i)=>pi<0?0:i<pi?m.end:i>pi?m.start:0),pressedIndex:pi>=0?pi:null,expandedRatio:ratio});
-  return <div {...props} className={cn('button-group','button-group--standard',className)} data-size={size} data-variant="standard" ref={root} role={props.role??'group'} style={{...buttonGroupStyle('standard',size),...style} as CSSProperties}><Measure items={items} size={size} rowRef={measure} overflowRef={overflowMeasure}/><div className="button-group__row">{shown.map((item,i)=><span className="button-group__item" data-item-id={String(item.id)} key={item.id} style={widths[i]!=null?{inlineSize:`${widths[i]}px`}:undefined}><Action item={item} size={size} onBlur={()=>{if(focused.current===item.id)focused.current=null;}} onFocus={()=>{focused.current=item.id;}} onPressStart={()=>setPressed(item.id)} onPressEnd={()=>setPressed(v=>v===item.id?null:v)}/></span>)}{overflow.length?<Overflow items={overflow} label={overflowLabel} size={size} triggerRef={overflowTrigger}/>:null}</div></div>;
+  return <div {...props} className={cn('button-group','button-group--standard',className)} data-size={size} data-variant="standard" ref={root} role={props.role??'group'} style={style}><Measure items={items} size={size} rowRef={measure} overflowRef={overflowMeasure}/><div className="button-group__row">{shown.map((item,i)=><span className="button-group__item" data-item-id={String(item.id)} key={item.id} style={widths[i]!=null?{inlineSize:`${widths[i]}px`}:undefined}><Action item={item} size={size} onBlur={()=>{if(focused.current===item.id)focused.current=null;}} onFocus={()=>{focused.current=item.id;}} onPressStart={()=>setPressed(item.id)} onPressEnd={()=>setPressed(v=>v===item.id?null:v)}/></span>)}{overflow.length?<Overflow items={overflow} label={overflowLabel} size={size} triggerRef={overflowTrigger}/>:null}</div></div>;
 }
 
 interface ConnectedInteractionRenderProps {
@@ -119,7 +120,7 @@ function Connected(props: ConnectedButtonGroupProps) {
   const change=useCallback((id:Key,on:boolean)=>{if(selectionMode==='single'){if(!on)return;if(!singleCtl)setSingle(id);props.onSelectionChange?.(id);}else{const n=new Set(multiValue);on?n.add(id):n.delete(id);if(!multiCtl)setMulti(n);props.onSelectionChange?.(new Set(n));}},[multiCtl,multiValue,props,selectionMode,singleCtl]);
   const html={...rest} as HTMLAttributes<HTMLDivElement>; for(const k of ['selectedKey','defaultSelectedKey','selectedKeys','defaultSelectedKeys','onSelectionChange'] as const) delete (html as Record<string,unknown>)[k];
   const ariaLabel=html['aria-label'], ariaLabelledBy=html['aria-labelledby']; delete html['aria-label']; delete html['aria-labelledby']; const userKey=html.onKeyDown; delete html.onKeyDown;
-  const root=<div {...html} className={cn('button-group','button-group--connected',className)} data-selection-mode={selectionMode} data-size={size} data-variant="connected" role={selectionMode==='multiple'?(html.role??'group'):undefined} style={{...buttonGroupStyle('connected',size),...style} as CSSProperties}/>;
+  const root=<div {...html} className={cn('button-group','button-group--connected',className)} data-selection-mode={selectionMode} data-size={size} data-variant="connected" role={selectionMode==='multiple'?(html.role??'group'):undefined} style={style}/>;
   if(selectionMode==='single'){
     const selectedIndex=items.findIndex(i=>i.id===singleValue);
     return <div {...root.props}><AriaRadioGroup aria-label={ariaLabel} aria-labelledby={ariaLabelledBy} className="button-group__row" orientation="horizontal" value={selectedIndex>=0?String(selectedIndex):''} onChange={value=>{const index=Number(value);const item=items[index];if(item&&!item.isDisabled)change(item.id,true);}}>{items.map((item,i)=><ConnectedItem item={item} index={i} count={items.length} selected={singleValue===item.id} key={item.id} mode="single" size={size} onChange={()=>{}}/>)}</AriaRadioGroup></div>;

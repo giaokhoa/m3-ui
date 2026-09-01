@@ -1,3 +1,4 @@
+import '@m3-ui/tokens/fab-menu.css';
 import clsx from 'clsx';
 import {
   Children,
@@ -17,9 +18,9 @@ import {
 import { FloatingActionButton, type FloatingActionButtonProps } from '../Fab';
 import { Surface } from '../Surface';
 import {
-  fabMenuTokens,
-  getFabMenuStyle,
-  getToggleFabStyle,
+  fabMenuRuntime,
+  getFabMenuRuntimeStyle,
+  getToggleFabOverrideStyle,
   type ToggleFabSize,
 } from './FabMenu.defaults';
 import './fab-menu.css';
@@ -146,7 +147,7 @@ export function FloatingActionButtonMenu({
         data-expanded={expanded ? '' : undefined}
         onKeyDownCapture={handleKeyDownCapture}
         onKeyUpCapture={handleKeyUpCapture}
-        style={{ ...getFabMenuStyle(maxMenuHeight), ...style }}
+        style={{ ...getFabMenuRuntimeStyle(maxMenuHeight), ...style }}
       >
         <div
           ref={actionsRef}
@@ -165,8 +166,8 @@ export function FloatingActionButtonMenu({
                 data-stagger-order={openOrder}
                 style={
                   {
-                    '--_fab-menu-open-delay': `${openOrder * fabMenuTokens.motion.staggerStepMs}ms`,
-                    '--_fab-menu-close-delay': `${closeOrder * fabMenuTokens.motion.staggerStepMs}ms`,
+                    '--_fab-menu-open-delay': `${openOrder * fabMenuRuntime.staggerStepMs}ms`,
+                    '--_fab-menu-close-delay': `${closeOrder * fabMenuRuntime.staggerStepMs}ms`,
                   } as CSSProperties
                 }
               >
@@ -198,8 +199,8 @@ export function FloatingActionButtonMenuItem({
   icon,
   onPress,
   isDisabled = false,
-  containerColor = 'var(--primary-container)',
-  contentColor = 'var(--on-primary-container)',
+  containerColor,
+  contentColor,
   className,
   style,
   tabIndex,
@@ -212,13 +213,13 @@ export function FloatingActionButtonMenuItem({
       {...props}
       aria-hidden={expanded ? undefined : true}
       className={clsx('fab-menu-item', className)}
-      color={containerColor}
-      contentColor={contentColor}
+      color={containerColor ?? 'var(--_fab-menu-item-container-color)'}
+      contentColor={contentColor ?? 'var(--_fab-menu-item-content-color)'}
       data-fab-menu-item=""
       interaction={{ kind: 'clickable', onPress }}
       isDisabled={isDisabled}
-      shadowElevation={fabMenuTokens.listItem.elevation}
-      shape={fabMenuTokens.listItem.shape}
+      shadowElevation={fabMenuRuntime.listItemElevation}
+      shape="var(--_fab-menu-item-shape)"
       style={style}
       tabIndex={expanded ? tabIndex : -1}
     >
@@ -250,7 +251,7 @@ export interface ToggleFloatingActionButtonProps
 
 /**
  * Toggleable FAB whose visual container morphs from the selected FAB size to
- * the 56px close-button geometry while preserving the initial interaction box.
+ * the canonical close-button geometry while preserving the initial interaction box.
  */
 export function ToggleFloatingActionButton({
   checked,
@@ -266,7 +267,7 @@ export function ToggleFloatingActionButton({
   checkedContentColor,
   ...props
 }: ToggleFloatingActionButtonProps) {
-  const toggleStyle = getToggleFabStyle(size, checked, {
+  const toggleStyle = getToggleFabOverrideStyle(checked, {
     containerColor,
     checkedContainerColor,
     contentColor,
@@ -279,6 +280,7 @@ export function ToggleFloatingActionButton({
       aria-pressed={checked}
       className={clsx('fab-menu-toggle', className)}
       data-checked={checked ? '' : undefined}
+      data-toggle-size={size}
       onPress={() => onCheckedChange(!checked)}
       style={{ ...toggleStyle, ...style }}
     >

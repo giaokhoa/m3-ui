@@ -11,10 +11,6 @@ export {
   type StandardButtonGroupProps,
 } from './ButtonGroup';
 export {
-  buttonGroupMotionTokens,
-  buttonGroupOverflowMenuTokens,
-  buttonGroupSizeTokens,
-  connectedButtonGroupSizeTokens,
   defaultButtonGroupExpandedRatio,
   distributePressedWidths,
   visiblePrefixCount,
