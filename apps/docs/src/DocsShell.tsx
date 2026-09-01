@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useState,
   type CSSProperties,
   type ReactNode,
 } from 'react';
@@ -61,11 +62,11 @@ interface DocsTrailItem {
 export interface DocsShellProps {
   title: ReactNode;
   description?: ReactNode;
-  toc?: TOCItemType[];
+  toc?: readonly TOCItemType[];
   children: ReactNode;
 }
 
-const docsNavigation = docsNavigationData as DocsNavigation;
+const docsNavigation = docsNavigationData as unknown as DocsNavigation;
 
 function normalizePath(pathname: string): string {
   const withoutTrailingSlash = pathname.replace(/\/+$/, '');
@@ -182,10 +183,82 @@ function NavLink({
       className="docs-nav__link"
       href={page.url}
       onClick={onNavigate}
+      style={getMaterialTypeCssProperties('labelLarge')}
       title={page.description}
     >
       {overview ? 'Overview' : page.name}
     </a>
+  );
+}
+
+function NavFolder({
+  node,
+  currentPath,
+  onNavigate,
+  depth,
+  index,
+}: {
+  node: DocsNavFolder;
+  currentPath: string;
+  onNavigate?: () => void;
+  depth: number;
+  index: number;
+}) {
+  const activeFolder = nodeContainsPath(node, currentPath);
+  const [open, setOpen] = useState(Boolean(node.defaultOpen || activeFolder));
+
+  useEffect(() => {
+    if (activeFolder) setOpen(true);
+  }, [activeFolder]);
+
+  const body = (
+    <div className="docs-nav__folder-body">
+      {node.index ? (
+        <NavLink
+          currentPath={currentPath}
+          onNavigate={onNavigate}
+          overview={node.index.name === node.name}
+          page={node.index}
+        />
+      ) : null}
+      <NavNodes
+        currentPath={currentPath}
+        depth={depth + 1}
+        nodes={node.children}
+        onNavigate={onNavigate}
+      />
+    </div>
+  );
+
+  if (node.collapsible === false) {
+    return (
+      <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
+        <div
+          className="docs-nav__folder-label"
+          style={getMaterialTypeCssProperties('titleSmall')}
+        >
+          {node.name}
+        </div>
+        {body}
+      </section>
+    );
+  }
+
+  return (
+    <details
+      className="docs-nav__folder"
+      key={`folder-${node.name}-${index}`}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+      open={open}
+    >
+      <summary
+        className="docs-nav__folder-summary"
+        style={getMaterialTypeCssProperties('titleSmall')}
+      >
+        {node.name}
+      </summary>
+      {body}
+    </details>
   );
 }
 
@@ -226,54 +299,15 @@ function NavNodes({
           );
         }
 
-        const activeFolder = nodeContainsPath(node, currentPath);
-        const body = (
-          <div className="docs-nav__folder-body">
-            {node.index ? (
-              <NavLink
-                currentPath={currentPath}
-                onNavigate={onNavigate}
-                overview={node.index.name === node.name}
-                page={node.index}
-              />
-            ) : null}
-            <NavNodes
-              currentPath={currentPath}
-              depth={depth + 1}
-              nodes={node.children}
-              onNavigate={onNavigate}
-            />
-          </div>
-        );
-
-        if (node.collapsible === false) {
-          return (
-            <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
-              <div
-                className="docs-nav__folder-label"
-                style={getMaterialTypeCssProperties('titleSmall')}
-              >
-                {node.name}
-              </div>
-              {body}
-            </section>
-          );
-        }
-
         return (
-          <details
-            className="docs-nav__folder"
-            defaultOpen={node.defaultOpen || activeFolder}
+          <NavFolder
+            currentPath={currentPath}
+            depth={depth}
+            index={index}
             key={`folder-${node.name}-${index}`}
-          >
-            <summary
-              className="docs-nav__folder-summary"
-              style={getMaterialTypeCssProperties('titleSmall')}
-            >
-              {node.name}
-            </summary>
-            {body}
-          </details>
+            node={node}
+            onNavigate={onNavigate}
+          />
         );
       })}
     </>
@@ -321,21 +355,27 @@ function DocsSidebar({
 function Breadcrumbs({ currentPath }: { currentPath: string }) {
   if (currentPath === '/docs') return null;
   const trail = findTrail(docsNavigation.children, currentPath) ?? [];
+  const labelStyle = getMaterialTypeCssProperties('labelMedium');
 
   return (
     <nav aria-label="Breadcrumb" className="docs-breadcrumbs">
       <ol>
         <li>
-          <a href="/docs">Docs</a>
+          <a href="/docs" style={labelStyle}>Docs</a>
         </li>
         {trail.map((item, index) => {
           const current = index === trail.length - 1;
           return (
             <li key={`${item.name}-${index}`}>
               {current || !item.url ? (
-                <span aria-current={current ? 'page' : undefined}>{item.name}</span>
+                <span
+                  aria-current={current ? 'page' : undefined}
+                  style={labelStyle}
+                >
+                  {item.name}
+                </span>
               ) : (
-                <a href={item.url}>{item.name}</a>
+                <a href={item.url} style={labelStyle}>{item.name}</a>
               )}
             </li>
           );
@@ -384,7 +424,7 @@ function PageNavigation({ currentPath }: { currentPath: string }) {
   );
 }
 
-function PageToc({ toc }: { toc: TOCItemType[] }) {
+function PageToc({ toc }: { toc: readonly TOCItemType[] }) {
   if (toc.length === 0) return null;
   return (
     <aside aria-label="On this page" className="docs-toc">
@@ -423,7 +463,7 @@ function Workspace({
   showToc,
   children,
 }: DocsShellProps & { currentPath: string; showToc: boolean }) {
-  const resolvedToc = toc ?? [];
+  const resolvedToc = toc ? [...toc] : [];
   const hasToc = showToc && resolvedToc.length > 0;
 
   return (
