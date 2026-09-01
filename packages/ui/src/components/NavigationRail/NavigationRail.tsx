@@ -17,6 +17,12 @@ export interface NavigationRailProps
   extends Omit<HTMLAttributes<HTMLElement>, 'color'>,
     NavigationRailStyleOptions {
   header?: ReactNode;
+  /**
+   * Controls the semantic wrapper around rail items. The default preserves the
+   * existing tab-style NavigationRailItem contract; route-navigation rails can
+   * opt into native link semantics with `links`.
+   */
+  itemSemantics?: 'tabs' | 'links';
 }
 
 export interface NavigationRailItemProps
@@ -32,6 +38,7 @@ export function NavigationRail({
   containerColor,
   contentColor,
   header,
+  itemSemantics = 'tabs',
   className,
   style,
   children,
@@ -42,6 +49,7 @@ export function NavigationRail({
     ...getNavigationRailStyle({ containerColor, contentColor }),
     ...style,
   } as CSSProperties;
+  const tabSemantics = itemSemantics === 'tabs';
 
   return (
     <nav
@@ -58,10 +66,10 @@ export function NavigationRail({
           </>
         ) : null}
         <div
-          aria-label={ariaLabel}
+          aria-label={tabSemantics ? ariaLabel : undefined}
           className="navigation-rail__items"
-          role="tablist"
-          aria-orientation="vertical"
+          role={tabSemantics ? 'tablist' : undefined}
+          aria-orientation={tabSemantics ? 'vertical' : undefined}
         >
           {children}
         </div>
