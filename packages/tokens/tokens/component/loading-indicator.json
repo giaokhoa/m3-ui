@@ -1,10 +1,10 @@
 {
   "component": {
     "loadingIndicator": {
-      "activeIndicatorColor": { "$type": "string", "$value": "var(--primary)" },
+      "activeIndicatorColor": { "$type": "string", "$value": "{color.role.primary}" },
       "activeSize": { "$type": "dimension", "$value": { "value": 38, "unit": "px" } },
-      "containedActiveColor": { "$type": "string", "$value": "var(--on-primary-container)" },
-      "containedContainerColor": { "$type": "string", "$value": "var(--primary-container)" },
+      "containedActiveColor": { "$type": "string", "$value": "{color.role.onPrimaryContainer}" },
+      "containedContainerColor": { "$type": "string", "$value": "{color.role.primaryContainer}" },
       "containerHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
       "containerShape": { "$type": "string", "$value": "full" },
       "containerWidth": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } }
