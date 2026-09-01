@@ -1,5 +1,9 @@
 import clsx from 'clsx';
 import { Children, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
+import {
+  defaultScaffoldContainerColor,
+  getScaffoldContentColor,
+} from './Scaffold.defaults';
 import './scaffold.css';
 
 export type ScaffoldFabPosition = 'start' | 'center' | 'end' | 'end-overlay';
@@ -54,6 +58,7 @@ export function Scaffold({
   const hasBottomBar = hasScaffoldSlotContent(bottomBar);
   const hasFab = hasScaffoldSlotContent(floatingActionButton);
   const hasSnackbar = hasScaffoldSlotContent(snackbarHost);
+  const resolvedContentColor = getScaffoldContentColor(containerColor, contentColor);
 
   return (
     <div
@@ -65,8 +70,8 @@ export function Scaffold({
       data-has-snackbar={hasSnackbar || undefined}
       data-fab-position={floatingActionButtonPosition}
       style={{
-        '--scaffold-container-color': containerColor,
-        '--scaffold-content-color': contentColor,
+        '--scaffold-container-color': containerColor ?? defaultScaffoldContainerColor,
+        '--scaffold-content-color': resolvedContentColor,
         ...style,
       } as CSSProperties}
     >
