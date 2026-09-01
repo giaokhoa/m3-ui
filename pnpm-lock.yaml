@@ -49,31 +49,6 @@ importers:
         specifier: ^7.0.0
         version: 7.3.6(yaml@2.9.0)
 
-  apps/playground:
-    dependencies:
-      '@m3-ui/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.8
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.8(react@19.2.8)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: ^19.0.0
-        version: 19.2.4(@types/react@19.2.18)
-      '@vitejs/plugin-react':
-        specifier: ^5.0.0
-        version: 5.2.0(vite@7.3.6(yaml@2.9.0))
-      vite:
-        specifier: ^7.0.0
-        version: 7.3.6(yaml@2.9.0)
-
   apps/storybook:
     dependencies:
       '@m3-ui/ui':
