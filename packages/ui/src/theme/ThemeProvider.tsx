@@ -8,7 +8,6 @@ import {
   type HTMLAttributes,
   type PropsWithChildren,
 } from 'react';
-import { createPortal } from 'react-dom';
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
@@ -79,6 +78,10 @@ export function ThemeProvider({
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+  const portalStyle = useMemo<ThemeStyle>(
+    () => ({ ...themeStyle, display: 'contents' }),
+    [themeStyle],
+  );
 
   return (
     <ThemeContext.Provider value={value}>
@@ -91,18 +94,13 @@ export function ThemeProvider({
         <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
-        {typeof document === 'undefined'
-          ? null
-          : createPortal(
-              <div
-                ref={setPortalContainer}
-                data-m3-theme=""
-                data-m3-theme-portal=""
-                data-theme={mode}
-                style={themeStyle}
-              />,
-              document.body,
-            )}
+        <div
+          ref={setPortalContainer}
+          data-m3-theme=""
+          data-m3-theme-portal=""
+          data-theme={mode}
+          style={portalStyle}
+        />
       </ThemePortalContainerContext.Provider>
     </ThemeContext.Provider>
   );
