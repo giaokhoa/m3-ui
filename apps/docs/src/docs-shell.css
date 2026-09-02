@@ -53,6 +53,13 @@
   background: inherit;
 }
 
+/* The app bar already owns site identity on persistent desktop layouts. Keeping
+ * the modal header only avoids a second 72px brand block that pushed the
+ * contextual links far below the global rail destinations. */
+.docs-permanent-drawer .docs-sidebar__header {
+  display: none;
+}
+
 .docs-sidebar__brand {
   display: flex;
   min-inline-size: 0;
