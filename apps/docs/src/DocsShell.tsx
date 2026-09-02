@@ -282,6 +282,7 @@ function NavLink({
       href={page.url}
       onPress={onNavigate}
       selected={normalizePath(page.url) === currentPath}
+      style={normalizePath(page.url) === currentPath ? { "--_navigation-drawer-item-container-color": "var(--secondary-container)" } as any : {}}
       title={page.description}
     >
       {overview ? 'Overview' : page.name}
@@ -502,6 +503,7 @@ function MainMenu({
             key={destination.key}
             onPress={onNavigate}
             selected={normalizePath(destination.page.url) === currentPath}
+            style={normalizePath(destination.page.url) === currentPath ? { "--_navigation-drawer-item-container-color": "var(--secondary-container)" } as any : {}}
           >
             {destination.name}
           </NavigationDrawerLink>
@@ -604,6 +606,11 @@ function GlobalNavigationRail({
           key={destination.key}
           label={destination.name}
           selected={activeDestination?.key === destination.key}
+          style={activeDestination?.key === destination.key ? {
+            '--_navigation-rail-indicator-color': 'var(--secondary-container)',
+            '--_navigation-rail-icon-color': 'var(--on-secondary-container)',
+            '--_navigation-rail-label-color': 'var(--on-secondary-container)',
+          } as any : {}}
         />
       ))}
     </NavigationRail>

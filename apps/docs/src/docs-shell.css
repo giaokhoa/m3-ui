@@ -72,6 +72,7 @@
 
 .docs-nav {
   padding-block: 8px 24px;
+  padding-inline: 12px;
 }
 
 .docs-sidebar__brand:focus-visible,
@@ -84,28 +85,28 @@
 }
 
 .docs-nav__folder {
-  margin-block: 8px;
+  margin-block: 0px;
 }
 
 .docs-nav__folder-label {
   display: flex;
   align-items: center;
-  min-block-size: 48px;
-  padding-inline: 28px;
+  min-block-size: 32px;
+  padding-inline: 16px;
   color: var(--on-surface-variant);
+  font-weight: 700;
 }
 
 .docs-nav__folder-body {
-  padding-block: 4px 8px;
-  padding-inline-start: 0px;
-}
-
-.docs-nav__divider {
-  margin: 16px 28px;
+  padding-block: 0px;
+  padding-inline-start: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
 }
 
 .docs-nav__separator {
-  margin: 16px 28px 8px;
+  margin: 24px 28px 8px;
   color: var(--on-surface-variant);
 }
 
@@ -236,12 +237,4 @@
 .docs-page-navigation__link--next {
   align-items: flex-end;
   text-align: end;
-}
-
-/* M3 Navigation Drawer selected state & folders */
-.navigation-drawer-item[data-selected] {
-  --_navigation-drawer-item-container-color: var(--secondary-container);
-  --_navigation-drawer-item-label-color: var(--on-secondary-container);
-  --_navigation-drawer-item-icon-color: var(--on-secondary-container);
-  font-weight: 700;
 }
