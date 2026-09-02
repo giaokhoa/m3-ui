@@ -1,318 +1,110 @@
 import type { MDXComponents } from 'mdx/types';
-import type {
-  AnchorHTMLAttributes,
-  BlockquoteHTMLAttributes,
-  HTMLAttributes,
-  PropsWithChildren,
-} from 'react';
-import {
-  Button,
-  Dialog,
-  DialogAction,
-  DialogActions,
-  DialogCloseAction,
-  DialogDescription,
-  DialogIcon,
-  DialogOverlay,
-  DialogTitle,
-  DialogTrigger,
-  ElevatedButton,
-  FilledTonalButton,
-  OutlinedButton,
-  OutlinedSecureTextField,
-  OutlinedTextField,
-  SecureTextField,
+import type { ComponentType } from 'react';
+import { NativeSignInFormPreview } from './formDemos';
+import { MdxClientComponent } from './mdx-client';
+import { Surface } from './mdxDirectComponents';
+
+type ClientMdxProps = Record<string, unknown>;
+
+function clientComponent(name: string): ComponentType<ClientMdxProps> {
+  function ClientMdxProxy(props: ClientMdxProps) {
+    return <MdxClientComponent {...props} __mdxComponent={name} />;
+  }
+
+  ClientMdxProxy.displayName = `DocsMdx(${name})`;
+  return ClientMdxProxy;
+}
+
+export const docsMdxComponents = {
+  h1: clientComponent('h1'),
+  h2: clientComponent('h2'),
+  h3: clientComponent('h3'),
+  h4: clientComponent('h4'),
+  p: clientComponent('p'),
+  li: clientComponent('li'),
+  a: clientComponent('a'),
+  code: clientComponent('code'),
+  pre: clientComponent('pre'),
+  blockquote: clientComponent('blockquote'),
+  table: clientComponent('table'),
+  th: clientComponent('th'),
+  td: clientComponent('td'),
+  ComponentPreview: clientComponent('ComponentPreview'),
+  LiveExample: clientComponent('LiveExample'),
+  MaterialParity: clientComponent('MaterialParity'),
+  ParitySummary: clientComponent('ParitySummary'),
+  ApiReference: clientComponent('ApiReference'),
+  MaterialSpecTable: clientComponent('MaterialSpecTable'),
+  ColorRoleGrid: clientComponent('ColorRoleGrid'),
+  DynamicColorPreview: clientComponent('DynamicColorPreview'),
+  TypeScaleSamples: clientComponent('TypeScaleSamples'),
+  CheckboxPreview: clientComponent('CheckboxPreview'),
+  RadioButtonPreview: clientComponent('RadioButtonPreview'),
+  SwitchPreview: clientComponent('SwitchPreview'),
+  SliderPreview: clientComponent('SliderPreview'),
+  CardPreview: clientComponent('CardPreview'),
+  ChipPreview: clientComponent('ChipPreview'),
+  IconButtonPreview: clientComponent('IconButtonPreview'),
+  FabPreview: clientComponent('FabPreview'),
+  Button: clientComponent('Button'),
+  ElevatedButton: clientComponent('ElevatedButton'),
+  FilledTonalButton: clientComponent('FilledTonalButton'),
+  OutlinedButton: clientComponent('OutlinedButton'),
+  TextButton: clientComponent('TextButton'),
+  TextField: clientComponent('TextField'),
+  OutlinedTextField: clientComponent('OutlinedTextField'),
+  SecureTextField: clientComponent('SecureTextField'),
+  OutlinedSecureTextField: clientComponent('OutlinedSecureTextField'),
+  DialogTrigger: clientComponent('DialogTrigger'),
+  DialogOverlay: clientComponent('DialogOverlay'),
+  Dialog: clientComponent('Dialog'),
+  DialogIcon: clientComponent('DialogIcon'),
+  DialogTitle: clientComponent('DialogTitle'),
+  DialogDescription: clientComponent('DialogDescription'),
+  DialogActions: clientComponent('DialogActions'),
+  DialogAction: clientComponent('DialogAction'),
+  DialogCloseAction: clientComponent('DialogCloseAction'),
+  ComponentHero: clientComponent('ComponentHero'),
+  SourceLinks: clientComponent('SourceLinks'),
+  GuidanceCallout: clientComponent('GuidanceCallout'),
+  AnatomyBlock: clientComponent('AnatomyBlock'),
+  FidelitySummary: clientComponent('FidelitySummary'),
+  RelatedComponents: clientComponent('RelatedComponents'),
+  GeneratedApiReferenceSlot: clientComponent('GeneratedApiReferenceSlot'),
+  PageSectionNote: clientComponent('PageSectionNote'),
+  SearchBarPreview: clientComponent('SearchBarPreview'),
+  ProgressIndicatorPreview: clientComponent('ProgressIndicatorPreview'),
+  LoadingIndicatorPreview: clientComponent('LoadingIndicatorPreview'),
+  SnackbarPreview: clientComponent('SnackbarPreview'),
+  TooltipPreview: clientComponent('TooltipPreview'),
+  TabsPreview: clientComponent('TabsPreview'),
+  SegmentedButtonPreview: clientComponent('SegmentedButtonPreview'),
+  SplitButtonPreview: clientComponent('SplitButtonPreview'),
+  ButtonGroupPreview: clientComponent('ButtonGroupPreview'),
+  ListItemPreview: clientComponent('ListItemPreview'),
+  MenuPreview: clientComponent('MenuPreview'),
+  BadgePreview: clientComponent('BadgePreview'),
+  DividerPreview: clientComponent('DividerPreview'),
+  DatePickerPreview: clientComponent('DatePickerPreview'),
+  TimePickerPreview: clientComponent('TimePickerPreview'),
+  BottomSheetPreview: clientComponent('BottomSheetPreview'),
+  CarouselPreview: clientComponent('CarouselPreview'),
+  ModalBottomSheetPreview: clientComponent('ModalBottomSheetPreview'),
+  PullToRefreshPreview: clientComponent('PullToRefreshPreview'),
+  ScrollFieldPreview: clientComponent('ScrollFieldPreview'),
+  SwipeToDismissPreview: clientComponent('SwipeToDismissPreview'),
+  SurfacePreview: clientComponent('SurfacePreview'),
+  ScrimPreview: clientComponent('ScrimPreview'),
+  VerticalDragHandlePreview: clientComponent('VerticalDragHandlePreview'),
+  NonInteractiveScrollbarPreview: clientComponent('NonInteractiveScrollbarPreview'),
+  TopAppBarPreview: clientComponent('TopAppBarPreview'),
+  BottomAppBarPreview: clientComponent('BottomAppBarPreview'),
+  FloatingToolbarPreview: clientComponent('FloatingToolbarPreview'),
+  ToggleButtonPreview: clientComponent('ToggleButtonPreview'),
+  FabMenuPreview: clientComponent('FabMenuPreview'),
+  AppBarOverflowPreview: clientComponent('AppBarOverflowPreview'),
+  ParityCatalog: clientComponent('ParityCatalog'),
+  MaterialFidelity: clientComponent('MaterialFidelity'),
+  NativeSignInFormPreview,
   Surface,
-  TextButton,
-  TextField,
-  getMaterialTypeCssProperties,
-} from '@m3-ui/ui';
-import {
-  CardPreview,
-  ChipPreview,
-  FabPreview,
-  IconButtonPreview,
-} from './actionSurfaceDemos';
-import {
-  allComponentDocs,
-  type AllComponentDocId,
-} from './allComponentDocs';
-import { ApiReference } from './apiReference';
-import type { ComponentDocMetadata } from './componentDocs';
-import {
-  ColorRoleGrid,
-  DynamicColorPreview,
-  TypeScaleSamples,
-} from './foundationDemos';
-import { LiveExample } from './liveExample';
-import { MaterialSpecTable } from './materialSpecTable';
-import {
-  CheckboxPreview,
-  RadioButtonPreview,
-  SliderPreview,
-  SwitchPreview,
-} from './selectionControlDemos';
-
-function Heading1({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h1
-      {...props}
-      className="docs-heading docs-heading--1"
-      style={{ ...getMaterialTypeCssProperties('headlineLarge'), ...style }}
-    />
-  );
-}
-
-function Heading2({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h2
-      {...props}
-      className="docs-heading docs-heading--2"
-      style={{ ...getMaterialTypeCssProperties('headlineMedium'), ...style }}
-    />
-  );
-}
-
-function Heading3({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3
-      {...props}
-      className="docs-heading docs-heading--3"
-      style={{ ...getMaterialTypeCssProperties('headlineSmall'), ...style }}
-    />
-  );
-}
-
-function Heading4({ style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h4
-      {...props}
-      className="docs-heading docs-heading--4"
-      style={{ ...getMaterialTypeCssProperties('titleLarge'), ...style }}
-    />
-  );
-}
-
-function Paragraph({ style, ...props }: HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p
-      {...props}
-      className="docs-paragraph"
-      style={{ ...getMaterialTypeCssProperties('bodyLarge'), ...style }}
-    />
-  );
-}
-
-function ListItem({ style, ...props }: HTMLAttributes<HTMLLIElement>) {
-  return (
-    <li
-      {...props}
-      style={{ ...getMaterialTypeCssProperties('bodyLarge'), ...style }}
-    />
-  );
-}
-
-function Anchor({ style, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return (
-    <a
-      {...props}
-      className="docs-link"
-      style={{ ...getMaterialTypeCssProperties('bodyLarge'), ...style }}
-    />
-  );
-}
-
-function InlineCode({ style, ...props }: HTMLAttributes<HTMLElement>) {
-  return <code {...props} className="docs-inline-code" style={style} />;
-}
-
-function CodeBlock({ style, ...props }: HTMLAttributes<HTMLPreElement>) {
-  return (
-    <Surface
-      className="docs-code-surface"
-      color="var(--surface-container)"
-      contentColor="var(--on-surface)"
-    >
-      <pre
-        {...props}
-        className="docs-code-block"
-        style={{ ...getMaterialTypeCssProperties('bodyMedium'), ...style }}
-      />
-    </Surface>
-  );
-}
-
-function Blockquote({
-  style,
-  ...props
-}: BlockquoteHTMLAttributes<HTMLQuoteElement>) {
-  return (
-    <Surface
-      className="docs-quote-surface"
-      color="var(--secondary-container)"
-      contentColor="var(--on-secondary-container)"
-    >
-      <blockquote
-        {...props}
-        className="docs-blockquote"
-        style={{ ...getMaterialTypeCssProperties('bodyLarge'), ...style }}
-      />
-    </Surface>
-  );
-}
-
-function Table({ style, ...props }: HTMLAttributes<HTMLTableElement>) {
-  return (
-    <div className="docs-table-scroll">
-      <table
-        {...props}
-        className="docs-table"
-        style={{ ...getMaterialTypeCssProperties('bodyMedium'), ...style }}
-      />
-    </div>
-  );
-}
-
-function TableHeader({ style, ...props }: HTMLAttributes<HTMLTableCellElement>) {
-  return (
-    <th
-      {...props}
-      style={{ ...getMaterialTypeCssProperties('titleSmall'), ...style }}
-    />
-  );
-}
-
-function TableCell({ style, ...props }: HTMLAttributes<HTMLTableCellElement>) {
-  return (
-    <td
-      {...props}
-      style={{ ...getMaterialTypeCssProperties('bodyMedium'), ...style }}
-    />
-  );
-}
-
-function ComponentPreview({ children }: PropsWithChildren) {
-  return (
-    <Surface
-      className="docs-preview"
-      color="var(--surface-container-low)"
-      contentColor="var(--on-surface)"
-    >
-      <div className="docs-preview__content">{children}</div>
-    </Surface>
-  );
-}
-
-function MaterialParity({ component }: { component: AllComponentDocId }) {
-  const metadata: ComponentDocMetadata = allComponentDocs[component];
-  const referenceUrl = metadata.referenceUrl ?? metadata.materialUrl;
-
-  return (
-    <Surface
-      className="docs-parity"
-      color="var(--surface-container-low)"
-      contentColor="var(--on-surface)"
-    >
-      <div className="docs-parity__content">
-        <div
-          className="docs-parity__eyebrow"
-          style={getMaterialTypeCssProperties('labelLarge')}
-        >
-          {metadata.contractLabel ?? 'Material contract'}
-        </div>
-        <dl className="docs-parity__list">
-          <div>
-            <dt style={getMaterialTypeCssProperties('labelLarge')}>Family</dt>
-            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
-              {referenceUrl ? (
-                <a className="docs-link" href={referenceUrl}>
-                  {metadata.family}
-                </a>
-              ) : (
-                metadata.family
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt style={getMaterialTypeCssProperties('labelLarge')}>Compose mapping</dt>
-            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
-              {metadata.composeMapping.join(' · ')}
-            </dd>
-          </div>
-          <div>
-            <dt style={getMaterialTypeCssProperties('labelLarge')}>Implementation</dt>
-            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
-              {metadata.implementation}
-            </dd>
-          </div>
-          <div>
-            <dt style={getMaterialTypeCssProperties('labelLarge')}>Web adaptation</dt>
-            <dd style={getMaterialTypeCssProperties('bodyMedium')}>
-              {metadata.webAdaptation}
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </Surface>
-  );
-}
-
-export const materialMdxComponents = {
-  h1: Heading1,
-  h2: Heading2,
-  h3: Heading3,
-  h4: Heading4,
-  p: Paragraph,
-  li: ListItem,
-  a: Anchor,
-  code: InlineCode,
-  pre: CodeBlock,
-  blockquote: Blockquote,
-  table: Table,
-  th: TableHeader,
-  td: TableCell,
-  ComponentPreview,
-  LiveExample,
-  MaterialParity,
-  ParitySummary: MaterialParity,
-  ApiReference,
-  MaterialSpecTable,
-  ColorRoleGrid,
-  DynamicColorPreview,
-  TypeScaleSamples,
-  CheckboxPreview,
-  RadioButtonPreview,
-  SwitchPreview,
-  SliderPreview,
-  CardPreview,
-  ChipPreview,
-  IconButtonPreview,
-  FabPreview,
-  Button,
-  ElevatedButton,
-  FilledTonalButton,
-  OutlinedButton,
-  TextButton,
-  TextField,
-  OutlinedTextField,
-  SecureTextField,
-  OutlinedSecureTextField,
-  DialogTrigger,
-  DialogOverlay,
-  Dialog,
-  DialogIcon,
-  DialogTitle,
-  DialogDescription,
-  DialogActions,
-  DialogAction,
-  DialogCloseAction,
 } satisfies MDXComponents;
-
-export function getMdxComponents(
-  components?: MDXComponents,
-): MDXComponents {
-  return {
-    ...materialMdxComponents,
-    ...components,
-  };
-}

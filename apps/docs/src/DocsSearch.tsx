@@ -1,4 +1,7 @@
+'use client';
+
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { useDocsSearch } from 'fumadocs-core/search/client';
 import { staticClient } from 'fumadocs-core/search/client/orama-static';
 import {
@@ -12,7 +15,7 @@ import {
 import './docs-search.css';
 
 const searchClient = staticClient({
-  from: `${import.meta.env.BASE_URL}search-index.json`,
+  from: '/search-index.json',
 });
 
 function SearchGlyph() {
@@ -90,7 +93,7 @@ export function DocsSearch() {
               const content = plainSearchText(result.content);
 
               return (
-                <a
+                <Link
                   className="docs-search__result-link"
                   href={result.url}
                   key={result.id}
@@ -102,7 +105,7 @@ export function DocsSearch() {
                   >
                     {content}
                   </ListItem>
-                </a>
+                </Link>
               );
             })
           )}

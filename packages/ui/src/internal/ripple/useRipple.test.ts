@@ -20,6 +20,7 @@ const minimumPressDurationMs = msNumber(RippleMinimumPressDuration);
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe('Ripple RAC press integration', () => {
@@ -72,16 +73,14 @@ describe('Ripple RAC press integration', () => {
   });
 
   it('clears pending lifecycle timers during cleanup', () => {
-    vi.useFakeTimers();
-    const callback = vi.fn();
-    const timers = new Set<ReturnType<typeof setTimeout>>();
-    timers.add(setTimeout(callback, 100));
-    timers.add(setTimeout(callback, 200));
+    const clearTimeout = vi.fn();
+    vi.stubGlobal('window', { clearTimeout });
+    const timers = new Set<number>([101, 202]);
 
     clearRippleTimers(timers);
-    vi.runAllTimers();
 
+    expect(clearTimeout).toHaveBeenNthCalledWith(1, 101);
+    expect(clearTimeout).toHaveBeenNthCalledWith(2, 202);
     expect(timers.size).toBe(0);
-    expect(callback).not.toHaveBeenCalled();
   });
 });
