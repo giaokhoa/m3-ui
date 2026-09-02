@@ -89,6 +89,25 @@ test.describe('Material 3 NavigationRail browser contract', () => {
       .toEqual(['rgb(29, 25, 43)', 'rgb(73, 69, 79)']);
   });
 
+  test('supports native route links without tab semantics', async ({ page }) => {
+    await openStory(page, 'components-navigationrail--semantic-links');
+    const rail = page.getByTestId('navigation-rail-links');
+    const home = page.getByTestId('navigation-rail-link-home');
+    const explore = page.getByTestId('navigation-rail-link-explore');
+
+    await expect(rail.getByRole('tablist')).toHaveCount(0);
+    await expect(home).toHaveAttribute('href', '#home');
+    await expect(home).toHaveAttribute('aria-current', 'page');
+    await expect(home).not.toHaveAttribute('role', 'tab');
+    await expect(home).not.toHaveAttribute('aria-selected');
+    await expect(explore).not.toHaveAttribute('aria-current');
+    await expect(home).toHaveRole('link');
+
+    const indicatorBox = await home.locator('.navigation-rail-item__indicator-ripple').boundingBox();
+    expectClose(indicatorBox?.width, 56);
+    expectClose(indicatorBox?.height, 32);
+  });
+
   test('preserves Compose vertical spacing and header spacer geometry', async ({ page }) => {
     await openStory(page, 'components-navigationrail--with-header');
     const header = page.getByTestId('navigation-rail-header');
