@@ -2,7 +2,6 @@ import '@m3-ui/tokens/theme.css';
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type CSSProperties,
@@ -80,14 +79,6 @@ export function ThemeProvider({
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
-  const [portalReady, setPortalReady] = useState(false);
-
-  // A portal cannot be emitted into the server-rendered HTML. Keep the first
-  // client render identical to SSR and attach the themed portal host only
-  // after hydration completes.
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -100,8 +91,9 @@ export function ThemeProvider({
         <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
-        {portalReady && typeof document !== 'undefined'
-          ? createPortal(
+        {typeof document === 'undefined'
+          ? null
+          : createPortal(
               <div
                 ref={setPortalContainer}
                 data-m3-theme=""
@@ -110,8 +102,7 @@ export function ThemeProvider({
                 style={themeStyle}
               />,
               document.body,
-            )
-          : null}
+            )}
       </ThemePortalContainerContext.Provider>
     </ThemeContext.Provider>
   );
