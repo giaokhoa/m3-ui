@@ -118,7 +118,7 @@
   grid-template-columns: minmax(0, 1fr);
   inline-size: min(100%, 1440px);
   min-block-size: 100%;
-  margin-inline: auto;
+  margin-inline: 0 auto;
 }
 
 .docs-workspace[data-has-toc] {
@@ -131,7 +131,7 @@
 
 .docs-main__inner {
   inline-size: min(100%, 84ch);
-  margin-inline: auto;
+  margin-inline: 0;
   padding-block: 32px 80px;
   padding-inline: min(5vw, 40px);
 }
