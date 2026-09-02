@@ -46,7 +46,7 @@ jobs:
           done
           cat /tmp/m3-ui-dev.log
           exit 1
-      - name: Capture screenshots and geometry
+      - name: Capture screenshots and hydration diagnostics
         shell: bash
         run: |
           mkdir -p audit-screenshots
@@ -55,51 +55,47 @@ jobs:
           import fs from 'node:fs/promises';
 
           const browser = await chromium.launch({ headless: true });
-          const cases = [
-            { name: 'button-1440', url: 'http://127.0.0.1:4173/docs/components/button', width: 1440, height: 1000 },
-            { name: 'button-1920', url: 'http://127.0.0.1:4173/docs/components/button', width: 1920, height: 1080 },
-            { name: 'color-1440', url: 'http://127.0.0.1:4173/docs/foundations/color', width: 1440, height: 1000 },
-          ];
-          const report = [];
-          for (const c of cases) {
-            const page = await browser.newPage({ viewport: { width: c.width, height: c.height }, colorScheme: 'light' });
-            const consoleErrors = [];
-            page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
-            page.on('pageerror', (err) => consoleErrors.push(`pageerror: ${err.message}`));
-            await page.goto(c.url, { waitUntil: 'networkidle' });
-            await page.waitForTimeout(800);
-            const geometry = await page.evaluate(() => {
-              const box = (selector) => {
-                const el = document.querySelector(selector);
-                if (!el) return null;
-                const r = el.getBoundingClientRect();
-                const s = getComputedStyle(el);
-                return {
-                  selector,
-                  x: r.x, y: r.y, width: r.width, height: r.height,
-                  borderInlineEnd: s.borderInlineEnd,
-                  background: s.backgroundColor,
-                };
-              };
-              const selected = [...document.querySelectorAll('[aria-current="page"]')].map((el) => {
-                const r = el.getBoundingClientRect();
-                return { text: el.textContent?.trim(), x: r.x, y: r.y, width: r.width, height: r.height, className: el.className };
-              });
-              return {
-                rail: box('.docs-global-rail'),
-                drawer: box('.docs-permanent-drawer'),
-                stage: box('.docs-navigation-stage'),
-                content: box('.docs-content'),
-                selected,
-                bodyScrollWidth: document.body.scrollWidth,
-                viewportWidth: innerWidth,
-              };
-            });
-            await page.screenshot({ path: `../../audit-screenshots/${c.name}.png`, fullPage: false });
-            report.push({ ...c, geometry, consoleErrors });
-            await page.close();
-          }
-          await fs.writeFile('../../audit-screenshots/layout.json', JSON.stringify(report, null, 2));
+          const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, colorScheme: 'light' });
+          const consoleErrors = [];
+          const failedResponses = [];
+          page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+          page.on('pageerror', (err) => consoleErrors.push(`pageerror: ${err.message}`));
+          page.on('response', (response) => {
+            if (response.status() >= 400) failedResponses.push({ status: response.status(), url: response.url() });
+          });
+
+          const inspect = async (label) => page.evaluate((label) => {
+            const box = (selector) => {
+              const el = document.querySelector(selector);
+              if (!el) return null;
+              const r = el.getBoundingClientRect();
+              const s = getComputedStyle(el);
+              return { selector, x: r.x, y: r.y, width: r.width, height: r.height, display: s.display, borderInlineEnd: s.borderInlineEnd };
+            };
+            return {
+              label,
+              innerWidth: window.innerWidth,
+              rootClientWidth: document.documentElement.clientWidth,
+              rail: box('.docs-global-rail'),
+              drawer: box('.docs-permanent-drawer'),
+              multiPane: box('.docs-multi-pane'),
+              stage: box('.docs-navigation-stage'),
+              bodyTextStart: document.body.innerText.slice(0, 160),
+              scripts: [...document.scripts].map((s) => s.src).filter(Boolean),
+            };
+          }, label);
+
+          await page.goto('http://127.0.0.1:4173/docs/components/button', { waitUntil: 'networkidle' });
+          await page.waitForTimeout(1000);
+          const before = await inspect('before-resize');
+          await page.screenshot({ path: '../../audit-screenshots/button-1920-before.png', fullPage: false });
+
+          await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+          await page.waitForTimeout(500);
+          const after = await inspect('after-resize');
+          await page.screenshot({ path: '../../audit-screenshots/button-1920-after-resize.png', fullPage: false });
+
+          await fs.writeFile('../../audit-screenshots/diagnostics.json', JSON.stringify({ before, after, consoleErrors, failedResponses }, null, 2));
           await browser.close();
           EOF
       - name: Upload audit screenshots
