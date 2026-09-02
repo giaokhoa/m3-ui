@@ -31,15 +31,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          setsid pnpm --filter @m3-ui/docs dev > /tmp/m3-ui-docs.log 2>&1 &
-          echo $! > /tmp/m3-ui-docs.pid
+          setsid pnpm dev > /tmp/m3-ui-dev.log 2>&1 &
+          dev_pid=$!
+          echo "$dev_pid" > /tmp/m3-ui-dev.pid
           for _ in {1..90}; do
             if curl --fail --silent http://127.0.0.1:4173/docs/components/button >/dev/null; then
               exit 0
             fi
+            if ! kill -0 "$dev_pid" 2>/dev/null; then
+              cat /tmp/m3-ui-dev.log
+              exit 1
+            fi
             sleep 2
           done
-          cat /tmp/m3-ui-docs.log
+          cat /tmp/m3-ui-dev.log
           exit 1
       - name: Capture screenshots and geometry
         shell: bash
@@ -108,7 +113,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          if [ -f /tmp/m3-ui-docs.pid ]; then
-            pid=$(cat /tmp/m3-ui-docs.pid)
+          if [ -f /tmp/m3-ui-dev.pid ]; then
+            pid=$(cat /tmp/m3-ui-dev.pid)
             pkill -TERM -s "$pid" 2>/dev/null || true
           fi
