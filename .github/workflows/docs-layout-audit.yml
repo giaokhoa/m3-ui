@@ -1,0 +1,114 @@
+name: Docs layout audit
+
+on:
+  push:
+    branches: [audit/docs-layout-screenshot]
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
+      - name: Start docs
+        shell: bash
+        run: |
+          set -euo pipefail
+          setsid pnpm --filter @m3-ui/docs dev > /tmp/m3-ui-docs.log 2>&1 &
+          echo $! > /tmp/m3-ui-docs.pid
+          for _ in {1..90}; do
+            if curl --fail --silent http://127.0.0.1:4173/docs/components/button >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/m3-ui-docs.log
+          exit 1
+      - name: Capture screenshots and geometry
+        shell: bash
+        run: |
+          mkdir -p audit-screenshots
+          pnpm --filter @m3-ui/storybook exec node --input-type=module <<'EOF'
+          import { chromium } from '@playwright/test';
+          import fs from 'node:fs/promises';
+
+          const browser = await chromium.launch({ headless: true });
+          const cases = [
+            { name: 'button-1440', url: 'http://127.0.0.1:4173/docs/components/button', width: 1440, height: 1000 },
+            { name: 'button-1920', url: 'http://127.0.0.1:4173/docs/components/button', width: 1920, height: 1080 },
+            { name: 'color-1440', url: 'http://127.0.0.1:4173/docs/foundations/color', width: 1440, height: 1000 },
+          ];
+          const report = [];
+          for (const c of cases) {
+            const page = await browser.newPage({ viewport: { width: c.width, height: c.height }, colorScheme: 'light' });
+            const consoleErrors = [];
+            page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+            page.on('pageerror', (err) => consoleErrors.push(`pageerror: ${err.message}`));
+            await page.goto(c.url, { waitUntil: 'networkidle' });
+            await page.waitForTimeout(800);
+            const geometry = await page.evaluate(() => {
+              const box = (selector) => {
+                const el = document.querySelector(selector);
+                if (!el) return null;
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return {
+                  selector,
+                  x: r.x, y: r.y, width: r.width, height: r.height,
+                  borderInlineEnd: s.borderInlineEnd,
+                  background: s.backgroundColor,
+                };
+              };
+              const selected = [...document.querySelectorAll('[aria-current="page"]')].map((el) => {
+                const r = el.getBoundingClientRect();
+                return { text: el.textContent?.trim(), x: r.x, y: r.y, width: r.width, height: r.height, className: el.className };
+              });
+              return {
+                rail: box('.docs-global-rail'),
+                drawer: box('.docs-permanent-drawer'),
+                stage: box('.docs-navigation-stage'),
+                content: box('.docs-content'),
+                selected,
+                bodyScrollWidth: document.body.scrollWidth,
+                viewportWidth: innerWidth,
+              };
+            });
+            await page.screenshot({ path: `../../audit-screenshots/${c.name}.png`, fullPage: false });
+            report.push({ ...c, geometry, consoleErrors });
+            await page.close();
+          }
+          await fs.writeFile('../../audit-screenshots/layout.json', JSON.stringify(report, null, 2));
+          await browser.close();
+          EOF
+      - name: Upload audit screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-layout-audit
+          path: audit-screenshots
+          if-no-files-found: error
+          retention-days: 1
+      - name: Stop docs
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/m3-ui-docs.pid ]; then
+            pid=$(cat /tmp/m3-ui-docs.pid)
+            pkill -TERM -s "$pid" 2>/dev/null || true
+          fi
