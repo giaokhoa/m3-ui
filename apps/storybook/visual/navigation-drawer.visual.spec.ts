@@ -44,6 +44,23 @@ test.describe('Material 3 NavigationDrawer browser contract', () => {
     await expect(selected).toHaveAttribute('aria-selected', 'true');
   });
 
+  test('drawer actions keep canonical geometry with native disclosure semantics', async ({ page }) => {
+    await openStory(page, 'components-navigationdrawer--action');
+    const action = page.getByTestId('drawer-action-disclosure');
+    const box = await action.boundingBox();
+
+    expectClose(box?.width, 336);
+    expectClose(box?.height, 56);
+    await expect(action).toHaveRole('button');
+    await expect(action).toHaveAttribute('aria-expanded', 'false');
+    await expect(action).not.toHaveAttribute('aria-selected');
+    await expect(page.getByTestId('drawer-action-panel')).toHaveCount(0);
+
+    await action.click();
+    await expect(action).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByTestId('drawer-action-panel')).toBeVisible();
+  });
+
   test('selection uses the real RAC press path and updates inactive colors', async ({ page }) => {
     await openStory(page, 'components-navigationdrawer--permanent');
     const home = page.getByTestId('drawer-item-home');

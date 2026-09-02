@@ -1,6 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { NavigationRail, NavigationRailItem, ThemeProvider } from '@m3-ui/ui';
+import {
+  NavigationRail,
+  NavigationRailItem,
+  NavigationRailLink,
+  ThemeProvider,
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/NavigationRail',
@@ -77,6 +82,43 @@ export const Default: Story = { render: () => <RailDemo /> };
 export const SelectedLabelOnly: Story = { render: () => <RailDemo alwaysShowLabel={false} /> };
 export const IconOnly: Story = { render: () => <RailDemo iconOnly /> };
 export const WithHeader: Story = { render: () => <RailDemo withHeader /> };
+
+export const SemanticLinks: Story = {
+  render: () => (
+    <div style={{ display: 'flex', minHeight: 420, height: '100vh', background: 'var(--surface)' }}>
+      <NavigationRail
+        aria-label="Documentation sections"
+        data-testid="navigation-rail-links"
+        itemSemantics="links"
+      >
+        <NavigationRailLink
+          data-testid="navigation-rail-link-home"
+          href="#home"
+          icon={homeIcon}
+          label="Home"
+          selected
+        />
+        <NavigationRailLink
+          data-testid="navigation-rail-link-explore"
+          href="#explore"
+          icon={exploreIcon}
+          label="Explore"
+          selected={false}
+        />
+        <NavigationRailLink
+          data-testid="navigation-rail-link-favorites"
+          href="#favorites"
+          icon={favoriteIcon}
+          label="Favorites"
+          selected={false}
+        />
+      </NavigationRail>
+      <main style={{ flex: 1, padding: 32, color: 'var(--on-surface)' }}>
+        <h1 style={{ marginTop: 0 }}>Route navigation rail</h1>
+      </main>
+    </div>
+  ),
+};
 
 export const Disabled: Story = {
   render: () => (

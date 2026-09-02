@@ -22,20 +22,24 @@ The visible product surface is owned by `m3-ui`:
 
 The public docs render as a documentation product rather than a centered MDX demo host.
 
-`DocsShell` owns the persistent shell:
+`DocsShell` separates global destinations from contextual navigation instead of flattening the full documentation tree into one drawer:
 
 - Material `Scaffold` owns the screen coordinate space, safe-area handling, and `TopAppBar` slot;
-- compact and medium Material width classes use `ModalNavigationDrawer` with an app-bar navigation action;
-- expanded, large, and extra-large Material width classes use a permanent `PermanentDrawerSheet` sidebar;
-- large and extra-large classes additionally show the current page TOC as a supporting documentation column;
+- compact and medium Material width classes use `ModalNavigationDrawer` as a two-level hierarchy: the main menu selects a top-level section, then the section view exposes only that section subtree with a semantic `Main menu` back action;
+- expanded uses a persistent global `NavigationRail` while contextual section navigation remains modal so the article retains useful reading width;
+- large and extra-large use the global rail plus a persistent contextual `PermanentDrawerSheet` when the active top-level destination is a folder;
+- top-level leaf destinations navigate directly and do not create an empty contextual pane;
+- extra-large additionally shows the current page TOC as an independent supporting documentation column;
 - the article remains a bounded readable column inside the remaining workspace;
-- breadcrumb and previous/next navigation are derived from the same page tree as the sidebar.
+- breadcrumb and previous/next navigation are derived from the same page tree as both navigation layers.
 
 The app consumes `useWindowAdaptiveInfo()` from `@m3-ui/ui/layout`. It must not copy the Material window thresholds into CSS or JavaScript. The named Material classes may be mapped to docs-specific composition decisions, but their breakpoint values stay owned by the canonical layout subsystem.
 
-Sidebar ordering and grouping are source data, not JSX inventory. `content/docs/**/meta.json` configures the Fumadocs page tree. `scripts/build-docs-data.mjs` loads the shared Fumadocs source, normalizes runtime-safe text fields, and writes `src/generated/docs-navigation.json` before dev/build/typecheck. The generated JSON is imported by the Next.js docs shell, so the first rendered frame already contains navigation.
+Navigation ordering and grouping are source data, not JSX inventory. `content/docs/**/meta.json` configures the Fumadocs page tree. `scripts/build-docs-data.mjs` loads the shared Fumadocs source, normalizes runtime-safe text fields, and writes `src/generated/docs-navigation.json` before dev/build/typecheck. The generated JSON is imported by the Next.js docs shell, so the first rendered frame already contains navigation.
 
-Documentation navigation uses semantic links. Do not force `NavigationDrawerItem` into this surface merely for its visual treatment: that component intentionally exposes tab-style selection semantics, while document navigation is a hierarchy of links.
+Route navigation uses semantic links. `NavigationRailLink` and `NavigationDrawerLink` preserve the canonical Material rail/drawer visual contracts while exposing native link semantics and `aria-current`. Drawer hierarchy actions such as drill-in and back use `NavigationDrawerButton`. Do not force `NavigationRailItem` or `NavigationDrawerItem` into document navigation merely for visual treatment: those item components intentionally expose tab-style selection semantics.
+
+Rail and drawer geometry, shape, colors, typography, ripple and interaction state layers remain owned by `@m3-ui/ui` defaults and generated Material tokens. Docs CSS only composes the rail, contextual navigation stage, article workspace, and TOC; it must not restyle canonical navigation items.
 
 The page TOC comes from each MDX page's generated `toc` and Fumadocs `AnchorProvider`/`TOCItem`. Do not parse headings in the browser or maintain a second TOC list manually.
 

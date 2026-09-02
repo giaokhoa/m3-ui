@@ -1,7 +1,8 @@
 .docs-scaffold,
 .docs-scaffold__body,
 .docs-permanent-drawer,
-.docs-modal-drawer {
+.docs-modal-drawer,
+.docs-navigation-stage {
   min-inline-size: 0;
   min-block-size: 0;
   block-size: 100%;
@@ -9,6 +10,21 @@
 
 .docs-scaffold__body {
   box-sizing: border-box;
+}
+
+.docs-multi-pane {
+  display: flex;
+  min-inline-size: 0;
+  min-block-size: 0;
+  block-size: 100%;
+}
+
+.docs-global-rail {
+  flex: 0 0 auto;
+}
+
+.docs-navigation-stage {
+  flex: 1 1 auto;
 }
 
 .docs-app-bar__brand,
@@ -62,7 +78,6 @@
   margin-block: 8px;
 }
 
-.docs-nav__folder-summary,
 .docs-nav__folder-label {
   display: flex;
   align-items: center;
@@ -71,23 +86,9 @@
   color: var(--on-surface-variant);
 }
 
-.docs-nav__folder-summary {
-  cursor: pointer;
-  list-style: none;
-}
-
-.docs-nav__folder-summary::-webkit-details-marker {
-  display: none;
-}
-
-.docs-nav__folder-summary::after {
-  content: '›';
-  margin-inline-start: auto;
-  transform: rotate(90deg);
-}
-
-.docs-nav__folder:not([open]) > .docs-nav__folder-summary::after {
-  transform: rotate(0deg);
+.docs-nav__folder-body {
+  padding-block: 4px 8px;
+  padding-inline-start: 8px;
 }
 
 .docs-nav__separator {

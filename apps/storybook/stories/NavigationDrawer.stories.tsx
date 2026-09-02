@@ -6,6 +6,7 @@ import {
   DrawerValue,
   ModalDrawerSheet,
   ModalNavigationDrawer,
+  NavigationDrawerButton,
   NavigationDrawerItem,
   PermanentDrawerSheet,
   PermanentNavigationDrawer,
@@ -54,6 +55,33 @@ function DrawerDemo() {
 }
 
 export const Permanent: Story = { render: () => <DrawerDemo /> };
+
+function ActionDemo() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={{ height: 420, background: 'var(--surface)' }}>
+      <PermanentNavigationDrawer
+        drawerContent={
+          <PermanentDrawerSheet>
+            <NavigationDrawerButton
+              aria-expanded={expanded}
+              badge={expanded ? '−' : '+'}
+              data-testid="drawer-action-disclosure"
+              onPress={() => setExpanded((value) => !value)}
+            >
+              Components
+            </NavigationDrawerButton>
+            {expanded ? <div data-testid="drawer-action-panel" style={{ padding: '8px 28px' }}>Buttons, cards, navigation</div> : null}
+          </PermanentDrawerSheet>
+        }
+      >
+        <main style={{ padding: 32, color: 'var(--on-surface)' }}>Drawer action semantics</main>
+      </PermanentNavigationDrawer>
+    </div>
+  );
+}
+
+export const Action: Story = { render: () => <ActionDemo /> };
 
 function ModalDemo() {
   const drawerState = useDrawerState();
