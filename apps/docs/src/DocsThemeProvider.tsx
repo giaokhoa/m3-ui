@@ -23,13 +23,6 @@ const storageKey = 'm3-ui-docs-theme';
 const preferences: readonly DocsThemePreference[] = ['system', 'light', 'dark'];
 const DocsThemeContext = createContext<DocsThemeContextValue | null>(null);
 
-function systemMode(): ThemeMode {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-}
-
 function storedPreference(): DocsThemePreference {
   if (typeof window === 'undefined') return 'system';
   const value = window.localStorage.getItem(storageKey);
@@ -40,9 +33,10 @@ function storedPreference(): DocsThemePreference {
 
 export function DocsThemeProvider({ children }: PropsWithChildren) {
   const [preference, setPreference] = useState<DocsThemePreference>('system');
-  const [preferredSystemMode, setPreferredSystemMode] = useState<ThemeMode>(
-    systemMode,
-  );
+  // Keep the server and the first client render identical. Browser-only theme
+  // sources are applied after hydration so ThemeProvider never hydrates from a
+  // different mode than the server rendered.
+  const [preferredSystemMode, setPreferredSystemMode] = useState<ThemeMode>('light');
 
   useEffect(() => {
     setPreference(storedPreference());

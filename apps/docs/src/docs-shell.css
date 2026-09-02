@@ -14,6 +14,7 @@
 
 .docs-multi-pane {
   display: flex;
+  gap: 0;
   min-inline-size: 0;
   min-block-size: 0;
   block-size: 100%;
@@ -21,6 +22,7 @@
 
 .docs-global-rail {
   flex: 0 0 auto;
+  border-inline-end: 1px solid var(--outline-variant);
 }
 
 .docs-navigation-stage {
@@ -49,6 +51,13 @@
   min-block-size: 72px;
   padding: 12px 16px 12px 24px;
   background: inherit;
+}
+
+/* The app bar already owns site identity on persistent desktop layouts. Keeping
+ * the modal header only avoids a second 72px brand block that pushed the
+ * contextual links far below the global rail destinations. */
+.docs-permanent-drawer .docs-sidebar__header {
+  display: none;
 }
 
 .docs-sidebar__brand {
