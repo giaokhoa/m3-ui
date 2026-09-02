@@ -100,8 +100,12 @@
   padding-inline-start: 8px;
 }
 
+.docs-nav__divider {
+  margin: 16px 28px;
+}
+
 .docs-nav__separator {
-  margin: 24px 28px 8px;
+  margin: 16px 28px 8px;
   color: var(--on-surface-variant);
 }
 

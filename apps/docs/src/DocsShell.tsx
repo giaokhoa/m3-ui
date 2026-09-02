@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  HorizontalDivider,
   IconButton,
   ModalDrawerSheet,
   ModalNavigationDrawer,
@@ -370,15 +371,19 @@ function NavNodes({
     <>
       {nodes.map((node, index) => {
         if (node.type === 'separator') {
-          return node.name ? (
-            <div
-              className="docs-nav__separator"
-              key={`separator-${depth}-${node.name}-${index}`}
-              style={getMaterialTypeCssProperties('titleSmall')}
-            >
-              {node.name}
+          return (
+            <div key={`separator-${depth}-${node.name}-${index}`}>
+              <HorizontalDivider className="docs-nav__divider" />
+              {node.name ? (
+                <div
+                  className="docs-nav__separator"
+                  style={getMaterialTypeCssProperties('titleSmall')}
+                >
+                  {node.name}
+                </div>
+              ) : null}
             </div>
-          ) : null;
+          );
         }
 
         if (node.type === 'page') {
