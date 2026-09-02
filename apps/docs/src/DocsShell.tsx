@@ -330,7 +330,7 @@ function NavFolder({
 
   if (node.collapsible === false) {
     return (
-      <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
+      <div className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
         <div
           className="docs-nav__folder-label"
           style={getMaterialTypeCssProperties('titleSmall')}
@@ -338,12 +338,12 @@ function NavFolder({
           {node.name}
         </div>
         {body}
-      </section>
+      </div>
     );
   }
 
   return (
-    <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
+    <div className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
       <NavigationDrawerButton
         aria-expanded={open}
         badge={<ChevronGlyph open={open} />}
@@ -352,7 +352,7 @@ function NavFolder({
         {node.name}
       </NavigationDrawerButton>
       {open ? body : null}
-    </section>
+    </div>
   );
 }
 
