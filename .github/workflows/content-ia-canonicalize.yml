@@ -1,0 +1,38 @@
+name: Canonicalize docs IA links
+
+on:
+  push:
+    branches:
+      - refactor/docs-content-ia
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Replace legacy docs routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          find apps/docs/content/docs -name '*.mdx' -print0 | xargs -0 sed -i \
+            -e 's#/docs/theming#/docs/foundations/theming#g' \
+            -e 's#/docs/forms#/docs/develop/forms#g' \
+            -e 's#/docs/layout#/docs/develop/layout#g' \
+            -e 's#/docs/accessibility#/docs/develop/accessibility#g' \
+            -e 's#/docs/parity#/docs/reference/parity#g'
+      - name: Commit canonical links and remove this workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/content-ia-canonicalize.yml
+          git add apps/docs/content/docs
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs: canonicalize links for role-based IA'
+          git push origin HEAD:${{ github.ref_name }}
