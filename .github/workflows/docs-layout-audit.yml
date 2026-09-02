@@ -85,7 +85,7 @@ jobs:
             };
           }, label);
 
-          await page.goto('http://127.0.0.1:4173/docs/components/button', { waitUntil: 'networkidle' });
+          await page.goto('http://localhost:4173/docs/components/button', { waitUntil: 'networkidle' });
           await page.waitForTimeout(1000);
           const before = await inspect('before-resize');
           await page.screenshot({ path: '../../audit-screenshots/button-1920-before.png', fullPage: false });
