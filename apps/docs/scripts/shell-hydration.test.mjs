@@ -29,12 +29,17 @@ test('docs theme starts from a deterministic hydration snapshot', async () => {
   );
 });
 
-test('desktop navigation panes meet at a semantic divider', async () => {
+test('desktop navigation panes align at a semantic divider', async () => {
   const css = await source('src/docs-shell.css');
 
   assert.match(css, /\.docs-multi-pane\s*\{[^}]*gap:\s*0;/s);
   assert.match(
     css,
     /\.docs-global-rail\s*\{[^}]*border-inline-end:\s*1px solid var\(--outline-variant\);/s,
+  );
+  assert.match(
+    css,
+    /\.docs-permanent-drawer \.docs-sidebar__header\s*\{[^}]*display:\s*none;/s,
+    'persistent contextual navigation must not keep the duplicate modal brand header',
   );
 });
