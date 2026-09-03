@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  HorizontalDivider,
   IconButton,
   ModalDrawerSheet,
   ModalNavigationDrawer,
@@ -281,6 +282,7 @@ function NavLink({
       href={page.url}
       onPress={onNavigate}
       selected={normalizePath(page.url) === currentPath}
+      style={normalizePath(page.url) === currentPath ? { "--_navigation-drawer-item-container-color": "var(--secondary-container)" } as any : {}}
       title={page.description}
     >
       {overview ? 'Overview' : page.name}
@@ -329,7 +331,7 @@ function NavFolder({
 
   if (node.collapsible === false) {
     return (
-      <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
+      <div className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
         <div
           className="docs-nav__folder-label"
           style={getMaterialTypeCssProperties('titleSmall')}
@@ -337,12 +339,12 @@ function NavFolder({
           {node.name}
         </div>
         {body}
-      </section>
+      </div>
     );
   }
 
   return (
-    <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
+    <div className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
       <NavigationDrawerButton
         aria-expanded={open}
         badge={<ChevronGlyph open={open} />}
@@ -351,7 +353,7 @@ function NavFolder({
         {node.name}
       </NavigationDrawerButton>
       {open ? body : null}
-    </section>
+    </div>
   );
 }
 
@@ -370,15 +372,19 @@ function NavNodes({
     <>
       {nodes.map((node, index) => {
         if (node.type === 'separator') {
-          return node.name ? (
-            <div
-              className="docs-nav__separator"
-              key={`separator-${depth}-${node.name}-${index}`}
-              style={getMaterialTypeCssProperties('titleSmall')}
-            >
-              {node.name}
+          return (
+            <div key={`separator-${depth}-${node.name}-${index}`}>
+              <HorizontalDivider className="docs-nav__divider" />
+              {node.name ? (
+                <div
+                  className="docs-nav__separator"
+                  style={getMaterialTypeCssProperties('titleSmall')}
+                >
+                  {node.name}
+                </div>
+              ) : null}
             </div>
-          ) : null;
+          );
         }
 
         if (node.type === 'page') {
@@ -497,6 +503,7 @@ function MainMenu({
             key={destination.key}
             onPress={onNavigate}
             selected={normalizePath(destination.page.url) === currentPath}
+            style={normalizePath(destination.page.url) === currentPath ? { "--_navigation-drawer-item-container-color": "var(--secondary-container)" } as any : {}}
           >
             {destination.name}
           </NavigationDrawerLink>
@@ -599,6 +606,11 @@ function GlobalNavigationRail({
           key={destination.key}
           label={destination.name}
           selected={activeDestination?.key === destination.key}
+          style={activeDestination?.key === destination.key ? {
+            '--_navigation-rail-indicator-color': 'var(--secondary-container)',
+            '--_navigation-rail-icon-color': 'var(--on-secondary-container)',
+            '--_navigation-rail-label-color': 'var(--on-secondary-container)',
+          } as any : {}}
         />
       ))}
     </NavigationRail>

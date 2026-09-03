@@ -2,6 +2,7 @@ import '@m3-ui/tokens/theme.css';
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type CSSProperties,
@@ -79,6 +80,11 @@ export function ThemeProvider({
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -91,7 +97,7 @@ export function ThemeProvider({
         <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
-        {typeof document === 'undefined'
+        {!mounted || typeof document === 'undefined'
           ? null
           : createPortal(
               <div
