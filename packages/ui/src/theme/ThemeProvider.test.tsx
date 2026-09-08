@@ -1,8 +1,22 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from './ThemeProvider';
 
 describe('ThemeProvider ownership boundary', () => {
+  it('keeps the initial tree identical with and without a browser portal host', () => {
+    const content = <ThemeProvider mode="dark"><span>content</span></ThemeProvider>;
+    const serverMarkup = renderToStaticMarkup(content);
+
+    // A portal must wait for an effect, even when document.body is already
+    // available. Rendering it on the initial client pass breaks hydration.
+    vi.stubGlobal('document', { body: { nodeType: 1 } });
+    try {
+      expect(renderToStaticMarkup(content)).toBe(serverMarkup);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('uses generated CSS for the static baseline instead of inline role serialization', () => {
     const markup = renderToStaticMarkup(
       <ThemeProvider mode="light">

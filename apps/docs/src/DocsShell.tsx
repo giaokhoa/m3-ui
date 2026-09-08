@@ -7,6 +7,7 @@ import {
   useId,
   useMemo,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from 'react';
@@ -838,6 +839,7 @@ function Workspace({
 
 export function DocsShell({ title, description, toc, children }: DocsShellProps) {
   const drawerState = useDrawerState();
+  useSyncExternalStore(drawerState.subscribe, drawerState.getSnapshot, drawerState.getSnapshot);
   const { windowSizeClass } = useWindowAdaptiveInfo();
   const currentPath = normalizePath(usePathname());
   const widthClass = windowSizeClass.width;
@@ -880,7 +882,11 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
   const appBar = (
     <TopAppBar
       navigationIcon={
-        <IconButton aria-label="Open navigation" onPress={openNavigation}>
+        <IconButton
+          aria-expanded={drawerState.isOpen}
+          aria-label="Open navigation"
+          onPress={openNavigation}
+        >
           <MenuGlyph />
         </IconButton>
       }
