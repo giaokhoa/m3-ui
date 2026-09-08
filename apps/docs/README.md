@@ -24,14 +24,17 @@ The public docs render as a documentation product rather than a centered MDX dem
 
 `DocsShell` separates global destinations from contextual navigation instead of flattening the full documentation tree into one drawer:
 
-- Material `Scaffold` owns the screen coordinate space, safe-area handling, and `TopAppBar` slot;
+- Material `Scaffold` owns the screen coordinate space and safe-area handling; its `TopAppBar` is used on compact and medium widths;
 - compact and medium Material width classes use `ModalNavigationDrawer` as a two-level hierarchy: the main menu selects a top-level section, then the section view exposes only that section subtree with a semantic `Main menu` back action;
-- expanded uses a persistent global `NavigationRail` while contextual section navigation remains modal so the article retains useful reading width;
+- expanded and wider use a full-height global `NavigationRail`, following the navigation composition of [the Material 3 site](https://m3.material.io/): search sits above the destinations, each section has its own icon, and the theme action stays at the bottom;
+- expanded keeps contextual section navigation modal so the article retains useful reading width; the active section's menu action is available beneath search in the rail;
 - large and extra-large use the global rail plus a persistent contextual `PermanentDrawerSheet` when the active top-level destination is a folder;
 - top-level leaf destinations navigate directly and do not create an empty contextual pane;
 - extra-large additionally shows the current page TOC as an independent supporting documentation column;
 - the article remains a bounded readable column inside the remaining workspace;
 - breadcrumb and previous/next navigation are derived from the same page tree as both navigation layers.
+
+The rail destinations scroll independently on short viewports, keeping the theme action reachable. A keyboard skip link targets the article workspace. Named Fumadocs separators are presented as collapsible contextual groups; the group containing the current page opens automatically, while ordering, routes, breadcrumbs, and previous/next navigation continue to use the original page tree. On compact and medium widths, the main menu uses the same destination icons and shows a chevron for sections with children.
 
 The app consumes `useWindowAdaptiveInfo()` from `@m3-ui/ui/layout`. It must not copy the Material window thresholds into CSS or JavaScript. The named Material classes may be mapped to docs-specific composition decisions, but their breakpoint values stay owned by the canonical layout subsystem.
 
@@ -115,7 +118,7 @@ Do not copy generated signatures or prop rows into MDX. If the generated output 
 - `createFromSource(source).staticGET()` exports the built-in ZBSearch database to `public/search-index.json`;
 - Next.js bundles the generated navigation JSON, while the static search database is served from `public/`.
 
-`DocsSearch` queries the static database with `useDocsSearch()` and `staticClient()` from `fumadocs-core`. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
+`DocsSearch` queries the static database with `useDocsSearch()` and `staticClient()` from `fumadocs-core`. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the desktop rail action uses `FilledTonalIconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
 
 Do not add a second client-side search implementation for titles or manually parsed MDX. If Fumadocs data cannot be generated, fix the source/data pipeline instead.
 

@@ -6,6 +6,7 @@ import { useDocsSearch } from 'fumadocs-core/search/client';
 import { staticClient } from 'fumadocs-core/search/client/orama-static';
 import {
   ExpandedFullScreenSearchBar,
+  FilledTonalIconButton,
   IconButton,
   ListItem,
   SearchBarInput,
@@ -44,11 +45,12 @@ function SearchStatus({ children }: { children: string }) {
   );
 }
 
-export function DocsSearch() {
+export function DocsSearch({ inRail = false }: { inRail?: boolean }) {
   const state = useSearchBarState();
   const { search, setSearch, query } = useDocsSearch({ client: searchClient });
   const results = query.data === 'empty' || query.data == null ? [] : query.data;
   const trimmedSearch = search.trim();
+  const SearchButton = inRail ? FilledTonalIconButton : IconButton;
   const inputField = useMemo(
     () => (
       <SearchBarInput
@@ -66,9 +68,14 @@ export function DocsSearch() {
 
   return (
     <>
-      <IconButton aria-label="Search documentation" onPress={state.expand}>
+      <SearchButton
+        aria-label="Search documentation"
+        onPress={state.expand}
+        shape={inRail ? 'square' : 'round'}
+        size={inRail ? 'medium' : 'small'}
+      >
         <SearchGlyph />
-      </IconButton>
+      </SearchButton>
       <ExpandedFullScreenSearchBar
         className="docs-search"
         inputField={inputField}
