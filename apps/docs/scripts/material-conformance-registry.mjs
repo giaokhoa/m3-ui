@@ -557,6 +557,144 @@ const surfaceOverlayFamilyDimensions = {
   },
 };
 
+const FEEDBACK_STATUS_INVENTORY_EVIDENCE =
+  'apps/docs/scripts/material-conformance.mjs';
+const FEEDBACK_STATUS_SHARED_EVIDENCE =
+  'apps/storybook/visual/feedback-status-conformance.visual.spec.ts';
+const FEEDBACK_STATUS_SSR_EVIDENCE = 'packages/ui/src/feedback-status.ssr.test.tsx';
+const PROGRESS_VISUAL_EVIDENCE =
+  'apps/storybook/visual/progress-indicator.visual.spec.ts';
+const LOADING_VISUAL_EVIDENCE =
+  'apps/storybook/visual/loading-indicator.visual.spec.ts';
+const SNACKBAR_VISUAL_EVIDENCE = 'apps/storybook/visual/snackbar.visual.spec.ts';
+const TOOLTIP_VISUAL_EVIDENCE = 'apps/storybook/visual/tooltip.visual.spec.ts';
+
+const feedbackStatusFamilyDimensions = {
+  'progress-indicator': {
+    api: requiredEvidence(
+      FEEDBACK_STATUS_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/ProgressIndicator/ProgressIndicator.defaults.test.ts',
+      PROGRESS_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(PROGRESS_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-progress-indicator.mjs',
+      'packages/tokens/scripts/progress-indicator.test.mjs',
+      PROGRESS_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(PROGRESS_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(
+      PROGRESS_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SSR_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    motion: requiredEvidence(PROGRESS_VISUAL_EVIDENCE),
+    theme: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      PROGRESS_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(FEEDBACK_STATUS_SSR_EVIDENCE),
+  },
+  'loading-indicator': {
+    api: requiredEvidence(
+      FEEDBACK_STATUS_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/LoadingIndicator/LoadingIndicator.motion.test.ts',
+      LOADING_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(LOADING_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/loading-indicator-css.test.mjs',
+      'packages/tokens/scripts/progress-indicator.test.mjs',
+      LOADING_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      'packages/ui/src/components/LoadingIndicator/LoadingIndicator.motion.test.ts',
+      LOADING_VISUAL_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      LOADING_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SSR_EVIDENCE,
+    ),
+    rtlLocalization: notApplicable(
+      'LoadingIndicator is a symmetric circular renderer and owns no start/end placement, directional slots, glyph mirroring, or locale formatting.',
+    ),
+    motion: requiredEvidence(
+      'packages/ui/src/components/LoadingIndicator/LoadingIndicator.motion.test.ts',
+      LOADING_VISUAL_EVIDENCE,
+    ),
+    theme: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      LOADING_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(FEEDBACK_STATUS_SSR_EVIDENCE),
+  },
+  snackbar: {
+    api: requiredEvidence(
+      FEEDBACK_STATUS_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Snackbar/Snackbar.defaults.test.ts',
+      SNACKBAR_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(SNACKBAR_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-tooltip-snackbar-scrim.mjs',
+      'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      SNACKBAR_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(SNACKBAR_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(
+      SNACKBAR_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SSR_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    motion: notApplicable(
+      'Snackbar owns no entrance, exit, replacement, timeout, or host animation contract in the current component. Application state owns queue/timing lifecycle, while action state-layer motion belongs to the shared button/ripple boundary.',
+    ),
+    theme: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      SNACKBAR_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(FEEDBACK_STATUS_SSR_EVIDENCE),
+  },
+  tooltip: {
+    api: requiredEvidence(
+      FEEDBACK_STATUS_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Tooltip/Tooltip.defaults.test.ts',
+      TOOLTIP_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(TOOLTIP_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-tooltip-snackbar-scrim.mjs',
+      'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      TOOLTIP_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      TOOLTIP_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      TOOLTIP_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+      FEEDBACK_STATUS_SSR_EVIDENCE,
+    ),
+    rtlLocalization: notApplicable(
+      'Tooltip collision and start/end placement are delegated to React Aria. The component owns no directional glyphs, locale formatting, or independent bidi ordering contract.',
+    ),
+    motion: requiredEvidence(
+      TOOLTIP_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    theme: requiredEvidence(FEEDBACK_STATUS_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      TOOLTIP_VISUAL_EVIDENCE,
+      FEEDBACK_STATUS_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(FEEDBACK_STATUS_SSR_EVIDENCE),
+  },
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -712,7 +850,12 @@ export const materialConformanceRegistry = {
       'list-item',
       contentPrimitiveFamilyDimensions['list-item'],
     ),
-    component('loading-indicator', ['packages/ui/src/components/LoadingIndicator/']),
+    component(
+      'loading-indicator',
+      ['packages/ui/src/components/LoadingIndicator/'],
+      'loading-indicator',
+      feedbackStatusFamilyDimensions['loading-indicator'],
+    ),
     directComponent(
       'navigation-bar',
       [
@@ -749,7 +892,12 @@ export const materialConformanceRegistry = {
     component('non-interactive-scrollbar', [
       'packages/ui/src/components/NonInteractiveScrollbar/',
     ]),
-    component('progress-indicator', ['packages/ui/src/components/ProgressIndicator/']),
+    component(
+      'progress-indicator',
+      ['packages/ui/src/components/ProgressIndicator/'],
+      'progress-indicator',
+      feedbackStatusFamilyDimensions['progress-indicator'],
+    ),
     component('pull-to-refresh', ['packages/ui/src/components/PullToRefresh/']),
     component(
       'radio-button',
@@ -782,7 +930,12 @@ export const materialConformanceRegistry = {
       'slider',
       selectionFamilyDimensions.slider,
     ),
-    component('snackbar', ['packages/ui/src/components/Snackbar/']),
+    component(
+      'snackbar',
+      ['packages/ui/src/components/Snackbar/'],
+      'snackbar',
+      feedbackStatusFamilyDimensions.snackbar,
+    ),
     component(
       'split-button',
       ['packages/ui/src/components/SplitButton/'],
@@ -816,7 +969,12 @@ export const materialConformanceRegistry = {
       'toggle-button',
       actionFamilyDimensions['toggle-button'],
     ),
-    component('tooltip', ['packages/ui/src/components/Tooltip/']),
+    component(
+      'tooltip',
+      ['packages/ui/src/components/Tooltip/'],
+      'tooltip',
+      feedbackStatusFamilyDimensions.tooltip,
+    ),
     component('top-app-bar', ['packages/ui/src/components/TopAppBar/']),
 
     layout(
