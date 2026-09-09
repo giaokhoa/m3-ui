@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import {
@@ -30,6 +30,20 @@ function propertyNameText(name) {
   return null;
 }
 
+function unwrapObjectLiteral(expression) {
+  let current = expression;
+  while (
+    current &&
+    (ts.isAsExpression(current) ||
+      ts.isSatisfiesExpression(current) ||
+      ts.isParenthesizedExpression(current) ||
+      ts.isTypeAssertionExpression(current))
+  ) {
+    current = current.expression;
+  }
+  return current && ts.isObjectLiteralExpression(current) ? current : null;
+}
+
 function topLevelObjectKeys(sourceText, fileName, variableName) {
   const sourceFile = ts.createSourceFile(
     fileName,
@@ -43,10 +57,13 @@ function topLevelObjectKeys(sourceText, fileName, variableName) {
     if (!ts.isVariableStatement(statement)) continue;
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name) || declaration.name.text !== variableName) continue;
-      if (!declaration.initializer || !ts.isObjectLiteralExpression(declaration.initializer)) {
-        throw new Error(`${fileName}: ${variableName} must be initialized with an object literal`);
+      const objectLiteral = declaration.initializer
+        ? unwrapObjectLiteral(declaration.initializer)
+        : null;
+      if (!objectLiteral) {
+        throw new Error(`${fileName}: ${variableName} must resolve to an object literal`);
       }
-      return declaration.initializer.properties
+      return objectLiteral.properties
         .map((property) => {
           if (ts.isPropertyAssignment(property) || ts.isMethodDeclaration(property)) {
             return propertyNameText(property.name);
@@ -64,8 +81,7 @@ function topLevelObjectKeys(sourceText, fileName, variableName) {
 export function loadComponentProvenanceIds(repoRoot = defaultRepositoryRoot()) {
   const ids = new Set();
   for (const [relativePath, variableName] of PROVENANCE_REGISTRIES) {
-    const absolutePath = resolve(repoRoot, relativePath);
-    const sourceText = readFileSync(absolutePath, 'utf8');
+    const sourceText = readFileSync(resolve(repoRoot, relativePath), 'utf8');
     for (const id of topLevelObjectKeys(sourceText, relativePath, variableName)) ids.add(id);
   }
   return ids;
@@ -84,19 +100,18 @@ function validateEvidencePaths({ paths, label, pathExists, errors }) {
   for (const evidencePath of paths) {
     if (typeof evidencePath !== 'string' || evidencePath.trim() === '') {
       errors.push(`${label}: evidence paths must be non-empty repository-relative strings`);
-      continue;
+    } else if (!pathExists(evidencePath)) {
+      errors.push(`${label}: evidence path does not exist: ${evidencePath}`);
     }
-    if (!pathExists(evidencePath)) errors.push(`${label}: evidence path does not exist: ${evidencePath}`);
   }
 }
 
 function validateDimensions({ family, pathExists, errors }) {
   const dimensions = family.dimensions ?? {};
-  const actualNames = Object.keys(dimensions);
   for (const dimension of CONFORMANCE_DIMENSIONS) {
     if (!(dimension in dimensions)) errors.push(`${family.id}: missing conformance dimension "${dimension}"`);
   }
-  for (const dimension of actualNames) {
+  for (const dimension of Object.keys(dimensions)) {
     if (!CONFORMANCE_DIMENSIONS.includes(dimension)) {
       errors.push(`${family.id}: unknown conformance dimension "${dimension}"`);
     }
@@ -113,14 +128,12 @@ function validateDimensions({ family, pathExists, errors }) {
       errors.push(`${label}: invalid status "${String(status)}"`);
       continue;
     }
-
     if (status === 'required') {
       const hasGap = Number.isInteger(contract.gapIssue) && contract.gapIssue > 0;
       if (paths.length === 0 && !hasGap) {
         errors.push(`${label}: required dimensions need automated evidence or a tracked gapIssue`);
       }
     }
-
     if (status === 'adapted') {
       if (typeof contract.reason !== 'string' || contract.reason.trim() === '') {
         errors.push(`${label}: adapted dimensions need a documented adaptation reason`);
@@ -129,13 +142,12 @@ function validateDimensions({ family, pathExists, errors }) {
         errors.push(`${label}: adapted dimensions need automated/provenance evidence`);
       }
     }
-
-    if (status === 'not-applicable') {
-      if (typeof contract.reason !== 'string' || contract.reason.trim() === '') {
-        errors.push(`${label}: not-applicable dimensions need a documented reason`);
-      }
+    if (
+      status === 'not-applicable' &&
+      (typeof contract.reason !== 'string' || contract.reason.trim() === '')
+    ) {
+      errors.push(`${label}: not-applicable dimensions need a documented reason`);
     }
-
     validateEvidencePaths({ paths, label, pathExists, errors });
   }
 }
@@ -146,7 +158,6 @@ function validateProvenance({ family, componentProvenanceIds, pathExists, errors
     errors.push(`${family.id}: missing authoritative/audited provenance`);
     return;
   }
-
   if (provenance.kind === 'component-docs') {
     if (!componentProvenanceIds.has(provenance.id)) {
       errors.push(
@@ -155,12 +166,10 @@ function validateProvenance({ family, componentProvenanceIds, pathExists, errors
     }
     return;
   }
-
   if (provenance.kind !== 'direct') {
     errors.push(`${family.id}: unsupported provenance kind "${String(provenance.kind)}"`);
     return;
   }
-
   if (typeof provenance.family !== 'string' || provenance.family.trim() === '') {
     errors.push(`${family.id}: direct provenance needs a family label`);
   }
@@ -180,11 +189,7 @@ function classifyExport(entry, classifiers) {
 }
 
 function symbolRecord(name, entry) {
-  return {
-    name,
-    kind: entry.kind,
-    source: entry.source,
-  };
+  return { name, kind: entry.kind, source: entry.source };
 }
 
 /**
@@ -204,7 +209,9 @@ export function validateMaterialConformance({
   const nonComponents = registry.nonComponents ?? [];
   const classifiers = [...families, ...nonComponents];
 
-  if (registry.schemaVersion !== 1) errors.push(`Unsupported conformance registry schema: ${registry.schemaVersion}`);
+  if (registry.schemaVersion !== 1) {
+    errors.push(`Unsupported conformance registry schema: ${registry.schemaVersion}`);
+  }
   if (!Number.isInteger(registry.parentIssue) || registry.parentIssue <= 0) {
     errors.push('Conformance registry needs a positive parentIssue');
   }
@@ -229,7 +236,6 @@ export function validateMaterialConformance({
     validateProvenance({ family, componentProvenanceIds, pathExists, errors });
     validateDimensions({ family, pathExists, errors });
   }
-
   for (const classification of nonComponents) {
     if (typeof classification.reason !== 'string' || classification.reason.trim() === '') {
       errors.push(`${classification.id}: non-component classifications need a reason`);
@@ -294,7 +300,9 @@ export function validateMaterialConformance({
       continue;
     }
     if (owners[0].kind !== 'layout') {
-      errors.push(`Public layout export "${name}" is classified as ${owners[0].kind ?? 'non-component'} (${owners[0].id})`);
+      errors.push(
+        `Public layout export "${name}" is classified as ${owners[0].kind ?? 'non-component'} (${owners[0].id})`,
+      );
       continue;
     }
     layoutSymbolNamesByFamily.get(owners[0].id)?.push(name);
@@ -306,29 +314,30 @@ export function validateMaterialConformance({
     }
   }
 
-  const report = {
-    schemaVersion: 1,
-    parentIssue: registry.parentIssue,
-    generatedFrom: {
-      root: rootModel?.entrypoint ?? registry.rootEntrypoint,
-      layout: layoutModel?.entrypoint ?? registry.layoutEntrypoint,
+  return {
+    report: {
+      schemaVersion: 1,
+      parentIssue: registry.parentIssue,
+      generatedFrom: {
+        root: rootModel?.entrypoint ?? registry.rootEntrypoint,
+        layout: layoutModel?.entrypoint ?? registry.layoutEntrypoint,
+      },
+      dimensions: [...CONFORMANCE_DIMENSIONS],
+      families: families.map((family) => ({
+        id: family.id,
+        kind: family.kind,
+        provenance: family.provenance,
+        publicSymbols: familySymbols.get(family.id) ?? [],
+        dimensions: family.dimensions,
+      })),
+      nonComponents: nonComponents.map((classification) => ({
+        id: classification.id,
+        reason: classification.reason,
+        publicSymbols: nonComponentSymbols.get(classification.id) ?? [],
+      })),
     },
-    dimensions: [...CONFORMANCE_DIMENSIONS],
-    families: families.map((family) => ({
-      id: family.id,
-      kind: family.kind,
-      provenance: family.provenance,
-      publicSymbols: familySymbols.get(family.id) ?? [],
-      dimensions: family.dimensions,
-    })),
-    nonComponents: nonComponents.map((classification) => ({
-      id: classification.id,
-      reason: classification.reason,
-      publicSymbols: nonComponentSymbols.get(classification.id) ?? [],
-    })),
+    errors,
   };
-
-  return { report, errors };
 }
 
 export function buildMaterialConformanceReport(repoRoot = defaultRepositoryRoot()) {
@@ -338,31 +347,26 @@ export function buildMaterialConformanceReport(repoRoot = defaultRepositoryRoot(
     packageName: '@m3-ui/ui/layout',
     entrypoint: 'packages/ui/src/layout/index.ts',
   });
-  const componentProvenanceIds = loadComponentProvenanceIds(repoRoot);
-  const result = validateMaterialConformance({
+  return validateMaterialConformance({
     rootModel,
     layoutModel,
-    componentProvenanceIds,
+    componentProvenanceIds: loadComponentProvenanceIds(repoRoot),
     pathExists: (relativePath) => existsSync(resolve(repoRoot, relativePath)),
   });
-  return result;
 }
 
 function runCli() {
-  const repoRoot = defaultRepositoryRoot();
-  const { report, errors } = buildMaterialConformanceReport(repoRoot);
+  const { report, errors } = buildMaterialConformanceReport();
   if (errors.length > 0) {
     console.error('[docs] Material conformance inventory failed:');
     for (const error of errors) console.error(`- ${error}`);
     process.exitCode = 1;
     return;
   }
-
   if (process.argv.includes('--json')) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
     return;
   }
-
   const symbolCount = report.families.reduce(
     (total, family) => total + family.publicSymbols.length,
     0,
@@ -377,6 +381,4 @@ function runCli() {
   );
 }
 
-const isMain =
-  process.argv[1] && resolve(process.argv[1]) === resolve(dirname(fileURLToPath(import.meta.url)), 'material-conformance.mjs');
-if (isMain) runCli();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) runCli();
