@@ -206,10 +206,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .modal-navigation-drawer-overlay,
+  .dismissible-navigation-drawer {
+    --_navigation-drawer-open-duration: 0ms;
+    --_navigation-drawer-settle-duration: 0ms;
+    --_navigation-drawer-close-duration: 0ms;
+  }
+
   .modal-navigation-drawer-overlay::before,
   .modal-navigation-drawer__sheet-frame,
   .dismissible-navigation-drawer__sheet-frame,
   .dismissible-navigation-drawer__content {
-    transition: none;
+    transition-duration: 0ms;
   }
 }
