@@ -56,6 +56,31 @@ export const FormContract: Story = {
   ),
 };
 
+function SearchSubmitDemo() {
+  const state = useSearchBarState();
+  const [query, setQuery] = useState('Material');
+  const [submitted, setSubmitted] = useState('');
+
+  return (
+    <div className="storybook-center">
+      <SearchBar state={state} data-testid="submit-search-bar">
+        <SearchBarInput
+          state={state}
+          aria-label="Submit search"
+          value={query}
+          onValueChange={setQuery}
+          onSearch={setSubmitted}
+        />
+      </SearchBar>
+      <output data-testid="submitted-query">{submitted}</output>
+    </div>
+  );
+}
+
+export const SearchSubmitContract: Story = {
+  render: () => <SearchSubmitDemo />,
+};
+
 function DynamicSearchPortalDemo() {
   const state = useSearchBarState();
   const [query, setQuery] = useState('Material');
