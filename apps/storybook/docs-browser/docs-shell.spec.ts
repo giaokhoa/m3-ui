@@ -17,9 +17,10 @@ async function openRoute(
   viewport: { width: number; height: number },
 ) {
   await page.setViewportSize(viewport);
-  const response = await page.goto(route, { waitUntil: 'networkidle' });
+  const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
   expect(response, `Expected a document response for ${route}`).not.toBeNull();
   expect(response!.status(), `Expected ${route} to render successfully`).toBeLessThan(400);
+  await expect(page.locator('#docs-main')).toBeVisible();
 }
 
 async function attachViewportScreenshot(
@@ -336,7 +337,7 @@ test('representative public routes render without browser runtime failures', asy
   ] as const;
 
   for (const [route, heading] of routes) {
-    const response = await page.goto(route, { waitUntil: 'networkidle' });
+    const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
     expect(response).not.toBeNull();
     expect(response!.status(), `Expected ${route} to render successfully`).toBeLessThan(400);
     await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
