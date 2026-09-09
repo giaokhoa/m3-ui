@@ -17,7 +17,7 @@ Run the production-like docs browser suite:
 pnpm --filter @m3-ui/storybook test:docs-browser
 ```
 
-The command builds `@m3-ui/docs`, starts the production Next.js server on port `4173`, and runs `playwright.docs.config.ts` against it. When iterating locally, an already-running server on that port may be reused by Playwright after the build completes.
+The command asks Turborepo to build `@m3-ui/docs` together with its workspace dependency closure, starts the production Next.js server on port `4173`, and runs `playwright.docs.config.ts` against it. This keeps clean-checkout execution aligned with the repository build graph instead of assuming `@m3-ui/ui` is already built. When iterating locally, an already-running server on that port may be reused by Playwright after the build completes.
 
 ## What the suite owns
 
