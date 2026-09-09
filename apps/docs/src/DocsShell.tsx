@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   useEffect,
+  useId,
   useMemo,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from 'react';
@@ -17,6 +19,7 @@ import {
   NavigationDrawerLink,
   NavigationRail,
   NavigationRailLink,
+  OutlinedIconButton,
   PermanentDrawerSheet,
   PermanentNavigationDrawer,
   TopAppBar,
@@ -142,10 +145,35 @@ function HomeGlyph() {
   );
 }
 
-function FolderGlyph() {
+function StartGlyph() {
   return (
     <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-      <path d="M3 5h7l2 2h9v12H3V5Zm2 4v8h14V9H5Z" fill="currentColor" />
+      <path d="M3 3h7v7H3V3Zm11 0h7v7h-7V3ZM3 14h7v7H3v-7Zm11 0h7v7h-7v-7Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FoundationsGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="M5 3h14v18H5V3Zm2 2v14h10V5h-3v7l-2-1.5L10 12V5H7Zm5 0v3l1 .75V5h-1Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function DevelopGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="m8.7 5.3 1.4 1.4L4.8 12l5.3 5.3-1.4 1.4L2 12l6.7-6.7Zm6.6 0L22 12l-6.7 6.7-1.4-1.4 5.3-5.3-5.3-5.3 1.4-1.4Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function ComponentsGlyph() {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="M11 7h2v4h4v2h-4v4h-2v-4H7v-2h4V7Z" fill="currentColor" />
     </svg>
   );
 }
@@ -179,6 +207,20 @@ function ThemeGlyph({ preference }: { preference: 'system' | 'light' | 'dark' })
     <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
       <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6h1v3h-2V2h1Zm0 17h1v3h-2v-3h1ZM2 11h3v2H2v-2Zm17 0h3v2h-3v-2ZM4.22 5.64l1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12Zm12.02 12.02 1.42-1.42 2.12 2.12-1.42 1.42-2.12-2.12ZM16.24 6.34l2.12-2.12 1.42 1.42-2.12 2.12-1.42-1.42ZM4.22 18.36l2.12-2.12 1.42 1.42-2.12 2.12-1.42-1.42Z" fill="currentColor" />
     </svg>
+  );
+}
+
+function ThemeAction({ inRail = false }: { inRail?: boolean }) {
+  const { preference, cyclePreference } = useDocsTheme();
+  const ThemeButton = inRail ? OutlinedIconButton : IconButton;
+
+  return (
+    <ThemeButton
+      aria-label={`Theme preference: ${preference}. Activate to change.`}
+      onPress={cyclePreference}
+    >
+      <ThemeGlyph preference={preference} />
+    </ThemeButton>
   );
 }
 
@@ -302,14 +344,19 @@ function NavFolder({
   index: number;
 }) {
   const activeFolder = nodeContainsPath(node, currentPath);
+  const bodyId = useId();
   const [open, setOpen] = useState(Boolean(node.defaultOpen || activeFolder));
 
   useEffect(() => {
     if (activeFolder) setOpen(true);
-  }, [activeFolder]);
+  }, [activeFolder, currentPath]);
 
   const body = (
-    <div className="docs-nav__folder-body">
+    <div
+      className="docs-nav__folder-body"
+      hidden={node.collapsible !== false && !open}
+      id={bodyId}
+    >
       {node.index ? (
         <NavLink
           currentPath={currentPath}
@@ -344,13 +391,14 @@ function NavFolder({
   return (
     <section className="docs-nav__folder" key={`folder-${node.name}-${index}`}>
       <NavigationDrawerButton
+        aria-controls={bodyId}
         aria-expanded={open}
         badge={<ChevronGlyph open={open} />}
         onPress={() => setOpen((value) => !value)}
       >
         {node.name}
       </NavigationDrawerButton>
-      {open ? body : null}
+      {body}
     </section>
   );
 }
@@ -366,21 +414,26 @@ function NavNodes({
   onNavigate?: () => void;
   depth?: number;
 }) {
+  // Fumadocs separators define the existing content groups. Present them as
+  // disclosures without duplicating the page inventory or changing its routes.
+  const groupedNodes: DocsNavDestinationNode[] = [];
+  let group: DocsNavFolder | undefined;
+  for (const node of nodes) {
+    if (node.type === 'separator') {
+      group = node.name
+        ? { type: 'folder', name: node.name, children: [] }
+        : undefined;
+      if (group) groupedNodes.push(group);
+    } else if (group) {
+      group.children.push(node);
+    } else {
+      groupedNodes.push(node);
+    }
+  }
+
   return (
     <>
-      {nodes.map((node, index) => {
-        if (node.type === 'separator') {
-          return node.name ? (
-            <div
-              className="docs-nav__separator"
-              key={`separator-${depth}-${node.name}-${index}`}
-              style={getMaterialTypeCssProperties('titleSmall')}
-            >
-              {node.name}
-            </div>
-          ) : null;
-        }
-
+      {groupedNodes.map((node, index) => {
         if (node.type === 'page') {
           return (
             <NavLink
@@ -482,6 +535,8 @@ function MainMenu({
           return (
             <NavigationDrawerButton
               aria-label={`Open ${destination.name} navigation`}
+              badge={<ChevronGlyph open={false} />}
+              icon={<DestinationIcon destination={destination} />}
               key={destination.key}
               onPress={() => onOpenSection(destination)}
               selected={activeDestination?.key === destination.key}
@@ -494,6 +549,7 @@ function MainMenu({
         return (
           <NavigationDrawerLink
             href={destination.page.url}
+            icon={<DestinationIcon destination={destination} />}
             key={destination.key}
             onPress={onNavigate}
             selected={normalizePath(destination.page.url) === currentPath}
@@ -576,32 +632,60 @@ function PersistentSidebar({
 }
 
 function DestinationIcon({ destination }: { destination: TopLevelDestination }) {
-  if (normalizePath(destination.page.url) === '/docs') return <HomeGlyph />;
-  if (destination.node.type === 'folder') return <FolderGlyph />;
+  const path = normalizePath(destination.page.url);
+  if (path === '/docs') return <HomeGlyph />;
+  if (path.startsWith('/docs/getting-started')) return <StartGlyph />;
+  if (path.startsWith('/docs/foundations')) return <FoundationsGlyph />;
+  if (path.startsWith('/docs/develop')) return <DevelopGlyph />;
+  if (path.startsWith('/docs/components')) return <ComponentsGlyph />;
   return <PageGlyph />;
 }
 
 function GlobalNavigationRail({
   activeDestination,
+  onOpenNavigation,
+  navigationOpen,
 }: {
   activeDestination?: TopLevelDestination;
+  onOpenNavigation?: () => void;
+  navigationOpen: boolean;
 }) {
   return (
-    <NavigationRail
-      aria-label="Documentation sections"
-      className="docs-global-rail"
-      itemSemantics="links"
-    >
-      {topLevelDestinations.map((destination) => (
-        <NavigationRailLink
-          href={destination.page.url}
-          icon={<DestinationIcon destination={destination} />}
-          key={destination.key}
-          label={destination.name}
-          selected={activeDestination?.key === destination.key}
-        />
-      ))}
-    </NavigationRail>
+    <div className="docs-global-navigation">
+      <NavigationRail
+        aria-label="Documentation sections"
+        className="docs-global-rail"
+        header={
+          <div className="docs-global-navigation__actions">
+            <DocsSearch inRail />
+            {onOpenNavigation ? (
+              <IconButton
+                aria-expanded={navigationOpen}
+                aria-label={`Open ${activeDestination?.name ?? 'documentation'} navigation`}
+                onPress={onOpenNavigation}
+              >
+                <MenuGlyph />
+              </IconButton>
+            ) : null}
+          </div>
+        }
+        itemSemantics="links"
+      >
+        {topLevelDestinations.map((destination) => (
+          <NavigationRailLink
+            aria-label={destination.name}
+            href={destination.page.url}
+            icon={<DestinationIcon destination={destination} />}
+            key={destination.key}
+            label={<span title={destination.name}>{destination.name}</span>}
+            selected={activeDestination?.key === destination.key}
+          />
+        ))}
+      </NavigationRail>
+      <div className="docs-global-navigation__footer">
+        <ThemeAction inRail />
+      </div>
+    </div>
   );
 }
 
@@ -721,7 +805,7 @@ function Workspace({
     <AnchorProvider toc={resolvedToc}>
       <div className="docs-scroll-region">
         <div className="docs-workspace" data-has-toc={hasToc || undefined}>
-          <main className="docs-main">
+          <main className="docs-main" id="docs-main" tabIndex={-1}>
             <div className="docs-main__inner">
               <Breadcrumbs currentPath={currentPath} />
               <article className="docs-article">
@@ -754,8 +838,8 @@ function Workspace({
 }
 
 export function DocsShell({ title, description, toc, children }: DocsShellProps) {
-  const { preference, cyclePreference } = useDocsTheme();
   const drawerState = useDrawerState();
+  useSyncExternalStore(drawerState.subscribe, drawerState.getSnapshot, drawerState.getSnapshot);
   const { windowSizeClass } = useWindowAdaptiveInfo();
   const currentPath = normalizePath(usePathname());
   const widthClass = windowSizeClass.width;
@@ -795,27 +879,22 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
     drawerState.open();
   };
 
-  const showNavigationAction = !showRail || (widthClass === 'expanded' && activeSection);
-
   const appBar = (
     <TopAppBar
       navigationIcon={
-        showNavigationAction ? (
-          <IconButton aria-label="Open navigation" onPress={openNavigation}>
-            <MenuGlyph />
-          </IconButton>
-        ) : undefined
+        <IconButton
+          aria-expanded={drawerState.isOpen}
+          aria-label="Open navigation"
+          onPress={openNavigation}
+        >
+          <MenuGlyph />
+        </IconButton>
       }
       title={<Link className="docs-app-bar__brand" href="/docs">m3-ui</Link>}
       actions={
         <>
           <DocsSearch />
-          <IconButton
-            aria-label={`Theme preference: ${preference}. Activate to change.`}
-            onPress={cyclePreference}
-          >
-            <ThemeGlyph preference={preference} />
-          </IconButton>
+          <ThemeAction />
         </>
       }
     />
@@ -873,7 +952,7 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
   );
 
   return (
-    <Scaffold className="docs-scaffold" topBar={appBar}>
+    <Scaffold className="docs-scaffold" topBar={showRail ? undefined : appBar}>
       {(innerPadding) => (
         <div
           className="docs-scaffold__body"
@@ -884,9 +963,18 @@ export function DocsShell({ title, description, toc, children }: DocsShellProps)
             paddingInlineEnd: innerPadding.end,
           }}
         >
+          <a className="docs-skip-link" href="#docs-main">
+            Skip to content
+          </a>
           {showRail ? (
             <div className="docs-multi-pane">
-              <GlobalNavigationRail activeDestination={activeDestination} />
+              <GlobalNavigationRail
+                activeDestination={activeDestination}
+                navigationOpen={drawerState.isOpen}
+                onOpenNavigation={
+                  widthClass === 'expanded' && activeSection ? openNavigation : undefined
+                }
+              />
               <div className="docs-navigation-stage">{navigationStage}</div>
             </div>
           ) : (

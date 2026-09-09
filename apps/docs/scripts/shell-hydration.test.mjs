@@ -35,7 +35,7 @@ test('desktop navigation panes align at a semantic divider', async () => {
   assert.match(css, /\.docs-multi-pane\s*\{[^}]*gap:\s*0;/s);
   assert.match(
     css,
-    /\.docs-global-rail\s*\{[^}]*border-inline-end:\s*1px solid var\(--outline-variant\);/s,
+    /\.docs-global-navigation\s*\{[^}]*border-inline-end:\s*1px solid var\(--outline-variant\);/s,
   );
   assert.match(
     css,

@@ -96,6 +96,8 @@ pnpm --filter @m3-ui/storybook test:visual
 
 `pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port `4173` and Storybook on `6006`.
 
+Preview runners can use `npm run dev -- --host 0.0.0.0 --port 4173 --strictPort` after installing and building the workspace. The root launcher generates the docs data and adapts those flags to the Next.js docs server; the requested port must be available.
+
 ## Documentation and visual review
 
 The public docs use `fumadocs-mdx` and `fumadocs-core` headlessly. They do not use `fumadocs-ui`; visible documentation UI is composed from `@m3-ui/ui`. See [`apps/docs/README.md`](apps/docs/README.md) for the docs app structure.

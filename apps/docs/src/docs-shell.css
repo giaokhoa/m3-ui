@@ -20,9 +20,50 @@
   block-size: 100%;
 }
 
-.docs-global-rail {
+.docs-global-navigation {
+  display: flex;
+  flex-direction: column;
   flex: 0 0 auto;
+  min-block-size: 0;
   border-inline-end: 1px solid var(--outline-variant);
+  background: var(--surface);
+}
+
+.docs-global-rail {
+  flex: 1 1 auto;
+  block-size: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.docs-global-navigation__actions,
+.docs-global-navigation__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-block: 12px;
+}
+
+.docs-global-navigation__footer {
+  flex: 0 0 auto;
+  padding-block: 16px;
+}
+
+.docs-skip-link {
+  position: fixed;
+  z-index: 10;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  padding: 12px 20px;
+  border-radius: 16px;
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
+  transform: translateY(calc(-100% - 16px));
+}
+
+.docs-skip-link:focus {
+  transform: none;
 }
 
 .docs-navigation-stage {
@@ -53,9 +94,8 @@
   background: inherit;
 }
 
-/* The app bar already owns site identity on persistent desktop layouts. Keeping
- * the modal header only avoids a second 72px brand block that pushed the
- * contextual links far below the global rail destinations. */
+/* Contextual links start beside the full-height rail. The mobile drawer keeps
+ * its brand and dismiss action; desktop identity is available through Home. */
 .docs-permanent-drawer .docs-sidebar__header {
   display: none;
 }
@@ -98,11 +138,6 @@
 .docs-nav__folder-body {
   padding-block: 4px 8px;
   padding-inline-start: 8px;
-}
-
-.docs-nav__separator {
-  margin: 24px 28px 8px;
-  color: var(--on-surface-variant);
 }
 
 .docs-scroll-region {

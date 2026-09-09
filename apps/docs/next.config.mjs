@@ -3,6 +3,8 @@ import { createMDX } from 'fumadocs-mdx/next';
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  devIndicators: { position: 'bottom-right' },
+  allowedDevOrigins: ['terminal.local'],
   async redirects() {
     return [
       {
