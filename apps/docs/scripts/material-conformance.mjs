@@ -9,7 +9,7 @@ import {
 import {
   CONFORMANCE_DIMENSIONS,
   materialConformanceRegistry,
-} from './interaction-utilities-conformance-registry.mjs';
+} from './adaptive-layout-conformance-registry.mjs';
 
 const PROVENANCE_REGISTRIES = [
   ['apps/docs/src/componentDocs.ts', 'componentDocs'],
