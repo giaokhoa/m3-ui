@@ -230,7 +230,7 @@ test('top-level leaf destinations do not create an empty persistent context pane
     page.getByRole('navigation', { name: 'Documentation sections' }),
   ).toBeVisible();
   await expect(page.locator('.docs-permanent-drawer')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'm3-ui documentation' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'm3-ui documentation' })).toBeVisible();
   runtime.assertClean();
 });
 
@@ -304,7 +304,9 @@ test('search returns the canonical component route', async ({ page }) => {
   await expect(result).toBeVisible();
   await result.click();
   await expect(page).toHaveURL(/\/docs\/components\/button$/);
-  await expect(page.getByRole('heading', { name: 'Button', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Button', exact: true }),
+  ).toBeVisible();
   runtime.assertClean();
 });
 
@@ -340,14 +342,23 @@ test('representative public routes render without browser runtime failures', asy
     const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
     expect(response).not.toBeNull();
     expect(response!.status(), `Expected ${route} to render successfully`).toBeLessThan(400);
-    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: heading, exact: true }),
+    ).toBeVisible();
   }
 
   runtime.assertClean();
 });
 
 test('unknown docs routes use framework not-found behavior', async ({ page }) => {
-  const runtime = installRuntimeGuard(page);
+  const runtime = installRuntimeGuard(page, {
+    // Chromium logs the intentionally requested document 404 as a console
+    // resource error. Consume exactly one such message; any additional 404 or
+    // other console error still fails the test.
+    allowedConsoleErrors: [
+      /^Failed to load resource: the server responded with a status of 404 \(Not Found\)$/,
+    ],
+  });
   await page.setViewportSize(representativeViewports.large);
   const response = await page.goto('/docs/this-route-must-not-exist');
   expect(response).not.toBeNull();
