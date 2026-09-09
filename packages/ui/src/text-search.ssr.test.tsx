@@ -51,7 +51,8 @@ describe('text and search SSR contracts', () => {
     expect(outlined).toContain('<fieldset');
     expect(outlined).toContain('role="presentation"');
     expect(outlined).toContain('type="email"');
-    expect(outlined).toContain('autocomplete="email"');
+    expect(outlined).toContain('name="email"');
+    expect(outlined).toContain('server@example.com');
   });
 
   it('renders secure variants without exposing a browser-only reveal dependency', () => {
