@@ -695,6 +695,76 @@ const feedbackStatusFamilyDimensions = {
   },
 };
 
+const PICKER_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const PICKER_SHARED_EVIDENCE =
+  'apps/storybook/visual/picker-conformance.visual.spec.ts';
+const PICKER_SSR_EVIDENCE = 'packages/ui/src/pickers.ssr.test.tsx';
+const DATE_PICKER_VISUAL_EVIDENCE =
+  'apps/storybook/visual/date-picker.visual.spec.ts';
+const TIME_PICKER_VISUAL_EVIDENCE =
+  'apps/storybook/visual/time-picker.visual.spec.ts';
+const PICKER_AUDIT_EVIDENCE =
+  'packages/tokens/scripts/audit-material-web-pickers.mjs';
+const PICKER_CSS_EVIDENCE = 'packages/tokens/scripts/pickers-css.test.mjs';
+const PICKER_TOKEN_EVIDENCE = 'packages/tokens/scripts/pickers.test.mjs';
+
+const pickerFamilyDimensions = {
+  'date-picker': {
+    api: requiredEvidence(
+      PICKER_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/DatePicker/DatePicker.defaults.test.ts',
+      DATE_PICKER_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(DATE_PICKER_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      PICKER_AUDIT_EVIDENCE,
+      PICKER_CSS_EVIDENCE,
+      PICKER_TOKEN_EVIDENCE,
+      DATE_PICKER_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(DATE_PICKER_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(
+      DATE_PICKER_VISUAL_EVIDENCE,
+      PICKER_SSR_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(DATE_PICKER_VISUAL_EVIDENCE),
+    motion: requiredEvidence(DATE_PICKER_VISUAL_EVIDENCE),
+    theme: requiredEvidence(PICKER_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      DATE_PICKER_VISUAL_EVIDENCE,
+      PICKER_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(PICKER_SSR_EVIDENCE),
+  },
+  'time-picker': {
+    api: requiredEvidence(
+      PICKER_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/TimePicker/TimePicker.defaults.test.ts',
+      TIME_PICKER_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(TIME_PICKER_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      PICKER_AUDIT_EVIDENCE,
+      PICKER_CSS_EVIDENCE,
+      PICKER_TOKEN_EVIDENCE,
+      TIME_PICKER_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(TIME_PICKER_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(
+      TIME_PICKER_VISUAL_EVIDENCE,
+      PICKER_SSR_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(TIME_PICKER_VISUAL_EVIDENCE),
+    motion: requiredEvidence(TIME_PICKER_VISUAL_EVIDENCE),
+    theme: requiredEvidence(PICKER_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      TIME_PICKER_VISUAL_EVIDENCE,
+      PICKER_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(PICKER_SSR_EVIDENCE),
+  },
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -798,7 +868,12 @@ export const materialConformanceRegistry = {
       'chip',
       contentPrimitiveFamilyDimensions.chip,
     ),
-    component('date-picker', ['packages/ui/src/components/DatePicker/']),
+    component(
+      'date-picker',
+      ['packages/ui/src/components/DatePicker/'],
+      'date-picker',
+      pickerFamilyDimensions['date-picker'],
+    ),
     component(
       'dialog',
       ['packages/ui/src/components/Dialog/'],
@@ -962,7 +1037,12 @@ export const materialConformanceRegistry = {
       'text-field',
       textSearchFamilyDimensions['text-field'],
     ),
-    component('time-picker', ['packages/ui/src/components/TimePicker/']),
+    component(
+      'time-picker',
+      ['packages/ui/src/components/TimePicker/'],
+      'time-picker',
+      pickerFamilyDimensions['time-picker'],
+    ),
     component(
       'toggle-button',
       ['packages/ui/src/components/ToggleButton/'],
