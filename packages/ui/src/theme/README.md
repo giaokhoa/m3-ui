@@ -62,8 +62,6 @@ interface ThemeContextValue {
 
 Material overlays rendered through portals need the same scoped theme as ordinary descendants. `ThemeProvider` creates a themed portal container under `document.body` and exposes it through `ThemePortalContainerContext`.
 
-The portal host is attached after the provider mounts. Its server output and first client render therefore have the same tree, preserving hydration before overlay descendants receive their themed container.
-
 The provider scope and portal scope receive the same `data-m3-theme`, `data-theme` and runtime override style object, so dialogs, menus, sheets and other portal surfaces resolve the same Material roles.
 
 ## Current files
