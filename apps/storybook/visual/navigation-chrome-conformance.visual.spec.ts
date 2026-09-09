@@ -98,7 +98,7 @@ test.describe('Material 3 Lane 8 navigation/chrome shared conformance', () => {
     await expect(page.locator('.modal-wide-navigation-rail-overlay')).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Row more actions' }).click();
-    let menu = page.getByRole('menu', { name: 'Theme row actions' });
+    let menu = page.getByRole('menu', { name: 'Row more actions' });
     await expect(menu).toBeVisible();
     await expect(menu.locator('..').locator('..').locator('.menu-surface__clip')).toHaveCSS(
       'background-color',
@@ -109,7 +109,7 @@ test.describe('Material 3 Lane 8 navigation/chrome shared conformance', () => {
     await expect(menu).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Column more actions' }).click();
-    menu = page.getByRole('menu', { name: 'Theme column actions' });
+    menu = page.getByRole('menu', { name: 'Column more actions' });
     await expect(menu).toBeVisible();
     await expectInsideThemePortal(page, menu);
   });
