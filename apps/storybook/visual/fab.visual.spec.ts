@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { setDocumentDirection } from '../test-support/browser';
 import { openStory } from '../test-support/story';
 
 async function openDefaultFab(page: Page) {
@@ -140,6 +141,22 @@ test.describe('Material 3 FAB visual parity', () => {
     await expect(page.locator('#storybook-root')).toHaveScreenshot('fab-extended-sizes.png');
   });
 
+  test('extended FAB leading content follows RTL logical direction', async ({ page }) => {
+    await openStory(page, 'components-fab--extended-sizes');
+    await setDocumentDirection(page, 'rtl');
+    const button = page.getByRole('button', { name: 'Baseline extended', exact: true });
+    const icon = button.locator('.fab__icon');
+    const [buttonBox, iconBox] = await Promise.all([
+      button.boundingBox(),
+      icon.boundingBox(),
+    ]);
+    expect(buttonBox).not.toBeNull();
+    expect(iconBox).not.toBeNull();
+    expect((iconBox?.x ?? 0) + (iconBox?.width ?? 0) / 2).toBeGreaterThan(
+      (buttonBox?.x ?? 0) + (buttonBox?.width ?? 0) / 2,
+    );
+  });
+
   test('text-only Extended FAB overloads stay expanded and keep runtime minimums', async ({ page }) => {
     await openStory(page, 'components-fab--text-only-extended');
 
@@ -191,6 +208,18 @@ test.describe('Material 3 FAB visual parity', () => {
     }
 
     await expect(page.locator('#storybook-root')).toHaveScreenshot('fab-collapsed-extended.png');
+  });
+
+  test('reduced motion removes extended and elevation transitions', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'components-fab--extended-sizes');
+    const button = page.getByRole('button', { name: 'Baseline extended', exact: true });
+    await expect(button.locator('.fab__content')).toHaveCSS('transition-duration', '0s');
+    await expect(button.locator('.fab__label')).toHaveCSS('transition-duration', '0s');
+    await expect(button.locator('.fab__visual > .elevation')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
   });
 
   test('keyboard focus uses the visual container shape', async ({ page }) => {
