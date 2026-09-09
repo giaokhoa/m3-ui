@@ -113,4 +113,50 @@ test.describe('Material 3 Lane 8 navigation/chrome shared conformance', () => {
     await expect(menu).toBeVisible();
     await expectInsideThemePortal(page, menu);
   });
+
+  test('wide navigation rail resolves logical start/end geometry in RTL', async ({ page }) => {
+    await openStory(page, 'conformance-navigationchrome--dynamic-theme');
+
+    const theme = page.locator('.navigation-chrome-dynamic-theme');
+    await theme.evaluate((element) => element.setAttribute('dir', 'rtl'));
+
+    const wideRail = page.getByTestId('theme-wide-navigation-rail');
+    await expect(wideRail).toHaveCSS('direction', 'rtl');
+    const selected = wideRail.locator('.wide-navigation-rail-item[data-selected]');
+    const [iconBox, labelBox] = await Promise.all([
+      selected.locator('.wide-navigation-rail-item__icon').boundingBox(),
+      selected.locator('.wide-navigation-rail-item__label').boundingBox(),
+    ]);
+    expect(iconBox).not.toBeNull();
+    expect(labelBox).not.toBeNull();
+    expect(iconBox!.x).toBeGreaterThan(labelBox!.x);
+  });
+
+  test('reduced motion removes drawer and wide/modal rail family transitions', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'conformance-navigationchrome--dynamic-theme');
+
+    const wideRail = page.getByTestId('theme-wide-navigation-rail');
+    await expect(wideRail).toHaveCSS('transition-duration', '0s');
+    await expect(wideRail.locator('.wide-navigation-rail-item').first()).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+
+    await page.getByTestId('theme-modal-drawer-open').click();
+    const drawerFrame = page.locator('.modal-navigation-drawer__sheet-frame');
+    await expect(drawerFrame).toBeVisible();
+    await expect(drawerFrame).toHaveCSS('transition-duration', '0s');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.modal-navigation-drawer-overlay')).toBeHidden();
+
+    await page.getByTestId('theme-modal-wide-rail-open').click();
+    const modalFrame = page.locator('.modal-wide-navigation-rail__frame');
+    await expect(modalFrame).toBeVisible();
+    await expect(modalFrame).toHaveCSS('transition-duration', '0s');
+    await expect(page.locator('.modal-wide-navigation-rail__rail')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+  });
 });
