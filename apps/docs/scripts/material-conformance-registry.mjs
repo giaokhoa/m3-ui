@@ -259,6 +259,147 @@ const textSearchFamilyDimensions = {
   },
 };
 
+const CONTENT_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const CONTENT_SHARED_EVIDENCE =
+  'apps/storybook/visual/content-primitives-conformance.visual.spec.ts';
+const CONTENT_SSR_EVIDENCE = 'packages/ui/src/content-primitives.ssr.test.tsx';
+const CHIP_VISUAL_EVIDENCE = 'apps/storybook/visual/chip.visual.spec.ts';
+const MENU_VISUAL_EVIDENCE = 'apps/storybook/visual/menu.visual.spec.ts';
+const EXPOSED_DROPDOWN_VISUAL_EVIDENCE =
+  'apps/storybook/visual/exposed-dropdown-menu.visual.spec.ts';
+const LIST_ITEM_VISUAL_EVIDENCE = 'apps/storybook/visual/list-item.visual.spec.ts';
+const BADGE_VISUAL_EVIDENCE = 'apps/storybook/visual/badge.visual.spec.ts';
+const DIVIDER_VISUAL_EVIDENCE = 'apps/storybook/visual/divider.visual.spec.ts';
+
+const contentPrimitiveFamilyDimensions = {
+  chip: {
+    api: requiredEvidence(
+      CONTENT_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Chip/Chip.defaults.test.ts',
+      CHIP_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(CHIP_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-chip.mjs',
+      'packages/tokens/scripts/chip-css.test.mjs',
+      CHIP_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(CHIP_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(CHIP_VISUAL_EVIDENCE),
+    rtlLocalization: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    motion: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    theme: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    browser: requiredEvidence(CHIP_VISUAL_EVIDENCE, CONTENT_SHARED_EVIDENCE),
+    ssr: requiredEvidence(CONTENT_SSR_EVIDENCE),
+  },
+  menu: {
+    api: requiredEvidence(
+      CONTENT_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Menu/Menu.test.ts',
+      'packages/ui/src/components/ExposedDropdownMenu/ExposedDropdownMenu.test.ts',
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-menu.mjs',
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+    ),
+    motion: requiredEvidence(MENU_VISUAL_EVIDENCE, CONTENT_SHARED_EVIDENCE),
+    theme: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      MENU_VISUAL_EVIDENCE,
+      EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
+      CONTENT_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(CONTENT_SSR_EVIDENCE),
+  },
+  'list-item': {
+    api: requiredEvidence(
+      CONTENT_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/ListItem/ListItem.elevation.test.ts',
+      LIST_ITEM_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(LIST_ITEM_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-list.mjs',
+      'packages/tokens/scripts/list-item-css.test.mjs',
+      LIST_ITEM_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(LIST_ITEM_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(LIST_ITEM_VISUAL_EVIDENCE),
+    rtlLocalization: requiredEvidence(LIST_ITEM_VISUAL_EVIDENCE),
+    motion: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    theme: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    browser: requiredEvidence(LIST_ITEM_VISUAL_EVIDENCE, CONTENT_SHARED_EVIDENCE),
+    ssr: requiredEvidence(CONTENT_SSR_EVIDENCE),
+  },
+  badge: {
+    api: requiredEvidence(
+      CONTENT_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Badge/Badge.defaults.test.ts',
+      BADGE_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(BADGE_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/badge-css.test.mjs',
+      BADGE_VISUAL_EVIDENCE,
+    ),
+    behavior: notApplicable(
+      'Badge and BadgedBox are presentational content/positioning primitives. They expose no component-owned activation, selection, disclosure, or focus behavior.',
+    ),
+    accessibility: requiredEvidence(BADGE_VISUAL_EVIDENCE, CONTENT_SSR_EVIDENCE),
+    rtlLocalization: requiredEvidence(BADGE_VISUAL_EVIDENCE),
+    motion: notApplicable(
+      'Badge and BadgedBox own no component transition or animation contract; consumers may animate surrounding content independently.',
+    ),
+    theme: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    browser: requiredEvidence(BADGE_VISUAL_EVIDENCE, CONTENT_SHARED_EVIDENCE),
+    ssr: requiredEvidence(CONTENT_SSR_EVIDENCE),
+  },
+  divider: {
+    api: requiredEvidence(
+      CONTENT_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Divider/Divider.defaults.test.ts',
+      DIVIDER_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(DIVIDER_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/divider-css.test.mjs',
+      DIVIDER_VISUAL_EVIDENCE,
+    ),
+    behavior: notApplicable(
+      'Divider is a semantic separator with no component-owned activation, selection, disclosure, or focus behavior.',
+    ),
+    accessibility: requiredEvidence(DIVIDER_VISUAL_EVIDENCE, CONTENT_SSR_EVIDENCE),
+    rtlLocalization: notApplicable(
+      'Divider owns horizontal/vertical orientation but no start/end placement, directional content, or bidi-sensitive interaction.',
+    ),
+    motion: notApplicable(
+      'Divider owns no transition or animation contract.',
+    ),
+    theme: requiredEvidence(CONTENT_SHARED_EVIDENCE),
+    browser: requiredEvidence(DIVIDER_VISUAL_EVIDENCE, CONTENT_SHARED_EVIDENCE),
+    ssr: requiredEvidence(CONTENT_SSR_EVIDENCE),
+  },
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -315,7 +456,12 @@ export const materialConformanceRegistry = {
   families: [
     component('app-bar-column', ['packages/ui/src/components/AppBarColumn/']),
     component('app-bar-row', ['packages/ui/src/components/AppBarRow/']),
-    component('badge', ['packages/ui/src/components/Badge/']),
+    component(
+      'badge',
+      ['packages/ui/src/components/Badge/'],
+      'badge',
+      contentPrimitiveFamilyDimensions.badge,
+    ),
     component('bottom-app-bar', ['packages/ui/src/components/BottomAppBar/']),
     component('bottom-sheet', [
       'packages/ui/src/components/BottomSheet/',
@@ -341,19 +487,34 @@ export const materialConformanceRegistry = {
       'checkbox',
       selectionFamilyDimensions.checkbox,
     ),
-    component('chip', ['packages/ui/src/components/Chip/']),
+    component(
+      'chip',
+      ['packages/ui/src/components/Chip/'],
+      'chip',
+      contentPrimitiveFamilyDimensions.chip,
+    ),
     component('date-picker', ['packages/ui/src/components/DatePicker/']),
     component('dialog', ['packages/ui/src/components/Dialog/']),
-    component('divider', ['packages/ui/src/components/Divider/']),
+    component(
+      'divider',
+      ['packages/ui/src/components/Divider/'],
+      'divider',
+      contentPrimitiveFamilyDimensions.divider,
+    ),
     component(
       'drag-handle',
       ['packages/ui/src/components/DragHandle/'],
       'vertical-drag-handle',
     ),
-    component('menu', [
-      'packages/ui/src/components/Menu/',
-      'packages/ui/src/components/ExposedDropdownMenu/',
-    ]),
+    component(
+      'menu',
+      [
+        'packages/ui/src/components/Menu/',
+        'packages/ui/src/components/ExposedDropdownMenu/',
+      ],
+      'menu',
+      contentPrimitiveFamilyDimensions.menu,
+    ),
     component(
       'fab',
       ['packages/ui/src/components/Fab/'],
@@ -373,7 +534,12 @@ export const materialConformanceRegistry = {
       'icon-button',
       actionFamilyDimensions['icon-button'],
     ),
-    component('list-item', ['packages/ui/src/components/ListItem/']),
+    component(
+      'list-item',
+      ['packages/ui/src/components/ListItem/'],
+      'list-item',
+      contentPrimitiveFamilyDimensions['list-item'],
+    ),
     component('loading-indicator', ['packages/ui/src/components/LoadingIndicator/']),
     directComponent(
       'navigation-bar',
