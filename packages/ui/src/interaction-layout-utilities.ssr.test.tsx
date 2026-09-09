@@ -36,7 +36,9 @@ describe('Lane 9 interaction and layout utility SSR contracts', () => {
     expect(second).toBe(first);
     expect(first).toContain('aria-label="Server carousel"');
     expect(first).toContain('carousel__viewport');
-    expect(first).toContain('Item 1');
+    expect(first).toContain('data-carousel-item=""');
+    expect(first).toContain('data-index="0"');
+    expect(first).toContain('Item');
     expect(first).not.toContain('NaN');
   });
 
