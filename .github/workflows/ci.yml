@@ -265,7 +265,7 @@ jobs:
           if-no-files-found: ignore
 
   required:
-    name: Dev smoke, test, typecheck, build, docs browser and visual regression
+    name: Dev smoke, test, typecheck, build and visual regression
     needs: [build, verify, visual, docs-browser]
     if: always()
     runs-on: ubuntu-latest
