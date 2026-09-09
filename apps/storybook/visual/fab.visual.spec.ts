@@ -1,16 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-
-async function openStory(page: Page, id: string) {
-  await page.goto(`/iframe.html?id=${id}&viewMode=story`, {
-    waitUntil: 'networkidle',
-  });
-
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
-
-  await expect(page.locator('#storybook-root')).toBeVisible();
-}
+import { openStory } from '../test-support/story';
 
 async function openDefaultFab(page: Page) {
   await openStory(page, 'components-fab--default');
