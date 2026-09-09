@@ -20,6 +20,7 @@ interface DocsThemeContextValue {
 }
 
 const storageKey = 'm3-ui-docs-theme';
+const themePortalId = 'docs-theme-portal';
 const preferences: readonly DocsThemePreference[] = ['system', 'light', 'dark'];
 const DocsThemeContext = createContext<DocsThemeContextValue | null>(null);
 
@@ -37,6 +38,10 @@ export function DocsThemeProvider({ children }: PropsWithChildren) {
   // sources are applied after hydration so ThemeProvider never hydrates from a
   // different mode than the server rendered.
   const [preferredSystemMode, setPreferredSystemMode] = useState<ThemeMode>('light');
+  const themePortalContainer =
+    typeof document === 'undefined'
+      ? null
+      : (document.getElementById(themePortalId) as HTMLDivElement | null);
 
   useEffect(() => {
     setPreference(storedPreference());
@@ -64,9 +69,19 @@ export function DocsThemeProvider({ children }: PropsWithChildren) {
     [preference, resolvedMode, cyclePreference],
   );
 
+  useEffect(() => {
+    if (themePortalContainer) {
+      themePortalContainer.dataset.theme = resolvedMode;
+    }
+  }, [resolvedMode, themePortalContainer]);
+
   return (
     <DocsThemeContext.Provider value={value}>
-      <ThemeProvider className="docs-theme" mode={resolvedMode}>
+      <ThemeProvider
+        className="docs-theme"
+        mode={resolvedMode}
+        portalContainer={themePortalContainer}
+      >
         {children}
       </ThemeProvider>
     </DocsThemeContext.Provider>
