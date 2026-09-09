@@ -400,6 +400,163 @@ const contentPrimitiveFamilyDimensions = {
   },
 };
 
+const SURFACES_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const SURFACES_SHARED_EVIDENCE =
+  'apps/storybook/visual/surfaces-overlays-conformance.visual.spec.ts';
+const SURFACES_SSR_EVIDENCE = 'packages/ui/src/surfaces-overlays.ssr.test.tsx';
+const CARD_VISUAL_EVIDENCE = 'apps/storybook/visual/card.visual.spec.ts';
+const SURFACE_VISUAL_EVIDENCE = 'apps/storybook/visual/surface.visual.spec.ts';
+const DIALOG_VISUAL_EVIDENCE = 'apps/storybook/visual/dialog.visual.spec.ts';
+const BOTTOM_SHEET_VISUAL_EVIDENCE =
+  'apps/storybook/visual/bottom-sheet.visual.spec.ts';
+const BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE =
+  'apps/storybook/visual/bottom-sheet-scaffold.visual.spec.ts';
+const SCRIM_VISUAL_EVIDENCE = 'apps/storybook/visual/scrim.visual.spec.ts';
+
+const surfaceOverlayFamilyDimensions = {
+  card: {
+    api: requiredEvidence(
+      SURFACES_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Card/Card.elevation.test.ts',
+      CARD_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(CARD_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-card.mjs',
+      CARD_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(CARD_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(CARD_VISUAL_EVIDENCE, SURFACES_SSR_EVIDENCE),
+    rtlLocalization: notApplicable(
+      'Card owns a symmetric container and does not own directional slots, glyph mirroring, locale formatting, or bidi-sensitive placement. Directionality of card content belongs to consumer children.',
+    ),
+    motion: requiredEvidence(CARD_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    theme: requiredEvidence(CARD_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    browser: requiredEvidence(CARD_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    ssr: requiredEvidence(SURFACES_SSR_EVIDENCE),
+  },
+  surface: {
+    api: requiredEvidence(
+      SURFACES_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Surface/Surface.defaults.test.ts',
+      SURFACE_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(SURFACE_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/ui/src/components/Surface/Surface.defaults.test.ts',
+      SURFACE_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(SURFACE_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(SURFACE_VISUAL_EVIDENCE, SURFACES_SSR_EVIDENCE),
+    rtlLocalization: notApplicable(
+      'Surface owns no directional slots, placement policy, locale formatting, or glyph mirroring. Consumer content owns bidi-sensitive layout inside the surface.',
+    ),
+    motion: notApplicable(
+      'Surface owns no component transition or animation contract. Interactive state feedback is delegated to the shared Ripple primitive, whose motion is tested at that shared boundary.',
+    ),
+    theme: requiredEvidence(SURFACE_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    browser: requiredEvidence(SURFACE_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    ssr: requiredEvidence(SURFACES_SSR_EVIDENCE),
+  },
+  dialog: {
+    api: requiredEvidence(
+      SURFACES_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Dialog/Dialog.defaults.test.ts',
+      DIALOG_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(DIALOG_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-dialog-sheet.mjs',
+      'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      DIALOG_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(DIALOG_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    accessibility: requiredEvidence(
+      DIALOG_VISUAL_EVIDENCE,
+      SURFACES_SHARED_EVIDENCE,
+      SURFACES_SSR_EVIDENCE,
+    ),
+    rtlLocalization: notApplicable(
+      'Dialog owns container geometry and logical action alignment but no directional glyphs, localized formatting, or semantic ordering. Caller-provided content and actions own bidi-sensitive text/order.',
+    ),
+    motion: notApplicable(
+      'The current Dialog renderer owns no component transition or animation in its CSS/runtime. React Aria owns modal lifecycle semantics; no synthetic Material animation contract is invented for this implementation.',
+    ),
+    theme: requiredEvidence(SURFACES_SHARED_EVIDENCE),
+    browser: requiredEvidence(DIALOG_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    ssr: requiredEvidence(SURFACES_SSR_EVIDENCE),
+  },
+  'bottom-sheet': {
+    api: requiredEvidence(
+      SURFACES_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/BottomSheet/BottomSheet.defaults.test.ts',
+      'packages/ui/src/components/BottomSheet/SheetState.test.ts',
+      'packages/ui/src/components/BottomSheetScaffold/BottomSheetScaffold.test.ts',
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+    ),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-dialog-sheet.mjs',
+      'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      'packages/ui/src/components/BottomSheet/SheetState.test.ts',
+      'packages/ui/src/components/BottomSheetScaffold/BottomSheetScaffold.test.ts',
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+      SURFACES_SHARED_EVIDENCE,
+      SURFACES_SSR_EVIDENCE,
+    ),
+    rtlLocalization: notApplicable(
+      'BottomSheet and BottomSheetScaffold own vertical anchors, centered sheet geometry, and modal/persistent lifecycle rather than start/end placement, directional icons, or locale formatting.',
+    ),
+    motion: requiredEvidence(
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+    ),
+    theme: requiredEvidence(BOTTOM_SHEET_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      BOTTOM_SHEET_VISUAL_EVIDENCE,
+      BOTTOM_SHEET_SCAFFOLD_VISUAL_EVIDENCE,
+      SURFACES_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(SURFACES_SSR_EVIDENCE),
+  },
+  scrim: {
+    api: requiredEvidence(
+      SURFACES_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/Scrim/Scrim.defaults.test.ts',
+      SCRIM_VISUAL_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(SCRIM_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-tooltip-snackbar-scrim.mjs',
+      'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      SCRIM_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(SCRIM_VISUAL_EVIDENCE),
+    accessibility: requiredEvidence(SCRIM_VISUAL_EVIDENCE, SURFACES_SSR_EVIDENCE),
+    rtlLocalization: notApplicable(
+      'Scrim fills its owner uniformly and owns no directional content, start/end placement, glyph mirroring, or locale formatting.',
+    ),
+    motion: notApplicable(
+      'Standalone Scrim owns no transition or animation contract. Overlay owners such as ModalBottomSheet own any animated scrim alpha and test that motion in their own family.',
+    ),
+    theme: requiredEvidence(SURFACES_SHARED_EVIDENCE),
+    browser: requiredEvidence(SCRIM_VISUAL_EVIDENCE, SURFACES_SHARED_EVIDENCE),
+    ssr: requiredEvidence(SURFACES_SSR_EVIDENCE),
+  },
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -463,10 +620,15 @@ export const materialConformanceRegistry = {
       contentPrimitiveFamilyDimensions.badge,
     ),
     component('bottom-app-bar', ['packages/ui/src/components/BottomAppBar/']),
-    component('bottom-sheet', [
-      'packages/ui/src/components/BottomSheet/',
-      'packages/ui/src/components/BottomSheetScaffold/',
-    ]),
+    component(
+      'bottom-sheet',
+      [
+        'packages/ui/src/components/BottomSheet/',
+        'packages/ui/src/components/BottomSheetScaffold/',
+      ],
+      'bottom-sheet',
+      surfaceOverlayFamilyDimensions['bottom-sheet'],
+    ),
     component(
       'button',
       ['packages/ui/src/components/Button/'],
@@ -479,7 +641,12 @@ export const materialConformanceRegistry = {
       'button-group',
       actionFamilyDimensions['button-group'],
     ),
-    component('card', ['packages/ui/src/components/Card/']),
+    component(
+      'card',
+      ['packages/ui/src/components/Card/'],
+      'card',
+      surfaceOverlayFamilyDimensions.card,
+    ),
     component('carousel', ['packages/ui/src/components/Carousel/']),
     component(
       'checkbox',
@@ -494,7 +661,12 @@ export const materialConformanceRegistry = {
       contentPrimitiveFamilyDimensions.chip,
     ),
     component('date-picker', ['packages/ui/src/components/DatePicker/']),
-    component('dialog', ['packages/ui/src/components/Dialog/']),
+    component(
+      'dialog',
+      ['packages/ui/src/components/Dialog/'],
+      'dialog',
+      surfaceOverlayFamilyDimensions.dialog,
+    ),
     component(
       'divider',
       ['packages/ui/src/components/Divider/'],
@@ -585,7 +757,12 @@ export const materialConformanceRegistry = {
       'radio-button',
       selectionFamilyDimensions['radio-button'],
     ),
-    component('scrim', ['packages/ui/src/components/Scrim/']),
+    component(
+      'scrim',
+      ['packages/ui/src/components/Scrim/'],
+      'scrim',
+      surfaceOverlayFamilyDimensions.scrim,
+    ),
     component('scroll-field', ['packages/ui/src/components/ScrollField/']),
     component(
       'search-bar',
@@ -612,7 +789,12 @@ export const materialConformanceRegistry = {
       'split-button',
       actionFamilyDimensions['split-button'],
     ),
-    component('surface', ['packages/ui/src/components/Surface/']),
+    component(
+      'surface',
+      ['packages/ui/src/components/Surface/'],
+      'surface',
+      surfaceOverlayFamilyDimensions.surface,
+    ),
     component('swipe-to-dismiss-box', ['packages/ui/src/components/SwipeToDismissBox/']),
     component(
       'switch',
