@@ -1,10 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-
-async function openStory(page: Page, id: string) {
-  await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
-  await page.evaluate(async () => { await document.fonts.ready; });
-  await expect(page.locator('#storybook-root')).toBeVisible();
-}
+import { openStory } from '../test-support/story';
 
 async function openControlled(page: Page) {
   await openStory(page, 'components-togglebutton--controlled');
@@ -112,5 +107,24 @@ test.describe('Material 3 ToggleButton browser parity', () => {
     await button.click();
     await expect(button).toHaveAttribute('aria-pressed', 'true');
     await expect(button).toHaveCSS('border-radius', '12px');
+  });
+
+  test('selected containers follow light, dark, and dynamic theme roles', async ({ page }) => {
+    await openStory(page, 'components-togglebutton--theme-matrix');
+    const cards = page.locator('.storybook-theme-card');
+    await expect(cards).toHaveCount(4);
+
+    const selectedContainerColors = await Promise.all(
+      [0, 1, 2, 3].map((index) =>
+        cards
+          .nth(index)
+          .getByRole('button', { name: 'Filled', exact: true })
+          .evaluate((element) => getComputedStyle(element).backgroundColor),
+      ),
+    );
+
+    expect(selectedContainerColors[0]).not.toBe(selectedContainerColors[1]);
+    expect(selectedContainerColors[2]).not.toBe(selectedContainerColors[0]);
+    expect(selectedContainerColors[3]).not.toBe(selectedContainerColors[1]);
   });
 });
