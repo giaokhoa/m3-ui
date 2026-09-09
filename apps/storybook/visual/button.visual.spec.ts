@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { setDocumentDirection } from '../test-support/browser';
 import { openStory } from '../test-support/story';
 
 async function openDefaultButton(page: Page) {
@@ -30,6 +31,22 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('logical start icon follows RTL direction without reversing the public slot contract', async ({ page }) => {
+    await openStory(page, 'components-button--icons');
+    await setDocumentDirection(page, 'rtl');
+    const button = page.getByRole('button', { name: 'Send' }).first();
+    const icon = button.locator('.button__icon');
+    const [buttonBox, iconBox] = await Promise.all([
+      button.boundingBox(),
+      icon.boundingBox(),
+    ]);
+    expect(buttonBox).not.toBeNull();
+    expect(iconBox).not.toBeNull();
+    expect((iconBox?.x ?? 0) + (iconBox?.width ?? 0) / 2).toBeGreaterThan(
+      (buttonBox?.x ?? 0) + (buttonBox?.width ?? 0) / 2,
+    );
+  });
+
   test('expressive size family', async ({ page }) => {
     await openStory(page, 'components-button--expressive-sizes');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
@@ -54,6 +71,16 @@ test.describe('Material 3 Button visual parity', () => {
     } finally {
       await page.mouse.up();
     }
+  });
+
+  test('reduced motion removes expressive shape transitions without changing activation', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'components-button--expressive-shape-morph');
+    const button = page.getByRole('button', { name: 'Press medium' });
+    await expect(button).toHaveCSS('transition-duration', '0s');
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(button).toBeFocused();
   });
 
   test('theme matrix', async ({ page }) => {

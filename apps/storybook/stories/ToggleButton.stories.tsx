@@ -4,6 +4,7 @@ import {
   ElevatedToggleButton,
   FilledTonalToggleButton,
   OutlinedToggleButton,
+  ThemeProvider,
   ToggleButton,
   type ToggleButtonSize,
 } from '@m3-ui/ui';
@@ -106,6 +107,10 @@ export const Controlled: Story = {
 };
 
 export const Disabled: Story = {
+  args: {
+    isDisabled: true,
+    children: 'Disabled button',
+  },
   render: () => (
     <div className="storybook-center">
       <div style={{ display: 'grid', gap: 24 }}>
@@ -129,4 +134,27 @@ export const Rtl: Story = {
 export const ReducedMotion: Story = {
   parameters: { reducedMotion: 'reduce' },
   render: () => <div className="storybook-center"><ControlledDemo /></div>,
+};
+
+export const ThemeMatrix: Story = {
+  render: () => (
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
+        <h3>Baseline · Light</h3>
+        <VariantRow selected />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="dark">
+        <h3>Baseline · Dark</h3>
+        <VariantRow selected />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
+        <h3>Dynamic · Light</h3>
+        <VariantRow selected />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
+        <h3>Dynamic · Dark</h3>
+        <VariantRow selected />
+      </ThemeProvider>
+    </div>
+  ),
 };

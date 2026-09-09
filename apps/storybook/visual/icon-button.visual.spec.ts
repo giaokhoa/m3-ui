@@ -104,6 +104,18 @@ test.describe('Material 3 IconButton visual parity', () => {
     }
   });
 
+  test('reduced motion removes surface transitions while preserving focus semantics', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'components-iconbutton--expressive-shape-morph');
+    const button = page.getByRole('button', { name: 'Press round favorite' });
+    await expect(button.locator('.icon-button__surface')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+    await button.focus();
+    await expect(button).toBeFocused();
+  });
+
   test('keyboard focus', async ({ page }) => {
     const button = await openDefaultIconButton(page);
     await page.keyboard.press('Tab');

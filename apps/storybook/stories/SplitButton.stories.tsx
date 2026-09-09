@@ -37,6 +37,16 @@ function storyFrame(children: ReactNode) {
   return <div className="storybook-center">{children}</div>;
 }
 
+function ThemeExample() {
+  return (
+    <SplitButton
+      leading="Theme action"
+      trailing={<ChevronDownIcon />}
+      trailingAriaLabel="Theme action options"
+    />
+  );
+}
+
 export const Default: Story = {
   render: (args) => storyFrame(<SplitButton {...args} />),
 };
@@ -195,14 +205,20 @@ export const ThemeMatrix: Story = {
   render: () => (
     <div className="storybook-theme-grid">
       <ThemeProvider className="storybook-theme-card" mode="light">
-        <h3>Light</h3>
-        <SplitButton leading="Filled" trailing={<ChevronDownIcon />} trailingAriaLabel="Options" />
-        <SplitButton variant="outlined" leading="Outlined" trailing={<ChevronDownIcon />} trailingAriaLabel="Options" />
+        <h3>Baseline · Light</h3>
+        <ThemeExample />
       </ThemeProvider>
       <ThemeProvider className="storybook-theme-card" mode="dark">
-        <h3>Dark</h3>
-        <SplitButton variant="tonal" leading="Tonal" trailing={<ChevronDownIcon />} trailingAriaLabel="Options" />
-        <SplitButton variant="elevated" leading="Elevated" trailing={<ChevronDownIcon />} trailingAriaLabel="Options" />
+        <h3>Baseline · Dark</h3>
+        <ThemeExample />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
+        <h3>Dynamic · Light</h3>
+        <ThemeExample />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
+        <h3>Dynamic · Dark</h3>
+        <ThemeExample />
       </ThemeProvider>
     </div>
   ),
