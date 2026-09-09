@@ -91,7 +91,11 @@ export const materialConformanceRegistry = {
     component('date-picker', ['packages/ui/src/components/DatePicker/']),
     component('dialog', ['packages/ui/src/components/Dialog/']),
     component('divider', ['packages/ui/src/components/Divider/']),
-    component('drag-handle', ['packages/ui/src/components/DragHandle/']),
+    component(
+      'drag-handle',
+      ['packages/ui/src/components/DragHandle/'],
+      'vertical-drag-handle',
+    ),
     component('menu', [
       'packages/ui/src/components/Menu/',
       'packages/ui/src/components/ExposedDropdownMenu/',
