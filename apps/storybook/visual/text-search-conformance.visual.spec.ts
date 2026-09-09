@@ -139,20 +139,20 @@ test.describe('Material 3 text and search conformance', () => {
   test('fullscreen SearchView inherits the dynamic ThemeProvider portal scope', async ({ page }) => {
     await openStory(page, 'conformance-textsearch--search-dynamic-portal');
     const theme = page.locator('.text-search-dynamic-theme');
-    const portal = page.locator(themePortalSelector);
     const bar = page.getByTestId('themed-search-bar');
-
-    await expect(portal).toHaveCount(1);
     const themeRole = await resolvedColor(theme, 'var(--surface-container-high)');
-    const portalRole = await resolvedColor(portal, 'var(--surface-container-high)');
-    expect(portalRole).toBe(themeRole);
     await expect(bar).toHaveCSS('background-color', themeRole);
 
     await page.getByTestId('open-themed-search').click();
-    const dialog = portal.getByRole('dialog', { name: 'Search' });
-    const view = portal.getByTestId('themed-search-view');
-    await expect(dialog).toBeVisible();
+    const view = page.getByTestId('themed-search-view');
+    const portal = page.locator(themePortalSelector).filter({ has: view });
     await expect(view).toBeVisible();
+    await expect(portal).toHaveCount(1);
+
+    const portalRole = await resolvedColor(portal, 'var(--surface-container-high)');
+    expect(portalRole).toBe(themeRole);
+    const dialog = portal.getByRole('dialog', { name: 'Search' });
+    await expect(dialog).toBeVisible();
     await expect(view).toHaveCSS('background-color', themeRole);
     await expect(view.getByRole('searchbox', { name: 'Themed search' })).toBeFocused();
   });
