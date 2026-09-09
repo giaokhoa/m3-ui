@@ -130,8 +130,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .checkbox__box,
+  .checkbox__box[data-state='checked'],
+  .checkbox__box[data-state='indeterminate'],
   .checkbox__check-path,
-  .checkbox__indeterminate-path {
+  .checkbox__indeterminate-path,
+  .checkbox__box[data-state='checked'] .checkbox__check-path,
+  .checkbox__box[data-state='indeterminate'] .checkbox__indeterminate-path {
     transition: none;
   }
 }
