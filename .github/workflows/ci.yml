@@ -232,9 +232,41 @@ jobs:
           path: apps/storybook/test-results
           if-no-files-found: ignore
 
+  docs-browser:
+    name: Docs browser regression
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium headless shell
+        run: pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium
+      - name: Docs Chromium regression
+        run: pnpm --filter @m3-ui/storybook test:docs-browser
+      - name: Upload docs browser failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-browser-failures
+          path: |
+            apps/storybook/docs-test-results
+            apps/storybook/docs-playwright-report
+          if-no-files-found: ignore
+
   required:
-    name: Dev smoke, test, typecheck, build and visual regression
-    needs: [build, verify, visual]
+    name: Dev smoke, test, typecheck, build, docs browser and visual regression
+    needs: [build, verify, visual, docs-browser]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -243,7 +275,9 @@ jobs:
           BUILD_RESULT: ${{ needs.build.result }}
           VERIFY_RESULT: ${{ needs.verify.result }}
           VISUAL_RESULT: ${{ needs.visual.result }}
+          DOCS_BROWSER_RESULT: ${{ needs.docs-browser.result }}
         run: |
           test "$BUILD_RESULT" = "success"
           test "$VERIFY_RESULT" = "success"
           test "$VISUAL_RESULT" = "success"
+          test "$DOCS_BROWSER_RESULT" = "success"
