@@ -90,6 +90,23 @@ test.describe('Material 3 Lane 6 feedback/status shared conformance', () => {
     );
   });
 
+  test('Snackbar logical inline layout keeps its action at inline-end in RTL', async ({ page }) => {
+    await openStory(page, 'conformance-feedbackstatus--rtl-snackbar');
+
+    const snackbar = page.getByTestId('rtl-snackbar');
+    const message = snackbar.getByRole('status');
+    const action = page.getByTestId('rtl-snackbar-action');
+    await expect(snackbar).toHaveCSS('direction', 'rtl');
+
+    const [messageBox, actionBox] = await Promise.all([
+      message.boundingBox(),
+      action.boundingBox(),
+    ]);
+    expect(messageBox).not.toBeNull();
+    expect(actionBox).not.toBeNull();
+    expect(actionBox!.x).toBeLessThan(messageBox!.x);
+  });
+
   test('Tooltip removes component-owned entrance motion when reduced motion is requested', async ({
     page,
   }) => {
