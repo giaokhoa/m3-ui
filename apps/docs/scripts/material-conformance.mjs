@@ -9,7 +9,7 @@ import {
 import {
   CONFORMANCE_DIMENSIONS,
   materialConformanceRegistry,
-} from './navigation-chrome-conformance-registry.mjs';
+} from './interaction-utilities-conformance-registry.mjs';
 
 const PROVENANCE_REGISTRIES = [
   ['apps/docs/src/componentDocs.ts', 'componentDocs'],
