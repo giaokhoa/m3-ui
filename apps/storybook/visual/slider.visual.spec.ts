@@ -1,10 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-
-async function openStory(page: Page, id: string) {
-  await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
-  await page.evaluate(async () => { await document.fonts.ready; });
-  await expect(page.locator('#storybook-root')).toBeVisible();
-}
+import { setDocumentDirection } from '../test-support/browser';
+import { openStory } from '../test-support/story';
 
 async function pseudoWidth(locator: ReturnType<Page['locator']>): Promise<number> {
   return locator.evaluate((element) =>
@@ -96,5 +92,56 @@ test.describe('Material 3 Slider browser contract', () => {
     const box = await nub.boundingBox();
     expect(box?.width).toBe(44);
     expect(box?.height).toBe(4);
+  });
+
+  test('disabled single and range thumbs keep native disabled semantics', async ({ page }) => {
+    await openStory(page, 'components-slider--disabled');
+    await expect(
+      page.getByRole('slider', { name: 'Disabled single' }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole('slider', { name: 'Disabled start' }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole('slider', { name: 'Disabled end' }),
+    ).toBeDisabled();
+  });
+
+  test('anchors the active horizontal track to logical inline start in RTL', async ({ page }) => {
+    await openStory(page, 'components-slider--default');
+    await setDocumentDirection(page, 'rtl');
+
+    const track = page.locator('.slider__track');
+    const active = page.locator('.slider__segment--active');
+    const [trackBox, activeBox] = await Promise.all([
+      track.boundingBox(),
+      active.boundingBox(),
+    ]);
+    expect(trackBox).not.toBeNull();
+    expect(activeBox).not.toBeNull();
+    expect(
+      Math.abs(trackBox!.x + trackBox!.width - (activeBox!.x + activeBox!.width)),
+      'active track should remain attached to logical inline-start (the right edge in RTL)',
+    ).toBeLessThanOrEqual(1);
+  });
+
+  test('removes handle and value-indicator transitions under reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'components-slider--discrete-ticks');
+    const slider = page.getByRole('slider', { name: 'Rating' });
+    await slider.focus();
+    const root = page.locator('.slider').first();
+    await expect(root.locator('.slider__handle')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+    await expect(root.locator('.slider__handle-nub')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+    await expect(root.locator('.slider__value-indicator')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
   });
 });

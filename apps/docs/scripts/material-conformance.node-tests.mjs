@@ -202,3 +202,33 @@ test('Lane 1 action families cannot regress to the generic parent gap', () => {
     }
   }
 });
+
+test('Lane 2 selection families cannot regress to the generic parent gap', () => {
+  const selectionIds = new Set([
+    'checkbox',
+    'radio-button',
+    'switch',
+    'slider',
+    'segmented-button',
+  ]);
+  const controls = materialConformanceRegistry.families.filter((family) =>
+    selectionIds.has(family.id),
+  );
+
+  assert.equal(controls.length, selectionIds.size);
+  for (const family of controls) {
+    for (const [dimension, contract] of Object.entries(family.dimensions)) {
+      assert.notEqual(
+        contract.gapIssue,
+        296,
+        `${family.id}.${dimension} must keep concrete Lane 2 evidence or an explicit classification`,
+      );
+      if (contract.status === 'required') {
+        assert.ok(
+          Array.isArray(contract.evidence) && contract.evidence.length > 0,
+          `${family.id}.${dimension} must retain automated evidence`,
+        );
+      }
+    }
+  }
+});

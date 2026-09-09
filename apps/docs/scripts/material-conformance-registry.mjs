@@ -118,6 +118,66 @@ const actionFamilyDimensions = {
   }),
 };
 
+const SELECTION_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const SELECTION_SHARED_EVIDENCE =
+  'apps/storybook/visual/selection-controls-conformance.visual.spec.ts';
+const SELECTION_SSR_EVIDENCE = 'packages/ui/src/selection-controls.ssr.test.tsx';
+
+function selectionDimensions({
+  browserEvidence,
+  tokenEvidence,
+  apiEvidence = [],
+  rtlEvidence = browserEvidence,
+  motionEvidence = browserEvidence,
+  themeEvidence = SELECTION_SHARED_EVIDENCE,
+}) {
+  return {
+    api: requiredEvidence(
+      SELECTION_INVENTORY_EVIDENCE,
+      ...apiEvidence,
+      browserEvidence,
+    ),
+    materialStatesVariants: requiredEvidence(browserEvidence),
+    tokensVisuals: requiredEvidence(...tokenEvidence, browserEvidence),
+    behavior: requiredEvidence(browserEvidence),
+    accessibility: requiredEvidence(browserEvidence),
+    rtlLocalization: requiredEvidence(rtlEvidence),
+    motion: requiredEvidence(motionEvidence),
+    theme: requiredEvidence(themeEvidence),
+    browser: requiredEvidence(browserEvidence),
+    ssr: requiredEvidence(SELECTION_SSR_EVIDENCE),
+  };
+}
+
+const selectionFamilyDimensions = {
+  checkbox: selectionDimensions({
+    browserEvidence: 'apps/storybook/visual/checkbox.visual.spec.ts',
+    apiEvidence: ['packages/ui/src/components/Checkbox/Checkbox.geometry.test.ts'],
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-checkbox.mjs'],
+    rtlEvidence: SELECTION_SHARED_EVIDENCE,
+  }),
+  'radio-button': selectionDimensions({
+    browserEvidence: 'apps/storybook/visual/radio-button.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-small-overlap.mjs'],
+    rtlEvidence: SELECTION_SHARED_EVIDENCE,
+    motionEvidence: SELECTION_SHARED_EVIDENCE,
+  }),
+  switch: selectionDimensions({
+    browserEvidence: 'apps/storybook/visual/switch.visual.spec.ts',
+    apiEvidence: ['packages/ui/src/components/Switch/Switch.defaults.test.ts'],
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-switch.mjs'],
+    motionEvidence: SELECTION_SHARED_EVIDENCE,
+  }),
+  slider: selectionDimensions({
+    browserEvidence: 'apps/storybook/visual/slider.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-slider.mjs'],
+  }),
+  'segmented-button': selectionDimensions({
+    browserEvidence: 'apps/storybook/visual/segmented-button.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-small-controls.mjs'],
+  }),
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -194,7 +254,12 @@ export const materialConformanceRegistry = {
     ),
     component('card', ['packages/ui/src/components/Card/']),
     component('carousel', ['packages/ui/src/components/Carousel/']),
-    component('checkbox', ['packages/ui/src/components/Checkbox/']),
+    component(
+      'checkbox',
+      ['packages/ui/src/components/Checkbox/'],
+      'checkbox',
+      selectionFamilyDimensions.checkbox,
+    ),
     component('chip', ['packages/ui/src/components/Chip/']),
     component('date-picker', ['packages/ui/src/components/DatePicker/']),
     component('dialog', ['packages/ui/src/components/Dialog/']),
@@ -267,12 +332,27 @@ export const materialConformanceRegistry = {
     ]),
     component('progress-indicator', ['packages/ui/src/components/ProgressIndicator/']),
     component('pull-to-refresh', ['packages/ui/src/components/PullToRefresh/']),
-    component('radio-button', ['packages/ui/src/components/RadioButton/']),
+    component(
+      'radio-button',
+      ['packages/ui/src/components/RadioButton/'],
+      'radio-button',
+      selectionFamilyDimensions['radio-button'],
+    ),
     component('scrim', ['packages/ui/src/components/Scrim/']),
     component('scroll-field', ['packages/ui/src/components/ScrollField/']),
     component('search-bar', ['packages/ui/src/components/SearchBar/']),
-    component('segmented-button', ['packages/ui/src/components/SegmentedButton/']),
-    component('slider', ['packages/ui/src/components/Slider/']),
+    component(
+      'segmented-button',
+      ['packages/ui/src/components/SegmentedButton/'],
+      'segmented-button',
+      selectionFamilyDimensions['segmented-button'],
+    ),
+    component(
+      'slider',
+      ['packages/ui/src/components/Slider/'],
+      'slider',
+      selectionFamilyDimensions.slider,
+    ),
     component('snackbar', ['packages/ui/src/components/Snackbar/']),
     component(
       'split-button',
@@ -282,7 +362,12 @@ export const materialConformanceRegistry = {
     ),
     component('surface', ['packages/ui/src/components/Surface/']),
     component('swipe-to-dismiss-box', ['packages/ui/src/components/SwipeToDismissBox/']),
-    component('switch', ['packages/ui/src/components/Switch/']),
+    component(
+      'switch',
+      ['packages/ui/src/components/Switch/'],
+      'switch',
+      selectionFamilyDimensions.switch,
+    ),
     component('tabs', ['packages/ui/src/components/Tabs/']),
     component('text-field', ['packages/ui/src/components/TextField/']),
     component('time-picker', ['packages/ui/src/components/TimePicker/']),

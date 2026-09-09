@@ -1,14 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-
-async function openStory(page: Page, id: string) {
-  await page.goto(`/iframe.html?id=${id}&viewMode=story`, {
-    waitUntil: 'networkidle',
-  });
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
-  await expect(page.locator('#storybook-root')).toBeVisible();
-}
+import { openStory } from '../test-support/story';
 
 async function openSelectedCheckbox(page: Page) {
   await openStory(page, 'components-checkbox--selected');
@@ -20,6 +11,34 @@ async function openSelectedCheckbox(page: Page) {
 }
 
 test.describe('Material 3 Checkbox visual parity', () => {
+  test('exposes native checked and indeterminate state and toggles from pointer and keyboard input', async ({
+    page,
+  }) => {
+    await openStory(page, 'components-checkbox--states');
+    const unchecked = page.getByRole('checkbox', { name: 'Unchecked', exact: true });
+    const checked = page.getByRole('checkbox', { name: 'Checked', exact: true });
+    const indeterminate = page.getByRole('checkbox', {
+      name: 'Indeterminate',
+      exact: true,
+    });
+
+    await expect(unchecked).not.toBeChecked();
+    await expect(checked).toBeChecked();
+    expect(
+      await indeterminate.evaluate(
+        (element) => (element as HTMLInputElement).indeterminate,
+      ),
+    ).toBe(true);
+
+    const uncheckedRoot = page.locator('.checkbox').filter({ has: unchecked });
+    await uncheckedRoot.click();
+    await expect(unchecked).toBeChecked();
+
+    await unchecked.focus();
+    await page.keyboard.press('Space');
+    await expect(unchecked).not.toBeChecked();
+  });
+
   test('states', async ({ page }) => {
     await openStory(page, 'components-checkbox--states');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
@@ -73,5 +92,19 @@ test.describe('Material 3 Checkbox visual parity', () => {
     } finally {
       await page.mouse.up();
     }
+  });
+
+  test('removes box and mark transitions under reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'components-checkbox--selected');
+    const root = page.locator('.checkbox');
+    await expect(root.locator('.checkbox__box')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+    await expect(root.locator('.checkbox__check-path')).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
   });
 });
