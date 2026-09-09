@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
   FloatingActionButtonMenu,
   FloatingActionButtonMenuItem,
+  ThemeProvider,
   ToggleFloatingActionButton,
 } from '@m3-ui/ui';
 
@@ -161,6 +162,29 @@ export const ToggleGeometry: Story = {
           />
         </div>
       ))}
+    </div>
+  ),
+};
+
+export const ThemeMatrix: Story = {
+  render: () => (
+    <div className="storybook-theme-grid">
+      <ThemeProvider className="storybook-theme-card" mode="light">
+        <h3>Baseline · Light</h3>
+        <FabMenuDemo initialExpanded />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="dark">
+        <h3>Baseline · Dark</h3>
+        <FabMenuDemo initialExpanded />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="light" sourceColor="#006a60">
+        <h3>Dynamic · Light</h3>
+        <FabMenuDemo initialExpanded />
+      </ThemeProvider>
+      <ThemeProvider className="storybook-theme-card" mode="dark" sourceColor="#b3261e">
+        <h3>Dynamic · Dark</h3>
+        <FabMenuDemo initialExpanded />
+      </ThemeProvider>
     </div>
   ),
 };
