@@ -9,6 +9,14 @@ export interface RuntimeGuard {
   assertClean(): void;
 }
 
+export interface RuntimeGuardOptions {
+  /**
+   * Narrow one-shot allowances for browser errors that are themselves the
+   * behavior under test. Each expression can suppress at most one message.
+   */
+  allowedConsoleErrors?: readonly RegExp[];
+}
+
 function isRequiredNextResource(rawUrl: string): boolean {
   try {
     const url = new URL(rawUrl);
@@ -23,8 +31,12 @@ function isRequiredNextResource(rawUrl: string): boolean {
  * External font/network noise is intentionally excluded; same-origin Next chunks
  * and the React/browser runtime are part of the docs product contract.
  */
-export function installRuntimeGuard(page: Page): RuntimeGuard {
+export function installRuntimeGuard(
+  page: Page,
+  options: RuntimeGuardOptions = {},
+): RuntimeGuard {
   const failures: string[] = [];
+  const remainingAllowedConsoleErrors = [...(options.allowedConsoleErrors ?? [])];
   const record = (kind: string, detail: string) => {
     failures.push(`[${kind}] ${detail}`);
   };
@@ -32,6 +44,14 @@ export function installRuntimeGuard(page: Page): RuntimeGuard {
   page.on('console', (message) => {
     const text = message.text();
     if (message.type() === 'error') {
+      const allowedIndex = remainingAllowedConsoleErrors.findIndex((pattern) =>
+        pattern.test(text),
+      );
+      if (allowedIndex >= 0) {
+        remainingAllowedConsoleErrors.splice(allowedIndex, 1);
+        return;
+      }
+
       record('console.error', text);
       return;
     }
