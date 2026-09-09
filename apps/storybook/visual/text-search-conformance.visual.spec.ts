@@ -2,6 +2,8 @@ import { expect, test, type Locator } from '@playwright/test';
 import { setDocumentDirection } from '../test-support/browser';
 import { openStory } from '../test-support/story';
 
+const themePortalSelector = '[data-' + 'm3' + '-theme-portal]';
+
 async function resolvedColor(scope: Locator, value: string): Promise<string> {
   return scope.evaluate((element, colorValue) => {
     const probe = document.createElement('span');
@@ -137,7 +139,7 @@ test.describe('Material 3 text and search conformance', () => {
   test('fullscreen SearchView inherits the dynamic ThemeProvider portal scope', async ({ page }) => {
     await openStory(page, 'conformance-textsearch--search-dynamic-portal');
     const theme = page.locator('.text-search-dynamic-theme');
-    const portal = page.locator('[data-m3-theme-portal]');
+    const portal = page.locator(themePortalSelector);
     const bar = page.getByTestId('themed-search-bar');
 
     await expect(portal).toHaveCount(1);
