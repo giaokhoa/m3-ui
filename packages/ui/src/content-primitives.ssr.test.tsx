@@ -6,6 +6,7 @@ import {
   Badge,
   BadgedBox,
   Button,
+  ExposedDropdownMenu,
   ExposedMenu,
   FilterChip,
   HorizontalDivider,
@@ -40,7 +41,7 @@ describe('Lane 4 content primitive SSR contracts', () => {
     expect(html).toContain('Server filter');
   });
 
-  it('keeps Menu and ExposedMenu closed SSR markup free of an implicit open overlay', () => {
+  it('keeps Menu, ExposedMenu, and ExposedDropdownMenu closed on the server', () => {
     const html = renderContentPrimitive(
       <>
         <Menu
@@ -52,14 +53,32 @@ describe('Lane 4 content primitive SSR contracts', () => {
         <ExposedMenu aria-label="Server exposed menu" value="Read only choice">
           <MenuItem id="choice">Read only choice</MenuItem>
         </ExposedMenu>
+        <ExposedDropdownMenu
+          aria-label="Server dropdown"
+          items={[
+            { value: 'one', label: 'One' },
+            { value: 'two', label: 'Two' },
+          ]}
+          value="one"
+          inputValue="One"
+          onInputChange={() => {}}
+          onSelectionChange={() => {}}
+          isOpen={false}
+          onOpenChange={() => {}}
+          name="server-choice"
+        />
       </>,
     );
 
     expect(html).toContain('Open server menu');
     expect(html).toContain('aria-haspopup="menu"');
-    expect(html).toContain('aria-expanded="false"');
     expect(html).toContain('Read only choice');
+    expect(html).toContain('role="combobox"');
+    expect(html).toContain('aria-autocomplete="list"');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('name="server-choice"');
     expect(html).not.toContain('role="menu"');
+    expect(html).not.toContain('role="listbox"');
   });
 
   it('renders passive, action, and single-selection ListItem semantics deterministically', () => {
