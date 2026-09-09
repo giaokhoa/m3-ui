@@ -106,3 +106,20 @@ export const RtlProgress: Story = {
     </div>
   ),
 };
+
+export const RtlSnackbar: Story = {
+  render: () => (
+    <div dir="rtl" style={{ padding: 32, width: 420 }}>
+      <Snackbar
+        data-testid="rtl-snackbar"
+        action={
+          <SnackbarAction data-testid="rtl-snackbar-action" onPress={() => {}}>
+            تراجع
+          </SnackbarAction>
+        }
+      >
+        تم حفظ العنصر
+      </Snackbar>
+    </div>
+  ),
+};
