@@ -6,6 +6,7 @@ import {
   BadgedBox,
   Button,
   ElevatedAssistChip,
+  ExposedDropdownMenu,
   FilterChip,
   HorizontalDivider,
   ListItem,
@@ -62,6 +63,14 @@ export const MotionAndDirection: Story = {
 };
 
 function DynamicThemeDemo() {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownValue, setDropdownValue] = useState('one');
+  const [inputValue, setInputValue] = useState('One');
+  const dropdownItems = [
+    { value: 'one', label: 'One' },
+    { value: 'two', label: 'Two' },
+  ] as const;
+
   return (
     <ThemeProvider
       className="content-primitives-dynamic-theme"
@@ -98,6 +107,20 @@ function DynamicThemeDemo() {
             First item
           </MenuItem>
         </Menu>
+        <ExposedDropdownMenu
+          aria-label="Dynamic dropdown"
+          className="theme-exposed-dropdown"
+          items={dropdownItems}
+          value={dropdownValue}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onSelectionChange={(nextValue, item) => {
+            setDropdownValue(nextValue);
+            setInputValue(item.label);
+          }}
+          isOpen={dropdownOpen}
+          onOpenChange={setDropdownOpen}
+        />
       </div>
     </ThemeProvider>
   );
