@@ -11,7 +11,7 @@ async function openSelectedCheckbox(page: Page) {
 }
 
 test.describe('Material 3 Checkbox visual parity', () => {
-  test('exposes native checked and indeterminate state and toggles from the control', async ({
+  test('exposes native checked and indeterminate state and toggles from pointer and keyboard input', async ({
     page,
   }) => {
     await openStory(page, 'components-checkbox--states');
@@ -30,8 +30,13 @@ test.describe('Material 3 Checkbox visual parity', () => {
       ),
     ).toBe(true);
 
-    await unchecked.click();
+    const uncheckedRoot = page.locator('.checkbox').filter({ has: unchecked });
+    await uncheckedRoot.click();
     await expect(unchecked).toBeChecked();
+
+    await unchecked.focus();
+    await page.keyboard.press('Space');
+    await expect(unchecked).not.toBeChecked();
   });
 
   test('states', async ({ page }) => {
