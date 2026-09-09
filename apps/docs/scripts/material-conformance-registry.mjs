@@ -20,12 +20,91 @@ export function openRequiredDimensions(gapIssue = 296) {
   );
 }
 
-const component = (id, sourcePrefixes, provenanceId = id) => ({
+const requiredEvidence = (...evidence) => ({ status: 'required', evidence });
+const notApplicable = (reason) => ({ status: 'not-applicable', reason });
+
+const ACTION_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const ACTION_THEME_EVIDENCE = 'apps/storybook/visual/actions-theme-conformance.visual.spec.ts';
+const ACTION_SSR_EVIDENCE = 'packages/ui/src/action-families.ssr.test.tsx';
+
+function actionDimensions({
+  browserEvidence,
+  tokenEvidence,
+  rtlEvidence = browserEvidence,
+  rtlReason,
+  themeEvidence = browserEvidence,
+}) {
+  return {
+    api: requiredEvidence(ACTION_INVENTORY_EVIDENCE, browserEvidence),
+    materialStatesVariants: requiredEvidence(browserEvidence),
+    tokensVisuals: requiredEvidence(...tokenEvidence, browserEvidence),
+    behavior: requiredEvidence(browserEvidence),
+    accessibility: requiredEvidence(browserEvidence),
+    rtlLocalization: rtlReason
+      ? notApplicable(rtlReason)
+      : requiredEvidence(rtlEvidence),
+    motion: requiredEvidence(browserEvidence),
+    theme: requiredEvidence(themeEvidence),
+    browser: requiredEvidence(browserEvidence),
+    ssr: requiredEvidence(ACTION_SSR_EVIDENCE),
+  };
+}
+
+const actionFamilyDimensions = {
+  button: actionDimensions({
+    browserEvidence: 'apps/storybook/visual/button.visual.spec.ts',
+    tokenEvidence: [
+      'packages/tokens/scripts/audit-material-web-button-sizes.mjs',
+      'packages/tokens/scripts/audit-material-web-button-variants.mjs',
+      'packages/tokens/scripts/audit-material-web-button-generic.mjs',
+    ],
+  }),
+  'button-group': actionDimensions({
+    browserEvidence: 'apps/storybook/visual/button-group.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-button-group.mjs'],
+    themeEvidence: ACTION_THEME_EVIDENCE,
+  }),
+  fab: actionDimensions({
+    browserEvidence: 'apps/storybook/visual/fab.visual.spec.ts',
+    tokenEvidence: [
+      'packages/tokens/scripts/audit-material-web-fab-sizes.mjs',
+      'packages/tokens/scripts/audit-material-web-fab-roles.mjs',
+      'packages/tokens/scripts/audit-material-web-fab-surface.mjs',
+      'packages/tokens/scripts/audit-material-web-fab-remaining.mjs',
+    ],
+  }),
+  'fab-menu': actionDimensions({
+    browserEvidence: 'apps/storybook/visual/fab-menu.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-fab-menu.mjs'],
+    themeEvidence: ACTION_THEME_EVIDENCE,
+  }),
+  'icon-button': actionDimensions({
+    browserEvidence: 'apps/storybook/visual/icon-button.visual.spec.ts',
+    tokenEvidence: [
+      'packages/tokens/scripts/audit-material-web-icon-button-sizes.mjs',
+      'packages/tokens/scripts/audit-material-web-icon-button-variants.mjs',
+      'packages/tokens/scripts/audit-material-web-icon-button-generic.mjs',
+    ],
+    rtlReason:
+      'IconButton owns a symmetric icon-only container and does not own directional glyph mirroring or localized text. Consumers provide any direction-sensitive icon content.',
+  }),
+  'split-button': actionDimensions({
+    browserEvidence: 'apps/storybook/visual/split-button.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/audit-material-web-split-button.mjs'],
+    themeEvidence: ACTION_THEME_EVIDENCE,
+  }),
+  'toggle-button': actionDimensions({
+    browserEvidence: 'apps/storybook/visual/toggle-button.visual.spec.ts',
+    tokenEvidence: ['packages/tokens/scripts/toggle-button-css.test.mjs'],
+  }),
+};
+
+const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
   sourcePrefixes,
   provenance: { kind: 'component-docs', id: provenanceId },
-  dimensions: openRequiredDimensions(),
+  dimensions,
 });
 
 const directComponent = (id, sourcePrefixes, { family, materialUrl, evidence }) => ({
@@ -82,8 +161,18 @@ export const materialConformanceRegistry = {
       'packages/ui/src/components/BottomSheet/',
       'packages/ui/src/components/BottomSheetScaffold/',
     ]),
-    component('button', ['packages/ui/src/components/Button/']),
-    component('button-group', ['packages/ui/src/components/ButtonGroup/']),
+    component(
+      'button',
+      ['packages/ui/src/components/Button/'],
+      'button',
+      actionFamilyDimensions.button,
+    ),
+    component(
+      'button-group',
+      ['packages/ui/src/components/ButtonGroup/'],
+      'button-group',
+      actionFamilyDimensions['button-group'],
+    ),
     component('card', ['packages/ui/src/components/Card/']),
     component('carousel', ['packages/ui/src/components/Carousel/']),
     component('checkbox', ['packages/ui/src/components/Checkbox/']),
@@ -100,10 +189,25 @@ export const materialConformanceRegistry = {
       'packages/ui/src/components/Menu/',
       'packages/ui/src/components/ExposedDropdownMenu/',
     ]),
-    component('fab', ['packages/ui/src/components/Fab/']),
-    component('fab-menu', ['packages/ui/src/components/FabMenu/']),
+    component(
+      'fab',
+      ['packages/ui/src/components/Fab/'],
+      'fab',
+      actionFamilyDimensions.fab,
+    ),
+    component(
+      'fab-menu',
+      ['packages/ui/src/components/FabMenu/'],
+      'fab-menu',
+      actionFamilyDimensions['fab-menu'],
+    ),
     component('floating-toolbar', ['packages/ui/src/components/FloatingToolbar/']),
-    component('icon-button', ['packages/ui/src/components/IconButton/']),
+    component(
+      'icon-button',
+      ['packages/ui/src/components/IconButton/'],
+      'icon-button',
+      actionFamilyDimensions['icon-button'],
+    ),
     component('list-item', ['packages/ui/src/components/ListItem/']),
     component('loading-indicator', ['packages/ui/src/components/LoadingIndicator/']),
     directComponent(
@@ -151,14 +255,24 @@ export const materialConformanceRegistry = {
     component('segmented-button', ['packages/ui/src/components/SegmentedButton/']),
     component('slider', ['packages/ui/src/components/Slider/']),
     component('snackbar', ['packages/ui/src/components/Snackbar/']),
-    component('split-button', ['packages/ui/src/components/SplitButton/']),
+    component(
+      'split-button',
+      ['packages/ui/src/components/SplitButton/'],
+      'split-button',
+      actionFamilyDimensions['split-button'],
+    ),
     component('surface', ['packages/ui/src/components/Surface/']),
     component('swipe-to-dismiss-box', ['packages/ui/src/components/SwipeToDismissBox/']),
     component('switch', ['packages/ui/src/components/Switch/']),
     component('tabs', ['packages/ui/src/components/Tabs/']),
     component('text-field', ['packages/ui/src/components/TextField/']),
     component('time-picker', ['packages/ui/src/components/TimePicker/']),
-    component('toggle-button', ['packages/ui/src/components/ToggleButton/']),
+    component(
+      'toggle-button',
+      ['packages/ui/src/components/ToggleButton/'],
+      'toggle-button',
+      actionFamilyDimensions['toggle-button'],
+    ),
     component('tooltip', ['packages/ui/src/components/Tooltip/']),
     component('top-app-bar', ['packages/ui/src/components/TopAppBar/']),
 
