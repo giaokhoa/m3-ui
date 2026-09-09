@@ -232,3 +232,27 @@ test('Lane 2 selection families cannot regress to the generic parent gap', () =>
     }
   }
 });
+
+test('Lane 3 text and search families cannot regress to the generic parent gap', () => {
+  const laneIds = new Set(['text-field', 'search-bar']);
+  const families = materialConformanceRegistry.families.filter((family) =>
+    laneIds.has(family.id),
+  );
+
+  assert.equal(families.length, laneIds.size);
+  for (const family of families) {
+    for (const [dimension, contract] of Object.entries(family.dimensions)) {
+      assert.notEqual(
+        contract.gapIssue,
+        296,
+        `${family.id}.${dimension} must keep concrete Lane 3 evidence or an explicit classification`,
+      );
+      if (contract.status === 'required') {
+        assert.ok(
+          Array.isArray(contract.evidence) && contract.evidence.length > 0,
+          `${family.id}.${dimension} must retain automated evidence`,
+        );
+      }
+    }
+  }
+});
