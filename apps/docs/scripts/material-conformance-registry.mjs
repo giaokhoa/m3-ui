@@ -30,12 +30,17 @@ const ACTION_SSR_EVIDENCE = 'packages/ui/src/action-families.ssr.test.tsx';
 function actionDimensions({
   browserEvidence,
   tokenEvidence,
+  apiEvidence = [],
   rtlEvidence = browserEvidence,
   rtlReason,
   themeEvidence = browserEvidence,
 }) {
   return {
-    api: requiredEvidence(ACTION_INVENTORY_EVIDENCE, browserEvidence),
+    api: requiredEvidence(
+      ACTION_INVENTORY_EVIDENCE,
+      ...apiEvidence,
+      browserEvidence,
+    ),
     materialStatesVariants: requiredEvidence(browserEvidence),
     tokensVisuals: requiredEvidence(...tokenEvidence, browserEvidence),
     behavior: requiredEvidence(browserEvidence),
@@ -53,6 +58,7 @@ function actionDimensions({
 const actionFamilyDimensions = {
   button: actionDimensions({
     browserEvidence: 'apps/storybook/visual/button.visual.spec.ts',
+    apiEvidence: ['packages/ui/src/components/Button/Button.runtime.test.ts'],
     tokenEvidence: [
       'packages/tokens/scripts/audit-material-web-button-sizes.mjs',
       'packages/tokens/scripts/audit-material-web-button-variants.mjs',
@@ -61,11 +67,18 @@ const actionFamilyDimensions = {
   }),
   'button-group': actionDimensions({
     browserEvidence: 'apps/storybook/visual/button-group.visual.spec.ts',
+    apiEvidence: [
+      'packages/ui/src/components/ButtonGroup/ButtonGroup.defaults.test.ts',
+    ],
     tokenEvidence: ['packages/tokens/scripts/audit-material-web-button-group.mjs'],
     themeEvidence: ACTION_THEME_EVIDENCE,
   }),
   fab: actionDimensions({
     browserEvidence: 'apps/storybook/visual/fab.visual.spec.ts',
+    apiEvidence: [
+      'packages/ui/src/components/Fab/Fab.defaults.test.ts',
+      'packages/ui/src/components/Fab/Fab.elevation.test.ts',
+    ],
     tokenEvidence: [
       'packages/tokens/scripts/audit-material-web-fab-sizes.mjs',
       'packages/tokens/scripts/audit-material-web-fab-roles.mjs',
@@ -75,11 +88,17 @@ const actionFamilyDimensions = {
   }),
   'fab-menu': actionDimensions({
     browserEvidence: 'apps/storybook/visual/fab-menu.visual.spec.ts',
+    apiEvidence: [
+      'packages/ui/src/components/FabMenu/FabMenu.defaults.test.ts',
+    ],
     tokenEvidence: ['packages/tokens/scripts/audit-material-web-fab-menu.mjs'],
     themeEvidence: ACTION_THEME_EVIDENCE,
   }),
   'icon-button': actionDimensions({
     browserEvidence: 'apps/storybook/visual/icon-button.visual.spec.ts',
+    apiEvidence: [
+      'packages/ui/src/components/IconButton/IconButton.runtime.test.ts',
+    ],
     tokenEvidence: [
       'packages/tokens/scripts/audit-material-web-icon-button-sizes.mjs',
       'packages/tokens/scripts/audit-material-web-icon-button-variants.mjs',
