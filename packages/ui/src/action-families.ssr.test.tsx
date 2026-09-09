@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import type { ReactElement } from 'react';
 import { renderToString } from 'react-dom/server';
+import { describe, expect, it } from 'vitest';
 import {
   Button,
   ButtonGroup,
@@ -15,7 +16,7 @@ import {
 
 const icon = <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 11h14v2H5z" /></svg>;
 
-function expectServerMarkup(element: React.ReactElement, text: string) {
+function expectServerMarkup(element: ReactElement, text: string) {
   const html = renderToString(element);
   expect(html).toContain(text);
   expect(html).not.toContain('data-reactroot');
