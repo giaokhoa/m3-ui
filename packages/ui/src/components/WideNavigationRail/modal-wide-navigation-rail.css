@@ -81,6 +81,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .modal-wide-navigation-rail-overlay {
+    --_modal-wide-navigation-rail-width-duration: 0ms;
+    --_modal-wide-navigation-rail-slide-duration: 0ms;
+    --_modal-wide-navigation-rail-effects-duration: 0ms;
+  }
+
   .modal-wide-navigation-rail__scrim,
   .modal-wide-navigation-rail__frame,
   .modal-wide-navigation-rail__rail {
