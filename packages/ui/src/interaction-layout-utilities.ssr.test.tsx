@@ -25,8 +25,10 @@ describe('Lane 9 interaction and layout utility SSR contracts', () => {
       <HorizontalMultiBrowseCarousel
         aria-label="Server carousel"
         itemCount={4}
-        itemContent={(index) => <span>Item {index + 1}</span>}
-      />
+        preferredItemWidth={186}
+      >
+        {({ index }) => <span>Item {index + 1}</span>}
+      </HorizontalMultiBrowseCarousel>
     );
 
     const first = renderLane9(tree);
