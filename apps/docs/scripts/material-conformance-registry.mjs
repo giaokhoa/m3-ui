@@ -178,6 +178,87 @@ const selectionFamilyDimensions = {
   }),
 };
 
+const TEXT_SEARCH_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
+const TEXT_SEARCH_SHARED_EVIDENCE =
+  'apps/storybook/visual/text-search-conformance.visual.spec.ts';
+const TEXT_SEARCH_SSR_EVIDENCE = 'packages/ui/src/text-search.ssr.test.tsx';
+const TEXT_FIELD_VISUAL_EVIDENCE = 'apps/storybook/visual/text-field.visual.spec.ts';
+const SECURE_TEXT_FIELD_VISUAL_EVIDENCE =
+  'apps/storybook/visual/secure-text-field.visual.spec.ts';
+const SEARCH_BAR_VISUAL_EVIDENCE = 'apps/storybook/visual/search-bar.visual.spec.ts';
+
+const textSearchFamilyDimensions = {
+  'text-field': {
+    api: requiredEvidence(
+      TEXT_SEARCH_INVENTORY_EVIDENCE,
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+    ),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-text-field.mjs',
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    motion: requiredEvidence(TEXT_SEARCH_SHARED_EVIDENCE),
+    theme: requiredEvidence(TEXT_FIELD_VISUAL_EVIDENCE),
+    browser: requiredEvidence(
+      TEXT_FIELD_VISUAL_EVIDENCE,
+      SECURE_TEXT_FIELD_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(TEXT_SEARCH_SSR_EVIDENCE),
+  },
+  'search-bar': {
+    api: requiredEvidence(
+      TEXT_SEARCH_INVENTORY_EVIDENCE,
+      'packages/ui/src/components/SearchBar/SearchBar.defaults.test.ts',
+      SEARCH_BAR_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    materialStatesVariants: requiredEvidence(SEARCH_BAR_VISUAL_EVIDENCE),
+    tokensVisuals: requiredEvidence(
+      'packages/tokens/scripts/audit-material-web-search.mjs',
+      'packages/ui/src/components/SearchBar/SearchBar.defaults.test.ts',
+      SEARCH_BAR_VISUAL_EVIDENCE,
+    ),
+    behavior: requiredEvidence(
+      SEARCH_BAR_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    accessibility: requiredEvidence(
+      SEARCH_BAR_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    rtlLocalization: requiredEvidence(SEARCH_BAR_VISUAL_EVIDENCE),
+    motion: requiredEvidence(SEARCH_BAR_VISUAL_EVIDENCE),
+    theme: requiredEvidence(TEXT_SEARCH_SHARED_EVIDENCE),
+    browser: requiredEvidence(
+      SEARCH_BAR_VISUAL_EVIDENCE,
+      TEXT_SEARCH_SHARED_EVIDENCE,
+    ),
+    ssr: requiredEvidence(TEXT_SEARCH_SSR_EVIDENCE),
+  },
+};
+
 const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
   id,
   kind: 'component',
@@ -340,7 +421,12 @@ export const materialConformanceRegistry = {
     ),
     component('scrim', ['packages/ui/src/components/Scrim/']),
     component('scroll-field', ['packages/ui/src/components/ScrollField/']),
-    component('search-bar', ['packages/ui/src/components/SearchBar/']),
+    component(
+      'search-bar',
+      ['packages/ui/src/components/SearchBar/'],
+      'search-bar',
+      textSearchFamilyDimensions['search-bar'],
+    ),
     component(
       'segmented-button',
       ['packages/ui/src/components/SegmentedButton/'],
@@ -369,7 +455,12 @@ export const materialConformanceRegistry = {
       selectionFamilyDimensions.switch,
     ),
     component('tabs', ['packages/ui/src/components/Tabs/']),
-    component('text-field', ['packages/ui/src/components/TextField/']),
+    component(
+      'text-field',
+      ['packages/ui/src/components/TextField/'],
+      'text-field',
+      textSearchFamilyDimensions['text-field'],
+    ),
     component('time-picker', ['packages/ui/src/components/TimePicker/']),
     component(
       'toggle-button',
