@@ -14,7 +14,10 @@ import {
   type Ref,
 } from 'react';
 import { Popover as AriaPopover } from 'react-aria-components';
-import { menuRuntime } from '../Menu/Menu.defaults';
+import { Elevation } from '../../internal/elevation';
+import { useThemePortalContainer } from '../../theme/ThemePortalContext';
+import { menuContainerElevation, menuRuntime } from '../Menu/Menu.defaults';
+import '../Menu/menu.css';
 import { OutlinedTextField, TextField } from '../TextField';
 import { calculateExposedDropdownMaxHeight } from './ExposedDropdownMenu.utils';
 import './exposed-dropdown-menu.css';
@@ -178,6 +181,7 @@ export function ExposedDropdownMenu<T = unknown>({
   const optionIdPrefix = useId();
   const anchorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const themePortalContainer = useThemePortalContainer();
   const [internalInputValue, setInternalInputValue] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const [maxHeight, setMaxHeight] = useState<number>();
@@ -196,8 +200,7 @@ export function ExposedDropdownMenu<T = unknown>({
     (next: string) => {
       if (inputValue === undefined) setInternalInputValue(next);
       onInputChange?.(next);
-    },
-    [inputValue, onInputChange],
+    }, [inputValue, onInputChange],
   );
 
   const open = useCallback(() => {
@@ -222,8 +225,7 @@ export function ExposedDropdownMenu<T = unknown>({
       if (!isReadOnly) setInput(item.label);
       close();
       requestAnimationFrame(() => inputRef.current?.focus());
-    },
-    [close, isReadOnly, items, onSelectionChange, setInput],
+    }, [close, isReadOnly, items, onSelectionChange, setInput],
   );
 
   const onInputKeyDown = useCallback(
@@ -448,40 +450,46 @@ export function ExposedDropdownMenu<T = unknown>({
         offset={4}
         containerPadding={menuRuntime.viewportMargin}
         shouldFlip
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-dropdown-menu__popover"
         style={{
           ...(matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : null),
           ...(maxHeight != null ? { maxHeight } : null),
         }}
       >
-        <div
-          id={popupId}
-          role="listbox"
-          aria-label={ariaLabel ?? (typeof label === 'string' ? label : 'Options')}
-          className="menu exposed-dropdown-menu__listbox"
-          onMouseDown={(event) => {
-            if (!isReadOnly) event.preventDefault();
-          }}
-        >
-          {items.map((item, index) => {
-            const isSelected = item.value === value;
-            const isActive = index === activeIndex;
-            const disabled = Boolean(item.isDisabled);
-            return (
-              <DropdownMenuItem
-                key={item.value}
-                item={item}
-                index={index}
-                isSelected={isSelected}
-                isActive={isActive}
-                disabled={disabled}
-                optionIdPrefix={optionIdPrefix}
-                setActiveIndex={setActiveIndex}
-                selectIndex={selectIndex}
-                renderItem={renderItem}
-              />
-            );
-          })}
+        <div className="menu-surface">
+          <Elevation level={menuContainerElevation} />
+          <div className="menu-surface__clip">
+            <div
+              id={popupId}
+              role="listbox"
+              aria-label={ariaLabel ?? (typeof label === 'string' ? label : 'Options')}
+              className="menu exposed-dropdown-menu__listbox"
+              onMouseDown={(event) => {
+                if (!isReadOnly) event.preventDefault();
+              }}
+            >
+              {items.map((item, index) => {
+                const isSelected = item.value === value;
+                const isActive = index === activeIndex;
+                const disabled = Boolean(item.isDisabled);
+                return (
+                  <DropdownMenuItem
+                    key={item.value}
+                    item={item}
+                    index={index}
+                    isSelected={isSelected}
+                    isActive={isActive}
+                    disabled={disabled}
+                    optionIdPrefix={optionIdPrefix}
+                    setActiveIndex={setActiveIndex}
+                    selectIndex={selectIndex}
+                    renderItem={renderItem}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
       </AriaPopover>
     </div>
