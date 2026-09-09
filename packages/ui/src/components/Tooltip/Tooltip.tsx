@@ -25,6 +25,7 @@ import {
   type TooltipProps as AriaTooltipProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
+import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   getPlainTooltipStyle,
   getRichTooltipStyle,
@@ -41,24 +42,6 @@ export interface PlainTooltipProps
     PlainTooltipStyleOptions {}
 
 export type TooltipTriggerProps = ComponentProps<typeof AriaTooltipTrigger>;
-
-type PortalInheritedStyle = CSSProperties &
-  Record<`--${string}`, string | number>;
-
-function readInheritedPortalStyle(element: HTMLElement): PortalInheritedStyle {
-  const computed = getComputedStyle(element);
-  const inherited: Record<string, string> = {};
-
-  for (let index = 0; index < computed.length; index += 1) {
-    const property = computed.item(index);
-    if (!property.startsWith('--') || property.startsWith('--_')) continue;
-
-    const value = computed.getPropertyValue(property).trim();
-    if (value) inherited[property] = value;
-  }
-
-  return inherited as PortalInheritedStyle;
-}
 
 const focusableSelector = [
   'a[href]',
@@ -78,7 +61,6 @@ interface RichTooltipContextValue {
   dialogRef: RefObject<HTMLElement | null>;
   isOpen: boolean;
   isPersistent: boolean;
-  portalStyle: PortalInheritedStyle;
   setOpen: (isOpen: boolean) => void;
   triggerRef: RefObject<HTMLSpanElement | null>;
 }
@@ -138,12 +120,18 @@ export function PlainTooltip({
   offset = plainTooltipRuntime.spacingBetweenTooltipAndAnchor,
   className,
   style,
+  UNSTABLE_portalContainer,
   ...props
 }: PlainTooltipProps) {
+  const themePortalContainer = useThemePortalContainer();
+
   return (
     <AriaTooltip
       {...props}
       offset={offset}
+      UNSTABLE_portalContainer={
+        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
+      }
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
@@ -199,9 +187,6 @@ export function RichTooltipTrigger({
   }
 
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const [portalStyle, setPortalStyle] = useState<PortalInheritedStyle>(
-    {} as PortalInheritedStyle,
-  );
   const isOpen = controlledOpen ?? uncontrolledOpen;
   const triggerRef = useRef<HTMLSpanElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
@@ -215,15 +200,6 @@ export function RichTooltipTrigger({
     },
     [controlledOpen, onOpenChange],
   );
-  const syncPortalStyle = useCallback(() => {
-    if (triggerRef.current) {
-      setPortalStyle(readInheritedPortalStyle(triggerRef.current));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) syncPortalStyle();
-  }, [isOpen, syncPortalStyle]);
 
   const context = useMemo<RichTooltipContextValue>(
     () => ({
@@ -231,11 +207,10 @@ export function RichTooltipTrigger({
       dialogRef,
       isOpen,
       isPersistent,
-      portalStyle,
       setOpen,
       triggerRef,
     }),
-    [dialogId, isOpen, isPersistent, portalStyle, setOpen],
+    [dialogId, isOpen, isPersistent, setOpen],
   );
 
   const [trigger, tooltip] = items;
@@ -262,7 +237,6 @@ export function RichTooltipTrigger({
           const target = event.target as HTMLElement;
           if (!target.matches(':focus-visible')) return;
 
-          syncPortalStyle();
           setOpen(true);
         }}
         onKeyDownCapture={(event) => {
@@ -276,7 +250,6 @@ export function RichTooltipTrigger({
         }}
         onPointerEnter={(event) => {
           if (event.pointerType === 'mouse') {
-            syncPortalStyle();
             setOpen(true);
           }
         }}
@@ -311,9 +284,11 @@ export function RichTooltip({
   shouldCloseOnInteractOutside,
   className,
   style,
+  UNSTABLE_portalContainer,
   ...props
 }: RichTooltipProps) {
   const context = useContext(RichTooltipContext);
+  const themePortalContainer = useThemePortalContainer();
   if (!context) {
     throw new Error('RichTooltip must be rendered inside RichTooltipTrigger.');
   }
@@ -365,6 +340,9 @@ export function RichTooltip({
       placement={placement}
       offset={offset}
       shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      UNSTABLE_portalContainer={
+        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
+      }
       data-has-action={action ? true : undefined}
       data-has-title={title ? true : undefined}
       className={(renderProps) => {
@@ -376,7 +354,6 @@ export function RichTooltip({
         const userStyle =
           typeof style === 'function' ? style(renderProps) : style;
         return {
-          ...context.portalStyle,
           ...getRichTooltipStyle({
             containerColor,
             contentColor,
