@@ -48,15 +48,18 @@ The page TOC comes from each MDX page's generated `toc` and Fumadocs `AnchorProv
 
 ## Foundation documentation contract
 
-Only publish a foundation as a public docs section when the reusable runtime contract actually exists in `@m3-ui/ui` or its canonical token graph.
+Only publish a foundation as a public docs section when the repository has a canonical, audited contract for that foundation. A foundation may be documented even when it is not a mutable `ThemeProvider` input; the documentation must state that boundary explicitly.
 
 The current documented foundation scope is:
 
 - semantic Material color roles and baseline/dynamic color schemes;
 - Material standard and emphasized type scales;
-- `ThemeProvider` propagation of color/typeface values, ripple focus configuration, and theme-aware portals.
+- Shape: the canonical shape graph, component mappings, and audited expressive-shape provenance;
+- Motion: canonical duration, easing, and spring roles plus reduced-motion/web adaptation;
+- Elevation: semantic `level0`–`level5`, tonal/shadow elevation, generated elevation paint, and the public `Surface` mapping;
+- Theming: `ThemeProvider` runtime color/typeface/ripple/portal ownership and its explicit non-ownership boundaries.
 
-Do not infer a global theme API from component-local tokens. Shape, motion, and elevation remain omitted from public foundation navigation until equivalent reusable runtime contracts are implemented and audited.
+Shape, motion, and elevation are public foundation documentation, but they are not currently global mutable `ThemeProvider` inputs. Do not infer `shapes`, `motion`, or `elevation` provider props from the existence of their foundation guides. Use documented component APIs, canonical generated tokens, semantic theme variables, or `Surface` elevation APIs where those contracts are actually public.
 
 Foundation visualizers in `src/foundationDemos.tsx` must consume public theme/type APIs rather than copy Material values. Example source colors may be literal application inputs, but they must never be presented as canonical `m3-ui` tokens.
 
