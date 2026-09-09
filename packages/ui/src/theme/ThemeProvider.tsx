@@ -2,7 +2,6 @@ import '@m3-ui/tokens/theme.css';
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type CSSProperties,
@@ -80,13 +79,6 @@ export function ThemeProvider({
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
-  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
-
-  // Keep the server and first client tree identical. The themed overlay host
-  // can be attached to the document once hydration has committed.
-  useEffect(() => {
-    setPortalHost(document.body);
-  }, []);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -99,7 +91,7 @@ export function ThemeProvider({
         <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
-        {portalHost === null
+        {typeof document === 'undefined'
           ? null
           : createPortal(
               <div
@@ -109,7 +101,7 @@ export function ThemeProvider({
                 data-theme={mode}
                 style={themeStyle}
               />,
-              portalHost,
+              document.body,
             )}
       </ThemePortalContainerContext.Provider>
     </ThemeContext.Provider>
