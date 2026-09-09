@@ -112,10 +112,11 @@ const navigationChromeFamilyDimensions = {
       MODAL_WIDE_NAVIGATION_RAIL_VISUAL,
       SSR_EVIDENCE,
     ),
-    rtlLocalization: requiredEvidence(MODAL_WIDE_NAVIGATION_RAIL_VISUAL),
+    rtlLocalization: requiredEvidence(SHARED_BROWSER_EVIDENCE),
     motion: requiredEvidence(
       WIDE_NAVIGATION_RAIL_VISUAL,
       MODAL_WIDE_NAVIGATION_RAIL_VISUAL,
+      SHARED_BROWSER_EVIDENCE,
     ),
     theme: requiredEvidence(SHARED_BROWSER_EVIDENCE),
     browser: requiredEvidence(
@@ -137,7 +138,7 @@ const navigationChromeFamilyDimensions = {
     behavior: requiredEvidence(NAVIGATION_DRAWER_VISUAL),
     accessibility: requiredEvidence(NAVIGATION_DRAWER_VISUAL, SSR_EVIDENCE),
     rtlLocalization: requiredEvidence(NAVIGATION_DRAWER_VISUAL),
-    motion: requiredEvidence(NAVIGATION_DRAWER_VISUAL),
+    motion: requiredEvidence(NAVIGATION_DRAWER_VISUAL, SHARED_BROWSER_EVIDENCE),
     theme: requiredEvidence(SHARED_BROWSER_EVIDENCE),
     browser: requiredEvidence(NAVIGATION_DRAWER_VISUAL, SHARED_BROWSER_EVIDENCE),
     ssr: requiredEvidence(SSR_EVIDENCE),
