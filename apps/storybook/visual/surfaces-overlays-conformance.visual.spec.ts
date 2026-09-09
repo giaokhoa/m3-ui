@@ -89,18 +89,19 @@ test.describe('Material 3 Lane 5 shared conformance', () => {
     await expect(sheet).toHaveCSS('background-color', cardRole);
 
     const overlay = page.locator('.modal-bottom-sheet-overlay');
+    // BottomSheet's family suite owns the animated scrim-alpha contract. This
+    // shared cross-family test only verifies the nested theme role and focus
+    // while the entrance transition may still be in flight.
     const overlayPaint = await overlay.evaluate((element) => {
       const style = getComputedStyle(element, '::before');
       return {
         backgroundColor: style.backgroundColor,
-        opacity: style.opacity,
         focusInsideDialog:
           document.activeElement?.closest('[role="dialog"]') !== null,
       };
     });
     expect(overlayPaint).toEqual({
       backgroundColor: scrimRole,
-      opacity: '0.32',
       focusInsideDialog: true,
     });
 
