@@ -241,3 +241,12 @@ body {
   max-inline-size: 100%;
   overflow-wrap: anywhere;
 }
+
+/* Persistent contextual navigation already establishes the desktop reading
+ * origin. Keep the bounded workspace and article adjacent to that pane instead
+ * of centering them again inside the remaining viewport. */
+.docs-permanent-drawer .docs-workspace,
+.docs-permanent-drawer .docs-main__inner {
+  margin-inline-start: 0;
+  margin-inline-end: auto;
+}

@@ -31,6 +31,13 @@ export interface ThemeProviderProps
   sourceColor?: string;
   contrastLevel?: number;
   /**
+   * Stable externally rendered portal target. Pass `null` during SSR and the
+   * matching element on the first client render when the host is owned by the
+   * application document. The caller is responsible for applying the same
+   * theme scope attributes/custom properties to an external container.
+   */
+  portalContainer?: HTMLDivElement | null;
+  /**
    * Global Material ripple focus treatment. `opacity` matches the default
    * AndroidX RippleThemeConfiguration; `inset-ring` maps to
    * RippleDefaults.InsetFocusRingThemeConfiguration.
@@ -53,6 +60,7 @@ export function ThemeProvider({
   mode = 'light',
   sourceColor,
   contrastLevel = 0,
+  portalContainer: externalPortalContainer,
   rippleFocus = 'opacity',
   children,
   style,
@@ -78,7 +86,12 @@ export function ThemeProvider({
     () => ({ mode, sourceColor, contrastLevel, rippleFocus, scheme }),
     [mode, sourceColor, contrastLevel, rippleFocus, scheme],
   );
-  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+  const [internalPortalContainer, setInternalPortalContainer] =
+    useState<HTMLDivElement | null>(null);
+  const portalContainer =
+    externalPortalContainer === undefined
+      ? internalPortalContainer
+      : externalPortalContainer;
 
   return (
     <ThemeContext.Provider value={value}>
@@ -91,11 +104,11 @@ export function ThemeProvider({
         <div {...props} data-m3-theme="" data-theme={mode} style={themeStyle}>
           {children}
         </div>
-        {typeof document === 'undefined'
+        {externalPortalContainer !== undefined || typeof document === 'undefined'
           ? null
           : createPortal(
               <div
-                ref={setPortalContainer}
+                ref={setInternalPortalContainer}
                 data-m3-theme=""
                 data-m3-theme-portal=""
                 data-theme={mode}

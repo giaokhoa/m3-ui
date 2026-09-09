@@ -16,6 +16,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <div
+          data-m3-theme=""
+          data-m3-theme-portal=""
+          data-theme="light"
+          id="docs-theme-portal"
+        />
         <DocsProviders>{children}</DocsProviders>
       </body>
     </html>

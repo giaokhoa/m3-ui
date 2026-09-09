@@ -29,17 +29,49 @@ test('docs theme starts from a deterministic hydration snapshot', async () => {
   );
 });
 
-test('desktop navigation panes align at a semantic divider', async () => {
-  const css = await source('src/docs-shell.css');
+test('docs theme uses a server-rendered portal host on the first client render', async () => {
+  const layout = await source('app/layout.tsx');
+  const provider = await source('src/DocsThemeProvider.tsx');
 
-  assert.match(css, /\.docs-multi-pane\s*\{[^}]*gap:\s*0;/s);
+  assert.match(layout, /id="docs-theme-portal"/);
+  assert.match(layout, /data-m3-theme-portal=""/);
+  assert.match(layout, /data-theme="light"/);
+  assert.match(provider, /document\.getElementById\(themePortalId\)/);
+  assert.match(provider, /portalContainer=\{themePortalContainer\}/);
   assert.match(
-    css,
+    provider,
+    /themePortalContainer\.dataset\.theme\s*=\s*resolvedMode/,
+    'the external portal scope must follow docs light/dark preference changes',
+  );
+  assert.doesNotMatch(
+    provider,
+    /setMounted|setPortalHost/,
+    'portal placement must not be deferred until after hydration',
+  );
+});
+
+test('desktop navigation panes align at a semantic divider', async () => {
+  const shellCss = await source('src/docs-shell.css');
+  const globalCss = await source('src/styles.css');
+
+  assert.match(shellCss, /\.docs-multi-pane\s*\{[^}]*gap:\s*0;/s);
+  assert.match(
+    shellCss,
     /\.docs-global-navigation\s*\{[^}]*border-inline-end:\s*1px solid var\(--outline-variant\);/s,
   );
   assert.match(
-    css,
+    shellCss,
     /\.docs-permanent-drawer \.docs-sidebar__header\s*\{[^}]*display:\s*none;/s,
     'persistent contextual navigation must not keep the duplicate modal brand header',
+  );
+  assert.match(
+    shellCss,
+    /\.docs-workspace\s*\{[^}]*margin-inline:\s*auto;/s,
+    'non-persistent layouts should retain the bounded centered workspace',
+  );
+  assert.match(
+    globalCss,
+    /\.docs-permanent-drawer \.docs-workspace,\s*\.docs-permanent-drawer \.docs-main__inner\s*\{[^}]*margin-inline-start:\s*0;[^}]*margin-inline-end:\s*auto;/s,
+    'persistent desktop content should anchor to the contextual navigation edge',
   );
 });

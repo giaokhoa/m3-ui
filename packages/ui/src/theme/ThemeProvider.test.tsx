@@ -1,8 +1,25 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from './ThemeProvider';
 
 describe('ThemeProvider ownership boundary', () => {
+  it('supports an externally rendered portal container without creating a body portal', () => {
+    const content = (
+      <ThemeProvider mode="light" portalContainer={null}>
+        <span>content</span>
+      </ThemeProvider>
+    );
+
+    vi.stubGlobal('document', { body: { nodeType: 1 } });
+    try {
+      const markup = renderToStaticMarkup(content);
+      expect(markup).toContain('<span>content</span>');
+      expect(markup).not.toContain('data-m3-theme-portal');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('uses generated CSS for the static baseline instead of inline role serialization', () => {
     const markup = renderToStaticMarkup(
       <ThemeProvider mode="light">
