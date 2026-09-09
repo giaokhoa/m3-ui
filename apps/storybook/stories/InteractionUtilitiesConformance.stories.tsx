@@ -45,7 +45,9 @@ function DynamicThemeDemo() {
             aria-label="Theme carousel"
             data-testid="theme-carousel"
             itemCount={carouselLabels.length}
-            itemContent={(index) => (
+            preferredItemWidth={186}
+          >
+            {({ index }) => (
               <div
                 style={{
                   alignItems: 'center',
@@ -61,7 +63,7 @@ function DynamicThemeDemo() {
                 {carouselLabels[index]}
               </div>
             )}
-          />
+          </HorizontalMultiBrowseCarousel>
         </section>
 
         <section style={{ blockSize: 160, inlineSize: 320 }}>
