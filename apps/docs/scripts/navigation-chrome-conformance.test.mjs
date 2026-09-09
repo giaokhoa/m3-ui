@@ -97,6 +97,15 @@ test('Lane 8 keeps family-owned motion distinct from shared Ripple/Menu motion',
   }
 });
 
+test('Lane 8 rail RTL and reduced-motion claims stay tied to real shared Chromium evidence', () => {
+  const rail = familyById.get('navigation-rail').dimensions;
+  assert.ok(rail.rtlLocalization.evidence.includes(sharedBrowserEvidence));
+  assert.ok(rail.motion.evidence.includes(sharedBrowserEvidence));
+
+  const drawer = familyById.get('navigation-drawer').dimensions;
+  assert.ok(drawer.motion.evidence.includes(sharedBrowserEvidence));
+});
+
 test('Lane 8 token/visual evidence remains tied to canonical navigation, app-bar and toolbar audits', () => {
   for (const familyId of ['navigation-bar', 'navigation-rail']) {
     const evidence = familyById.get(familyId).dimensions.tokensVisuals.evidence;
