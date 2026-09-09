@@ -53,6 +53,23 @@ test.describe('Material 3 Lane 4 shared conformance', () => {
     await expect(listItem).toBeFocused();
   });
 
+  test('ExposedDropdownMenu removes chevron motion without changing disclosure', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openStory(page, 'conformance-contentprimitives--dynamic-theme');
+
+    const dropdown = page.locator('.theme-exposed-dropdown');
+    expectNoTransition(
+      await transitionDurations(dropdown.locator('.exposed-dropdown-menu__chevron')),
+    );
+
+    const combobox = page.getByRole('combobox', { name: 'Dynamic dropdown' });
+    await combobox.click();
+    await expect(combobox).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('listbox', { name: 'Dynamic dropdown' })).toBeVisible();
+  });
+
   test('Chip leading and trailing slots follow logical RTL placement', async ({ page }) => {
     await openStory(page, 'conformance-contentprimitives--motion-and-direction');
     await setDocumentDirection(page, 'rtl');
@@ -74,7 +91,7 @@ test.describe('Material 3 Lane 4 shared conformance', () => {
     expect(trailingBox!.x).toBeLessThan(labelBox!.x);
   });
 
-  test('dynamic source color reaches content primitives and the Menu portal scope', async ({
+  test('dynamic source color reaches content primitives and both menu portal surfaces', async ({
     page,
   }) => {
     await openStory(page, 'conformance-contentprimitives--dynamic-theme');
@@ -104,16 +121,34 @@ test.describe('Material 3 Lane 4 shared conformance', () => {
     await expect(badge).toHaveCSS('background-color', error);
     await expect(divider).toHaveCSS('background-color', outlineVariant);
 
+    const themeMenuRole = await resolvedColor(theme, 'var(--surface-container)');
+
     await page.getByTestId('theme-menu-trigger').click();
     const menuItem = page.getByTestId('theme-menu-item');
     await expect(menuItem).toBeVisible();
-    const portal = page.locator(themePortalSelector).filter({ has: menuItem });
-    await expect(portal).toHaveCount(1);
+    const menuPortal = page.locator(themePortalSelector).filter({ has: menuItem });
+    await expect(menuPortal).toHaveCount(1);
+    expect(await resolvedColor(menuPortal, 'var(--surface-container)')).toBe(
+      themeMenuRole,
+    );
+    await expect(menuPortal.locator('.menu-surface__clip')).toHaveCSS(
+      'background-color',
+      themeMenuRole,
+    );
 
-    const themeMenuRole = await resolvedColor(theme, 'var(--surface-container)');
-    const portalMenuRole = await resolvedColor(portal, 'var(--surface-container)');
-    expect(portalMenuRole).toBe(themeMenuRole);
-    await expect(portal.locator('.menu-surface__clip')).toHaveCSS(
+    await page.keyboard.press('Escape');
+    await expect(menuItem).toBeHidden();
+
+    const combobox = page.getByRole('combobox', { name: 'Dynamic dropdown' });
+    await combobox.click();
+    const listbox = page.getByRole('listbox', { name: 'Dynamic dropdown' });
+    await expect(listbox).toBeVisible();
+    const dropdownPortal = page.locator(themePortalSelector).filter({ has: listbox });
+    await expect(dropdownPortal).toHaveCount(1);
+    expect(await resolvedColor(dropdownPortal, 'var(--surface-container)')).toBe(
+      themeMenuRole,
+    );
+    await expect(dropdownPortal.locator('.menu-surface__clip')).toHaveCSS(
       'background-color',
       themeMenuRole,
     );
