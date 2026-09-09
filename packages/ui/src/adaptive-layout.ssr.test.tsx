@@ -142,9 +142,9 @@ describe('Lane 10 adaptive layout SSR contracts', () => {
     const second = renderLane10(tree);
     expect(second).toBe(first);
     expect(first).toContain('Navigable list');
-    expect(first).toContain('Navigable detail');
+    expect(first).not.toContain('Navigable detail');
     expect(first).toContain('Navigable main');
-    expect(first).toContain('Navigable supporting');
+    expect(first).not.toContain('Navigable supporting');
     expect(first).not.toContain('window.history');
     expect(first).not.toContain('NaN');
   });
