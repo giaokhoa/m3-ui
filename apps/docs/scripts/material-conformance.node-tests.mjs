@@ -4,6 +4,7 @@ import {
   validateMaterialConformance,
 } from './material-conformance.mjs';
 import {
+  materialConformanceRegistry,
   openRequiredDimensions,
 } from './material-conformance-registry.mjs';
 
@@ -168,4 +169,36 @@ test('fails unknown component-docs provenance ids', () => {
       error.includes('component docs provenance id "missing-doc-id" is not present'),
     ),
   );
+});
+
+test('Lane 1 action families cannot regress to the generic parent gap', () => {
+  const actionIds = new Set([
+    'button',
+    'button-group',
+    'fab',
+    'fab-menu',
+    'icon-button',
+    'split-button',
+    'toggle-button',
+  ]);
+  const actions = materialConformanceRegistry.families.filter((family) =>
+    actionIds.has(family.id),
+  );
+
+  assert.equal(actions.length, actionIds.size);
+  for (const family of actions) {
+    for (const [dimension, contract] of Object.entries(family.dimensions)) {
+      assert.notEqual(
+        contract.gapIssue,
+        296,
+        `${family.id}.${dimension} must keep concrete Lane 1 evidence or an explicit classification`,
+      );
+      if (contract.status === 'required') {
+        assert.ok(
+          Array.isArray(contract.evidence) && contract.evidence.length > 0,
+          `${family.id}.${dimension} must retain automated evidence`,
+        );
+      }
+    }
+  }
 });
