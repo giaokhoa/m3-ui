@@ -9,8 +9,9 @@
     "preview": "vite preview --host 0.0.0.0 --port 6006 --strictPort",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
+    "test:docs-browser": "pnpm --filter @m3-ui/docs build && playwright test --config playwright.docs.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist test-results playwright-report"
+    "clean": "rm -rf dist test-results playwright-report docs-test-results docs-playwright-report"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",
