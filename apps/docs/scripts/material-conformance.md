@@ -55,6 +55,14 @@ A dimension is one of:
 
 Evidence paths are repository-relative and must exist. Deleting or moving an evidence file without updating the registry fails the gate.
 
+## Program completion invariant
+
+Tracked `gapIssue` values remain a valid **in-progress audit mechanism** while a focused child issue is actively establishing conformance for a family. They let the registry represent known unfinished work without pretending historical coverage already proves the contract.
+
+Once the repository-wide program has completed its family lanes, the merged final registry is expected to remain **gap-free**. `material-conformance-completion.test.mjs` builds the real final report from the TypeScript public entrypoints and fails required CI if any current family dimension reintroduces `gapIssue`, loses required/adapted evidence, loses an N/A/adaptation reason, or stops owning actual public symbols.
+
+This completion test deliberately does not hard-code a second family catalog. New public source families still have to pass the ordinary ownership/provenance validator, and after program completion they must land with explicit conformance evidence/classification rather than relying on a residual tracker gap.
+
 ## Closing gaps in family lanes
 
 The Phase 2A registry intentionally starts conservatively: unresolved required dimensions point at parent tracker #296 rather than treating historical tests as proof of conformance.
