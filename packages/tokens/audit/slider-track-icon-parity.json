@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "issue": 337,
+  "reviewedAt": "2026-09-10",
+  "disposition": "intentional-web-adaptation",
+  "compose": {
+    "repository": "androidx/androidx",
+    "revision": "8a166498189e52db64ed8b3dcce776fa0bcba28e",
+    "sourceFiles": [
+      "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Slider.kt",
+      "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/SliderTokens.kt",
+      "compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/SliderSamples.kt"
+    ],
+    "findings": {
+      "dedicatedTrackIconPublicParameter": false,
+      "defaultSliderRendersTrackIcons": false,
+      "defaultRangeSliderRendersTrackIcons": false,
+      "sizeSpecificSliderTokenModulesAtReviewedPin": false,
+      "sliderDefaultsTrackHasTrackIconParameter": false,
+      "singleSliderTrackIconSample": {
+        "classification": "sample-only-custom-track",
+        "mechanism": "Slider custom track lambda plus Modifier.drawWithContent and DrawScope painters",
+        "startIcon": "Icons.Filled.MusicNote",
+        "endIcon": "Icons.Filled.MusicOff",
+        "iconSize": "20dp",
+        "iconPadding": "10dp",
+        "thumbTrackGapSize": "6dp",
+        "trackHeight": "36dp",
+        "trackCornerSize": "12dp",
+        "drawStopIndicator": null,
+        "activeColorSource": "SliderDefaults.colors().activeTickColor",
+        "inactiveColorSource": "SliderDefaults.colors().inactiveTickColor",
+        "accessibility": "Icons are painted inside DrawScope and the sample creates no separate semantic node or content description for them."
+      },
+      "rangeSlider": {
+        "dedicatedTrackIconPublicParameter": false,
+        "trackIconSample": false,
+        "customTrackComposableAvailable": true,
+        "differenceFromSingleSlider": "No dedicated icon contract exists for either component; only the generic custom-track composition capability is shared structurally."
+      }
+    }
+  },
+  "canonical": {
+    "sizeTokenFile": "packages/tokens/tokens/component/slider-sizes.json",
+    "coverageEvidenceFile": "packages/tokens/audit/material-web-coverage/slider-sizes.json",
+    "composeCoverage": "No size-specific SliderTokens.kt files in the pinned 120-file denominator",
+    "materialWeb": {
+      "repository": "material-components/material-web",
+      "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+      "generatedVersion": "34.0.21",
+      "modules": [
+        "md-comp-slider-medium",
+        "md-comp-slider-large",
+        "md-comp-slider-xlarge"
+      ]
+    },
+    "figma": {
+      "version": "1.25",
+      "component": "Standard slider",
+      "componentKey": "4851d51e7cd3b6f9988e35f1ea59cbd4d382627b",
+      "sizeVariants": ["XSmall", "Small", "Medium", "Large", "XLarge"]
+    },
+    "iconGeometry": {
+      "medium": { "iconSize": "24px", "iconPadding": "6px" },
+      "large": { "iconSize": "24px", "iconPadding": "6px" },
+      "xLarge": { "iconSize": "32px", "iconPadding": "8px" }
+    },
+    "iconSpecificColorTokens": false,
+    "iconSpecificDisabledTokens": false,
+    "iconSpecificRtlTokens": false
+  },
+  "web": {
+    "componentFile": "packages/ui/src/components/Slider/Slider.tsx",
+    "readmeFile": "packages/ui/src/components/Slider/README.md",
+    "interactionOwner": "React Aria Components Slider, SliderTrack and SliderThumb",
+    "dedicatedTrackIconProp": false,
+    "arbitraryComposeTrackComposableProp": false,
+    "reason": "The reviewed Compose source exposes generic custom thumb/track composition, and the only track-icon example implements icons manually inside that generic track hook. Adding a Kotlin-shaped trackIcon or custom-track renderer to m3-ui solely for this sample would duplicate or bypass the locked React Aria slider semantics boundary without a dedicated Material public contract.",
+    "accessibility": "The reviewed Compose sample treats the icons as decorative paint. No independent accessible name, role or state is established. A future semantic icon contract would require a separate accessibility review rather than inheriting semantics from this sample.",
+    "rtl": "No dedicated upstream track-icon RTL contract or token exists at the reviewed pin. React Aria continues to own slider direction and value semantics; Compose DrawScope offset arithmetic is not ported as a web API.",
+    "disabled": "The reviewed track-icon sample does not establish a disabled icon contract, and the canonical graph has no icon-specific disabled token. Existing slider disabled semantics and paint remain unchanged.",
+    "publicApiChange": false,
+    "productionRendererChange": false,
+    "canonicalDtcgChange": false,
+    "generatedCssChange": false
+  }
+}
