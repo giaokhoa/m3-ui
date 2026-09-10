@@ -41,9 +41,23 @@ The value indicator is a Web public adaptation. Its current generated typography
 
 The web API keeps RAC/Material Web numeric defaults (`0..100`, `step=1`) because React Aria's accessible range-input model requires a concrete step. Compose's normalized `0..1` continuous state remains available by passing `minValue={0}`, `maxValue={1}` and the desired web step explicitly. `RangeSlider` defaults to the full configured range when no value is supplied, matching Compose's `rememberRangeSliderState(startValue=0, endValue=1)` structurally without inventing intermediate default values.
 
+## Track-icon audit
+
+Disposition: **intentional web adaptation**.
+
+At the reviewed Compose pin, neither `Slider` nor `RangeSlider` exposes a dedicated track-icon parameter, and `SliderDefaults.Track` has no `trackIcon` input. The default Slider and RangeSlider renderers therefore do not render track icons. Compose does expose generic custom thumb/track composables, but those are composition hooks rather than a Material track-icon contract.
+
+`SliderWithTrackIconsSample` demonstrates track icons only by supplying a custom `track` lambda and painting `MusicNote` / `MusicOff` painters from `Modifier.drawWithContent`. The sample uses **20dp icon / 10dp padding**, a 6dp thumb gap, 36dp track height and 12dp outer corner, and chooses `SliderDefaults.colors().activeTickColor` / `inactiveTickColor` as paint colors. The icons are DrawScope paint: the sample creates no separate semantics node or content description. `RangeSlider` has the same generic custom-track composition capability, but no dedicated track-icon API or corresponding track-icon sample.
+
+The canonical medium/large/xLarge `iconSize` and `iconPadding` facts are not current Compose generated-token facts. Existing source coverage explicitly records that the reviewed 120-file Compose token denominator has no size-specific Slider token modules. These geometry facts are retained from **Material Web 34.0.21 and Figma** evidence: medium and large use 24px icons with 6px padding; xLarge uses 32px icons with 8px padding. They remain valid immutable size anatomy, but a generated token name does not imply a public renderer feature.
+
+No icon-specific canonical color, disabled or RTL token exists. The Compose sample's use of tick colors is sample policy rather than generated track-icon semantics, and it does not establish a disabled treatment or a standalone RTL contract. RAC continues to own slider direction/value semantics on the web; Compose DrawScope offset arithmetic is not ported.
+
+Accordingly m3-ui does not add `trackIcon`, a Kotlin-shaped custom-track prop, separate icon accessibility semantics, or new gesture/state behavior for #337. A future Material source may justify a dedicated web capability, but that decision must establish its own public layout, accessibility, disabled and RTL contract rather than inferring one from this sample. Machine-readable evidence is recorded in `packages/tokens/audit/slider-track-icon-parity.json`.
+
 ## Intentional boundaries
 
-- Track icons from the newer medium/large/xLarge token modules are retained in canonical tokens but are not exposed until the corresponding current public layout contract is implemented and browser-tested.
+- Track-icon geometry from Material Web/Figma size tokens is retained canonically, while the reviewed Compose track-icon example remains sample-only custom-track paint; no public track-icon API is inferred from it.
 - Arbitrary Compose custom thumb/track composables remain normal web composition concerns rather than Kotlin-shaped props.
 - Deprecated Material Web state-layer and overlap-outline token families are not promoted back into the current public contract.
 - `showTicks` is opt-in, matching the Material Web public adapter. RAC `step` remains the web stepping primitive rather than introducing Compose's separate `steps` count API.
