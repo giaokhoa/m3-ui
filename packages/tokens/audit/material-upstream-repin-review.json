@@ -60,10 +60,12 @@
       "upstreamRevision": "56216725c98110c5f01debfdd2ba5e9bcaa9ceb0",
       "surface": "ScrollField focus indication",
       "disposition": "production-fix-required",
-      "reason": "The reviewed web implementation used a component-local always-on focus outline instead of the shared ThemeProvider/Ripple focus policy. This re-pin migrates ScrollField focus indication to the shared Ripple contract and adds browser evidence for both opacity and inset-ring modes.",
+      "reason": "The reviewed web implementation used a component-local always-on focus outline instead of the shared ThemeProvider/Ripple focus policy. This re-pin migrates ScrollField focus indication to the shared Ripple contract, while preserving a forced-colors fallback, and proves both opacity and inset-ring focus modes in Chromium.",
       "evidence": [
         "packages/ui/src/components/ScrollField/ScrollField.tsx",
-        "apps/storybook/visual/scroll-field.visual.spec.ts"
+        "packages/ui/src/components/ScrollField/scroll-field.css",
+        "apps/storybook/visual/scroll-field.visual.spec.ts",
+        "apps/storybook/visual/material-upstream-repin.visual.spec.ts"
       ]
     },
     {
@@ -75,11 +77,12 @@
       ],
       "surface": "Expressive TimePicker renderer geometry",
       "disposition": "production-fix-required",
-      "reason": "The latest Compose expressive dial changes reduce the vertical display-to-dial gap to 12dp, remove the vibrant vertical clock-face bottom margin, and use a 40dp horizontal period selector. m3-ui adopts those renderer facts. Standalone vibrant container padding remains a documented web surface adaptation; Compose dialog-only mode-switch/icon layout is not invented as public web API.",
+      "reason": "The reviewed expressive TimePicker sequence changes uncontained side-control spacing and dial-mode geometry. m3-ui has no Compose dialog-only mode-switch surface, so it does not invent one. It adopts the observable renderer facts that map to the public web picker: a 12px vibrant vertical display-to-dial gap, zero extra vibrant vertical clock-face bottom space, and a 40px vibrant horizontal period selector. Standard geometry remains 36px gap, 24px bottom space and the existing 38px horizontal period selector. Standalone vibrant container padding remains a documented web surface adaptation.",
       "evidence": [
         "packages/ui/src/components/TimePicker/TimePicker.defaults.ts",
         "packages/ui/src/components/TimePicker/TimePicker.defaults.test.ts",
         "apps/storybook/visual/time-picker.visual.spec.ts",
+        "apps/storybook/visual/material-upstream-repin.visual.spec.ts",
         "apps/docs/content/docs/components/time-picker.mdx"
       ]
     },
