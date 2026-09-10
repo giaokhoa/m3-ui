@@ -26,8 +26,8 @@ export const material3Sources = Object.freeze({
     kind: 'implementation-reference',
     name: 'AndroidX Compose Material3',
     repository: 'androidx/androidx',
-    revision: 'ff9a7111302243197384c499d5e3461c1804cd6e',
-    revisionAt: '2026-08-22T05:52:17Z',
+    revision: '8a166498189e52db64ed8b3dcce776fa0bcba28e',
+    revisionAt: '2026-09-10T07:43:25Z',
     tokenRoot: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens',
     freshness: Object.freeze({
       ref: 'androidx-main',

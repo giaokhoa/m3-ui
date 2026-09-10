@@ -3,15 +3,17 @@ import { hour12, normalizeTime, periodForHour, withPeriod } from './TimePicker.t
 import { getTimePickerStyle, timePickerRuntime } from './TimePicker.defaults';
 
 describe('TimePicker runtime defaults', () => {
-  it('keeps dial geometry and renderer layout mechanics in TypeScript', () => {
+  it('keeps dial geometry and reviewed renderer layout mechanics in TypeScript', () => {
     expect(timePickerRuntime.dialLabelRadius).toBe(101);
     expect(timePickerRuntime.inner24HourRadius).toBe(69);
     expect(timePickerRuntime.pointerDeadZone).toBe(30);
     expect(timePickerRuntime.autoHorizontalMinWidth).toBe(560);
     expect(timePickerRuntime.standardDisplayDialGap).toBe(36);
-    expect(timePickerRuntime.vibrantVerticalDisplayDialGap).toBe(36);
+    expect(timePickerRuntime.vibrantVerticalDisplayDialGap).toBe(12);
     expect(timePickerRuntime.vibrantHorizontalDisplayDialGap).toBe(52);
-    expect(timePickerRuntime.verticalClockFaceBottomSpace).toBe(24);
+    expect(timePickerRuntime.standardVerticalClockFaceBottomSpace).toBe(24);
+    expect(timePickerRuntime.vibrantVerticalClockFaceBottomSpace).toBe(0);
+    expect(timePickerRuntime.vibrantHorizontalPeriodSelectorHeight).toBe(40);
     expect(timePickerRuntime.vibrantVerticalPadding).toBe(12);
     expect(timePickerRuntime.vibrantHorizontalPadding).toBe(24);
   });
@@ -20,9 +22,11 @@ describe('TimePicker runtime defaults', () => {
     const style = getTimePickerStyle();
     expect(style).toEqual({
       '--_tp-standard-display-dial-gap': '36px',
-      '--_tp-vibrant-vertical-display-dial-gap': '36px',
+      '--_tp-vibrant-vertical-display-dial-gap': '12px',
       '--_tp-vibrant-horizontal-display-dial-gap': '52px',
-      '--_tp-vertical-clock-face-bottom-space': '24px',
+      '--_tp-standard-vertical-clock-face-bottom-space': '24px',
+      '--_tp-vibrant-vertical-clock-face-bottom-space': '0px',
+      '--_tp-vibrant-period-h-height': '40px',
       '--_tp-vibrant-vertical-padding': '12px',
       '--_tp-vibrant-horizontal-padding': '24px',
     });

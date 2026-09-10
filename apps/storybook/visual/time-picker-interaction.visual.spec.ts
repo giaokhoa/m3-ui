@@ -57,8 +57,8 @@ test.describe('Material 3 TimePicker shared interaction contract', () => {
       root.boundingBox(), selectors.boundingBox(), dial.boundingBox(),
     ]);
     close((selectorBox?.y ?? 0) - (rootBox?.y ?? 0), 12);
-    close((dialBox?.y ?? 0) - ((selectorBox?.y ?? 0) + (selectorBox?.height ?? 0)), 36);
-    close((rootBox?.y ?? 0) + (rootBox?.height ?? 0) - ((dialBox?.y ?? 0) + (dialBox?.height ?? 0)), 36);
+    close((dialBox?.y ?? 0) - ((selectorBox?.y ?? 0) + (selectorBox?.height ?? 0)), 12);
+    close((rootBox?.y ?? 0) + (rootBox?.height ?? 0) - ((dialBox?.y ?? 0) + (dialBox?.height ?? 0)), 12);
   });
 
   test('TimeInput period selector is 52x72 and aligns with the 72px fields', async ({ page }) => {
