@@ -29,6 +29,17 @@ export const material3Sources = Object.freeze({
     revision: 'ff9a7111302243197384c499d5e3461c1804cd6e',
     revisionAt: '2026-08-22T05:52:17Z',
     tokenRoot: 'compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens',
+    freshness: Object.freeze({
+      ref: 'androidx-main',
+      scopes: Object.freeze([
+        Object.freeze({ id: 'core', path: 'compose/material3/material3' }),
+        Object.freeze({ id: 'adaptive', path: 'compose/material3/adaptive' }),
+        Object.freeze({
+          id: 'adaptive-navigation-suite',
+          path: 'compose/material3/material3-adaptive-navigation-suite',
+        }),
+      ]),
+    }),
   }),
   materialWeb: Object.freeze({
     kind: 'implementation-reference',
@@ -40,6 +51,10 @@ export const material3Sources = Object.freeze({
     latestGeneratedRoot: 'tokens/versions/latest/sass',
     latestGeneratedVersion: '34.0.21',
     publicAdapterVersion: 'v0.192',
+    freshness: Object.freeze({
+      ref: 'main',
+      scopes: Object.freeze([Object.freeze({ id: 'tokens', path: 'tokens' })]),
+    }),
   }),
   materialComponentsAndroid: Object.freeze({
     kind: 'implementation-reference',
