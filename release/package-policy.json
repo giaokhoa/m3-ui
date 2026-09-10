@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "status": "pre-publication",
+  "packages": [
+    "@m3-ui/ui",
+    "@m3-ui/tokens"
+  ],
+  "metadata": {
+    "homepage": "https://github.com/giaokhoa/m3-ui#readme",
+    "bugs": "https://github.com/giaokhoa/m3-ui/issues",
+    "repository": "git+https://github.com/giaokhoa/m3-ui.git"
+  },
+  "license": {
+    "spdx": null,
+    "licenseFile": null,
+    "decision": "maintainer-required"
+  },
+  "versioning": {
+    "mode": "lockstep",
+    "sourceVersionPlaceholder": "0.0.0",
+    "firstPublicVersion": null,
+    "firstPublicVersionDecision": "maintainer-required",
+    "semverSpecification": "2.0.0",
+    "workspaceDependencySource": "workspace:*",
+    "packedInternalDependency": "exact-lockstep-version"
+  },
+  "consumer": {
+    "runtime": "browser-bundler",
+    "moduleFormat": "esm",
+    "reactPeer": "^19.0.0",
+    "typescriptResolution": "Bundler",
+    "packageManager": "agnostic-after-pack",
+    "minimumNode": null,
+    "minimumNodeDecision": "maintainer-required",
+    "verifiedDevelopmentToolchain": {
+      "node": "22",
+      "pnpm": "10.0.0"
+    }
+  },
+  "changeRecords": {
+    "mechanism": "changesets",
+    "implementationStatus": "required-before-public-release"
+  },
+  "publication": {
+    "enabled": false,
+    "private": true,
+    "registry": null,
+    "access": null,
+    "authorization": "explicit-maintainer-approval-required",
+    "scopeOwnership": "unverified",
+    "scopeOwnershipDecision": "maintainer-evidence-required"
+  }
+}

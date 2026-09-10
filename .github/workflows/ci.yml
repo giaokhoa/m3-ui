@@ -191,6 +191,8 @@ jobs:
         run: pnpm -r --if-present test
       - name: Typecheck
         run: pnpm -r --if-present typecheck
+      - name: Package distribution policy guard
+        run: pnpm test:package-policy
       - name: Packed external consumer smoke
         run: pnpm test:package-consumer
 
