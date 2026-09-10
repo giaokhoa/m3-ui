@@ -191,6 +191,8 @@ jobs:
         run: pnpm -r --if-present test
       - name: Typecheck
         run: pnpm -r --if-present typecheck
+      - name: Packed external consumer smoke
+        run: pnpm test:package-consumer
 
   visual:
     name: Visual regression (${{ matrix.shard }}/4)
