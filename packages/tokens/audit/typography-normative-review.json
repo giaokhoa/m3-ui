@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "issue": 338,
+  "reviewedAt": "2026-09-10",
+  "buildInput": false,
+  "normative": {
+    "source": "Material Design 3",
+    "pages": [
+      "https://m3.material.io/styles/typography/overview",
+      "https://m3.material.io/styles/typography/type-scale-tokens"
+    ],
+    "retrievalResult": "javascript-shell-no-text-verifiable-token-values",
+    "retrievalDetail": "Both current official Material Design typography pages returned only a JavaScript-required shell through the available text audit channel. No disputed tracking or emphasized-weight value could therefore be verified from normative page text during this review.",
+    "thirdPartyValuesAcceptedAsNormative": false
+  },
+  "sources": {
+    "compose": {
+      "repository": "androidx/androidx",
+      "revision": "8a166498189e52db64ed8b3dcce776fa0bcba28e",
+      "revisionAt": "2026-09-10T07:43:25Z",
+      "typeScaleVersion": "v0_103",
+      "tokenFile": "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/TypeScaleTokens.kt"
+    },
+    "figma": {
+      "name": "Material 3 Design Kit",
+      "version": "1.25",
+      "releasedAt": "2026-05-19"
+    },
+    "materialWeb": {
+      "repository": "material-components/material-web",
+      "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+      "generatedVersion": "34.0.21",
+      "baselineFile": "tokens/versions/latest/sass/_md-sys-typescale.scss",
+      "emphasizedFile": "tokens/versions/latest/sass/_md-sys-typescale-emphasized.scss"
+    },
+    "materialComponentsAndroid": {
+      "repository": "material-components/material-components-android",
+      "revision": "ac7e18efeefb331850c561faf9ab8bf81d27ba68",
+      "generatedVersion": "34.0.0"
+    },
+    "flutter": {
+      "repository": "flutter/flutter",
+      "revision": "4ebf37fe7df0a130ba5bee17315b98f905c10b34",
+      "generatedFrom": "Material Design token database"
+    }
+  },
+  "baseline": {
+    "driftId": "typography-baseline-tracking-source-lag",
+    "disposition": "insufficient-normative-evidence",
+    "canonicalChange": false,
+    "reason": "The current official Material typography pages are normative, but their disputed numeric token values were not text-verifiable in this review. Figma v1.25, Material Web 34.0.21, Material Components Android 34.0.0 and Flutter token-database output agree with one another, but implementation/design-reference consensus is not a canonical mutation rule. Canonical values therefore remain unchanged while the disagreement stays explicit.",
+    "roleOrder": ["displayLarge", "titleMedium", "bodyMedium"],
+    "differences": {
+      "displayLarge": {
+        "canonical": -0.2,
+        "compose": -0.2,
+        "figma": -0.25,
+        "materialWeb": -0.25,
+        "materialComponentsAndroid": -0.25,
+        "flutter": -0.25
+      },
+      "titleMedium": {
+        "canonical": 0.2,
+        "compose": 0.2,
+        "figma": 0.15,
+        "materialWeb": 0.15,
+        "materialComponentsAndroid": 0.15,
+        "flutter": 0.15
+      },
+      "bodyMedium": {
+        "canonical": 0.2,
+        "compose": 0.2,
+        "figma": 0.25,
+        "materialWeb": 0.25,
+        "materialComponentsAndroid": 0.25,
+        "flutter": 0.25
+      }
+    }
+  },
+  "emphasized": {
+    "driftId": "typography-compose-emphasized-todo",
+    "disposition": "source-specific-implementation-drift",
+    "canonicalChange": false,
+    "reason": "The reviewed Compose TypeScaleTokens.kt explicitly marks the emphasized block TODO pending generated tokens. Canonical emphasized values already follow the independently reviewed Figma v1.25 and Material Web 34.0.21 generated evidence, so the stale Compose TODO block remains implementation-source drift rather than a reason to regress canonical tokens. This disposition does not claim normative approval of the emphasized values.",
+    "composeBlockMarkedTodo": true,
+    "representativeDifferences": {
+      "displayLargeTracking": { "canonical": -0.25, "compose": 0, "materialWeb": -0.25 },
+      "bodyLargeTracking": { "canonical": 0.5, "compose": 0.15, "materialWeb": 0.5 },
+      "titleMediumWeight": { "canonical": 600, "compose": 700, "materialWeb": 600 },
+      "titleSmallWeight": { "canonical": 600, "compose": 700, "materialWeb": 600 },
+      "labelLargeWeight": { "canonical": 600, "compose": 700, "materialWeb": 600 },
+      "labelMediumWeight": { "canonical": 600, "compose": 700, "materialWeb": 600 },
+      "labelSmallWeight": { "canonical": 600, "compose": 700, "materialWeb": 600 }
+    }
+  },
+  "decision": {
+    "canonicalDtcgChanged": false,
+    "generatedOutputsChanged": false,
+    "majorityVoteUsed": false,
+    "upstreamCopiedIntoCanonical": false,
+    "driftMustRemainExplicit": true,
+    "futureTrigger": "Revisit only when maintainers can verify current normative Material token values or when another reviewed Material source change supplies stronger normative evidence."
+  }
+}
