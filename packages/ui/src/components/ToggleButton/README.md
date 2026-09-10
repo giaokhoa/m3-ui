@@ -1,6 +1,6 @@
 # ToggleButton parity notes
 
-Pinned AndroidX revision: `ff9a7111302243197384c499d5e3461c1804cd6e`.
+Pinned AndroidX revision: `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
 Material Web reference/audit pin: `cac97678831d48d4eb4a606ca50f92673a1dc20c`.
 
 ## Upstream sources
