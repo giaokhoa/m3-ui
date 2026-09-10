@@ -2,6 +2,24 @@
   "name": "@m3-ui/tokens",
   "version": "0.0.0",
   "private": true,
+  "description": "Canonical Material 3 design tokens and generated ESM/CSS adapters for m3-ui.",
+  "keywords": [
+    "material-3",
+    "material-design",
+    "design-tokens",
+    "dtcg",
+    "style-dictionary",
+    "css"
+  ],
+  "homepage": "https://github.com/giaokhoa/m3-ui#readme",
+  "bugs": {
+    "url": "https://github.com/giaokhoa/m3-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giaokhoa/m3-ui.git",
+    "directory": "packages/tokens"
+  },
   "type": "module",
   "sideEffects": false,
   "files": ["dist"],

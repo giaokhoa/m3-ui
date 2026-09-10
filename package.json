@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "turbo build",
-    "test:package-consumer": "node scripts/package-consumer-smoke.mjs"
+    "test:package-consumer": "node scripts/package-consumer-smoke.mjs",
+    "test:package-policy": "node scripts/package-policy-check.mjs"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
