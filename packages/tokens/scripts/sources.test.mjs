@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { material3Sources, sourceFreshness } from './sources.mjs';
+import {
+  material3Sources,
+  materialFreshnessScopes,
+  sourceFreshness,
+} from './sources.mjs';
 
 test('material.io remains the normative textual spec', () => {
   assert.equal(material3Sources.spec.kind, 'normative-text');
@@ -39,4 +43,47 @@ test('source metadata is pinned so freshness decisions are reproducible', () => 
   assert.ok(sourceFreshness(material3Sources.materialWeb) > sourceFreshness(material3Sources.figma));
   assert.ok(sourceFreshness(material3Sources.materialComponentsAndroid) > sourceFreshness(material3Sources.figma));
   assert.ok(sourceFreshness(material3Sources.flutter) > sourceFreshness(material3Sources.figma));
+});
+
+test('freshness scopes reference reviewed pins and only relevant Material paths', () => {
+  assert.deepEqual(
+    materialFreshnessScopes.map((scope) => scope.id),
+    [
+      'androidx-material3-core',
+      'androidx-material3-adaptive',
+      'material-web-generated',
+    ],
+  );
+
+  for (const scope of materialFreshnessScopes) {
+    assert.ok(material3Sources[scope.source]);
+    assert.ok(scope.paths.length > 0);
+    assert.ok(scope.paths.every((path) => !path.startsWith('/') && !path.includes('..')));
+  }
+
+  const core = materialFreshnessScopes.find((scope) => scope.id === 'androidx-material3-core');
+  const adaptive = materialFreshnessScopes.find(
+    (scope) => scope.id === 'androidx-material3-adaptive',
+  );
+  const materialWeb = materialFreshnessScopes.find(
+    (scope) => scope.id === 'material-web-generated',
+  );
+
+  assert.equal(core.source, 'compose');
+  assert.equal(core.upstreamRef, 'androidx-main');
+  assert.ok(core.paths.includes('compose/material3/material3'));
+  assert.ok(core.paths.includes('compose/material3/material3-ripple'));
+
+  assert.equal(adaptive.source, 'compose');
+  assert.equal(adaptive.upstreamRef, 'androidx-main');
+  assert.deepEqual(adaptive.paths, [
+    'compose/material3/adaptive/adaptive',
+    'compose/material3/adaptive/adaptive-layout',
+    'compose/material3/adaptive/adaptive-navigation',
+    'compose/material3/material3-adaptive-navigation-suite',
+  ]);
+
+  assert.equal(materialWeb.source, 'materialWeb');
+  assert.equal(materialWeb.upstreamRef, 'main');
+  assert.deepEqual(materialWeb.paths, [material3Sources.materialWeb.latestGeneratedRoot]);
 });

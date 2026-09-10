@@ -61,6 +61,42 @@ export const material3Sources = Object.freeze({
   }),
 });
 
+/**
+ * Read-only freshness scopes for Git-backed Material evidence.
+ *
+ * Each scope references an existing `material3Sources` key so the reviewed pin
+ * stays single-source-of-truth. Paths intentionally follow the Material surfaces
+ * m3-ui audits; repository-wide HEAD activity is not freshness drift.
+ */
+export const materialFreshnessScopes = Object.freeze([
+  Object.freeze({
+    id: 'androidx-material3-core',
+    source: 'compose',
+    upstreamRef: 'androidx-main',
+    paths: Object.freeze([
+      'compose/material3/material3',
+      'compose/material3/material3-ripple',
+    ]),
+  }),
+  Object.freeze({
+    id: 'androidx-material3-adaptive',
+    source: 'compose',
+    upstreamRef: 'androidx-main',
+    paths: Object.freeze([
+      'compose/material3/adaptive/adaptive',
+      'compose/material3/adaptive/adaptive-layout',
+      'compose/material3/adaptive/adaptive-navigation',
+      'compose/material3/material3-adaptive-navigation-suite',
+    ]),
+  }),
+  Object.freeze({
+    id: 'material-web-generated',
+    source: 'materialWeb',
+    upstreamRef: 'main',
+    paths: Object.freeze([material3Sources.materialWeb.latestGeneratedRoot]),
+  }),
+]);
+
 export function sourceFreshness(source) {
   const raw = source.revisionAt ?? source.releasedAt ?? source.retrievedAt;
   return raw == null ? null : Date.parse(raw);

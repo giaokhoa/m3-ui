@@ -19,6 +19,7 @@
     "validate": "node scripts/validate.mjs",
     "inventory:compose": "node scripts/inventory-compose.mjs",
     "inventory:material-web": "node scripts/inventory-material-web.mjs",
+    "freshness:material": "node scripts/material-freshness.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
     "audit:material-web-declarations": "node scripts/audit-material-web-declarations.mjs",
     "audit:material-web-declarations:complete": "node scripts/audit-material-web-declarations.mjs --require-complete",
