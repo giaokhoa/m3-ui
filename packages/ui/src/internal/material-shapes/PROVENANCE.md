@@ -10,7 +10,7 @@ Material shape definitions are not taken from that package's catalog. Components
 
 For the current Loading Indicator checkpoint the pinned Material 3 source is:
 
-- `androidx/androidx@ff9a7111302243197384c499d5e3461c1804cd6e`
+- `androidx/androidx@8a166498189e52db64ed8b3dcce776fa0bcba28e`
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialShapes.kt`
 - `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/LoadingIndicator.kt`
 

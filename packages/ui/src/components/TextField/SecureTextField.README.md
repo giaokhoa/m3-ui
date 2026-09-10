@@ -4,7 +4,7 @@
 
 ## Pinned sources
 
-AndroidX Compose Material3 revision: `ff9a7111302243197384c499d5e3461c1804cd6e`.
+AndroidX Compose Material3 revision: `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
 
 Reviewed source files:
 

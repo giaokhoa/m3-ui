@@ -27,7 +27,7 @@ The 240px default linear width is deliberately a runtime projection because Andr
 
 ## Runtime behavior
 
-Pinned AndroidX Compose revision `ff9a7111302243197384c499d5e3461c1804cd6e` is used for `WavyProgressIndicator.kt`, `ProgressIndicator.kt`, the component drawing helpers, `ProgressIndicatorTokens`, `LinearProgressIndicatorTokens`, `CircularProgressIndicatorTokens`, and `MotionTokens`. Compose supplies current wavy geometry, progress coercion, determinate amplitude lifecycle, zero-speed behavior, circular continuity, and indeterminate motion.
+Pinned AndroidX Compose revision `8a166498189e52db64ed8b3dcce776fa0bcba28e` is used for `WavyProgressIndicator.kt`, `ProgressIndicator.kt`, the component drawing helpers, `ProgressIndicatorTokens`, `LinearProgressIndicatorTokens`, `CircularProgressIndicatorTokens`, and `MotionTokens`. Compose supplies current wavy geometry, progress coercion, determinate amplitude lifecycle, zero-speed behavior, circular continuity, and indeterminate motion.
 
 Current Material Web revision `cac97678831d48d4eb4a606ca50f92673a1dc20c` remains the audit pin for web renderer behavior. Standard progress keeps its existing Web adaptations; this wavy hardening does not rewrite standard indicators or canonical tokens.
 

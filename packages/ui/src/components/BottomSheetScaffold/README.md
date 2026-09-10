@@ -3,7 +3,7 @@
 ## Sources
 
 - AndroidX `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/BottomSheetScaffold.kt`
-- AndroidX source revision: `ff9a7111302243197384c499d5e3461c1804cd6e`
+- AndroidX source revision: `8a166498189e52db64ed8b3dcce776fa0bcba28e`
 - Material Web audit revision: `cac97678831d48d4eb4a606ca50f92673a1dc20c`
 - Existing web primitives audited: `BottomSheet/**`, `Scaffold/**`, `Snackbar`, `TopAppBar`, `DragHandle`, `Surface`
 - Canonical design tokens remain generated from `packages/tokens/tokens/**/*.json`; this component adds no canonical token overrides.
