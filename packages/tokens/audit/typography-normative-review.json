@@ -83,6 +83,13 @@
     "canonicalChange": false,
     "reason": "The reviewed Compose TypeScaleTokens.kt explicitly marks the emphasized block TODO pending generated tokens. Canonical emphasized values already follow the independently reviewed Figma v1.25 and Material Web 34.0.21 generated evidence, so the stale Compose TODO block remains implementation-source drift rather than a reason to regress canonical tokens. This disposition does not claim normative approval of the emphasized values.",
     "composeBlockMarkedTodo": true,
+    "evidenceCoverage": {
+      "compose": "exact reviewed TypeScaleTokens.kt emphasized TODO block",
+      "figma": "15 emphasized text styles observed; SemiBold 600 vocabulary and Display Large emphasized Medium sample captured",
+      "materialWeb": "full generated md-sys-typescale-emphasized 34.0.21 corpus",
+      "materialComponentsAndroid": "existing repository tracking evidence captures baseline md.sys.typescale only; no emphasized comparison claimed",
+      "flutter": "existing repository tracking evidence captures baseline _M3Typography only; no emphasized comparison claimed"
+    },
     "representativeDifferences": {
       "displayLargeTracking": { "canonical": -0.25, "compose": 0, "materialWeb": -0.25 },
       "bodyLargeTracking": { "canonical": 0.5, "compose": 0.15, "materialWeb": 0.5 },
