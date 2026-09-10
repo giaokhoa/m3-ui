@@ -114,6 +114,11 @@ test('emphasized Compose TODO is source-specific drift while canonical keeps rev
   assert.equal(review.emphasized.canonicalChange, false);
   assert.equal(review.emphasized.composeBlockMarkedTodo, true);
   assert.equal(drift.typography.compose.emphasizedBlockMarkedTodo, true);
+  assert.match(review.emphasized.evidenceCoverage.compose, /exact reviewed TypeScaleTokens/);
+  assert.match(review.emphasized.evidenceCoverage.figma, /15 emphasized text styles/);
+  assert.match(review.emphasized.evidenceCoverage.materialWeb, /full generated/);
+  assert.match(review.emphasized.evidenceCoverage.materialComponentsAndroid, /baseline/);
+  assert.match(review.emphasized.evidenceCoverage.flutter, /baseline/);
 
   const expected = review.emphasized.representativeDifferences;
   assert.equal(expected.displayLargeTracking.canonical, canonicalTracking('displayLargeEmphasized'));
