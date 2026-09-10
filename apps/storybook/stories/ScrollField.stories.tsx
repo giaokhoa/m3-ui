@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ScrollField } from '@m3-ui/ui';
+import { ScrollField, ThemeProvider } from '@m3-ui/ui';
 
 const meta = { title: 'Components/ScrollField', component: ScrollField } satisfies Meta<typeof ScrollField>;
 export default meta;
@@ -58,4 +58,27 @@ export const ReducedMotion: Story = {
 
 export const Rtl: Story = {
   args: { items: values, defaultSelectedIndex: 2, 'aria-label': 'RTL minutes', dir: 'rtl' },
+};
+
+export const FocusModes: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 24 }}>
+      <ThemeProvider rippleFocus="opacity">
+        <ScrollField
+          data-testid="scroll-field-opacity-focus"
+          items={values}
+          defaultSelectedIndex={2}
+          aria-label="Opacity focus minutes"
+        />
+      </ThemeProvider>
+      <ThemeProvider rippleFocus="inset-ring">
+        <ScrollField
+          data-testid="scroll-field-inset-focus"
+          items={values}
+          defaultSelectedIndex={2}
+          aria-label="Inset ring focus minutes"
+        />
+      </ThemeProvider>
+    </div>
+  ),
 };
