@@ -7,6 +7,13 @@ export const FRESHNESS_STATUSES = Object.freeze({
   unavailable: 'unavailable',
 });
 
+export const FRESHNESS_OUTCOMES = Object.freeze({
+  current: 'current',
+  newerUpstream: 'newer-upstream',
+  unavailable: 'unavailable',
+  invalidConfiguration: 'invalid-configuration',
+});
+
 function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
@@ -237,8 +244,89 @@ export async function probeMaterialFreshness({
   };
 }
 
+export function freshnessOutcome(report) {
+  if (report.configurationError != null) return FRESHNESS_OUTCOMES.invalidConfiguration;
+  if (report.summary.unavailable > 0) return FRESHNESS_OUTCOMES.unavailable;
+  if (report.summary.newerUpstream > 0) return FRESHNESS_OUTCOMES.newerUpstream;
+  return FRESHNESS_OUTCOMES.current;
+}
+
+function markdownCell(value) {
+  return String(value ?? '—').replaceAll('|', '\\|').replaceAll('\n', '<br>');
+}
+
+function revisionCell(revision) {
+  return revision == null ? '—' : `\`${revision}\``;
+}
+
+function statusCell(scope) {
+  if (scope.status !== FRESHNESS_STATUSES.unavailable) {
+    return scope.relation == null ? scope.status : `${scope.status} (${scope.relation})`;
+  }
+  const detail = scope.error == null ? 'unknown' : `${scope.error.kind}: ${scope.error.message}`;
+  return `${scope.status} — ${detail}`;
+}
+
+export function renderFreshnessSummary(report) {
+  const outcome = freshnessOutcome(report);
+  const messages = {
+    [FRESHNESS_OUTCOMES.current]:
+      'All monitored Git-backed Material scopes are current relative to their reviewed pins.',
+    [FRESHNESS_OUTCOMES.newerUpstream]:
+      'Newer relevant upstream evidence exists. Triage the affected scopes before changing reviewed pins.',
+    [FRESHNESS_OUTCOMES.unavailable]:
+      'Freshness could not be determined for one or more scopes because an upstream/network/tooling probe failed. This is not semantic drift.',
+    [FRESHNESS_OUTCOMES.invalidConfiguration]:
+      'The checked-in freshness configuration is invalid. Fix repository monitoring metadata before trusting this signal.',
+  };
+
+  const lines = [
+    '## Material upstream freshness',
+    '',
+    `**Outcome:** \`${outcome}\``,
+    '',
+    messages[outcome],
+    '',
+    `Observed at: \`${report.observedAt}\``,
+    `Counts: current=${report.summary.current}, newer-upstream=${report.summary.newerUpstream}, unavailable=${report.summary.unavailable}`,
+  ];
+
+  if (report.configurationError != null) {
+    lines.push('', `Configuration error: ${markdownCell(report.configurationError)}`);
+  }
+
+  if (report.scopes.length === 0) {
+    lines.push('', '_No valid monitored scopes were evaluated._', '');
+    return lines.join('\n');
+  }
+
+  lines.push(
+    '',
+    '| Scope | Path | Reviewed pin | Reviewed at | Latest relevant revision | Latest at | Status |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
+  );
+
+  for (const scope of report.scopes) {
+    lines.push(
+      `| ${markdownCell(`${scope.sourceName} (${scope.id})`)} | ${markdownCell(scope.path)} | ${revisionCell(scope.reviewedRevision)} | ${markdownCell(scope.reviewedAt)} | ${revisionCell(scope.latest?.revision)} | ${markdownCell(scope.latest?.at)} | ${markdownCell(statusCell(scope))} |`,
+    );
+  }
+
+  lines.push('');
+  return lines.join('\n');
+}
+
 export function freshnessExitCode(report) {
-  if (report.configurationError != null || report.summary.unavailable > 0) return 2;
-  if (report.summary.newerUpstream > 0) return 1;
-  return 0;
+  switch (freshnessOutcome(report)) {
+    case FRESHNESS_OUTCOMES.current:
+      return 0;
+    case FRESHNESS_OUTCOMES.newerUpstream:
+      return 1;
+    case FRESHNESS_OUTCOMES.unavailable:
+      return 2;
+    case FRESHNESS_OUTCOMES.invalidConfiguration:
+      return 3;
+    default:
+      return 3;
+  }
 }
