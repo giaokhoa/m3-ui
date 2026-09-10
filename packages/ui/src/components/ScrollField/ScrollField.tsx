@@ -14,6 +14,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Ripple, useRipple } from '../../internal/ripple';
 import { getScrollFieldStyle, scrollFieldRuntime, type ScrollFieldStyleOptions } from './ScrollField.defaults';
 import { clampScrollFieldDrag, normalizeScrollFieldIndex, settleScrollFieldSteps } from './ScrollField.logic';
 import './scroll-field.css';
@@ -81,6 +82,8 @@ export function ScrollField({
   disabledSelectedContentColor,
   className,
   style,
+  onBlur,
+  onFocus,
   onKeyDown,
   onWheel,
   onPointerDown,
@@ -114,6 +117,8 @@ export function ScrollField({
   const wheelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suppressClickRef = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
+  const ripple = useRipple({ origin: 'center' });
 
   useLayoutEffect(() => {
     optimisticIndexRef.current = selectedIndex;
@@ -280,6 +285,14 @@ export function ScrollField({
       aria-valuetext={currentValueText}
       data-selected-index={selectedIndex}
       data-disabled={isDisabled || undefined}
+      onBlur={(event) => {
+        setIsFocusVisible(false);
+        onBlur?.(event);
+      }}
+      onFocus={(event) => {
+        setIsFocusVisible(event.currentTarget.matches(':focus-visible'));
+        onFocus?.(event);
+      }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (event.defaultPrevented || isDisabled) return;
@@ -311,6 +324,11 @@ export function ScrollField({
         }
       }}
     >
+      <Ripple
+        controller={ripple}
+        focusRingRadius="16px"
+        state={{ isFocusVisible }}
+      />
       <div className="scroll-field__viewport" aria-hidden="true">
         {SLOT_OFFSETS.map((offset) => {
           const index = normalizeScrollFieldIndex(selectedIndex + offset, itemCount);
