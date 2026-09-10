@@ -61,6 +61,7 @@ export const Rtl: Story = {
 };
 
 export const FocusModes: Story = {
+  args: { items: values },
   render: () => (
     <div style={{ display: 'grid', gap: 24 }}>
       <ThemeProvider rippleFocus="opacity">
