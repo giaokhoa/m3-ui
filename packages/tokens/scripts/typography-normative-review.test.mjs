@@ -26,7 +26,7 @@ const canonicalWeight = (role) => {
   return canonical.typeface.weight[alias].$value;
 };
 
-test('normative review records the official Material pages and an explicit unavailable-value result', () => {
+test('normative review records official pages, source pins and an explicit unavailable-value result', () => {
   assert.equal(review.issue, 338);
   assert.equal(review.reviewedAt, '2026-09-10');
   assert.equal(review.buildInput, false);
@@ -39,6 +39,33 @@ test('normative review records the official Material pages and an explicit unava
     'javascript-shell-no-text-verifiable-token-values',
   );
   assert.equal(review.normative.thirdPartyValuesAcceptedAsNormative, false);
+
+  assert.equal(review.sources.compose.repository, material3Sources.compose.repository);
+  assert.equal(review.sources.compose.revision, material3Sources.compose.revision);
+  assert.equal(review.sources.compose.revisionAt, material3Sources.compose.revisionAt);
+  assert.equal(review.sources.figma.version, material3Sources.figma.version);
+  assert.equal(review.sources.figma.releasedAt, material3Sources.figma.releasedAt);
+  assert.equal(review.sources.materialWeb.repository, material3Sources.materialWeb.repository);
+  assert.equal(review.sources.materialWeb.revision, material3Sources.materialWeb.revision);
+  assert.equal(
+    review.sources.materialWeb.generatedVersion,
+    material3Sources.materialWeb.latestGeneratedVersion,
+  );
+  assert.equal(
+    review.sources.materialComponentsAndroid.repository,
+    material3Sources.materialComponentsAndroid.repository,
+  );
+  assert.equal(
+    review.sources.materialComponentsAndroid.revision,
+    material3Sources.materialComponentsAndroid.revision,
+  );
+  assert.equal(
+    review.sources.materialComponentsAndroid.generatedVersion,
+    material3Sources.materialComponentsAndroid.generatedVersion,
+  );
+  assert.equal(review.sources.flutter.repository, material3Sources.flutter.repository);
+  assert.equal(review.sources.flutter.revision, material3Sources.flutter.revision);
+  assert.equal(review.sources.flutter.generatedFrom, material3Sources.flutter.generatedFrom);
 });
 
 test('baseline disagreement stays explicit and does not majority-vote canonical DTCG', () => {
