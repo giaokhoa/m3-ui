@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import { material3Sources } from './sources.mjs';
 
-const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 const currentProvenanceFiles = [
   'packages/ui/src/components/ScrollField/README.md',
   'packages/ui/src/components/AppBarColumn/README.md',
