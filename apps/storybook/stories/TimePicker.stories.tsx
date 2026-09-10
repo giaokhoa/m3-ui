@@ -33,6 +33,11 @@ export const Vibrant: Story = {
     <TimePicker layout="vertical" variant="vibrant" defaultValue={{ hour: 14, minute: 20 }} />
   ),
 };
+export const VibrantHorizontal: Story = {
+  render: () => (
+    <TimePicker layout="horizontal" variant="vibrant" defaultValue={{ hour: 14, minute: 20 }} />
+  ),
+};
 export const Input: Story = {
   render: () => <TimeInput defaultValue={{ hour: 10, minute: 30 }} />,
 };
