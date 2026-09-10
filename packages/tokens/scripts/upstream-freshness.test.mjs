@@ -3,6 +3,7 @@ import test from 'node:test';
 import { material3Sources } from './sources.mjs';
 import {
   collectFreshnessScopes,
+  compareRevisionsUrl,
   FRESHNESS_STATUSES,
   freshnessExitCode,
   latestRelevantCommitUrl,
@@ -10,6 +11,8 @@ import {
 } from './upstream-freshness-lib.mjs';
 
 const reviewedRevision = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const olderPathRevision = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+const newerPathRevision = 'cccccccccccccccccccccccccccccccccccccccc';
 
 function source(overrides = {}) {
   return {
@@ -35,7 +38,7 @@ function response(payload, { ok = true, status = 200 } = {}) {
   };
 }
 
-function commit(sha, at) {
+function commit(sha, at = '2026-09-02T14:50:50Z') {
   return [
     {
       sha,
@@ -43,6 +46,16 @@ function commit(sha, at) {
       commit: { committer: { date: at } },
     },
   ];
+}
+
+function sequencedFetch(...responses) {
+  let index = 0;
+  return async () => {
+    const next = responses[index];
+    index += 1;
+    if (next instanceof Error) throw next;
+    return next;
+  };
 }
 
 test('checked-in monitor scopes are explicit, path-aware, and stable', () => {
@@ -78,74 +91,106 @@ test('checked-in monitor scopes are explicit, path-aware, and stable', () => {
   );
 });
 
-test('latest commit query is scoped to ref and path instead of repository HEAD', () => {
+test('GitHub queries are scoped to the monitored ref/path and reviewed ancestry', () => {
   const [scope] = collectFreshnessScopes({ example: source() });
-  const url = new URL(latestRelevantCommitUrl(scope));
-  assert.equal(url.pathname, '/repos/example/upstream/commits');
-  assert.equal(url.searchParams.get('sha'), 'main');
-  assert.equal(url.searchParams.get('path'), 'packages/core');
-  assert.equal(url.searchParams.get('per_page'), '1');
+  const latestUrl = new URL(latestRelevantCommitUrl(scope));
+  assert.equal(latestUrl.pathname, '/repos/example/upstream/commits');
+  assert.equal(latestUrl.searchParams.get('sha'), 'main');
+  assert.equal(latestUrl.searchParams.get('path'), 'packages/core');
+  assert.equal(latestUrl.searchParams.get('per_page'), '1');
+
+  const compareUrl = new URL(compareRevisionsUrl(scope, newerPathRevision));
+  assert.equal(
+    compareUrl.pathname,
+    `/repos/example/upstream/compare/${reviewedRevision}...${newerPathRevision}`,
+  );
 });
 
-test('different path SHA does not create drift when its newest commit predates the reviewed pin', async () => {
+test('different path SHA remains current when that path commit is behind the reviewed pin', async () => {
   const report = await probeMaterialFreshness({
     sources: { example: source() },
     observedAt: '2026-09-10T00:00:00Z',
-    fetchImpl: async () =>
-      response(
-        commit('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', '2026-08-20T12:00:00Z'),
-      ),
+    fetchImpl: sequencedFetch(
+      response(commit(olderPathRevision, '2026-09-09T12:00:00Z')),
+      response({ status: 'behind' }),
+    ),
   });
 
+  assert.equal(report.scopes[0].relation, 'behind');
   assert.equal(report.scopes[0].status, FRESHNESS_STATUSES.current);
   assert.equal(report.summary.current, 1);
   assert.equal(freshnessExitCode(report), 0);
 });
 
-test('relevant path commit after the reviewed pin reports newer upstream', async () => {
+test('path commit ahead of the reviewed pin reports newer upstream independent of timestamp', async () => {
   const report = await probeMaterialFreshness({
     sources: { example: source() },
     observedAt: '2026-09-10T00:00:00Z',
-    fetchImpl: async () =>
-      response(
-        commit('cccccccccccccccccccccccccccccccccccccccc', '2026-09-02T14:50:50Z'),
-      ),
+    fetchImpl: sequencedFetch(
+      response(commit(newerPathRevision, '2026-06-30T12:00:00Z')),
+      response({ status: 'ahead' }),
+    ),
   });
 
+  assert.equal(report.scopes[0].relation, 'ahead');
   assert.equal(report.scopes[0].status, FRESHNESS_STATUSES.newerUpstream);
   assert.equal(report.summary.newerUpstream, 1);
   assert.equal(freshnessExitCode(report), 1);
 });
 
-test('network and HTTP failures remain unavailable rather than semantic drift', async () => {
-  const sources = {
-    alpha: source({ freshness: { ref: 'main', scopes: [{ id: 'core', path: 'alpha' }] } }),
-    beta: source({ freshness: { ref: 'main', scopes: [{ id: 'core', path: 'beta' }] } }),
-  };
+test('exact reviewed revision is current without an ancestry request', async () => {
   let calls = 0;
   const report = await probeMaterialFreshness({
-    sources,
+    sources: { example: source() },
     fetchImpl: async () => {
       calls += 1;
-      if (calls === 1) throw new Error('offline');
-      return response([], { ok: false, status: 403 });
+      return response(commit(reviewedRevision));
     },
   });
 
-  assert.deepEqual(report.scopes.map((item) => item.status), ['unavailable', 'unavailable']);
-  assert.deepEqual(report.scopes.map((item) => item.error.kind), ['network', 'http']);
-  assert.equal(report.summary.unavailable, 2);
-  assert.equal(freshnessExitCode(report), 2);
+  assert.equal(calls, 1);
+  assert.equal(report.scopes[0].relation, 'identical');
+  assert.equal(report.scopes[0].status, FRESHNESS_STATUSES.current);
 });
 
-test('malformed upstream payload is classified separately', async () => {
-  const report = await probeMaterialFreshness({
+test('network and HTTP failures remain unavailable rather than semantic drift', async () => {
+  const latestNetworkFailure = await probeMaterialFreshness({
+    sources: { example: source() },
+    fetchImpl: sequencedFetch(new Error('offline')),
+  });
+  assert.equal(latestNetworkFailure.scopes[0].status, FRESHNESS_STATUSES.unavailable);
+  assert.equal(latestNetworkFailure.scopes[0].error.kind, 'network');
+
+  const compareHttpFailure = await probeMaterialFreshness({
+    sources: { example: source() },
+    fetchImpl: sequencedFetch(
+      response(commit(newerPathRevision)),
+      response({}, { ok: false, status: 403 }),
+    ),
+  });
+  assert.equal(compareHttpFailure.scopes[0].status, FRESHNESS_STATUSES.unavailable);
+  assert.equal(compareHttpFailure.scopes[0].error.kind, 'http');
+  assert.equal(compareHttpFailure.scopes[0].latest.revision, newerPathRevision);
+  assert.equal(freshnessExitCode(compareHttpFailure), 2);
+});
+
+test('malformed latest payload and unsupported ancestry are classified separately', async () => {
+  const malformed = await probeMaterialFreshness({
     sources: { example: source() },
     fetchImpl: async () => response([{ sha: 'short', commit: {} }]),
   });
-  assert.equal(report.scopes[0].status, FRESHNESS_STATUSES.unavailable);
-  assert.equal(report.scopes[0].error.kind, 'invalid-response');
-  assert.equal(freshnessExitCode(report), 2);
+  assert.equal(malformed.scopes[0].error.kind, 'invalid-response');
+
+  const diverged = await probeMaterialFreshness({
+    sources: { example: source() },
+    fetchImpl: sequencedFetch(
+      response(commit(newerPathRevision)),
+      response({ status: 'diverged' }),
+    ),
+  });
+  assert.equal(diverged.scopes[0].status, FRESHNESS_STATUSES.unavailable);
+  assert.equal(diverged.scopes[0].error.kind, 'ancestry');
+  assert.equal(freshnessExitCode(diverged), 2);
 });
 
 test('invalid monitor configuration is reported without making a network request', async () => {
@@ -172,10 +217,10 @@ test('scope output is deterministically ordered and probe does not mutate source
   const before = structuredClone(sources);
   const report = await probeMaterialFreshness({
     sources,
-    fetchImpl: async () =>
-      response(
-        commit('dddddddddddddddddddddddddddddddddddddddd', '2026-08-20T12:00:00Z'),
-      ),
+    fetchImpl: sequencedFetch(
+      response(commit(reviewedRevision)),
+      response(commit(reviewedRevision)),
+    ),
   });
 
   assert.deepEqual(report.scopes.map((item) => item.id), ['alpha:a', 'zeta:z']);
