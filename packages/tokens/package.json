@@ -17,6 +17,7 @@
     "build": "rm -rf dist && pnpm tokens:build",
     "test": "rm -rf dist && node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
+    "freshness:upstream": "node scripts/upstream-freshness.mjs",
     "inventory:compose": "node scripts/inventory-compose.mjs",
     "inventory:material-web": "node scripts/inventory-material-web.mjs",
     "audit:androidx": "node scripts/audit-androidx.mjs",
