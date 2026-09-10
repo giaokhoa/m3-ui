@@ -4,10 +4,13 @@ import { material3Sources } from './sources.mjs';
 import {
   collectFreshnessScopes,
   compareRevisionsUrl,
+  FRESHNESS_OUTCOMES,
   FRESHNESS_STATUSES,
   freshnessExitCode,
+  freshnessOutcome,
   latestRelevantCommitUrl,
   probeMaterialFreshness,
+  renderFreshnessSummary,
 } from './upstream-freshness-lib.mjs';
 
 const reviewedRevision = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -206,7 +209,8 @@ test('invalid monitor configuration is reported without making a network request
   assert.equal(called, false);
   assert.match(report.configurationError, /freshness\.ref/);
   assert.equal(report.summary.unavailable, 1);
-  assert.equal(freshnessExitCode(report), 2);
+  assert.equal(freshnessOutcome(report), FRESHNESS_OUTCOMES.invalidConfiguration);
+  assert.equal(freshnessExitCode(report), 3);
 });
 
 test('scope output is deterministically ordered and probe does not mutate source metadata', async () => {
@@ -228,11 +232,50 @@ test('scope output is deterministically ordered and probe does not mutate source
 });
 
 test('unavailable result takes exit-code precedence over detected drift', () => {
-  assert.equal(
-    freshnessExitCode({
-      configurationError: null,
-      summary: { current: 0, newerUpstream: 1, unavailable: 1 },
-    }),
-    2,
-  );
+  const report = {
+    configurationError: null,
+    summary: { current: 0, newerUpstream: 1, unavailable: 1 },
+  };
+  assert.equal(freshnessOutcome(report), FRESHNESS_OUTCOMES.unavailable);
+  assert.equal(freshnessExitCode(report), 2);
+});
+
+test('GitHub summary renders exact reviewed/latest provenance and actionable drift status', async () => {
+  const report = await probeMaterialFreshness({
+    sources: { example: source() },
+    observedAt: '2026-09-10T00:00:00Z',
+    fetchImpl: sequencedFetch(
+      response(commit(newerPathRevision, '2026-09-10T01:02:03Z')),
+      response({ status: 'ahead' }),
+    ),
+  });
+
+  assert.equal(freshnessOutcome(report), FRESHNESS_OUTCOMES.newerUpstream);
+  const summary = renderFreshnessSummary(report);
+  assert.match(summary, /Outcome:\*\* `newer-upstream`/);
+  assert.match(summary, new RegExp(reviewedRevision));
+  assert.match(summary, new RegExp(newerPathRevision));
+  assert.match(summary, /packages\/core/);
+  assert.match(summary, /2026-09-10T01:02:03Z/);
+  assert.match(summary, /newer-upstream \(ahead\)/);
+  assert.match(summary, /Triage the affected scopes before changing reviewed pins/);
+});
+
+test('summary keeps unavailable and invalid configuration distinct from semantic drift', async () => {
+  const unavailable = await probeMaterialFreshness({
+    sources: { example: source() },
+    observedAt: '2026-09-10T00:00:00Z',
+    fetchImpl: sequencedFetch(new Error('offline')),
+  });
+  assert.equal(freshnessOutcome(unavailable), FRESHNESS_OUTCOMES.unavailable);
+  assert.match(renderFreshnessSummary(unavailable), /This is not semantic drift/);
+  assert.match(renderFreshnessSummary(unavailable), /network: latest commit: offline/);
+
+  const invalid = await probeMaterialFreshness({
+    sources: { broken: source({ freshness: { ref: '', scopes: [] } }) },
+    observedAt: '2026-09-10T00:00:00Z',
+  });
+  assert.equal(freshnessOutcome(invalid), FRESHNESS_OUTCOMES.invalidConfiguration);
+  assert.match(renderFreshnessSummary(invalid), /Outcome:\*\* `invalid-configuration`/);
+  assert.match(renderFreshnessSummary(invalid), /Configuration error:/);
 });
