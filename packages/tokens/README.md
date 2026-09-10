@@ -184,6 +184,52 @@ pnpm --filter @m3-ui/tokens coverage:union:complete
 
 Additional focused audit commands are defined in `packages/tokens/package.json` and under `scripts/`.
 
+## Material upstream freshness lifecycle
+
+Freshness is a separate read-only signal from pinned conformance. Normal PR/main CI continues to validate the exact reviewed revisions in `scripts/sources.mjs`; it never turns floating AndroidX or Material Web HEAD into the conformance oracle.
+
+Run the focused probe locally with:
+
+```bash
+pnpm --filter @m3-ui/tokens freshness:upstream
+```
+
+The command emits the machine-readable report from the freshness foundation and never rewrites source pins, canonical DTCG, generated CSS, audit snapshots, public APIs or GitHub issues. In GitHub Actions it also writes the same result as a concise Markdown table to `GITHUB_STEP_SUMMARY`, including each monitored scope, reviewed pin/timestamp, latest relevant revision/timestamp and status.
+
+The workflow-facing outcomes are intentionally distinct:
+
+- `current` — exit `0`; every monitored Git-backed scope is at or behind the reviewed pin for that relevant path.
+- `newer-upstream` — exit `1`; at least one monitored relevant path has a newer upstream commit and requires semantic triage.
+- `unavailable` — exit `2`; network, GitHub API, rate-limit, malformed-response or ancestry tooling prevented a reliable freshness decision. This is not semantic drift.
+- `invalid-configuration` — exit `3`; checked-in freshness metadata is invalid and must be repaired before the signal can be trusted.
+
+`.github/workflows/material-freshness.yml` runs this probe weekly and supports manual `workflow_dispatch`. It has read-only repository permissions and deliberately does not install the workspace, run Storybook, docs Chromium, the full build, conformance suites or issue mutation merely to detect upstream movement.
+
+### Reviewed re-pin procedure
+
+When the probe reports `newer-upstream`, treat the report as an audit target, not permission to upgrade automatically:
+
+1. Capture the report's reviewed and latest relevant revisions/timestamps for every affected scope.
+2. Inspect only the changed Material source surfaces inside those monitored paths; do not treat unrelated repository-wide AndroidX activity as Material drift.
+3. Map affected source families through the completed #296 conformance ownership/report model, starting from `apps/docs/scripts/material-conformance-registry.mjs` and its derived public-symbol report rather than reopening every component lane.
+4. Classify each relevant delta as **no observable m3-ui impact**, **already equivalent on web**, **documented adaptation remains valid**, **audit/provenance metadata only**, **test expectation change**, or **production/public-contract change**.
+5. Change reviewed revision metadata only after that semantic triage is complete. A newer commit by itself is not sufficient evidence for a pin bump.
+6. Update snapshots, drift records, provenance, canonical tokens and generated output only where their semantics genuinely depend on the accepted delta. **Never auto-copy upstream values into canonical DTCG.** AndroidX, Material Web, Figma and other implementations remain read-only evidence, never build inputs.
+7. Run focused source/coverage/audit tests first. If implementation, canonical tokens, generated styling or a public contract changes, then require the complete normal CI matrix, including typecheck, build, docs browser and all visual shards.
+8. Record exact before/after revisions, changed source surfaces, every disposition and the relevant CI run in the reviewed re-pin issue/PR. Child implementation PRs close only their child issue; parent lifecycle rules from `AGENTS.md` still apply.
+
+A detected upstream delta is therefore actionable and visible, but it does not mutate or weaken the repository's reproducible Material contract.
+
+### Non-Git and corroborating evidence freshness
+
+Not every source can honestly use commit-based freshness semantics. `scripts/sources.mjs` therefore remains explicit about the evidence metadata the repository actually knows:
+
+- **Material Design normative pages:** `retrievedAt` records the last intentional retrieval/review, not a machine-verifiable publication timestamp. Re-review the captured normative pages at least every 90 days and earlier when public Material guidance changes materially or an affected semantic area is under audit. Update `retrievedAt` only after that review.
+- **Figma Material 3 Design Kit:** track the explicit kit `version` and `releasedAt` already recorded in the source registry. Re-review when maintainers intentionally confirm a newer kit version is available, and during the same periodic Material evidence review. Do not claim an unavailable Figma API gives authoritative latest-version freshness.
+- **Material Components Android and Flutter:** these are corroborating implementation references, not active scheduled monitors in the current freshness contract because they have no `freshness` scopes. Refresh them on demand when the semantic area they corroborate is being audited or when other reviewed evidence exposes a discrepancy worth cross-checking.
+
+If policy later promotes another Git-backed source to active monitoring, add an explicit path/module-aware `freshness` scope and deterministic tests first; do not infer active monitoring from the mere presence of a repository URL.
+
 ## Related implementation docs
 
 - Theme runtime: `packages/ui/src/theme/README.md`
