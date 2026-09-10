@@ -1,4 +1,5 @@
 const GIT_SHA = /^[0-9a-f]{40}$/;
+const COMPARABLE_RELATIONS = new Set(['ahead', 'behind', 'identical']);
 
 export const FRESHNESS_STATUSES = Object.freeze({
   current: 'current',
@@ -68,6 +69,10 @@ export function latestRelevantCommitUrl(scope) {
   return `https://api.github.com/repos/${scope.repository}/commits?${params}`;
 }
 
+export function compareRevisionsUrl(scope, latestRevision) {
+  return `https://api.github.com/repos/${scope.repository}/compare/${scope.reviewedRevision}...${latestRevision}`;
+}
+
 function parseLatestCommit(scope, payload) {
   if (!Array.isArray(payload) || payload.length === 0) {
     throw new Error(`${scope.id}: upstream returned no commits for ${scope.path}`);
@@ -85,24 +90,52 @@ function parseLatestCommit(scope, payload) {
   };
 }
 
-function classify(scope, latest) {
-  const reviewedTime = Date.parse(scope.reviewedAt);
-  const latestTime = Date.parse(latest.at);
-  // A path's newest commit can legitimately have a different SHA while still
-  // predating the repository-wide reviewed pin. Time ordering prevents that
-  // from becoming a false positive.
-  return latestTime > reviewedTime
+function parseRelation(scope, payload) {
+  const relation = payload?.status;
+  if (!COMPARABLE_RELATIONS.has(relation)) {
+    throw new Error(
+      `${scope.id}: reviewed pin and latest path commit have unsupported ancestry relation ${String(relation)}`,
+    );
+  }
+  return relation;
+}
+
+function classify(relation) {
+  return relation === 'ahead'
     ? FRESHNESS_STATUSES.newerUpstream
     : FRESHNESS_STATUSES.current;
 }
 
-function unavailableResult(scope, kind, message) {
+function unavailableResult(scope, kind, message, latest = null) {
   return {
     ...scope,
-    latest: null,
+    latest,
+    relation: null,
     status: FRESHNESS_STATUSES.unavailable,
     error: { kind, message },
   };
+}
+
+async function requestJson(fetchImpl, url, headers) {
+  let response;
+  try {
+    response = await fetchImpl(url, { headers });
+  } catch (error) {
+    return { error: { kind: 'network', message: errorMessage(error) } };
+  }
+  if (!response?.ok) {
+    return {
+      error: {
+        kind: 'http',
+        message: `GitHub request failed with status ${response?.status ?? 'unknown'}`,
+      },
+    };
+  }
+  try {
+    return { value: await response.json() };
+  } catch (error) {
+    return { error: { kind: 'invalid-response', message: errorMessage(error) } };
+  }
 }
 
 export async function probeMaterialFreshness({
@@ -126,35 +159,65 @@ export async function probeMaterialFreshness({
 
   const results = [];
   for (const scope of scopes) {
-    let response;
-    try {
-      response = await fetchImpl(latestRelevantCommitUrl(scope), { headers });
-    } catch (error) {
-      results.push(unavailableResult(scope, 'network', errorMessage(error)));
-      continue;
-    }
-
-    if (!response?.ok) {
+    const latestResponse = await requestJson(fetchImpl, latestRelevantCommitUrl(scope), headers);
+    if (latestResponse.error != null) {
       results.push(
         unavailableResult(
           scope,
-          'http',
-          `GitHub request failed with status ${response?.status ?? 'unknown'}`,
+          latestResponse.error.kind,
+          `latest commit: ${latestResponse.error.message}`,
+        ),
+      );
+      continue;
+    }
+
+    let latest;
+    try {
+      latest = parseLatestCommit(scope, latestResponse.value);
+    } catch (error) {
+      results.push(unavailableResult(scope, 'invalid-response', errorMessage(error)));
+      continue;
+    }
+
+    if (latest.revision === scope.reviewedRevision) {
+      results.push({
+        ...scope,
+        latest,
+        relation: 'identical',
+        status: FRESHNESS_STATUSES.current,
+        error: null,
+      });
+      continue;
+    }
+
+    const compareResponse = await requestJson(
+      fetchImpl,
+      compareRevisionsUrl(scope, latest.revision),
+      headers,
+    );
+    if (compareResponse.error != null) {
+      results.push(
+        unavailableResult(
+          scope,
+          compareResponse.error.kind,
+          `ancestry comparison: ${compareResponse.error.message}`,
+          latest,
         ),
       );
       continue;
     }
 
     try {
-      const latest = parseLatestCommit(scope, await response.json());
+      const relation = parseRelation(scope, compareResponse.value);
       results.push({
         ...scope,
         latest,
-        status: classify(scope, latest),
+        relation,
+        status: classify(relation),
         error: null,
       });
     } catch (error) {
-      results.push(unavailableResult(scope, 'invalid-response', errorMessage(error)));
+      results.push(unavailableResult(scope, 'ancestry', errorMessage(error), latest));
     }
   }
 
