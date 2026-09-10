@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const node = process.execPath;
 
 function run(command, args, options = {}) {
   console.log(`> ${command} ${args.join(' ')}`);
@@ -109,6 +108,8 @@ try {
   const reactDom = await readJson(join(repoRoot, 'packages/ui/node_modules/react-dom/package.json'));
   const reactTypes = await readJson(join(repoRoot, 'packages/ui/node_modules/@types/react/package.json'));
   const reactDomTypes = await readJson(join(repoRoot, 'packages/ui/node_modules/@types/react-dom/package.json'));
+  const typescript = await readJson(join(repoRoot, 'node_modules/typescript/package.json'));
+  const vite = await readJson(join(repoRoot, 'packages/ui/node_modules/vite/package.json'));
 
   await writeFile(
     join(consumerDir, 'package.json'),
@@ -125,6 +126,8 @@ try {
       devDependencies: {
         '@types/react': reactTypes.version,
         '@types/react-dom': reactDomTypes.version,
+        typescript: typescript.version,
+        vite: vite.version,
       },
     }, null, 2)}\n`,
   );
@@ -134,22 +137,22 @@ try {
   });
 
   await writeFile(
-    join(consumerDir, 'runtime.mjs'),
-    `import { access } from 'node:fs/promises';\nimport { fileURLToPath } from 'node:url';\nimport * as Tokens from '@m3-ui/tokens';\nimport * as UI from '@m3-ui/ui';\nimport * as Layout from '@m3-ui/ui/layout';\n\nif (Object.keys(Tokens).length === 0) throw new Error('tokens root export is empty');\nif (Object.keys(UI).length === 0) throw new Error('ui root export is empty');\nif (Object.keys(Layout).length === 0) throw new Error('ui layout export is empty');\n\nfor (const specifier of ['@m3-ui/tokens/theme.css', '@m3-ui/ui/styles.css', '@m3-ui/ui/styles/button.css']) {\n  const resolved = import.meta.resolve(specifier);\n  await access(fileURLToPath(resolved));\n  console.log(specifier, '->', resolved);\n}\n`,
-  );
-  run(node, ['runtime.mjs'], { cwd: consumerDir });
-
-  await writeFile(
     join(consumerDir, 'consumer.ts'),
-    `import * as Tokens from '@m3-ui/tokens';\nimport * as UI from '@m3-ui/ui';\nimport * as Layout from '@m3-ui/ui/layout';\n\nvoid Tokens;\nvoid UI;\nvoid Layout;\n`,
+    `import * as Tokens from '@m3-ui/tokens';\nimport * as UI from '@m3-ui/ui';\nimport * as Layout from '@m3-ui/ui/layout';\nimport '@m3-ui/tokens/theme.css';\nimport '@m3-ui/ui/styles.css';\nimport '@m3-ui/ui/styles/button.css';\n\nconsole.log(Object.keys(Tokens).length, Object.keys(UI).length, Object.keys(Layout).length);\n`,
   );
+  await writeFile(
+    join(consumerDir, 'index.html'),
+    '<!doctype html><html><body><script type="module" src="/consumer.ts"></script></body></html>\n',
+  );
+  run(npm, ['exec', '--', 'vite', 'build'], { cwd: consumerDir });
+
   await writeFile(
     join(consumerDir, 'tsconfig.json'),
     `${JSON.stringify({
       compilerOptions: {
         target: 'ES2022',
-        module: 'NodeNext',
-        moduleResolution: 'NodeNext',
+        module: 'ESNext',
+        moduleResolution: 'Bundler',
         strict: true,
         noEmit: true,
         jsx: 'react-jsx',
@@ -158,7 +161,7 @@ try {
       include: ['consumer.ts'],
     }, null, 2)}\n`,
   );
-  run(pnpm, ['exec', 'tsc', '-p', join(consumerDir, 'tsconfig.json')]);
+  run(npm, ['exec', '--', 'tsc', '-p', 'tsconfig.json'], { cwd: consumerDir });
 
   console.log('Packed external consumer smoke passed.');
 } finally {
