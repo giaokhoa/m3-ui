@@ -1,0 +1,103 @@
+---
+title: Shape
+description: Material 3 shape scale, semantic corner roles, component token mapping, and expressive-shape provenance.
+---
+
+<ComponentHero
+  eyebrow="Material foundation"
+  definition="Shape communicates hierarchy, containment, and expressive emphasis through consistent corner and silhouette roles rather than arbitrary decoration."
+/>
+
+<SourceLinks
+  links={[
+    {
+      label: 'Material 3 shape overview',
+      href: 'https://m3.material.io/styles/shape/overview',
+      kind: 'spec',
+    },
+    {
+      label: 'AndroidX Compose Material3 shape tokens',
+      href: 'https://github.com/androidx/androidx/blob/androidx-main/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/ShapeTokens.kt',
+      kind: 'compose',
+    },
+    {
+      label: 'AndroidX Compose MaterialShapes',
+      href: 'https://github.com/androidx/androidx/blob/androidx-main/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialShapes.kt',
+      kind: 'compose',
+    },
+  ]}
+/>
+
+## Shape as a Material role
+
+Material shape is part of visual hierarchy. A component's shape helps communicate its container, grouping, state, and emphasis; it should not be chosen only because one radius happens to look attractive in isolation.
+
+Use the semantic shape role specified for the component or pattern. When a component changes shape across a state or expressive transition, that change is part of the component contract rather than a general instruction to make every surface more rounded.
+
+<GuidanceCallout title="Prefer semantic roles over ad-hoc radii">
+  Keep component geometry connected to the canonical shape graph. If a design needs a different visual hierarchy, first choose the appropriate Material component or supported variant instead of replacing its shape with an unrelated CSS radius.
+</GuidanceCallout>
+
+## Standard shape scale
+
+The canonical `m3-ui` shape graph lives in `packages/tokens/tokens/core/shape.json`. It contains the current Material corner vocabulary:
+
+- `shape.none`
+- `shape.extraSmall`
+- `shape.small`
+- `shape.medium`
+- `shape.large`
+- `shape.largeIncreased`
+- `shape.extraLarge`
+- `shape.extraLargeIncreased`
+- `shape.extraExtraLarge`
+- `shape.full`
+
+The graph also contains directional corner groups such as `extraSmallTop`, `largeStart`, `largeEnd`, `largeTop`, and `extraLargeTop` for surfaces whose geometry is intentionally asymmetric.
+
+These names are the documentation contract; their concrete measurements stay in the generated token source rather than being copied into MDX. When generated spec-table support is available, this page can render those values directly from the token graph without creating a second source of truth.
+
+## How components consume shape
+
+Component tokens point back to the core shape roles instead of duplicating their values. For example, current component token files map card containers to `shape.medium`, selected chip geometry to `shape.full`, and many size/state variants to other semantic shape aliases.
+
+That indirection matters: a component owns *which role* it uses, while `packages/tokens` owns the canonical value of the role. Documentation should describe the semantic mapping and let generated token data provide measurements.
+
+<GuidanceCallout title="Do not treat the token package as a new public styling API" kind="caution">
+  `packages/tokens` is the repository source of truth, but consumers should use the public `@m3-ui/ui` component contracts that are actually exported. This guide does not introduce a public `Shape`, `Shapes`, or raw-radius API.
+</GuidanceCallout>
+
+## Expressive shape vocabulary
+
+M3 Expressive also uses named non-rounded silhouettes for shape-driven motion and emphasis. The repository audits the current AndroidX Compose `MaterialShapes` catalog and the Material 3 Design Kit rather than inferring this vocabulary from the standard corner scale.
+
+Current audit evidence records 35 expressive shapes in both sources, with one naming-set difference: Compose contains `clam shell`, while the audited Figma Shape Set contains `hexagon`. The repository classifies that as source drift and prefers the newer Compose reference for implementation work; it does not silently merge both names into a fictional canonical catalog.
+
+<GuidanceCallout title="Expressive shapes are provenance-sensitive" kind="adaptation">
+  Claims about named expressive silhouettes are Compose/Figma implementation evidence. Material Design remains the source of design intent, but the public Material overview does not provide the repository's complete audited name list.
+</GuidanceCallout>
+
+## Shape morphing and internal geometry
+
+Some expressive components need polygon geometry and morphing rather than a CSS `border-radius`. `m3-ui` contains internal Material-shape renderer code for those implementation needs, including the Loading Indicator.
+
+That renderer is not a public foundation API. Its existence does not mean applications should import internal polygon primitives or replace normal component shape tokens with arbitrary morphable paths.
+
+## Cross-source fidelity
+
+The standard shape scale is reconciled against the current Compose and Material Web token evidence in the repository's foundation drift audit. Differences that are semantically equivalent or caused by older public adapters remain classified as drift instead of being normalized away in docs prose.
+
+The expressive catalog is audited separately because its named silhouettes are a different concept from the standard corner-radius scale. Keeping those two vocabularies separate prevents a renderer implementation detail from being presented as a replacement for Material component shape roles.
+
+## Practical guidance
+
+- Start with the component's shipped shape and supported variants.
+- Use semantic token roles when implementing or auditing component internals.
+- Keep directional shapes for patterns whose edge attachment or container relationship requires them.
+- Treat `full` as the semantic fully rounded role rather than depending on its renderer sentinel value.
+- Treat expressive named silhouettes and morphing as explicit component behavior, not a global theming knob.
+- Record Compose, Material Web, or Figma differences as provenance/drift when sources do not use the same vocabulary.
+
+## Known boundaries
+
+`m3-ui` currently exposes shape primarily through component behavior and canonical tokens, not through a general public shape-theme API. This page therefore documents the Material foundation and the repository's canonical mapping without inventing runtime APIs that consumers cannot import.

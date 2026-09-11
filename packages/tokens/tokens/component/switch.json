@@ -1,0 +1,50 @@
+{
+  "component": {
+    "switch": {
+      "track": {
+        "width": { "$type": "dimension", "$value": { "value": 52, "unit": "px" } },
+        "height": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+        "outlineWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
+      },
+      "handle": {
+        "unselectedSize": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+        "selectedSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "pressedSize": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+      },
+      "stateLayerSize": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+      "minimumInteractiveSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "colors": {
+        "checkedThumb": { "$type": "string", "$value": "{color.role.onPrimary}" },
+        "checkedTrack": { "$type": "string", "$value": "{color.role.primary}" },
+        "checkedBorder": { "$type": "string", "$value": "transparent" },
+        "checkedIcon": { "$type": "string", "$value": "{color.role.onPrimaryContainer}" },
+        "uncheckedThumb": { "$type": "string", "$value": "{color.role.outline}" },
+        "uncheckedTrack": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+        "uncheckedBorder": { "$type": "string", "$value": "{color.role.outline}" },
+        "uncheckedIcon": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+        "disabledCheckedThumb": { "$type": "string", "$value": "{color.role.surface}" },
+        "disabledCheckedTrack": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledCheckedBorder": { "$type": "string", "$value": "transparent" },
+        "disabledCheckedIcon": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledUncheckedThumb": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledUncheckedTrack": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" },
+        "disabledUncheckedBorder": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "disabledUncheckedIcon": { "$type": "string", "$value": "{color.role.surfaceContainerHighest}" }
+      },
+      "disabledOpacity": {
+        "checkedThumb": { "$type": "number", "$value": 1 },
+        "track": { "$type": "number", "$value": 0.12 },
+        "checkedIcon": { "$type": "number", "$value": 0.38 },
+        "uncheckedThumb": { "$type": "number", "$value": 0.38 },
+        "uncheckedIcon": { "$type": "number", "$value": 0.38 }
+      },
+      "motion": {
+        "geometry": {
+          "duration": { "$type": "string", "$value": "{motion.spring.fastSpatial.duration}" },
+          "easing": { "$type": "string", "$value": "{motion.spring.fastSpatial.easing}" }
+        }
+      }
+    }
+  }
+}

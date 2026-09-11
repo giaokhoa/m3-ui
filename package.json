@@ -1,0 +1,23 @@
+{
+  "name": "m3-ui-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "turbo build",
+    "test:package-consumer": "node scripts/package-consumer-smoke.mjs",
+    "test:package-policy": "node scripts/package-policy-check.mjs",
+    "changeset": "pnpm dlx @changesets/cli@3.0.2",
+    "changeset:status": "pnpm dlx @changesets/cli@3.0.2 status",
+    "release:dry-run": "node scripts/release-dry-run.mjs"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

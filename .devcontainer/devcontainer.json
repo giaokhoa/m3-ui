@@ -1,0 +1,23 @@
+{
+  "name": "m3-ui",
+  "image": "mcr.microsoft.com/devcontainers/base:trixie",
+  "features": {
+    "ghcr.io/devcontainers/features/node:2.1.0": {
+      "version": "22",
+      "pnpmVersion": "10.0.0"
+    }
+  },
+  "remoteUser": "vscode",
+  "forwardPorts": [4173, 6006],
+  "portsAttributes": {
+    "4173": {
+      "label": "Docs",
+      "onAutoForward": "notify"
+    },
+    "6006": {
+      "label": "Storybook",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium"
+}

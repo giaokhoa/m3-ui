@@ -1,0 +1,74 @@
+---
+title: Bottom sheets
+description: Material non-modal and modal bottom sheets with shared anchor state, drag-handle semantics, and explicit modal lifecycle ownership.
+---
+
+Bottom sheets present supplemental content from the bottom edge of a composition. `BottomSheet` stays in the local tree and leaves the background interactive; `ModalBottomSheet` adds true modal lifecycle behavior, a scrim, and focus containment.
+
+[Material 3 bottom sheets](https://m3.material.io/components/bottom-sheets/overview)
+
+<ComponentPreview>
+  <BottomSheetPreview />
+</ComponentPreview>
+
+## When to use
+
+Use a non-modal bottom sheet when users should continue interacting with the surrounding content while the sheet remains available. Use a modal bottom sheet when the sheet must temporarily own interaction and obscure the underlying surface.
+
+Do not describe a local `BottomSheet` as modal simply because it visually overlaps content.
+
+## Shared sheet state
+
+Both surfaces use `SheetState` as the Material anchor-state owner. The standard logical states are `Hidden`, `PartiallyExpanded`, and `Expanded`; applications can configure enabled anchors and veto transitions through the public state contract.
+
+```tsx
+const state = useSheetState({
+  initialValue: SheetValue.PartiallyExpanded,
+});
+
+<BottomSheet state={state}>{content}</BottomSheet>
+```
+
+Imperative `show()`, `hide()`, `expand()`, and `partialExpand()` transitions operate through that same state owner rather than creating component-local competing state.
+
+## Non-modal sheet
+
+`BottomSheet` renders inside its parent composition. Its containing block owns stacking and the background remains interactive. Anchor calculation is based on local sheet/container geometry; it is not Material window-size classification or adaptive navigation policy.
+
+## Modal sheet
+
+<ComponentPreview>
+  <ModalBottomSheetPreview />
+</ComponentPreview>
+
+`ModalBottomSheet` composes the Material sheet with browser modal behavior. React Aria `ModalOverlay`/`Modal` own portal placement, focus containment, scroll locking, outside/Escape dismissal, and focus restoration.
+
+Dismissal first settles the Material sheet toward `Hidden`; `onDismissRequest` runs after the hide transition completes. Outside-click and Escape dismissal can be controlled independently through the public props.
+
+## Drag handle and gestures
+
+The built-in drag handle is an actionable button with state-dependent accessible wording such as expand, collapse, or dismiss. `gesturesEnabled` controls pointer dragging, while `handleActionEnabled` can preserve keyboard/button activation independently.
+
+Pass `dragHandle={null}` only when the composition intentionally removes the affordance.
+
+## Accessibility
+
+For modal sheets, the sheet is exposed as a modal dialog and must have enough labeling/context for users to understand the surface. Let the public modal overlay own focus containment and restoration; do not add a second focus trap.
+
+For non-modal sheets, background content remains reachable, so ensure focus order and sheet actions make sense alongside the surrounding page. The drag handle's accessible action should match the actual next state available.
+
+## API reference
+
+<ApiReference name="BottomSheet" />
+
+## Material fidelity and web adaptation
+
+<MaterialParity component="bottom-sheet" />
+
+Material supplies sheet anchors, presentation, gestures, and drag-handle intent. Browser modal lifecycle is an explicit adaptation provided only by `ModalBottomSheet`; local sheet measurement is component geometry, not adaptive window policy.
+
+## Related components
+
+- [Dialog](/docs/components/dialog) — centered/focused modal surface.
+- [Scrim](/docs/components/scrim) — visual obscuring/dismiss layer without modal lifecycle ownership.
+- [Adaptive layout](/docs/develop/layout) — screen/window adaptation, distinct from sheet-local geometry.

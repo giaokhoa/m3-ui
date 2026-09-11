@@ -1,0 +1,13 @@
+{
+  "component": {
+    "list": {
+      "base": {
+        "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.innerOffset}" },
+        "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" }
+      },
+      "reorder": {
+        "itemShadowColor": { "$type": "string", "$value": "{color.role.shadow}" }
+      }
+    }
+  }
+}

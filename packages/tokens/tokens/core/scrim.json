@@ -1,0 +1,6 @@
+{
+  "scrim": {
+    "containerColor": { "$type": "string", "$value": "{color.role.scrim}" },
+    "containerOpacity": { "$type": "number", "$value": 0.32 }
+  }
+}

@@ -1,0 +1,85 @@
+.card {
+  position: relative;
+  display: block;
+  border-radius: var(--_card-container-radius);
+  color: var(--_card-content-color);
+  outline: none;
+}
+
+.card[data-interactive] {
+  min-inline-size: var(--_card-min-interactive-size);
+  min-block-size: var(--_card-min-interactive-size);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --ripple-color: currentColor;
+}
+
+.card[data-disabled] {
+  cursor: default;
+  color: var(--_card-disabled-content-color);
+}
+
+.card > .elevation {
+  z-index: 0;
+  transition-property: box-shadow;
+  transition-duration: var(--_card-elevation-duration, 0ms);
+  transition-timing-function: var(--_card-elevation-easing, linear);
+}
+
+.card__surface {
+  position: relative;
+  z-index: 1;
+  display: block;
+  min-inline-size: 100%;
+  min-block-size: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--_card-container-color);
+  box-shadow: inset 0 0 0 var(--_card-outline-width, 0px)
+    var(--_card-outline-color, transparent);
+  color: inherit;
+}
+
+.card[data-interactive] .card__surface {
+  min-inline-size: var(--_card-min-interactive-size);
+  min-block-size: var(--_card-min-interactive-size);
+}
+
+.card[data-disabled] .card__surface {
+  background: var(--_card-disabled-container-color);
+  box-shadow: inset 0 0 0 var(--_card-outline-width, 0px)
+    var(--_card-disabled-outline-color, transparent);
+}
+
+.card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card > .elevation {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .card__surface {
+    background: Canvas;
+    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width, 0px)) CanvasText;
+    color: CanvasText;
+  }
+
+  .card[data-disabled] .card__surface {
+    box-shadow: inset 0 0 0 max(1px, var(--_card-outline-width, 0px)) GrayText;
+    color: GrayText;
+  }
+
+  .card[data-interactive]:focus-visible .card__surface {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

@@ -1,0 +1,50 @@
+.carousel {
+  inline-size: 100%;
+  color: inherit;
+  background: var(--_carousel-container-color, transparent);
+}
+
+.carousel__viewport {
+  inline-size: 100%;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  touch-action: pan-y;
+  outline: none;
+}
+
+.carousel__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel__viewport:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.carousel__track {
+  display: flex;
+  gap: var(--_carousel-item-spacing, 0px);
+  inline-size: max-content;
+  padding-inline-start: var(--_carousel-padding-start, 0px);
+  padding-inline-end: var(--_carousel-padding-end, 0px);
+}
+
+.carousel__item {
+  flex: 0 0 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  clip-path: inset(0 var(--_carousel-mask-inset, 0px) 0 var(--_carousel-mask-inset, 0px));
+  transform: translateX(var(--_carousel-translation, 0px));
+  transition: clip-path 120ms linear, transform 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel__item {
+    transition: none;
+  }
+
+  .carousel__viewport {
+    scroll-behavior: auto;
+  }
+}

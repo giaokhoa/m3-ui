@@ -1,0 +1,28 @@
+---
+title: Browser support
+description: Current browser assumptions, tested surfaces, and web-platform expectations for m3-ui.
+---
+
+`m3-ui` targets modern browsers and relies on current HTML, CSS, DOM, and accessibility behavior. The project intentionally uses browser-native semantics where they are the correct web equivalent of a Material interaction contract.
+
+## Tested today
+
+The repository's committed visual-regression suite currently runs in Chromium. Treat that as the strongest continuously checked browser-rendering evidence available from CI today.
+
+That does **not** mean the public API is Chromium-only, and it does not justify claiming that every component is continuously certified across Chromium, Firefox, and WebKit.
+
+## Runtime assumptions
+
+Consumers should provide a modern React 19 environment with React DOM 19 and a browser capable of the web platform features used by the library and React Aria Components.
+
+`m3-ui` does not emulate Android input, focus, accessibility, or layout runtime behavior when the browser already has the correct semantic primitive. Examples include native document navigation, ARIA semantics, keyboard focus behavior, and normalized press interactions.
+
+## Browser differences are not automatically Material gaps
+
+A browser implementation can be conformant to the Material design intent without reproducing Compose internals. The relevant question is whether the user-visible design, behavior, semantics, and accessibility contract is preserved on the web.
+
+When behavior differs intentionally because the browser platform has a different semantic primitive, the docs label that as a web adaptation. When an observable Material requirement is missing, it is recorded as a known gap instead.
+
+## What to validate for your product
+
+Before shipping a production application, test the browser and assistive-technology matrix your product supports. The repository's own CI evidence is useful input, not a substitute for product-specific compatibility and accessibility testing.

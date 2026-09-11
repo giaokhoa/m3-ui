@@ -1,0 +1,24 @@
+{
+  "component": {
+    "fabMenu": {
+      "closeButton": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "containerElevation": { "$type": "string", "$value": "level3" },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "containerWidth": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } }
+      },
+      "listItem": {
+        "betweenSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "containerElevation": { "$type": "string", "$value": "level3" },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "containerShape": { "$type": "string", "$value": "full" },
+        "iconLabelSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "leadingSpace": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "trailingSpace": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+      }
+    }
+  }
+}

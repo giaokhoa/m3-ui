@@ -1,0 +1,48 @@
+.surface {
+  position: relative;
+  display: block;
+  overflow: visible;
+  box-sizing: border-box;
+  outline: none;
+  isolation: isolate;
+}
+
+.surface > .elevation {
+  z-index: -1;
+}
+
+.surface__content {
+  position: relative;
+  z-index: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  color: inherit;
+}
+
+.surface[data-interactive] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --ripple-color: currentColor;
+}
+
+.surface[data-disabled] {
+  cursor: default;
+  opacity: 0.38;
+}
+
+@media (forced-colors: active) {
+  .surface {
+    background: Canvas !important;
+    color: CanvasText !important;
+  }
+
+  .surface[data-interactive]:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .surface[data-disabled] {
+    color: GrayText !important;
+  }
+}

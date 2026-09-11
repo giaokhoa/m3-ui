@@ -1,0 +1,42 @@
+.docs-list-item-demo,
+.docs-menu-demo,
+.docs-divider-demo {
+  display: grid;
+  gap: 24px;
+  inline-size: 100%;
+}
+
+.docs-list-item-demo > div,
+.docs-list-item-demo > .list-item-selection-group {
+  inline-size: min(100%, 560px);
+}
+
+.docs-menu-demo {
+  justify-items: start;
+}
+
+.docs-menu-demo .exposed-menu {
+  inline-size: min(100%, 320px);
+}
+
+.docs-badge-demo,
+.docs-divider-demo__vertical {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+
+.docs-divider-demo__horizontal {
+  display: grid;
+  gap: 12px;
+  inline-size: min(100%, 480px);
+}
+
+.docs-divider-demo__vertical {
+  min-block-size: 48px;
+}
+
+.docs-divider-demo__vertical .divider--vertical {
+  align-self: stretch;
+}

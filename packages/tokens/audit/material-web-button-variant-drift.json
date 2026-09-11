@@ -1,0 +1,161 @@
+{
+  "policy": {
+    "scope": "Button variant cross-source drift between pinned Material Web 34.0.21, pinned AndroidX Compose generated tokens, and effective Compose runtime defaults.",
+    "rule": "Variant declarations remain state-specific. Runtime overrides and generated-source defects are recorded instead of silently rewriting canonical values. Material Web declarations marked deprecated are outside the current Web denominator but remain visible as deprecation skew."
+  },
+  "drift": [
+    {
+      "id": "button-filled-disabled-icon-color",
+      "module": "md-comp-button-filled",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.filled.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-filled-disabled-label-color",
+      "module": "md-comp-button-filled",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.filled.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-tonal-disabled-icon-color",
+      "module": "md-comp-button-tonal",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.filledTonal.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-tonal-disabled-label-color",
+      "module": "md-comp-button-tonal",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.filledTonal.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-elevated-disabled-icon-color",
+      "module": "md-comp-button-elevated",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.elevated.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-elevated-disabled-label-color",
+      "module": "md-comp-button-elevated",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.elevated.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-elevated-unselected-icon-color",
+      "module": "md-comp-button-elevated",
+      "variable": "unselected-icon-color",
+      "canonicalPath": "component.button.variant.elevated.unselectedIconColor",
+      "classification": "compose-generated-source-lag",
+      "preferredReference": "composeRuntime+materialWebLatest",
+      "materialWeb": "primary",
+      "composeGenerated": "on-primary",
+      "composeRuntime": "primary",
+      "canonical": "primary"
+    },
+    {
+      "id": "button-outlined-disabled-icon-color",
+      "module": "md-comp-button-outlined",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.outlined.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-outlined-disabled-label-color",
+      "module": "md-comp-button-outlined",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.outlined.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-text-disabled-container-color",
+      "module": "md-comp-button-text",
+      "variable": "disabled-container-color",
+      "canonicalPath": "component.button.variant.text.disabledContainerColor",
+      "classification": "implementation-override",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface",
+      "composeRuntime": "transparent",
+      "canonical": "transparent"
+    },
+    {
+      "id": "button-text-disabled-icon-color",
+      "module": "md-comp-button-text",
+      "variable": "disabled-icon-color",
+      "canonicalPath": "component.button.variant.text.disabledIconColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    },
+    {
+      "id": "button-text-disabled-label-color",
+      "module": "md-comp-button-text",
+      "variable": "disabled-label-text-color",
+      "canonicalPath": "component.button.variant.text.disabledLabelTextColor",
+      "classification": "cross-source-color-drift",
+      "preferredReference": "composeRuntime",
+      "materialWeb": "on-surface",
+      "composeGenerated": "on-surface-variant",
+      "canonical": "on-surface-variant"
+    }
+  ],
+  "generatedSourceSkew": [
+    {
+      "id": "button-text-primary-content-runtime-override",
+      "module": "md-comp-button-text",
+      "classification": "compose-generated-source-lag",
+      "materialWeb": "primary",
+      "composeGenerated": "on-surface-variant",
+      "composeRuntime": "primary",
+      "reason": "Pinned Compose ButtonDefaults explicitly uses Primary for TextButton contentColor with a TODO to replace it with the generated token once corrected. Material Web 34.0.21 independently uses Primary across enabled/focus/hover/pressed text and icon roles."
+    }
+  ],
+  "deprecationSkew": [
+    {
+      "id": "button-hover-elevation-web-deprecated",
+      "modules": ["md-comp-button-filled", "md-comp-button-tonal", "md-comp-button-elevated"],
+      "classification": "material-web-deprecated-compose-current",
+      "reason": "Material Web 34.0.21 marks hovered container elevation as no longer part of the design spec, while pinned Compose generated tokens and runtime elevation APIs still expose/use it. Canonical Compose behavior is retained but the Web declaration is excluded from the current Web denominator."
+    }
+  ]
+}

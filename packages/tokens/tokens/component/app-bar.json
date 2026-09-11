@@ -1,0 +1,49 @@
+{
+  "component": {
+    "appBar": {
+      "base": {
+        "avatarSize": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+        "containerColor": { "$type": "string", "$value": "var(--surface)" },
+        "containerElevation": { "$type": "string", "$value": "level0" },
+        "containerShape": { "$type": "string", "$value": "none" },
+        "iconButtonSpace": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "leadingIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "leadingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "onScrollContainerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "onScrollContainerElevation": { "$type": "string", "$value": "level2" },
+        "subtitleColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "titleColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "trailingIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "trailingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }
+      },
+      "variant": {
+        "small": {
+          "containerHeight": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+          "subtitleTypography": { "$type": "string", "$value": "labelMedium" },
+          "titleTypography": { "$type": "string", "$value": "titleLarge" }
+        },
+        "medium": {
+          "containerHeight": { "$type": "dimension", "$value": { "value": 112, "unit": "px" } },
+          "titleTypography": { "$type": "string", "$value": "headlineSmall" }
+        },
+        "mediumFlexible": {
+          "containerHeight": { "$type": "dimension", "$value": { "value": 112, "unit": "px" } },
+          "largeContainerHeight": { "$type": "dimension", "$value": { "value": 136, "unit": "px" } },
+          "subtitleTypography": { "$type": "string", "$value": "labelLarge" },
+          "titleTypography": { "$type": "string", "$value": "headlineMedium" }
+        },
+        "large": {
+          "containerHeight": { "$type": "dimension", "$value": { "value": 152, "unit": "px" } },
+          "titleTypography": { "$type": "string", "$value": "headlineMedium" }
+        },
+        "largeFlexible": {
+          "containerHeight": { "$type": "dimension", "$value": { "value": 120, "unit": "px" } },
+          "largeContainerHeight": { "$type": "dimension", "$value": { "value": 152, "unit": "px" } },
+          "subtitleTypography": { "$type": "string", "$value": "titleMedium" },
+          "titleTypography": { "$type": "string", "$value": "displaySmall" }
+        }
+      }
+    }
+  }
+}

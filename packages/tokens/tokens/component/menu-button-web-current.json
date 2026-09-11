@@ -1,0 +1,14 @@
+{
+  "component": {
+    "menuButton": {
+      "shared": {
+        "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+        "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" }
+      },
+      "filled": {
+        "shape": { "$type": "string", "$value": "full" },
+        "hoverContainerElevation": { "$type": "string", "$value": "level1" }
+      }
+    }
+  }
+}

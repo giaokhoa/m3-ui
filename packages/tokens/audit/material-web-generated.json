@@ -1,0 +1,23 @@
+{
+  "source": {
+    "repository": "material-components/material-web",
+    "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "revisionAt": "2026-08-21T19:30:42Z",
+    "generatedVersion": "34.0.21",
+    "root": "tokens/versions/latest/sass"
+  },
+  "counts": {
+    "allForwards": 194,
+    "componentModules": 177,
+    "systemModules": 13,
+    "referenceModules": 2,
+    "otherModules": 2
+  },
+  "digests": {
+    "allForwards": "dd4e0497c5e0a584d66735fb5162411e7bfddb513a686c2726aa110b89a5d84a",
+    "components": "734b1b6502e9baa88c3479914c1da0b62c6a0532c7a5d7d747548b6d048d7eb6",
+    "systems": "96ed92929296dc822c8754b2f8313afce9b6a0d2c72611172312d99d7da48df7",
+    "references": "c7bab6c9e7846b14c1eb0d52b497049817f059180597b68a079e2e79a9de54f3",
+    "other": "c922ddc90a290d9a5348248112c591e6ca0984b0c445398d03e46471730c30d9"
+  }
+}

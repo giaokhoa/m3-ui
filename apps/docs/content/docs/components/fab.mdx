@@ -1,0 +1,102 @@
+---
+title: FAB
+description: Material 3 floating action button hierarchy, extended forms, expressive sizes, elevation, and web action semantics.
+---
+
+Floating action buttons highlight a high-priority action for a screen. Use a FAB when one action deserves persistent visual prominence; do not use it as a generic replacement for ordinary buttons or for several equal-priority actions.
+
+[Material 3 FABs](https://m3.material.io/components/floating-action-button/overview)
+
+<ComponentPreview>
+  <FabPreview />
+</ComponentPreview>
+
+```tsx
+import { FloatingActionButton } from '@m3-ui/ui';
+
+<FloatingActionButton aria-label="Create" onPress={create}>
+  <AddIcon />
+</FloatingActionButton>
+```
+
+## When to use
+
+Use a FAB for the screen's most important creation or transformation action when Material guidance for that product context calls for persistent emphasis. Prefer a normal button for inline actions, dialogs, forms, and dense action sets.
+
+Extended FABs add a text label when the action benefits from more explicit wording or when the layout can afford the additional width.
+
+## Basic and extended FABs
+
+```tsx
+<FloatingActionButton aria-label="Create">
+  <AddIcon />
+</FloatingActionButton>
+
+<ExtendedFloatingActionButton icon={<AddIcon />}>
+  Create
+</ExtendedFloatingActionButton>
+```
+
+For icon-only FABs, provide an accessible name because icon content is presentation-only.
+
+## Size families
+
+The public standard FAB family includes `SmallFloatingActionButton`, `FloatingActionButton`, `MediumFloatingActionButton`, and `LargeFloatingActionButton`. The extended family mirrors those Material size roles with small, baseline, medium, and large public components.
+
+Choose the semantic component size rather than copying container or icon measurements into application CSS.
+
+## Extended collapse behavior
+
+An extended FAB with an icon can set `expanded={false}` to collapse to its icon. A text-only extended FAB stays expanded because collapsing it would remove the visible action affordance.
+
+```tsx
+<ExtendedFloatingActionButton
+  icon={<ComposeIcon />}
+  expanded={showLabel}
+>
+  Compose
+</ExtendedFloatingActionButton>
+```
+
+Application state owns `expanded`; the FAB does not add a scroll listener or navigation policy to decide when the label should collapse.
+
+## Color and elevation
+
+The Compose-aligned public color roles include the default primary-container family plus secondary- and tertiary-container variants. `elevation` accepts the component's audited standard/lowered behavior, with Material interaction state flowing through the shared elevation engine.
+
+```tsx
+<FloatingActionButton
+  aria-label="Edit"
+  variant="secondaryContainer"
+>
+  <EditIcon />
+</FloatingActionButton>
+```
+
+Avoid adding a second author `box-shadow` or copied Material color values around the FAB. Use the public customization hooks only when product design intentionally departs from the canonical defaults.
+
+## Behavior and states
+
+React Aria Button owns action semantics, disabled state, keyboard and pointer activation, hover, and focus visibility. Material tokens and the shared ripple/elevation engines own container, content, state layers, shape, elevation, and motion.
+
+## Accessibility
+
+Icon-only FABs need an explicit accessible name. Extended FAB text normally supplies that name; if the visible content is not plain text, provide a clear `aria-label`.
+
+A FAB is a button action, not a navigation landmark. Place it in the application's logical focus order and avoid duplicating the same primary action in several simultaneous FABs.
+
+## API reference
+
+<ApiReference name="FloatingActionButton" />
+
+## Material fidelity and adaptations
+
+<MaterialParity component="fab" />
+
+The public `FabVariant` also preserves `surface`, `primary`, `secondary`, and `tertiary` compatibility variants plus `BrandedFloatingActionButton` from audited Material Web evidence. Those are explicit cross-source compatibility surfaces, not Compose-only Material APIs.
+
+## Related components
+
+- [Button](/docs/components/button) — ordinary labeled actions.
+- [Floating action button menu](/docs/components/fab-menu) — a controlled group of related FAB actions.
+- [Bottom app bar](/docs/components/bottom-app-bar) — app-bar composition that may include a FAB.

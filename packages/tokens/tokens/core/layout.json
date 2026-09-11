@@ -1,0 +1,22 @@
+{
+  "layout": {
+    "windowSizeClass": {
+      "width": {
+        "mediumLowerBound": { "$type": "dimension", "$value": { "value": 600, "unit": "px" } },
+        "expandedLowerBound": { "$type": "dimension", "$value": { "value": 840, "unit": "px" } },
+        "largeLowerBound": { "$type": "dimension", "$value": { "value": 1200, "unit": "px" } },
+        "extraLargeLowerBound": { "$type": "dimension", "$value": { "value": 1600, "unit": "px" } }
+      },
+      "height": {
+        "mediumLowerBound": { "$type": "dimension", "$value": { "value": 480, "unit": "px" } },
+        "expandedLowerBound": { "$type": "dimension", "$value": { "value": 900, "unit": "px" } }
+      }
+    },
+    "pane": {
+      "partitionSpacer": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "preferredWidth": { "$type": "dimension", "$value": { "value": 360, "unit": "px" } },
+      "preferredWidthExtraLarge": { "$type": "dimension", "$value": { "value": 412, "unit": "px" } },
+      "preferredHeight": { "$type": "dimension", "$value": { "value": 420, "unit": "px" } }
+    }
+  }
+}

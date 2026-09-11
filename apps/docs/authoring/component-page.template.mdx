@@ -1,0 +1,98 @@
+---
+title: Component name
+description: One-sentence description of the shipped Material component family.
+---
+
+<ComponentHero definition="Short Material-first definition of the component and its primary purpose." />
+
+<SourceLinks
+  links={[
+    { kind: 'spec', label: 'Material overview', href: 'https://m3.material.io/components/...' },
+    { kind: 'compose', label: 'AndroidX Material3 API', href: 'https://developer.android.com/reference/...' },
+  ]}
+/>
+
+## Example
+
+<ComponentPreview>
+  {/* Canonical live example using public m3-ui exports only. */}
+</ComponentPreview>
+
+## Usage
+
+```tsx
+import { ComponentName } from '@m3-ui/ui';
+
+<ComponentName />
+```
+
+## When to use
+
+Explain Material guidance before implementation details. State when this family is appropriate and which nearby Material family to choose instead.
+
+<GuidanceCallout title="Choose this component when…">
+  Keep decision guidance concise and grounded in Material sources.
+</GuidanceCallout>
+
+## Variants
+
+Document only variants that exist in the public package. Distinguish Material/Compose variants from explicit web adaptations.
+
+## Anatomy
+
+<AnatomyBlock
+  items={[
+    { name: 'Container', description: 'What this part communicates or owns.' },
+    { name: 'Content', description: 'What this part communicates or owns.' },
+  ]}
+/>
+
+## Behavior
+
+Describe observable behavior and application ownership boundaries.
+
+## States
+
+Cover enabled, disabled, selected, hovered, focused, pressed, dragged, expanded, or other states only when they apply.
+
+## Size and layout
+
+<PageSectionNote>
+  Optional. Add only when the component has meaningful Material size, orientation, local layout, or expressive behavior.
+</PageSectionNote>
+
+## Accessibility
+
+Describe browser semantics, keyboard/focus behavior, accessible naming, and React Aria behavior after Material guidance. Do not present web semantics as normative Material design guidance.
+
+## Examples
+
+Add a small number of focused composition examples. Exhaustive matrices remain Storybook responsibility.
+
+## API reference
+
+<GeneratedApiReferenceSlot component="ComponentName" />
+
+## Material fidelity
+
+<FidelitySummary
+  component="component-doc-id"
+  adaptations={[
+    'Optional page-specific adaptation that is not already represented by shared metadata.',
+  ]}
+  knownGaps={[
+    'Optional known gap. Omit the prop when there are no page-specific gaps.',
+  ]}
+/>
+
+## Related components
+
+<RelatedComponents
+  items={[
+    {
+      label: 'Related component',
+      href: '/docs/components/related-component',
+      description: 'Why a reader might choose or compare it.',
+    },
+  ]}
+/>

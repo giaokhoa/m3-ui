@@ -1,0 +1,29 @@
+{
+  "component": {
+    "button": {
+      "variant": {
+        "text": {
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.1 },
+          "disabledIconOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "focusedIconColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "focusedLabelTextColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "focusedStateLayerColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "hoveredIconColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "hoveredLabelTextColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "hoveredStateLayerColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "iconColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "labelTextColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "pressedIconColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "pressedLabelTextColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "pressedStateLayerColor": { "$type": "string", "$value": "{component.button.variant.text.contentColor}" },
+          "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+        }
+      }
+    }
+  }
+}

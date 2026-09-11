@@ -1,0 +1,46 @@
+{
+  "component": {
+    "searchBar": {
+      "containedAvatarTargetSize": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+      "containedIconLabelGap": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "containedLeadingMargin": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "containedLeadingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "containedNoActionsLeadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "containedNoActionsTrailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "containedTrailingActionsGap": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+      "containedTrailingActionsLeadingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "containedTrailingActionsTrailingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "containedTrailingMargin": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "containedTrailingSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+      "leadingIconLeadingIconLabelSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "leadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "trailingIconLabelTrailingIconSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "trailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "containedMotionSpring": {
+        "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+        "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+      },
+      "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+      "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+      "hoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+      "pressedStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+    },
+    "searchView": {
+      "containedDockedBarResultsGap": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+      "containedFullScreenBarContainerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+      "containedIconLabelGap": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "containedLeadingMargin": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "containedTrailingMargin": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+      "leadingIconLeadingIconLabelSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "leadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "trailingIconLabelTrailingIconSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "trailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "containedBackgroundColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "containedDockedBarShape": { "$type": "string", "$value": "full" },
+      "containedDockedResultsShape": { "$type": "string", "$value": "medium" }
+    }
+  }
+}

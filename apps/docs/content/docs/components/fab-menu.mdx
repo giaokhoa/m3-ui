@@ -1,0 +1,81 @@
+---
+title: Floating action button menu
+description: Controlled Material 3 FAB action collections, toggle-FAB geometry, focus transfer, and button-group web semantics.
+---
+
+A floating action button menu expands one prominent FAB trigger into a small group of related actions. Use it when a screen-level primary action has a few closely related alternatives and Material's FAB-menu pattern fits the product hierarchy.
+
+<ComponentPreview>
+  <FabMenuPreview />
+</ComponentPreview>
+
+```tsx
+import {
+  FloatingActionButtonMenu,
+  FloatingActionButtonMenuItem,
+  ToggleFloatingActionButton,
+} from '@m3-ui/ui';
+
+const [expanded, setExpanded] = useState(false);
+
+<FloatingActionButtonMenu
+  expanded={expanded}
+  trigger={
+    <ToggleFloatingActionButton
+      aria-label="Create actions"
+      checked={expanded}
+      icon={<AddIcon />}
+      checkedIcon={<CloseIcon />}
+      onCheckedChange={setExpanded}
+    />
+  }
+>
+  <FloatingActionButtonMenuItem icon={<EditIcon />} onPress={edit}>
+    Edit
+  </FloatingActionButtonMenuItem>
+</FloatingActionButtonMenu>
+```
+
+## When to use
+
+Use a FAB menu for a compact set of related high-priority actions anchored to the FAB concept. Prefer ordinary buttons or a button group for inline action clusters. Prefer a true menu when the interaction is command/menu navigation and should use menu semantics.
+
+## Controlled expansion
+
+The application owns expansion. The container projects the current relationship onto the supplied trigger but does not create a second open-state machine.
+
+`maxMenuHeight` can bound a long action collection without changing that ownership. Expansion, checked state, and any route or business state remain application-controlled.
+
+## Actions and focus
+
+When the collection opens, keyboard interaction can move from the trigger into the first available action. If the collection closes while focus is inside it, focus is restored to the trigger.
+
+Disabled action items retain disabled button behavior. Reduced-motion preference removes stagger/morph timing without changing focus transfer or the final expanded state.
+
+## Toggle FAB
+
+`ToggleFloatingActionButton` supplies the checked/unchecked trigger geometry used by the family. Checked state changes the visual form while preserving the underlying interaction target.
+
+Use the toggle state only for the menu's real expanded/checked relationship; do not use it as a decorative pressed style disconnected from application state.
+
+## Accessibility
+
+FAB-menu items are ordinary button-like actions, not ARIA menu commands. The collection therefore uses grouped action semantics rather than `role="menu"` / `role="menuitem"`.
+
+The trigger needs a clear accessible name and an accurate expanded relationship. Action labels should describe what activation does. Focus restoration to the trigger on collapse helps keyboard and assistive-technology users retain context.
+
+## API reference
+
+<ApiReference name="FloatingActionButtonMenu" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="fab-menu" />
+
+Material supplies the FAB-menu visual/action hierarchy and motion intent. Grouped button semantics, DOM focus transfer, and focus restoration are deliberate browser adaptations; the component does not mislabel its action collection as an ARIA menu.
+
+## Related components
+
+- [FAB](/docs/components/fab) — single prominent floating actions.
+- [Button group](/docs/components/button-group) — inline action groups.
+- [Menu](/docs/components/menu) — true menu/selection surfaces.

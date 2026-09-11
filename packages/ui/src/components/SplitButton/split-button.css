@@ -1,0 +1,140 @@
+.split-button {
+  display: inline-flex;
+  min-block-size: var(--_split-button-min-interactive-size);
+  align-items: center;
+  max-inline-size: 100%;
+}
+
+.split-button__layout {
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  align-items: stretch;
+  gap: var(--_split-button-spacing);
+}
+
+.split-button__button {
+  min-block-size: var(--_split-button-container-height);
+  padding-block: 0;
+}
+
+.split-button__leading {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding-inline-start: var(--_split-button-leading-padding-start);
+  padding-inline-end: var(--_split-button-leading-padding-end);
+  --_split-button-leading-radius:
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-corner)
+    var(--_split-button-inner-corner)
+    var(--_split-button-outer-corner);
+  --_split-button-leading-pressed-radius:
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-outer-corner);
+  --_split-button-leading-active-radius: var(--_split-button-leading-radius);
+}
+
+.split-button__trailing {
+  flex: 0 0 auto;
+  min-inline-size: var(--_split-button-min-interactive-size);
+  padding-inline-start: var(--_split-button-trailing-padding-start);
+  padding-inline-end: var(--_split-button-trailing-padding-end);
+  --_split-button-trailing-radius:
+    var(--_split-button-inner-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-corner);
+  --_split-button-trailing-pressed-radius:
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-pressed-corner);
+  --_split-button-trailing-active-radius: var(--_split-button-trailing-radius);
+}
+
+.split-button__leading[data-pressed] {
+  --_split-button-leading-active-radius: var(--_split-button-leading-pressed-radius);
+}
+
+.split-button__trailing[aria-pressed='true'] {
+  --_split-button-trailing-active-radius: var(--_split-button-outer-corner);
+}
+
+.split-button__trailing[data-pressed] {
+  --_split-button-trailing-active-radius: var(--_split-button-trailing-pressed-radius);
+}
+
+.split-button__trailing[aria-pressed='true']::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  content: '';
+  opacity: var(--_split-button-checked-state-layer-opacity);
+  pointer-events: none;
+}
+
+.split-button__slot {
+  display: inline-flex;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_button-icon-spacing);
+}
+
+.split-button__leading .button__content {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.split-button__leading-slot {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.split-button__leading-slot > svg {
+  flex: none;
+  inline-size: var(--_button-icon-size);
+  block-size: var(--_button-icon-size);
+}
+
+.split-button__trailing-slot > svg {
+  flex: none;
+  inline-size: var(--_split-button-trailing-icon-size);
+  block-size: var(--_split-button-trailing-icon-size);
+}
+
+.split-button__leading:dir(rtl) {
+  --_split-button-leading-radius:
+    var(--_split-button-inner-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-corner);
+  --_split-button-leading-pressed-radius:
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-pressed-corner);
+}
+
+.split-button__trailing:dir(rtl) {
+  --_split-button-trailing-radius:
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-corner)
+    var(--_split-button-inner-corner)
+    var(--_split-button-outer-corner);
+  --_split-button-trailing-pressed-radius:
+    var(--_split-button-outer-corner)
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-inner-pressed-corner)
+    var(--_split-button-outer-corner);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-button__button {
+    transition: none !important;
+  }
+}

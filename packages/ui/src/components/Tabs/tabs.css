@@ -1,0 +1,171 @@
+.tabs {
+  background: var(--_tabs-container-color);
+  color: var(--on-surface);
+  width: 100%;
+}
+
+.tabs__viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.tabs--scrollable .tabs__viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.tabs--scrollable .tabs__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs__track {
+  position: relative;
+  width: 100%;
+}
+
+.tabs--scrollable .tabs__track {
+  min-width: 100%;
+  width: max-content;
+}
+
+.tabs__list {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  min-width: 100%;
+  padding: 0;
+}
+
+.tabs--scrollable .tabs__list {
+  box-sizing: border-box;
+  min-width: max-content;
+  padding-inline: var(--_tabs-edge-padding);
+  width: max-content;
+}
+
+.tabs__tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--_tabs-tab-height);
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabs--scrollable .tabs__tab {
+  flex: 0 0 auto;
+  min-width: var(--_tabs-min-tab-width);
+}
+
+.tabs__tab[data-disabled] {
+  cursor: default;
+}
+
+.tabs__content {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--_tabs-tab-height);
+  opacity: var(--_tabs-content-opacity);
+  padding-inline: var(--_tabs-horizontal-text-padding);
+  position: relative;
+  z-index: 2;
+}
+
+.tabs__content[data-icon-and-label] {
+  flex-direction: column;
+  gap: var(--_tabs-stacked-gap);
+  min-height: var(--_tabs-tab-large-height);
+}
+
+.tabs__content[data-leading] {
+  flex-direction: row;
+  gap: var(--_tabs-leading-gap);
+  min-height: var(--_tabs-tab-height);
+}
+
+.tabs__icon {
+  color: var(--_tabs-icon-color);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: var(--_tabs-icon-size);
+  transition: color var(--_tabs-motion-duration) var(--_tabs-motion-easing);
+  width: var(--_tabs-icon-size);
+}
+
+.tabs__icon > svg {
+  display: block;
+  fill: currentColor;
+  height: 100%;
+  width: 100%;
+}
+
+.tabs__label {
+  color: var(--_tabs-label-color);
+  font-family: var(--_tabs-label-font-family);
+  font-size: var(--_tabs-label-font-size);
+  font-weight: var(--_tabs-label-font-weight);
+  letter-spacing: var(--_tabs-label-letter-spacing);
+  line-height: var(--_tabs-label-line-height);
+  text-align: center;
+  transition: color var(--_tabs-motion-duration) var(--_tabs-motion-easing);
+}
+
+.tabs__indicator {
+  background: var(--_tabs-indicator-color);
+  border-radius: var(--_tabs-indicator-radius);
+  bottom: 0;
+  height: var(--_tabs-indicator-height);
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(var(--_tabs-indicator-x, 0px));
+  transition:
+    transform var(--_tabs-motion-duration) var(--_tabs-motion-easing),
+    width var(--_tabs-motion-duration) var(--_tabs-motion-easing);
+  width: var(--_tabs-indicator-width, 0px);
+  z-index: 3;
+}
+
+.tabs__tab > .ripple {
+  border-radius: 0;
+  inset: 0;
+  z-index: 1;
+}
+
+.tabs__tab > .ripple .ripple__state-layer {
+  background: var(--_ripple-color);
+}
+
+.tabs__tab[data-hovered] > .ripple {
+  --_ripple-color: var(--_ripple-hover-color);
+}
+
+.tabs__tab[data-focus-visible] > .ripple {
+  --_ripple-color: var(--_ripple-focus-color);
+}
+
+.tabs__divider {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabs__icon,
+  .tabs__indicator,
+  .tabs__label {
+    transition: none;
+  }
+}

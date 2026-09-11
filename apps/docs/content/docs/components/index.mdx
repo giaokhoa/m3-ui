@@ -1,0 +1,88 @@
+---
+title: Components
+description: Material 3 component guides backed by the same m3-ui implementation and canonical token graph.
+---
+
+## Component guides
+
+These pages document the public React API through the Material contract: family, variants, states, accessibility, Compose mapping, and intentional web adaptations.
+
+For a single data-driven view of those contracts, sources, mappings, and web adaptations, see the [Parity catalog](/docs/reference/parity).
+
+### Actions
+
+- [Button](/docs/components/button) — five Material button variants plus expressive sizes and interaction states.
+- [Toggle button](/docs/components/toggle-button) — controlled filled, elevated, tonal, and outlined pressable toggles with expressive sizes.
+- [Icon button](/docs/components/icon-button) — action and toggle families across audited variants, sizes, widths, and shapes.
+- [FAB](/docs/components/fab) — icon-only and extended floating actions, audited sizes/elevation, and explicit cross-source compatibility variants.
+- [Floating action button menu](/docs/components/fab-menu) — controlled expandable FAB actions with focus transfer, staggered reveal, and toggle-FAB geometry.
+- [Chip](/docs/components/chip) — assist, suggestion, filter, and input chip families with action versus selection semantics kept distinct.
+
+### Input and surfaces
+
+- [Text field](/docs/components/text-field) — filled, outlined, secure, and multiline fields with supporting content, validation, and native input behavior.
+- [Surface](/docs/components/surface) — passive or explicitly interactive Material containers with tonal/shadow elevation and role-aware state semantics.
+- [Card](/docs/components/card) — filled, elevated, and outlined surfaces with an explicit semantic-role boundary for interactive cards.
+- [Dialog](/docs/components/dialog) — Material modal composition, scrim, actions, theme portals, and focus semantics.
+- [Scrim](/docs/components/scrim) — passive or dismissible obscuring layers that leave modal lifecycle and stacking to their owner.
+- [Bottom sheets](/docs/components/bottom-sheet) — local non-modal and true modal sheets sharing one Material anchor-state contract.
+- [Lists and list items](/docs/components/list-item) — passive, action, single-radio, and multiple-checkbox rows with one-, two-, or three-line Material geometry.
+- [Menus](/docs/components/menu) — anchored menus, sections, items, and a read-only exposed-menu form with React Aria focus semantics.
+- [Badges](/docs/components/badge) — dot/content badge geometry plus explicit application-owned accessible status wording.
+- [Dividers](/docs/components/divider) — horizontal and vertical semantic separators with token-backed Material defaults.
+
+### App bars and toolbars
+
+- [Top app bar](/docs/components/top-app-bar) — small, centered, medium, large, and flexible variants with explicit scroll-state inputs.
+- [Bottom app bar](/docs/components/bottom-app-bar) — regular/flexible action bars, optional FAB composition, and app-owned exit-always state.
+- [Floating toolbar](/docs/components/floating-toolbar) — horizontal/vertical expressive toolbars with standard/vibrant roles, explicit expansion, FAB placement, and RTL-aware exit translation.
+- [App bar row](/docs/components/app-bar-row) — inline-axis action layout with local width measurement and accessible overflow.
+- [App bar column](/docs/components/app-bar-column) — block-axis action layout with local height measurement and accessible overflow.
+
+### Selection controls
+
+- [Checkbox](/docs/components/checkbox) — checked, unchecked, indeterminate, disabled, and interaction states.
+- [Radio button](/docs/components/radio-button) — single-selection groups, labels, validation, and keyboard semantics.
+- [Switch](/docs/components/switch) — on/off state, optional thumb content, disabled treatment, and theme focus indication.
+- [Slider](/docs/components/slider) — single and range values, audited sizes, accessible thumbs, and explicit web adaptations for ticks and value indicators.
+
+### Pickers
+
+- [Date pickers](/docs/components/date-picker) — single/range calendar selection, native date-input mode, timezone-free ISO state, and explicit dialog composition.
+- [Time pickers](/docs/components/time-picker) — dial and keyboard input sharing normalized time state, 12/24-hour presentation, and component-local orientation switching.
+
+### Grouped controls
+
+- [Tabs](/docs/components/tabs) — primary/secondary tab lists, fixed or scrollable presentation, and application-owned panel content.
+- [Segmented buttons](/docs/components/segmented-button) — single-choice radio semantics and multi-choice checkbox semantics kept distinct.
+- [Split button](/docs/components/split-button) — independent leading/trailing actions with disclosure or toggle state while menu content remains application-owned.
+- [Button group](/docs/components/button-group) — standard action groups with local overflow plus connected single/multiple selection groups.
+
+### Browsing and feedback
+
+- [Carousels](/docs/components/carousel) — multi-browse, uncontained, and centered-hero arrangements with focal geometry and explicit state.
+- [Search bar](/docs/components/search-bar) — collapsed search input with docked or full-screen expanded surfaces and an application-owned data boundary.
+- [Progress indicators](/docs/components/progress-indicator) — standard and M3 Expressive wavy progress with determinate, indeterminate, and explicit Web compatibility behavior.
+- [Loading indicator](/docs/components/loading-indicator) — expressive Material shape morphing in contained and uncontained forms.
+- [Snackbar](/docs/components/snackbar) — transient-message surface, live-region semantics, actions, and an explicit host/timeout boundary.
+- [Tooltips](/docs/components/tooltip) — plain tooltip semantics kept distinct from interactive rich-tooltip dialog semantics.
+
+### Compose Material utilities
+
+These APIs are part of AndroidX Compose Material3 even when they do not have a dedicated component family page on `m3.material.io`. Their parity cards therefore link directly to the authoritative Android Developers API reference.
+
+- [Pull to refresh](/docs/components/pull-to-refresh) — top-boundary pull gestures with app-controlled refresh lifecycle and an overridable indicator slot.
+- [Swipe to dismiss](/docs/components/swipe-to-dismiss-box) — logical start/end dismissal anchors, foreground interaction preservation, and RTL-aware pointer settling.
+- [Scroll field](/docs/components/scroll-field) — wheel, drag, click, and keyboard selection exposed as an accessible spinbutton value.
+- [Vertical drag handle](/docs/components/drag-handle) — Material resize affordance and interaction feedback with resize state/semantics owned by the surrounding composition.
+- [Non-interactive scrollbar](/docs/components/non-interactive-scrollbar) — visual-only scroll position feedback that observes native or adapted scrollers without becoming another control.
+
+## Documentation rule
+
+A component page should describe behavior that exists in `@m3-ui/ui`; it must not become a second implementation of the component. Live previews use the public package, and Material measurements remain sourced from canonical generated tokens rather than documentation CSS literals.
+
+Cross-source compatibility APIs are labeled as such instead of being presented as Compose-only Material contracts.
+
+## Layout boundary
+
+Component documentation does not define adaptive window classes, pane directives, navigation switching, or scaffold behavior. Layout documentation will consume the dedicated `@m3-ui/ui/layout` subsystem instead of creating a docs-only responsive model.

@@ -1,0 +1,44 @@
+.docs-app-bar-demo,
+.docs-floating-toolbar-demo {
+  display: grid;
+  gap: 16px;
+  inline-size: 100%;
+}
+
+.docs-app-bar-demo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.docs-top-app-bar-demo__stage,
+.docs-bottom-app-bar-demo__stage {
+  background: var(--surface);
+  color: var(--on-surface);
+  inline-size: 100%;
+  min-block-size: 280px;
+  overflow: hidden;
+}
+
+.docs-bottom-app-bar-demo__stage {
+  display: flex;
+  flex-direction: column;
+}
+
+.docs-app-bar-demo__body {
+  flex: 1;
+  padding: 24px;
+}
+
+.docs-floating-toolbar-demo__stage {
+  align-items: center;
+  background: var(--surface-container-low);
+  border-radius: var(--shape-corner-large);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  min-block-size: 280px;
+  overflow: hidden;
+  padding: 32px;
+}

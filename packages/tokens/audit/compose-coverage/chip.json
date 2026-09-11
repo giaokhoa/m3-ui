@@ -1,0 +1,1 @@
+{"family":"chip","status":"reconciled","sources":["AssistChipTokens.kt","ChipsTokens.kt","FilterChipTokens.kt","InputChipTokens.kt","SuggestionChipTokens.kt"],"canonical":["tokens/component/chip/base.json","tokens/component/chip/action.json","tokens/component/chip/selectable.json"]}

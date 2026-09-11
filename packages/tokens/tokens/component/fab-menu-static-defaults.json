@@ -1,0 +1,10 @@
+{
+  "component": {
+    "fabMenu": {
+      "web": {
+        "horizontalPadding": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+        "triggerBottomPadding": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+      }
+    }
+  }
+}

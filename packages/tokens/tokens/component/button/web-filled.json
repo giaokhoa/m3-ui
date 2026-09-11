@@ -1,0 +1,54 @@
+{
+  "component": {
+    "button": {
+      "variant": {
+        "filled": {
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.1 },
+          "disabledIconOpacity": { "$type": "number", "$value": 0.38 },
+          "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+          "containerShadowColor": { "$type": "string", "$value": "var(--shadow)" },
+          "disabledIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "disabledLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "focusedIconColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "focusedLabelTextColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "focusedStateLayerColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "focusedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" },
+          "hoveredIconColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "hoveredLabelTextColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "hoveredStateLayerColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "hoveredStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "iconColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "labelTextColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "pressedIconColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "pressedLabelTextColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "pressedStateLayerColor": { "$type": "string", "$value": "{component.button.variant.filled.contentColor}" },
+          "pressedStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" },
+          "selectedContainerColor": { "$type": "string", "$value": "var(--primary)" },
+          "selectedFocusedIconColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedFocusedLabelTextColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedFocusedStateLayerColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedHoveredIconColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedHoveredLabelTextColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedHoveredStateLayerColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedIconColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedLabelTextColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedPressedIconColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedPressedLabelTextColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "selectedPressedStateLayerColor": { "$type": "string", "$value": "var(--on-primary)" },
+          "unselectedContainerColor": { "$type": "string", "$value": "var(--surface-container)" },
+          "unselectedFocusedIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedFocusedLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedFocusedStateLayerColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedHoveredIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedHoveredLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedHoveredStateLayerColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedPressedIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedPressedLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedPressedStateLayerColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        }
+      }
+    }
+  }
+}

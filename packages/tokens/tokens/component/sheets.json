@@ -1,0 +1,35 @@
+{
+  "component": {
+    "sheetFloating": {
+      "containerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "containerElevation": { "$type": "string", "$value": "level1" },
+      "containerShape": { "$type": "string", "$value": "extraLarge" }
+    },
+    "sheetSide": {
+      "dockedContainerHeight": { "$type": "string", "$value": "100%" },
+      "dockedContainerWidth": { "$type": "dimension", "$value": { "value": 256, "unit": "px" } },
+      "detachedContainerShape": { "$type": "string", "$value": "large" },
+      "dockedActionFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionFocusStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionFocusStateLayerOpacity": { "$type": "number", "$value": 0.1 },
+      "dockedActionHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionHoverStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionHoverStateLayerOpacity": { "$type": "number", "$value": 0.08 },
+      "dockedActionPressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionPressedStateLayerColor": { "$type": "string", "$value": "var(--primary)" },
+      "dockedActionPressedStateLayerOpacity": { "$type": "number", "$value": 0.1 },
+      "dockedContainerShape": { "$type": "string", "$value": "none" },
+      "dockedDividerColor": { "$type": "string", "$value": "var(--outline)" },
+      "dockedFocusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+      "dockedFocusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+      "dockedFocusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+      "dockedHeadlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+      "dockedHeadlineFont": { "$type": "string", "$value": "titleLarge" },
+      "dockedModalContainerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+      "dockedModalContainerElevation": { "$type": "string", "$value": "level1" },
+      "dockedModalContainerShape": { "$type": "string", "$value": "largeStart" },
+      "dockedStandardContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "dockedStandardContainerElevation": { "$type": "string", "$value": "level0" }
+    }
+  }
+}

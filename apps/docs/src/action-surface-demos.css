@@ -1,0 +1,28 @@
+.docs-card-demo {
+  display: grid;
+  gap: 16px;
+  inline-size: min(100%, 560px);
+}
+
+.docs-card-demo > .card {
+  inline-size: 100%;
+}
+
+.docs-card-demo__content {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+}
+
+.docs-card-demo__body {
+  color: var(--on-surface-variant);
+}
+
+.docs-chip-demo,
+.docs-icon-button-demo,
+.docs-fab-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}

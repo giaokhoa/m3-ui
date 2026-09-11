@@ -1,0 +1,30 @@
+.docs-tabs-demo,
+.docs-segmented-demo,
+.docs-button-group-demo {
+  display: grid;
+  gap: 24px;
+  inline-size: 100%;
+}
+
+.docs-tabs-demo {
+  min-inline-size: 0;
+}
+
+.docs-segmented-demo {
+  justify-items: start;
+}
+
+.docs-split-button-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+}
+
+.docs-split-button-demo__state {
+  color: var(--on-surface-variant);
+}
+
+.docs-button-group-demo__standard {
+  inline-size: min(100%, 360px);
+}

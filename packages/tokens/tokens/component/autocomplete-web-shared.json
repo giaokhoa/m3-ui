@@ -1,0 +1,15 @@
+{
+  "component": {
+    "autocomplete": {
+      "webShared": {
+        "menuCascadingIndicatorIconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "menuCascadingIndicatorIconColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+        "menuContainerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+        "populatedLabelTextSize": { "$type": "dimension", "$value": "{typography.bodySmall.fontSize}" },
+        "populatedLabelTextLineHeight": { "$type": "dimension", "$value": "{typography.bodySmall.lineHeight}" },
+        "hoverStateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+        "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+      }
+    }
+  }
+}

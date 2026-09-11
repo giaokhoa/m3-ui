@@ -1,0 +1,160 @@
+.fab {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_fab-target-size);
+  block-size: var(--_fab-target-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab__visual {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: var(--_fab-container-width);
+  block-size: var(--_fab-container-height);
+  flex: none;
+  border-radius: var(--_fab-container-radius);
+}
+
+.fab__visual > .elevation {
+  transition-property: box-shadow;
+  transition-duration: var(--_fab-elevation-duration, 0ms);
+  transition-timing-function: var(--_fab-elevation-easing, linear);
+}
+
+.fab__surface {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  inline-size: 100%;
+  block-size: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--_fab-container-color);
+  color: var(--_fab-content-color);
+  --ripple-color: var(--_fab-state-layer-color, currentColor);
+}
+
+.fab__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  inline-size: var(--_fab-icon-size);
+  block-size: var(--_fab-icon-size);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.fab__icon > svg,
+.fab__icon > img {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.fab--extended {
+  inline-size: auto;
+  min-inline-size: var(--_fab-target-size);
+}
+
+.fab--extended .fab__visual {
+  inline-size: auto;
+  min-inline-size: var(--_fab-container-width);
+}
+
+.fab__content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  min-inline-size: var(--_fab-container-width);
+  block-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+  color: inherit;
+  transition:
+    gap var(--_fab-expand-size-duration) var(--_fab-expand-size-easing),
+    padding-inline var(--_fab-expand-size-duration) var(--_fab-expand-size-easing);
+}
+
+.fab__label {
+  display: inline-block;
+  max-inline-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: var(--_fab-label-color, inherit);
+  font-family: var(--_fab-label-font-family);
+  font-size: var(--_fab-label-font-size);
+  font-weight: var(--_fab-label-font-weight);
+  line-height: var(--_fab-label-line-height);
+  letter-spacing: var(--_fab-label-letter-spacing);
+  white-space: nowrap;
+  transition:
+    max-inline-size var(--_fab-expand-size-duration) var(--_fab-expand-size-easing),
+    opacity var(--_fab-expand-opacity-duration) var(--_fab-expand-opacity-easing);
+}
+
+.fab--extended[data-has-icon][data-expanded] .fab__content {
+  min-inline-size: var(--_fab-expanded-min-width);
+  justify-content: flex-start;
+  gap: var(--_fab-icon-label-space);
+  padding-inline-start: var(--_fab-leading-space);
+  padding-inline-end: var(--_fab-trailing-space);
+}
+
+.fab--extended[data-has-icon][data-expanded] .fab__label,
+.fab--extended:not([data-has-icon]) .fab__label {
+  max-inline-size: 32rem;
+  opacity: 1;
+}
+
+.fab--extended:not([data-has-icon]) .fab__content {
+  min-inline-size: var(--_fab-expanded-min-width);
+  justify-content: center;
+  padding-inline-start: var(--_fab-text-only-leading-space);
+  padding-inline-end: var(--_fab-text-only-trailing-space);
+}
+
+.fab--branded-extended[data-focused] .fab__label {
+  color: var(--_fab-focus-label-color);
+}
+
+.fab--branded-extended[data-hovered] .fab__label {
+  color: var(--_fab-hover-label-color);
+}
+
+.fab--branded-extended[data-pressed] .fab__label {
+  color: var(--_fab-pressed-label-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab__visual > .elevation,
+  .fab__content,
+  .fab__label {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .fab__surface {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    forced-color-adjust: none;
+  }
+}

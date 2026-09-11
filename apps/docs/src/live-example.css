@@ -1,0 +1,41 @@
+.docs-live-example {
+  margin-block: 24px;
+  overflow: hidden;
+}
+
+.docs-live-example__preview {
+  display: flex;
+  min-block-size: 128px;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.docs-live-example__actions {
+  display: flex;
+  min-block-size: 56px;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 12px;
+  border-block-start: 1px solid var(--outline-variant);
+}
+
+.docs-live-example__copy-status {
+  margin-inline-start: auto;
+  color: var(--on-surface-variant);
+}
+
+.docs-live-example__source {
+  margin: 0;
+  padding: 20px 24px;
+  overflow: auto;
+  border-block-start: 1px solid var(--outline-variant);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  white-space: pre;
+}

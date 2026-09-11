@@ -1,0 +1,11 @@
+.docs-control-stack {
+  display: grid;
+  gap: 12px;
+  align-items: start;
+}
+
+.docs-slider-stack {
+  display: grid;
+  inline-size: min(100%, 560px);
+  gap: 24px;
+}

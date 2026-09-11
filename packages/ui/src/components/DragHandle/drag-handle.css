@@ -1,0 +1,73 @@
+.drag-handle {
+  --_drag-handle-current-color: var(--_drag-handle-default-color);
+  --_drag-handle-current-height: var(--_drag-handle-default-height);
+  --_drag-handle-current-shape: var(--_drag-handle-default-shape);
+  --_drag-handle-current-width: var(--_drag-handle-default-width);
+  --ripple-color: var(--_drag-handle-hover-state-layer-color);
+
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_drag-handle-min-interactive-size);
+  block-size: max(
+    var(--_drag-handle-min-interactive-size),
+    var(--_drag-handle-current-height)
+  );
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.drag-handle[data-pressed] {
+  --_drag-handle-current-color: var(--_drag-handle-pressed-color);
+  --_drag-handle-current-height: var(--_drag-handle-pressed-height);
+  --_drag-handle-current-shape: var(--_drag-handle-pressed-shape);
+  --_drag-handle-current-width: var(--_drag-handle-pressed-width);
+}
+
+.drag-handle[data-dragged] {
+  --_drag-handle-current-color: var(--_drag-handle-dragged-color);
+  --_drag-handle-current-height: var(--_drag-handle-dragged-height);
+  --_drag-handle-current-shape: var(--_drag-handle-dragged-shape);
+  --_drag-handle-current-width: var(--_drag-handle-dragged-width);
+}
+
+.drag-handle[data-focus-visible] {
+  --ripple-color: var(--_drag-handle-focus-state-layer-color);
+}
+
+.drag-handle__container {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_drag-handle-container-width);
+  block-size: var(--_drag-handle-current-height);
+  border-radius: var(--_drag-handle-current-shape);
+  overflow: hidden;
+}
+
+.drag-handle__bar {
+  box-sizing: border-box;
+  inline-size: var(--_drag-handle-current-width);
+  block-size: var(--_drag-handle-current-height);
+  border-radius: var(--_drag-handle-current-shape);
+  background: var(--_drag-handle-current-color);
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .drag-handle__bar {
+    background: CanvasText;
+  }
+}

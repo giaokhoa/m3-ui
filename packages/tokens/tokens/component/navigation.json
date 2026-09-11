@@ -1,0 +1,182 @@
+{
+  "component": {
+    "navigation": {
+      "bar": {
+        "containerColor": { "$type": "string", "$value": "var(--surface-container)" },
+        "containerElevation": { "$type": "string", "$value": "level2" },
+        "containerHeight": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+        "itemActiveIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "itemActiveIndicatorColor": { "$type": "string", "$value": "var(--secondary-container)" },
+        "itemActiveIndicatorIconLabelSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+        "itemActiveIndicatorShape": { "$type": "string", "$value": "full" },
+        "itemActiveLabelTextColor": { "$type": "string", "$value": "var(--secondary)" },
+        "itemBetweenSpace": { "$type": "dimension", "$value": { "value": 0, "unit": "px" } },
+        "itemInactiveIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "itemInactiveLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "navShape": { "$type": "string", "$value": "none" },
+        "tallContainerHeight": { "$type": "dimension", "$value": { "value": 80, "unit": "px" } },
+        "labelTextTypography": { "$type": "string", "$value": "labelMedium" },
+        "horizontalItem": {
+          "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+          "activeIndicatorLeadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "activeIndicatorTrailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+        },
+        "verticalItem": {
+          "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "activeIndicatorWidth": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+          "containerBetweenSpace": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+        }
+      },
+      "drawer": {
+        "activeFocusIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activeFocusLabelTextColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activeHoverIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activeHoverLabelTextColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activeIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activeIndicatorColor": { "$type": "string", "$value": "var(--secondary-container)" },
+        "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+        "activeIndicatorShape": { "$type": "string", "$value": "full" },
+        "activeIndicatorWidth": { "$type": "dimension", "$value": { "value": 336, "unit": "px" } },
+        "activeLabelTextColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activePressedIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "activePressedLabelTextColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+        "bottomContainerShape": { "$type": "string", "$value": "largeTop" },
+        "containerHeightPercent": { "$type": "number", "$value": 100 },
+        "containerShape": { "$type": "string", "$value": "largeEnd" },
+        "containerWidth": { "$type": "dimension", "$value": { "value": 360, "unit": "px" } },
+        "focusIndicatorColor": { "$type": "string", "$value": "var(--secondary)" },
+        "headlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "headlineTypography": { "$type": "string", "$value": "titleSmall" },
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "inactiveFocusIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "inactiveFocusLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "inactiveHoverIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "inactiveHoverLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "inactiveIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "inactiveLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "inactivePressedIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "inactivePressedLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+        "labelTextTypography": { "$type": "string", "$value": "labelLarge" },
+        "largeBadgeLabelColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+        "largeBadgeLabelTypography": { "$type": "string", "$value": "labelLarge" },
+        "modalContainerColor": { "$type": "string", "$value": "var(--surface-container-low)" },
+        "modalContainerElevation": { "$type": "string", "$value": "level1" },
+        "standardContainerColor": { "$type": "string", "$value": "var(--surface)" },
+        "standardContainerElevation": { "$type": "string", "$value": "level0" }
+      },
+      "rail": {
+        "color": {
+          "itemActiveFocusedStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemActiveHoveredStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemActiveIcon": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemActiveIndicator": { "$type": "string", "$value": "var(--secondary-container)" },
+          "itemActiveLabelText": { "$type": "string", "$value": "var(--secondary)" },
+          "itemActivePressedStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemInactiveFocusedStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemInactiveHoveredStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "itemInactiveIcon": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "itemInactiveLabelText": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "itemInactivePressedStateLayer": { "$type": "string", "$value": "var(--on-secondary-container)" }
+        },
+        "baselineItem": {
+          "activeIndicatorIconLabelSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "activeIndicatorLeadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "activeIndicatorShape": { "$type": "string", "$value": "full" },
+          "activeIndicatorTrailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "containerHeight": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+          "containerShape": { "$type": "string", "$value": "none" },
+          "containerVerticalSpace": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+          "headerSpaceMinimum": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+        },
+        "collapsed": {
+          "containerElevation": { "$type": "string", "$value": "level0" },
+          "containerShape": { "$type": "string", "$value": "none" },
+          "containerWidth": { "$type": "dimension", "$value": { "value": 96, "unit": "px" } },
+          "itemVerticalSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "topSpace": { "$type": "dimension", "$value": { "value": 44, "unit": "px" } },
+          "containerColor": { "$type": "string", "$value": "var(--surface)" },
+          "narrowContainerWidth": { "$type": "dimension", "$value": { "value": 80, "unit": "px" } }
+        },
+        "expanded": {
+          "containerElevation": { "$type": "string", "$value": "level0" },
+          "containerShape": { "$type": "string", "$value": "none" },
+          "containerWidthMaximum": { "$type": "dimension", "$value": { "value": 360, "unit": "px" } },
+          "containerWidthMinimum": { "$type": "dimension", "$value": { "value": 220, "unit": "px" } },
+          "modalContainerElevation": { "$type": "string", "$value": "level2" },
+          "modalContainerShape": { "$type": "string", "$value": "large" },
+          "topSpace": { "$type": "dimension", "$value": { "value": 44, "unit": "px" } },
+          "modalContainerColor": { "$type": "string", "$value": "var(--surface-container)" }
+        },
+        "horizontalItem": {
+          "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+          "fullWidthLeadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "fullWidthTrailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "iconLabelSpace": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+          "leadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "labelTextTypography": { "$type": "string", "$value": "labelLarge" }
+        },
+        "verticalItem": {
+          "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+          "activeIndicatorWidth": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+          "iconLabelSpace": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+          "leadingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "trailingSpace": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+          "labelTextTypography": { "$type": "string", "$value": "labelMedium" }
+        }
+      },
+      "tab": {
+        "primary": {
+          "activeIndicatorColor": { "$type": "string", "$value": "var(--primary)" },
+          "activeIndicatorHeight": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+          "activeIndicatorShape": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+          "containerColor": { "$type": "string", "$value": "var(--surface)" },
+          "containerElevation": { "$type": "string", "$value": "level0" },
+          "containerHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+          "containerShape": { "$type": "string", "$value": "none" },
+          "activeFocusIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "activeHoverIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "activeIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "activePressedIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "iconAndLabelTextContainerHeight": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+          "inactiveFocusIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "inactiveHoverIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "inactiveIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "inactivePressedIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "activeFocusLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+          "activeHoverLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+          "activeLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+          "activePressedLabelTextColor": { "$type": "string", "$value": "var(--primary)" },
+          "inactiveFocusLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "inactiveHoverLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "inactiveLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "inactivePressedLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "labelTextTypography": { "$type": "string", "$value": "titleSmall" }
+        },
+        "secondary": {
+          "activeLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "containerColor": { "$type": "string", "$value": "var(--surface)" },
+          "containerElevation": { "$type": "string", "$value": "level0" },
+          "containerHeight": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+          "containerShape": { "$type": "string", "$value": "none" },
+          "dividerColor": { "$type": "string", "$value": "var(--surface-variant)" },
+          "dividerHeight": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "focusLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "hoverLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "inactiveLabelTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "labelTextTypography": { "$type": "string", "$value": "titleSmall" },
+          "pressedLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "activeIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "focusIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "hoverIconColor": { "$type": "string", "$value": "var(--on-surface)" },
+          "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+          "inactiveIconColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "pressedIconColor": { "$type": "string", "$value": "var(--on-surface)" }
+        }
+      }
+    }
+  }
+}

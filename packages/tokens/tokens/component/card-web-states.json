@@ -1,0 +1,43 @@
+{
+  "component": {
+    "card": {
+      "base": {
+        "iconSize": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+        "iconColor": { "$type": "string", "$value": "{color.role.primary}" },
+        "containerShape": { "$type": "string", "$value": "medium" },
+        "containerShadowColor": { "$type": "string", "$value": "{color.role.shadow}" },
+        "focusIndicatorColor": { "$type": "string", "$value": "{color.role.secondary}" },
+        "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
+        "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+        "state": {
+          "dragged": {
+            "color": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "opacity": { "$type": "number", "$value": "{state.layer.opacity.dragged}" }
+          },
+          "focus": {
+            "color": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "opacity": { "$type": "number", "$value": "{state.layer.opacity.focus}" }
+          },
+          "hover": {
+            "color": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "opacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" }
+          },
+          "pressed": {
+            "color": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "opacity": { "$type": "number", "$value": "{state.layer.opacity.pressed}" }
+          }
+        }
+      },
+      "variant": {
+        "outlined": {
+          "outline": {
+            "draggedColor": { "$type": "string", "$value": "{color.role.outlineVariant}" },
+            "focusColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+            "hoverColor": { "$type": "string", "$value": "{color.role.outlineVariant}" },
+            "pressedColor": { "$type": "string", "$value": "{color.role.outlineVariant}" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "source": {
+    "repository": "material-components/material-web",
+    "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "generatedVersion": "34.0.21",
+    "root": "tokens/versions/latest/sass"
+  },
+  "groups": [
+    {
+      "family": "app-bar",
+      "status": "reconciled",
+      "classification": "current",
+      "sources": ["md-comp-app-bar","md-comp-app-bar-large","md-comp-app-bar-large-flexible","md-comp-app-bar-medium","md-comp-app-bar-medium-flexible","md-comp-app-bar-small"],
+      "canonical": ["tokens/component/app-bar.json"]
+    },
+    {
+      "family": "chips",
+      "status": "reconciled",
+      "classification": "current",
+      "sources": ["md-comp-assist-chip","md-comp-filter-chip","md-comp-input-chip","md-comp-suggestion-chip"],
+      "canonical": ["tokens/component/chip/base.json","tokens/component/chip/action.json","tokens/component/chip/selectable.json"]
+    },
+    {"family":"badge","status":"reconciled","classification":"current","sources":["md-comp-badge"],"canonical":["tokens/component/badge.json"]},
+    {"family":"banners","status":"reconciled","classification":"current","sources":["md-comp-banner","md-comp-banners","md-comp-banners-basic","md-comp-banners-rich"],"canonical":["tokens/component/banners.json"]},
+    {"family":"bottom-app-bar","status":"reconciled","classification":"current","sources":["md-comp-bottom-app-bar"],"canonical":["tokens/component/bottom-app-bar.json"]},
+    {"family":"button","status":"reconciled","classification":"current","sources":["md-comp-button","md-comp-button-elevated","md-comp-button-filled","md-comp-button-outlined","md-comp-button-text","md-comp-button-tonal","md-comp-button-xsmall","md-comp-button-small","md-comp-button-medium","md-comp-button-large","md-comp-button-xlarge"],"canonical":["tokens/component/button/base.json","tokens/component/button/variants.json","tokens/component/button/sizes.json"]},
+    {"family":"button-group","status":"reconciled","classification":"current","sources":["md-comp-button-group-connected-large","md-comp-button-group-connected-medium","md-comp-button-group-connected-small","md-comp-button-group-connected-xlarge","md-comp-button-group-connected-xsmall","md-comp-button-group-standard-large","md-comp-button-group-standard-medium","md-comp-button-group-standard-small","md-comp-button-group-standard-xlarge","md-comp-button-group-standard-xsmall"],"canonical":["tokens/component/button-group.json"]},
+    {"family":"carousel","status":"reconciled","classification":"current","sources":["md-comp-carousel-item"],"canonical":["tokens/component/carousel.json"]},
+    {"family":"checkbox","status":"reconciled","classification":"current","sources":["md-comp-checkbox"],"canonical":["tokens/component/checkbox.json"]},
+    {"family":"data-table","status":"reconciled","classification":"current","sources":["md-comp-data-table"],"canonical":["tokens/component/data-table.json"]},
+    {"family":"pickers","status":"reconciled","classification":"current","sources":["md-comp-date-input-modal","md-comp-date-picker-docked","md-comp-date-picker-modal","md-comp-time-input","md-comp-time-picker"],"canonical":["tokens/component/pickers.json","tokens/component/date-picker-docked.json"]},
+    {"family":"dialog","status":"reconciled","classification":"current","sources":["md-comp-dialog"],"canonical":["tokens/component/surface-controls.json"]},
+    {"family":"full-screen-dialog","status":"reconciled","classification":"current","sources":["md-comp-full-screen-dialog"],"canonical":["tokens/component/full-screen-dialog.json"]},
+    {"family":"divider","status":"reconciled","classification":"current","sources":["md-comp-divider"],"canonical":["tokens/component/divider.json"]},
+    {"family":"drag-handle","status":"reconciled","classification":"current","sources":["md-comp-drag-handle"],"canonical":["tokens/component/drag-handle.json"]},
+    {"family":"cards","status":"reconciled","classification":"current","sources":["md-comp-elevated-card","md-comp-filled-card","md-comp-outlined-card"],"canonical":["tokens/component/card.json"]},
+    {"family":"fab-menu","status":"reconciled","classification":"current","sources":["md-comp-fab-menu","md-comp-fab-menu-primary-close-button","md-comp-fab-menu-primary-container","md-comp-fab-menu-secondary-close-button","md-comp-fab-menu-secondary-container","md-comp-fab-menu-tertiary-close-button","md-comp-fab-menu-tertiary-container"],"canonical":["tokens/component/fab-menu.json"]},
+    {"family":"fab","status":"reconciled","classification":"current","sources":["md-comp-extended-fab","md-comp-extended-fab-branded","md-comp-extended-fab-large","md-comp-extended-fab-medium","md-comp-extended-fab-primary","md-comp-extended-fab-primary-container","md-comp-extended-fab-secondary","md-comp-extended-fab-secondary-container","md-comp-extended-fab-small","md-comp-extended-fab-surface","md-comp-extended-fab-tertiary","md-comp-extended-fab-tertiary-container","md-comp-fab","md-comp-fab-branded","md-comp-fab-branded-large","md-comp-fab-large","md-comp-fab-medium","md-comp-fab-primary","md-comp-fab-primary-container","md-comp-fab-primary-large","md-comp-fab-primary-small","md-comp-fab-secondary","md-comp-fab-secondary-container","md-comp-fab-secondary-large","md-comp-fab-secondary-small","md-comp-fab-small","md-comp-fab-surface","md-comp-fab-surface-large","md-comp-fab-tertiary","md-comp-fab-tertiary-container","md-comp-fab-tertiary-large","md-comp-fab-tertiary-small"],"canonical":["tokens/component/fab.json"]},
+    {"family":"autocomplete-search","status":"reconciled","classification":"current","sources":["md-comp-filled-autocomplete","md-comp-outlined-autocomplete","md-comp-search-bar","md-comp-search-view"],"canonical":["tokens/component/autocomplete-search.json"]},
+    {"family":"select","status":"reconciled","classification":"current","sources":["md-comp-filled-select","md-comp-outlined-select"],"canonical":["tokens/component/select.json"]},
+    {"family":"menu-button","status":"reconciled","classification":"current","sources":["md-comp-filled-menu-button","md-comp-outlined-menu-button","md-comp-standard-menu-button"],"canonical":["tokens/component/menu-button.json"]},
+    {"family":"text-field","status":"reconciled","classification":"current","sources":["md-comp-filled-text-field","md-comp-outlined-text-field"],"canonical":["tokens/component/text-field/shared.json","tokens/component/text-field/filled.json","tokens/component/text-field/outlined.json"]},
+    {"family":"icon-button","status":"reconciled","classification":"current","sources":["md-comp-icon-button","md-comp-icon-button-filled","md-comp-icon-button-outlined","md-comp-icon-button-standard","md-comp-icon-button-tonal","md-comp-icon-button-xsmall","md-comp-icon-button-small","md-comp-icon-button-medium","md-comp-icon-button-large","md-comp-icon-button-xlarge"],"canonical":["tokens/component/icon-button.json"]},
+    {"family":"list","status":"reconciled","classification":"current","sources":["md-comp-list","md-comp-list-expand","md-comp-list-reorder","md-comp-list-reveal"],"canonical":["tokens/component/list.json"]},
+    {"family":"loading-indicator","status":"reconciled","classification":"current","sources":["md-comp-loading-indicator"],"canonical":["tokens/component/loading-indicator.json"]},
+    {"family":"menu","status":"reconciled","classification":"current","sources":["md-comp-menu","md-comp-menus","md-comp-menus-standard","md-comp-menus-vibrant"],"canonical":["tokens/component/menu.json"]},
+    {"family":"navigation","status":"reconciled","classification":"current","sources":["md-comp-nav-bar","md-comp-nav-bar-item-horizontal","md-comp-nav-bar-item-vertical","md-comp-nav-rail","md-comp-nav-rail-collapsed","md-comp-nav-rail-expanded","md-comp-nav-rail-item","md-comp-nav-rail-item-horizontal","md-comp-nav-rail-item-vertical","md-comp-navigation-bar","md-comp-navigation-drawer","md-comp-navigation-rail","md-comp-primary-navigation-tab","md-comp-secondary-navigation-tab"],"canonical":["tokens/component/navigation.json"]},
+    {"family":"segmented-button","status":"reconciled","classification":"current","sources":["md-comp-outlined-segmented-button"],"canonical":["tokens/component/outlined-segmented-button.json"]},
+    {"family":"progress-indicator","status":"reconciled","classification":"current","sources":["md-comp-progress-indicator","md-comp-progress-indicator-circular","md-comp-progress-indicator-linear"],"canonical":["tokens/component/progress-indicator.json"]},
+    {"family":"radio-button","status":"reconciled","classification":"current","sources":["md-comp-radio-button"],"canonical":["tokens/component/radio-button.json"]},
+    {"family":"tooltip","status":"reconciled","classification":"current","sources":["md-comp-plain-tooltip","md-comp-rich-tooltip"],"canonical":["tokens/component/tooltip.json"]},
+    {"family":"scrim","status":"reconciled","classification":"current","sources":["md-comp-scrim"],"canonical":["tokens/core/scrim.json"]},
+    {"family":"sheets","status":"reconciled","classification":"current","sources":["md-comp-sheet-bottom","md-comp-sheet-floating","md-comp-sheet-side"],"canonical":["tokens/component/sheets.json","tokens/component/surface-controls.json"]},
+    {"family":"slider","status":"reconciled","classification":"current","sources":["md-comp-slider","md-comp-slider-xsmall","md-comp-slider-small","md-comp-slider-medium","md-comp-slider-large","md-comp-slider-xlarge"],"canonical":["tokens/component/surface-controls.json","tokens/component/slider-sizes.json"]},
+    {"family":"snackbar","status":"reconciled","classification":"current","sources":["md-comp-snackbar"],"canonical":["tokens/component/snackbar.json"]},
+    {"family":"split-button","status":"reconciled","classification":"current","sources":["md-comp-split-button-large","md-comp-split-button-medium","md-comp-split-button-small","md-comp-split-button-xlarge","md-comp-split-button-xsmall"],"canonical":["tokens/component/split-button.json"]},
+    {"family":"switch","status":"reconciled","classification":"current","sources":["md-comp-switch"],"canonical":["tokens/component/switch.json"]},
+    {"family":"toolbar","status":"reconciled","classification":"current","sources":["md-comp-toolbar-docked","md-comp-toolbar-floating","md-comp-toolbar-floating-fab","md-comp-toolbar-standard","md-comp-toolbar-vibrant"],"canonical":["tokens/component/surface-controls.json"]},
+    {"family":"legacy-button-aliases","status":"excluded","classification":"legacy-generated-alias","sources":["md-comp-elevated-button","md-comp-filled-button","md-comp-filled-tonal-button","md-comp-outlined-button","md-comp-text-button"],"reason":"Upstream marks these namespaces deprecated in favor of md.comp.button variant and size token sets."},
+    {"family":"legacy-icon-button-aliases","status":"excluded","classification":"legacy-generated-alias","sources":["md-comp-filled-icon-button","md-comp-filled-tonal-icon-button"],"reason":"Upstream marks these namespaces deprecated in favor of md.comp.icon-button variant and size token sets."},
+    {"family":"legacy-progress-aliases","status":"excluded","classification":"legacy-generated-alias","sources":["md-comp-circular-progress-indicator","md-comp-linear-progress-indicator"],"reason":"Upstream deprecates these split namespaces in favor of md.comp.progress-indicator."},
+    {"family":"legacy-top-app-bar-aliases","status":"excluded","classification":"legacy-generated-alias","sources":["md-comp-top-app-bar-large","md-comp-top-app-bar-medium","md-comp-top-app-bar-small","md-comp-top-app-bar-small-centered"],"reason":"Upstream marks top-app-bar namespaces deprecated in favor of md.comp.app-bar family token sets."}
+  ],
+  "outsideComponentDenominator": [
+    {"source":"md-fab-surface-small","status":"excluded","classification":"legacy-platform-alias","reason":"Upstream deprecates this non-md.comp namespace in favor of md.comp.fab and md.comp.fab.small/surface token sets."},
+    {"source":"md-outlined-icon-button","status":"excluded","classification":"legacy-platform-alias","reason":"Upstream deprecates this non-md.comp namespace in favor of md.comp.icon-button.outlined and size token sets."}
+  ],
+  "schemaVersion": 1
+}

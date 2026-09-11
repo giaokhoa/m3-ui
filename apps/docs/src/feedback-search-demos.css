@@ -1,0 +1,40 @@
+.docs-search-bar-demo {
+  position: relative;
+  inline-size: min(100%, 560px);
+}
+
+.docs-search-bar-demo__results {
+  padding-block: 8px;
+}
+
+.docs-indicator-demo,
+.docs-snackbar-demo {
+  display: grid;
+  gap: 20px;
+  inline-size: 100%;
+}
+
+.docs-indicator-demo__linear {
+  display: grid;
+  gap: 20px;
+  align-items: center;
+}
+
+.docs-indicator-demo__circular,
+.docs-loading-indicator-demo,
+.docs-tooltip-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+
+.docs-loading-indicator-demo > div {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.docs-snackbar-demo .snackbar {
+  inline-size: min(100%, 560px);
+}

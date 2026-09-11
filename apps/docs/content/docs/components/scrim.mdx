@@ -1,0 +1,64 @@
+---
+title: Scrim
+description: Material scrim presentation with passive and dismissible forms while modal state, focus, portals, and stacking remain overlay-owned.
+---
+
+A scrim visually obscures content behind a modal or elevated surface. `Scrim` deliberately implements only that Material visual/dismiss layer; it is not a complete modal manager.
+
+<ComponentPreview>
+  <ScrimPreview />
+</ComponentPreview>
+
+```tsx
+import { Scrim } from '@m3-ui/ui';
+
+<Scrim />
+```
+
+## When to use
+
+Use `Scrim` inside a custom overlay composition when you need the Material obscuring layer and the overlay owner already handles focus, portals, stacking, scroll, and dismissal lifecycle. Prefer Dialog or ModalBottomSheet when their higher-level contracts match the UI.
+
+## Passive scrim
+
+Without `onDismiss`, the scrim is presentation-only and hidden from the accessibility tree. This is appropriate when another control owns dismissal or when the layer is purely visual.
+
+## Dismissible scrim
+
+Supplying `onDismiss` makes the layer an explicit dismissal action and requires an accessible name.
+
+```tsx
+<Scrim aria-label="Dismiss dialog" onDismiss={closeDialog} />
+```
+
+The full-screen dismiss action stays out of the normal tab sequence so it does not become an unexpected keyboard stop. The surrounding overlay still owns the actual modal relationship.
+
+## Modal ownership boundary
+
+`Scrim` does not create a portal, trap focus, lock document scroll, handle Escape, restore focus, or choose stacking order. A real modal composition must own those responsibilities.
+
+Do not combine a custom scrim with a second independent modal/focus manager around Dialog or ModalBottomSheet. Those components already own their browser overlay lifecycle.
+
+## Styling and animation
+
+`containerColor`, `containerOpacity`, and `alpha` are presentation hooks. `alpha` can follow an animation progress value without changing whether the surrounding surface is semantically modal or dismissed.
+
+## Accessibility
+
+A passive scrim should remain hidden from assistive technology. A dismissible scrim needs a clear action name that identifies the surface it dismisses, while keyboard users must still have an explicit reachable dismissal path within the overlay content.
+
+## API reference
+
+<ApiReference name="Scrim" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="scrim" />
+
+Material supplies scrim color/opacity and obscuring-layer intent. Optional native button-style dismissal is a web interaction adaptation; portal, focus containment, Escape, scroll lock, restoration, and z-index remain the overlay owner's responsibility.
+
+## Related components
+
+- [Dialog](/docs/components/dialog) — complete browser modal dialog composition.
+- [Bottom sheets](/docs/components/bottom-sheet) — modal and non-modal sheet surfaces.
+- [Surface](/docs/components/surface) — general Material surface composition.

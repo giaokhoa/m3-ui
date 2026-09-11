@@ -1,0 +1,35 @@
+{
+  "component": {
+    "outlinedSegmentedButton": {
+      "containerHeight": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+      "disabledIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledOutlineColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "outlineColor": { "$type": "string", "$value": "{color.role.outline}" },
+      "selectedContainerColor": { "$type": "string", "$value": "{color.role.secondaryContainer}" },
+      "selectedFocusIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedFocusLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedHoverIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedHoverLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedPressedIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedPressedLabelTextColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "selectedIconColor": { "$type": "string", "$value": "{color.role.onSecondaryContainer}" },
+      "unselectedFocusIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedFocusLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedHoverIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedHoverLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedPressedIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedPressedLabelTextColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "unselectedIconColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+      "disabledIconOpacity": { "$type": "number", "$value": 0.38 },
+      "disabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+      "disabledOutlineOpacity": { "$type": "number", "$value": 0.12 },
+      "labelTextFont": { "$type": "string", "$value": "labelLarge" },
+      "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "shape": { "$type": "string", "$value": "full" },
+      "iconSize": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } }
+    }
+  }
+}

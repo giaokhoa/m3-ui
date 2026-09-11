@@ -1,0 +1,64 @@
+---
+title: App bar column
+description: Material app-bar action columns with local height-based overflow, shared action/toggle semantics, and accessible overflow menus.
+---
+
+`AppBarColumn` is the block-axis counterpart to `AppBarRow`. It keeps the largest fitting prefix of actions visible and moves only the non-fitting suffix into overflow when its own container height becomes constrained.
+
+<ComponentPreview>
+  <AppBarOverflowPreview />
+</ComponentPreview>
+
+```tsx
+import { AppBarColumn } from '@m3-ui/ui';
+
+<AppBarColumn
+  aria-label="Document actions"
+  items={items}
+  maxItemCount={4}
+/>
+```
+
+## When to use
+
+Use `AppBarColumn` for vertical app-bar/action slots that need component-local overflow. Use the adaptive navigation/layout APIs when the application must choose between rails, drawers, panes, or other screen-level structures.
+
+## Shared item model
+
+`AppBarColumn` consumes the same `AppBarAction` union as `AppBarRow`, so ordinary actions, controlled toggles, and custom items can preserve their state/identity across horizontal and vertical compositions.
+
+Controlled toggle state remains application-owned regardless of whether the item appears inline or inside overflow.
+
+## Local overflow behavior
+
+The column observes only its own available block size and rendered item heights. `maxItemCount` can impose an additional count limit; if overflow exists, the trigger itself uses one slot.
+
+This is local component geometry. It does not infer Material window-size classes, decide navigation form, or alter pane/scaffold policy.
+
+## Overflow menu
+
+The default trigger exposes a named More actions control. A custom `overflowTrigger` can replace it while React Aria Menu remains responsible for popup positioning, keyboard navigation, dismissal, and focus restoration.
+
+Custom items provide separate inline/overflow renderers; use the provided `dismiss()` callback after an overflow action when appropriate.
+
+## Accessibility
+
+Give the column an accessible name when context does not already identify the action set. Ensure custom inline/overflow renderers preserve equivalent names, disabled/selected state, and action behavior.
+
+Do not render duplicate semantic copies of the same action in visible and overflow regions simultaneously.
+
+## API reference
+
+<ApiReference name="AppBarColumn" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="app-bar-column" />
+
+Material supplies vertical action-group/overflow intent. Local `ResizeObserver` measurement and React Aria menu semantics implement the web behavior; application adaptive layout remains outside the component.
+
+## Related components
+
+- [App bar row](/docs/components/app-bar-row) — inline-axis counterpart.
+- [Floating toolbar](/docs/components/floating-toolbar) — floating action collection.
+- [Adaptive layout](/docs/develop/layout) — window-level application adaptation.

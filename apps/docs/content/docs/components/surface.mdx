@@ -1,0 +1,68 @@
+---
+title: Surface
+description: Material surface composition with tonal and shadow elevation plus explicit passive, clickable, selectable, and toggleable web semantics.
+---
+
+`Surface` is the low-level Material container primitive for color, content color, shape, border, tonal elevation, and shadow elevation. Use higher-level components when their Material contract fits; use `Surface` when application composition genuinely needs a generic Material surface.
+
+<ComponentPreview>
+  <SurfacePreview />
+</ComponentPreview>
+
+```tsx
+import { Surface } from '@m3-ui/ui';
+
+<Surface tonalElevation="level1">
+  <Content />
+</Surface>
+```
+
+## When to use
+
+Use a passive `Surface` to establish a Material container/elevation relationship without adding interaction. Prefer Card, Button, ListItem, or another higher-level component when the UI matches that component's semantics and anatomy.
+
+## Passive surfaces
+
+Without `interaction`, `Surface` remains a plain content container. Nested surfaces can accumulate tonal elevation through the shared surface context, preserving the Material idea of hierarchical tonal elevation rather than unrelated local color overrides.
+
+`tonalElevation` and `shadowElevation` express Material surface hierarchy; neither changes DOM stacking order or z-index.
+
+## Interaction contracts
+
+Interactive surfaces opt into one explicit model through `interaction`:
+
+- `clickable` exposes button-like activation and calls `onPress`;
+- `selectable` defaults to radio-style selection and can use option semantics where the surrounding widget requires it;
+- `toggleable` defaults to checkbox-style state and can use switch or pressed-button semantics where appropriate.
+
+The component derives the matching checked/selected/pressed accessibility state and supports keyboard activation. Do not use an interaction variant merely for hover/ripple styling when the surface is not actually actionable or selectable.
+
+## Nested controls
+
+An interactive `Surface` avoids activating itself when a recognized nested link, button, input, select, textarea, summary, or other interactive descendant receives the event. Even so, prefer a passive surface when the content contains several independent controls; one large interaction target plus nested controls can still be confusing.
+
+## Elevation and styling
+
+Use semantic Material elevation levels and theme roles instead of copying shadow/color recipes. Custom background, border, shape, and color hooks are deliberate escape hatches; reusable design decisions should remain in the theme/token system.
+
+## Accessibility
+
+A passive surface should not become focusable. For interactive surfaces, choose the interaction/role that matches the actual user contract and provide a meaningful accessible name through its content or explicit labeling.
+
+Do not conflate visual selection with semantic selection: radio, checkbox, switch, and pressed-button states communicate different models to assistive technology.
+
+## API reference
+
+<ApiReference name="Surface" />
+
+## Material fidelity and web adaptation
+
+<ParitySummary component="surface" />
+
+Material supplies surface hierarchy, color, shape, elevation, and state-layer intent. The explicit button/radio/checkbox/switch/pressed role mappings are browser adaptations for a generic interactive surface; they do not replace higher-level Material components when those components are appropriate.
+
+## Related components
+
+- [Card](/docs/components/card) — content-grouping surface family.
+- [Elevation](/docs/foundations/elevation) — tonal vs shadow elevation semantics.
+- [Scrim](/docs/components/scrim) — obscuring overlay layer.

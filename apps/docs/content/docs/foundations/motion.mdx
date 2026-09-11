@@ -1,0 +1,99 @@
+---
+title: Motion
+description: Material 3 motion principles, standard and expressive provenance, generated motion roles, and reduced-motion behavior on the web.
+---
+
+## Motion communicates change
+
+Material motion should make interface changes easier to understand. Use motion to preserve continuity between states, reinforce hierarchy by showing what is entering, leaving, or changing emphasis, and provide feedback that keeps an interaction connected to its cause.
+
+[Material 3 motion overview](https://m3.material.io/styles/motion/overview)
+
+Motion is not decoration applied after layout and interaction decisions. A transition should help explain state, spatial relationship, or response. When motion does not improve that understanding, prefer the simpler change.
+
+## Standard and expressive vocabulary
+
+`m3-ui` keeps the canonical motion graph in `@m3-ui/tokens`. The graph includes classic duration and easing roles, plus standard and expressive spring schemes reconciled against the pinned AndroidX Compose Material3 token sources.
+
+Standard motion is the conservative baseline for changes that should feel direct and stable. Expressive motion can use a more energetic spatial response where the current Material source evidence supports it. Component behavior should select the semantic role appropriate to the interaction rather than inventing per-component timing values.
+
+The provenance is intentionally not treated as uniform across upstream implementations:
+
+- AndroidX Compose Material3 corroborates the canonical duration/easing vocabulary and both the standard and expressive spring schemes.
+- The audited latest Material Web generated tokens corroborate the duration/easing vocabulary and the standard spring scheme, but do not expose an expressive spring family.
+- The audited public Material Web adapter does not expose spring physics, so it is not evidence for expressive spring parameters.
+
+That difference is a source gap, not permission to synthesize a second set of values in documentation or component code.
+
+## Duration, easing, and spring roles
+
+Duration roles describe how long a transition class should take. Easing roles describe how progress is distributed through time. Spring roles describe response using motion-scheme semantics for spatial movement and visual effects.
+
+The docs deliberately do not reproduce canonical numeric values. Read them from generated `@m3-ui/tokens`, which remains the source of truth.
+
+A component can consume the generated roles directly when its audited Material behavior calls for them:
+
+```tsx
+import * as token from '@m3-ui/tokens';
+
+const transition =
+  `border-radius ${token.MotionSpringDefaultEffectsDuration} ` +
+  token.MotionSpringDefaultEffectsEasing;
+```
+
+`m3-ui` already uses this pattern in component runtime code. Component-local aliases or orchestration may choose a generated role, but they should not redefine the canonical role value.
+
+## Spatial motion and effects
+
+Use spatial motion when geometry or position changes help preserve continuity between states. Use effect motion for visual properties such as shape, opacity, color, or elevation when no spatial relationship needs to be communicated.
+
+The standard and expressive schemes distinguish those categories because spatial movement can benefit from a different response than a non-spatial effect. Do not translate this into a rule that every transition must animate both geometry and effects; the interaction still determines which properties need motion.
+
+## Reduced motion on the web
+
+Material guidance describes the design intent of motion. Browser reduced-motion behavior is a web adaptation layered on top of that intent.
+
+For CSS-only transitions and animations, honor the user's `prefers-reduced-motion` preference in CSS. Removing the transition is usually clearer than replacing it with an arbitrary docs-only duration:
+
+```css
+.component {
+  transition: transform var(--component-motion-duration)
+    var(--component-motion-easing);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .component {
+    transition: none;
+  }
+}
+```
+
+When JavaScript coordinates motion because layout measurement, delayed cleanup, or interaction state requires it, read the same browser preference before scheduling motion-dependent work:
+
+```ts
+const reducedMotion = window.matchMedia?.(
+  '(prefers-reduced-motion: reduce)',
+).matches;
+
+if (reducedMotion) {
+  finishTransitionImmediately();
+} else {
+  scheduleAnimatedTransition();
+}
+```
+
+Reduced motion should preserve the state change and interaction result. It should not disable navigation, selection, disclosure, loading completion, focus transfer, or other functional behavior merely because their visual transition is removed.
+
+## Component consumption
+
+Components consume generated motion tokens through audited runtime defaults, CSS transitions, or JavaScript orchestration where browser behavior requires it. Examples in the current codebase include generated spring effect roles for Button shape transitions, generated duration roles for staggered FAB menu behavior, and shared elevation motion roles.
+
+Prefer CSS transitions or animations for purely visual changes. Use JavaScript animation state when the component must measure layout, coordinate lifecycle timing, or keep interaction semantics synchronized with the transition.
+
+Do not port Compose animation APIs literally. Preserve the Material timing, easing, spring, continuity, and hierarchy semantics while using idiomatic browser mechanisms.
+
+## Source-of-truth boundary
+
+This guide documents the Material motion contract; it does not create a new public motion theme API. Canonical motion values live in `packages/tokens/tokens/core/motion.json` and are emitted through `@m3-ui/tokens`.
+
+The pinned motion evidence audit records where Compose and Material Web agree and where they differ. Documentation should describe those differences explicitly instead of hiding them behind a generic claim of cross-platform parity.

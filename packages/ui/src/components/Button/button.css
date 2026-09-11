@@ -1,0 +1,114 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--_button-min-width);
+  min-block-size: var(--_button-min-height);
+  margin: 0;
+  padding-block: var(--_button-padding-block);
+  padding-inline-start: var(--_button-padding-inline-start);
+  padding-inline-end: var(--_button-padding-inline-end);
+  border: var(--_button-outline-width) solid var(--_button-outline-color);
+  border-radius: var(--_button-container-radius);
+  outline: none;
+  appearance: none;
+  background: var(--_button-container-color);
+  color: var(--_button-content-color);
+  font-family: var(--_button-font-family);
+  font-size: var(--_button-font-size);
+  font-weight: var(--_button-font-weight);
+  line-height: var(--_button-line-height);
+  letter-spacing: var(--_button-letter-spacing);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --ripple-color: var(--_button-content-color);
+}
+
+.button[data-has-start-icon] {
+  padding-inline-start: var(--_button-icon-padding-inline-start);
+  padding-inline-end: var(--_button-icon-padding-inline-end);
+}
+
+.button[data-has-end-icon]:not([data-has-start-icon]) {
+  padding-inline-start: var(--_button-icon-padding-inline-end);
+  padding-inline-end: var(--_button-icon-padding-inline-start);
+}
+
+.button[data-has-start-icon][data-has-end-icon] {
+  padding-inline-start: var(--_button-icon-padding-inline-start);
+  padding-inline-end: var(--_button-icon-padding-inline-start);
+}
+
+.button__content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button[data-has-start-icon] .button__content,
+.button[data-has-end-icon] .button__content {
+  gap: var(--_button-icon-spacing);
+}
+
+.button__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_button-icon-size);
+  block-size: var(--_button-icon-size);
+  color: currentColor;
+}
+
+.button__icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.button[data-disabled] {
+  border-color: color-mix(
+    in srgb,
+    var(--_button-outline-color) var(--_button-disabled-outline-opacity),
+    transparent
+  );
+  background: color-mix(
+    in srgb,
+    var(--_button-disabled-container-color) var(--_button-disabled-container-opacity),
+    transparent
+  );
+  color: color-mix(
+    in srgb,
+    var(--_button-disabled-content-color) var(--_button-disabled-content-opacity),
+    transparent
+  );
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button > .elevation {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .button {
+    border-color: ButtonText;
+  }
+
+  .button:focus-visible {
+    outline: 2px solid ButtonText;
+    outline-offset: 2px;
+  }
+
+  .button[data-disabled] {
+    border-color: GrayText;
+    color: GrayText;
+  }
+}

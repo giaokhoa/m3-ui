@@ -1,0 +1,52 @@
+{
+  "component": {
+    "toggleButton": {
+      "disabled": {
+        "containerOpacity": { "$type": "number", "$value": 0.1 },
+        "contentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+        "contentOpacity": { "$type": "number", "$value": 0.38 },
+        "outlineOpacity": { "$type": "number", "$value": 0.1 }
+      },
+      "motion": {
+        "effectsDuration": { "$type": "string", "$value": "{motion.spring.defaultEffects.duration}" },
+        "effectsEasing": { "$type": "string", "$value": "{motion.spring.defaultEffects.easing}" }
+      },
+      "size": {
+        "extraSmall": {
+          "iconSpacing": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }
+        }
+      },
+      "variant": {
+        "filled": {
+          "unselectedContainerColor": { "$type": "string", "$value": "{color.role.surfaceContainer}" },
+          "unselectedContentColor": { "$type": "string", "$value": "{color.role.onSurfaceVariant}" },
+          "selectedContainerColor": { "$type": "string", "$value": "{color.role.primary}" },
+          "selectedContentColor": { "$type": "string", "$value": "{color.role.onPrimary}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" }
+        },
+        "elevated": {
+          "unselectedContainerColor": { "$type": "string", "$value": "{component.button.variant.elevated.containerColor}" },
+          "unselectedContentColor": { "$type": "string", "$value": "{component.button.variant.elevated.contentColor}" },
+          "selectedContainerColor": { "$type": "string", "$value": "{color.role.primary}" },
+          "selectedContentColor": { "$type": "string", "$value": "{color.role.onPrimary}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" }
+        },
+        "filledTonal": {
+          "unselectedContainerColor": { "$type": "string", "$value": "{component.button.variant.filledTonal.containerColor}" },
+          "unselectedContentColor": { "$type": "string", "$value": "{component.button.variant.filledTonal.contentColor}" },
+          "selectedContainerColor": { "$type": "string", "$value": "{color.role.secondary}" },
+          "selectedContentColor": { "$type": "string", "$value": "{color.role.onSecondary}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.onSurface}" }
+        },
+        "outlined": {
+          "unselectedContainerColor": { "$type": "string", "$value": "transparent" },
+          "unselectedContentColor": { "$type": "string", "$value": "{component.button.variant.outlined.contentColor}" },
+          "selectedContainerColor": { "$type": "string", "$value": "{color.role.inverseSurface}" },
+          "selectedContentColor": { "$type": "string", "$value": "{color.role.inverseOnSurface}" },
+          "outlineColor": { "$type": "string", "$value": "{color.role.outlineVariant}" },
+          "disabledContainerColor": { "$type": "string", "$value": "{color.role.outlineVariant}" }
+        }
+      }
+    }
+  }
+}

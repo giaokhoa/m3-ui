@@ -1,0 +1,32 @@
+{
+  "component": {
+    "dataTable": {
+      "footerContainerHeight": { "$type": "dimension", "$value": { "value": 52, "unit": "px" } },
+      "headerContainerHeight": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+      "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "rowItemContainerHeight": { "$type": "dimension", "$value": { "value": 52, "unit": "px" } },
+      "rowItemDisabledLabelTextOpacity": { "$type": "number", "$value": 0.38 },
+      "rowItemOutlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+      "containerShape": { "$type": "string", "$value": "extraSmall" },
+      "footerContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "footerSupportingTextColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+      "footerSupportingTextFont": { "$type": "string", "$value": "bodyMedium" },
+      "headerContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "headerHeadlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+      "headerHeadlineFont": { "$type": "string", "$value": "titleSmall" },
+      "headerHoverHeadlineColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "headerHoverSortingIconButtonColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "outlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
+      "rowItemDisabledLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemLabelTextColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemLabelTextFont": { "$type": "string", "$value": "bodyMedium" },
+      "rowItemOutlineColor": { "$type": "string", "$value": "var(--outline-variant)" },
+      "rowItemSelectedContainerColor": { "$type": "string", "$value": "var(--surface-container-highest)" },
+      "rowItemSelectedHoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemSelectedHoverStateLayerOpacity": { "$type": "number", "$value": 0.08 },
+      "rowItemUnselectedContainerColor": { "$type": "string", "$value": "var(--surface)" },
+      "rowItemUnselectedHoverStateLayerColor": { "$type": "string", "$value": "var(--on-surface)" },
+      "rowItemUnselectedHoverStateLayerOpacity": { "$type": "number", "$value": 0.08 }
+    }
+  }
+}

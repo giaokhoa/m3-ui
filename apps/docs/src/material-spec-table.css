@@ -1,0 +1,56 @@
+.docs-material-spec {
+  display: block;
+  margin-block: 1.5rem;
+  overflow: hidden;
+  border-radius: 1.5rem;
+}
+
+.docs-material-spec__content {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.docs-material-spec__content > h3,
+.docs-material-spec__content > p {
+  margin: 0;
+}
+
+.docs-material-spec__eyebrow {
+  color: var(--primary);
+}
+
+.docs-material-spec__content code,
+.docs-material-spec__table code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.docs-material-spec__table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.docs-material-spec__table {
+  width: 100%;
+  min-width: 58rem;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.docs-material-spec__table th,
+.docs-material-spec__table td {
+  padding: 0.75rem;
+  border-block-end: 1px solid var(--outline-variant);
+  vertical-align: top;
+  text-align: start;
+}
+
+.docs-material-spec__table th {
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+
+.docs-material-spec__table td code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

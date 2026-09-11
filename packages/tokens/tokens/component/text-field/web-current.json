@@ -1,0 +1,27 @@
+{
+  "component": {
+    "textField": {
+      "shared": {
+        "webPopulatedLabelTextSize": { "$type": "dimension", "$value": "{typography.bodySmall.fontSize}" },
+        "webPopulatedLabelTextLineHeight": { "$type": "dimension", "$value": "{typography.bodySmall.lineHeight}" }
+      },
+      "filled": {
+        "webCurrent": {
+          "disabledContainerOpacity": { "$type": "number", "$value": 0.04 },
+          "focusActiveIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" },
+          "hoverIndicatorColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "hoverStateLayerColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "hoverStateLayerOpacity": { "$type": "number", "$value": "{state.layer.opacity.hover}" },
+          "errorHoverAccentColor": { "$type": "string", "$value": "{color.role.onErrorContainer}" }
+        }
+      },
+      "outlined": {
+        "webCurrent": {
+          "focusOutlineWidth": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+          "hoverAccentColor": { "$type": "string", "$value": "{color.role.onSurface}" },
+          "errorHoverAccentColor": { "$type": "string", "$value": "{color.role.onErrorContainer}" }
+        }
+      }
+    }
+  }
+}

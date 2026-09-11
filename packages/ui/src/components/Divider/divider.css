@@ -1,0 +1,18 @@
+.divider {
+  box-sizing: border-box;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--_divider-color);
+}
+
+.divider--horizontal {
+  inline-size: 100%;
+  block-size: var(--_divider-thickness);
+}
+
+.divider--vertical {
+  inline-size: var(--_divider-thickness);
+  block-size: 100%;
+}

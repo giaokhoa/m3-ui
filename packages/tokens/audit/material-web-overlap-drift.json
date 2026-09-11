@@ -1,0 +1,68 @@
+{
+  "policy": {
+    "scope": "Cross-source declaration drift for Material Web modules that overlap the Compose canonical corpus.",
+    "rule": "A Material Web mismatch may only be reconciled as documented drift when the pinned alternate source and implementation evidence are recorded here. Exact semantic remaps do not count as drift.",
+    "canonicalIntent": "Preserve effective Material 3 behavior while retaining generated-source provenance; do not overwrite implementation-derived canonical values merely to make a secondary-source declaration gate green."
+  },
+  "drift": [
+    {
+      "id": "button-xsmall-icon-label-space",
+      "module": "md-comp-button-xsmall",
+      "variable": "icon-label-space",
+      "canonicalPath": "component.button.size.extraSmall.iconSpacing",
+      "classification": "implementation-override",
+      "preferredReference": "composeImplementation",
+      "values": {
+        "materialWeb34_0_21": "8px",
+        "composeGenerated": "8dp",
+        "composeImplementation": "4dp",
+        "canonical": "4px"
+      },
+      "reason": "Pinned Compose ButtonDefaults explicitly hard-codes ExtraSmallIconSpacing to 4.dp and marks the generated ButtonXSmallTokens value TODO for correction. The canonical token models the effective implementation value, while the generated-source discrepancy remains visible here."
+    },
+    {
+      "id": "button-xsmall-leading-space",
+      "module": "md-comp-button-xsmall",
+      "variable": "leading-space",
+      "canonicalPath": "component.button.size.extraSmall.padding.inlineStart",
+      "classification": "generated-source-lag",
+      "preferredReference": "composeImplementation+materialWebLatest",
+      "values": {
+        "materialWeb34_0_21": "12px",
+        "composeGenerated": "16dp",
+        "composeImplementation": "12dp",
+        "canonical": "12px"
+      },
+      "reason": "Pinned Compose ButtonDefaults explicitly hard-codes extra-small content start padding to 12.dp with a TODO to update once ButtonXSmallTokens is corrected; Material Web 34.0.21 independently agrees at 12px."
+    },
+    {
+      "id": "button-xsmall-trailing-space",
+      "module": "md-comp-button-xsmall",
+      "variable": "trailing-space",
+      "canonicalPath": "component.button.size.extraSmall.padding.inlineEnd",
+      "classification": "generated-source-lag",
+      "preferredReference": "composeImplementation+materialWebLatest",
+      "values": {
+        "materialWeb34_0_21": "12px",
+        "composeGenerated": "16dp",
+        "composeImplementation": "12dp",
+        "canonical": "12px"
+      },
+      "reason": "Pinned Compose ButtonDefaults explicitly hard-codes extra-small content end padding to 12.dp with a TODO to update once ButtonXSmallTokens is corrected; Material Web 34.0.21 independently agrees at 12px."
+    }
+  ],
+  "semanticRemaps": [
+    {
+      "id": "button-selected-shape-source-target-naming",
+      "classification": "semantic-equivalent",
+      "modules": [
+        "md-comp-button-xsmall",
+        "md-comp-button-small",
+        "md-comp-button-medium",
+        "md-comp-button-large",
+        "md-comp-button-xlarge"
+      ],
+      "reason": "Material Web selected-container-shape-round names the selected shape by the source round state and resolves to the square counterpart. Compose ToggleButton resolves checkedShape to the square target (ContainerShapeSquare / SelectedContainerShapeSquare). The apparent name/value inversion is a source-vs-target naming convention, not a behavioral disagreement."
+    }
+  ]
+}

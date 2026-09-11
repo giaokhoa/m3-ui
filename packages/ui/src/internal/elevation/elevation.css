@@ -1,0 +1,11 @@
+.elevation,
+.elevation-host {
+  box-shadow: var(--_elevation-box-shadow);
+}
+
+.elevation {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}

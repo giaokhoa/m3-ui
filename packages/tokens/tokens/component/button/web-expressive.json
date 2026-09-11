@@ -1,0 +1,73 @@
+{
+  "component": {
+    "button": {
+      "size": {
+        "extraSmall": {
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "containerShapeRound": { "$type": "string", "$value": "full" },
+          "containerShapeSquare": { "$type": "string", "$value": "medium" },
+          "selectedContainerShapeRound": { "$type": "string", "$value": "{component.button.size.extraSmall.containerShapeSquare}" },
+          "selectedContainerShapeSquare": { "$type": "string", "$value": "{component.button.size.extraSmall.containerShapeRound}" },
+          "pressedShapeMotion": {
+            "spring": {
+              "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+              "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+            }
+          }
+        },
+        "small": {
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "containerShapeRound": { "$type": "string", "$value": "full" },
+          "containerShapeSquare": { "$type": "string", "$value": "medium" },
+          "selectedContainerShapeRound": { "$type": "string", "$value": "{component.button.size.small.containerShapeSquare}" },
+          "selectedContainerShapeSquare": { "$type": "string", "$value": "{component.button.size.small.containerShapeRound}" },
+          "pressedShapeMotion": {
+            "spring": {
+              "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+              "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+            }
+          }
+        },
+        "medium": {
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+          "containerShapeRound": { "$type": "string", "$value": "full" },
+          "containerShapeSquare": { "$type": "string", "$value": "large" },
+          "selectedContainerShapeRound": { "$type": "string", "$value": "{component.button.size.medium.containerShapeSquare}" },
+          "selectedContainerShapeSquare": { "$type": "string", "$value": "{component.button.size.medium.containerShapeRound}" },
+          "pressedShapeMotion": {
+            "spring": {
+              "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+              "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+            }
+          }
+        },
+        "large": {
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "containerShapeRound": { "$type": "string", "$value": "full" },
+          "containerShapeSquare": { "$type": "string", "$value": "extraLarge" },
+          "selectedContainerShapeRound": { "$type": "string", "$value": "{component.button.size.large.containerShapeSquare}" },
+          "selectedContainerShapeSquare": { "$type": "string", "$value": "{component.button.size.large.containerShapeRound}" },
+          "pressedShapeMotion": {
+            "spring": {
+              "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+              "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+            }
+          }
+        },
+        "extraLarge": {
+          "outlineWidth": { "$type": "dimension", "$value": { "value": 3, "unit": "px" } },
+          "containerShapeRound": { "$type": "string", "$value": "full" },
+          "containerShapeSquare": { "$type": "string", "$value": "extraLarge" },
+          "selectedContainerShapeRound": { "$type": "string", "$value": "{component.button.size.extraLarge.containerShapeSquare}" },
+          "selectedContainerShapeSquare": { "$type": "string", "$value": "{component.button.size.extraLarge.containerShapeRound}" },
+          "pressedShapeMotion": {
+            "spring": {
+              "dampingRatio": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.dampingRatio}" },
+              "stiffness": { "$type": "number", "$value": "{motion.spring.standard.fastSpatial.stiffness}" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

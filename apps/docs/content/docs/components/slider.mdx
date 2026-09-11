@@ -1,0 +1,94 @@
+---
+title: Slider
+description: Material 3 single-value and range sliders with audited size families, accessible thumbs, and explicit web adaptations.
+---
+
+Sliders let users choose a numeric value from a bounded range. `Slider` selects one value; `RangeSlider` selects a start/end pair with independently accessible thumbs.
+
+[Material 3 slider](https://m3.material.io/components/sliders/overview)
+
+<ComponentPreview>
+  <SliderPreview />
+</ComponentPreview>
+
+```tsx
+import { RangeSlider, Slider } from '@m3-ui/ui';
+
+<Slider defaultValue={40} label="Volume" />
+
+<RangeSlider
+  defaultValue={[25, 75]}
+  label="Price range"
+  thumbLabels={['Minimum price', 'Maximum price']}
+/>
+```
+
+## When to use
+
+Use a slider when users benefit from choosing approximately or continuously within a meaningful range. Prefer a text/numeric field when exact entry matters more than spatial adjustment, and avoid sliders for choices with no meaningful ordered continuum.
+
+## Values and steps
+
+The public slider contract exposes `minValue`, `maxValue`, `step`, orientation, controlled/uncontrolled values, and change events. `RangeSlider` uses a readonly two-number tuple while adapting to the underlying multi-thumb web state internally.
+
+Keep application validation/formatting separate from the component's numeric state. Use `getValueLabel` when displayed value text needs formatting.
+
+## Sizes
+
+The audited public size family is `xSmall`, `small`, `medium`, `large`, and `xLarge`. Choose the semantic size from the surrounding Material hierarchy instead of reproducing handle/track dimensions in CSS.
+
+## Range sliders and thumb labels
+
+A range slider has two independent accessible thumbs. When the shared label does not sufficiently identify each thumb, use `thumbLabels`.
+
+```tsx
+<RangeSlider
+  aria-label="Temperature range"
+  defaultValue={[18, 24]}
+  thumbLabels={['Minimum temperature', 'Maximum temperature']}
+/>
+```
+
+## Behavior and states
+
+React Aria owns slider/thumb roles, keyboard adjustment, pointer dragging, orientation, focus, and value semantics. Material tokens own track, handle, state layers, color, geometry, and visual motion.
+
+Do not implement a second drag/keyboard state machine around the component.
+
+## Ticks and value indicators
+
+`showTicks` and `showValueIndicator` are explicit audited **Material Web adaptations** in `m3-ui`. They are not silently described as Compose-only API or as new normative Material geometry.
+
+```tsx
+<Slider
+  defaultValue={60}
+  label="Stepped value"
+  minValue={0}
+  maxValue={100}
+  step={20}
+  showTicks
+  showValueIndicator
+/>
+```
+
+Ticks derive from the configured range and step. The value indicator is visual and does not replace the accessible numeric value exposed by the slider thumb.
+
+## Accessibility
+
+Every slider needs an accessible label. Range sliders need enough naming to distinguish the start/end thumbs. Preserve meaningful value text when raw numbers alone are ambiguous, and do not hide the component's keyboard adjustment behavior behind pointer-only interactions.
+
+## API reference
+
+<ApiReference name="Slider" />
+
+## Material fidelity and adaptations
+
+<MaterialParity component="slider" />
+
+Material supplies the slider selection model and visual contract. React Aria supplies accessible slider/thumb semantics and browser interaction. Ticks/value indicators remain explicitly classified as audited Material Web adaptations where applicable.
+
+## Related components
+
+- [Text field](/docs/components/text-field) — exact typed values.
+- [Segmented buttons](/docs/components/segmented-button) — discrete categorical selection.
+- [Forms and validation](/docs/develop/forms) — application form ownership.

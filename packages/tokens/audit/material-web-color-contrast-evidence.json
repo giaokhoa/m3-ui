@@ -1,0 +1,64 @@
+{
+  "source": {
+    "kind": "implementation-reference",
+    "repository": "material-components/material-web",
+    "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "generatedVersion": "34.0.21",
+    "root": "tokens/versions/latest/sass",
+    "verifiedAt": "2026-08-23"
+  },
+  "method": {
+    "readOnly": true,
+    "note": "Pinned normalized role-to-palette aliases from the four generated Material Web contrast modules. surfaceTint preserves the source-level alias to the mode's primary role."
+  },
+  "modes": {
+    "lightHigh": {
+      "module": "md-sys-color__high-contrast",
+      "file": "_md-sys-color__high-contrast.scss",
+      "roles": {
+        "primary":"palette.primary.20","onPrimary":"palette.primary.100","primaryContainer":"palette.primary.30","onPrimaryContainer":"palette.primary.100","primaryFixed":"palette.primary.30","primaryFixedDim":"palette.primary.20","onPrimaryFixed":"palette.primary.100","onPrimaryFixedVariant":"palette.primary.100",
+        "secondary":"palette.secondary.20","onSecondary":"palette.secondary.100","secondaryContainer":"palette.secondary.30","onSecondaryContainer":"palette.secondary.100","secondaryFixed":"palette.secondary.30","secondaryFixedDim":"palette.secondary.20","onSecondaryFixed":"palette.secondary.100","onSecondaryFixedVariant":"palette.secondary.100",
+        "tertiary":"palette.tertiary.20","onTertiary":"palette.tertiary.100","tertiaryContainer":"palette.tertiary.30","onTertiaryContainer":"palette.tertiary.100","tertiaryFixed":"palette.tertiary.30","tertiaryFixedDim":"palette.tertiary.20","onTertiaryFixed":"palette.tertiary.100","onTertiaryFixedVariant":"palette.tertiary.100",
+        "error":"palette.error.20","onError":"palette.error.100","errorContainer":"palette.error.30","onErrorContainer":"palette.error.100",
+        "surface":"palette.neutral.98","surfaceDim":"palette.neutral.87","surfaceBright":"palette.neutral.98","surfaceContainerLowest":"palette.neutral.100","surfaceContainerLow":"palette.neutral.96","surfaceContainer":"palette.neutral.94","surfaceContainerHigh":"palette.neutral.92","surfaceContainerHighest":"palette.neutral.90","onSurface":"palette.neutral.0","onSurfaceVariant":"palette.neutralVariant.0","surfaceVariant":"palette.neutralVariant.90","surfaceTint":"role.primary","outline":"palette.neutralVariant.20","outlineVariant":"palette.neutralVariant.30",
+        "inverseSurface":"palette.neutral.20","inverseOnSurface":"palette.neutral.100","inversePrimary":"palette.primary.80","background":"palette.neutral.98","onBackground":"palette.neutral.0","scrim":"palette.neutral.0","shadow":"palette.neutral.0"
+      }
+    },
+    "lightMedium": {
+      "module": "md-sys-color__medium-contrast",
+      "file": "_md-sys-color__medium-contrast.scss",
+      "roles": {
+        "primary":"palette.primary.30","onPrimary":"palette.primary.100","primaryContainer":"palette.primary.40","onPrimaryContainer":"palette.primary.100","primaryFixed":"palette.primary.40","primaryFixedDim":"palette.primary.30","onPrimaryFixed":"palette.primary.100","onPrimaryFixedVariant":"palette.primary.100",
+        "secondary":"palette.secondary.30","onSecondary":"palette.secondary.100","secondaryContainer":"palette.secondary.40","onSecondaryContainer":"palette.secondary.100","secondaryFixed":"palette.secondary.40","secondaryFixedDim":"palette.secondary.30","onSecondaryFixed":"palette.secondary.100","onSecondaryFixedVariant":"palette.secondary.100",
+        "tertiary":"palette.tertiary.30","onTertiary":"palette.tertiary.100","tertiaryContainer":"palette.tertiary.40","onTertiaryContainer":"palette.tertiary.100","tertiaryFixed":"palette.tertiary.40","tertiaryFixedDim":"palette.tertiary.30","onTertiaryFixed":"palette.tertiary.100","onTertiaryFixedVariant":"palette.tertiary.100",
+        "error":"palette.error.30","onError":"palette.error.100","errorContainer":"palette.error.40","onErrorContainer":"palette.error.100",
+        "surface":"palette.neutral.98","surfaceDim":"palette.neutral.87","surfaceBright":"palette.neutral.98","surfaceContainerLowest":"palette.neutral.100","surfaceContainerLow":"palette.neutral.96","surfaceContainer":"palette.neutral.94","surfaceContainerHigh":"palette.neutral.92","surfaceContainerHighest":"palette.neutral.90","onSurface":"palette.neutral.0","onSurfaceVariant":"palette.neutralVariant.20","surfaceVariant":"palette.neutralVariant.90","surfaceTint":"role.primary","outline":"palette.neutralVariant.30","outlineVariant":"palette.neutralVariant.50",
+        "inverseSurface":"palette.neutral.20","inverseOnSurface":"palette.neutral.100","inversePrimary":"palette.primary.80","background":"palette.neutral.98","onBackground":"palette.neutral.0","scrim":"palette.neutral.0","shadow":"palette.neutral.0"
+      }
+    },
+    "darkHigh": {
+      "module": "md-sys-color__dark__high-contrast",
+      "file": "_md-sys-color__dark__high-contrast.scss",
+      "roles": {
+        "primary":"palette.primary.95","onPrimary":"palette.primary.0","primaryContainer":"palette.primary.80","onPrimaryContainer":"palette.primary.0","primaryFixed":"palette.primary.90","primaryFixedDim":"palette.primary.80","onPrimaryFixed":"palette.primary.0","onPrimaryFixedVariant":"palette.primary.0",
+        "secondary":"palette.secondary.95","onSecondary":"palette.secondary.0","secondaryContainer":"palette.secondary.80","onSecondaryContainer":"palette.secondary.0","secondaryFixed":"palette.secondary.90","secondaryFixedDim":"palette.secondary.80","onSecondaryFixed":"palette.secondary.0","onSecondaryFixedVariant":"palette.secondary.0",
+        "tertiary":"palette.tertiary.95","onTertiary":"palette.tertiary.0","tertiaryContainer":"palette.tertiary.80","onTertiaryContainer":"palette.tertiary.0","tertiaryFixed":"palette.tertiary.90","tertiaryFixedDim":"palette.tertiary.80","onTertiaryFixed":"palette.tertiary.0","onTertiaryFixedVariant":"palette.tertiary.0",
+        "error":"palette.error.95","onError":"palette.error.0","errorContainer":"palette.error.80","onErrorContainer":"palette.error.0",
+        "surface":"palette.neutral.6","surfaceDim":"palette.neutral.6","surfaceBright":"palette.neutral.24","surfaceContainerLowest":"palette.neutral.4","surfaceContainerLow":"palette.neutral.10","surfaceContainer":"palette.neutral.12","surfaceContainerHigh":"palette.neutral.17","surfaceContainerHighest":"palette.neutral.22","onSurface":"palette.neutral.100","onSurfaceVariant":"palette.neutralVariant.100","surfaceVariant":"palette.neutralVariant.30","surfaceTint":"role.primary","outline":"palette.neutralVariant.95","outlineVariant":"palette.neutralVariant.80",
+        "inverseSurface":"palette.neutral.90","inverseOnSurface":"palette.neutral.0","inversePrimary":"palette.primary.20","background":"palette.neutral.6","onBackground":"palette.neutral.100","scrim":"palette.neutral.0","shadow":"palette.neutral.0"
+      }
+    },
+    "darkMedium": {
+      "module": "md-sys-color__dark__medium-contrast",
+      "file": "_md-sys-color__dark__medium-contrast.scss",
+      "roles": {
+        "primary":"palette.primary.90","onPrimary":"palette.primary.10","primaryContainer":"palette.primary.60","onPrimaryContainer":"palette.primary.0","primaryFixed":"palette.primary.90","primaryFixedDim":"palette.primary.80","onPrimaryFixed":"palette.primary.0","onPrimaryFixedVariant":"palette.primary.20",
+        "secondary":"palette.secondary.90","onSecondary":"palette.secondary.10","secondaryContainer":"palette.secondary.60","onSecondaryContainer":"palette.secondary.0","secondaryFixed":"palette.secondary.90","secondaryFixedDim":"palette.secondary.80","onSecondaryFixed":"palette.secondary.0","onSecondaryFixedVariant":"palette.secondary.20",
+        "tertiary":"palette.tertiary.90","onTertiary":"palette.tertiary.10","tertiaryContainer":"palette.tertiary.60","onTertiaryContainer":"palette.tertiary.0","tertiaryFixed":"palette.tertiary.90","tertiaryFixedDim":"palette.tertiary.80","onTertiaryFixed":"palette.tertiary.0","onTertiaryFixedVariant":"palette.tertiary.20",
+        "error":"palette.error.90","onError":"palette.error.10","errorContainer":"palette.error.60","onErrorContainer":"palette.error.0",
+        "surface":"palette.neutral.6","surfaceDim":"palette.neutral.6","surfaceBright":"palette.neutral.24","surfaceContainerLowest":"palette.neutral.4","surfaceContainerLow":"palette.neutral.10","surfaceContainer":"palette.neutral.12","surfaceContainerHigh":"palette.neutral.17","surfaceContainerHighest":"palette.neutral.22","onSurface":"palette.neutral.100","onSurfaceVariant":"palette.neutralVariant.90","surfaceVariant":"palette.neutralVariant.30","surfaceTint":"role.primary","outline":"palette.neutralVariant.70","outlineVariant":"palette.neutralVariant.60",
+        "inverseSurface":"palette.neutral.90","inverseOnSurface":"palette.neutral.10","inversePrimary":"palette.primary.30","background":"palette.neutral.6","onBackground":"palette.neutral.100","scrim":"palette.neutral.0","shadow":"palette.neutral.0"
+      }
+    }
+  }
+}

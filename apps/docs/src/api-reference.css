@@ -1,0 +1,121 @@
+.docs-api-reference {
+  display: block;
+  margin-block: 1.5rem;
+  overflow: hidden;
+  border-radius: 1.5rem;
+}
+
+.docs-api-reference__content {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.docs-api-reference__content > h3,
+.docs-api-reference__content > p,
+.docs-api-reference__props > h4,
+.docs-api-reference__source {
+  margin: 0;
+}
+
+.docs-api-reference__eyebrow {
+  color: var(--primary);
+}
+
+.docs-api-reference__signatures {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.docs-api-reference__signatures pre {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  background: var(--surface-container-high);
+}
+
+.docs-api-reference__signatures code,
+.docs-api-reference__table code,
+.docs-api-reference__source code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.docs-api-reference__annotations {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.docs-api-reference__annotations > div {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) 1fr;
+  gap: 0.75rem;
+}
+
+.docs-api-reference__annotations dt {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.docs-api-reference__annotations dd {
+  margin: 0;
+}
+
+.docs-api-reference__props {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.docs-api-reference__table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.docs-api-reference__table {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.docs-api-reference__table th,
+.docs-api-reference__table td {
+  padding: 0.75rem;
+  border-block-end: 1px solid var(--outline-variant);
+  vertical-align: top;
+  text-align: start;
+}
+
+.docs-api-reference__table th {
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+
+.docs-api-reference__table td:nth-child(2) code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.docs-api-reference__required {
+  margin-inline-start: 0.125rem;
+  color: var(--error);
+}
+
+.docs-api-reference__inherited {
+  min-width: 0;
+}
+
+.docs-api-reference__inherited summary {
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.docs-api-reference__inherited[open] summary {
+  margin-block-end: 0.75rem;
+}
+
+.docs-api-reference__source {
+  color: var(--on-surface-variant);
+}

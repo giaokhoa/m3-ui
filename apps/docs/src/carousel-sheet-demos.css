@@ -1,0 +1,54 @@
+.docs-carousel-demo {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.docs-carousel-demo__item {
+  align-items: center;
+  block-size: 168px;
+  box-sizing: border-box;
+  display: flex;
+  inline-size: 100%;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.docs-bottom-sheet-demo__stage {
+  background: var(--surface);
+  block-size: 420px;
+  color: var(--on-surface);
+  inline-size: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.docs-bottom-sheet-demo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.docs-bottom-sheet-demo__background {
+  color: var(--on-surface-variant);
+  max-inline-size: 36rem;
+  padding: 0 16px;
+}
+
+.docs-bottom-sheet-demo__body {
+  display: grid;
+  gap: 12px;
+  min-block-size: 300px;
+  padding: 0 24px 24px;
+}
+
+.docs-bottom-sheet-demo__body p {
+  margin: 0;
+}
+
+.docs-bottom-sheet-demo__modal-trigger {
+  display: flex;
+  justify-content: flex-start;
+}

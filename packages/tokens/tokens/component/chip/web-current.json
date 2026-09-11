@@ -1,0 +1,29 @@
+{
+  "component": {
+    "chip": {
+      "variant": {
+        "assist": {
+          "focusOutlineColor": { "$type": "string", "$value": "var(--on-surface)" }
+        },
+        "suggestion": {
+          "focusOutlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" }
+        },
+        "filter": {
+          "unselectedFocusOutlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedHoveredElevation": { "$type": "string", "$value": "level0" },
+          "selectedPressedStateLayerColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "unselectedPressedStateLayerColor": { "$type": "string", "$value": "var(--on-secondary-container)" }
+        },
+        "input": {
+          "unselectedFocusOutlineColor": { "$type": "string", "$value": "var(--on-surface-variant)" },
+          "selectedDraggedLeadingIconColor": { "$type": "string", "$value": "var(--on-secondary-container)" },
+          "unselectedFocusLeadingIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "unselectedHoverLeadingIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "unselectedPressedLeadingIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "selectedDraggedTrailingIconColor": { "$type": "string", "$value": "var(--primary)" },
+          "unselectedDraggedTrailingIconColor": { "$type": "string", "$value": "var(--primary)" }
+        }
+      }
+    }
+  }
+}

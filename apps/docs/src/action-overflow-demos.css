@@ -1,0 +1,52 @@
+.docs-action-overflow__toggle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.docs-action-overflow__toggle-grid svg,
+.docs-action-overflow__fab-stage svg {
+  inline-size: 24px;
+  block-size: 24px;
+}
+
+.docs-action-overflow__fab-stage {
+  position: relative;
+  min-block-size: 320px;
+}
+
+.docs-action-overflow__fab-anchor {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-end: 0;
+}
+
+.docs-action-overflow__output {
+  display: block;
+  color: var(--on-surface-variant);
+  margin-block-end: 12px;
+}
+
+.docs-action-overflow__app-bars {
+  display: grid;
+  gap: 20px;
+}
+
+.docs-action-overflow__row-host {
+  inline-size: 176px;
+  border: 1px solid var(--outline-variant);
+}
+
+.docs-action-overflow__column-host {
+  block-size: 168px;
+  inline-size: max-content;
+  border: 1px solid var(--outline-variant);
+}
+
+.docs-action-overflow__tiny-icon {
+  display: grid;
+  inline-size: 24px;
+  block-size: 24px;
+  place-items: center;
+}
