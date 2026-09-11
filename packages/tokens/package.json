@@ -21,13 +21,20 @@
     "directory": "packages/tokens"
   },
   "type": "module",
-  "sideEffects": false,
-  "files": ["dist"],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/generated/tokens.js",
   "module": "./dist/generated/tokens.js",
   "types": "./dist/generated/tokens.d.ts",
   "exports": {
-    ".": {"types": "./dist/generated/tokens.d.ts", "import": "./dist/generated/tokens.js"},
+    ".": {
+      "types": "./dist/generated/tokens.d.ts",
+      "import": "./dist/generated/tokens.js"
+    },
     "./*.css": "./dist/generated/*.css"
   },
   "scripts": {
@@ -114,5 +121,7 @@
     "coverage:material-web:complete": "node scripts/coverage-material-web.mjs --require-complete",
     "coverage:union:complete": "node scripts/coverage-union.mjs --require-complete"
   },
-  "devDependencies": {"style-dictionary": "5.5.2"}
+  "devDependencies": {
+    "style-dictionary": "5.5.2"
+  }
 }
