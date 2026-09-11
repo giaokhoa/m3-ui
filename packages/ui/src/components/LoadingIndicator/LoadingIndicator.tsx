@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
   useEffect,
-  useState,
+  useRef,
   useSyncExternalStore,
   type CSSProperties,
 } from 'react';
@@ -60,28 +60,6 @@ function usePrefersReducedMotion(): boolean {
   );
 }
 
-function useAnimationClock(enabled: boolean): number {
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    if (!enabled || typeof requestAnimationFrame === 'undefined') {
-      setElapsed(0);
-      return undefined;
-    }
-
-    let frame = 0;
-    let start: number | undefined;
-    const tick = (now: number) => {
-      start ??= now;
-      setElapsed(now - start);
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [enabled]);
-
-  return elapsed;
-}
 
 interface MaterialLoadingProps
   extends Omit<
@@ -110,7 +88,8 @@ export interface ContainedLoadingIndicatorProps extends MaterialLoadingProps {
 function LoadingVisual({ value }: { value?: number }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const indeterminate = value === undefined;
-  const elapsed = useAnimationClock(indeterminate && !prefersReducedMotion);
+  const groupRef = useRef<SVGGElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const size = loadingIndicatorTokens.containerWidth;
 
   let path = '';
@@ -134,15 +113,56 @@ function LoadingVisual({ value }: { value?: number }) {
     );
     rotation = -progress * loadingIndicatorRuntime.determinateRotation;
   } else {
-    const frame = indeterminateLoadingFrame(elapsed, indeterminateMorphs.length);
+    const initialFrame = indeterminateLoadingFrame(0, indeterminateMorphs.length);
     path = processedMorphPath(
-      indeterminateMorphs[frame.morphIndex],
-      frame.morphProgress,
+      indeterminateMorphs[initialFrame.morphIndex],
+      initialFrame.morphProgress,
       size,
       indeterminateScaleFactor,
     );
-    rotation = frame.rotation;
+    rotation = initialFrame.rotation;
   }
+
+  useEffect(() => {
+    if (!indeterminate) return undefined;
+
+    const group = groupRef.current;
+    const activePath = pathRef.current;
+    if (!group || !activePath) return undefined;
+
+    const renderFrame = (elapsed: number) => {
+      const frame = indeterminateLoadingFrame(elapsed, indeterminateMorphs.length);
+      activePath.setAttribute(
+        'd',
+        processedMorphPath(
+          indeterminateMorphs[frame.morphIndex],
+          frame.morphProgress,
+          size,
+          indeterminateScaleFactor,
+        ),
+      );
+      group.setAttribute(
+        'transform',
+        `rotate(${frame.rotation} ${size / 2} ${size / 2})`,
+      );
+    };
+
+    if (prefersReducedMotion || typeof requestAnimationFrame === 'undefined') {
+      renderFrame(0);
+      return undefined;
+    }
+
+    let animationFrame = 0;
+    let start: number | undefined;
+    const tick = (now: number) => {
+      start ??= now;
+      renderFrame(now - start);
+      animationFrame = requestAnimationFrame(tick);
+    };
+
+    animationFrame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [indeterminate, prefersReducedMotion, size]);
 
   return (
     <svg
@@ -150,8 +170,15 @@ function LoadingVisual({ value }: { value?: number }) {
       className="loading-indicator__svg"
       viewBox={`0 0 ${size} ${size}`}
     >
-      <g transform={`rotate(${rotation} ${size / 2} ${size / 2})`}>
-        <path className="loading-indicator__active" d={path} />
+      <g
+        ref={groupRef}
+        transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
+      >
+        <path
+          ref={pathRef}
+          className="loading-indicator__active"
+          d={path}
+        />
       </g>
     </svg>
   );
