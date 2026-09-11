@@ -21,7 +21,7 @@ Semantic colors alias `color.role.*`, so `ThemeProvider sourceColor` updates Sli
 
 Pinned references:
 
-- AndroidX Compose Material3 `Slider.kt`: `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
+- AndroidX Compose Material3 `Slider.kt`: `059f5aff7b57aa6dc164065e53c55934bec4ee22`.
 - Material Web public slider adapter: `cac97678831d48d4eb4a606ca50f92673a1dc20c`.
 - Material Web generated tokens: 34.0.21.
 

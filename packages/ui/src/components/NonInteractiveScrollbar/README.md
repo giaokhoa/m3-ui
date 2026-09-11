@@ -3,7 +3,7 @@
 ## Sources
 
 - AndroidX source of truth: `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Scrollbar.kt`
-- AndroidX revision: `8a166498189e52db64ed8b3dcce776fa0bcba28e`
+- AndroidX revision: `059f5aff7b57aa6dc164065e53c55934bec4ee22`
 - Relevant AndroidX tests: `compose/material3/material3/src/androidDeviceTest/kotlin/androidx/compose/material3/ScrollbarTest.kt`
 - Material Web audit revision: `cac97678831d48d4eb4a606ca50f92673a1dc20c`
 

@@ -2,7 +2,7 @@
 
 ## Source boundary
 
-- AndroidX Compose Material3 source of truth: `FloatingActionButtonMenu.kt` at `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
+- AndroidX Compose Material3 source of truth: `FloatingActionButtonMenu.kt` at `059f5aff7b57aa6dc164065e53c55934bec4ee22`.
 - Token references reviewed from that source: `FabMenuBaselineTokens`, `FabBaselineTokens`, `FabMediumTokens`, `FabLargeTokens`, `FabPrimaryContainerTokens`, and `MotionSchemeKeyTokens`.
 - Material Web audit/reference revision: `cac97678831d48d4eb4a606ca50f92673a1dc20c`.
 - Canonical repo build inputs remain `packages/tokens/tokens/**/*.json` through Style Dictionary. This component does not mutate canonical tokens.

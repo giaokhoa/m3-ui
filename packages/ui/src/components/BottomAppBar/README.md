@@ -4,7 +4,7 @@ Read this file before changing BottomAppBar elevation, container color, or Surfa
 
 ## AndroidX rendering contract
 
-The pinned AndroidX Material 3 source at `8a166498189e52db64ed8b3dcce776fa0bcba28e` passes BottomAppBar `tonalElevation` to `Surface`. `Surface` has separate `tonalElevation` and `shadowElevation` parameters, and its `shadowElevation` default is `0.dp`.
+The pinned AndroidX Material 3 source at `059f5aff7b57aa6dc164065e53c55934bec4ee22` passes BottomAppBar `tonalElevation` to `Surface`. `Surface` has separate `tonalElevation` and `shadowElevation` parameters, and its `shadowElevation` default is `0.dp`.
 
 Therefore BottomAppBar `ContainerElevation` is **tonal elevation**, not a request for a drop shadow. Do not translate `BottomAppBarTokens.ContainerElevation` or the public `tonalElevation` override into `getElevationBoxShadow()` or `<Elevation>`.
 

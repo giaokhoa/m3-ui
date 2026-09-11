@@ -7,8 +7,8 @@
     "kind": "implementation-reference",
     "name": "AndroidX Compose Material3",
     "repository": "androidx/androidx",
-    "revision": "8a166498189e52db64ed8b3dcce776fa0bcba28e",
-    "revisionAt": "2026-09-10T07:43:25Z",
+    "revision": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+    "revisionAt": "2026-09-10T23:49:53Z",
     "files": [
       {
         "path": "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/MotionTokens.kt",

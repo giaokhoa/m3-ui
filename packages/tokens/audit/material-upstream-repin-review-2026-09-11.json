@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-11T03:58:09Z",
+  "issue": 365,
+  "sources": {
+    "compose": {
+      "repository": "androidx/androidx",
+      "fromRevision": "8a166498189e52db64ed8b3dcce776fa0bcba28e",
+      "fromRevisionAt": "2026-09-10T07:43:25Z",
+      "toRevision": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+      "toRevisionAt": "2026-09-10T23:49:53Z",
+      "scopeHeads": {
+        "core": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+        "adaptive": "1606adf0448db3b94758f3734111cb3a26976236",
+        "adaptive-navigation-suite": "1606adf0448db3b94758f3734111cb3a26976236"
+      },
+      "candidateContainsAllScopeHeads": true,
+      "tokenRootChanged": false,
+      "tokenRootEvidence": "No files under compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens changed between the previous reviewed pin and the selected candidate. The only reviewed Material3 source deltas are a TimePicker sample-state fix and ListItemDefaults ContentPadding evaluation timing.",
+      "canonicalDtcgChanged": false,
+      "generatedTokenCssChanged": false
+    },
+    "materialWeb": {
+      "repository": "material-components/material-web",
+      "reviewedRevision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+      "reviewedRevisionAt": "2026-08-21T19:30:42Z",
+      "latestTokenScopeRevision": "763a97326fc2d0f425366cc3fa87bd0eccfaabdc",
+      "latestTokenScopeRevisionAt": "2026-04-06T22:01:50Z",
+      "relationToReviewedRevision": "behind",
+      "rePinRequired": false,
+      "tokenRootChanged": false
+    }
+  },
+  "deltas": [
+    {
+      "id": "time-picker-sample-saveable-state",
+      "upstreamRevision": "0dabeb2872174c2f434dfa9ba0e93a744076916b",
+      "surface": "TimePicker sample rememberSaveable state representation",
+      "disposition": "no-observable-m3-ui-impact",
+      "reason": "AndroidX changes only sample SaveableStateRegistry plumbing: the sample stores a primitive Boolean instead of boxed TimePickerDisplayMode so rememberSaveable can restore it. m3-ui owns TimePicker state through React/browser state and does not port Compose saveable-state mechanics.",
+      "evidence": [
+        "packages/ui/src/components/TimePicker/TimePicker.tsx",
+        "apps/storybook/visual/time-picker-interaction.visual.spec.ts"
+      ]
+    },
+    {
+      "id": "list-item-content-padding-getter",
+      "upstreamRevision": "e8bbe8962463b7b89bf5d81860102f27ec5db3e1",
+      "surface": "ListItemDefaults ContentPadding evaluation timing",
+      "disposition": "documented-adaptation-remains-valid",
+      "reason": "AndroidX changes ContentPadding from an initialized value to a getter so the existing Compose precision-pointer sizing flag is read dynamically. The padding values and List token references are unchanged. m3-ui does not expose Kotlin ListItemDefaults or Compose precision-pointer sizing state, so this internal evaluation-timing fix does not justify a new web pointer-density API or canonical spacing change.",
+      "evidence": [
+        "packages/ui/src/components/ListItem/README.md",
+        "packages/tokens/tokens/component/list.json"
+      ]
+    }
+  ],
+  "reviewDecision": {
+    "composeRePin": true,
+    "materialWebRePin": false,
+    "canonicalTokenRegeneration": false,
+    "productionChanges": [],
+    "parentsRemainOpen": [
+      363
+    ]
+  }
+}
