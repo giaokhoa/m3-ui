@@ -67,15 +67,27 @@ async function assertFiles(root, paths) {
   }
 }
 
+async function listRelativeFiles(root) {
+  return (await readdir(root, { recursive: true })).map((path) => path.replaceAll('\\', '/'));
+}
+
 async function assertNoInternalTestDeclarations(root) {
-  const files = (await readdir(root, { recursive: true })).map((path) => path.replaceAll('\\', '/'));
-  const leaked = files
+  const leaked = (await listRelativeFiles(root))
     .filter((path) => /(?:^|\/)[^/]+\.(?:test|spec|stor(?:y|ies))\.d\.ts(?:\.map)?$/i.test(path))
     .sort();
   assert.deepEqual(
     leaked,
     [],
     `packed UI artifact must not contain internal test/spec/story declarations: ${leaked.join(', ')}`,
+  );
+}
+
+async function assertNoDeclarationMaps(root) {
+  const leaked = (await listRelativeFiles(root)).filter((path) => path.endsWith('.d.ts.map')).sort();
+  assert.deepEqual(
+    leaked,
+    [],
+    `packed UI artifact must not contain declaration maps without shipped source files: ${leaked.join(', ')}`,
   );
 }
 
@@ -130,6 +142,7 @@ try {
     'dist/styles/button.css',
   ]);
   await assertNoInternalTestDeclarations(uiPacked.packageRoot);
+  await assertNoDeclarationMaps(uiPacked.packageRoot);
 
   const react = await readJson(join(repoRoot, 'packages/ui/node_modules/react/package.json'));
   const reactDom = await readJson(join(repoRoot, 'packages/ui/node_modules/react-dom/package.json'));
