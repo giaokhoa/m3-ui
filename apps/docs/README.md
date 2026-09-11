@@ -121,7 +121,7 @@ Do not copy generated signatures or prop rows into MDX. If the generated output 
 - `createFromSource(source).staticGET()` exports the built-in ZBSearch database to `public/search-index.json`;
 - Next.js bundles the generated navigation JSON, while the static search database is served from `public/`.
 
-`DocsSearch` queries the static database with `useDocsSearch()` and `staticClient()` from `fumadocs-core`. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the desktop rail action uses `FilledTonalIconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
+`DocsSearch` keeps the always-visible top-app-bar/rail trigger lightweight. Activating it lazy-loads `DocsSearchDialog`, which owns `useDocsSearch()` and `staticClient()` from `fumadocs-core`; the search index is still fetched only after a query needs it. The visible search experience remains Material UI: the top-app-bar action uses `IconButton`, the desktop rail action uses `FilledTonalIconButton`, the expanded surface uses `ExpandedFullScreenSearchBar` and `SearchBarInput`, and result visuals use `ListItem` inside semantic links.
 
 Do not add a second client-side search implementation for titles or manually parsed MDX. If Fumadocs data cannot be generated, fix the source/data pipeline instead.
 

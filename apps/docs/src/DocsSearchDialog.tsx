@@ -1,0 +1,109 @@
+'use client';
+
+import { useMemo } from 'react';
+import Link from 'next/link';
+import { useDocsSearch } from 'fumadocs-core/search/client';
+import { staticClient } from 'fumadocs-core/search/client/orama-static';
+import {
+  ExpandedFullScreenSearchBar,
+  ListItem,
+  SearchBarInput,
+  getMaterialTypeCssProperties,
+  useSearchBarState,
+} from '@m3-ui/ui';
+import { SearchGlyph } from './DocsSearch';
+import './docs-search.css';
+
+const searchClient = staticClient({
+  from: '/search-index.json',
+});
+
+function plainSearchText(value: string): string {
+  return value.replace(/<\/?mark>/g, '');
+}
+
+function SearchStatus({ children }: { children: string }) {
+  return (
+    <p
+      className="docs-search__status"
+      style={getMaterialTypeCssProperties('bodyMedium')}
+    >
+      {children}
+    </p>
+  );
+}
+
+export function DocsSearchDialog({ onDismiss }: { onDismiss: () => void }) {
+  const state = useSearchBarState('expanded');
+  const { search, setSearch, query } = useDocsSearch({ client: searchClient });
+  const results = query.data === 'empty' || query.data == null ? [] : query.data;
+  const trimmedSearch = search.trim();
+  const inputField = useMemo(
+    () => (
+      <SearchBarInput
+        aria-label="Search documentation"
+        clearable
+        leadingIcon={<SearchGlyph />}
+        placeholder="Search documentation"
+        state={state}
+        value={search}
+        onValueChange={setSearch}
+      />
+    ),
+    [search, setSearch, state],
+  );
+
+  const dismiss = () => {
+    setSearch('');
+    onDismiss();
+  };
+
+  return (
+    <ExpandedFullScreenSearchBar
+      className="docs-search"
+      inputField={inputField}
+      state={state}
+      onDismiss={dismiss}
+    >
+      <div className="docs-search__results" aria-live="polite">
+        {trimmedSearch.length === 0 ? (
+          <SearchStatus>
+            Search the documentation by component, foundation, or API.
+          </SearchStatus>
+        ) : query.isLoading ? (
+          <SearchStatus>Searching…</SearchStatus>
+        ) : query.error ? (
+          <SearchStatus>
+            Search is unavailable. Try again after reloading the page.
+          </SearchStatus>
+        ) : results.length === 0 ? (
+          <SearchStatus>No documentation results found.</SearchStatus>
+        ) : (
+          results.map((result) => {
+            const breadcrumbs = result.breadcrumbs
+              ?.map(plainSearchText)
+              .filter(Boolean)
+              .join(' / ');
+            const content = plainSearchText(result.content);
+
+            return (
+              <Link
+                className="docs-search__result-link"
+                href={result.url}
+                key={result.id}
+                onClick={dismiss}
+              >
+                <ListItem
+                  overline={breadcrumbs}
+                  supportingText={result.type === 'page' ? undefined : result.type}
+                >
+                  {content}
+                </ListItem>
+              </Link>
+            );
+          })
+        )}
+      </div>
+    </ExpandedFullScreenSearchBar>
+  );
+}

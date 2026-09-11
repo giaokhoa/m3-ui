@@ -5,7 +5,7 @@ import { gzipSync } from 'node:zlib';
 const appDir = resolve(import.meta.dirname, '..');
 const serverAppDir = resolve(appDir, '.next/server/app');
 const chunksDir = resolve(appDir, '.next/static/chunks');
-const maxInitialJsGzipBytes = 600 * 1024;
+const maxInitialJsGzipBytes = 480 * 1024;
 
 async function filesUnder(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -46,7 +46,8 @@ if (htmlFiles.length === 0) {
   throw new Error('No prerendered docs HTML found; run the production docs build first.');
 }
 
-const gzipBytesByChunk = new Map();
+const chunkStatsByName = new Map();
+const deferredSearchEndpoint = '/search-index.json';
 let largest = { route: '', bytes: 0 };
 
 for (const htmlFile of htmlFiles) {
@@ -54,13 +55,24 @@ for (const htmlFile of htmlFiles) {
   let bytes = 0;
 
   for (const chunkName of chunkReferences(html)) {
-    let gzipBytes = gzipBytesByChunk.get(chunkName);
-    if (gzipBytes === undefined) {
+    let stats = chunkStatsByName.get(chunkName);
+    if (stats === undefined) {
       const chunk = await readFile(resolve(chunksDir, chunkName));
-      gzipBytes = gzipSync(chunk, { level: 9 }).byteLength;
-      gzipBytesByChunk.set(chunkName, gzipBytes);
+      stats = {
+        gzipBytes: gzipSync(chunk, { level: 9 }).byteLength,
+        source: chunk.toString('utf8'),
+      };
+      chunkStatsByName.set(chunkName, stats);
     }
-    bytes += gzipBytes;
+
+    if (stats.source.includes(deferredSearchEndpoint)) {
+      throw new Error(
+        `${routeForHtml(htmlFile)} includes the search index endpoint in initial JavaScript; ` +
+          'search runtime must load only after search activation.',
+      );
+    }
+
+    bytes += stats.gzipBytes;
   }
 
   const route = routeForHtml(htmlFile);
