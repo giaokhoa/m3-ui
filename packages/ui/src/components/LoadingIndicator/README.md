@@ -47,4 +47,4 @@ Indeterminate mode cycles:
 
 `SoftBurst → Cookie9Sided → Pentagon → Pill → Sunny → Cookie4Sided → Oval → SoftBurst`.
 
-`prefers-reduced-motion: reduce` freezes the indeterminate renderer at its initial frame while preserving progress semantics.
+`prefers-reduced-motion: reduce` freezes the indeterminate renderer at its initial frame while preserving progress semantics. The indeterminate frame clock updates stable SVG DOM refs directly, so animation frames do not schedule React reconciliation.

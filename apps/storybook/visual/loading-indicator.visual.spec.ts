@@ -10,8 +10,44 @@ async function openStory(page: Page, id: string) {
   await expect(page.locator('#storybook-root')).toBeVisible();
 }
 
+async function installReactCommitCounter(page: Page) {
+  await page.addInitScript(() => {
+    const runtime = window as Window & {
+      __loadingIndicatorReactCommits?: number;
+      __REACT_DEVTOOLS_GLOBAL_HOOK__?: {
+        supportsFiber: boolean;
+        inject: () => number;
+        onCommitFiberRoot: () => void;
+        onCommitFiberUnmount: () => void;
+      };
+    };
+    let nextRendererId = 1;
+    runtime.__loadingIndicatorReactCommits = 0;
+    runtime.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+      supportsFiber: true,
+      inject: () => nextRendererId++,
+      onCommitFiberRoot: () => {
+        runtime.__loadingIndicatorReactCommits =
+          (runtime.__loadingIndicatorReactCommits ?? 0) + 1;
+      },
+      onCommitFiberUnmount: () => {},
+    };
+  });
+}
+
+async function reactCommitCount(page: Page) {
+  return page.evaluate(
+    () =>
+      (window as Window & { __loadingIndicatorReactCommits?: number })
+        .__loadingIndicatorReactCommits ?? 0,
+  );
+}
 test.describe('Material 3 LoadingIndicator browser contract', () => {
-  test('indeterminate semantics and canonical 48px container', async ({ page }) => {
+  test('indeterminate animation advances without per-frame React commits', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await installReactCommitCounter(page);
     await openStory(page, 'components-loadingindicator--default');
     const progress = page.getByRole('progressbar', { name: 'Loading' });
     const box = await progress.boundingBox();
@@ -20,7 +56,23 @@ test.describe('Material 3 LoadingIndicator browser contract', () => {
     await expect(progress).not.toHaveAttribute('aria-valuenow');
     expect(box?.width).toBe(48);
     expect(box?.height).toBe(48);
-    await expect(progress.locator('path')).toHaveAttribute('d', /^M.+Z$/);
+    const visual = progress.locator('svg');
+    await expect(visual.locator('path')).toHaveAttribute('d', /^M.+Z$/);
+    await page.waitForTimeout(100);
+    const beforeCommits = await reactCommitCount(page);
+    const before = await visual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    await page.waitForTimeout(180);
+    const after = await visual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    const afterCommits = await reactCommitCount(page);
+
+    expect(after).not.toEqual(before);
+    expect(afterCommits).toBe(beforeCommits);
   });
 
   test('determinate mode keeps RAC range semantics and morphs across progress', async ({ page }) => {
