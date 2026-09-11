@@ -60,6 +60,18 @@ async function assertFiles(root, paths) {
   }
 }
 
+async function assertNoInternalTestDeclarations(root) {
+  const files = (await readdir(root, { recursive: true })).map((path) => path.replaceAll('\\', '/'));
+  const leaked = files
+    .filter((path) => /(?:^|\/)[^/]+\.(?:test|spec|stor(?:y|ies))\.d\.ts(?:\.map)?$/i.test(path))
+    .sort();
+  assert.deepEqual(
+    leaked,
+    [],
+    `packed UI artifact must not contain internal test/spec/story declarations: ${leaked.join(', ')}`,
+  );
+}
+
 async function sha256(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
 }
@@ -108,6 +120,7 @@ try {
     'dist/styles.css',
     'dist/styles/button.css',
   ]);
+  await assertNoInternalTestDeclarations(uiPacked.packageRoot);
 
   const react = await readJson(join(repoRoot, 'packages/ui/node_modules/react/package.json'));
   const reactDom = await readJson(join(repoRoot, 'packages/ui/node_modules/react-dom/package.json'));
