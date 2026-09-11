@@ -9,7 +9,7 @@
     "ghcr.io/devcontainers/features/github-cli:1.1.2": {}
   },
   "mounts": [
-    "source=m3-ui-github-cli-config,target=/home/vscode/.config/gh,type=volume",
+    "source=github-cli-config,target=/home/vscode/.config/gh,type=volume",
     "source=m3-ui-desktop-commander-config,target=/home/vscode/.desktop-commander,type=volume",
     "source=m3-ui-desktop-commander-device,target=/home/vscode/.desktop-commander-device,type=volume"
   ],

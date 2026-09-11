@@ -163,7 +163,7 @@ Nested providers and Material overlays share the same theme through the themed p
 
 The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 10.0.0, installs GitHub CLI, installs Desktop Commander Remote, installs the workspace with the frozen lockfile, and installs the Playwright Chromium headless shell plus Linux dependencies.
 
-The m3-ui devcontainer uses its own persistent Docker volumes for GitHub CLI and Desktop Commander state. These volumes are deliberately separate from other repositories/devcontainers.
+The m3-ui devcontainer intentionally reuses the shared `github-cli-config` Docker volume for GitHub CLI authentication, while Desktop Commander config/device state stays in m3-ui-specific volumes so remote devices remain isolated per devcontainer.
 
 With VS Code and Dev Containers:
 
@@ -175,7 +175,7 @@ With VS Code and Dev Containers:
 6. Reopen/restart the container as needed; the post-start hook will reuse the persisted m3-ui device credential and start the remote agent automatically.
 7. Run `pnpm dev` or a package-level command above.
 
-Do not copy `gh` or Desktop Commander credential files into the repository.
+Do not copy `gh` or Desktop Commander credential files into the repository. GitHub CLI auth is shared through the persistent `github-cli-config` volume; Desktop Commander credentials remain isolated in the m3-ui-specific device volume.
 
 ## Agent instructions
 
