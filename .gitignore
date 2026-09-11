@@ -4,3 +4,10 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Agent skills restored from skills-lock.json
+.agents/skills/*
+!.agents/skills/material3-parity/
+!.agents/skills/material3-parity/**
+!.agents/skills/style-dictionary/
+!.agents/skills/style-dictionary/**
