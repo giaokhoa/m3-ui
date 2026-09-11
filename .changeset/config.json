@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.0/schema.json",
+  "changelog": false,
+  "commit": false,
+  "fixed": [
+    [
+      "@m3-ui/ui",
+      "@m3-ui/tokens"
+    ]
+  ],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@m3-ui/docs",
+    "@m3-ui/storybook"
+  ],
+  "privatePackages": {
+    "version": true,
+    "tag": false
+  }
+}

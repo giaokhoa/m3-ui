@@ -195,6 +195,8 @@ jobs:
         run: pnpm test:package-policy
       - name: Packed external consumer smoke
         run: pnpm test:package-consumer
+      - name: Release dry run
+        run: pnpm release:dry-run
 
   visual:
     name: Visual regression (${{ matrix.shard }}/4)

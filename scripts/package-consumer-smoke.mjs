@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { access, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,6 +58,10 @@ async function assertFiles(root, paths) {
   for (const path of paths) {
     await access(join(root, path));
   }
+}
+
+async function sha256(path) {
+  return createHash('sha256').update(await readFile(path)).digest('hex');
 }
 
 const tempRoot = await mkdtemp(join(tmpdir(), 'm3-ui-package-consumer-'));
@@ -162,6 +167,38 @@ try {
     }, null, 2)}\n`,
   );
   run(npm, ['exec', '--', 'tsc', '-p', 'tsconfig.json'], { cwd: consumerDir });
+
+  if (process.env.M3_UI_PACKAGE_REPORT) {
+    const reportPath = resolve(process.env.M3_UI_PACKAGE_REPORT);
+    await writeFile(
+      reportPath,
+      `${JSON.stringify({
+        schemaVersion: 1,
+        packages: [
+          {
+            name: tokensPacked.manifest.name,
+            version: tokensPacked.manifest.version,
+            private: tokensPacked.manifest.private,
+            tarball: basename(tokensTarball),
+            sha256: await sha256(tokensTarball),
+            dependencies: tokensPacked.manifest.dependencies ?? {},
+            exports: tokensPacked.manifest.exports ?? {},
+          },
+          {
+            name: uiPacked.manifest.name,
+            version: uiPacked.manifest.version,
+            private: uiPacked.manifest.private,
+            tarball: basename(uiTarball),
+            sha256: await sha256(uiTarball),
+            dependencies: uiPacked.manifest.dependencies ?? {},
+            peerDependencies: uiPacked.manifest.peerDependencies ?? {},
+            exports: uiPacked.manifest.exports ?? {},
+          },
+        ],
+        validation: { browserBundle: true, typescript: true },
+      }, null, 2)}\n`,
+    );
+  }
 
   console.log('Packed external consumer smoke passed.');
 } finally {
