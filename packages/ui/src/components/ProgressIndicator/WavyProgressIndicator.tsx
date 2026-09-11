@@ -1,9 +1,10 @@
 import clsx from 'clsx';
-import { useId, useSyncExternalStore, type CSSProperties } from 'react';
+import { useId, type CSSProperties } from 'react';
 import {
   ProgressBar as AriaProgressBar,
   type ProgressBarProps as AriaProgressBarProps,
 } from 'react-aria-components';
+import { usePrefersReducedMotion } from '../../internal/motion/usePrefersReducedMotion';
 import {
   getProgressIndicatorStyle,
   progressIndicatorRuntime,
@@ -16,23 +17,6 @@ import {
   progressFraction,
 } from './ProgressIndicator.geometry';
 import './progress-indicator.css';
-
-function subscribeReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-  media.addEventListener('change', callback);
-  return () => media.removeEventListener('change', callback);
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    () =>
-      typeof window !== 'undefined' &&
-      Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
-    () => true,
-  );
-}
 
 export interface WavyProgressIndicatorProps {
   /** 0..1 wave amplitude multiplier. Determinate indicators use the Material lifecycle when omitted. */

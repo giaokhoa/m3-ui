@@ -5,6 +5,7 @@ import {
   CircularWavyProgressIndicator,
   LinearProgressIndicator,
   LinearWavyProgressIndicator,
+  LoadingIndicator,
   ThemeProvider,
 } from '@m3-ui/ui';
 
@@ -46,6 +47,24 @@ export const ExpressiveWavy: Story = {
       <LinearWavyProgressIndicator aria-label="Wavy linear loading" isIndeterminate />
       <CircularWavyProgressIndicator aria-label="Wavy circular 60 percent" value={0.6} />
       <CircularWavyProgressIndicator aria-label="Wavy circular loading" isIndeterminate />
+    </Row></div>
+  ),
+};
+
+export const ReducedMotionConsumers: Story = {
+  name: 'Reduced motion consumers',
+  render: () => (
+    <div className="storybook-center"><Row>
+      <LoadingIndicator aria-label="Shared reduced motion loading one" />
+      <LoadingIndicator aria-label="Shared reduced motion loading two" />
+      <CircularWavyProgressIndicator
+        aria-label="Shared reduced motion wavy determinate"
+        value={0.6}
+      />
+      <CircularWavyProgressIndicator
+        aria-label="Shared reduced motion wavy loading"
+        isIndeterminate
+      />
     </Row></div>
   ),
 };

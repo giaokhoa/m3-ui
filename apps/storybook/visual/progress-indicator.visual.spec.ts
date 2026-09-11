@@ -6,7 +6,146 @@ async function openStory(page: Page, id: string) {
   await expect(page.locator('#storybook-root')).toBeVisible();
 }
 
+async function installReducedMotionHarness(page: Page) {
+  await page.addInitScript(() => {
+    const query = '(prefers-reduced-motion: reduce)';
+    const originalMatchMedia = window.matchMedia.bind(window);
+    const listeners = new Set<(event: MediaQueryListEvent) => void>();
+    let matches = false;
+    let maxActiveListeners = 0;
+
+    const media = {
+      get matches() {
+        return matches;
+      },
+      media: query,
+      onchange: null,
+      addEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
+        if (type !== 'change') return;
+        listeners.add(listener as (event: MediaQueryListEvent) => void);
+        maxActiveListeners = Math.max(maxActiveListeners, listeners.size);
+      },
+      removeEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
+        if (type !== 'change') return;
+        listeners.delete(listener as (event: MediaQueryListEvent) => void);
+      },
+      addListener: (listener: (event: MediaQueryListEvent) => void) => {
+        listeners.add(listener);
+        maxActiveListeners = Math.max(maxActiveListeners, listeners.size);
+      },
+      removeListener: (listener: (event: MediaQueryListEvent) => void) => {
+        listeners.delete(listener);
+      },
+      dispatchEvent: () => true,
+    } as unknown as MediaQueryList;
+
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (value: string) =>
+        value === query ? media : originalMatchMedia(value),
+    });
+
+    (window as Window & {
+      __reducedMotionHarness?: {
+        set: (value: boolean) => void;
+        stats: () => { activeListeners: number; maxActiveListeners: number };
+      };
+    }).__reducedMotionHarness = {
+      set: (value) => {
+        matches = value;
+        const event = { matches, media: query } as MediaQueryListEvent;
+        for (const listener of [...listeners]) listener(event);
+      },
+      stats: () => ({
+        activeListeners: listeners.size,
+        maxActiveListeners,
+      }),
+    };
+  });
+}
+
+async function setReducedMotion(page: Page, value: boolean) {
+  await page.evaluate((next) => {
+    (window as Window & {
+      __reducedMotionHarness?: { set: (value: boolean) => void };
+    }).__reducedMotionHarness?.set(next);
+  }, value);
+}
+
+async function reducedMotionStats(page: Page) {
+  return page.evaluate(() =>
+    (window as Window & {
+      __reducedMotionHarness?: {
+        stats: () => { activeListeners: number; maxActiveListeners: number };
+      };
+    }).__reducedMotionHarness?.stats(),
+  );
+}
 test.describe('Material 3 ProgressIndicator browser contract', () => {
+  test('reduced-motion consumers share one browser listener and update together', async ({
+    page,
+  }) => {
+    await installReducedMotionHarness(page);
+    await openStory(page, 'components-progressindicator--reduced-motion-consumers');
+
+    const loading = page.getByRole('progressbar', {
+      name: 'Shared reduced motion loading one',
+    });
+    const wavy = page.getByRole('progressbar', {
+      name: 'Shared reduced motion wavy loading',
+    });
+    const loadingVisual = loading.locator('svg');
+
+    expect(await reducedMotionStats(page)).toEqual({
+      activeListeners: 1,
+      maxActiveListeners: 1,
+    });
+    await expect(wavy.locator('animate')).toHaveCount(1);
+
+    const movingBefore = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    await page.waitForTimeout(120);
+    const movingAfter = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    expect(movingAfter).not.toEqual(movingBefore);
+
+    await setReducedMotion(page, true);
+    await expect(wavy.locator('animate')).toHaveCount(0);
+    await page.waitForTimeout(30);
+    const frozenBefore = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    await page.waitForTimeout(120);
+    const frozenAfter = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    expect(frozenAfter).toEqual(frozenBefore);
+    expect(await reducedMotionStats(page)).toEqual({
+      activeListeners: 1,
+      maxActiveListeners: 1,
+    });
+
+    await setReducedMotion(page, false);
+    await expect(wavy.locator('animate')).toHaveCount(1);
+    await page.waitForTimeout(30);
+    const resumedBefore = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    await page.waitForTimeout(120);
+    const resumedAfter = await loadingVisual.evaluate((svg) => ({
+      path: svg.querySelector('path')?.getAttribute('d'),
+      transform: svg.querySelector('g')?.getAttribute('transform'),
+    }));
+    expect(resumedAfter).not.toEqual(resumedBefore);
+  });
+
   test('default range and standard linear geometry', async ({ page }) => {
     await openStory(page, 'components-progressindicator--default');
     const progress = page.getByRole('progressbar', { name: 'Loading progress' });
