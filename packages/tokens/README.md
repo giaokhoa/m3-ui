@@ -216,7 +216,7 @@ When the probe reports `newer-upstream`, treat the report as an audit target, no
 5. Change reviewed revision metadata only after that semantic triage is complete. A newer commit by itself is not sufficient evidence for a pin bump.
 6. Update snapshots, drift records, provenance, canonical tokens and generated output only where their semantics genuinely depend on the accepted delta. **Never auto-copy upstream values into canonical DTCG.** AndroidX, Material Web, Figma and other implementations remain read-only evidence, never build inputs.
 7. Run focused source/coverage/audit tests first. If implementation, canonical tokens, generated styling or a public contract changes, then require the complete normal CI matrix, including typecheck, build, docs browser and all visual shards.
-8. Record exact before/after revisions, changed source surfaces, every disposition and the relevant CI run in the reviewed re-pin issue/PR. Child implementation PRs close only their child issue; parent lifecycle rules from `AGENTS.md` still apply.
+8. Record exact before/after revisions, changed source surfaces, every disposition and the relevant CI run in a new immutable review file, then register that file in `audit/material-upstream-repin-reviews.json`. Never rewrite an older review to look like the newest pin; the index identifies the latest generation while preserving the full revision chain. Child implementation PRs close only their child issue; parent lifecycle rules from `AGENTS.md` still apply.
 
 A detected upstream delta is therefore actionable and visible, but it does not mutate or weaken the repository's reproducible Material contract.
 
