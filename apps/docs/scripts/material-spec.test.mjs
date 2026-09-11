@@ -61,14 +61,9 @@ test('Material spec output is deterministic and does not leak absolute workspace
   assert.equal(first.includes(resolve(repoRoot)), false);
 });
 
-test('MDX fixture embeds MaterialSpecTable through the shared runtime registry', async () => {
+test('MDX fixture uses MaterialSpecTable without a page-local import', async () => {
   const fixture = await readFile(resolve(scriptDir, 'fixtures/material-spec.mdx'), 'utf8');
-  const serverRegistry = await readFile(resolve(scriptDir, '../src/mdx.tsx'), 'utf8');
-  const clientRegistry = await readFile(resolve(scriptDir, '../src/mdx-client.tsx'), 'utf8');
 
   assert.match(fixture, /<MaterialSpecTable family="button" groups=\{\['size', 'shape', 'icon'\]\} \/>/);
   assert.doesNotMatch(fixture, /^\s*import\s/m);
-  assert.match(serverRegistry, /MaterialSpecTable: clientComponent\('MaterialSpecTable'\)/);
-  assert.match(clientRegistry, /import \{ MaterialSpecTable \} from '\.\/materialSpecTable';/);
-  assert.match(clientRegistry, /\bMaterialSpecTable,\s*\n/);
 });

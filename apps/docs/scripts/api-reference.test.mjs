@@ -46,14 +46,9 @@ test('API output is deterministic and does not leak absolute workspace paths', (
   assert.equal(first.includes(resolve(repoRoot)), false);
 });
 
-test('MDX fixture embeds ApiReference through the shared runtime registry', async () => {
+test('MDX fixture uses ApiReference without a page-local import', async () => {
   const fixture = await readFile(resolve(scriptDir, 'fixtures/api-reference.mdx'), 'utf8');
-  const serverRegistry = await readFile(resolve(scriptDir, '../src/mdx.tsx'), 'utf8');
-  const clientRegistry = await readFile(resolve(scriptDir, '../src/mdx-client.tsx'), 'utf8');
 
   assert.match(fixture, /<ApiReference name="Button" \/>/);
   assert.doesNotMatch(fixture, /^\s*import\s/m);
-  assert.match(serverRegistry, /ApiReference: clientComponent\('ApiReference'\)/);
-  assert.match(clientRegistry, /import \{ ApiReference \} from '\.\/apiReference';/);
-  assert.match(clientRegistry, /\bApiReference,\s*\n/);
 });

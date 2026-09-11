@@ -1,8 +1,13 @@
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentType } from 'react';
+import { ApiReference } from './apiReference';
+import { componentPageMdxComponents } from './componentPageMdxComponents';
 import { NativeSignInFormPreview } from './formDemos';
+import { MaterialSpecTable } from './materialSpecTable';
 import { MdxClientComponent } from './mdx-client';
 import { Surface } from './mdxDirectComponents';
+import { staticMdxComponents } from './mdxStaticComponents';
+import { parityMdxComponents } from './parityMdxComponents';
 
 type ClientMdxProps = Record<string, unknown>;
 
@@ -16,25 +21,12 @@ function clientComponent(name: string): ComponentType<ClientMdxProps> {
 }
 
 export const docsMdxComponents = {
-  h1: clientComponent('h1'),
-  h2: clientComponent('h2'),
-  h3: clientComponent('h3'),
-  h4: clientComponent('h4'),
-  p: clientComponent('p'),
-  li: clientComponent('li'),
-  a: clientComponent('a'),
-  code: clientComponent('code'),
-  pre: clientComponent('pre'),
-  blockquote: clientComponent('blockquote'),
-  table: clientComponent('table'),
-  th: clientComponent('th'),
-  td: clientComponent('td'),
-  ComponentPreview: clientComponent('ComponentPreview'),
+  ...staticMdxComponents,
+  ApiReference,
+  MaterialSpecTable,
+  ...componentPageMdxComponents,
+  ...parityMdxComponents,
   LiveExample: clientComponent('LiveExample'),
-  MaterialParity: clientComponent('MaterialParity'),
-  ParitySummary: clientComponent('ParitySummary'),
-  ApiReference: clientComponent('ApiReference'),
-  MaterialSpecTable: clientComponent('MaterialSpecTable'),
   ColorRoleGrid: clientComponent('ColorRoleGrid'),
   DynamicColorPreview: clientComponent('DynamicColorPreview'),
   TypeScaleSamples: clientComponent('TypeScaleSamples'),
@@ -64,14 +56,6 @@ export const docsMdxComponents = {
   DialogActions: clientComponent('DialogActions'),
   DialogAction: clientComponent('DialogAction'),
   DialogCloseAction: clientComponent('DialogCloseAction'),
-  ComponentHero: clientComponent('ComponentHero'),
-  SourceLinks: clientComponent('SourceLinks'),
-  GuidanceCallout: clientComponent('GuidanceCallout'),
-  AnatomyBlock: clientComponent('AnatomyBlock'),
-  FidelitySummary: clientComponent('FidelitySummary'),
-  RelatedComponents: clientComponent('RelatedComponents'),
-  GeneratedApiReferenceSlot: clientComponent('GeneratedApiReferenceSlot'),
-  PageSectionNote: clientComponent('PageSectionNote'),
   SearchBarPreview: clientComponent('SearchBarPreview'),
   ProgressIndicatorPreview: clientComponent('ProgressIndicatorPreview'),
   LoadingIndicatorPreview: clientComponent('LoadingIndicatorPreview'),
@@ -103,8 +87,6 @@ export const docsMdxComponents = {
   ToggleButtonPreview: clientComponent('ToggleButtonPreview'),
   FabMenuPreview: clientComponent('FabMenuPreview'),
   AppBarOverflowPreview: clientComponent('AppBarOverflowPreview'),
-  ParityCatalog: clientComponent('ParityCatalog'),
-  MaterialFidelity: clientComponent('MaterialFidelity'),
   NativeSignInFormPreview,
   Surface,
 } satisfies MDXComponents;

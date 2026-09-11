@@ -11,7 +11,7 @@
     "conformance:json": "node scripts/material-conformance.mjs --json",
     "docs:lint": "pnpm conformance:lint && node scripts/docs-conformance.mjs",
     "dev": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && next dev --hostname 0.0.0.0 --port 4173",
-    "build": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && next build",
+    "build": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && next build && node scripts/check-client-js-budget.mjs",
     "start": "next start --hostname 0.0.0.0 --port 4173",
     "test": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && pnpm docs:lint && node --test scripts/*.test.mjs scripts/material-conformance.node-tests.mjs",
     "typecheck": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && next typegen && tsc -p tsconfig.json --noEmit",

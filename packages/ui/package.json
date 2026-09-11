@@ -39,6 +39,10 @@
       "types": "./dist/layout/index.d.ts",
       "import": "./dist/layout.js"
     },
+    "./typography": {
+      "types": "./dist/theme/typography/typeScale.d.ts",
+      "import": "./dist/typography.js"
+    },
     "./styles.css": {
       "types": "./dist/css.d.ts",
       "default": "./dist/styles.css"
