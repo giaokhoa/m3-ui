@@ -20,6 +20,7 @@ export default defineConfig({
       entry: {
         index: 'src/index.ts',
         layout: 'src/layout/index.ts',
+        typography: 'src/theme/typography/typeScale.ts',
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,

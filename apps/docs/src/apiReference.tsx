@@ -1,4 +1,5 @@
-import { Surface, getMaterialTypeCssProperties } from '@m3-ui/ui';
+import { getMaterialTypeCssProperties } from '@m3-ui/ui/typography';
+import { Surface } from './mdxDirectComponents';
 import apiReferenceData from './generated/api-reference.generated.json';
 import './api-reference.css';
 
