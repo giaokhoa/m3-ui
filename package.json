@@ -10,7 +10,8 @@
     "changeset": "pnpm dlx @changesets/cli@3.0.2",
     "changeset:status": "pnpm dlx @changesets/cli@3.0.2 status",
     "release:dry-run": "node scripts/release-dry-run.mjs",
-    "test:actions-pins": "node scripts/github-actions-pin-check.mjs"
+    "test:actions-pins": "node scripts/github-actions-pin-check.mjs",
+    "test:actions-credentials": "node scripts/github-actions-credential-check.mjs"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
