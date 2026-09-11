@@ -7,6 +7,16 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  viteFinal(config) {
+    return {
+      ...config,
+      build: {
+        ...config.build,
+        // Keep the native :dir() semantics used by RTL selectors.
+        cssTarget: ['chrome120', 'edge120', 'firefox114', 'safari16.4', 'ios16.4'],
+      },
+    };
+  },
 };
 
 export default config;

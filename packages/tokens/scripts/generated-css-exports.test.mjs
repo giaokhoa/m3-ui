@@ -11,15 +11,19 @@ test('generated CSS adapters share one package export convention', async () => {
   const packageJson = JSON.parse(
     await readFile(resolve(packageRoot, 'package.json'), 'utf8'),
   );
-  assert.equal(
+  assert.deepEqual(
     packageJson.exports['./*.css'],
-    './dist/generated/*.css',
-    'generated CSS subpaths must use the wildcard export convention',
+    {
+      types: './dist/css.d.ts',
+      default: './dist/generated/*.css',
+    },
+    'generated CSS subpaths must expose runtime CSS and a TypeScript declaration',
   );
 
-  await Promise.all(
-    listCssAdapterNames().map((name) =>
+  await Promise.all([
+    access(resolve(packageRoot, 'dist/css.d.ts')),
+    ...listCssAdapterNames().map((name) =>
       access(resolve(packageRoot, `dist/generated/${name}.css`)),
     ),
-  );
+  ]);
 });
