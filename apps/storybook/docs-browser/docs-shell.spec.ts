@@ -234,6 +234,80 @@ test('top-level leaf destinations do not create an empty persistent context pane
   runtime.assertClean();
 });
 
+test('persisted theme is applied before hydration and migrates legacy storage', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.addInitScript(() => {
+    window.localStorage.setItem('m3-ui-docs-theme', 'dark');
+  });
+  await page.route('**/_next/static/chunks/*.js', (route) => route.abort());
+
+  const response = await page.goto(componentRoute, { waitUntil: 'domcontentloaded' });
+  expect(response).not.toBeNull();
+  expect(response!.status()).toBeLessThan(400);
+
+  const themeRoot = page.locator('.docs-theme[data-m3-theme]');
+  const portal = page.locator('#docs-theme-portal');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(themeRoot).toHaveAttribute('data-theme', 'dark');
+  await expect(portal).toHaveAttribute('data-theme', 'dark');
+
+  const snapshot = await page.evaluate(() => ({
+    current: window.localStorage.getItem('m3-ui-docs-theme:v1'),
+    legacy: window.localStorage.getItem('m3-ui-docs-theme'),
+    rootSurface: getComputedStyle(document.documentElement)
+      .getPropertyValue('--surface')
+      .trim(),
+    themeSurface: getComputedStyle(
+      document.querySelector<HTMLElement>('.docs-theme[data-m3-theme]')!,
+    )
+      .getPropertyValue('--surface')
+      .trim(),
+    portalSurface: getComputedStyle(
+      document.querySelector<HTMLElement>('#docs-theme-portal')!,
+    )
+      .getPropertyValue('--surface')
+      .trim(),
+  }));
+
+  expect(snapshot.current).toBe('dark');
+  expect(snapshot.legacy).toBeNull();
+  expect(snapshot.rootSurface).not.toBe('');
+  expect(snapshot.themeSurface).toBe(snapshot.rootSurface);
+  expect(snapshot.portalSurface).toBe(snapshot.rootSurface);
+});
+
+test('docs theme survives unavailable browser storage', async ({ page }) => {
+  const runtime = installRuntimeGuard(page);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() => {
+    const blocked = () => {
+      throw new DOMException('Storage blocked', 'SecurityError');
+    };
+    Object.defineProperties(Storage.prototype, {
+      getItem: { configurable: true, value: blocked },
+      setItem: { configurable: true, value: blocked },
+      removeItem: { configurable: true, value: blocked },
+    });
+  });
+
+  await openRoute(page, componentRoute, representativeViewports.expanded);
+
+  const themeRoot = page.locator('.docs-theme[data-m3-theme]');
+  const portal = page.locator('#docs-theme-portal');
+  await expect(themeRoot).toHaveAttribute('data-theme', 'dark');
+  await expect(portal).toHaveAttribute('data-theme', 'dark');
+
+  const systemThemeButton = page.getByRole('button', {
+    name: 'Theme preference: system. Activate to change.',
+  });
+  await systemThemeButton.click();
+  await expect(themeRoot).toHaveAttribute('data-theme', 'light');
+  await expect(portal).toHaveAttribute('data-theme', 'light');
+  runtime.assertClean();
+});
+
 test('theme preference and portaled search stay synchronized after hydration', async ({
   page,
 }) => {

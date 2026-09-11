@@ -99,7 +99,7 @@ const resolvedMode =
 </ThemeProvider>
 ```
 
-The documentation application uses this pattern in its own `DocsThemeProvider`: docs state may be `system | light | dark`, but only the resolved `light | dark` value crosses into the public `@m3-ui/ui` provider. That docs-only preference state is not part of the core theme API.
+The documentation application uses this pattern in its own `DocsThemeProvider`: docs state may be `system | light | dark`, but only the resolved `light | dark` value crosses into the public `@m3-ui/ui` provider. A docs-owned pre-hydration bootstrap resolves the persisted/versioned preference (or the system color scheme) before the themed scopes paint, then `DocsThemeProvider` continues observing system changes after hydration. That docs-only persistence/bootstrap policy is not part of the core theme API.
 
 ## Theme-aware portals
 
