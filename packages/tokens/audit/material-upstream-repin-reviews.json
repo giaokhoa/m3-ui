@@ -1,11 +1,16 @@
 {
   "schemaVersion": 1,
-  "latestReviewId": "2026-09-10-compose-329",
+  "latestReviewId": "2026-09-11-compose-365",
   "reviews": [
     {
       "id": "2026-09-10-compose-329",
       "issue": 329,
       "file": "material-upstream-repin-review.json"
+    },
+    {
+      "id": "2026-09-11-compose-365",
+      "issue": 365,
+      "file": "material-upstream-repin-review-2026-09-11.json"
     }
   ]
 }

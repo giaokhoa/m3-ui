@@ -4,7 +4,7 @@
 
 ## Pinned sources
 
-- AndroidX `AppBarRow.kt` and `AppBarDsl.kt` at `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
+- AndroidX `AppBarRow.kt` and `AppBarDsl.kt` at `059f5aff7b57aa6dc164065e53c55934bec4ee22`.
 - AndroidX current TopAppBar behavior at the same pin is the integration reference.
 - Material Web audit pin: `cac97678831d48d4eb4a606ca50f92673a1dc20c`.
 - Canonical design tokens remain `packages/tokens/tokens/**/*.json` through Style Dictionary. AppBarRow adds no canonical tokens; it reuses `IconButton`, `Tooltip`, and `Menu` styling/tokens.

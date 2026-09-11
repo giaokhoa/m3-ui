@@ -1,6 +1,6 @@
 # ScrollField parity notes
 
-- AndroidX source of truth: `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ScrollField.kt` at `8a166498189e52db64ed8b3dcce776fa0bcba28e`.
+- AndroidX source of truth: `compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ScrollField.kt` at `059f5aff7b57aa6dc164065e53c55934bec4ee22`.
 - AndroidX behavior retained: centered three-row wheel, ArrowUp/ArrowDown one-step selection, nearest-item settle, click-to-select, wrap-around intent, disabled state, and discrete current-value accessibility.
 - Web adaptation: the public API uses controlled/uncontrolled React indices and either `items` or `itemCount + renderItem`; it does not expose `PagerState`, coroutine APIs, `Dp`, or Compose interaction sources.
 - The web implementation virtualizes a five-slot window around the current value rather than duplicating a 100,000-page pager, keeping DOM size constant.
