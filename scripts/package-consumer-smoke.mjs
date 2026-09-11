@@ -36,6 +36,13 @@ function assertNoWorkspaceProtocols(manifest) {
   }
 }
 
+function assertCssSideEffects(manifest) {
+  assert.ok(
+    Array.isArray(manifest.sideEffects) && manifest.sideEffects.includes('**/*.css'),
+    `${manifest.name} packed manifest must preserve public CSS imports as side effects`,
+  );
+}
+
 async function packPackage(packageDir, packDir) {
   const before = new Set(await readdir(packDir));
   run(pnpm, ['pack', '--pack-destination', packDir], { cwd: packageDir });
@@ -101,6 +108,8 @@ try {
   assert.equal(uiPacked.manifest.private, true, 'ui must remain private in this readiness child');
   assertNoWorkspaceProtocols(tokensPacked.manifest);
   assertNoWorkspaceProtocols(uiPacked.manifest);
+  assertCssSideEffects(tokensPacked.manifest);
+  assertCssSideEffects(uiPacked.manifest);
   assert.equal(
     uiPacked.manifest.dependencies?.['@m3-ui/tokens'],
     tokensPacked.manifest.version,
