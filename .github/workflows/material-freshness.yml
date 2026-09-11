@@ -17,11 +17,11 @@ jobs:
     name: Check reviewed Material pins
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
@@ -32,4 +32,6 @@ jobs:
         with:
           node-version: 22
       - name: Probe relevant upstream freshness
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: pnpm --filter @m3-ui/tokens freshness:upstream
