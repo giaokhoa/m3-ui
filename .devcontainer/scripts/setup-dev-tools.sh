@@ -15,9 +15,9 @@ sudo chown -R vscode:vscode \
   /home/vscode/.desktop-commander \
   /home/vscode/.desktop-commander-device
 
-repo_root="$(git rev-parse --show-toplevel)"
-if ! git config --global --get-all safe.directory | grep -Fxq "${repo_root}"; then
-  git config --global --add safe.directory "${repo_root}"
+readonly workspace_root='/workspaces/m3-ui'
+if ! git config --global --get-all safe.directory | grep -Fxq "${workspace_root}"; then
+  git config --global --add safe.directory "${workspace_root}"
 fi
 
 if command -v gh >/dev/null 2>&1 && gh auth status --hostname github.com >/dev/null 2>&1; then
