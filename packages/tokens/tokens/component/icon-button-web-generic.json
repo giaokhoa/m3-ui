@@ -1,9 +1,0 @@
-{
-  "component": {
-    "iconButton": {
-      "focusIndicatorColor": { "$type": "string", "$value": "{color.role.secondary}" },
-      "focusIndicatorOutlineOffset": { "$type": "dimension", "$value": "{state.focusIndicator.outerOffset}" },
-      "focusIndicatorThickness": { "$type": "dimension", "$value": "{state.focusIndicator.thickness}" }
-    }
-  }
-}
