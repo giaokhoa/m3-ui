@@ -1,14 +1,10 @@
 import clsx from 'clsx';
-import {
-  useEffect,
-  useRef,
-  useSyncExternalStore,
-  type CSSProperties,
-} from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import {
   ProgressBar as AriaProgressBar,
   type ProgressBarProps as AriaProgressBarProps,
 } from 'react-aria-components';
+import { usePrefersReducedMotion } from '../../internal/motion/usePrefersReducedMotion';
 import {
   getLoadingIndicatorStyle,
   loadingIndicatorRuntime,
@@ -37,29 +33,6 @@ const determinateScaleFactor =
   calculateScaleFactor(determinateLoadingPolygons) * activeScale;
 const indeterminateScaleFactor =
   calculateScaleFactor(indeterminateLoadingPolygons) * activeScale;
-
-function subscribeReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-  media.addEventListener('change', callback);
-  return () => media.removeEventListener('change', callback);
-}
-
-function getReducedMotionSnapshot(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
-  );
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    () => true,
-  );
-}
-
 
 interface MaterialLoadingProps
   extends Omit<
