@@ -10,8 +10,13 @@ import {
   type PropsWithChildren,
 } from 'react';
 import { ThemeProvider, type ThemeMode } from '@m3-ui/ui';
-
-export type DocsThemePreference = ThemeMode | 'system';
+import {
+  docsThemePreferences,
+  docsThemeStorageKey,
+  isDocsThemePreference,
+  legacyDocsThemeStorageKey,
+  type DocsThemePreference,
+} from './docsThemePreference';
 
 interface DocsThemeContextValue {
   preference: DocsThemePreference;
@@ -19,25 +24,47 @@ interface DocsThemeContextValue {
   cyclePreference: () => void;
 }
 
-const storageKey = 'm3-ui-docs-theme';
 const themePortalId = 'docs-theme-portal';
-const preferences: readonly DocsThemePreference[] = ['system', 'light', 'dark'];
 const DocsThemeContext = createContext<DocsThemeContextValue | null>(null);
 
 function storedPreference(): DocsThemePreference {
   if (typeof window === 'undefined') return 'system';
-  const value = window.localStorage.getItem(storageKey);
-  return value === 'light' || value === 'dark' || value === 'system'
-    ? value
-    : 'system';
+
+  try {
+    let value = window.localStorage.getItem(docsThemeStorageKey);
+    if (!isDocsThemePreference(value)) {
+      const legacyValue = window.localStorage.getItem(legacyDocsThemeStorageKey);
+      if (isDocsThemePreference(legacyValue)) {
+        value = legacyValue;
+        try {
+          window.localStorage.setItem(docsThemeStorageKey, legacyValue);
+          window.localStorage.removeItem(legacyDocsThemeStorageKey);
+        } catch {}
+      }
+    }
+    return isDocsThemePreference(value) ? value : 'system';
+  } catch {
+    return 'system';
+  }
+}
+
+function bootstrappedMode(): ThemeMode {
+  if (typeof document === 'undefined') return 'light';
+  return document.documentElement.dataset.docsTheme === 'dark' ? 'dark' : 'light';
+}
+
+function persistPreference(preference: DocsThemePreference) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(docsThemeStorageKey, preference);
+    window.localStorage.removeItem(legacyDocsThemeStorageKey);
+  } catch {}
 }
 
 export function DocsThemeProvider({ children }: PropsWithChildren) {
   const [preference, setPreference] = useState<DocsThemePreference>('system');
-  // Keep the server and the first client render identical. Browser-only theme
-  // sources are applied after hydration so ThemeProvider never hydrates from a
-  // different mode than the server rendered.
-  const [preferredSystemMode, setPreferredSystemMode] = useState<ThemeMode>('light');
+  const [preferredSystemMode, setPreferredSystemMode] =
+    useState<ThemeMode>(bootstrappedMode);
   const themePortalContainer =
     typeof document === 'undefined'
       ? null
@@ -47,20 +74,21 @@ export function DocsThemeProvider({ children }: PropsWithChildren) {
     setPreference(storedPreference());
 
     const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const updateSystemMode = () => setPreferredSystemMode(media.matches ? 'dark' : 'light');
+    const updateSystemMode = () =>
+      setPreferredSystemMode(media.matches ? 'dark' : 'light');
     updateSystemMode();
     media.addEventListener('change', updateSystemMode);
     return () => media.removeEventListener('change', updateSystemMode);
   }, []);
 
   const cyclePreference = useCallback(() => {
-    setPreference((current) => {
-      const index = preferences.indexOf(current);
-      const next = preferences[(index + 1) % preferences.length] ?? 'system';
-      window.localStorage.setItem(storageKey, next);
-      return next;
-    });
-  }, []);
+    const index = docsThemePreferences.indexOf(preference);
+    const next =
+      docsThemePreferences[(index + 1) % docsThemePreferences.length] ??
+      'system';
+    persistPreference(next);
+    setPreference(next);
+  }, [preference]);
 
   const resolvedMode =
     preference === 'system' ? preferredSystemMode : preference;
@@ -70,10 +98,14 @@ export function DocsThemeProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = resolvedMode;
+    root.dataset.docsTheme = resolvedMode;
+    root.dataset.docsThemePreference = preference;
     if (themePortalContainer) {
       themePortalContainer.dataset.theme = resolvedMode;
     }
-  }, [resolvedMode, themePortalContainer]);
+  }, [preference, resolvedMode, themePortalContainer]);
 
   return (
     <DocsThemeContext.Provider value={value}>

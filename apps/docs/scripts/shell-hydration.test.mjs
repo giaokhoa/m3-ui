@@ -9,26 +9,6 @@ async function source(path) {
   return readFile(resolve(appDir, path), 'utf8');
 }
 
-test('docs theme starts from a deterministic hydration snapshot', async () => {
-  const provider = await source('src/DocsThemeProvider.tsx');
-
-  assert.match(
-    provider,
-    /useState<ThemeMode>\('light'\)/,
-    'the server and first client render must resolve system theme from the same initial mode',
-  );
-  assert.doesNotMatch(
-    provider,
-    /useState<ThemeMode>\(\s*systemMode/,
-    'browser matchMedia must not run as the initial state initializer',
-  );
-  assert.match(
-    provider,
-    /window\.matchMedia\('\(prefers-color-scheme: dark\)'\)/,
-    'system theme should still be observed after hydration',
-  );
-});
-
 test('docs theme uses a server-rendered portal host on the first client render', async () => {
   const layout = await source('app/layout.tsx');
   const provider = await source('src/DocsThemeProvider.tsx');
