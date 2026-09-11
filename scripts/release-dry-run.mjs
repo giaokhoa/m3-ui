@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 const node = process.execPath;
+const git = process.platform === 'win32' ? 'git.exe' : 'git';
 
 function outputPathFromArgs(args) {
   const index = args.indexOf('--output');
@@ -19,6 +20,25 @@ function outputPathFromArgs(args) {
 function run(command, args, env) {
   console.log(`> ${command} ${args.join(' ')}`);
   execFileSync(command, args, { cwd: repoRoot, stdio: 'inherit', env });
+}
+
+function succeeds(command, args, env) {
+  try {
+    execFileSync(command, args, { cwd: repoRoot, stdio: 'ignore', env });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function ensureChangesetsBaseRef(env) {
+  if (succeeds(git, ['show-ref', '--verify', '--quiet', 'refs/heads/main'], env)) return;
+  assert.equal(
+    succeeds(git, ['show-ref', '--verify', '--quiet', 'refs/remotes/origin/main'], env),
+    true,
+    'Changesets dry run requires refs/heads/main or refs/remotes/origin/main in the checkout',
+  );
+  run(git, ['update-ref', 'refs/heads/main', 'refs/remotes/origin/main'], env);
 }
 
 async function readJson(path) {
@@ -52,6 +72,7 @@ try {
   }
 
   run(node, ['scripts/package-policy-check.mjs'], safeEnv);
+  ensureChangesetsBaseRef(safeEnv);
   run(pnpm, ['dlx', '@changesets/cli@3.0.2', 'status', '--output', changesetStatusPath], safeEnv);
   run(node, ['scripts/package-consumer-smoke.mjs'], {
     ...safeEnv,
