@@ -26,6 +26,19 @@ async function repoFile(relativePath) {
   return readFile(new URL(`../../../${relativePath}`, import.meta.url), 'utf8');
 }
 
+async function indexedReviews() {
+  const index = JSON.parse(
+    await repoFile('packages/tokens/audit/material-upstream-repin-reviews.json'),
+  );
+  return Promise.all(
+    index.reviews.map(async (entry) => ({
+      ...entry,
+      content: await repoFile(`packages/tokens/audit/${entry.file}`),
+      review: JSON.parse(await repoFile(`packages/tokens/audit/${entry.file}`)),
+    })),
+  );
+}
+
 test('current Compose provenance follows the reviewed source registry', async () => {
   const reviewedRevision = material3Sources.compose.revision;
   assert.match(reviewedRevision, /^[0-9a-f]{40}$/);
@@ -39,28 +52,37 @@ test('current Compose provenance follows the reviewed source registry', async ()
   }
 });
 
-test('historical re-pin provenance stays historical instead of leaking into current claims', async () => {
-  const review = JSON.parse(
-    await repoFile('packages/tokens/audit/material-upstream-repin-review.json'),
-  );
-  const historicalRevision = review.sources.compose.fromRevision;
+test('all prior reviewed Compose revisions stay historical instead of leaking into current claims', async () => {
+  const reviews = await indexedReviews();
+  const currentRevision = material3Sources.compose.revision;
+  const historicalRevisions = new Set();
 
-  assert.match(historicalRevision, /^[0-9a-f]{40}$/);
-  assert.notEqual(historicalRevision, material3Sources.compose.revision);
+  for (const { review } of reviews) {
+    historicalRevisions.add(review.sources.compose.fromRevision);
+    historicalRevisions.add(review.sources.compose.toRevision);
+  }
+  historicalRevisions.delete(currentRevision);
 
-  for (const relativePath of currentProvenanceFiles) {
-    const content = await repoFile(relativePath);
-    assert.ok(
-      !content.includes(historicalRevision),
-      `${relativePath} must not present historical Compose revision ${historicalRevision} as current provenance`,
-    );
+  assert.ok(historicalRevisions.size > 0, 'at least one historical Compose revision is expected');
+  for (const revision of historicalRevisions) {
+    assert.match(revision, /^[0-9a-f]{40}$/);
+    for (const relativePath of currentProvenanceFiles) {
+      const content = await repoFile(relativePath);
+      assert.ok(
+        !content.includes(revision),
+        `${relativePath} must not present historical Compose revision ${revision} as current provenance`,
+      );
+    }
   }
 
-  const historicalReview = await repoFile(
-    'packages/tokens/audit/material-upstream-repin-review.json',
-  );
-  assert.ok(
-    historicalReview.includes(historicalRevision),
-    'the reviewed re-pin history must retain its original fromRevision',
-  );
+  for (const entry of reviews) {
+    assert.ok(
+      entry.content.includes(entry.review.sources.compose.fromRevision),
+      `${entry.file} must retain its original fromRevision`,
+    );
+    assert.ok(
+      entry.content.includes(entry.review.sources.compose.toRevision),
+      `${entry.file} must retain its original toRevision`,
+    );
+  }
 });
