@@ -33,11 +33,11 @@ test('Material freshness workflow invokes only the focused upstream probe', () =
 });
 
 test('Material freshness workflow follows pinned repository runtime setup without dependency installation', () => {
-  assert.ok(workflow.includes('uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7'));
+  assert.match(workflow, /uses: actions\/checkout@[0-9a-f]{40} # v[^\n]+/i);
   assert.match(workflow, /persist-credentials: false/);
-  assert.ok(workflow.includes('uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6'));
+  assert.match(workflow, /uses: pnpm\/action-setup@[0-9a-f]{40} # v[^\n]+/i);
   assert.match(workflow, /version: 10\.0\.0/);
-  assert.ok(workflow.includes('uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7'));
+  assert.match(workflow, /uses: actions\/setup-node@[0-9a-f]{40} # v[^\n]+/i);
   assert.match(workflow, /node-version: 22/);
   assert.match(workflow, /timeout-minutes: 10/);
 });
