@@ -35,10 +35,13 @@
       "types": "./dist/generated/tokens.d.ts",
       "import": "./dist/generated/tokens.js"
     },
-    "./*.css": "./dist/generated/*.css"
+    "./*.css": {
+      "types": "./dist/css.d.ts",
+      "default": "./dist/generated/*.css"
+    }
   },
   "scripts": {
-    "tokens:build": "style-dictionary build --config style-dictionary.config.mjs",
+    "tokens:build": "style-dictionary build --config style-dictionary.config.mjs && node scripts/write-css-declaration.mjs",
     "build": "rm -rf dist && pnpm tokens:build",
     "test": "rm -rf dist && node scripts/validate.mjs && pnpm tokens:build && node --test scripts/*.test.mjs",
     "validate": "node scripts/validate.mjs",
@@ -122,6 +125,6 @@
     "coverage:union:complete": "node scripts/coverage-union.mjs --require-complete"
   },
   "devDependencies": {
-    "style-dictionary": "5.5.2"
+    "style-dictionary": "5.5.3"
   }
 }

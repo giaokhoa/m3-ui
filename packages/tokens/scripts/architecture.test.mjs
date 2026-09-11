@@ -22,15 +22,26 @@ async function sourceFiles(directory) {
   return files;
 }
 
+function runtimeExportTarget(target, matched = '') {
+  if (typeof target === 'string') return target.replace('*', matched);
+  if (!target || typeof target !== 'object') return undefined;
+  for (const condition of ['default', 'import', 'require']) {
+    if (condition in target) return runtimeExportTarget(target[condition], matched);
+  }
+  return undefined;
+}
+
 function resolvePackageExport(exportsMap, subpath) {
-  if (Object.hasOwn(exportsMap, subpath)) return exportsMap[subpath];
+  if (Object.hasOwn(exportsMap, subpath)) {
+    return runtimeExportTarget(exportsMap[subpath]);
+  }
 
   for (const [pattern, target] of Object.entries(exportsMap)) {
-    if (!pattern.includes('*') || typeof target !== 'string') continue;
+    if (!pattern.includes('*')) continue;
     const [prefix, suffix] = pattern.split('*');
     if (!subpath.startsWith(prefix) || !subpath.endsWith(suffix)) continue;
     const matched = subpath.slice(prefix.length, subpath.length - suffix.length);
-    return target.replace('*', matched);
+    return runtimeExportTarget(target, matched);
   }
 
   return undefined;

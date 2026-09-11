@@ -4,6 +4,10 @@ import test from 'node:test';
 
 const workflowUrl = new URL('../../../.github/workflows/material-freshness.yml', import.meta.url);
 const workflow = await readFile(workflowUrl, 'utf8');
+const rootPackage = JSON.parse(
+  await readFile(new URL('../../../package.json', import.meta.url), 'utf8'),
+);
+const pnpmVersion = rootPackage.packageManager.replace(/^pnpm@/, '');
 
 test('Material freshness workflow is scheduled, manual, and read-only', () => {
   assert.match(
@@ -36,7 +40,10 @@ test('Material freshness workflow follows pinned repository runtime setup withou
   assert.match(workflow, /uses: actions\/checkout@[0-9a-f]{40} # v[^\n]+/i);
   assert.match(workflow, /persist-credentials: false/);
   assert.match(workflow, /uses: pnpm\/action-setup@[0-9a-f]{40} # v[^\n]+/i);
-  assert.match(workflow, /version: 10\.0\.0/);
+  assert.ok(
+    workflow.includes(`version: ${pnpmVersion}`),
+    `freshness workflow pnpm version must match packageManager (${rootPackage.packageManager})`,
+  );
   assert.match(workflow, /uses: actions\/setup-node@[0-9a-f]{40} # v[^\n]+/i);
   assert.match(workflow, /node-version: 22/);
   assert.match(workflow, /timeout-minutes: 10/);

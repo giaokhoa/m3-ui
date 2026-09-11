@@ -1,6 +1,6 @@
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 
 const TYPE_FORMAT_FLAGS =
   ts.TypeFormatFlags.NoTruncation |

@@ -161,7 +161,7 @@ Nested providers and Material overlays share the same theme through the themed p
 
 ## Dev container
 
-The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 10.0.0, installs GitHub CLI, installs Desktop Commander Remote, installs the workspace with the frozen lockfile, and installs the Playwright Chromium headless shell plus Linux dependencies.
+The repository includes a Node.js 22 devcontainer under `.devcontainer/`. It activates pnpm 12.3.4, installs GitHub CLI, installs Desktop Commander Remote, installs the workspace with the frozen lockfile, and installs the Playwright Chromium headless shell plus Linux dependencies.
 
 The m3-ui devcontainer intentionally reuses the shared `giaokhoa_devcontainer_github-cli-config` Docker volume for GitHub CLI authentication, while Desktop Commander config/device state stays in m3-ui-specific volumes so remote devices remain isolated per devcontainer.
 

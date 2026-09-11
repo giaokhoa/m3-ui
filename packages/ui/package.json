@@ -39,11 +39,17 @@
       "types": "./dist/layout/index.d.ts",
       "import": "./dist/layout.js"
     },
-    "./styles.css": "./dist/styles.css",
-    "./styles/*.css": "./dist/styles/*.css"
+    "./styles.css": {
+      "types": "./dist/css.d.ts",
+      "default": "./dist/styles.css"
+    },
+    "./styles/*.css": {
+      "types": "./dist/css.d.ts",
+      "default": "./dist/styles/*.css"
+    }
   },
   "scripts": {
-    "build": "vite build && node scripts/build-styles.mjs && tsc -p tsconfig.build.json",
+    "build": "vite build && node scripts/build-styles.mjs && tsc -p tsconfig.build.json && node scripts/sanitize-declarations.mjs",
     "test": "node --test scripts/*.node-tests.mjs && vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist"
@@ -53,17 +59,17 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@internationalized/date": "3.12.3",
+    "@internationalized/date": "3.12.4",
     "@m3-ui/tokens": "workspace:*",
-    "@material/material-color-utilities": "0.3.0",
+    "@material/material-color-utilities": "0.4.0",
     "clsx": "2.1.1",
-    "react-aria-components": "^1.0.0"
+    "react-aria-components": "^1.21.1"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "vite": "^7.0.0",
-    "vitest": "^3.2.4"
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
   }
 }

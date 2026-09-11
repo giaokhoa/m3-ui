@@ -5,3 +5,6 @@
 /src/generated/api-reference.generated.json
 /src/generated/material-spec.generated.json
 /src/generated/live-examples.generated.json
+
+/next-env.d.ts
+*.tsbuildinfo

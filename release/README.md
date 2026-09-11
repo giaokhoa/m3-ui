@@ -42,7 +42,7 @@ The supported runtime shape is **browser-oriented ESM through a CSS-aware bundle
 
 React and React DOM `^19.0.0` remain UI peer dependencies. TypeScript consumers are validated with `moduleResolution: "Bundler"`. Packed artifacts are package-manager agnostic: the external-consumer smoke installs them with npm and verifies that no `workspace:` protocol leaks into consumer-visible manifests.
 
-Repository development and CI are verified on **Node 22** with **pnpm 10.0.0**. Those are development/release-toolchain facts, not a claim that Node 22 is the minimum version every consumer must run. A maintainer must select the minimum consumer-toolchain Node floor before an `engines` field is added.
+Repository development and CI are verified on **Node 22** with **pnpm 12.3.4**. Those are development/release-toolchain facts, not a claim that Node 22 is the minimum version every consumer must run. A maintainer must select the minimum consumer-toolchain Node floor before an `engines` field is added.
 
 ## Publication boundary
 

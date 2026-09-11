@@ -1,7 +1,7 @@
 {
   "name": "m3-ui-workspace",
   "private": true,
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "pnpm@12.3.4",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "turbo build",
@@ -14,12 +14,7 @@
     "test:actions-credentials": "node scripts/github-actions-credential-check.mjs"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+    "turbo": "^2.10.12",
+    "typescript": "^7.0.2"
   }
 }

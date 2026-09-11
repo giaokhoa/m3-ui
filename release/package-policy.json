@@ -34,7 +34,7 @@
     "minimumNodeDecision": "maintainer-required",
     "verifiedDevelopmentToolchain": {
       "node": "22",
-      "pnpm": "10.0.0"
+      "pnpm": "12.3.4"
     }
   },
   "changeRecords": {

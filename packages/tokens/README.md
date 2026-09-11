@@ -42,7 +42,7 @@ AndroidX Compose, the Material 3 Figma kit, Material Web and other Material impl
 canonical DTCG
       │
       ▼
-Style Dictionary 5.5.2
+Style Dictionary 5.5.3
       │
       ├── dist/generated/tokens.js
       ├── dist/generated/tokens.d.ts
