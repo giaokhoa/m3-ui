@@ -5,10 +5,22 @@
     "ghcr.io/devcontainers/features/node:2.1.0": {
       "version": "22",
       "pnpmVersion": "10.0.0"
-    }
+    },
+    "ghcr.io/devcontainers/features/github-cli:1.1.2": {}
   },
+  "mounts": [
+    "source=github-cli-config,target=/home/vscode/.config/gh,type=volume",
+    "source=m3-ui-desktop-commander-config,target=/home/vscode/.desktop-commander,type=volume",
+    "source=m3-ui-desktop-commander-device,target=/home/vscode/.desktop-commander-device,type=volume"
+  ],
   "remoteUser": "vscode",
-  "forwardPorts": [4173, 6006],
+  "containerEnv": {
+    "GH_CONFIG_DIR": "/home/vscode/.config/gh"
+  },
+  "forwardPorts": [
+    4173,
+    6006
+  ],
   "portsAttributes": {
     "4173": {
       "label": "Docs",
@@ -19,5 +31,21 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium"
+  "postCreateCommand": "bash .devcontainer/scripts/setup-dev-tools.sh && pnpm install --frozen-lockfile && pnpm --filter @m3-ui/storybook exec playwright install --with-deps --only-shell chromium",
+  "postStartCommand": "bash .devcontainer/scripts/start-desktop-commander-remote.sh",
+  "customizations": {
+    "vscode": {
+      "mcp": {
+        "servers": {
+          "desktop-commander": {
+            "type": "stdio",
+            "command": "desktop-commander",
+            "args": [
+              "--no-onboarding"
+            ]
+          }
+        }
+      }
+    }
+  }
 }
