@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   MenuSection,
+  MenuSubmenu,
 } from '@m3-ui/ui';
 
 const meta = {
@@ -89,6 +90,109 @@ export const SegmentedGroups: Story = {
           <MenuItem id="link">Copy link</MenuItem>
           <MenuItem id="send">Send</MenuItem>
         </MenuSection>
+      </Menu>
+    </div>
+  ),
+};
+
+function ExpressiveSingleSelectionDemo() {
+  const [selected, setSelected] = useState('center');
+  return (
+    <div style={{ padding: 80 }}>
+      <output data-testid="single-value">{selected}</output>
+      <Menu
+        aria-label="Text alignment"
+        selectionMode="single"
+        selectedKeys={new Set([selected])}
+        onSelectionChange={(keys) => {
+          if (keys !== 'all') {
+            const [key] = [...keys];
+            if (key != null) setSelected(String(key));
+          }
+        }}
+        trigger={<Button data-testid="single-trigger">Alignment</Button>}
+      >
+        <MenuSection variant="segmented" tone="standard">
+          <MenuItem id="left" leading="○" selectedLeading="✓">Left</MenuItem>
+          <MenuItem id="center" leading="○" selectedLeading="✓">Center</MenuItem>
+          <MenuItem id="right" leading="○" selectedLeading="✓">Right</MenuItem>
+        </MenuSection>
+      </Menu>
+    </div>
+  );
+}
+
+export const ExpressiveSingleSelection: Story = {
+  render: () => <ExpressiveSingleSelectionDemo />,
+};
+
+function ExpressiveMultipleSelectionDemo() {
+  const [selected, setSelected] = useState(new Set(['bold']));
+  return (
+    <div style={{ padding: 80 }}>
+      <output data-testid="multiple-value">{[...selected].sort().join(',')}</output>
+      <Menu
+        aria-label="Text styles"
+        shouldCloseOnSelect={false}
+        selectionMode="multiple"
+        selectedKeys={selected}
+        onSelectionChange={(keys) => {
+          if (keys !== 'all') setSelected(new Set([...keys].map(String)));
+        }}
+        trigger={<Button data-testid="multiple-trigger">Styles</Button>}
+      >
+        <MenuSection variant="segmented" tone="vibrant">
+          <MenuItem id="bold" leading="B" selectedLeading="✓" supportingText="Strong emphasis">Bold</MenuItem>
+          <MenuItem id="italic" leading="I" selectedLeading="✓">Italic</MenuItem>
+          <MenuItem id="underline" leading="U" selectedLeading="✓">Underline</MenuItem>
+        </MenuSection>
+      </Menu>
+    </div>
+  );
+}
+
+export const ExpressiveMultipleSelection: Story = {
+  render: () => <ExpressiveMultipleSelectionDemo />,
+};
+
+export const CascadingSubmenu: Story = {
+  render: () => (
+    <div style={{ padding: 120 }}>
+      <Menu
+        aria-label="Editor actions"
+        trigger={<Button data-testid="submenu-trigger">Editor</Button>}
+      >
+        <MenuItem id="undo">Undo</MenuItem>
+        <MenuSubmenu
+          aria-label="Format options"
+          trigger={<MenuItem id="format" trailing="›">Format</MenuItem>}
+        >
+          <MenuItem id="bold">Bold</MenuItem>
+          <MenuItem id="italic">Italic</MenuItem>
+          <MenuItem id="underline">Underline</MenuItem>
+        </MenuSubmenu>
+        <MenuItem id="share">Share</MenuItem>
+      </Menu>
+    </div>
+  ),
+};
+
+export const CascadingSubmenuRTL: Story = {
+  render: () => (
+    <div dir="rtl" style={{ padding: 120 }}>
+      <Menu
+        aria-label="RTL editor actions"
+        trigger={<Button data-testid="submenu-rtl-trigger">Menu</Button>}
+      >
+        <MenuItem id="undo">Undo</MenuItem>
+        <MenuSubmenu
+          aria-label="RTL format options"
+          trigger={<MenuItem id="format" trailing="‹">Format RTL</MenuItem>}
+        >
+          <MenuItem id="bold">Bold RTL</MenuItem>
+          <MenuItem id="italic">Italic RTL</MenuItem>
+        </MenuSubmenu>
+        <MenuItem id="share">Share</MenuItem>
       </Menu>
     </div>
   ),

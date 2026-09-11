@@ -83,7 +83,15 @@ test('generated Menu CSS replaces the generic TS fallback facade', async () => {
   assert.match(css, /--_menu-max-width: 280px;/);
   assert.match(css, /--_menu-item-min-height: 48px;/);
   assert.match(css, /--_menu-motion-duration: 137ms;/);
-  assert.match(css, /--_menu-segmented-padding: 4px;/);
+  assert.match(css, /--_menu-group-padding: 4px;/);
+  assert.match(css, /--_menu-group-gap: 2px;/);
+  assert.match(css, /--_menu-group-outer-radius: 16px;/);
+  assert.match(css, /--_menu-item-outer-radius: 12px;/);
+  assert.match(css, /--_menu-item-inner-radius: 4px;/);
+  assert.match(css, /--_menu-item-selected-radius: 12px;/);
+  assert.match(css, /menu-section--segmented\[data-tone='vibrant'\]/);
+  assert.match(css, /--_menu-group-container-color: var\(--tertiary-container\);/);
+  assert.match(css, /--_menu-item-container-color: var\(--tertiary\);/);
 });
 
 test('generated FabMenu CSS owns list-item and toggle family defaults', async () => {

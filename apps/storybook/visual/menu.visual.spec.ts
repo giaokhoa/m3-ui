@@ -141,4 +141,71 @@ test.describe('Material 3 Menu browser contract', () => {
     await page.getByTestId('reduced-trigger').click();
     await expect(page.locator('.menu-popover')).toHaveCSS('transition-duration', '0s');
   });
+
+  test('single selection uses menuitemradio semantics and Material selected shapes', async ({ page }) => {
+    await openStory(page, 'components-menu--expressive-single-selection');
+    await page.getByTestId('single-trigger').click();
+    const items = page.getByRole('menuitemradio');
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(1)).toHaveAttribute('aria-checked', 'true');
+    await expect(items.nth(1).locator('.menu-item__leading')).toHaveText('✓');
+    await expect(items.nth(0)).toHaveCSS('border-top-left-radius', '12px');
+    await expect(items.nth(0)).toHaveCSS('border-bottom-left-radius', '4px');
+    await expect(items.nth(1)).toHaveCSS('border-bottom-left-radius', '12px');
+
+    await items.nth(2).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('single-value')).toHaveText('right');
+  });
+
+  test('multiple selection uses menuitemcheckbox semantics and vibrant group roles', async ({ page }) => {
+    await openStory(page, 'components-menu--expressive-multiple-selection');
+    await page.getByTestId('multiple-trigger').click();
+    const items = page.getByRole('menuitemcheckbox');
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(0)).toHaveAttribute('aria-checked', 'true');
+    const group = page.locator('.menu-section--segmented[data-tone="vibrant"]');
+    await expect(group).toBeVisible();
+
+    await items.nth(1).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('multiple-value')).toHaveText('bold,italic');
+    await expect(items.nth(1)).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('submenu uses RAC arrow and Escape focus semantics', async ({ page }) => {
+    await openStory(page, 'components-menu--cascading-submenu');
+    await page.getByTestId('submenu-trigger').click();
+    const format = page.getByRole('menuitem', { name: /Format/ });
+    await format.focus();
+    await page.keyboard.press('ArrowRight');
+
+    await expect(page.getByRole('menu')).toHaveCount(2);
+    await expect(page.getByRole('menuitem', { name: 'Bold' })).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('menu')).toHaveCount(1);
+    await expect(format).toBeFocused();
+  });
+
+  test('logical end submenu placement mirrors in RTL', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'language', {
+        configurable: true,
+        get: () => 'ar',
+      });
+      Object.defineProperty(navigator, 'languages', {
+        configurable: true,
+        get: () => ['ar'],
+      });
+    });
+    await openStory(page, 'components-menu--cascading-submenu-rtl');
+    await page.getByTestId('submenu-rtl-trigger').click();
+    const format = page.getByRole('menuitem', { name: /Format RTL/ });
+    await format.focus();
+    await page.keyboard.press('ArrowLeft');
+
+    const submenu = page.locator('.menu-submenu-popover');
+    await expect(submenu).toBeVisible();
+    await expect(submenu).toHaveAttribute('data-placement', /left/);
+  });
 });

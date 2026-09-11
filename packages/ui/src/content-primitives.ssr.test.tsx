@@ -14,6 +14,7 @@ import {
   ListItemSelectionGroup,
   Menu,
   MenuItem,
+  MenuSubmenu,
   ThemeProvider,
   VerticalDivider,
 } from './index';
@@ -49,6 +50,12 @@ describe('Lane 4 content primitive SSR contracts', () => {
           trigger={<Button>Open server menu</Button>}
         >
           <MenuItem id="one">Server menu item</MenuItem>
+          <MenuSubmenu
+            aria-label="Server submenu"
+            trigger={<MenuItem id="more">More</MenuItem>}
+          >
+            <MenuItem id="nested">Nested server item</MenuItem>
+          </MenuSubmenu>
         </Menu>
         <ExposedMenu aria-label="Server exposed menu" value="Read only choice">
           <MenuItem id="choice">Read only choice</MenuItem>

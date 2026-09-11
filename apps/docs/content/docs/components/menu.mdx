@@ -38,6 +38,49 @@ Use a menu for a temporary list of actions or choices that should not occupy per
 
 `MenuItem` keeps leading/supporting/trailing slots visual while the item itself remains the semantic action. Sections use real section/header relationships; visual section variants do not invent a new selection model.
 
+## Selection and expressive groups
+
+Set `selectionMode="single"` for one-of-many choices. React Aria exposes those items as `menuitemradio`; `selectedLeading` can swap the leading visual without changing the semantic label.
+
+```tsx
+<Menu
+  aria-label="Text alignment"
+  selectionMode="single"
+  selectedKeys={selected}
+  onSelectionChange={setSelected}
+  trigger={<Button>Alignment</Button>}
+>
+  <MenuSection variant="segmented">
+    <MenuItem id="left" leading="○" selectedLeading="✓">Left</MenuItem>
+    <MenuItem id="center" leading="○" selectedLeading="✓">Center</MenuItem>
+    <MenuItem id="right" leading="○" selectedLeading="✓">Right</MenuItem>
+  </MenuSection>
+</Menu>
+```
+
+Use `selectionMode="multiple"` for checkable choices; React Aria exposes them as `menuitemcheckbox`. `MenuSection variant="segmented" tone="vibrant"` applies the reviewed expressive group geometry and vibrant Material roles from generated canonical tokens.
+
+For checkable menus that should remain open while several options are toggled, pass React Aria's `shouldCloseOnSelect={false}` through `Menu`.
+
+## Cascading submenus
+
+`MenuSubmenu` composes a Material submenu on React Aria `SubmenuTrigger`. Arrow-key direction, hover disclosure, Escape, focus travel, logical RTL behavior, collision handling, and nested overlay placement stay React Aria-owned.
+
+```tsx
+<Menu aria-label="Editor actions" trigger={<Button>Editor</Button>}>
+  <MenuItem id="undo">Undo</MenuItem>
+  <MenuSubmenu
+    aria-label="Format options"
+    trigger={<MenuItem id="format" trailing="›">Format</MenuItem>}
+  >
+    <MenuItem id="bold">Bold</MenuItem>
+    <MenuItem id="italic">Italic</MenuItem>
+  </MenuSubmenu>
+</Menu>
+```
+
+Do not attach a competing Arrow/Escape handler to submenu triggers; the wrapper intentionally delegates that interaction model to React Aria.
+
 ## Exposed menu
 
 `ExposedMenu` uses the Material text-field visual anchor for **read-only menu selection**.
