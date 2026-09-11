@@ -34,7 +34,7 @@ After a first version is selected, releases follow Semantic Versioning 2.0.0. Th
 
 ## Change records
 
-**Changesets** is the selected change-record/versioning mechanism for public releases. It is not yet installed because this child defines policy only; the release-boundary child must wire it into a dry-run before publication is possible. Release-affecting PRs will declare the affected package(s), bump class, and user-facing summary. Lockstep release logic must resolve the final UI/tokens version as one coordinated version.
+**Changesets** is the selected change-record/versioning mechanism and is now configured for dry-run planning. Release-affecting PRs can use `pnpm changeset` to declare the affected package(s), bump class, and user-facing summary. The command pins Changesets 3.0.2 through `pnpm dlx`, so release planning does not require adding release-only tooling to the workspace lockfile. The fixed group keeps UI and tokens on one coordinated version while docs and Storybook remain outside the active release set. The dry-run reads this plan but does not apply version changes to the working tree.
 
 ## Consumer and toolchain contract
 
@@ -48,7 +48,11 @@ Repository development and CI are verified on **Node 22** with **pnpm 10.0.0**. 
 
 Current visibility policy is private-until-authorized. `private: true` is a hard safety control and npm refuses publication while it is set. No registry credentials, `publishConfig`, npm access level, release tag, or publish command may be added merely to make readiness CI pass.
 
-The next release child may add a deterministic **dry-run only** path using the exact packed artifacts. Crossing from dry-run to registry publication requires separate explicit maintainer authorization plus resolution of all blocked decisions above. Parent issue #342 remains open until its children are complete and explicit closure authorization is given.
+Run `pnpm release:dry-run` for the deterministic release gate. It runs the package-policy guard, reads the Changesets release plan, builds and packs the real package tarballs, installs those exact tarballs into the external consumer, verifies bundling and TypeScript declarations, records SHA-256 hashes, and reports every unresolved publication blocker. npm/GitHub authentication variables are removed from the child environment and temporary empty npm user/global configs are used so the gate cannot depend on registry credentials.
+
+The same command is available through the manual **Release dry run** GitHub Actions workflow. That workflow has `contents: read` permission only and uploads only the generated validation report. Normal CI preserves the existing policy and packed-consumer gates and additionally runs the same release dry-run.
+
+There is intentionally no publish workflow. Crossing the boundary requires a separate repository change after explicit maintainer authorization that resolves the legal license, first public version, minimum consumer Node support, npm scope ownership, registry and access policy, and then changes the machine-readable publication policy. Merely having a green dry-run is not publication authorization. Parent issue #342 remains open until its children are complete and explicit closure authorization is given.
 
 ## Normative packaging references
 

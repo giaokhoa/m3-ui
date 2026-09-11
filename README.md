@@ -102,7 +102,7 @@ Preview runners can use `npm run dev -- --host 0.0.0.0 --port 4173 --strictPort`
 
 The packages are not published yet. `@m3-ui/ui` and `@m3-ui/tokens` remain `private: true`; `0.0.0` is only a workspace placeholder, not a proposed first public version.
 
-Use `pnpm test:package-policy` to validate the current metadata/versioning/publication guard and `pnpm test:package-consumer` to validate the actual packed tarballs from an external consumer. The release contract, blocked maintainer decisions, lockstep versioning policy and no-publish boundary are documented in [`release/README.md`](release/README.md).
+Use `pnpm release:dry-run` for the complete release-readiness gate. It combines the package policy guard, Changesets release-plan validation and the actual packed external-consumer smoke; use `--output <path>` to retain its JSON artifact report. The existing `pnpm test:package-policy` and `pnpm test:package-consumer` commands remain independently available and stay in normal CI. The release contract, blocked maintainer decisions, lockstep versioning policy and no-publish boundary are documented in [`release/README.md`](release/README.md).
 
 ## Documentation and visual review
 

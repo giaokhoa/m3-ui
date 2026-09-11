@@ -1,0 +1,39 @@
+name: Release dry run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Validate release artifacts without publishing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Release dry run
+        run: pnpm release:dry-run -- --output release-dry-run-report.json
+      - name: Upload dry-run report
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dry-run-report
+          path: release-dry-run-report.json
+          if-no-files-found: error
+          retention-days: 7

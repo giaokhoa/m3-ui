@@ -39,7 +39,7 @@
   },
   "changeRecords": {
     "mechanism": "changesets",
-    "implementationStatus": "required-before-public-release"
+    "implementationStatus": "configured-for-dry-run"
   },
   "publication": {
     "enabled": false,
@@ -49,5 +49,14 @@
     "authorization": "explicit-maintainer-approval-required",
     "scopeOwnership": "unverified",
     "scopeOwnershipDecision": "maintainer-evidence-required"
+  },
+  "dryRun": {
+    "command": "pnpm release:dry-run",
+    "changesetsConfig": ".changeset/config.json",
+    "changesetsCli": "@changesets/cli@3.0.2",
+    "packedArtifactValidation": "external-consumer-smoke",
+    "usesRegistryCredentials": false,
+    "publishes": false,
+    "workflow": ".github/workflows/release-dry-run.yml"
   }
 }
