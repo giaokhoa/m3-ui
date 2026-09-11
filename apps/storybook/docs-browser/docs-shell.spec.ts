@@ -289,12 +289,26 @@ test('theme preference and portaled search stay synchronized after hydration', a
   runtime.assertClean();
 });
 
-test('search returns the canonical component route', async ({ page }) => {
+test('search stays deferred until activation and returns the canonical component route', async ({
+  page,
+}) => {
   const runtime = installRuntimeGuard(page);
+  const searchIndexRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/search-index.json') {
+      searchIndexRequests.push(request.url());
+    }
+  });
+
   await openRoute(page, componentRoute, representativeViewports.expanded);
+  expect(searchIndexRequests).toHaveLength(0);
 
   await page.getByRole('button', { name: 'Search documentation' }).click();
   const searchbox = page.getByRole('searchbox', { name: 'Search documentation' });
+  await expect(searchbox).toBeVisible();
+  await expect(searchbox).toBeFocused();
+  expect(searchIndexRequests).toHaveLength(0);
+
   await searchbox.fill('button');
 
   const result = page
@@ -302,6 +316,8 @@ test('search returns the canonical component route', async ({ page }) => {
     .locator('.docs-search__result-link[href="/docs/components/button"]')
     .first();
   await expect(result).toBeVisible();
+  expect(searchIndexRequests).toHaveLength(1);
+
   await result.click();
   await expect(page).toHaveURL(/\/docs\/components\/button$/);
   await expect(

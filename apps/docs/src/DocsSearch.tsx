@@ -1,25 +1,20 @@
 'use client';
 
-import { useMemo } from 'react';
-import Link from 'next/link';
-import { useDocsSearch } from 'fumadocs-core/search/client';
-import { staticClient } from 'fumadocs-core/search/client/orama-static';
-import {
-  ExpandedFullScreenSearchBar,
-  FilledTonalIconButton,
-  IconButton,
-  ListItem,
-  SearchBarInput,
-  getMaterialTypeCssProperties,
-  useSearchBarState,
-} from '@m3-ui/ui';
-import './docs-search.css';
+import { useState, type ComponentType } from 'react';
+import { FilledTonalIconButton, IconButton } from '@m3-ui/ui';
 
-const searchClient = staticClient({
-  from: '/search-index.json',
-});
+type SearchDialogComponent = ComponentType<{ onDismiss: () => void }>;
 
-function SearchGlyph() {
+let searchDialogPromise:
+  | Promise<{ DocsSearchDialog: SearchDialogComponent }>
+  | undefined;
+
+function loadSearchDialog() {
+  searchDialogPromise ??= import('./DocsSearchDialog');
+  return searchDialogPromise;
+}
+
+export function SearchGlyph() {
   return (
     <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
       <path
@@ -30,94 +25,30 @@ function SearchGlyph() {
   );
 }
 
-function plainSearchText(value: string): string {
-  return value.replace(/<\/?mark>/g, '');
-}
-
-function SearchStatus({ children }: { children: string }) {
-  return (
-    <p
-      className="docs-search__status"
-      style={getMaterialTypeCssProperties('bodyMedium')}
-    >
-      {children}
-    </p>
-  );
-}
-
 export function DocsSearch({ inRail = false }: { inRail?: boolean }) {
-  const state = useSearchBarState();
-  const { search, setSearch, query } = useDocsSearch({ client: searchClient });
-  const results = query.data === 'empty' || query.data == null ? [] : query.data;
-  const trimmedSearch = search.trim();
+  const [SearchDialog, setSearchDialog] =
+    useState<SearchDialogComponent | null>(null);
   const SearchButton = inRail ? FilledTonalIconButton : IconButton;
-  const inputField = useMemo(
-    () => (
-      <SearchBarInput
-        aria-label="Search documentation"
-        clearable
-        leadingIcon={<SearchGlyph />}
-        placeholder="Search documentation"
-        state={state}
-        value={search}
-        onValueChange={setSearch}
-      />
-    ),
-    [search, setSearch, state],
-  );
+
+  const openSearch = () => {
+    void loadSearchDialog().then(({ DocsSearchDialog }) => {
+      setSearchDialog(() => DocsSearchDialog);
+    });
+  };
 
   return (
     <>
       <SearchButton
         aria-label="Search documentation"
-        onPress={state.expand}
+        onPress={openSearch}
         shape={inRail ? 'square' : 'round'}
         size={inRail ? 'medium' : 'small'}
       >
         <SearchGlyph />
       </SearchButton>
-      <ExpandedFullScreenSearchBar
-        className="docs-search"
-        inputField={inputField}
-        state={state}
-        onDismiss={() => setSearch('')}
-      >
-        <div className="docs-search__results" aria-live="polite">
-          {trimmedSearch.length === 0 ? (
-            <SearchStatus>Search the documentation by component, foundation, or API.</SearchStatus>
-          ) : query.isLoading ? (
-            <SearchStatus>Searching…</SearchStatus>
-          ) : query.error ? (
-            <SearchStatus>Search is unavailable. Try again after reloading the page.</SearchStatus>
-          ) : results.length === 0 ? (
-            <SearchStatus>No documentation results found.</SearchStatus>
-          ) : (
-            results.map((result) => {
-              const breadcrumbs = result.breadcrumbs
-                ?.map(plainSearchText)
-                .filter(Boolean)
-                .join(' / ');
-              const content = plainSearchText(result.content);
-
-              return (
-                <Link
-                  className="docs-search__result-link"
-                  href={result.url}
-                  key={result.id}
-                  onClick={state.collapse}
-                >
-                  <ListItem
-                    overline={breadcrumbs}
-                    supportingText={result.type === 'page' ? undefined : result.type}
-                  >
-                    {content}
-                  </ListItem>
-                </Link>
-              );
-            })
-          )}
-        </div>
-      </ExpandedFullScreenSearchBar>
+      {SearchDialog ? (
+        <SearchDialog onDismiss={() => setSearchDialog(null)} />
+      ) : null}
     </>
   );
 }
