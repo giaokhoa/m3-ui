@@ -5,6 +5,7 @@ import { access, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:f
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { packageNameFromSpecifier } from '../packages/ui/scripts/runtime-externals.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
@@ -69,6 +70,45 @@ async function assertFiles(root, paths) {
 
 async function listRelativeFiles(root) {
   return (await readdir(root, { recursive: true })).map((path) => path.replaceAll('\\', '/'));
+}
+
+function collectImportSpecifiers(source) {
+  const specifiers = new Set();
+  const patterns = [
+    /(?:import|export)\s+(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/g,
+    /import\(\s*['"]([^'"]+)['"]\s*\)/g,
+  ];
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) specifiers.add(match[1]);
+  }
+
+  return specifiers;
+}
+
+async function assertRuntimeDependenciesStayExternal(packageRoot, manifest) {
+  const runtimeDependencies = new Set([
+    ...Object.keys(manifest.dependencies ?? {}),
+    ...Object.keys(manifest.peerDependencies ?? {}),
+  ]);
+  const emittedPackages = new Set();
+
+  for (const relativePath of await listRelativeFiles(join(packageRoot, 'dist'))) {
+    if (!relativePath.endsWith('.js')) continue;
+    const source = await readFile(join(packageRoot, 'dist', relativePath), 'utf8');
+    for (const specifier of collectImportSpecifiers(source)) {
+      if (specifier.startsWith('.') || specifier.startsWith('/') || specifier.startsWith('\0')) continue;
+      const packageName = packageNameFromSpecifier(specifier);
+      if (packageName) emittedPackages.add(packageName);
+    }
+  }
+
+  for (const packageName of emittedPackages) {
+    assert.ok(
+      runtimeDependencies.has(packageName),
+      `packed UI JS external import ${packageName} must be declared as a dependency or peer dependency`,
+    );
+  }
 }
 
 async function assertNoInternalTestDeclarations(root) {
@@ -143,6 +183,7 @@ try {
   ]);
   await assertNoInternalTestDeclarations(uiPacked.packageRoot);
   await assertNoDeclarationMaps(uiPacked.packageRoot);
+  await assertRuntimeDependenciesStayExternal(uiPacked.packageRoot, uiPacked.manifest);
 
   const react = await readJson(join(repoRoot, 'packages/ui/node_modules/react/package.json'));
   const reactDom = await readJson(join(repoRoot, 'packages/ui/node_modules/react-dom/package.json'));

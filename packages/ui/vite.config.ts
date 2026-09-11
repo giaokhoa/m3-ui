@@ -1,5 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { createRuntimeExternalPredicate } from './scripts/runtime-externals.mjs';
+
+const packageManifest = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+);
 
 export default defineConfig({
   plugins: [react()],
@@ -20,12 +26,7 @@ export default defineConfig({
       cssFileName: 'styles',
     },
     rollupOptions: {
-      external: [
-        /^react(?:\/.*)?$/,
-        /^react-dom(?:\/.*)?$/,
-        'react-aria-components',
-        /^@m3-ui\/tokens(?:\/.*)?$/,
-      ],
+      external: createRuntimeExternalPredicate(packageManifest),
     },
   },
 });
