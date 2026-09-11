@@ -16,6 +16,7 @@ import {
   MenuTrigger as AriaMenuTrigger,
   Popover as AriaPopover,
   Section as AriaSection,
+  SubmenuTrigger as AriaSubmenuTrigger,
   type MenuItemProps as AriaMenuItemProps,
   type MenuProps as AriaMenuProps,
   type PopoverProps as AriaPopoverProps,
@@ -101,22 +102,28 @@ export interface MenuItemProps
   extends Omit<AriaMenuItemProps, 'children' | 'className'> {
   children: ReactNode;
   leading?: ReactNode;
+  selectedLeading?: ReactNode;
   trailing?: ReactNode;
   supportingText?: ReactNode;
   className?: string;
 }
 
-export function MenuItem({
-  children,
-  leading,
-  trailing,
-  supportingText,
-  className,
-  onPressStart,
-  onPressEnd,
-  ...props
-}: MenuItemProps) {
-  const ripple = useRipple();
+type MenuItemRipple = ReturnType<typeof useRipple>;
+
+function materialMenuItem(
+  {
+    children,
+    leading,
+    selectedLeading,
+    trailing,
+    supportingText,
+    className,
+    onPressStart,
+    onPressEnd,
+    ...props
+  }: MenuItemProps,
+  ripple: MenuItemRipple,
+) {
   const ripplePressProps = ripple.getPressProps({ onPressStart, onPressEnd });
 
   return (
@@ -124,7 +131,10 @@ export function MenuItem({
       {...props}
       {...ripplePressProps}
       className={clsx('menu-item', className)}
-      textValue={props.textValue ?? (typeof children === 'string' ? children : undefined)}
+      textValue={
+        props.textValue ??
+        (typeof children === 'string' ? children : undefined)
+      }
     >
       {(renderProps) => (
         <>
@@ -135,17 +145,87 @@ export function MenuItem({
               isHovered: renderProps.isHovered,
             }}
           />
-          {leading != null ? <span className="menu-item__leading">{leading}</span> : null}
+          {(renderProps.isSelected ? selectedLeading ?? leading : leading) !=
+          null ? (
+            <span className="menu-item__leading">
+              {renderProps.isSelected ? selectedLeading ?? leading : leading}
+            </span>
+          ) : null}
           <span className="menu-item__body">
             <span className="menu-item__label">{children}</span>
             {supportingText != null ? (
               <span className="menu-item__supporting">{supportingText}</span>
             ) : null}
           </span>
-          {trailing != null ? <span className="menu-item__trailing">{trailing}</span> : null}
+          {trailing != null ? (
+            <span className="menu-item__trailing">{trailing}</span>
+          ) : null}
         </>
       )}
     </AriaMenuItem>
+  );
+}
+
+export function MenuItem(props: MenuItemProps) {
+  const ripple = useRipple();
+  return materialMenuItem(props, ripple);
+}
+
+export interface MenuSubmenuProps<T extends object>
+  extends Omit<AriaMenuProps<T>, 'className' | 'style'> {
+  trigger: ReactElement<MenuItemProps, typeof MenuItem>;
+  delay?: number;
+  placement?: AriaPopoverProps['placement'];
+  offset?: number;
+  crossOffset?: number;
+  className?: string;
+  style?: CSSProperties;
+  popoverClassName?: string;
+}
+
+/**
+ * Material submenu composition backed by React Aria's SubmenuTrigger.
+ * RAC owns arrow-key/hover disclosure, Escape and focus travel while the
+ * Material layer owns surface paint, spacing and motion.
+ */
+export function MenuSubmenu<T extends object>({
+  trigger,
+  delay = 200,
+  placement = 'end top',
+  offset = 4,
+  crossOffset = 0,
+  className,
+  style,
+  popoverClassName,
+  ...menuProps
+}: MenuSubmenuProps<T>) {
+  const themePortalContainer = useThemePortalContainer();
+  const ripple = useRipple();
+
+  return (
+    <AriaSubmenuTrigger delay={delay}>
+      {materialMenuItem(trigger.props, ripple)}
+      <AriaPopover
+        placement={placement}
+        offset={offset}
+        crossOffset={crossOffset}
+        containerPadding={menuRuntime.viewportMargin}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
+        className={clsx(
+          'menu-popover',
+          'menu-submenu-popover',
+          popoverClassName,
+        )}
+      >
+        <MenuSurface>
+          <AriaMenu
+            {...menuProps}
+            className={clsx('menu', className)}
+            style={style}
+          />
+        </MenuSurface>
+      </AriaPopover>
+    </AriaSubmenuTrigger>
   );
 }
 
@@ -153,6 +233,7 @@ export interface MenuSectionProps {
   children: ReactNode;
   label?: ReactNode;
   variant?: 'standard' | 'segmented';
+  tone?: 'standard' | 'vibrant';
   className?: string;
 }
 
@@ -160,10 +241,12 @@ export function MenuSection({
   children,
   label,
   variant = 'standard',
+  tone = 'standard',
   className,
 }: MenuSectionProps) {
   return (
     <AriaSection
+      data-tone={variant === 'segmented' ? tone : undefined}
       className={clsx(
         'menu-section',
         variant === 'segmented' && 'menu-section--segmented',

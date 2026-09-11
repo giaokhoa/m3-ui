@@ -240,11 +240,19 @@ export const componentDocs = {
   menu: {
     family: 'Menus',
     materialUrl: 'https://m3.material.io/components/menus/overview',
-    composeMapping: ['DropdownMenu', 'DropdownMenuItem', 'ExposedDropdownMenu-style read-only selection'],
+    composeMapping: [
+      'DropdownMenu',
+      'DropdownMenuItem',
+      'SelectableDropdownMenuItem',
+      'CheckableDropdownMenuItem',
+      'DropdownMenuGroup',
+      'cascading submenu composition',
+      'ExposedDropdownMenu-style read-only selection',
+    ],
     implementation:
-      'Implements anchored Material menus, menu items, labeled or segmented sections, viewport-aware popover spacing, supporting/leading/trailing slots, and a read-only exposed menu anchored to the existing Material TextField renderer.',
+      'Implements anchored Material menus, action/radio/checkbox menu items, standard or vibrant segmented groups, selected/checkable leading visuals, canonical positional and selected shapes, cascading submenus, viewport-aware popover spacing, supporting/leading/trailing slots, and a read-only exposed menu anchored to the existing Material TextField renderer.',
     webAdaptation:
-      'React Aria owns menu/menuitem semantics, roving focus, Arrow/Home/End movement, typeahead, Escape, outside dismissal, overlay positioning, and focus restoration. ExposedMenu deliberately remains a read-only menu with aria-haspopup/expanded rather than pretending to be an editable combobox or autocomplete.',
+      'React Aria owns menu/menuitem/menuitemradio/menuitemcheckbox semantics, selection state, roving focus, Arrow/Home/End movement, typeahead, logical-direction submenu disclosure, Escape, outside dismissal, overlay positioning, and focus restoration. MenuSubmenu maps Material cascading-menu presentation onto React Aria SubmenuTrigger rather than duplicating its focus or keyboard engine. ExposedMenu deliberately remains a read-only menu with aria-haspopup/expanded rather than pretending to be an editable combobox or autocomplete.',
   },
   badge: {
     family: 'Badges',

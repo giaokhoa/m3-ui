@@ -306,6 +306,7 @@ const contentPrimitiveFamilyDimensions = {
     ),
     tokensVisuals: requiredEvidence(
       'packages/tokens/scripts/audit-material-web-menu.mjs',
+      'packages/tokens/scripts/issue-178-static-css.test.mjs',
       MENU_VISUAL_EVIDENCE,
       EXPOSED_DROPDOWN_VISUAL_EVIDENCE,
     ),
