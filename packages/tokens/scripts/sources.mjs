@@ -13,6 +13,8 @@ export const material3Sources = Object.freeze({
       motionOverview: 'https://m3.material.io/styles/motion/overview',
       elevationOverview: 'https://m3.material.io/styles/elevation/overview',
       statesOverview: 'https://m3.material.io/foundations/interaction/states/overview',
+      buttonsOverview: 'https://m3.material.io/components/buttons/overview',
+      buttonsSpecs: 'https://m3.material.io/components/buttons/specs',
     }),
   }),
   figma: Object.freeze({
@@ -21,6 +23,15 @@ export const material3Sources = Object.freeze({
     libraryKey: 'lk-5a31d104cabc6a74d4edf6425e7bc6575e9c0f18cda7efb746193aef4d915b077d115c985e6cf49d36d97d455a17d5127a2cbbfbc618b8a70a38669dccb61462',
     version: '1.25',
     releasedAt: '2026-05-19',
+    components: Object.freeze({
+      button: Object.freeze({
+        filled: 'ab924dce8b851fd820bd0d56da24a9c489311ae6',
+        elevated: '83034000281dcf9f147679e07ef11d2b65e311dc',
+        filledTonal: 'bc43537f1f7aec7e0c159679f9a721e7aab9f100',
+        outlined: 'dd2040219668454df5aa170434636aa823624c1a',
+        text: 'c94bd76a8dbf75d7885f3015ad8474d898fca25b',
+      }),
+    }),
   }),
   compose: Object.freeze({
     kind: 'implementation-reference',
