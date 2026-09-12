@@ -13,6 +13,7 @@ test('ListItem semantic colors alias canonical runtime roles', async () => {
   const expected = {
     focusIndicatorColor: '{color.role.secondary}',
     itemContainerColor: '{color.role.surface}',
+    itemSegmentedContainerColor: '{color.role.surface}',
     itemLabelTextColor: '{color.role.onSurface}',
     itemLeadingIconColor: '{color.role.onSurfaceVariant}',
     itemTrailingIconColor: '{color.role.onSurfaceVariant}',
@@ -67,6 +68,9 @@ test('generated ListItem CSS owns immutable geometry typography paint and state 
   assert.match(css, /--_list-item-padding-block-end: 10px;/);
   assert.match(css, /--_list-item-container-color: var\(--surface\);/);
   assert.match(css, /--_list-item-shape: 0px;/);
+  assert.match(css, /--_list-item-segmented-gap: 2px;/);
+  assert.match(css, /--_list-item-segmented-shape: 4px;/);
+  assert.match(css, /--_list-item-segmented-outer-shape: 16px;/);
   assert.match(css, /--_list-item-focus-indicator-color: var\(--secondary\);/);
   assert.match(css, /--_list-item-headline-font-family: var\(--font-family-plain\);/);
   assert.match(css, /--_list-item-headline-font-size: 16px;/);
@@ -91,6 +95,26 @@ test('generated ListItem CSS owns immutable geometry typography paint and state 
   assert.match(css, /\.list-item\[data-selected\]\[data-dragged\] \{[^}]*--_list-item-leading-color: var\(--on-surface\);/s);
   assert.match(css, /\.list-item\[data-disabled\]:not\(\[data-selected\]\) \{[^}]*--_list-item-label-opacity: 0\.38;/s);
   assert.match(css, /\.list-item\[data-selected\]\[data-disabled\] \{[^}]*--_list-item-container-color: var\(--on-surface\);[^}]*--_list-item-container-opacity: 0\.38;/s);
+  assert.match(
+    css,
+    /:is\(\.segmented-list-item-group, \.list-item-selection-group--segmented\) \{[^}]*--_list-item-segmented-gap: 2px;/s,
+  );
+  assert.match(
+    css,
+    /:is\(\.segmented-list-item-group, \.list-item-selection-group--segmented\) > \.list-item \{[^}]*--_list-item-container-color: var\(--surface\);[^}]*--_list-item-shape: var\(--_list-item-segmented-shape\);/s,
+  );
+  assert.match(
+    css,
+    /> \.list-item:first-child \{[^}]*--_list-item-shape-start-start: var\(--_list-item-segmented-outer-shape\);/s,
+  );
+  assert.match(
+    css,
+    /> \.list-item:last-child \{[^}]*--_list-item-shape-end-end: var\(--_list-item-segmented-outer-shape\);/s,
+  );
+  assert.match(
+    css,
+    /> \.list-item:is\(\[data-selected\], \[data-hovered\], \[data-focus-visible\], \[data-pressed\], \[data-dragged\]\) \{[^}]*--_list-item-shape-start-start: var\(--_list-item-shape\);/s,
+  );
 
   const dragged = css.indexOf('.list-item[data-dragged]:not([data-selected])');
   const disabled = css.indexOf('.list-item[data-disabled]:not([data-selected])');
