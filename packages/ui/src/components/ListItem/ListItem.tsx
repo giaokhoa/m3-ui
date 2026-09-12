@@ -70,15 +70,37 @@ export type ListItemProps =
   | SingleSelectionListItemProps
   | MultipleSelectionListItemProps;
 
+export interface SegmentedListItemGroupProps
+  extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export function SegmentedListItemGroup({
+  children,
+  className,
+  ...props
+}: SegmentedListItemGroupProps) {
+  return (
+    <div
+      {...props}
+      className={clsx('segmented-list-item-group', className)}
+    >
+      {children}
+    </div>
+  );
+}
+
 export interface ListItemSelectionGroupProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   children: ReactNode;
+  variant?: 'standard' | 'segmented';
 }
 
 const SingleSelectionGroupContext = createContext(false);
 
 export function ListItemSelectionGroup({
   children,
+  variant = 'standard',
   className,
   onKeyDown,
   ...props
@@ -130,7 +152,11 @@ export function ListItemSelectionGroup({
     <SingleSelectionGroupContext.Provider value>
       <div
         {...props}
-        className={clsx('list-item-selection-group', className)}
+        className={clsx(
+          'list-item-selection-group',
+          variant === 'segmented' && 'list-item-selection-group--segmented',
+          className,
+        )}
         role="radiogroup"
         onKeyDown={handleKeyDown}
       >
