@@ -1,7 +1,7 @@
 {
   "policy": {
-    "scope": "Button variant cross-source drift between pinned Material Web 34.0.21, pinned AndroidX Compose generated tokens, and effective Compose runtime defaults.",
-    "rule": "Variant declarations remain state-specific. Runtime overrides and generated-source defects are recorded instead of silently rewriting canonical values. Material Web declarations marked deprecated are outside the current Web denominator but remain visible as deprecation skew."
+    "scope": "Button variant cross-source drift between Material 3 Design Kit v1.25, pinned Material Web latest-generated/public runtime evidence, pinned AndroidX Compose generated tokens, and effective Compose runtime defaults.",
+    "rule": "Canonical Button paint targets observable web semantics. Figma/latest-generated values are design evidence; Material Web public runtime is web implementation evidence; Compose runtime/generated values are Android evidence. Runtime overrides are recorded separately from generated token drift, and material.io textual pages are not treated as numeric evidence when values are not text-verifiable."
   },
   "drift": [
     {
@@ -9,66 +9,56 @@
       "module": "md-comp-button-filled",
       "variable": "disabled-icon-color",
       "canonicalPath": "component.button.variant.filled.disabledIconColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-filled-disabled-label-color",
       "module": "md-comp-button-filled",
       "variable": "disabled-label-text-color",
       "canonicalPath": "component.button.variant.filled.disabledLabelTextColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
-    },
-    {
-      "id": "button-tonal-disabled-icon-color",
-      "module": "md-comp-button-tonal",
-      "variable": "disabled-icon-color",
-      "canonicalPath": "component.button.variant.filledTonal.disabledIconColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
-      "materialWeb": "on-surface",
-      "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
-    },
-    {
-      "id": "button-tonal-disabled-label-color",
-      "module": "md-comp-button-tonal",
-      "variable": "disabled-label-text-color",
-      "canonicalPath": "component.button.variant.filledTonal.disabledLabelTextColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
-      "materialWeb": "on-surface",
-      "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-elevated-disabled-icon-color",
       "module": "md-comp-button-elevated",
       "variable": "disabled-icon-color",
       "canonicalPath": "component.button.variant.elevated.disabledIconColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-elevated-disabled-label-color",
       "module": "md-comp-button-elevated",
       "variable": "disabled-label-text-color",
       "canonicalPath": "component.button.variant.elevated.disabledLabelTextColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-elevated-unselected-icon-color",
@@ -87,56 +77,70 @@
       "module": "md-comp-button-outlined",
       "variable": "disabled-icon-color",
       "canonicalPath": "component.button.variant.outlined.disabledIconColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-outlined-disabled-label-color",
       "module": "md-comp-button-outlined",
       "variable": "disabled-label-text-color",
       "canonicalPath": "component.button.variant.outlined.disabledLabelTextColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-text-disabled-container-color",
       "module": "md-comp-button-text",
       "variable": "disabled-container-color",
       "canonicalPath": "component.button.variant.text.disabledContainerColor",
-      "classification": "implementation-override",
-      "preferredReference": "composeRuntime",
+      "classification": "generated-design-vs-runtime-override",
+      "preferredReference": "composeRuntime+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface",
       "composeRuntime": "transparent",
-      "canonical": "transparent"
+      "canonical": "transparent",
+      "figma": "on-surface",
+      "materialWebRuntime": "transparent"
     },
     {
       "id": "button-text-disabled-icon-color",
       "module": "md-comp-button-text",
       "variable": "disabled-icon-color",
       "canonicalPath": "component.button.variant.text.disabledIconColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     },
     {
       "id": "button-text-disabled-label-color",
       "module": "md-comp-button-text",
       "variable": "disabled-label-text-color",
       "canonicalPath": "component.button.variant.text.disabledLabelTextColor",
-      "classification": "cross-source-color-drift",
-      "preferredReference": "composeRuntime",
+      "classification": "android-web-platform-color-drift",
+      "preferredReference": "figma+materialWebLatest+materialWebRuntime",
       "materialWeb": "on-surface",
       "composeGenerated": "on-surface-variant",
-      "canonical": "on-surface-variant"
+      "canonical": "on-surface",
+      "figma": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeRuntime": "on-surface-variant"
     }
   ],
   "generatedSourceSkew": [
@@ -153,9 +157,63 @@
   "deprecationSkew": [
     {
       "id": "button-hover-elevation-web-deprecated",
-      "modules": ["md-comp-button-filled", "md-comp-button-tonal", "md-comp-button-elevated"],
+      "modules": [
+        "md-comp-button-filled",
+        "md-comp-button-tonal",
+        "md-comp-button-elevated"
+      ],
       "classification": "material-web-deprecated-compose-current",
       "reason": "Material Web 34.0.21 marks hovered container elevation as no longer part of the design spec, while pinned Compose generated tokens and runtime elevation APIs still expose/use it. Canonical Compose behavior is retained but the Web declaration is excluded from the current Web denominator."
+    }
+  ],
+  "resolvedConvergence": [
+    {
+      "id": "button-tonal-disabled-content-color",
+      "classification": "cross-source-convergence",
+      "figma": "on-surface",
+      "materialWebLatest": "on-surface",
+      "materialWebRuntime": "on-surface",
+      "composeGenerated": "on-surface",
+      "composeRuntime": "on-surface",
+      "canonical": "on-surface",
+      "reason": "The prior drift manifest was stale: pinned FilledTonalButtonTokens uses OnSurface for disabled label and icon, so all reviewed sources agree."
+    }
+  ],
+  "runtimeOverrides": [
+    {
+      "id": "button-text-disabled-container-runtime-override",
+      "classification": "design-token-vs-runtime-override",
+      "figma": "on-surface @ 0.10",
+      "materialWebLatestGenerated": "on-surface @ 0.10",
+      "materialWebRuntime": "transparent (internal Text Button overrides disabled container color to none and opacity to 0)",
+      "composeGenerated": "on-surface @ 0.10",
+      "composeRuntime": "transparent",
+      "canonical": "transparent",
+      "preferredReference": "composeRuntime+materialWebRuntime",
+      "reason": "Both observable implementations intentionally suppress the disabled Text container; canonical web behavior follows observable runtime rather than an unconsumed generated token."
+    },
+    {
+      "id": "button-outlined-disabled-container-runtime-override",
+      "classification": "design-token-vs-runtime-override",
+      "figma": "on-surface @ 0.10",
+      "materialWebLatestGenerated": "disabled opacity exists but no current generated disabled container color declaration",
+      "materialWebRuntime": "transparent (internal Outlined Button overrides disabled container color to none and opacity to 0)",
+      "composeRuntime": "transparent",
+      "canonical": "transparent",
+      "preferredReference": "composeRuntime+materialWebRuntime",
+      "reason": "Figma presents a disabled fill, but both observable implementations intentionally render no disabled container fill."
+    },
+    {
+      "id": "button-outlined-disabled-outline-runtime-skew",
+      "classification": "unresolved-upstream-runtime-skew-resolved-as-web-adaptation",
+      "figma": "outline-variant @ 1.0",
+      "materialWebLatestGenerated": "outline-variant; no latest generated disabled outline opacity token",
+      "materialWebRuntime": "v0_192 public adapter renders on-surface @ 0.12",
+      "composeGenerated": "disabled outline color = outline-variant",
+      "composeRuntime": "outline-variant @ 0.10 (runtime applies OutlineColor with DisabledContainerOpacity)",
+      "canonical": "outline-variant @ 0.10",
+      "preferredReference": "composeRuntime-adaptation",
+      "reason": "Current upstream runtimes and design evidence disagree, and the reviewed material.io page exposes no text-verifiable numeric disabled outline value. Canonical retains the pinned Compose runtime behavior until normative evidence or current Material Web runtime consumption resolves the skew."
     }
   ]
 }
