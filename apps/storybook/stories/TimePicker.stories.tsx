@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TimeInput, TimePicker, type TimeOfDay } from '@m3-ui/ui';
+import { TimeInput, TimePicker, TimeScroll, type TimeInputDraftValue, type TimeOfDay } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/TimePicker',
@@ -46,6 +46,22 @@ export const VibrantInput: Story = {
     <TimeInput variant="vibrant" defaultValue={{ hour: 21, minute: 5 }} is24Hour />
   ),
 };
+
+export const Scroll: Story = {
+  render: () => <TimeScroll data-testid="time-scroll" defaultValue={{ hour: 10, minute: 30 }} />,
+};
+export const ScrollTwentyFourHour: Story = {
+  render: () => (
+    <TimeScroll data-testid="time-scroll" is24Hour defaultValue={{ hour: 18, minute: 45 }} />
+  ),
+};
+export const ScrollRtl: Story = {
+  render: () => (
+    <div dir="rtl">
+      <TimeScroll data-testid="time-scroll" defaultValue={{ hour: 8, minute: 10 }} />
+    </div>
+  ),
+};
 export const Disabled: Story = {
   render: () => (
     <TimePicker layout="vertical" disabled defaultValue={{ hour: 7, minute: 40 }} />
@@ -88,3 +104,45 @@ function SharedDemo() {
   );
 }
 export const SharedState: Story = { render: () => <SharedDemo /> };
+
+
+function DraftStateDemo() {
+  const [value, setValue] = useState<TimeOfDay>({ hour: 10, minute: 30 });
+  const [draftValue, setDraftValue] = useState<TimeInputDraftValue>({ hour: '10', minute: '30' });
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <TimeInput
+        value={value}
+        onChange={setValue}
+        draftValue={draftValue}
+        onDraftValueChange={setDraftValue}
+      />
+      <output data-testid="draft-time-value">
+        {String(value.hour).padStart(2, '0')}:{String(value.minute).padStart(2, '0')}
+      </output>
+      <output data-testid="draft-raw-value">{draftValue.hour}:{draftValue.minute}</output>
+    </div>
+  );
+}
+export const DraftState: Story = { render: () => <DraftStateDemo /> };
+
+function ModeSwitchDemo() {
+  const [value, setValue] = useState<TimeOfDay>({ hour: 11, minute: 25 });
+  const [mode, setMode] = useState<'dial' | 'input' | 'scroll'>('dial');
+  return (
+    <div style={{ display: 'grid', gap: 20 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button type="button" onClick={() => setMode('dial')}>Dial</button>
+        <button type="button" onClick={() => setMode('input')}>Input</button>
+        <button type="button" onClick={() => setMode('scroll')}>Scroll</button>
+      </div>
+      {mode === 'dial' ? <TimePicker layout="vertical" value={value} onChange={setValue} /> : null}
+      {mode === 'input' ? <TimeInput value={value} onChange={setValue} /> : null}
+      {mode === 'scroll' ? <TimeScroll value={value} onChange={setValue} /> : null}
+      <output data-testid="switch-time-value">
+        {String(value.hour).padStart(2, '0')}:{String(value.minute).padStart(2, '0')}
+      </output>
+    </div>
+  );
+}
+export const ModeSwitch: Story = { render: () => <ModeSwitchDemo /> };

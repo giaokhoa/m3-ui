@@ -20,8 +20,8 @@
 .time-picker__dial-label[data-selected]{background:var(--_tp-selector-color);color:var(--_tp-dial-selected-label-color)}
 .time-picker__track{position:absolute;inset-inline-start:50%;inset-block-start:50%;inline-size:var(--_tp-track-length);block-size:var(--_tp-selector-track-width);background:var(--_tp-selector-color);transform:translateY(-50%) rotate(var(--_tp-track-angle));transform-origin:left center;pointer-events:none}
 .time-picker__center{position:absolute;inset:50% auto auto 50%;inline-size:var(--_tp-selector-center-size);block-size:var(--_tp-selector-center-size);border-radius:50%;background:var(--_tp-selector-color);transform:translate(-50%,-50%);z-index:3}
-.time-picker[data-variant="vibrant"][data-layout="vertical"]{gap:var(--_tp-vibrant-vertical-display-dial-gap);padding:var(--_tp-vibrant-vertical-padding);padding-block-end:calc(var(--_tp-vibrant-vertical-padding) + var(--_tp-vibrant-vertical-clock-face-bottom-space));border-radius:28px;background:var(--surface-container)}
-.time-picker[data-variant="vibrant"][data-layout="horizontal"]{gap:var(--_tp-vibrant-horizontal-display-dial-gap);padding:var(--_tp-vibrant-horizontal-padding);border-radius:28px;background:var(--surface-container)}
+.time-picker[data-variant="vibrant"][data-layout="vertical"]{gap:var(--_tp-vibrant-vertical-display-dial-gap);padding:var(--_tp-vibrant-vertical-padding);padding-block-end:calc(var(--_tp-vibrant-vertical-padding) + var(--_tp-vibrant-vertical-clock-face-bottom-space));border-radius:var(--_tp-vibrant-container-shape);background:var(--surface-container)}
+.time-picker[data-variant="vibrant"][data-layout="horizontal"]{gap:var(--_tp-vibrant-horizontal-display-dial-gap);padding:var(--_tp-vibrant-horizontal-padding);border-radius:var(--_tp-vibrant-container-shape);background:var(--surface-container)}
 .time-picker[data-variant="vibrant"][data-layout="horizontal"] .time-picker__period{block-size:var(--_tp-vibrant-period-h-height)}
 .time-picker[data-variant="vibrant"] .time-picker__dial{background:var(--surface-container-lowest)}
 .time-picker[data-variant="vibrant"] .time-picker__time-selector{border-radius:var(--_tp-vibrant-field-shape);background:var(--surface-container-lowest);color:var(--on-surface)}
@@ -32,7 +32,7 @@
 .time-input .time-picker__period{inline-size:var(--_tp-input-period-width);block-size:var(--_tp-input-period-height)}
 .time-input input:focus{background:var(--_tp-input-focus-color);color:var(--_tp-input-focus-text);outline:var(--_tp-input-focus-outline-width) solid var(--_tp-input-focus-outline)}
 .time-input input[aria-invalid="true"]{outline:2px solid var(--error)}
-.time-input[data-variant="vibrant"]{padding:var(--_tp-vibrant-vertical-padding);border-radius:28px;background:var(--surface-container)}
+.time-input[data-variant="vibrant"]{padding:var(--_tp-vibrant-vertical-padding);border-radius:var(--_tp-vibrant-container-shape);background:var(--surface-container)}
 .time-input[data-variant="vibrant"] input{border-radius:var(--_tp-vibrant-field-shape);background:var(--surface-container-lowest);color:var(--on-surface)}
 .time-input[data-variant="vibrant"] input:focus{color:var(--primary);outline-color:var(--primary)}
 .time-input[data-variant="vibrant"] .time-picker__period{border-radius:var(--_tp-vibrant-period-shape);background:var(--surface-container-lowest)}
@@ -40,3 +40,27 @@
 [dir="rtl"] .time-picker__selectors,[dir="rtl"] .time-input{direction:rtl}
 @media (prefers-reduced-motion:no-preference){.time-picker__track{transition:transform var(--_tp-spatial-duration) var(--_tp-spatial-easing),inline-size var(--_tp-spatial-duration) var(--_tp-spatial-easing)}.time-picker__dial-label,.time-picker__time-selector,.time-picker__period-button{transition:background-color var(--_tp-effects-duration) var(--_tp-effects-easing),color var(--_tp-effects-duration) var(--_tp-effects-easing)}}
 @media (prefers-reduced-motion:reduce){.time-picker__track,.time-picker__dial-label,.time-picker__time-selector,.time-picker__period-button{transition:none}}
+/* Current expressive time fields use the same geometry across dial, input, and scroll modes. */
+.time-picker[data-variant="vibrant"] .time-picker__selectors{gap:0;grid-template-columns:auto auto auto auto}
+.time-picker[data-variant="vibrant"] .time-picker__time-selector{inline-size:var(--_tp-vibrant-time-field-width);block-size:var(--_tp-vibrant-time-field-height)}
+.time-picker[data-variant="vibrant"][data-layout="vertical"][data-24-hour] .time-picker__time-selector{inline-size:var(--_tp-vibrant-time-field-portrait-24-width)}
+.time-picker[data-variant="vibrant"] .time-picker__separator{display:grid;place-items:center;inline-size:var(--_tp-vibrant-separator-width);block-size:var(--_tp-vibrant-time-field-height)}
+.time-picker[data-variant="vibrant"][data-layout="vertical"] .time-picker__period{inline-size:var(--_tp-vibrant-period-width);block-size:var(--_tp-vibrant-period-height);margin-inline-start:var(--_tp-vibrant-period-large-padding)}
+.time-picker[data-variant="vibrant"][data-layout="horizontal"] .time-picker__period{margin-block-start:var(--_tp-vibrant-period-large-padding)}
+
+.time-input[data-variant="vibrant"]{gap:0}
+.time-input[data-variant="vibrant"] input{inline-size:var(--_tp-vibrant-time-field-width);block-size:var(--_tp-vibrant-time-field-height);font-family:var(--_tp-time-selector-font-family);font-size:var(--_tp-time-selector-font-size);line-height:var(--_tp-time-selector-line-height);font-weight:var(--_tp-time-selector-font-weight);letter-spacing:var(--_tp-time-selector-letter-spacing)}
+.time-input[data-variant="vibrant"] .time-input__separator{display:grid;place-items:center;inline-size:var(--_tp-vibrant-separator-width);block-size:var(--_tp-vibrant-time-field-height)}
+.time-input[data-variant="vibrant"] .time-picker__period{inline-size:var(--_tp-vibrant-period-width);block-size:var(--_tp-vibrant-period-height);margin-inline-start:var(--_tp-vibrant-period-padding)}
+
+.time-scroll{box-sizing:border-box;display:flex;align-items:flex-start;inline-size:max-content;padding:var(--_tp-vibrant-vertical-padding);border-radius:var(--_tp-vibrant-container-shape);background:var(--surface-container);color:var(--on-surface);font-family:var(--m3-font-family,Roboto,sans-serif)}
+.time-scroll__fields{display:flex;align-items:flex-start;direction:ltr}
+.time-scroll__field.scroll-field{inline-size:var(--_tp-vibrant-time-field-width);min-inline-size:var(--_tp-vibrant-time-field-width);block-size:var(--_tp-vibrant-time-field-height);border-radius:var(--_tp-vibrant-field-shape)}
+.time-scroll__field .scroll-field__item{font-family:var(--_tp-time-selector-font-family);font-size:var(--_tp-time-selector-font-size);line-height:var(--_tp-time-selector-line-height);font-weight:var(--_tp-time-selector-font-weight);letter-spacing:var(--_tp-time-selector-letter-spacing)}
+.time-scroll__field .scroll-field__item[data-selected]{font-size:var(--_tp-time-selector-font-size);font-weight:var(--_tp-time-selector-font-weight)}
+.time-scroll__separator{display:grid;place-items:center;inline-size:var(--_tp-vibrant-separator-width);block-size:var(--_tp-vibrant-time-field-height);color:var(--_tp-separator);font-family:var(--_tp-time-selector-font-family);font-size:var(--_tp-time-selector-font-size);line-height:var(--_tp-time-selector-line-height);font-weight:var(--_tp-time-selector-font-weight);letter-spacing:var(--_tp-time-selector-letter-spacing)}
+.time-scroll>.time-picker__period{inline-size:var(--_tp-vibrant-period-width);block-size:var(--_tp-vibrant-period-height);margin-inline-start:var(--_tp-vibrant-period-padding);border-radius:var(--_tp-vibrant-period-shape);background:var(--surface-container-lowest)}
+.time-scroll>.time-picker__period .time-picker__period-button[data-selected]{background:var(--primary-container);color:var(--on-primary-container)}
+.time-scroll .time-picker__period-button+.time-picker__period-button{border-block-start:1px solid var(--_tp-period-outline)}
+[dir="rtl"] .time-scroll{direction:rtl}
+[dir="rtl"] .time-scroll__fields{direction:ltr}

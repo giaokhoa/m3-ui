@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { DatePicker, ThemeProvider, TimePicker } from '@m3-ui/ui';
+import { DatePicker, ThemeProvider, TimePicker, TimeScroll } from '@m3-ui/ui';
 
 const meta = {
   title: 'Conformance/Pickers',
@@ -39,6 +39,10 @@ export const DynamicTheme: Story = {
           data-testid="theme-time-picker"
           defaultValue={{ hour: 10, minute: 30 }}
           layout="vertical"
+        />
+        <TimeScroll
+          data-testid="theme-time-scroll"
+          defaultValue={{ hour: 10, minute: 30 }}
         />
       </div>
     </ThemeProvider>

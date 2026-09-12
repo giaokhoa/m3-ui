@@ -15,6 +15,7 @@ import {
   RadioGroup as AriaRadioGroup,
 } from 'react-aria-components';
 import { TextButton } from '../Button';
+import { ScrollField } from '../ScrollField';
 import { Ripple, useRipple } from '../../internal/ripple';
 import { getTimePickerStyle, timePickerRuntime } from './TimePicker.defaults';
 import {
@@ -22,6 +23,7 @@ import {
   normalizeTime,
   periodForHour,
   withPeriod,
+  type TimeInputDraftValue,
   type TimeOfDay,
   type TimePickerLayout,
   type TimePickerPeriod,
@@ -46,7 +48,14 @@ export interface TimePickerProps extends SharedProps {
   onSelectionChange?: (selection: TimePickerSelection) => void;
 }
 
-export interface TimeInputProps extends SharedProps {}
+export interface TimeInputProps extends SharedProps {
+  /** Raw native-input text, kept separate from the last valid TimeOfDay. */
+  draftValue?: TimeInputDraftValue;
+  defaultDraftValue?: TimeInputDraftValue;
+  onDraftValueChange?: (value: TimeInputDraftValue) => void;
+}
+
+export interface TimeScrollProps extends Omit<SharedProps, 'variant'> {}
 
 type TimeStateProps = Pick<SharedProps, 'value' | 'defaultValue' | 'onChange'>;
 type DialTrackStyle = CSSProperties & {
@@ -407,6 +416,85 @@ export function TimePicker({
   );
 }
 
+function timeDraftValue(value: TimeOfDay, is24Hour: boolean): TimeInputDraftValue {
+  return {
+    hour: String(is24Hour ? value.hour : hour12(value.hour)).padStart(2, '0'),
+    minute: String(value.minute).padStart(2, '0'),
+  };
+}
+
+function scrollHourIndex(value: TimeOfDay, is24Hour: boolean) {
+  return is24Hour ? value.hour : hour12(value.hour) - 1;
+}
+
+export function TimeScroll({
+  is24Hour = false,
+  disabled,
+  value: controlled,
+  defaultValue,
+  onChange,
+  className,
+  style,
+  ...domProps
+}: TimeScrollProps) {
+  const [value, setValue] = useTime({ value: controlled, defaultValue, onChange });
+  const period = periodForHour(value.hour);
+  const hourIndex = scrollHourIndex(value, is24Hour);
+  const displayHour = is24Hour ? value.hour : hour12(value.hour);
+
+  return (
+    <div
+      {...domProps}
+      className={cx('time-scroll', className)}
+      data-24-hour={is24Hour || undefined}
+      data-variant="vibrant"
+      style={{ ...getTimePickerStyle(), ...style }}
+    >
+      <div className="time-scroll__fields">
+        <ScrollField
+          className="time-scroll__field time-scroll__field--hour"
+          aria-label="Hour"
+          aria-valuetext={
+            is24Hour
+              ? `${String(displayHour).padStart(2, '0')} hours`
+              : `${displayHour} ${period.toUpperCase()}`
+          }
+          itemCount={is24Hour ? 24 : 12}
+          selectedIndex={hourIndex}
+          isDisabled={disabled}
+          getItemText={(index) =>
+            String(is24Hour ? index : index + 1).padStart(2, '0')
+          }
+          renderItem={(index) =>
+            String(is24Hour ? index : index + 1).padStart(2, '0')
+          }
+          onSelectionChange={(index) => {
+            const nextHour = is24Hour
+              ? index
+              : withPeriod(index + 1, periodForHour(value.hour));
+            setValue({ ...value, hour: nextHour });
+          }}
+        />
+        <span className="time-scroll__separator" aria-hidden="true">:</span>
+        <ScrollField
+          className="time-scroll__field time-scroll__field--minute"
+          aria-label="Minute"
+          aria-valuetext={`${String(value.minute).padStart(2, '0')} minutes`}
+          itemCount={60}
+          selectedIndex={value.minute}
+          isDisabled={disabled}
+          getItemText={(index) => String(index).padStart(2, '0')}
+          renderItem={(index) => String(index).padStart(2, '0')}
+          onSelectionChange={(minute) => setValue({ ...value, minute })}
+        />
+      </div>
+      {!is24Hour ? (
+        <PeriodSelector value={value} setValue={setValue} disabled={disabled} />
+      ) : null}
+    </div>
+  );
+}
+
 function inputValid(raw: string, kind: 'hour' | 'minute', is24Hour: boolean) {
   if (!/^\d{1,2}$/.test(raw)) return false;
   const value = Number(raw);
@@ -444,28 +532,47 @@ export function TimeInput({
   value: controlled,
   defaultValue,
   onChange,
+  draftValue: controlledDraft,
+  defaultDraftValue,
+  onDraftValueChange,
   className,
   style,
   ...domProps
 }: TimeInputProps) {
   const [value, setValue] = useTime({ value: controlled, defaultValue, onChange });
-  const hourText = () =>
-    String(is24Hour ? value.hour : hour12(value.hour)).padStart(2, '0');
-  const minuteText = () => String(value.minute).padStart(2, '0');
-  const [hourDraft, setHourDraft] = useState(hourText);
-  const [minuteDraft, setMinuteDraft] = useState(minuteText);
+  const formattedDraft = timeDraftValue(value, is24Hour);
+  const [innerDraft, setInnerDraft] = useState<TimeInputDraftValue>(() =>
+    defaultDraftValue ?? formattedDraft,
+  );
+  const draft = controlledDraft ?? innerDraft;
   const hourRef = useRef<HTMLInputElement>(null);
   const minuteRef = useRef<HTMLInputElement>(null);
 
+  const setDraft = useCallback(
+    (next: TimeInputDraftValue) => {
+      if (controlledDraft === undefined) setInnerDraft(next);
+      onDraftValueChange?.(next);
+    },
+    [controlledDraft, onDraftValueChange],
+  );
+
   useEffect(() => {
-    if (document.activeElement !== hourRef.current) setHourDraft(hourText());
-    if (document.activeElement !== minuteRef.current) setMinuteDraft(minuteText());
-  }, [value.hour, value.minute, is24Hour]);
+    if (controlledDraft !== undefined) return;
+    setInnerDraft((current) => ({
+      hour:
+        document.activeElement === hourRef.current
+          ? current.hour
+          : formattedDraft.hour,
+      minute:
+        document.activeElement === minuteRef.current
+          ? current.minute
+          : formattedDraft.minute,
+    }));
+  }, [controlledDraft, formattedDraft.hour, formattedDraft.minute]);
 
   const field = (
     kind: 'hour' | 'minute',
-    draft: string,
-    setDraft: (v: string) => void,
+    draftText: string,
     ref: RefObject<HTMLInputElement | null>,
   ) => (
     <label className="time-input__field">
@@ -475,13 +582,14 @@ export function TimeInput({
         inputMode="numeric"
         pattern="[0-9]*"
         maxLength={2}
-        value={draft}
+        value={draftText}
         aria-label={kind === 'hour' ? 'Hour' : 'Minute'}
-        aria-invalid={(draft !== '' && !inputValid(draft, kind, is24Hour)) || undefined}
+        aria-invalid={(draftText !== '' && !inputValid(draftText, kind, is24Hour)) || undefined}
         onFocus={(event) => event.currentTarget.select()}
         onChange={(event) => {
           const raw = event.target.value.replace(/\D/g, '').slice(0, 2);
-          setDraft(raw);
+          const nextDraft = { ...draft, [kind]: raw };
+          setDraft(nextDraft);
           if (
             commitInput(raw, kind, value, is24Hour, setValue) &&
             raw.length === 2 &&
@@ -490,7 +598,6 @@ export function TimeInput({
             minuteRef.current?.focus();
           }
         }}
-        onBlur={() => setDraft(kind === 'hour' ? hourText() : minuteText())}
       />
     </label>
   );
@@ -502,9 +609,9 @@ export function TimeInput({
       data-variant={variant}
       style={{ ...getTimePickerStyle(), ...style }}
     >
-      {field('hour', hourDraft, setHourDraft, hourRef)}
+      {field('hour', draft.hour, hourRef)}
       <span className="time-input__separator">:</span>
-      {field('minute', minuteDraft, setMinuteDraft, minuteRef)}
+      {field('minute', draft.minute, minuteRef)}
       {!is24Hour ? (
         <PeriodSelector value={value} setValue={setValue} disabled={disabled} />
       ) : null}

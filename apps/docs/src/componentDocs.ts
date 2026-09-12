@@ -291,11 +291,16 @@ export const componentDocs = {
   'time-picker': {
     family: 'Time pickers',
     materialUrl: 'https://m3.material.io/components/time-pickers/overview',
-    composeMapping: ['TimePicker', 'TimeInput'],
+    composeMapping: [
+      'TimePicker',
+      'TimeInput',
+      'TimeScroll',
+      'TimePickerState.hourInput/minuteInput',
+    ],
     implementation:
-      'Implements Material clock-dial and keyboard-input forms with shared normalized TimeOfDay state, hour/minute selection, 12/24-hour presentation, AM/PM controls, standard/vibrant shape variants, and vertical/horizontal presentation.',
+      'Implements Material clock-dial, native numeric-input, and current vibrant scroll forms with one normalized TimeOfDay model, 12/24-hour presentation, AM/PM controls, expressive geometry, and explicit raw input-draft state that remains distinct from the last valid time.',
     webAdaptation:
-      'The active clock face uses slider semantics, AM/PM uses radio-group semantics, and TimeInput uses native numeric text inputs with explicit accessible names and aria-invalid drafts. layout="auto" observes only the picker container to choose orientation; it is local component presentation and not an adaptive window-size or pane API.',
+      'The active clock face uses slider semantics, AM/PM uses radio-group semantics, TimeScroll reuses the shared ScrollField keyboard/wheel/pointer engine, and TimeInput exposes raw browser text drafts as strings rather than porting Kotlin state objects. layout="auto" observes only the picker container to choose dial orientation; applications own any dialog or mode-switch composition.',
   },
   carousel: {
     family: 'Carousels',

@@ -7,6 +7,7 @@ import {
   ThemeProvider,
   TimeInput,
   TimePicker,
+  TimeScroll,
 } from './index';
 
 function renderLane7(element: ReactElement) {
@@ -67,6 +68,7 @@ describe('Lane 7 picker SSR contracts', () => {
           layout="vertical"
         />
         <TimeInput defaultValue={{ hour: 10, minute: 30 }} />
+        <TimeScroll defaultValue={{ hour: 10, minute: 30 }} />
       </>
     );
 
@@ -79,6 +81,10 @@ describe('Lane 7 picker SSR contracts', () => {
     expect(first).toContain('aria-label="Hour dial"');
     expect(first).toContain('aria-label="Hour"');
     expect(first).toContain('aria-label="Minute"');
+    expect(first).toContain('class="time-scroll');
+    expect(first).toContain('role="spinbutton"');
+    expect(first).toContain('aria-valuetext="10 AM"');
+    expect(first).toContain('aria-valuetext="30 minutes"');
     expect(first).toContain('10');
     expect(first).toContain('30');
     expect(first).not.toContain('NaN');

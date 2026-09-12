@@ -49,6 +49,7 @@ test('generated TimePicker CSS owns immutable picker and input token defaults', 
   const css = await generated('time-picker');
 
   assert.match(css, /\.time-picker,/);
+  assert.match(css, /\.time-scroll \{/);
   assert.doesNotMatch(css, /--_tp-standard-display-dial-gap:/);
   assert.doesNotMatch(css, /--_tp-vibrant-vertical-display-dial-gap:/);
   assert.doesNotMatch(css, /--_tp-vibrant-horizontal-display-dial-gap:/);
@@ -74,8 +75,17 @@ test('generated TimePicker CSS owns immutable picker and input token defaults', 
   assert.match(css, /--_tp-period-font-size: 16px;/);
   assert.match(css, /--_tp-dial-label-font-size: 16px;/);
   assert.match(css, /--_tp-standard-field-shape: 8px;/);
+  assert.match(css, /--_tp-vibrant-container-shape: 28px;/);
   assert.match(css, /--_tp-vibrant-field-shape: 16px;/);
   assert.match(css, /--_tp-vibrant-period-shape: 9999px;/);
+  assert.match(css, /--_tp-vibrant-time-field-width: 100px;/);
+  assert.match(css, /--_tp-vibrant-time-field-portrait-24-width: 132px;/);
+  assert.match(css, /--_tp-vibrant-time-field-height: 120px;/);
+  assert.match(css, /--_tp-vibrant-separator-width: 16px;/);
+  assert.match(css, /--_tp-vibrant-period-width: 56px;/);
+  assert.match(css, /--_tp-vibrant-period-height: 120px;/);
+  assert.match(css, /--_tp-vibrant-period-padding: 8px;/);
+  assert.match(css, /--_tp-vibrant-period-large-padding: 16px;/);
   assert.match(css, /--_tp-spatial-duration: 194ms;/);
   assert.match(css, /--_tp-effects-duration: 166ms;/);
   assert.match(css, /--_tp-dial-color: var\(--surface-container-highest\);/);
