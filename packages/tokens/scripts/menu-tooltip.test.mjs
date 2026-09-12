@@ -15,6 +15,8 @@ test('Style Dictionary emits full menu state vocabulary and tooltip families', a
   assert.equal(token.ComponentMenuSegmentedActiveContainerShape, '24px');
   assert.equal(token.ComponentMenuSegmentedHorizontalIconOnlySegmentedGap, '4px');
   assert.equal(token.ComponentMenuSegmentedItemLabelTextTypography, 'bodyLarge');
+  assert.equal(token.ComponentTooltipCaretWidth, '16px');
+  assert.equal(token.ComponentTooltipCaretHeight, '8px');
   assert.equal(token.ComponentTooltipPlainSupportingTextTypography, 'bodySmall');
   assert.equal(token.ComponentTooltipRichContainerElevation, 'level2');
   assert.equal(token.ComponentTooltipRichActionPressedLabelTextColor, 'var(--primary)');

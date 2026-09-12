@@ -19,9 +19,15 @@ export function createTooltipCss(context) {
   const actionRole = get('component.tooltip.rich.actionLabelTextTypography');
 
   return [
+    '.plain-tooltip, .rich-tooltip {',
+    line('--_tooltip-caret-width', get('component.tooltip.caret.width')),
+    line('--_tooltip-caret-height', get('component.tooltip.caret.height')),
+    '}',
+    '',
     '.plain-tooltip {',
     line('--_plain-tooltip-container-color', get('component.tooltip.plain.containerColor')),
     line('--_plain-tooltip-content-color', get('component.tooltip.plain.supportingTextColor')),
+    line('--_tooltip-caret-color', 'var(--_plain-tooltip-container-color)'),
     line('--_plain-tooltip-radius', get(`shape.${get('component.tooltip.plain.containerShape')}`)),
     line('--_plain-tooltip-min-width', '40px'),
     line('--_plain-tooltip-min-height', '24px'),
@@ -39,6 +45,7 @@ export function createTooltipCss(context) {
     '.rich-tooltip {',
     line('--_rich-tooltip-container-color', get('component.tooltip.rich.containerColor')),
     line('--_rich-tooltip-content-color', get('component.tooltip.rich.supportingTextColor')),
+    line('--_tooltip-caret-color', 'var(--_rich-tooltip-container-color)'),
     line('--_rich-tooltip-title-color', get('component.tooltip.rich.subheadColor')),
     line('--_rich-tooltip-action-color', get('component.tooltip.rich.actionLabelTextColor')),
     line('--_rich-tooltip-action-focus-label-color', get('component.tooltip.rich.actionFocusLabelTextColor')),

@@ -115,10 +115,64 @@ export const Placements: Story = {
   ),
 };
 
+export const CaretPlacements: Story = {
+  render: () => (
+    <div
+      className="storybook-center"
+      style={{ alignItems: 'center', display: 'grid', gap: 56, gridTemplateColumns: 'repeat(2, auto)' }}
+    >
+      <TooltipDemo caret placement="top" testId="caret-top" triggerLabel="Caret top" triggerTestId="caret-top-trigger" tooltip="Top" />
+      <TooltipDemo caret placement="bottom" testId="caret-bottom" triggerLabel="Caret bottom" triggerTestId="caret-bottom-trigger" tooltip="Bottom" />
+      <TooltipDemo caret placement="start" testId="caret-start" triggerLabel="Caret start" triggerTestId="caret-start-trigger" tooltip="Start" />
+      <TooltipDemo caret placement="end" testId="caret-end" triggerLabel="Caret end" triggerTestId="caret-end-trigger" tooltip="End" />
+    </div>
+  ),
+};
+
+export const CaretRTL: Story = {
+  render: () => (
+    <div
+      dir="rtl"
+      className="storybook-center"
+      style={{ alignItems: 'center', display: 'flex', gap: 64 }}
+    >
+      <TooltipDemo caret dir="rtl" shouldFlip={false} placement="start" testId="caret-rtl-start" triggerLabel="RTL start" triggerTestId="caret-rtl-start-trigger" tooltip="Start" />
+      <TooltipDemo caret dir="rtl" shouldFlip={false} placement="end" testId="caret-rtl-end" triggerLabel="RTL end" triggerTestId="caret-rtl-end-trigger" tooltip="End" />
+    </div>
+  ),
+};
+
+export const CaretFlips: Story = {
+  render: () => (
+    <div style={{ position: 'fixed', inset: 0 }}>
+      <div style={{ position: 'absolute', top: 2, left: '50%', transform: 'translateX(-50%)' }}>
+        <TooltipDemo caret placement="top" testId="flip-top" triggerLabel="Flip top" triggerTestId="flip-top-trigger" tooltip="Top flips" />
+      </div>
+      <div style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)' }}>
+        <TooltipDemo caret placement="bottom" testId="flip-bottom" triggerLabel="Flip bottom" triggerTestId="flip-bottom-trigger" tooltip="Bottom flips" />
+      </div>
+      <div style={{ position: 'absolute', left: 2, top: '50%', transform: 'translateY(-50%)' }}>
+        <TooltipDemo caret placement="start" testId="flip-start" triggerLabel="Flip start" triggerTestId="flip-start-trigger" tooltip="Start flips" />
+      </div>
+      <div style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}>
+        <TooltipDemo caret placement="end" testId="flip-end" triggerLabel="Flip end" triggerTestId="flip-end-trigger" tooltip="End flips" />
+      </div>
+    </div>
+  ),
+};
+
 export const Rich: Story = {
   render: () => (
     <div className="storybook-center">
       <RichTooltipDemo />
+    </div>
+  ),
+};
+
+export const RichCaret: Story = {
+  render: () => (
+    <div className="storybook-center">
+      <RichTooltipDemo caret testId="rich-caret" triggerLabel="Rich caret" triggerTestId="rich-caret-trigger" />
     </div>
   ),
 };
@@ -137,12 +191,22 @@ export const RichTextOnly: Story = {
 };
 
 function ThemeTooltip({ label }: { label: string }) {
-  return <TooltipDemo tooltip={`${label} tooltip`} triggerLabel={label} />;
+  const slug = label.toLowerCase().replaceAll(' ', '-');
+  return (
+    <TooltipDemo
+      caret
+      testId={`plain-tooltip-${slug}`}
+      tooltip={`${label} tooltip`}
+      triggerLabel={label}
+      triggerTestId={`plain-trigger-${slug}`}
+    />
+  );
 }
 
 function ThemeRichTooltip({ label }: { label: string }) {
   return (
     <RichTooltipDemo
+      caret
       testId={`rich-tooltip-${label.toLowerCase().replaceAll(' ', '-')}`}
       triggerLabel={label}
       triggerTestId={`rich-trigger-${label.toLowerCase().replaceAll(' ', '-')}`}
