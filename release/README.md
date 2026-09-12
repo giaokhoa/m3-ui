@@ -11,11 +11,11 @@ The repository is in **pre-publication** state. Both packages remain `private: t
 | `name` | ready | Keep `@m3-ui/ui` and `@m3-ui/tokens`. |
 | `description` | ready | Package-specific descriptions are checked into each manifest. |
 | `repository` | ready | Both packages point at this GitHub repository with their package directory. |
-| `homepage` | ready | Repository README is the current project homepage. |
+| `homepage` | ready | The public project/package homepage is `https://giaokhoa.github.io/m3-ui/`; source and issue metadata remain on GitHub. |
 | `bugs` | ready | GitHub Issues is the issue tracker. |
 | `keywords` | ready | Package-specific discovery keywords are present. |
 | `files`, `exports`, `main`, `module`, `types`, `sideEffects` | ready | Existing package surface is retained and validated by the packed-consumer gate. |
-| `license` | **blocked** | No root `LICENSE` exists and no legal license has been selected. A maintainer must choose the license before publication. Do not infer one from dependencies or upstream Material projects. |
+| `license` | ready | Apache-2.0 was selected by maintainer decision in #401. The root `LICENSE` is canonical and byte-identical package-local copies are shipped in both tarballs. |
 | `engines` | **blocked** | CI proves Node 22 for repository tooling, but no minimum consumer-toolchain Node floor has been selected or compatibility-matrix tested. |
 | `author` / `contributors` | intentionally omitted | Git history provides attribution; no package-level legal author identity has been designated. |
 | `funding` | intentionally omitted | No funding endpoint or policy is present. |
@@ -50,16 +50,17 @@ Repository development and CI are verified on **Node 22** with **pnpm 12.3.4**. 
 
 Current visibility policy is private-until-authorized. `private: true` is a hard safety control and npm refuses publication while it is set. No registry credentials, `publishConfig`, npm access level, release tag, or publish command may be added merely to make readiness CI pass.
 
-Run `pnpm release:dry-run` for the deterministic release gate. It runs the package-policy guard, reads the Changesets release plan, builds and packs the real package tarballs, installs those exact tarballs into the external consumer, verifies bundling and TypeScript declarations, records SHA-256 hashes, and reports every unresolved publication blocker. npm/GitHub authentication variables are removed from the child environment and temporary empty npm user/global configs are used so the gate cannot depend on registry credentials.
+Run `pnpm release:dry-run` for the deterministic release gate. It runs the package-policy guard, reads the Changesets release plan, builds and packs the real package tarballs, installs those exact tarballs into the external consumer, verifies bundling and TypeScript declarations, records SHA-256 hashes, and reports every unresolved publication blocker. npm/GitHub authentication variables are removed from the child environment and temporary empty npm user/global configs are used so the gate cannot depend on registry credentials. The dry-run also scopes Git's `safe.directory` command config to the current repository root so Changesets can inspect `main` consistently inside devcontainer worktrees without mutating global Git trust settings.
 
 The same command is available through the manual **Release dry run** GitHub Actions workflow. That workflow has `contents: read` permission only and uploads only the generated validation report. Normal CI preserves the existing policy and packed-consumer gates and additionally runs the same release dry-run.
 
-There is intentionally no publish workflow. Crossing the boundary requires a separate repository change after explicit maintainer authorization that resolves the legal license, first public version, minimum consumer Node support, npm scope ownership, registry and access policy, and then changes the machine-readable publication policy. Merely having a green dry-run is not publication authorization. Parent issue #342 remains open until its children are complete and explicit closure authorization is given.
+There is intentionally no publish workflow. Apache-2.0 and the public homepage are now resolved, but crossing the publication boundary still requires a separate repository change after explicit maintainer authorization that resolves the first public version, minimum consumer Node support, npm scope ownership, registry and access policy, and then changes the machine-readable publication policy. Merely having a green dry-run is not publication authorization. The completed #342 readiness initiative established these safety boundaries; #401 resolves only its former legal-license/homepage blockers.
 
 ## Normative packaging references
 
 - npm `package.json` documentation: <https://docs.npmjs.com/files/package.json/>
 - pnpm workspace protocol and packed dependency conversion: <https://pnpm.io/workspaces>
 - Semantic Versioning 2.0.0: <https://semver.org/>
+- Apache License 2.0: <https://www.apache.org/licenses/LICENSE-2.0>
 
-These references define packaging/versioning mechanics only; they do not select this project's legal license, first public version, npm scope ownership, or publication authorization.
+The Apache-2.0 selection is a maintainer decision recorded by #401. The remaining packaging/versioning references define mechanics only; they do not select the first public version, npm scope ownership, registry/access policy, or publication authorization.

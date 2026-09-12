@@ -106,6 +106,10 @@ Use `pnpm release:dry-run` for the complete release-readiness gate. It combines 
 
 ## Documentation and visual review
 
+Live docs: <https://giaokhoa.github.io/m3-ui/>
+
+Live Storybook: <https://giaokhoa.github.io/m3-ui/storybook/>
+
 The public docs use `fumadocs-mdx` and `fumadocs-core` headlessly. They do not use `fumadocs-ui`; visible documentation UI is composed from `@m3-ui/ui`. See [`apps/docs/README.md`](apps/docs/README.md) for the docs app structure.
 
 Storybook is the primary component visual-review surface. Playwright provides committed Chromium visual regression on top of the static Storybook build. Intentional visual updates are generated with the Storybook `test:visual:update` script inside the devcontainer and committed under `apps/storybook/visual/__screenshots__/`.
@@ -176,6 +180,10 @@ With VS Code and Dev Containers:
 7. Run `pnpm dev` or a package-level command above.
 
 Do not copy `gh` or Desktop Commander credential files into the repository. GitHub CLI auth is shared through the persistent `giaokhoa_devcontainer_github-cli-config` volume; Desktop Commander credentials remain isolated in the m3-ui-specific device volume.
+
+## License
+
+m3-ui is licensed under the [Apache License 2.0](LICENSE). Package tarballs for `@m3-ui/ui` and `@m3-ui/tokens` ship the same license text.
 
 ## Agent instructions
 
