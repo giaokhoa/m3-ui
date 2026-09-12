@@ -41,9 +41,30 @@ A passive `ListItem` is content only. Supplying `onPress` opts into the React Ar
 
 Do not nest independent interactive controls inside an action row in a way that creates invalid nested interaction.
 
+## Segmented lists
+
+Use `SegmentedListItemGroup` when passive, action, or independently checkable rows should use the expressive segmented list treatment. The group owns the canonical 2px spacing and first/middle/last/only base geometry; each child is still the same `ListItem` semantic engine.
+
+```tsx
+<SegmentedListItemGroup>
+  <ListItem onPress={openProfile}>Profile</ListItem>
+  <ListItem
+    selectionMode="multiple"
+    selected={notifications}
+    onSelectionChange={setNotifications}
+  >
+    Notifications
+  </ListItem>
+</SegmentedListItemGroup>
+```
+
+For one-of-many selection, use `ListItemSelectionGroup variant="segmented"`. It keeps the existing radiogroup and roving-focus contract while applying the same segmented geometry.
+
+The positional shape is only the idle base shape. Hover, focus, press, selected, and dragged Material states replace it with their reviewed full state shape rather than preserving first/last outer corners.
+
 ## Single selection
 
-`selectionMode="single"` exposes radio-item semantics. Related rows belong in `ListItemSelectionGroup`, which provides the group relationship and one-of-many keyboard/focus behavior.
+`selectionMode="single"` exposes radio-item semantics. Related rows belong in `ListItemSelectionGroup`, which provides the group relationship and one-of-many keyboard/focus behavior. Set `variant="segmented"` when the same radio group should use expressive segmented geometry.
 
 Single selection is not an ordinary action button and not an independent checkbox.
 
@@ -71,7 +92,7 @@ For selectable rows, preserve the radio vs checkbox distinction. For action rows
 
 <MaterialParity component="list-item" />
 
-Material supplies row anatomy, line families, state presentation, and visual selection/action treatment. Browser semantics intentionally map action rows to buttons, single selection to radios, and multiple selection to checkboxes.
+Material supplies row anatomy, line families, segmented positional geometry, state presentation, and visual selection/action treatment. Browser semantics intentionally map action rows to buttons, single selection to radios, and multiple selection to checkboxes. Segmented grouping changes presentation only; it does not create a new interaction model.
 
 ## Related components
 
