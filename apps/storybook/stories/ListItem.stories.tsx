@@ -1,6 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ListItem, ListItemSelectionGroup, ThemeProvider } from '@m3-ui/ui';
+import {
+  ListItem,
+  ListItemSelectionGroup,
+  SegmentedListItemGroup,
+  ThemeProvider,
+} from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/ListItem',
@@ -69,6 +74,142 @@ export const SingleSelection: Story = {
       </Stage>
     );
   },
+};
+
+export const SegmentedGeometry: Story = {
+  render: () => (
+    <Stage>
+      <SegmentedListItemGroup data-testid="segmented-three">
+        <ListItem data-testid="segmented-first" leading={personIcon}>First</ListItem>
+        <ListItem data-testid="segmented-middle" leading={personIcon}>Middle</ListItem>
+        <ListItem data-testid="segmented-last" leading={personIcon}>Last</ListItem>
+      </SegmentedListItemGroup>
+      <div style={{ blockSize: 16 }} />
+      <SegmentedListItemGroup data-testid="segmented-one">
+        <ListItem data-testid="segmented-only" leading={personIcon}>Only</ListItem>
+      </SegmentedListItemGroup>
+    </Stage>
+  ),
+};
+
+export const SegmentedSingleSelection: Story = {
+  render: () => {
+    const [selected, setSelected] = useState('alpha');
+    return (
+      <Stage>
+        <div data-testid="segmented-single-value">Selected: {selected}</div>
+        <ListItemSelectionGroup
+          aria-label="Segmented single choice"
+          variant="segmented"
+        >
+          {['alpha', 'beta', 'gamma'].map((value) => (
+            <ListItem
+              key={value}
+              data-testid={`segmented-single-${value}`}
+              selectionMode="single"
+              selected={selected === value}
+              onPress={() => setSelected(value)}
+              leading={personIcon}
+            >
+              {value}
+            </ListItem>
+          ))}
+        </ListItemSelectionGroup>
+      </Stage>
+    );
+  },
+};
+
+function SegmentedMultipleSelectionDemo() {
+  const [alpha, setAlpha] = useState(false);
+  const [beta, setBeta] = useState(true);
+  return (
+    <Stage>
+      <SegmentedListItemGroup>
+        <ListItem
+          data-testid="segmented-action"
+          onPress={() => undefined}
+          leading={personIcon}
+        >
+          Action
+        </ListItem>
+        <ListItem
+          data-testid="segmented-multi-alpha"
+          selectionMode="multiple"
+          selected={alpha}
+          onSelectionChange={setAlpha}
+          leading={personIcon}
+        >
+          Alpha
+        </ListItem>
+        <ListItem
+          data-testid="segmented-multi-beta"
+          selectionMode="multiple"
+          selected={beta}
+          onSelectionChange={setBeta}
+          leading={personIcon}
+        >
+          Beta
+        </ListItem>
+      </SegmentedListItemGroup>
+    </Stage>
+  );
+}
+
+export const SegmentedMultipleSelection: Story = {
+  render: () => <SegmentedMultipleSelectionDemo />,
+};
+
+export const SegmentedVisualStates: Story = {
+  render: () => (
+    <Stage>
+      <SegmentedListItemGroup>
+        <ListItem data-testid="segmented-disabled" isDisabled leading={personIcon}>
+          Disabled first
+        </ListItem>
+        <ListItem
+          data-testid="segmented-dragged"
+          isDragged
+          onPress={() => undefined}
+          leading={personIcon}
+        >
+          Dragged middle
+        </ListItem>
+        <ListItem
+          data-testid="segmented-selected"
+          selectionMode="multiple"
+          selected
+          onSelectionChange={() => undefined}
+          leading={personIcon}
+        >
+          Selected last
+        </ListItem>
+      </SegmentedListItemGroup>
+    </Stage>
+  ),
+};
+
+export const SegmentedRTL: Story = {
+  render: () => (
+    <Stage dir="rtl">
+      <SegmentedListItemGroup>
+        <ListItem
+          data-testid="segmented-rtl-first"
+          leading={personIcon}
+          trailing={chevronIcon}
+        >
+          First RTL
+        </ListItem>
+        <ListItem
+          data-testid="segmented-rtl-last"
+          leading={personIcon}
+          trailing={chevronIcon}
+        >
+          Last RTL
+        </ListItem>
+      </SegmentedListItemGroup>
+    </Stage>
+  ),
 };
 
 export const MultipleSelection: Story = {
