@@ -19,6 +19,7 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@m3-ui/tokens": "workspace:*",
     "@playwright/test": "1.63.0",
     "@storybook/addon-a11y": "10.6.0",
     "@storybook/react-vite": "10.6.0",

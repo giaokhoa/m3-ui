@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-12",
+  "issue": 409,
+  "testOwnership": {
+    "officialSourceAndCanonicalFacts": {
+      "owner": "token/source reconciliation tests",
+      "evidence": [
+        "audit/figma-button-evidence.json",
+        "audit/button-disabled-state-reconciliation.json",
+        "audit/button-default-size-reconciliation.json",
+        "audit/button-shape-pointer-reconciliation.json"
+      ],
+      "rule": "Material/Figma/Compose/Material Web facts and source conflicts are locked here; UI tests must not duplicate those values as independent truth."
+    },
+    "uiRuntimeWiring": {
+      "owner": "packages/ui Button runtime tests",
+      "rule": "Verify helper/runtime output against generated @m3-ui/tokens semantic exports, not copied pixel/elevation/motion literals."
+    },
+    "browserContracts": {
+      "owner": "Storybook Playwright Button suite",
+      "rule": "Verify observable computed CSS/state contracts against generated @m3-ui/tokens values; keep accessibility/DOM/browser behavior assertions where tokens do not own semantics."
+    },
+    "visualRegression": {
+      "owner": "Storybook screenshots",
+      "rule": "Screenshots detect rendering regressions but are not normative Material-spec oracles by themselves."
+    }
+  },
+  "interactionHistoryCleanup": {
+    "disposition": "removed-dead-compose-ordering-adapter",
+    "consumerAudit": "No source consumer remained; only the internal barrel exported interactionOrder to itself.",
+    "removedFiles": [
+      "packages/ui/src/internal/interactions/interactionOrder.ts",
+      "packages/ui/src/internal/interactions/interactionOrder.test.ts",
+      "packages/ui/src/internal/interactions/index.ts",
+      "packages/ui/src/internal/interactions/README.md"
+    ],
+    "removedBrowserLocks": [
+      "latest active interaction: focus after hover",
+      "latest active interaction: hover after focus"
+    ],
+    "removedSnapshots": [
+      "filled-hover-then-focus.png",
+      "filled-focus-then-hover.png"
+    ],
+    "reason": "Current Button presentation consumes React Aria current render-state booleans. The removed browser sequences mainly locked focus-visible/input-modality history and an unused Compose-style latest-started interaction model, not an official Button contract."
+  },
+  "browserContractCoverage": [
+    "all five expressive size geometry/icon/typography contracts versus generated tokens",
+    "disabled content/container/outline roles versus reconciled generated tokens",
+    "default omitted size equals explicit current Small contract",
+    "all five Square idle/pressed shape contracts versus generated shape tokens",
+    "independent hover, keyboard-focus, pressed/ripple and reduced-motion behavior",
+    "RTL logical icon placement",
+    "theme matrix and variant screenshots as regression evidence"
+  ],
+  "storybookTokenDependency": {
+    "package": "@m3-ui/storybook",
+    "dependency": "@m3-ui/tokens",
+    "kind": "devDependency",
+    "reason": "Playwright contract tests consume generated token exports directly as expected values instead of relying on transitive @m3-ui/ui dependency resolution or duplicating literals."
+  }
+}

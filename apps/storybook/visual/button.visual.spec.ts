@@ -1,3 +1,4 @@
+import * as token from '@m3-ui/tokens';
 import { expect, test, type Page } from '@playwright/test';
 import { setDocumentDirection } from '../test-support/browser';
 import { openStory } from '../test-support/story';
@@ -50,8 +51,12 @@ test.describe('Material 3 Button visual parity', () => {
       };
     });
     expect(outlinedRoles.disabledContent).toBe(outlinedRoles.onSurface);
-    expect(outlinedRoles.disabledContainer).toBe('transparent');
-    expect(outlinedRoles.disabledOutlineOpacity).toBe('10%');
+    expect(outlinedRoles.disabledContainer).toBe(
+      token.ComponentButtonVariantOutlinedDisabledContainerColor,
+    );
+    expect(outlinedRoles.disabledOutlineOpacity).toBe(
+      `${token.ComponentButtonVariantOutlinedDisabledOutlineOpacity * 100}%`,
+    );
 
     const textRoles = await text.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -62,7 +67,9 @@ test.describe('Material 3 Button visual parity', () => {
       };
     });
     expect(textRoles.disabledContent).toBe(textRoles.onSurface);
-    expect(textRoles.disabledContainer).toBe('transparent');
+    expect(textRoles.disabledContainer).toBe(
+      token.ComponentButtonVariantTextDisabledContainerColor,
+    );
   });
 
   test('icon layouts', async ({ page }) => {
@@ -132,6 +139,100 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('expressive size family resolves canonical generated token contracts', async ({ page }) => {
+    await openStory(page, 'components-button--expressive-sizes');
+    const cases = [
+      {
+        name: 'Extra small',
+        size: 'extraSmall',
+        minHeight: token.ComponentButtonSizeExtraSmallHeight,
+        paddingBlock: token.ComponentButtonSizeExtraSmallPaddingBlock,
+        paddingInlineStart: token.ComponentButtonSizeExtraSmallPaddingInlineStart,
+        paddingInlineEnd: token.ComponentButtonSizeExtraSmallPaddingInlineEnd,
+        iconSize: token.ComponentButtonSizeExtraSmallIconSize,
+        iconSpacing: token.ComponentButtonSizeExtraSmallIconSpacing,
+        fontSize: token.TypographyLabelLargeFontSize,
+        lineHeight: token.TypographyLabelLargeLineHeight,
+      },
+      {
+        name: 'Small',
+        size: 'small',
+        minHeight: token.ComponentButtonSizeSmallHeight,
+        paddingBlock: token.ComponentButtonSizeSmallPaddingBlock,
+        paddingInlineStart: token.ComponentButtonSizeSmallPaddingInlineStart,
+        paddingInlineEnd: token.ComponentButtonSizeSmallPaddingInlineEnd,
+        iconSize: token.ComponentButtonSizeSmallIconSize,
+        iconSpacing: token.ComponentButtonSizeSmallIconSpacing,
+        fontSize: token.TypographyLabelLargeFontSize,
+        lineHeight: token.TypographyLabelLargeLineHeight,
+      },
+      {
+        name: 'Medium',
+        size: 'medium',
+        minHeight: token.ComponentButtonSizeMediumHeight,
+        paddingBlock: token.ComponentButtonSizeMediumPaddingBlock,
+        paddingInlineStart: token.ComponentButtonSizeMediumPaddingInlineStart,
+        paddingInlineEnd: token.ComponentButtonSizeMediumPaddingInlineEnd,
+        iconSize: token.ComponentButtonSizeMediumIconSize,
+        iconSpacing: token.ComponentButtonSizeMediumIconSpacing,
+        fontSize: token.TypographyTitleMediumFontSize,
+        lineHeight: token.TypographyTitleMediumLineHeight,
+      },
+      {
+        name: 'Large',
+        size: 'large',
+        minHeight: token.ComponentButtonSizeLargeHeight,
+        paddingBlock: token.ComponentButtonSizeLargePaddingBlock,
+        paddingInlineStart: token.ComponentButtonSizeLargePaddingInlineStart,
+        paddingInlineEnd: token.ComponentButtonSizeLargePaddingInlineEnd,
+        iconSize: token.ComponentButtonSizeLargeIconSize,
+        iconSpacing: token.ComponentButtonSizeLargeIconSpacing,
+        fontSize: token.TypographyHeadlineSmallFontSize,
+        lineHeight: token.TypographyHeadlineSmallLineHeight,
+      },
+      {
+        name: 'Extra large',
+        size: 'extraLarge',
+        minHeight: token.ComponentButtonSizeExtraLargeHeight,
+        paddingBlock: token.ComponentButtonSizeExtraLargePaddingBlock,
+        paddingInlineStart: token.ComponentButtonSizeExtraLargePaddingInlineStart,
+        paddingInlineEnd: token.ComponentButtonSizeExtraLargePaddingInlineEnd,
+        iconSize: token.ComponentButtonSizeExtraLargeIconSize,
+        iconSpacing: token.ComponentButtonSizeExtraLargeIconSpacing,
+        fontSize: token.TypographyHeadlineLargeFontSize,
+        lineHeight: token.TypographyHeadlineLargeLineHeight,
+      },
+    ] as const;
+
+    for (const expected of cases) {
+      const button = page.getByRole('button', { name: expected.name, exact: true });
+      await expect(button).toHaveAttribute('data-size', expected.size);
+      const contract = await button.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          minHeight: style.getPropertyValue('--_button-min-height').trim(),
+          paddingBlock: style.getPropertyValue('--_button-padding-block').trim(),
+          paddingInlineStart: style.getPropertyValue('--_button-padding-inline-start').trim(),
+          paddingInlineEnd: style.getPropertyValue('--_button-padding-inline-end').trim(),
+          iconSize: style.getPropertyValue('--_button-icon-size').trim(),
+          iconSpacing: style.getPropertyValue('--_button-icon-spacing').trim(),
+          fontSize: style.getPropertyValue('--_button-font-size').trim(),
+          lineHeight: style.getPropertyValue('--_button-line-height').trim(),
+        };
+      });
+      expect(contract).toEqual({
+        minHeight: expected.minHeight,
+        paddingBlock: expected.paddingBlock,
+        paddingInlineStart: expected.paddingInlineStart,
+        paddingInlineEnd: expected.paddingInlineEnd,
+        iconSize: expected.iconSize,
+        iconSpacing: expected.iconSpacing,
+        fontSize: expected.fontSize,
+        lineHeight: expected.lineHeight,
+      });
+    }
+  });
+
   test('expressive square shape family', async ({ page }) => {
     await openStory(page, 'components-button--expressive-square-shapes');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
@@ -142,11 +243,11 @@ test.describe('Material 3 Button visual parity', () => {
   test('expressive square shapes preserve the audited idle and pressed matrix', async ({ page }) => {
     await openStory(page, 'components-button--expressive-square-shapes');
     const cases = [
-      ['Square extra small', '12px', '8px'],
-      ['Square small', '12px', '8px'],
-      ['Square medium', '16px', '12px'],
-      ['Square large', '28px', '16px'],
-      ['Square extra large', '28px', '16px'],
+      ['Square extra small', token.ShapeMedium, token.ShapeSmall],
+      ['Square small', token.ShapeMedium, token.ShapeSmall],
+      ['Square medium', token.ShapeLarge, token.ShapeMedium],
+      ['Square large', token.ShapeExtraLarge, token.ShapeLarge],
+      ['Square extra large', token.ShapeExtraLarge, token.ShapeLarge],
     ] as const;
 
     for (const [name, idleRadius, pressedRadius] of cases) {
@@ -218,22 +319,6 @@ test.describe('Material 3 Button visual parity', () => {
     await page.keyboard.press('Tab');
     await expect(button).toBeFocused();
     await expect(button).toHaveScreenshot('filled-focus.png');
-  });
-
-  test('latest active interaction: focus after hover', async ({ page }) => {
-    const button = await openDefaultButton(page);
-    await button.hover();
-    await page.keyboard.press('Tab');
-    await expect(button).toBeFocused();
-    await expect(button).toHaveScreenshot('filled-hover-then-focus.png');
-  });
-
-  test('latest active interaction: hover after focus', async ({ page }) => {
-    const button = await openDefaultButton(page);
-    await page.keyboard.press('Tab');
-    await expect(button).toBeFocused();
-    await button.hover();
-    await expect(button).toHaveScreenshot('filled-focus-then-hover.png');
   });
 
   test('filled press ripple', async ({ page }) => {
