@@ -126,4 +126,145 @@ test.describe('Material 3 ListItem browser contract', () => {
     const [leadingBox, trailingBox] = await Promise.all([item.locator('.list-item__leading').boundingBox(), item.locator('.list-item__trailing').boundingBox()]);
     expect(leadingBox?.x ?? 0).toBeGreaterThan(trailingBox?.x ?? 0);
   });
+
+  test('segmented group uses canonical positional shapes and 2px gap', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-geometry');
+    const first = page.getByTestId('segmented-first');
+    const middle = page.getByTestId('segmented-middle');
+    const last = page.getByTestId('segmented-last');
+    const only = page.getByTestId('segmented-only');
+
+    const [firstBox, middleBox] = await Promise.all([
+      first.boundingBox(),
+      middle.boundingBox(),
+    ]);
+    expectClose(
+      (middleBox?.y ?? 0) - ((firstBox?.y ?? 0) + (firstBox?.height ?? 0)),
+      2,
+    );
+
+    const radii = async (locator: typeof first) =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          topLeft: style.borderTopLeftRadius,
+          topRight: style.borderTopRightRadius,
+          bottomLeft: style.borderBottomLeftRadius,
+          bottomRight: style.borderBottomRightRadius,
+        };
+      });
+
+    expect(await radii(first)).toEqual({
+      topLeft: '16px',
+      topRight: '16px',
+      bottomLeft: '4px',
+      bottomRight: '4px',
+    });
+    expect(await radii(middle)).toEqual({
+      topLeft: '4px',
+      topRight: '4px',
+      bottomLeft: '4px',
+      bottomRight: '4px',
+    });
+    expect(await radii(last)).toEqual({
+      topLeft: '4px',
+      topRight: '4px',
+      bottomLeft: '16px',
+      bottomRight: '16px',
+    });
+    expect(await radii(only)).toEqual({
+      topLeft: '16px',
+      topRight: '16px',
+      bottomLeft: '16px',
+      bottomRight: '16px',
+    });
+  });
+
+  test('segmented single selection preserves radio roving-focus behavior', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-single-selection');
+    const alpha = page.getByTestId('segmented-single-alpha');
+    const beta = page.getByTestId('segmented-single-beta');
+
+    await expect(alpha).toHaveAttribute('role', 'radio');
+    await expect(alpha).toHaveAttribute('aria-checked', 'true');
+    await alpha.focus();
+    await page.keyboard.press('ArrowDown');
+
+    await expect(beta).toBeFocused();
+    await expect(beta).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByTestId('segmented-single-value')).toHaveText(
+      'Selected: beta',
+    );
+  });
+
+  test('segmented multiple selection preserves independent checkbox semantics', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-multiple-selection');
+    const alpha = page.getByTestId('segmented-multi-alpha');
+    const beta = page.getByTestId('segmented-multi-beta');
+
+    await expect(alpha).toHaveAttribute('role', 'checkbox');
+    await expect(alpha).toHaveAttribute('aria-checked', 'false');
+    await expect(beta).toHaveAttribute('aria-checked', 'true');
+
+    await alpha.click();
+    await expect(alpha).toHaveAttribute('aria-checked', 'true');
+    await expect(beta).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('segmented interaction states replace positional base shape with full state shape', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-visual-states');
+    const disabled = page.getByTestId('segmented-disabled');
+    const dragged = page.getByTestId('segmented-dragged');
+    const selected = page.getByTestId('segmented-selected');
+
+    const disabledStyle = await disabled.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        topLeft: style.borderTopLeftRadius,
+        bottomLeft: style.borderBottomLeftRadius,
+      };
+    });
+    expect(disabledStyle).toEqual({ topLeft: '16px', bottomLeft: '4px' });
+
+    for (const item of [dragged, selected]) {
+      const values = await item.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return [
+          style.borderTopLeftRadius,
+          style.borderTopRightRadius,
+          style.borderBottomLeftRadius,
+          style.borderBottomRightRadius,
+        ];
+      });
+      expect(values).toEqual(['16px', '16px', '16px', '16px']);
+    }
+    await expect(elevationPaint(page, 'segmented-dragged')).toHaveAttribute(
+      'data-elevation',
+      'level4',
+    );
+  });
+
+  test('segmented group preserves logical slots in RTL', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-rtl');
+    const item = page.getByTestId('segmented-rtl-first');
+    const [leadingBox, trailingBox] = await Promise.all([
+      item.locator('.list-item__leading').boundingBox(),
+      item.locator('.list-item__trailing').boundingBox(),
+    ]);
+    expect(leadingBox?.x ?? 0).toBeGreaterThan(trailingBox?.x ?? 0);
+  });
+
+  test('segmented selected paint follows dynamic theme roles', async ({ page }) => {
+    await openStory(page, 'components-listitem--segmented-theme-matrix');
+    const baseline = page.getByTestId('segmented-theme-baseline');
+    const dynamic = page.getByTestId('segmented-theme-dynamic');
+    const [baselinePaint, dynamicPaint] = await Promise.all([
+      baseline.evaluate((element) => getComputedStyle(element, '::before').backgroundColor),
+      dynamic.evaluate((element) => getComputedStyle(element, '::before').backgroundColor),
+    ]);
+    expect(baselinePaint).not.toBe('');
+    expect(dynamicPaint).not.toBe('');
+    expect(dynamicPaint).not.toBe(baselinePaint);
+  });
+
 });
