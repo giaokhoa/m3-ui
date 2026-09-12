@@ -393,11 +393,12 @@
       {
         "id": "button-default-small-icon-size",
         "issue": 407,
-        "figma": "Small icon = 20",
-        "materialWeb": "small/default icon = 20",
-        "compose": "ButtonDefaults.IconSize = 18dp with upstream TODO; SmallIconSize = 20dp",
-        "canonical": "legacy baseline icon = 18; explicit size=small icon = 20",
-        "status": "unresolved"
+        "figma": "all five component sets default Size=Small; Small icon = 20",
+        "materialWeb": "latest Small = 40px container / 20px icon / 16px leading+trailing; public v0_192 runtime default = 40px / 18px icon / 24px leading+trailing and exposes no size property",
+        "compose": "classic Button defaults = 40dp / IconSize 18dp / legacy ContentPadding; expressive Small = 40dp / SmallIconSize 20dp / SmallContentPadding. Compose marks IconSize 18dp with TODO to update when BaselineButtonTokens is corrected.",
+        "canonical": "public React default size=small (40px / 20px icon / 16px inline padding); legacy baseline tokens retained as source-reference fallback",
+        "status": "resolved-current-small-default",
+        "decision": "Because @m3-ui/ui is still private 0.0.0, the pre-public React default follows the current Figma component default and latest Small token family. Legacy Compose classic / Material Web v0.192 values remain audited evidence rather than public defaults."
       },
       {
         "id": "button-square-size-helper",
@@ -414,5 +415,42 @@
         "status": "unresolved"
       }
     ]
+  },
+  "defaultProperties": {
+    "filled": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled",
+      "showIcon": true,
+      "showFocusIndicator": false
+    },
+    "elevated": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled",
+      "showIcon": true,
+      "showFocusIndicator": false
+    },
+    "filledTonal": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled",
+      "showIcon": true,
+      "showFocusIndicator": false
+    },
+    "outlined": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled",
+      "showIcon": true,
+      "showFocusIndicator": false
+    },
+    "text": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled",
+      "showIcon": true,
+      "showFocusIndicator": false
+    }
   }
 }

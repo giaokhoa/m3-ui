@@ -66,6 +66,23 @@ test('Figma Button component sets retain the complete published variant contract
   assert.equal(evidence.componentSets.outlined.publishedPressedVariantSpelling, 'Presssed');
 });
 
+test('all five published Figma Button sets default to Round Small Enabled', () => {
+  assert.deepEqual(Object.keys(evidence.defaultProperties), [
+    'filled',
+    'elevated',
+    'filledTonal',
+    'outlined',
+    'text',
+  ]);
+  for (const [variant, defaults] of Object.entries(evidence.defaultProperties)) {
+    assert.equal(defaults.type, 'Round', `${variant}.type`);
+    assert.equal(defaults.size, 'Small', `${variant}.size`);
+    assert.equal(defaults.state, 'Enabled', `${variant}.state`);
+    assert.equal(defaults.showIcon, true, `${variant}.showIcon`);
+    assert.equal(defaults.showFocusIndicator, false, `${variant}.showFocusIndicator`);
+  }
+});
+
 test('reviewed Figma expressive Button size facts match canonical DTCG', () => {
   for (const [size, figma] of Object.entries(evidence.sizes)) {
     const canonical = canonicalSizes[size];
@@ -139,7 +156,7 @@ test('Button Figma conflicts stay explicit and tracked instead of silently rewri
       ['button-disabled-content-role', 406, 'resolved-web-reference'],
       ['button-text-disabled-container', 406, 'resolved-runtime-adaptation'],
       ['button-outlined-disabled-presentation', 406, 'resolved-mixed-runtime-adaptation'],
-      ['button-default-small-icon-size', 407, 'unresolved'],
+      ['button-default-small-icon-size', 407, 'resolved-current-small-default'],
       ['button-square-size-helper', 408, 'unresolved'],
       ['button-storybook-spec-locks', 409, 'unresolved'],
     ],
