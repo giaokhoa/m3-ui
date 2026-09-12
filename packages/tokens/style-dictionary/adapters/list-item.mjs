@@ -52,6 +52,9 @@ export function createListItemCss(context) {
     line('--_list-item-container-color', get(`${base}.itemContainerColor`)),
     line('--_list-item-container-opacity', 1),
     line('--_list-item-shape', shape(`${base}.itemContainerShape`)),
+    line('--_list-item-segmented-gap', get(`${base}.segmentedGap`)),
+    line('--_list-item-segmented-shape', shape(`${base}.itemContainerExpressiveShape`)),
+    line('--_list-item-segmented-outer-shape', shape(`${base}.containerShape`)),
     line('--_list-item-focus-indicator-color', get(`${base}.focusIndicatorColor`)),
     line('--_list-item-focus-indicator-thickness', get(`${base}.focusIndicatorThickness`)),
     line('--_list-item-focus-indicator-outline-offset', get(`${base}.focusIndicatorOutlineOffset`)),
@@ -143,6 +146,42 @@ export function createListItemCss(context) {
       line('--_list-item-supporting-opacity', get(`${base}.itemSelectedDisabledSupportingTextOpacity`)),
       line('--_ripple-color', get(`${base}.itemSelectedDisabledLabelTextColor`)),
     ]),
+    ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented)',
+      [
+        line('--_list-item-segmented-gap', get(`${base}.segmentedGap`)),
+      ],
+    ),
+    ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item:not([data-selected]):not([data-hovered]):not([data-focus-visible]):not([data-pressed]):not([data-dragged])',
+      [
+        line('--_list-item-container-color', get(`${base}.itemSegmentedContainerColor`)),
+        line('--_list-item-shape', 'var(--_list-item-segmented-shape)'),
+      ],
+    ),
+    ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item:first-child',
+      [
+        line('--_list-item-shape-start-start', 'var(--_list-item-segmented-outer-shape)'),
+        line('--_list-item-shape-start-end', 'var(--_list-item-segmented-outer-shape)'),
+      ],
+    ),
+    ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item:last-child',
+      [
+        line('--_list-item-shape-end-start', 'var(--_list-item-segmented-outer-shape)'),
+        line('--_list-item-shape-end-end', 'var(--_list-item-segmented-outer-shape)'),
+      ],
+    ),
+    ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item:is([data-selected], [data-hovered], [data-focus-visible], [data-pressed], [data-dragged])',
+      [
+        line('--_list-item-shape-start-start', 'var(--_list-item-shape)'),
+        line('--_list-item-shape-start-end', 'var(--_list-item-shape)'),
+        line('--_list-item-shape-end-start', 'var(--_list-item-shape)'),
+        line('--_list-item-shape-end-end', 'var(--_list-item-shape)'),
+      ],
+    ),
     '',
   ];
 

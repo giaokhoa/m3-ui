@@ -2,6 +2,13 @@
   display: block;
 }
 
+.segmented-list-item-group,
+.list-item-selection-group--segmented {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_list-item-segmented-gap);
+}
+
 .list-item {
   position: relative;
   isolation: isolate;
@@ -17,7 +24,22 @@
   padding-inline-end: var(--_list-item-padding-inline-end);
   overflow: hidden;
   border: 0;
-  border-radius: var(--_list-item-shape);
+  border-start-start-radius: var(
+    --_list-item-shape-start-start,
+    var(--_list-item-shape)
+  );
+  border-start-end-radius: var(
+    --_list-item-shape-start-end,
+    var(--_list-item-shape)
+  );
+  border-end-start-radius: var(
+    --_list-item-shape-end-start,
+    var(--_list-item-shape)
+  );
+  border-end-end-radius: var(
+    --_list-item-shape-end-end,
+    var(--_list-item-shape)
+  );
   background: transparent;
   text-align: start;
   transition:

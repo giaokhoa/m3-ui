@@ -231,11 +231,11 @@ export const componentDocs = {
   'list-item': {
     family: 'Lists',
     materialUrl: 'https://m3.material.io/components/lists/overview',
-    composeMapping: ['ListItem'],
+    composeMapping: ['ListItem', 'SegmentedListItem', 'ListItemDefaults.segmentedShapes'],
     implementation:
-      'Implements one-, two-, and three-line Material list rows with leading, overline, headline, supporting, and trailing slots plus passive, action, selected, disabled, dragged, hover, focus, and pressed presentation.',
+      'Implements one-, two-, and three-line Material list rows with leading, overline, headline, supporting, and trailing slots plus passive, action, selected, disabled, dragged, hover, focus, and pressed presentation. SegmentedListItemGroup and ListItemSelectionGroup variant="segmented" add the reviewed 2px segmented spacing and first/middle/last/only base geometry while reusing the same ListItem engine.',
     webAdaptation:
-      'Passive rows remain div content; action rows use React Aria Button semantics. Single-selection rows expose radio semantics and an optional roving-focus ListItemSelectionGroup, while multiple-selection rows expose checkbox semantics. Dragged state is presentation-only and does not implement browser drag-and-drop by itself.',
+      'Passive rows remain div content; action rows use React Aria Button semantics. Single-selection rows expose radio semantics and an optional roving-focus ListItemSelectionGroup, while multiple-selection rows expose checkbox semantics. Segmented grouping is presentation-only: DOM position determines the idle base corners, while hover/focus/press/selected/dragged states still replace the full shape. Dragged state does not implement browser drag-and-drop by itself.',
   },
   menu: {
     family: 'Menus',
