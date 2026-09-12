@@ -19,7 +19,9 @@ import {
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
+import { clampScrollFraction } from '../TopAppBar/TopAppBar.defaults';
 import {
+  appBarWithSearchTokens,
   getSearchBarStyle,
   getSearchViewStyle,
   searchBarTokens,
@@ -32,10 +34,15 @@ function join(...values: Array<string | undefined | false>) {
   return values.filter(Boolean).join(' ');
 }
 
+function cssLength(value: string | number): string {
+  return typeof value === 'number' ? `${value}px` : value;
+}
+
 // Expanded surfaces own the initial query focus. Keep this internal so an
 // inputField may be composed through arbitrary wrappers while the actual
 // SearchBarInput still participates in React Aria's modal FocusScope.
 const SearchBarInputAutoFocusContext = createContext(false);
+const searchBarFocusReturnTargets = new WeakMap<() => void, HTMLElement>();
 
 function ExpandedSearchInput({ children }: { children: ReactNode }) {
   return (
@@ -83,9 +90,7 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
 
     // ModalOverlay is SSR-gated, so the expanded input may mount after its
     // wrapper effects have already run. Own initial focus at the input mount
-    // itself. This mirrors React Spectrum's mobile-search pattern: the query
-    // field focuses in a passive effect before the parent useDialog fallback
-    // decides whether it needs to focus the dialog surface.
+    // itself before the dialog fallback decides whether it needs focus.
     useEffect(() => {
       if (!shouldAutoFocus || disabled) return;
       localRef.current?.focus({ preventScroll: true });
@@ -119,6 +124,9 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
           autoFocus={shouldAutoFocus}
           onFocus={(event) => {
             props.onFocus?.(event);
+            if (state && !expandedAutoFocus) {
+              searchBarFocusReturnTargets.set(state.collapse, event.currentTarget);
+            }
             state?.expand();
           }}
           onChange={(event) => onValueChange?.(event.currentTarget.value)}
@@ -169,11 +177,84 @@ export function SearchBar({ state, children, className, style, ...props }: Searc
   );
 }
 
+export interface AppBarWithSearchProps
+  extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+  state: SearchBarState;
+  inputField: ReactNode;
+  navigationIcon?: ReactNode;
+  actions?: ReactNode;
+  /** Application-owned overlap signal. No scroll listener is installed. */
+  overlappedFraction?: number;
+}
+
+export function AppBarWithSearch({
+  state,
+  inputField,
+  navigationIcon,
+  actions,
+  overlappedFraction = 0,
+  className,
+  ...props
+}: AppBarWithSearchProps) {
+  const overlap = clampScrollFraction(overlappedFraction);
+  const scrolled = overlap > 0.01;
+
+  return (
+    <header
+      {...props}
+      data-elevation={appBarWithSearchTokens.containerElevation}
+      data-overlapped-fraction={overlap}
+      data-scrolled={scrolled || undefined}
+      className={join('app-bar-with-search', 'elevation-host', className)}
+    >
+      <div className="app-bar-with-search__navigation">{navigationIcon}</div>
+      <div className="app-bar-with-search__search-slot">
+        <SearchBar state={state}>{inputField}</SearchBar>
+      </div>
+      <div className="app-bar-with-search__actions">{actions}</div>
+    </header>
+  );
+}
+
 interface ExpandedSearchBarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   state: SearchBarState;
   inputField: ReactNode;
   children?: ReactNode;
   onDismiss?: () => void;
+}
+
+function useDockedSearchDismiss(
+  root: React.RefObject<HTMLDivElement | null>,
+  state: SearchBarState,
+  onDismiss?: () => void,
+) {
+  useEffect(() => {
+    if (!state.isExpanded) return;
+
+    const dismiss = (restore: boolean) => {
+      const target = searchBarFocusReturnTargets.get(state.collapse);
+      if (restore && target?.isConnected) target.focus({ preventScroll: true });
+      searchBarFocusReturnTargets.delete(state.collapse);
+      state.collapse();
+      onDismiss?.();
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (root.current && !root.current.contains(event.target as Node)) {
+        dismiss(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') dismiss(true);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [root, state, onDismiss]);
 }
 
 export type ExpandedDockedSearchBarProps = ExpandedSearchBarBaseProps;
@@ -188,28 +269,7 @@ export function ExpandedDockedSearchBar({
   ...props
 }: ExpandedDockedSearchBarProps) {
   const root = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!state.isExpanded) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (root.current && !root.current.contains(event.target as Node)) {
-        state.collapse();
-        onDismiss?.();
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        state.collapse();
-        onDismiss?.();
-      }
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [state, onDismiss]);
+  useDockedSearchDismiss(root, state, onDismiss);
 
   if (!state.isExpanded) return null;
   return (
@@ -229,12 +289,81 @@ export function ExpandedDockedSearchBar({
   );
 }
 
+export interface ExpandedDockedSearchBarWithGapProps
+  extends ExpandedSearchBarBaseProps {
+  /** Gap between the search bar and results dropdown. Defaults to canonical 2px. */
+  dropdownGap?: string | number;
+  /** Override the canonical dropdown scrim paint. Use transparent to remove it. */
+  dropdownScrimColor?: CSSProperties['backgroundColor'];
+}
+
+export function ExpandedDockedSearchBarWithGap({
+  state,
+  inputField,
+  children,
+  className,
+  style,
+  onDismiss,
+  dropdownGap,
+  dropdownScrimColor,
+  ...props
+}: ExpandedDockedSearchBarWithGapProps) {
+  const root = useRef<HTMLDivElement | null>(null);
+  useDockedSearchDismiss(root, state, onDismiss);
+
+  if (!state.isExpanded) return null;
+  const overrides = {
+    ...(dropdownGap === undefined ? {} : { '--_search-view-gap': cssLength(dropdownGap) }),
+  } as CSSProperties & Record<`--${string}`, string | number>;
+  const scrimStyle = dropdownScrimColor === undefined
+    ? undefined
+    : ({ '--_search-view-scrim-color': dropdownScrimColor } as CSSProperties & Record<`--${string}`, string | number>);
+
+  return (
+    <>
+      <div
+        className="search-view__docked-gap-scrim"
+        aria-hidden="true"
+        style={scrimStyle}
+      />
+      <div
+        {...props}
+        ref={root}
+        data-state="expanded"
+        className={join('search-view', 'search-view--docked-gap', className)}
+        style={{
+          ...getSearchViewStyle('docked'),
+          ...overrides,
+          ...(style as CSSProperties | undefined),
+        }}
+      >
+        <div
+          className="search-view__header elevation-host"
+          data-elevation={searchViewTokens.containerElevation}
+        >
+          <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+        </div>
+        <div
+          className="search-view__docked-dropdown elevation-host"
+          data-elevation={searchViewTokens.containerElevation}
+        >
+          {children}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export interface ExpandedFullScreenSearchBarProps
   extends ExpandedSearchBarBaseProps {
   isDismissable?: boolean;
 }
 
-export function ExpandedFullScreenSearchBar({
+interface FullScreenSearchSurfaceProps extends ExpandedFullScreenSearchBarProps {
+  contained?: boolean;
+}
+
+function FullScreenSearchSurface({
   state,
   inputField,
   children,
@@ -242,8 +371,9 @@ export function ExpandedFullScreenSearchBar({
   style,
   onDismiss,
   isDismissable = true,
+  contained = false,
   ...props
-}: ExpandedFullScreenSearchBarProps) {
+}: FullScreenSearchSurfaceProps) {
   const themePortalContainer = useThemePortalContainer();
 
   return (
@@ -265,11 +395,25 @@ export function ExpandedFullScreenSearchBar({
             {...props}
             data-elevation={searchViewTokens.containerElevation}
             data-state="expanded"
-            className={join('search-view', 'search-view--fullscreen', 'elevation-host', className)}
+            data-contained={contained || undefined}
+            className={join(
+              'search-view',
+              contained
+                ? 'search-view--fullscreen-contained'
+                : 'search-view--fullscreen',
+              'elevation-host',
+              className,
+            )}
             style={{ ...getSearchViewStyle('fullscreen'), ...(style as CSSProperties | undefined) }}
           >
             <div className="search-view__header">
-              <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+              {contained ? (
+                <div className="search-view__contained-bar">
+                  <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+                </div>
+              ) : (
+                <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+              )}
             </div>
             <div className="search-view__results">{children}</div>
           </div>
@@ -277,4 +421,16 @@ export function ExpandedFullScreenSearchBar({
       </AriaModal>
     </AriaModalOverlay>
   );
+}
+
+export function ExpandedFullScreenSearchBar(props: ExpandedFullScreenSearchBarProps) {
+  return <FullScreenSearchSurface {...props} />;
+}
+
+export type ExpandedFullScreenContainedSearchBarProps = ExpandedFullScreenSearchBarProps;
+
+export function ExpandedFullScreenContainedSearchBar(
+  props: ExpandedFullScreenContainedSearchBarProps,
+) {
+  return <FullScreenSearchSurface {...props} contained />;
 }

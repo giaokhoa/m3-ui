@@ -1,6 +1,7 @@
 import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
 import {
+  appBarWithSearchTokens,
   getSearchBarStyle,
   getSearchViewStyle,
   searchBarRuntime,
@@ -9,7 +10,7 @@ import {
 } from './SearchBar.defaults';
 
 describe('SearchBar defaults', () => {
-  it('projects canonical SearchBar/SearchView tokens', () => {
+  it('projects canonical SearchBar/SearchView/AppBarWithSearch tokens', () => {
     expect(searchBarTokens).toMatchObject({
       containerColor: token.ComponentSearchBarContainerColor,
       containerHeight: token.ComponentSearchBarContainerHeight,
@@ -21,6 +22,17 @@ describe('SearchBar defaults', () => {
       dockedContainerShape: token.ComponentSearchViewDockedContainerShape,
       dockedHeaderHeight: token.ComponentSearchViewDockedHeaderContainerHeight,
       fullScreenHeaderHeight: token.ComponentSearchViewFullScreenHeaderContainerHeight,
+      containedBackgroundColor: token.ComponentSearchViewContainedBackgroundColor,
+      containedDockedBarResultsGap: token.ComponentSearchViewContainedDockedBarResultsGap,
+      containedDockedResultsShape: token.ComponentSearchViewContainedDockedResultsShape,
+      containedFullScreenBarHeight: token.ComponentSearchViewContainedFullScreenBarContainerHeight,
+    });
+    expect(appBarWithSearchTokens).toMatchObject({
+      containerColor: token.ComponentAppBarBaseContainerColor,
+      scrolledContainerColor: token.ComponentAppBarBaseOnScrollContainerColor,
+      searchContainerColor: token.ComponentAppBarBaseSearchContainerColor,
+      scrolledSearchContainerColor: token.ComponentAppBarBaseSearchOnScrollContainerColor,
+      containerHeight: token.ComponentAppBarVariantSmallContainerHeight,
     });
   });
 
@@ -30,8 +42,10 @@ describe('SearchBar defaults', () => {
       maxWidth: 720,
       dockedMinHeight: 240,
       dockedMaxHeightScreenRatio: 2 / 3,
+      dockedWithGapMaxHeightScreenRatio: 1 / 2,
       horizontalPadding: 16,
       iconSize: 24,
+      fullScreenExpandedHorizontalPadding: 8,
     });
   });
 
@@ -45,6 +59,7 @@ describe('SearchBar defaults', () => {
       '--_search-max-width': '720px',
       '--_search-horizontal-padding': '16px',
       '--_search-icon-size': '24px',
+      '--_search-fullscreen-horizontal-padding': '8px',
     });
     expect(docked).toEqual(bar);
     expect(fullscreen).toEqual(bar);

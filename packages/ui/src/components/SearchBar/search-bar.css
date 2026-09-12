@@ -109,14 +109,117 @@
   transform-origin: top center;
 }
 
-.search-view--fullscreen {
+.search-view__docked-gap-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--_search-view-scrim-color);
+}
+
+.search-view--docked-gap {
+  position: relative;
+  z-index: 1000;
+  width: var(--_search-min-width);
+  min-width: min(100%, var(--_search-min-width));
+  max-width: min(100%, var(--_search-max-width));
+  max-height: 50vh;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  animation: search-view-enter var(--_search-expand-duration) var(--_search-expand-easing);
+  transform-origin: top center;
+}
+
+.search-view--docked-gap .search-view__header {
+  overflow: hidden;
+  border-radius: var(--_search-view-bar-radius);
+  background: var(--_search-view-container-color);
+}
+
+.search-view__docked-dropdown {
+  min-height: calc(240px - var(--_search-view-header-height) - var(--_search-view-gap));
+  max-height: calc(50vh - var(--_search-view-header-height) - var(--_search-view-gap));
+  margin-block-start: var(--_search-view-gap);
+  overflow: auto;
+  border-radius: var(--_search-view-results-radius);
+  background: var(--_search-view-container-color);
+  color: var(--on-surface);
+}
+
+.search-view--fullscreen,
+.search-view--fullscreen-contained {
   width: 100%;
   height: 100%;
   border-radius: 0;
   animation: search-view-enter var(--_search-expand-duration) var(--_search-expand-easing);
 }
-.search-view--fullscreen .search-view__results {
+
+.search-view--fullscreen .search-view__results,
+.search-view--fullscreen-contained .search-view__results {
   height: calc(100% - var(--_search-view-header-height));
+}
+
+.search-view--fullscreen-contained {
+  background: var(--_search-view-contained-background-color);
+}
+
+.search-view--fullscreen-contained .search-view__header {
+  display: flex;
+  align-items: center;
+  padding-inline: var(--_search-fullscreen-horizontal-padding);
+}
+
+.search-view__contained-bar {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: min(100%, var(--_search-min-width));
+  max-width: var(--_search-max-width);
+  height: var(--_search-view-contained-bar-height);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--_search-view-contained-bar-radius);
+  background: var(--_search-view-contained-bar-color);
+}
+
+.app-bar-with-search {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  height: var(--_app-bar-with-search-height);
+  background: var(--_app-bar-with-search-container-color);
+  transition: background-color var(--_app-bar-with-search-motion-duration) var(--_app-bar-with-search-motion-easing);
+}
+
+.app-bar-with-search__navigation,
+.app-bar-with-search__actions {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--_app-bar-with-search-navigation-icon-color);
+}
+
+.app-bar-with-search__navigation { padding-inline-start: var(--_app-bar-with-search-navigation-space); }
+.app-bar-with-search__actions {
+  justify-content: flex-end;
+  gap: 0;
+  padding-inline-end: var(--_app-bar-with-search-action-space);
+  color: var(--_app-bar-with-search-action-icon-color);
+}
+
+.app-bar-with-search__search-slot {
+  min-width: 0;
+  padding-block: calc((var(--_app-bar-with-search-height) - var(--_app-bar-with-search-search-height)) / 2);
+  padding-inline-start: var(--_app-bar-with-search-search-leading-space);
+  padding-inline-end: var(--_app-bar-with-search-search-trailing-space);
+}
+
+.app-bar-with-search__search-slot .search-bar {
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+  background: var(--_app-bar-with-search-search-container-color);
 }
 
 @keyframes search-view-enter {
@@ -128,10 +231,15 @@
 
 @media (prefers-reduced-motion: reduce) {
   .search-view--docked,
-  .search-view--fullscreen { animation: none; }
+  .search-view--docked-gap,
+  .search-view--fullscreen,
+  .search-view--fullscreen-contained { animation: none; }
+
+  .app-bar-with-search { transition-duration: 0ms; }
 }
 
 @media (max-width: 359px) {
   .search-bar,
-  .search-view--docked { width: 100%; min-width: 100%; }
+  .search-view--docked,
+  .search-view--docked-gap { width: 100%; min-width: 100%; }
 }

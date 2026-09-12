@@ -1,9 +1,9 @@
 ---
 title: Search bar
-description: Material 3 search input and docked/full-screen result surfaces with explicit shared state, browser search semantics, and application-owned data.
+description: Material 3 search input, docked/full-screen result surfaces, contained and app-bar variants, explicit shared state, and browser-native search semantics.
 ---
 
-Search bars give users a prominent entry point for finding content. Material 3 defines the search surface and its collapsed/expanded presentation; the application still owns indexing, ranking, requests, result content, and navigation.
+Search bars give users a prominent entry point for finding content. Material 3 defines the search surface and its collapsed/expanded presentation; the application still owns indexing, ranking, requests, result content, navigation, and any scroll offset used to style an integrated app bar.
 
 [Material 3 search](https://m3.material.io/components/search/overview)
 
@@ -39,23 +39,49 @@ const state = useSearchBarState();
 
 Use a search bar when search is an important destination-level task and users benefit from a persistent or prominent search entry point. Use a normal text field for ordinary form filtering where the Material search surface and expanded result behavior are unnecessary.
 
-Choose docked or full-screen expanded presentation from the product context. `SearchBar` does not infer a window breakpoint or navigation policy by itself.
+Choose docked, docked-with-gap, full-screen, contained full-screen, or app-bar composition from the product context. `SearchBar` does not infer a window breakpoint, navigation policy, search backend, or scroll owner.
 
 ## Shared search state
 
-`SearchBar`, `SearchBarInput`, and an expanded search surface share one `SearchBarState` from `useSearchBarState()`. That keeps expansion/collapse behavior explicit instead of hiding application state in several disconnected components.
+`SearchBar`, `SearchBarInput`, every expanded surface, and `AppBarWithSearch` can share one `SearchBarState` from `useSearchBarState()`. This keeps collapsed/expanded transitions explicit instead of hiding application state in disconnected components.
 
-The state controls the Material search-surface lifecycle; it does not own the search backend or result model.
+The state controls the Material search-surface lifecycle; it does not own result data, networking, routing, or document scroll state.
 
-## Docked and full-screen results
+## Docked results
 
-`ExpandedDockedSearchBar` keeps results near the input and remains non-modal. It can dismiss on outside pointer interaction or Escape according to the public behavior.
+`ExpandedDockedSearchBar` is the compatible attached docked surface. It keeps results near the input, remains non-modal, focuses the expanded query field, and can dismiss on outside pointer interaction or Escape.
 
-`ExpandedFullScreenSearchBar` owns the browser modal/dialog focus scope and dismissal behavior appropriate to the full-screen surface. Treat that modal behavior as a web interaction adaptation layered onto the Material presentation, not as a claim that every visual search expansion is a browser dialog.
+`ExpandedDockedSearchBarWithGap` maps the current Compose split presentation: the search bar and results dropdown are separate surfaces with the canonical 2px gap, medium results shape, scrim, and a lower maximum expanded height. `dropdownGap` and `dropdownScrimColor` are narrow web overrides when product composition requires them.
+
+Escape returns focus to the collapsed query field when that field initiated the expansion. Outside pointer dismissal does not force focus back over the user's new pointer target.
+
+## Full-screen results
+
+`ExpandedFullScreenSearchBar` owns the browser modal/dialog focus scope and dismissal behavior appropriate to the existing full-screen surface.
+
+`ExpandedFullScreenContainedSearchBar` preserves that React Aria modal lifecycle while rendering the current contained Material treatment: the full-screen surface uses the contained background and keeps a canonical 56px rounded search bar inside the full-screen header instead of turning the whole header into the search field.
+
+Treat browser modal behavior as the web interaction adaptation layered onto the Material presentation, not as a claim that every visual search expansion is a browser dialog.
+
+## App bar with search
+
+`AppBarWithSearch` composes an optional navigation slot, the shared search field, and optional actions in the current Material app-bar search layout.
+
+```tsx
+<AppBarWithSearch
+  state={state}
+  inputField={input}
+  navigationIcon={<BackButton />}
+  actions={<ProfileButton />}
+  overlappedFraction={contentOverlap}
+/>
+```
+
+`overlappedFraction` is deliberately application-owned. Pass a value from `0` to `1` based on the scroll container or layout state your application already owns. Values above a small overlap threshold switch the app-bar and search-container scrolled colors. The component does not install a document scroll listener or reproduce Compose nested-scroll machinery.
 
 ## Input and submission semantics
 
-`SearchBarInput` uses a native search form/search input boundary. `onValueChange` handles editing, while submit calls `onSearch`. A clear action can clear the current value and return focus to the input.
+`SearchBarInput` uses a native search form/search input boundary. `onValueChange` handles editing, while native form submission calls `onSearch`. A clear action can clear the current value and return focus to the input.
 
 Keep the user's query in application or shared search state as appropriate. Network requests, debouncing, caching, ranking, and route changes remain outside the component.
 
@@ -67,15 +93,17 @@ The docs application uses Fumadocs search data as one consumer example; that bac
 
 ## Behavior and states
 
-React/browser semantics own form submission, text editing, focus, and modal/docked dismissal behavior. Material tokens own the search container, expanded surface, state layers, typography, icon/action slots, and visual motion.
+React/browser semantics own form submission, text editing, focus, and modal/docked dismissal behavior. Material tokens own the search container, expanded surface, split gap/scrim, contained treatment, app-bar colors, state layers, typography, and visual motion.
 
-Full-screen modal state should restore or preserve focus according to the public overlay contract. Docked dismissal should not masquerade as modal focus trapping.
+All variants use the same collapsed/expanded state contract. Reduced-motion preferences remove the expanded-surface animation and app-bar color-transition duration without creating a second state path.
 
 ## Accessibility
 
 Give the search input a meaningful visible or accessible label. Result content needs its own semantics; the search bar does not automatically announce arbitrary network/result changes.
 
-If an application announces result counts or asynchronous status, use an appropriate status/live-region pattern and avoid repeatedly interrupting users on every keystroke. In full-screen mode, keep dialog naming/focus behavior consistent with the public modal surface.
+If an application announces result counts or asynchronous status, use an appropriate status/live-region pattern and avoid repeatedly interrupting users on every keystroke. Full-screen variants keep React Aria dialog/focus behavior; docked variants remain non-modal.
+
+Navigation and action content supplied to `AppBarWithSearch` keeps the semantics of the controls the application provides. The component does not replace those controls with generic clickable wrappers.
 
 ## API reference
 
@@ -85,10 +113,11 @@ If an application announces result counts or asynchronous status, use an appropr
 
 <MaterialParity component="search-bar" />
 
-Material provides the search-surface hierarchy, anatomy, and docked/full-screen presentation intent. Native search form semantics, browser focus, outside dismissal, and full-screen dialog behavior are web adaptations. Search data/indexing/navigation remain application-owned.
+The reviewed Compose mapping includes `SearchBar`, `ExpandedDockedSearchBar`, `ExpandedDockedSearchBarWithGap`, `ExpandedFullScreenSearchBar`, `ExpandedFullScreenContainedSearchBar`, and `AppBarWithSearch`. Material supplies their surface hierarchy, geometry, colors, and presentation intent. Native search form semantics, browser focus restoration, outside dismissal, React Aria modal ownership, and application-owned scroll overlap are intentional web adaptations.
 
 ## Related components
 
 - [Text field](/docs/components/text-field) — general text entry.
 - [Dialog](/docs/components/dialog) — general modal surface semantics.
+- [Top app bar](/docs/components/top-app-bar) — general app-bar composition and application-owned scroll state.
 - [Adaptive layout](/docs/develop/layout) — application/window layout policy, separate from search-surface presentation.

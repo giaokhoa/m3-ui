@@ -2,7 +2,10 @@ import type { ReactElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
+  AppBarWithSearch,
   ExpandedDockedSearchBar,
+  ExpandedDockedSearchBarWithGap,
+  ExpandedFullScreenContainedSearchBar,
   ExpandedFullScreenSearchBar,
   OutlinedSecureTextField,
   OutlinedTextField,
@@ -84,25 +87,49 @@ describe('text and search SSR contracts', () => {
     const html = renderTextSearch(
       <>
         <SearchBar state={collapsedSearchState}>{input}</SearchBar>
+        <AppBarWithSearch
+          state={collapsedSearchState}
+          inputField={input}
+          navigationIcon={<span>Back</span>}
+          actions={<span>Actions</span>}
+          overlappedFraction={1}
+          data-testid="app-bar-search"
+        />
         <ExpandedDockedSearchBar
           state={collapsedSearchState}
           inputField={input}
         >
           Docked results
         </ExpandedDockedSearchBar>
+        <ExpandedDockedSearchBarWithGap
+          state={collapsedSearchState}
+          inputField={input}
+        >
+          Gap results
+        </ExpandedDockedSearchBarWithGap>
         <ExpandedFullScreenSearchBar
           state={collapsedSearchState}
           inputField={input}
         >
           Fullscreen results
         </ExpandedFullScreenSearchBar>
+        <ExpandedFullScreenContainedSearchBar
+          state={collapsedSearchState}
+          inputField={input}
+        >
+          Contained results
+        </ExpandedFullScreenContainedSearchBar>
       </>,
     );
 
     expect(html).toContain('role="search"');
     expect(html).toContain('type="search"');
     expect(html).toContain('data-state="collapsed"');
+    expect(html).toContain('app-bar-with-search');
+    expect(html).toContain('data-scrolled="true"');
     expect(html).not.toContain('search-view--docked');
+    expect(html).not.toContain('search-view--docked-gap');
     expect(html).not.toContain('search-view--fullscreen');
+    expect(html).not.toContain('search-view--fullscreen-contained');
   });
 });

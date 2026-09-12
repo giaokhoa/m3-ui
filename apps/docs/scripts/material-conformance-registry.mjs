@@ -237,6 +237,7 @@ const textSearchFamilyDimensions = {
     materialStatesVariants: requiredEvidence(SEARCH_BAR_VISUAL_EVIDENCE),
     tokensVisuals: requiredEvidence(
       'packages/tokens/scripts/audit-material-web-search.mjs',
+      'packages/tokens/scripts/app-bars-search-toolbar-css.test.mjs',
       'packages/ui/src/components/SearchBar/SearchBar.defaults.test.ts',
       SEARCH_BAR_VISUAL_EVIDENCE,
     ),

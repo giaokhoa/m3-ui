@@ -34,6 +34,17 @@ test('generated search CSS owns static surface, shape, type and motion', async (
   assert.match(css, /--_search-view-header-height: 56px;/);
   assert.match(css, /\.search-view--fullscreen \{/);
   assert.match(css, /--_search-view-header-height: 72px;/);
+  assert.match(css, /\.search-view--docked-gap \{/);
+  assert.match(css, /--_search-view-gap: 2px;/);
+  assert.match(css, /--_search-view-results-radius: 12px;/);
+  assert.match(css, /--_search-view-scrim-color: color-mix\(in srgb, var\(--scrim\) 32%, transparent\);/);
+  assert.match(css, /\.search-view--fullscreen-contained \{/);
+  assert.match(css, /--_search-view-contained-background-color: var\(--surface-container-low\);/);
+  assert.match(css, /--_search-view-contained-bar-height: 56px;/);
+  assert.match(css, /\.app-bar-with-search \{/);
+  assert.match(css, /--_app-bar-with-search-height: 64px;/);
+  assert.match(css, /\.app-bar-with-search\[data-scrolled\]/);
+  assert.match(css, /--_app-bar-with-search-search-container-color: var\(--surface-container-highest\);/);
 });
 
 test('generated floating-toolbar CSS owns token geometry, variants, FAB state and motion', async () => {
