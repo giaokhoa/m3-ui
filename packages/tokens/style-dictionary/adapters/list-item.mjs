@@ -147,6 +147,12 @@ export function createListItemCss(context) {
       line('--_ripple-color', get(`${base}.itemSelectedDisabledLabelTextColor`)),
     ]),
     ...rule(
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented)',
+      [
+        line('--_list-item-segmented-gap', get(`${base}.segmentedGap`)),
+      ],
+    ),
+    ...rule(
       ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item',
       [
         line('--_list-item-container-color', get(`${base}.itemSegmentedContainerColor`)),
