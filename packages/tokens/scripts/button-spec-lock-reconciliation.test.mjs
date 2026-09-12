@@ -39,8 +39,17 @@ test('Button runtime and Storybook contract tests consume generated tokens inste
   assert.doesNotMatch(browserTest, /\['Square extra small', '12px', '8px'\]/);
 });
 
-test('Storybook declares its direct generated-token test dependency', () => {
+test('Storybook declares and CI builds its direct generated-token test dependency', async () => {
   assert.equal(storybookManifest.devDependencies?.['@m3-ui/tokens'], 'workspace:*');
+  const workflow = await readFile(new URL('.github/workflows/ci.yml', repoRoot), 'utf8');
+  const visualJob = workflow.slice(workflow.indexOf('  visual:'), workflow.indexOf('  docs-browser:'));
+  assert.match(visualJob, /Build generated token test dependency/);
+  assert.match(visualJob, /pnpm --filter @m3-ui\/tokens build/);
+  assert.ok(
+    visualJob.indexOf('pnpm --filter @m3-ui/tokens build') <
+      visualJob.indexOf('pnpm --filter @m3-ui/storybook exec playwright test'),
+    'visual CI must build token dist before Playwright imports @m3-ui/tokens',
+  );
 });
 
 test('unused Compose-style interaction-order adapter and history snapshots stay removed', async () => {

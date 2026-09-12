@@ -58,6 +58,7 @@
     "package": "@m3-ui/storybook",
     "dependency": "@m3-ui/tokens",
     "kind": "devDependency",
-    "reason": "Playwright contract tests consume generated token exports directly as expected values instead of relying on transitive @m3-ui/ui dependency resolution or duplicating literals."
+    "reason": "Playwright contract tests consume generated token exports directly as expected values instead of relying on transitive @m3-ui/ui dependency resolution or duplicating literals.",
+    "ciPrerequisite": "visual regression shards build @m3-ui/tokens after install and before Playwright because only the Storybook static artifact is transferred from the build job"
   }
 }
