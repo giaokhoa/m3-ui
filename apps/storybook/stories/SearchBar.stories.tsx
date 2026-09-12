@@ -1,7 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
+  AppBarWithSearch,
   ExpandedDockedSearchBar,
+  ExpandedDockedSearchBarWithGap,
+  ExpandedFullScreenContainedSearchBar,
   ExpandedFullScreenSearchBar,
   SearchBar,
   SearchBarInput,
@@ -32,11 +35,24 @@ function Results() {
   );
 }
 
-function Input({ state, query, setQuery }: { state: ReturnType<typeof useSearchBarState>; query: string; setQuery: (value: string) => void }) {
+function Input({
+  state,
+  query,
+  setQuery,
+  testId,
+  label = 'Search',
+}: {
+  state: ReturnType<typeof useSearchBarState>;
+  query: string;
+  setQuery: (value: string) => void;
+  testId?: string;
+  label?: string;
+}) {
   return (
     <SearchBarInput
       state={state}
-      aria-label="Search"
+      aria-label={label}
+      data-testid={testId}
       placeholder="Search"
       value={query}
       onValueChange={setQuery}
@@ -82,6 +98,40 @@ function DockedDemo() {
   );
 }
 
+function DockedWithGapDemo() {
+  const state = useSearchBarState();
+  const [query, setQuery] = useState('Material');
+  return (
+    <Stage>
+      <SearchBar state={state} data-testid="gap-collapsed-bar">
+        <Input
+          state={state}
+          query={query}
+          setQuery={setQuery}
+          testId="gap-trigger-input"
+          label="Gap search"
+        />
+      </SearchBar>
+      <ExpandedDockedSearchBarWithGap
+        state={state}
+        inputField={
+          <Input
+            state={state}
+            query={query}
+            setQuery={setQuery}
+            testId="gap-expanded-input"
+            label="Gap search"
+          />
+        }
+        data-testid="search-view-docked-gap"
+      >
+        <Results />
+      </ExpandedDockedSearchBarWithGap>
+      <output data-testid="state-value">{state.value}</output>
+    </Stage>
+  );
+}
+
 function FullScreenDemo() {
   const state = useSearchBarState();
   const [query, setQuery] = useState('Material');
@@ -96,7 +146,79 @@ function FullScreenDemo() {
   );
 }
 
+function FullScreenContainedDemo() {
+  const state = useSearchBarState();
+  const [query, setQuery] = useState('Material');
+  return (
+    <Stage>
+      <button data-testid="contained-background-button" onClick={state.expand}>Open contained search</button>
+      <ExpandedFullScreenContainedSearchBar
+        state={state}
+        inputField={
+          <Input
+            state={state}
+            query={query}
+            setQuery={setQuery}
+            label="Contained search"
+            testId="contained-search-input"
+          />
+        }
+        data-testid="search-view-fullscreen-contained"
+      >
+        <Results />
+      </ExpandedFullScreenContainedSearchBar>
+      <output data-testid="state-value">{state.value}</output>
+    </Stage>
+  );
+}
+
+function ChromeButton({ label, testId }: { label: string; testId: string }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      data-testid={testId}
+      style={{ width: 40, height: 40, border: 0, background: 'transparent', color: 'inherit' }}
+    >
+      {label.slice(0, 1)}
+    </button>
+  );
+}
+
+function AppBarSearchDemo({ dir }: { dir?: 'ltr' | 'rtl' }) {
+  const state = useSearchBarState();
+  const [query, setQuery] = useState('');
+  const [overlap, setOverlap] = useState(0);
+  return (
+    <Stage dir={dir}>
+      <button data-testid="toggle-overlap" onClick={() => setOverlap((value) => value ? 0 : 1)}>
+        Toggle overlap
+      </button>
+      <AppBarWithSearch
+        state={state}
+        inputField={
+          <Input
+            state={state}
+            query={query}
+            setQuery={setQuery}
+            label="App bar search"
+            testId="app-bar-search-input"
+          />
+        }
+        navigationIcon={<ChromeButton label="Back" testId="app-bar-navigation" />}
+        actions={<ChromeButton label="Profile" testId="app-bar-action" />}
+        overlappedFraction={overlap}
+        data-testid="app-bar-with-search"
+      />
+    </Stage>
+  );
+}
+
 export const Default: Story = { render: () => <CollapsedDemo /> };
 export const Rtl: Story = { render: () => <CollapsedDemo dir="rtl" /> };
 export const DockedExpanded: Story = { render: () => <DockedDemo /> };
+export const DockedWithGap: Story = { render: () => <DockedWithGapDemo /> };
 export const FullScreenExpanded: Story = { render: () => <FullScreenDemo /> };
+export const FullScreenContained: Story = { render: () => <FullScreenContainedDemo /> };
+export const AppBarSearch: Story = { render: () => <AppBarSearchDemo /> };
+export const AppBarSearchRtl: Story = { render: () => <AppBarSearchDemo dir="rtl" /> };

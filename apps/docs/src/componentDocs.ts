@@ -150,11 +150,18 @@ export const componentDocs = {
   'search-bar': {
     family: 'Search',
     materialUrl: 'https://m3.material.io/components/search/overview',
-    composeMapping: ['SearchBar', 'ExpandedDockedSearchBar', 'ExpandedFullScreenSearchBar'],
+    composeMapping: [
+      'SearchBar',
+      'ExpandedDockedSearchBar',
+      'ExpandedDockedSearchBarWithGap',
+      'ExpandedFullScreenSearchBar',
+      'ExpandedFullScreenContainedSearchBar',
+      'AppBarWithSearch',
+    ],
     implementation:
-      'Implements a collapsed Material search field plus docked and full-screen expanded search surfaces driven by a shared explicit search-bar state object. The input supports leading/trailing content, clearing, native search submission, and controlled or uncontrolled text values.',
+      'Implements the collapsed Material search field, basic docked/full-screen surfaces, current split docked-with-gap presentation, contained full-screen presentation, and AppBarWithSearch composition. All variants share the same explicit SearchBarState and native search-input contract.',
     webAdaptation:
-      'SearchBarInput renders a native search form and search input. React Aria owns the full-screen modal/dialog focus and dismissal behavior, while the docked surface owns browser outside-pointer and Escape dismissal. Search-result retrieval is deliberately outside the component and can be supplied by Fumadocs or any application search backend.',
+      'SearchBarInput renders a native search form and search input. React Aria owns full-screen modal/dialog focus and dismissal behavior; docked surfaces use narrow outside-pointer/Escape handling without owning scroll. AppBarWithSearch consumes an application-owned overlappedFraction rather than installing Compose-style nested-scroll machinery. Search-result retrieval remains application-owned.',
   },
   'progress-indicator': {
     family: 'Progress indicators',
