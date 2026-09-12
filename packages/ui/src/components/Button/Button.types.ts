@@ -5,6 +5,8 @@ export type ButtonSize =
   | 'large'
   | 'extraLarge';
 
+export type ButtonShapeType = 'round' | 'square';
+
 export type ButtonVariant =
   | 'filled'
   | 'elevated'

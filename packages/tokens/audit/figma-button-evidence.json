@@ -403,9 +403,12 @@
       {
         "id": "button-square-size-helper",
         "issue": 408,
-        "figma": "Round/Square are published for all five sizes",
-        "canonical": "public buttonShapesForSize() exposes only round -> pressed mapping; custom square values can be authored manually",
-        "status": "unresolved"
+        "figma": "Round/Square are published for all five sizes; Square enabled radii = 12/12/16/28/28 and pressed = 8/8/12/16/16.",
+        "canonical": "buttonShapesForSize(size, type) exposes both round and square canonical mappings from generated DTCG tokens.",
+        "status": "resolved-square-helper",
+        "materialWeb": "latest generated Button size tokens publish container-shape-square = medium/medium/large/extraLarge/extraLarge and pressed-container-shape = small/small/medium/large/large.",
+        "compose": "pinned ButtonXSmall/Small/Medium/Large/XLarge tokens publish the same square and pressed shape keys.",
+        "decision": "Expose Square through the existing size-aware helper with a backward-compatible type parameter; do not hard-code shape radii in runtime."
       },
       {
         "id": "button-storybook-spec-locks",

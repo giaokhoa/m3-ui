@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-12",
+  "issue": 408,
+  "shapeDecision": {
+    "disposition": "supported-canonical-helper",
+    "api": "buttonShapesForSize(size, type = \"round\")",
+    "types": [
+      "round",
+      "square"
+    ],
+    "sizes": [
+      "extraSmall",
+      "small",
+      "medium",
+      "large",
+      "extraLarge"
+    ],
+    "reason": "Current Figma, Material Web latest generated tokens, and pinned Compose generated size tokens agree on the Round/Square container-shape matrix and pressed target shapes."
+  },
+  "shapeMatrix": {
+    "extraSmall": {
+      "round": "full",
+      "square": "medium",
+      "squareRadiusPx": 12,
+      "pressed": "small",
+      "pressedRadiusPx": 8
+    },
+    "small": {
+      "round": "full",
+      "square": "medium",
+      "squareRadiusPx": 12,
+      "pressed": "small",
+      "pressedRadiusPx": 8
+    },
+    "medium": {
+      "round": "full",
+      "square": "large",
+      "squareRadiusPx": 16,
+      "pressed": "medium",
+      "pressedRadiusPx": 12
+    },
+    "large": {
+      "round": "full",
+      "square": "extraLarge",
+      "squareRadiusPx": 28,
+      "pressed": "large",
+      "pressedRadiusPx": 16
+    },
+    "extraLarge": {
+      "round": "full",
+      "square": "extraLarge",
+      "squareRadiusPx": 28,
+      "pressed": "large",
+      "pressedRadiusPx": 16
+    }
+  },
+  "sources": {
+    "figma": {
+      "name": "Material 3 Design Kit",
+      "version": "1.25",
+      "evidence": "audit/figma-button-evidence.json",
+      "variantTypeProperty": [
+        "Round",
+        "Square"
+      ]
+    },
+    "materialWeb": {
+      "repository": "material-components/material-web",
+      "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+      "generatedVersion": "34.0.21",
+      "modules": [
+        "md-comp-button-xsmall",
+        "md-comp-button-small",
+        "md-comp-button-medium",
+        "md-comp-button-large",
+        "md-comp-button-xlarge"
+      ]
+    },
+    "compose": {
+      "repository": "androidx/androidx",
+      "revision": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+      "generatedTokenFiles": [
+        "ButtonXSmallTokens.kt",
+        "ButtonSmallTokens.kt",
+        "ButtonMediumTokens.kt",
+        "ButtonLargeTokens.kt",
+        "ButtonXLargeTokens.kt"
+      ]
+    }
+  },
+  "precisionPointerDecision": {
+    "disposition": "excluded-android-device-policy",
+    "canonicalWebBehavior": "no automatic Button density/size change based on pointer hardware",
+    "composeTrigger": "feature flag enabled AND physical alphabetic keyboard present AND physical mouse present; drawing-tablet stylus+mouse devices are excluded from mouse classification",
+    "composeButtonEffect": {
+      "smallMinHeightDp": {
+        "normal": 40,
+        "precisionPointer": 36
+      },
+      "smallVerticalPaddingDp": {
+        "normal": 10,
+        "precisionPointer": 8
+      }
+    },
+    "figma": "No precision-pointer/density variant property exists in the five reviewed Button component sets.",
+    "materialWeb": "No equivalent Button size/device-policy API is exposed by the reviewed public runtime.",
+    "reason": "CSS pointer/hover media queries or the current PointerEvent.pointerType are not semantically equivalent to Compose system device inventory plus feature flag. Web Button keeps explicit size selection and stable touch-target semantics until a normative/current web source defines an equivalent policy."
+  }
+}

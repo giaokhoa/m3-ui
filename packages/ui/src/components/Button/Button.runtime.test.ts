@@ -8,10 +8,18 @@ import {
 const idleState = { isDisabled: false, isPressed: false } as const;
 
 describe('Button runtime integration', () => {
-  it('keeps expressive shape resolution in runtime because shapes may be supplied by props', () => {
+  it('keeps the full Round and Square expressive shape matrix in runtime', () => {
     expect(buttonShapesForSize('extraSmall')).toEqual({ shape: '9999px', pressedShape: '8px' });
+    expect(buttonShapesForSize('small')).toEqual({ shape: '9999px', pressedShape: '8px' });
     expect(buttonShapesForSize('medium')).toEqual({ shape: '9999px', pressedShape: '12px' });
+    expect(buttonShapesForSize('large')).toEqual({ shape: '9999px', pressedShape: '16px' });
     expect(buttonShapesForSize('extraLarge')).toEqual({ shape: '9999px', pressedShape: '16px' });
+
+    expect(buttonShapesForSize('extraSmall', 'square')).toEqual({ shape: '12px', pressedShape: '8px' });
+    expect(buttonShapesForSize('small', 'square')).toEqual({ shape: '12px', pressedShape: '8px' });
+    expect(buttonShapesForSize('medium', 'square')).toEqual({ shape: '16px', pressedShape: '12px' });
+    expect(buttonShapesForSize('large', 'square')).toEqual({ shape: '28px', pressedShape: '16px' });
+    expect(buttonShapesForSize('extraLarge', 'square')).toEqual({ shape: '28px', pressedShape: '16px' });
   });
 
   it('only emits runtime shape overrides when shapes are supplied', () => {

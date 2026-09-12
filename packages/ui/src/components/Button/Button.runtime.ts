@@ -1,6 +1,6 @@
 import * as token from '@m3-ui/tokens';
 import type { CSSProperties } from 'react';
-import type { ButtonSize } from './Button.types';
+import type { ButtonShapeType, ButtonSize } from './Button.types';
 
 export type ButtonStyle = CSSProperties & Record<`--${string}`, string | number>;
 export type ButtonShapeValue = string | number;
@@ -29,6 +29,23 @@ const shapeRadius = {
 
 type ButtonPressedShape = keyof typeof shapeRadius;
 
+const containerShapeBySizeAndType = {
+  round: {
+    extraSmall: token.ComponentButtonSizeExtraSmallContainerShapeRound,
+    small: token.ComponentButtonSizeSmallContainerShapeRound,
+    medium: token.ComponentButtonSizeMediumContainerShapeRound,
+    large: token.ComponentButtonSizeLargeContainerShapeRound,
+    extraLarge: token.ComponentButtonSizeExtraLargeContainerShapeRound,
+  },
+  square: {
+    extraSmall: token.ComponentButtonSizeExtraSmallContainerShapeSquare,
+    small: token.ComponentButtonSizeSmallContainerShapeSquare,
+    medium: token.ComponentButtonSizeMediumContainerShapeSquare,
+    large: token.ComponentButtonSizeLargeContainerShapeSquare,
+    extraLarge: token.ComponentButtonSizeExtraLargeContainerShapeSquare,
+  },
+} as const satisfies Record<ButtonShapeType, Record<ButtonSize, ButtonPressedShape>>;
+
 const pressedShapeBySize = {
   extraSmall: token.ComponentButtonSizeExtraSmallPressedShape,
   small: token.ComponentButtonSizeSmallPressedShape,
@@ -44,9 +61,12 @@ function normalizeShapeValue(value: ButtonShapeValue): string | number {
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-export function buttonShapesForSize(size: ButtonSize): ButtonShapes {
+export function buttonShapesForSize(
+  size: ButtonSize,
+  type: ButtonShapeType = 'round',
+): ButtonShapes {
   return {
-    shape: token.ShapeFull,
+    shape: shapeRadius[containerShapeBySizeAndType[type][size]],
     pressedShape: shapeRadius[pressedShapeBySize[size]],
   };
 }
