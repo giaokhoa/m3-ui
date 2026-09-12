@@ -199,7 +199,6 @@ export function MenuSubmenu<T extends object>({
   popoverClassName,
   ...menuProps
 }: MenuSubmenuProps<T>) {
-  const themePortalContainer = useThemePortalContainer();
   const ripple = useRipple();
 
   return (
@@ -210,7 +209,6 @@ export function MenuSubmenu<T extends object>({
         offset={offset}
         crossOffset={crossOffset}
         containerPadding={menuRuntime.viewportMargin}
-        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className={clsx(
           'menu-popover',
           'menu-submenu-popover',
