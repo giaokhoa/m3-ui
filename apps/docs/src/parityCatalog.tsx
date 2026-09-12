@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getMaterialTypeCssProperties } from '@m3-ui/ui/typography';
 import materialConformanceReport from './generated/material-conformance.generated.json';
 import { Surface } from './mdxDirectComponents';
@@ -98,13 +99,13 @@ export function ParityCatalog() {
                 </summary>
                 <div className="docs-parity-catalog__body">
                   <div className="docs-parity-catalog__links">
-                    <a
+                    <Link
                       className="docs-link"
                       href={`/docs/components/${id}`}
                       style={getMaterialTypeCssProperties('labelLarge')}
                     >
                       Open guide
-                    </a>
+                    </Link>
                     {metadata.evidence.map((source) =>
                       source.url ? (
                         <a

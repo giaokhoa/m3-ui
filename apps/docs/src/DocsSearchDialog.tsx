@@ -14,8 +14,9 @@ import {
 import { SearchGlyph } from './DocsSearch';
 import './docs-search.css';
 
+const docsBasePath = process.env.NEXT_PUBLIC_M3_UI_DOCS_BASE_PATH ?? '';
 const searchClient = staticClient({
-  from: '/search-index.json',
+  from: `${docsBasePath}/search-index.json`,
 });
 
 function plainSearchText(value: string): string {

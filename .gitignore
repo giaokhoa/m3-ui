@@ -11,3 +11,6 @@ dist
 !.agents/skills/material3-parity/**
 !.agents/skills/style-dictionary/
 !.agents/skills/style-dictionary/**
+
+# Combined static GitHub Pages artifact
+pages-dist
