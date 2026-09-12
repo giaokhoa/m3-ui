@@ -33,6 +33,14 @@ Canonical `component.list.base` tokens own immutable ListItem spacing, one/two/t
 
 React Aria remains the source of truth for hover, focus-visible, press and disabled state. The component does not mirror those states into a TypeScript color/shape resolver. `data-selected`, `data-dragged`, line count and the narrow elevation level are component semantics layered onto the RAC host.
 
+## Segmented composition
+
+`SegmentedListItemGroup` is the presentation boundary for passive, action and multiple-selection rows. `ListItemSelectionGroup variant="segmented"` applies the same presentation while preserving the existing radiogroup/roving-focus contract for single selection. Neither path creates a second ListItem interaction engine.
+
+The generated ListItem CSS owns `component.list.base.segmentedGap`, `itemSegmentedContainerColor`, `itemContainerExpressiveShape` and `containerShape`. DOM position provides first/middle/last/only idle geometry: the middle shape remains the expressive base shape while the list container shape overrides only the outer corners of the first/last item. Hover, focus-visible, press, selected and dragged states intentionally replace all four corners with their full state shape, matching `ListItemDefaults.segmentedShapes(index, count)` plus the normal ListItem interaction shape resolver.
+
+Handwritten CSS only supplies the flex-column group layout and logical corner application. Do not move the 2px gap or 4px/16px Material shape facts into runtime TypeScript or handwritten CSS.
+
 ## Ripple boundary
 
 Interactive ListItems continue to use the shared RAC Ripple contract: RAC current render state drives hover/focus indication and normalized PressEvents drive runtime wave geometry/lifecycle. Generated ListItem CSS supplies only the component semantic Ripple color. Shared generated `ripple.css` remains the single owner of immutable hover/focus/pressed state-layer opacity and Ripple motion/focus styling; ListItem does not restate those primitive values.
@@ -46,6 +54,7 @@ Source/dev and modular style consumers include generated elevation and ListItem 
 Tests should cover the observable behavior:
 
 - generated CSS maps canonical 56/72/88 geometry, typography, state colors/opacities, shapes and motion;
+- segmented groups map the canonical 2px gap, expressive middle shape, outer first/last corners and full interaction-state shape replacement;
 - normal/selected items select semantic `level0` and dragged items select canonical `level4`;
 - selected/disabled/hover/focus/press/dragged visuals preserve Material behavior and state precedence;
 - dynamic `sourceColor` updates ListItem paint through semantic role CSS variables;
