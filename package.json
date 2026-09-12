@@ -18,5 +18,7 @@
   "devDependencies": {
     "turbo": "^2.10.12",
     "typescript": "^7.0.2"
-  }
+  },
+  "homepage": "https://giaokhoa.github.io/m3-ui/",
+  "license": "Apache-2.0"
 }

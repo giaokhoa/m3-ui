@@ -11,7 +11,7 @@
     "ui",
     "design-system"
   ],
-  "homepage": "https://github.com/giaokhoa/m3-ui#readme",
+  "homepage": "https://giaokhoa.github.io/m3-ui/",
   "bugs": {
     "url": "https://github.com/giaokhoa/m3-ui/issues"
   },
@@ -25,7 +25,8 @@
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "LICENSE"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -75,5 +76,6 @@
     "@vitejs/plugin-react": "^6.1.1",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"
-  }
+  },
+  "license": "Apache-2.0"
 }

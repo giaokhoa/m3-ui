@@ -56,6 +56,8 @@ for (const manifest of packages) {
   assert.ok(manifest.description?.trim(), `${manifest.name} requires a distribution description`);
   assert.ok(Array.isArray(manifest.keywords) && manifest.keywords.length > 0, `${manifest.name} requires discovery keywords`);
   assert.equal(manifest.homepage, policy.metadata.homepage);
+  assert.equal(manifest.license, policy.license.spdx, `${manifest.name} must declare the selected SPDX license`);
+  assert.ok(manifest.files?.includes('LICENSE'), `${manifest.name} must explicitly ship its license text`);
   assert.equal(manifest.bugs?.url, policy.metadata.bugs);
   assert.equal(manifest.repository?.type, 'git');
   assert.equal(manifest.repository?.url, policy.metadata.repository);
@@ -70,11 +72,24 @@ assert.equal(ui.dependencies?.['@m3-ui/tokens'], policy.versioning.workspaceDepe
 assert.equal(ui.peerDependencies?.react, policy.consumer.reactPeer);
 assert.equal(ui.peerDependencies?.['react-dom'], policy.consumer.reactPeer);
 
-if (policy.license.spdx === null) {
-  for (const manifest of packages) {
-    assert.equal('license' in manifest, false, `${manifest.name} must not invent a license before maintainer selection`);
-  }
-  assert.equal(await exists('LICENSE'), false, 'release policy must be updated when a root LICENSE is introduced');
+assert.equal(policy.license.spdx, 'Apache-2.0');
+assert.equal(policy.license.licenseFile, 'LICENSE');
+assert.equal(policy.license.decision, 'maintainer-selected');
+assert.equal(policy.license.decisionIssue, 401);
+assert.deepEqual(policy.license.packageLicenseFiles, ['packages/ui/LICENSE', 'packages/tokens/LICENSE']);
+assert.equal(root.license, policy.license.spdx);
+assert.equal(root.homepage, policy.metadata.homepage);
+assert.equal(await exists(policy.license.licenseFile), true, 'selected root LICENSE file must exist');
+const rootLicense = await readFile(join(repoRoot, policy.license.licenseFile), 'utf8');
+assert.match(rootLicense, /^\s*Apache License\s+Version 2\.0, January 2004/m);
+assert.match(rootLicense, /http:\/\/www\.apache\.org\/licenses\//);
+for (const packageLicenseFile of policy.license.packageLicenseFiles) {
+  assert.equal(await exists(packageLicenseFile), true, `${packageLicenseFile} must exist for packed distribution`);
+  assert.equal(
+    await readFile(join(repoRoot, packageLicenseFile), 'utf8'),
+    rootLicense,
+    `${packageLicenseFile} must remain byte-identical to the root Apache-2.0 license`,
+  );
 }
 
 const allScripts = [root, ui, tokens].flatMap((manifest) => Object.entries(manifest.scripts ?? {}));

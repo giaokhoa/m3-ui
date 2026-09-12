@@ -11,7 +11,7 @@
     "style-dictionary",
     "css"
   ],
-  "homepage": "https://github.com/giaokhoa/m3-ui#readme",
+  "homepage": "https://giaokhoa.github.io/m3-ui/",
   "bugs": {
     "url": "https://github.com/giaokhoa/m3-ui/issues"
   },
@@ -25,7 +25,8 @@
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "LICENSE"
   ],
   "main": "./dist/generated/tokens.js",
   "module": "./dist/generated/tokens.js",
@@ -126,5 +127,6 @@
   },
   "devDependencies": {
     "style-dictionary": "5.5.3"
-  }
+  },
+  "license": "Apache-2.0"
 }

@@ -6,14 +6,19 @@
     "@m3-ui/tokens"
   ],
   "metadata": {
-    "homepage": "https://github.com/giaokhoa/m3-ui#readme",
+    "homepage": "https://giaokhoa.github.io/m3-ui/",
     "bugs": "https://github.com/giaokhoa/m3-ui/issues",
     "repository": "git+https://github.com/giaokhoa/m3-ui.git"
   },
   "license": {
-    "spdx": null,
-    "licenseFile": null,
-    "decision": "maintainer-required"
+    "spdx": "Apache-2.0",
+    "licenseFile": "LICENSE",
+    "packageLicenseFiles": [
+      "packages/ui/LICENSE",
+      "packages/tokens/LICENSE"
+    ],
+    "decision": "maintainer-selected",
+    "decisionIssue": 401
   },
   "versioning": {
     "mode": "lockstep",

@@ -156,6 +156,8 @@ try {
 
   assert.equal(tokensPacked.manifest.name, '@m3-ui/tokens');
   assert.equal(uiPacked.manifest.name, '@m3-ui/ui');
+  assert.equal(tokensPacked.manifest.license, 'Apache-2.0');
+  assert.equal(uiPacked.manifest.license, 'Apache-2.0');
   assert.equal(tokensPacked.manifest.private, true, 'tokens must remain private in this readiness child');
   assert.equal(uiPacked.manifest.private, true, 'ui must remain private in this readiness child');
   assertNoWorkspaceProtocols(tokensPacked.manifest);
@@ -169,11 +171,13 @@ try {
   );
 
   await assertFiles(tokensPacked.packageRoot, [
+    'LICENSE',
     'dist/generated/tokens.js',
     'dist/generated/tokens.d.ts',
     'dist/generated/theme.css',
   ]);
   await assertFiles(uiPacked.packageRoot, [
+    'LICENSE',
     'dist/index.js',
     'dist/index.d.ts',
     'dist/layout.js',
@@ -181,6 +185,9 @@ try {
     'dist/styles.css',
     'dist/styles/button.css',
   ]);
+  const rootLicense = await readFile(join(repoRoot, 'LICENSE'), 'utf8');
+  assert.equal(await readFile(join(tokensPacked.packageRoot, 'LICENSE'), 'utf8'), rootLicense);
+  assert.equal(await readFile(join(uiPacked.packageRoot, 'LICENSE'), 'utf8'), rootLicense);
   await assertNoInternalTestDeclarations(uiPacked.packageRoot);
   await assertNoDeclarationMaps(uiPacked.packageRoot);
   await assertRuntimeDependenciesStayExternal(uiPacked.packageRoot, uiPacked.manifest);

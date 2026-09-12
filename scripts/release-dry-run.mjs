@@ -71,6 +71,14 @@ try {
     }
   }
 
+  const inheritedGitConfigCount = Number.parseInt(safeEnv.GIT_CONFIG_COUNT ?? '0', 10);
+  const gitConfigIndex = Number.isFinite(inheritedGitConfigCount) && inheritedGitConfigCount >= 0
+    ? inheritedGitConfigCount
+    : 0;
+  safeEnv.GIT_CONFIG_COUNT = String(gitConfigIndex + 1);
+  safeEnv[`GIT_CONFIG_KEY_${gitConfigIndex}`] = 'safe.directory';
+  safeEnv[`GIT_CONFIG_VALUE_${gitConfigIndex}`] = repoRoot;
+
   run(node, ['scripts/package-policy-check.mjs'], safeEnv);
   ensureChangesetsBaseRef(safeEnv);
   run(pnpm, ['dlx', '@changesets/cli@3.0.2', 'status', '--output', changesetStatusPath], safeEnv);
