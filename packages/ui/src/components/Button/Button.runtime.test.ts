@@ -1,25 +1,62 @@
+import * as token from '@m3-ui/tokens';
 import { describe, expect, it } from 'vitest';
 import { buttonElevationLevels } from './Button.elevation';
 import {
   buttonShapesForSize,
   getButtonStyle,
 } from './Button.runtime';
+import type { ButtonShapeType, ButtonSize } from './Button.types';
 
 const idleState = { isDisabled: false, isPressed: false } as const;
+const shapeRadius = {
+  full: token.ShapeFull,
+  small: token.ShapeSmall,
+  medium: token.ShapeMedium,
+  large: token.ShapeLarge,
+  extraLarge: token.ShapeExtraLarge,
+} as const;
+const shapeTokens = {
+  extraSmall: {
+    round: token.ComponentButtonSizeExtraSmallContainerShapeRound,
+    square: token.ComponentButtonSizeExtraSmallContainerShapeSquare,
+    pressed: token.ComponentButtonSizeExtraSmallPressedShape,
+  },
+  small: {
+    round: token.ComponentButtonSizeSmallContainerShapeRound,
+    square: token.ComponentButtonSizeSmallContainerShapeSquare,
+    pressed: token.ComponentButtonSizeSmallPressedShape,
+  },
+  medium: {
+    round: token.ComponentButtonSizeMediumContainerShapeRound,
+    square: token.ComponentButtonSizeMediumContainerShapeSquare,
+    pressed: token.ComponentButtonSizeMediumPressedShape,
+  },
+  large: {
+    round: token.ComponentButtonSizeLargeContainerShapeRound,
+    square: token.ComponentButtonSizeLargeContainerShapeSquare,
+    pressed: token.ComponentButtonSizeLargePressedShape,
+  },
+  extraLarge: {
+    round: token.ComponentButtonSizeExtraLargeContainerShapeRound,
+    square: token.ComponentButtonSizeExtraLargeContainerShapeSquare,
+    pressed: token.ComponentButtonSizeExtraLargePressedShape,
+  },
+} as const;
+
+function expectedShapes(size: ButtonSize, type: ButtonShapeType) {
+  const values = shapeTokens[size];
+  return {
+    shape: shapeRadius[values[type]],
+    pressedShape: shapeRadius[values.pressed],
+  };
+}
 
 describe('Button runtime integration', () => {
-  it('keeps the full Round and Square expressive shape matrix in runtime', () => {
-    expect(buttonShapesForSize('extraSmall')).toEqual({ shape: '9999px', pressedShape: '8px' });
-    expect(buttonShapesForSize('small')).toEqual({ shape: '9999px', pressedShape: '8px' });
-    expect(buttonShapesForSize('medium')).toEqual({ shape: '9999px', pressedShape: '12px' });
-    expect(buttonShapesForSize('large')).toEqual({ shape: '9999px', pressedShape: '16px' });
-    expect(buttonShapesForSize('extraLarge')).toEqual({ shape: '9999px', pressedShape: '16px' });
-
-    expect(buttonShapesForSize('extraSmall', 'square')).toEqual({ shape: '12px', pressedShape: '8px' });
-    expect(buttonShapesForSize('small', 'square')).toEqual({ shape: '12px', pressedShape: '8px' });
-    expect(buttonShapesForSize('medium', 'square')).toEqual({ shape: '16px', pressedShape: '12px' });
-    expect(buttonShapesForSize('large', 'square')).toEqual({ shape: '28px', pressedShape: '16px' });
-    expect(buttonShapesForSize('extraLarge', 'square')).toEqual({ shape: '28px', pressedShape: '16px' });
+  it('resolves Round and Square runtime shapes from generated semantic tokens', () => {
+    for (const size of Object.keys(shapeTokens) as ButtonSize[]) {
+      expect(buttonShapesForSize(size)).toEqual(expectedShapes(size, 'round'));
+      expect(buttonShapesForSize(size, 'square')).toEqual(expectedShapes(size, 'square'));
+    }
   });
 
   it('only emits runtime shape overrides when shapes are supplied', () => {
@@ -32,21 +69,27 @@ describe('Button runtime integration', () => {
     const shapes = buttonShapesForSize('medium');
     const idle = getButtonStyle(idleState, { shapes });
     const pressed = getButtonStyle({ ...idleState, isPressed: true }, { shapes });
-    expect(idle['--_button-container-radius']).toBe('9999px');
-    expect(pressed['--_button-container-radius']).toBe('12px');
-    expect(pressed.transition).toContain('border-radius 166ms linear(');
+    expect(idle['--_button-container-radius']).toBe(token.ShapeFull);
+    expect(pressed['--_button-container-radius']).toBe(token.ShapeMedium);
+    expect(pressed.transition).toBe(
+      `border-radius ${token.MotionSpringDefaultEffectsDuration} ${token.MotionSpringDefaultEffectsEasing}`,
+    );
     expect(pressed.transition).not.toContain('box-shadow');
   });
 
-  it('supplies semantic elevation level sets without resolving RAC interaction state locally', () => {
+  it('supplies generated semantic elevation level sets without resolving RAC state locally', () => {
     expect(buttonElevationLevels.elevated).toEqual({
-      default: 'level1',
-      hovered: 'level2',
-      focused: 'level1',
-      pressed: 'level1',
-      disabled: 'level0',
+      default: token.ComponentButtonVariantElevatedDefaultElevation,
+      hovered: token.ComponentButtonVariantElevatedHoveredElevation,
+      focused: token.ComponentButtonVariantElevatedFocusedElevation,
+      pressed: token.ComponentButtonVariantElevatedPressedElevation,
+      disabled: token.ComponentButtonVariantElevatedDisabledElevation,
     });
-    expect(buttonElevationLevels.filled.hovered).toBe('level1');
-    expect(buttonElevationLevels.outlined.hovered).toBe('level0');
+    expect(buttonElevationLevels.filled.hovered).toBe(
+      token.ComponentButtonVariantFilledHoveredElevation,
+    );
+    expect(buttonElevationLevels.outlined.hovered).toBe(
+      token.ComponentButtonVariantOutlinedHoveredElevation,
+    );
   });
 });

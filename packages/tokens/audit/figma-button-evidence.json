@@ -413,9 +413,10 @@
       {
         "id": "button-storybook-spec-locks",
         "issue": 409,
-        "figma": "reviewed component values are now available as independent design evidence",
-        "canonical": "browser snapshots and some runtime tests still duplicate literals or interaction-history outcomes",
-        "status": "unresolved"
+        "figma": "reviewed Button component values remain independent design evidence owned by source/token reconciliation tests",
+        "canonical": "UI unit tests compare runtime wiring to generated semantic tokens; Storybook browser tests compare computed contracts to generated tokens; screenshots remain regression-only evidence",
+        "status": "resolved-layered-spec-locks",
+        "decision": "Remove dead interaction-history machinery and history-order screenshots; keep normative facts in source/token tests and use generated tokens as expected values in UI/browser contract tests."
       }
     ]
   },
