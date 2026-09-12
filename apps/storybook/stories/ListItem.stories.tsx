@@ -262,3 +262,59 @@ export const ThemeMatrix: Story = {
     </div>
   ),
 };
+
+function SegmentedThemeList({
+  mode,
+  sourceColor,
+  label,
+  testId,
+}: {
+  mode: 'light' | 'dark';
+  sourceColor?: string;
+  label: string;
+  testId: string;
+}) {
+  return (
+    <ThemeProvider mode={mode} sourceColor={sourceColor}>
+      <div style={{ background: 'var(--surface)', padding: 16 }}>
+        <div style={{ marginBottom: 8, color: 'var(--on-surface)' }}>{label}</div>
+        <SegmentedListItemGroup>
+          <ListItem
+            data-testid={testId}
+            selectionMode="multiple"
+            selected
+            onSelectionChange={() => undefined}
+            leading={personIcon}
+          >
+            Selected segmented item
+          </ListItem>
+        </SegmentedListItemGroup>
+      </div>
+    </ThemeProvider>
+  );
+}
+
+export const SegmentedThemeMatrix: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        gap: 12,
+        padding: 12,
+      }}
+    >
+      <SegmentedThemeList
+        testId="segmented-theme-baseline"
+        label="Baseline light"
+        mode="light"
+      />
+      <SegmentedThemeList
+        testId="segmented-theme-dynamic"
+        label="Dynamic light"
+        mode="light"
+        sourceColor="#006a60"
+      />
+    </div>
+  ),
+};
