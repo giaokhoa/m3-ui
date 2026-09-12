@@ -56,6 +56,15 @@ test('generated Button CSS owns static component mapping but not runtime theme c
   assert.match(css, /--_button-content-color: var\(--on-primary\);/);
   assert.match(css, /\.button--outlined \{/);
   assert.match(css, /--_button-outline-color: var\(--outline-variant\);/);
+  assert.match(css, /--_button-disabled-content-color: var\(--on-surface\);/);
+  assert.match(
+    css,
+    /\.button--outlined \{[\s\S]*--_button-disabled-container-color: transparent;[\s\S]*--_button-disabled-outline-opacity: 10%;/,
+  );
+  assert.match(
+    css,
+    /\.button--text \{[\s\S]*--_button-disabled-container-color: transparent;[\s\S]*--_button-disabled-content-color: var\(--on-surface\);/,
+  );
 
   assert.match(css, /\.button\[data-size='medium'\] \{/);
   assert.match(css, /--_button-min-height: 56px;/);

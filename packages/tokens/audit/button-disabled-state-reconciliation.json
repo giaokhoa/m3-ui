@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-12",
+  "issue": 406,
+  "materialSite": {
+    "overview": "https://m3.material.io/components/buttons/overview",
+    "specs": "https://m3.material.io/components/buttons/specs",
+    "status": "normative-guidance-present-values-not-text-verified",
+    "reason": "The public page confirms Button design/usage context, but the disabled numeric/color-role values reviewed here are not exposed as text-verifiable page content. It is not used to invent a winner for disputed values."
+  },
+  "sources": {
+    "figma": {
+      "name": "Material 3 Design Kit",
+      "version": "1.25",
+      "releasedAt": "2026-05-19",
+      "evidence": "audit/figma-button-evidence.json"
+    },
+    "compose": {
+      "repository": "androidx/androidx",
+      "revision": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+      "runtimePath": "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+      "generatedTokenPaths": [
+        "FilledButtonTokens.kt",
+        "ElevatedButtonTokens.kt",
+        "FilledTonalButtonTokens.kt",
+        "OutlinedButtonTokens.kt",
+        "TextButtonTokens.kt"
+      ]
+    },
+    "materialWeb": {
+      "repository": "material-components/material-web",
+      "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+      "latestGeneratedVersion": "34.0.21",
+      "publicRuntimeTokenGeneration": "v0_192",
+      "runtimePaths": [
+        "button/internal/_shared.scss",
+        "button/internal/_outlined-button.scss",
+        "button/internal/_text-button.scss"
+      ]
+    }
+  },
+  "decisions": [
+    {
+      "id": "disabled-content-role",
+      "scope": [
+        "filled",
+        "elevated",
+        "filledTonal",
+        "outlined",
+        "text"
+      ],
+      "canonical": "onSurface @ 0.38",
+      "disposition": "web-platform-reference",
+      "figma": "onSurface @ 0.38",
+      "materialWebLatest": "onSurface @ 0.38",
+      "materialWebRuntime": "onSurface @ 0.38",
+      "compose": {
+        "filled": "onSurfaceVariant @ 0.38",
+        "elevated": "onSurfaceVariant @ 0.38",
+        "filledTonal": "onSurface @ 0.38",
+        "outlined": "onSurfaceVariant @ 0.38",
+        "text": "onSurfaceVariant @ 0.38"
+      },
+      "reason": "For a web library, both current Web token evidence and observable Material Web runtime agree with the current Figma design reference. Compose divergence is retained as Android platform/source drift rather than projected into web paint."
+    },
+    {
+      "id": "filled-family-disabled-container",
+      "scope": [
+        "filled",
+        "elevated",
+        "filledTonal"
+      ],
+      "canonical": "onSurface @ 0.10",
+      "disposition": "current-design-web-reference",
+      "figma": "onSurface @ 0.10",
+      "materialWebLatest": "onSurface @ 0.10",
+      "materialWebRuntime": "onSurface @ 0.12 in v0_192 adapter",
+      "compose": {
+        "filled": "onSurface @ 0.10",
+        "elevated": "onSurface @ 0.10",
+        "filledTonal": "onSurface @ 0.12"
+      },
+      "reason": "Canonical already follows the current Figma/latest-generated web value. Older Web adapter and Tonal Compose 0.12 remain source lag/platform drift; no change is needed in this issue."
+    },
+    {
+      "id": "text-outlined-disabled-container",
+      "scope": [
+        "text",
+        "outlined"
+      ],
+      "canonical": "transparent",
+      "disposition": "observable-runtime-override",
+      "figma": "onSurface @ 0.10",
+      "materialWebLatest": "generated disabled values exist, but runtime explicitly overrides the container to none/0",
+      "materialWebRuntime": "transparent",
+      "composeRuntime": "transparent",
+      "reason": "Both observable runtimes intentionally suppress the disabled fill, so web runtime behavior is stronger implementation evidence than an unconsumed generated/design value."
+    },
+    {
+      "id": "outlined-disabled-outline",
+      "scope": [
+        "outlined"
+      ],
+      "canonical": "outlineVariant @ 0.10",
+      "disposition": "compose-runtime-web-adaptation-until-normative-resolution",
+      "figma": "outlineVariant @ 1.0",
+      "materialWebLatest": "outlineVariant with no latest disabled opacity declaration",
+      "materialWebRuntime": "onSurface @ 0.12 via v0_192 public adapter",
+      "composeRuntime": "outlineVariant @ 0.10",
+      "reason": "Upstream observable/runtime/design evidence remains inconsistent and the Material page provides no text-verifiable numeric value. Preserve current canonical behavior and keep the source skew explicit."
+    }
+  ]
+}

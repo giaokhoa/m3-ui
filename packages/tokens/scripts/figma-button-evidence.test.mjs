@@ -136,9 +136,9 @@ test('Button Figma conflicts stay explicit and tracked instead of silently rewri
   assert.deepEqual(
     evidence.reconciliation.trackedDrift.map((entry) => [entry.id, entry.issue, entry.status]),
     [
-      ['button-disabled-content-role', 406, 'unresolved'],
-      ['button-text-disabled-container', 406, 'unresolved'],
-      ['button-outlined-disabled-presentation', 406, 'unresolved'],
+      ['button-disabled-content-role', 406, 'resolved-web-reference'],
+      ['button-text-disabled-container', 406, 'resolved-runtime-adaptation'],
+      ['button-outlined-disabled-presentation', 406, 'resolved-mixed-runtime-adaptation'],
       ['button-default-small-icon-size', 407, 'unresolved'],
       ['button-square-size-helper', 408, 'unresolved'],
       ['button-storybook-spec-locks', 409, 'unresolved'],
@@ -154,7 +154,7 @@ test('Button Figma conflicts stay explicit and tracked instead of silently rewri
   assert.ok(materialWebIds.has('button-text-disabled-container-color'));
   assert.ok(materialWebIds.has('button-outlined-disabled-label-color'));
 
-  assert.equal(canonicalVariants.filled.disabledContentColor.$value, '{color.role.onSurfaceVariant}');
+  assert.equal(canonicalVariants.filled.disabledContentColor.$value, '{color.role.onSurface}');
   assert.equal(canonicalVariants.text.disabledContainerColor.$value, 'transparent');
   assert.equal(canonicalVariants.outlined.disabledContainerColor.$value, 'transparent');
   assert.equal(canonicalVariants.outlined.disabledOutlineOpacity.$value, 0.1);

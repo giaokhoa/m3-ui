@@ -366,8 +366,9 @@
         "figma": "onSurface @ 0.38",
         "materialWeb": "on-surface @ 0.38",
         "compose": "onSurfaceVariant @ 0.38",
-        "canonical": "onSurfaceVariant @ 0.38",
-        "status": "unresolved"
+        "canonical": "onSurface @ 0.38",
+        "status": "resolved-web-reference",
+        "decision": "Figma + Material Web latest/runtime define the web paint; Compose OnSurfaceVariant remains Android source drift."
       },
       {
         "id": "button-text-disabled-container",
@@ -376,7 +377,8 @@
         "materialWeb": "on-surface @ 0.10",
         "compose": "transparent",
         "canonical": "transparent",
-        "status": "unresolved"
+        "status": "resolved-runtime-adaptation",
+        "decision": "Keep transparent because both Compose runtime and Material Web runtime override the generated/design container fill."
       },
       {
         "id": "button-outlined-disabled-presentation",
@@ -384,8 +386,9 @@
         "figma": "onSurface @ 0.10 container + outlineVariant @ 1 + onSurface @ 0.38 content",
         "materialWeb": "generic on-surface container @ 0.10 + outline-variant disabled outline + on-surface content @ 0.38",
         "compose": "transparent container + Compose disabled outline/content defaults",
-        "canonical": "transparent container + outlineVariant @ 0.10 + onSurfaceVariant @ 0.38 content",
-        "status": "unresolved"
+        "canonical": "transparent container + outlineVariant @ 0.10 + onSurface @ 0.38 content",
+        "status": "resolved-mixed-runtime-adaptation",
+        "decision": "Content follows current Web/Figma role; container stays transparent from both runtimes; outline keeps Compose runtime 0.10 while upstream outline evidence remains inconsistent."
       },
       {
         "id": "button-default-small-icon-size",

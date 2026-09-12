@@ -24,6 +24,47 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('disabled variants use reconciled web roles and runtime container adaptations', async ({ page }) => {
+    await openStory(page, 'components-button--disabled-variants');
+
+    const filled = page.getByRole('button', { name: 'Filled', exact: true });
+    const outlined = page.getByRole('button', { name: 'Outlined', exact: true });
+    const text = page.getByRole('button', { name: 'Text', exact: true });
+
+    const filledRoles = await filled.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        disabledContent: style.getPropertyValue('--_button-disabled-content-color').trim(),
+        onSurface: style.getPropertyValue('--on-surface').trim(),
+      };
+    });
+    expect(filledRoles.disabledContent).toBe(filledRoles.onSurface);
+
+    const outlinedRoles = await outlined.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        disabledContent: style.getPropertyValue('--_button-disabled-content-color').trim(),
+        onSurface: style.getPropertyValue('--on-surface').trim(),
+        disabledContainer: style.getPropertyValue('--_button-disabled-container-color').trim(),
+        disabledOutlineOpacity: style.getPropertyValue('--_button-disabled-outline-opacity').trim(),
+      };
+    });
+    expect(outlinedRoles.disabledContent).toBe(outlinedRoles.onSurface);
+    expect(outlinedRoles.disabledContainer).toBe('transparent');
+    expect(outlinedRoles.disabledOutlineOpacity).toBe('10%');
+
+    const textRoles = await text.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        disabledContent: style.getPropertyValue('--_button-disabled-content-color').trim(),
+        onSurface: style.getPropertyValue('--on-surface').trim(),
+        disabledContainer: style.getPropertyValue('--_button-disabled-container-color').trim(),
+      };
+    });
+    expect(textRoles.disabledContent).toBe(textRoles.onSurface);
+    expect(textRoles.disabledContainer).toBe('transparent');
+  });
+
   test('icon layouts', async ({ page }) => {
     await openStory(page, 'components-button--icons');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
