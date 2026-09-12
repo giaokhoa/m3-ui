@@ -186,11 +186,11 @@ export const componentDocs = {
   tooltip: {
     family: 'Tooltips',
     materialUrl: 'https://m3.material.io/components/tooltips/overview',
-    composeMapping: ['PlainTooltip', 'RichTooltip', 'TooltipBox/tooltip state behavior'],
+    composeMapping: ['PlainTooltip', 'RichTooltip', 'TooltipDefaults.caretSize/caretShape', 'TooltipBox/tooltip state behavior'],
     implementation:
-      'Implements plain and rich Material tooltip surfaces with canonical visual roles, placement spacing, portal inheritance, hover/focus invocation, persistent rich-tooltip behavior, actions, and theme-aware visual propagation.',
+      'Implements plain and rich Material tooltip surfaces with canonical visual roles, placement spacing, optional canonical 16×8 caret decoration, portal inheritance, hover/focus invocation, persistent rich-tooltip behavior, actions, and theme-aware visual propagation.',
     webAdaptation:
-      'Plain tooltips use the React Aria tooltip pattern and accessible description wiring. Rich tooltips can contain actions, so they intentionally use non-modal dialog semantics with aria-haspopup/expanded/controls relationships instead of misusing the non-interactive ARIA tooltip role.',
+      'Plain tooltips use the React Aria tooltip pattern and accessible description wiring. Rich tooltips can contain actions, so they intentionally use non-modal dialog semantics with aria-haspopup/expanded/controls relationships instead of misusing the non-interactive ARIA tooltip role. Logical start/end caret placement is normalized to physical placement from explicit dir or React Aria locale direction, while React Aria still owns measurement, collision, and flipping.',
   },
   tabs: {
     family: 'Tabs',

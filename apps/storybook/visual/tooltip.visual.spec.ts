@@ -34,6 +34,32 @@ async function waitForTooltipSettled(tooltip: Locator) {
     .toBe('1|1');
 }
 
+async function caretPaint(tooltip: Locator) {
+  return tooltip.evaluate((element) => {
+    const tooltipStyle = getComputedStyle(element);
+    const caretStyle = getComputedStyle(element, '::after');
+    return {
+      background: caretStyle.backgroundColor,
+      content: caretStyle.content,
+      height: caretStyle.height,
+      surfaceBackground: tooltipStyle.backgroundColor,
+      width: caretStyle.width,
+    };
+  });
+}
+
+async function caretInsets(tooltip: Locator) {
+  return tooltip.evaluate((element) => {
+    const caretStyle = getComputedStyle(element, '::after');
+    return {
+      bottom: caretStyle.bottom,
+      left: caretStyle.left,
+      right: caretStyle.right,
+      top: caretStyle.top,
+    };
+  });
+}
+
 async function hoverDefault(page: Page) {
   await openStory(page, 'components-tooltip--default');
   await primePointerModality(page);
@@ -172,6 +198,91 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
     expect(motion.duration).toContain('0.137s');
     expect(motion.timing).toContain('linear(');
   });
+
+
+  test('optional caret uses canonical 16x8 geometry and follows resolved placement', async ({ page }) => {
+    await openStory(page, 'components-tooltip--caret-placements');
+    await primePointerModality(page);
+
+    const cases = [
+      { trigger: 'caret-top-trigger', tooltip: 'caret-top', placement: /top/, width: '16px', height: '8px' },
+      { trigger: 'caret-bottom-trigger', tooltip: 'caret-bottom', placement: /bottom/, width: '16px', height: '8px' },
+      { trigger: 'caret-start-trigger', tooltip: 'caret-start', placement: /left/, width: '8px', height: '16px' },
+      { trigger: 'caret-end-trigger', tooltip: 'caret-end', placement: /right/, width: '8px', height: '16px' },
+    ] as const;
+
+    for (const item of cases) {
+      await page.getByTestId(item.trigger).hover();
+      const tooltip = page.getByTestId(item.tooltip);
+      await expect(tooltip).toBeVisible();
+      await waitForTooltipSettled(tooltip);
+      await expect(tooltip).toHaveAttribute('data-caret', 'true');
+      await expect(tooltip).toHaveAttribute('data-placement', item.placement);
+      expect(await caretPaint(tooltip)).toEqual({
+        background: (await caretPaint(tooltip)).surfaceBackground,
+        content: '""',
+        height: item.height,
+        surfaceBackground: (await caretPaint(tooltip)).surfaceBackground,
+        width: item.width,
+      });
+    }
+  });
+
+  test('caret remains absent by default', async ({ page }) => {
+    const { tooltip } = await hoverDefault(page);
+    await expect(tooltip).not.toHaveAttribute('data-caret');
+    expect((await caretPaint(tooltip)).content).toBe('none');
+  });
+
+  test('caret follows RAC collision flips on every viewport edge', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 240 });
+    await openStory(page, 'components-tooltip--caret-flips');
+    await primePointerModality(page);
+
+    const cases = [
+      { trigger: 'flip-top-trigger', tooltip: 'flip-top', placement: /bottom/ },
+      { trigger: 'flip-bottom-trigger', tooltip: 'flip-bottom', placement: /top/ },
+      { trigger: 'flip-start-trigger', tooltip: 'flip-start', placement: /right/ },
+      { trigger: 'flip-end-trigger', tooltip: 'flip-end', placement: /left/ },
+    ] as const;
+
+    for (const item of cases) {
+      await page.getByTestId(item.trigger).hover();
+      const tooltip = page.getByTestId(item.tooltip);
+      await expect(tooltip).toBeVisible();
+      await waitForTooltipSettled(tooltip);
+      await expect(tooltip).toHaveAttribute('data-placement', item.placement);
+      expect((await caretPaint(tooltip)).content).toBe('""');
+    }
+  });
+
+  test('logical start/end caret placement mirrors in RTL direction', async ({ page }) => {
+    await openStory(page, 'components-tooltip--caret-rtl');
+    await primePointerModality(page);
+
+    await page.getByTestId('caret-rtl-start-trigger').hover();
+    const startTooltip = page.getByTestId('caret-rtl-start');
+    await expect(startTooltip).toHaveAttribute('data-placement', /right/);
+    expect((await caretInsets(startTooltip)).left).toBe('-8px');
+
+    await page.getByTestId('caret-rtl-end-trigger').hover();
+    const endTooltip = page.getByTestId('caret-rtl-end');
+    await expect(endTooltip).toHaveAttribute('data-placement', /left/);
+    expect((await caretInsets(endTooltip)).right).toBe('-8px');
+  });
+
+  test('caret inherits plain tooltip container paint across light dark and dynamic themes', async ({ page }) => {
+    await openStory(page, 'components-tooltip--theme-matrix');
+    await primePointerModality(page);
+
+    for (const slug of ['light', 'dark', 'dynamic', 'dynamic-dark']) {
+      await page.getByTestId(`plain-trigger-${slug}`).hover();
+      const tooltip = page.getByTestId(`plain-tooltip-${slug}`);
+      await expect(tooltip).toBeVisible();
+      const paint = await caretPaint(tooltip);
+      expect(paint.background).toBe(paint.surfaceBackground);
+    }
+  });
 });
 
 test.describe('Material 3 RichTooltip browser contract', () => {
@@ -278,6 +389,26 @@ test.describe('Material 3 RichTooltip browser contract', () => {
     await page.keyboard.press('Tab');
     await expect(action).toBeFocused();
     await expect(tooltip).toBeVisible();
+  });
+
+  test('rich tooltip caret uses canonical geometry and surface paint', async ({ page }) => {
+    await openStory(page, 'components-tooltip--rich-caret');
+    const trigger = page.getByTestId('rich-caret-trigger');
+    await trigger.hover();
+    const tooltip = page.getByTestId('rich-caret');
+    await expect(tooltip).toBeVisible();
+    await waitForTooltipSettled(tooltip);
+    await expect(tooltip).toHaveAttribute('data-caret', 'true');
+    await expect(tooltip).toHaveAttribute('data-placement', /top/);
+    const paint = await caretPaint(tooltip);
+    expect(paint).toEqual({
+      background: paint.surfaceBackground,
+      content: '""',
+      height: '8px',
+      surfaceBackground: paint.surfaceBackground,
+      width: '16px',
+    });
+    await expect(tooltip.getByRole('dialog')).toBeVisible();
   });
 
   test('text-only rich tooltip keeps Compose 4px block padding and closes on pointer exit when non-persistent', async ({

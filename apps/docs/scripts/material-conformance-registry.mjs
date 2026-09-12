@@ -669,6 +669,7 @@ const feedbackStatusFamilyDimensions = {
     tokensVisuals: requiredEvidence(
       'packages/tokens/scripts/audit-material-web-tooltip-snackbar-scrim.mjs',
       'packages/tokens/scripts/feedback-overlays-css.test.mjs',
+      'packages/tokens/scripts/menu-tooltip.test.mjs',
       TOOLTIP_VISUAL_EVIDENCE,
     ),
     behavior: requiredEvidence(
@@ -680,9 +681,7 @@ const feedbackStatusFamilyDimensions = {
       FEEDBACK_STATUS_SHARED_EVIDENCE,
       FEEDBACK_STATUS_SSR_EVIDENCE,
     ),
-    rtlLocalization: notApplicable(
-      'Tooltip collision and start/end placement are delegated to React Aria. The component owns no directional glyphs, locale formatting, or independent bidi ordering contract.',
-    ),
+    rtlLocalization: requiredEvidence(TOOLTIP_VISUAL_EVIDENCE),
     motion: requiredEvidence(
       TOOLTIP_VISUAL_EVIDENCE,
       FEEDBACK_STATUS_SHARED_EVIDENCE,

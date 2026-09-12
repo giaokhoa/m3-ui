@@ -46,6 +46,21 @@ Keep plain tooltip content non-interactive. If users must move focus into the ov
 
 Focus may move into the rich action without modal focus containment. Escape, outside interaction, or the explicit action can dismiss according to the public trigger/surface behavior.
 
+## Caret
+
+Both `PlainTooltip` and `RichTooltip` accept an opt-in `caret` prop. It is off by default, matching the reviewed Compose API where the caret shape is nullable.
+
+```tsx
+<TooltipTrigger>
+  <Button>Info</Button>
+  <PlainTooltip caret placement="top">
+    Supporting context
+  </PlainTooltip>
+</TooltipTrigger>
+```
+
+The default Material caret is 16×8 px and inherits the tooltip container color. The caret is presentational CSS only: it does not add focusable or accessibility content, and React Aria remains responsible for popup measurement, collision handling, and resolved placement. When a collision flips the popup, the caret follows the resolved `data-placement`. Logical `start`/`end` placement mirrors for RTL using the explicit `dir` when supplied, otherwise the React Aria locale direction.
+
 ## Portals and theme context
 
 Tooltip surfaces are portalled. Public theme variables are projected into the portal so nested Material themes remain visually coherent without leaking component-private implementation variables.

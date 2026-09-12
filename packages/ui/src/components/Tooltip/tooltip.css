@@ -12,6 +12,60 @@
   overflow-wrap: anywhere;
 }
 
+.plain-tooltip[data-caret],
+.rich-tooltip[data-caret] {
+  position: relative;
+}
+
+.plain-tooltip[data-caret]::after,
+.rich-tooltip[data-caret]::after {
+  position: absolute;
+  display: block;
+  background: var(--_tooltip-caret-color);
+  content: '';
+  pointer-events: none;
+}
+
+.plain-tooltip[data-caret][data-placement^='top']::after,
+.rich-tooltip[data-caret][data-placement^='top']::after {
+  bottom: calc(-1 * var(--_tooltip-caret-height));
+  left: 50%;
+  width: var(--_tooltip-caret-width);
+  height: var(--_tooltip-caret-height);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  translate: -50% 0;
+}
+
+.plain-tooltip[data-caret][data-placement^='bottom']::after,
+.rich-tooltip[data-caret][data-placement^='bottom']::after {
+  top: calc(-1 * var(--_tooltip-caret-height));
+  left: 50%;
+  width: var(--_tooltip-caret-width);
+  height: var(--_tooltip-caret-height);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  translate: -50% 0;
+}
+
+.plain-tooltip[data-caret][data-placement^='left']::after,
+.rich-tooltip[data-caret][data-placement^='left']::after {
+  top: 50%;
+  right: calc(-1 * var(--_tooltip-caret-height));
+  width: var(--_tooltip-caret-height);
+  height: var(--_tooltip-caret-width);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  translate: 0 -50%;
+}
+
+.plain-tooltip[data-caret][data-placement^='right']::after,
+.rich-tooltip[data-caret][data-placement^='right']::after {
+  top: 50%;
+  left: calc(-1 * var(--_tooltip-caret-height));
+  width: var(--_tooltip-caret-height);
+  height: var(--_tooltip-caret-width);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  translate: 0 -50%;
+}
+
 .plain-tooltip {
   min-inline-size: var(--_plain-tooltip-min-width);
   min-block-size: var(--_plain-tooltip-min-height);

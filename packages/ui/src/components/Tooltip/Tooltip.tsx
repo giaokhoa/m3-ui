@@ -21,6 +21,7 @@ import {
   Popover as AriaPopover,
   Tooltip as AriaTooltip,
   TooltipTrigger as AriaTooltipTrigger,
+  useLocale,
   type PopoverProps as AriaPopoverProps,
   type TooltipProps as AriaTooltipProps,
 } from 'react-aria-components';
@@ -39,9 +40,23 @@ import './tooltip.css';
 
 export interface PlainTooltipProps
   extends AriaTooltipProps,
-    PlainTooltipStyleOptions {}
+    PlainTooltipStyleOptions {
+  /** Render the default Material 3 caret using the resolved React Aria placement. */
+  caret?: boolean;
+}
 
 export type TooltipTriggerProps = ComponentProps<typeof AriaTooltipTrigger>;
+
+type TooltipPlacement = NonNullable<AriaTooltipProps['placement']>;
+
+function resolvedTooltipPlacement(
+  placement: TooltipPlacement,
+  direction: 'ltr' | 'rtl',
+): TooltipPlacement {
+  if (placement === 'start') return direction === 'rtl' ? 'right' : 'left';
+  if (placement === 'end') return direction === 'rtl' ? 'left' : 'right';
+  return placement;
+}
 
 const focusableSelector = [
   'a[href]',
@@ -96,6 +111,8 @@ type RichPopoverProps = Omit<
 export interface RichTooltipProps
   extends RichPopoverProps,
     RichTooltipStyleOptions {
+  /** Render the default Material 3 caret using the resolved React Aria placement. */
+  caret?: boolean;
   title?: ReactNode;
   action?: ReactNode | ((close: () => void) => ReactNode);
   children: ReactNode;
@@ -113,10 +130,13 @@ export function TooltipTrigger(props: TooltipTriggerProps) {
 }
 
 export function PlainTooltip({
+  caret = false,
   containerColor,
   contentColor,
   shape,
   maxWidth,
+  placement = 'top',
+  dir,
   offset = plainTooltipRuntime.spacingBetweenTooltipAndAnchor,
   className,
   style,
@@ -124,10 +144,14 @@ export function PlainTooltip({
   ...props
 }: PlainTooltipProps) {
   const themePortalContainer = useThemePortalContainer();
+  const { direction } = useLocale();
 
   return (
     <AriaTooltip
       {...props}
+      data-caret={caret || undefined}
+      dir={dir}
+      placement={resolvedTooltipPlacement(placement, dir === 'rtl' || dir === 'ltr' ? dir : direction)}
       offset={offset}
       UNSTABLE_portalContainer={
         UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
@@ -268,6 +292,7 @@ export function RichTooltipTrigger({
 }
 
 export function RichTooltip({
+  caret = false,
   title,
   action,
   children,
@@ -280,6 +305,7 @@ export function RichTooltip({
   shape,
   maxWidth,
   placement = 'top',
+  dir,
   offset = richTooltipRuntime.spacingBetweenTooltipAndAnchor,
   shouldCloseOnInteractOutside,
   className,
@@ -289,6 +315,7 @@ export function RichTooltip({
 }: RichTooltipProps) {
   const context = useContext(RichTooltipContext);
   const themePortalContainer = useThemePortalContainer();
+  const { direction } = useLocale();
   if (!context) {
     throw new Error('RichTooltip must be rendered inside RichTooltipTrigger.');
   }
@@ -337,12 +364,14 @@ export function RichTooltip({
       isOpen={context.isOpen}
       onOpenChange={context.setOpen}
       triggerRef={context.triggerRef}
-      placement={placement}
+      dir={dir}
+      placement={resolvedTooltipPlacement(placement, dir === 'rtl' || dir === 'ltr' ? dir : direction)}
       offset={offset}
       shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
       UNSTABLE_portalContainer={
         UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
       }
+      data-caret={caret || undefined}
       data-has-action={action ? true : undefined}
       data-has-title={title ? true : undefined}
       className={(renderProps) => {
