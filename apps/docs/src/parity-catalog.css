@@ -69,3 +69,19 @@
 .docs-parity-catalog__details dd {
   color: var(--on-surface-variant);
 }
+
+.docs-parity-catalog__capabilities,
+.docs-parity-catalog__release-findings {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.docs-parity-catalog__release-title {
+  margin: 32px 0 12px;
+}
+
+.docs-parity-catalog__release-findings {
+  padding: 20px 20px 20px 40px;
+}

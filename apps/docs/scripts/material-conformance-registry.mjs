@@ -23,6 +23,21 @@ export function openRequiredDimensions(gapIssue = 296) {
 const requiredEvidence = (...evidence) => ({ status: 'required', evidence });
 const notApplicable = (reason) => ({ status: 'not-applicable', reason });
 
+const supportedCapability = (id, label, publicSymbols, evidence) => ({
+  id,
+  label,
+  status: 'supported',
+  publicSymbols,
+  evidence,
+});
+const adaptedCapability = (id, label, publicSymbols, reason, evidence) => ({
+  id,
+  label,
+  status: 'adapted',
+  publicSymbols,
+  reason,
+  evidence,
+});
 const ACTION_INVENTORY_EVIDENCE = 'apps/docs/scripts/material-conformance.mjs';
 const ACTION_THEME_EVIDENCE = 'apps/storybook/visual/actions-theme-conformance.visual.spec.ts';
 const ACTION_SSR_EVIDENCE = 'packages/ui/src/action-families.ssr.test.tsx';
@@ -766,12 +781,180 @@ const pickerFamilyDimensions = {
   },
 };
 
-const component = (id, sourcePrefixes, provenanceId = id, dimensions = openRequiredDimensions()) => ({
+const reviewedCapabilities = {
+  menu: [
+    supportedCapability(
+      'action-items',
+      'Action menu items',
+      ['Menu', 'MenuItem'],
+      [MENU_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'selectable-items',
+      'Single-selection menu items',
+      ['Menu', 'MenuItem'],
+      [MENU_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'checkable-items',
+      'Multiple-selection/checkable menu items',
+      ['Menu', 'MenuItem'],
+      [MENU_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'groups-vibrant',
+      'Segmented groups and vibrant presentation',
+      ['MenuSection'],
+      [MENU_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'submenu',
+      'Cascading submenu composition',
+      ['MenuSubmenu'],
+      [MENU_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'exposed-read-only-menu',
+      'Read-only exposed menu selection',
+      ['ExposedMenu'],
+      [MENU_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/menu.mdx'],
+    ),
+    adaptedCapability(
+      'exposed-combobox',
+      'Editable or read-only exposed combobox/listbox',
+      ['ExposedDropdownMenu'],
+      'The browser mapping uses a combobox input plus listbox/options so native text editing can remain editable; isReadOnly preserves the non-editable form of the same public surface.',
+      [EXPOSED_DROPDOWN_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/menu.mdx'],
+    ),
+  ],
+  'list-item': [
+    supportedCapability(
+      'standard',
+      'Standard passive and action rows',
+      ['ListItem'],
+      [LIST_ITEM_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'single-selection',
+      'Single-selection list rows',
+      ['ListItem', 'ListItemSelectionGroup'],
+      [LIST_ITEM_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'multiple-selection',
+      'Multiple-selection list rows',
+      ['ListItem'],
+      [LIST_ITEM_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'segmented',
+      'Segmented list composition and positional geometry',
+      ['ListItem', 'SegmentedListItemGroup'],
+      [LIST_ITEM_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/list-item.mdx'],
+    ),
+  ],
+  tooltip: [
+    supportedCapability(
+      'plain',
+      'Plain tooltip',
+      ['PlainTooltip'],
+      [TOOLTIP_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'rich',
+      'Rich tooltip',
+      ['RichTooltip'],
+      [TOOLTIP_VISUAL_EVIDENCE],
+    ),
+    adaptedCapability(
+      'caret',
+      'Optional tooltip caret with collision-aware orientation',
+      ['PlainTooltip', 'RichTooltip'],
+      'The Material 16×8 caret is CSS presentation while React Aria remains the sole owner of overlay measurement, collision flipping, and resolved physical placement.',
+      [TOOLTIP_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/tooltip.mdx'],
+    ),
+  ],
+  'search-bar': [
+    supportedCapability(
+      'collapsed',
+      'Collapsed search bar/input',
+      ['SearchBar', 'SearchBarInput'],
+      [SEARCH_BAR_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'docked',
+      'Attached docked expanded search',
+      ['ExpandedDockedSearchBar'],
+      [SEARCH_BAR_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'docked-with-gap',
+      'Split docked search with results gap',
+      ['ExpandedDockedSearchBarWithGap'],
+      [SEARCH_BAR_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'full-screen',
+      'Full-screen expanded search',
+      ['ExpandedFullScreenSearchBar'],
+      [SEARCH_BAR_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'full-screen-contained',
+      'Contained full-screen expanded search',
+      ['ExpandedFullScreenContainedSearchBar'],
+      [SEARCH_BAR_VISUAL_EVIDENCE],
+    ),
+    adaptedCapability(
+      'app-bar-integration',
+      'App bar with integrated search',
+      ['AppBarWithSearch'],
+      'AppBarWithSearch preserves the reviewed Material composition and scrolled color state, while the application supplies an explicit overlap fraction instead of installing Compose-style nested-scroll ownership.',
+      [SEARCH_BAR_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/search-bar.mdx'],
+    ),
+  ],
+  'time-picker': [
+    supportedCapability(
+      'dial',
+      'Clock-dial time selection',
+      ['TimePicker'],
+      [TIME_PICKER_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'input',
+      'Numeric time input',
+      ['TimeInput'],
+      [TIME_PICKER_VISUAL_EVIDENCE],
+    ),
+    supportedCapability(
+      'scroll',
+      'Scroll-wheel time selection',
+      ['TimeScroll'],
+      [TIME_PICKER_VISUAL_EVIDENCE],
+    ),
+    adaptedCapability(
+      'raw-input-draft',
+      'Raw hour/minute draft state distinct from the last valid time',
+      ['TimeInput', 'TimeInputDraftValue'],
+      'Browser-native drafts are exposed as strings so empty and invalid intermediate text can be represented without corrupting the normalized TimeOfDay value.',
+      [TIME_PICKER_VISUAL_EVIDENCE, 'apps/docs/content/docs/components/time-picker.mdx'],
+    ),
+  ],
+};
+
+const component = (
+  id,
+  sourcePrefixes,
+  provenanceId = id,
+  dimensions = openRequiredDimensions(),
+  capabilities,
+) => ({
   id,
   kind: 'component',
   sourcePrefixes,
   provenance: { kind: 'component-docs', id: provenanceId },
   dimensions,
+  ...(capabilities ? { capabilities } : {}),
 });
 
 const directComponent = (id, sourcePrefixes, { family, materialUrl, evidence }) => ({
@@ -807,10 +990,75 @@ const layout = (id, sourcePrefixes, family) => ({
  * symbols from the TypeScript package entrypoints and expands this registry.
  */
 export const materialConformanceRegistry = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   parentIssue: 296,
   rootEntrypoint: 'packages/ui/src/index.ts',
   layoutEntrypoint: 'packages/ui/src/layout/index.ts',
+  reviewedReleaseFindings: [
+    {
+      id: 'bottom-app-bar-custom-container-color',
+      family: 'bottom-app-bar',
+      status: 'adapted',
+      reason: 'The reviewed vibrant sample customizes container color through ordinary composition; the existing web surface already exposes equivalent color/style composition and does not need a Kotlin-shaped sample API.',
+      evidence: ['apps/docs/src/appBarToolbarDocs.ts'],
+    },
+    {
+      id: 'vertical-slider',
+      family: 'slider',
+      status: 'supported',
+      reason: 'Vertical orientation is already a public Slider/RangeSlider capability owned by React Aria semantics and Material presentation.',
+      evidence: ['apps/storybook/visual/slider.visual.spec.ts'],
+    },
+    {
+      id: 'pull-to-refresh-indicator-distance',
+      family: 'pull-to-refresh',
+      status: 'adapted',
+      reason: 'The reviewed IndicatorMaxDistance default is observably covered by the existing threshold/indicator-distance contract; no duplicate Kotlin constant is needed on the web surface.',
+      evidence: ['apps/docs/content/docs/components/pull-to-refresh.mdx'],
+    },
+    {
+      id: 'top-app-bar-content-padding',
+      family: 'top-app-bar',
+      status: 'adapted',
+      reason: 'Web composition/style overrides already express app-bar content padding; source-shape parity alone does not justify another public Kotlin-shaped parameter.',
+      evidence: ['apps/docs/src/appBarToolbarDocs.ts'],
+    },
+    {
+      id: 'chip-content-padding-spacing',
+      family: 'chip',
+      status: 'adapted',
+      reason: 'Existing slots and web style composition can express custom content padding/spacing while canonical defaults stay token-owned.',
+      evidence: ['apps/docs/content/docs/components/chip.mdx'],
+    },
+    {
+      id: 'secure-text-obfuscation-plumbing',
+      family: 'text-field',
+      status: 'adapted',
+      reason: 'Native password-input semantics are the intentional browser mapping; Compose obfuscation plumbing is not copied as a second text-editing engine.',
+      evidence: ['apps/storybook/visual/secure-text-field.visual.spec.ts'],
+    },
+    {
+      id: 'compose-saveable-state-plumbing',
+      family: 'layout-three-pane-scaffold',
+      status: 'excluded',
+      reason: 'Compose saveable-state holder mechanics are implementation plumbing rather than a browser public-contract requirement; the web lifecycle adaptation is documented separately.',
+      evidence: ['packages/ui/src/layout/README.md'],
+    },
+    {
+      id: 'compose-interaction-source-plumbing',
+      family: 'button',
+      status: 'excluded',
+      reason: 'MutableInteractionSource internals are not a public web capability; React Aria normalized interaction state remains the browser source of truth.',
+      evidence: ['.agents/skills/material3-parity/SKILL.md'],
+    },
+    {
+      id: 'compose-scroll-state-holder-plumbing',
+      family: 'search-bar',
+      status: 'excluded',
+      reason: 'Compose scroll-state holder and nested-scroll plumbing are not ported when observable search/app-bar state can be represented by explicit application-owned web state.',
+      evidence: ['apps/docs/content/docs/components/search-bar.mdx'],
+    },
+  ],
   nonComponents: [
     {
       id: 'theme-runtime',
@@ -900,6 +1148,7 @@ export const materialConformanceRegistry = {
       ],
       'menu',
       contentPrimitiveFamilyDimensions.menu,
+      reviewedCapabilities.menu,
     ),
     component(
       'fab',
@@ -925,6 +1174,7 @@ export const materialConformanceRegistry = {
       ['packages/ui/src/components/ListItem/'],
       'list-item',
       contentPrimitiveFamilyDimensions['list-item'],
+      reviewedCapabilities['list-item'],
     ),
     component(
       'loading-indicator',
@@ -993,6 +1243,7 @@ export const materialConformanceRegistry = {
       ['packages/ui/src/components/SearchBar/'],
       'search-bar',
       textSearchFamilyDimensions['search-bar'],
+      reviewedCapabilities['search-bar'],
     ),
     component(
       'segmented-button',
@@ -1043,6 +1294,7 @@ export const materialConformanceRegistry = {
       ['packages/ui/src/components/TimePicker/'],
       'time-picker',
       pickerFamilyDimensions['time-picker'],
+      reviewedCapabilities['time-picker'],
     ),
     component(
       'toggle-button',
@@ -1055,6 +1307,7 @@ export const materialConformanceRegistry = {
       ['packages/ui/src/components/Tooltip/'],
       'tooltip',
       feedbackStatusFamilyDimensions.tooltip,
+      reviewedCapabilities.tooltip,
     ),
     component('top-app-bar', ['packages/ui/src/components/TopAppBar/']),
 

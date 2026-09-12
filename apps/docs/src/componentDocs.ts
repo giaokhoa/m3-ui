@@ -254,12 +254,13 @@ export const componentDocs = {
       'CheckableDropdownMenuItem',
       'DropdownMenuGroup',
       'cascading submenu composition',
-      'ExposedDropdownMenu-style read-only selection',
+      'ExposedMenu read-only selection',
+      'ExposedDropdownMenu editable/read-only combobox and listbox selection',
     ],
     implementation:
-      'Implements anchored Material menus, action/radio/checkbox menu items, standard or vibrant segmented groups, selected/checkable leading visuals, canonical positional and selected shapes, cascading submenus, viewport-aware popover spacing, supporting/leading/trailing slots, and a read-only exposed menu anchored to the existing Material TextField renderer.',
+      'Implements anchored Material menus, action/radio/checkbox menu items, standard or vibrant segmented groups, selected/checkable leading visuals, canonical positional and selected shapes, cascading submenus, viewport-aware popover spacing, supporting/leading/trailing slots, a read-only ExposedMenu surface, and an ExposedDropdownMenu combobox/listbox surface that supports editable or read-only input behavior.',
     webAdaptation:
-      'React Aria owns menu/menuitem/menuitemradio/menuitemcheckbox semantics, selection state, roving focus, Arrow/Home/End movement, typeahead, logical-direction submenu disclosure, Escape, outside dismissal, overlay positioning, and focus restoration. MenuSubmenu maps Material cascading-menu presentation onto React Aria SubmenuTrigger rather than duplicating its focus or keyboard engine. ExposedMenu deliberately remains a read-only menu with aria-haspopup/expanded rather than pretending to be an editable combobox or autocomplete.',
+      'React Aria owns menu/menuitem/menuitemradio/menuitemcheckbox semantics, selection state, roving focus, Arrow/Home/End movement, typeahead, logical-direction submenu disclosure, Escape, outside dismissal, overlay positioning, and focus restoration. MenuSubmenu maps Material cascading-menu presentation onto React Aria SubmenuTrigger rather than duplicating its focus or keyboard engine. ExposedMenu deliberately remains a read-only menu with aria-haspopup/expanded. ExposedDropdownMenu is a separate browser-native combobox/listbox mapping: it can be editable or read-only, keeps text editing on the input, and leaves filtering/query policy to application code.',
   },
   badge: {
     family: 'Badges',

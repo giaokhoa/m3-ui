@@ -17,7 +17,7 @@ function apiExport(path, kind = 'component') {
 
 function fixture() {
   const registry = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     parentIssue: 296,
     rootEntrypoint: 'packages/ui/src/index.ts',
     layoutEntrypoint: 'packages/ui/src/layout/index.ts',
@@ -141,6 +141,55 @@ test('fails an adapted dimension without a documented reason', () => {
       error.includes('button.browser: adapted dimensions need a documented adaptation reason'),
     ),
   );
+});
+
+test('fails a supported capability when its mapped public symbol is absent', () => {
+  const base = fixture();
+  base.registry.families[0].capabilities = [
+    {
+      id: 'expressive',
+      label: 'Expressive button',
+      status: 'supported',
+      publicSymbols: ['MissingButton'],
+      evidence: ['evidence/button.md'],
+    },
+  ];
+  const { errors } = validateMaterialConformance(base);
+  assert.ok(
+    errors.some((error) =>
+      error.includes('mapped public symbol "MissingButton" is not owned by family button'),
+    ),
+  );
+});
+
+test('fails an adapted capability without concrete reason or evidence', () => {
+  const base = fixture();
+  base.registry.families[0].capabilities = [
+    {
+      id: 'browser-adaptation',
+      label: 'Browser adaptation',
+      status: 'adapted',
+      publicSymbols: ['Button'],
+    },
+  ];
+  const { errors } = validateMaterialConformance(base);
+  assert.ok(errors.some((error) => error.includes('reviewed capabilities need concrete evidence')));
+  assert.ok(errors.some((error) => error.includes('adapted capabilities need a concrete reason')));
+});
+
+test('fails a capability gap without a positive tracking issue', () => {
+  const base = fixture();
+  base.registry.families[0].capabilities = [
+    {
+      id: 'missing-capability',
+      label: 'Missing capability',
+      status: 'gap',
+      reason: 'Not implemented yet.',
+      evidence: ['evidence/button.md'],
+    },
+  ];
+  const { errors } = validateMaterialConformance(base);
+  assert.ok(errors.some((error) => error.includes('capability gaps need a positive gapIssue')));
 });
 
 test('fails stale evidence paths', () => {
