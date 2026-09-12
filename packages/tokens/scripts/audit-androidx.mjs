@@ -1,7 +1,8 @@
+import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readCanonicalDirectory, resolveTokenValues, validateCanonical } from './dtcg.mjs';
-import { compareTokenGraph, hasAuditDrift, summarizeAudit } from './audit.mjs';
+import { compareTokenGraph, hasAuditDrift } from './audit.mjs';
 import { androidX, tokenSources } from './androidx/source.mjs';
 import { parseAndroidXTokenFile } from './androidx/parser.mjs';
 
@@ -10,6 +11,10 @@ const canonical = await readCanonicalDirectory(resolve(scriptDir, '../tokens'));
 const validation = validateCanonical(canonical);
 if (validation.errors.length > 0) throw new Error(`Canonical source is invalid:\n${validation.errors.join('\n')}`);
 const resolvedCanonical = resolveTokenValues(validation.tokens);
+const buttonDisabledReconciliation = JSON.parse(
+  await readFile(new URL('../audit/button-disabled-state-reconciliation.json', import.meta.url), 'utf8'),
+);
+
 
 function normalizeRuntimeColor(value) {
   if (typeof value !== 'string') return value;
@@ -134,9 +139,66 @@ const mappings = [
   { canonical: 'component.textField.filled.colors.errorIndicator', reference: 'FilledTextFieldTokens.kt:errorActiveIndicatorColor' },
 ];
 
-const results = compareTokenGraph(canonicalValues, referenceValues, mappings);
-const summary = summarizeAudit(results);
+const disabledContentDecision = buttonDisabledReconciliation.decisions.find(
+  (entry) => entry.id === 'disabled-content-role',
+);
+if (!disabledContentDecision) throw new Error('Missing Button disabled-content reconciliation decision');
+
+const documentedDrift = new Map([
+  [
+    'component.button.variant.filled.disabledContentColor|FilledButtonTokens.kt:disabledLabelTextColor',
+    {
+      issue: buttonDisabledReconciliation.issue,
+      decisionId: disabledContentDecision.id,
+      requiredDisposition: 'web-platform-reference',
+      canonical: 'onSurface',
+      reference: 'onSurfaceVariant',
+    },
+  ],
+]);
+
+const rawResults = compareTokenGraph(canonicalValues, referenceValues, mappings);
+const seenDocumentedDrift = new Set();
+const results = rawResults.map((result) => {
+  if (result.status !== 'mismatch') return result;
+  const key = `${result.canonical}|${result.reference}`;
+  const drift = documentedDrift.get(key);
+  if (!drift) return result;
+  if (buttonDisabledReconciliation.issue !== drift.issue) {
+    throw new Error(`AndroidX documented drift ${key} issue mismatch`);
+  }
+  if (disabledContentDecision.disposition !== drift.requiredDisposition) {
+    throw new Error(`AndroidX documented drift ${key} disposition mismatch`);
+  }
+  if (result.canonicalValue !== drift.canonical || result.referenceValue !== drift.reference) {
+    throw new Error(
+      `AndroidX documented drift ${key} value mismatch: canonical=${JSON.stringify(result.canonicalValue)} reference=${JSON.stringify(result.referenceValue)}`,
+    );
+  }
+  seenDocumentedDrift.add(key);
+  return { ...result, status: 'documented-drift', issue: drift.issue, decisionId: drift.decisionId };
+});
+
+const unusedDocumentedDrift = [...documentedDrift.keys()].filter((key) => !seenDocumentedDrift.has(key));
+if (unusedDocumentedDrift.length) {
+  throw new Error(`Unused AndroidX documented drift: ${unusedDocumentedDrift.join(', ')}`);
+}
+
+const summary = results.reduce(
+  (acc, result) => {
+    acc[result.status] = (acc[result.status] ?? 0) + 1;
+    return acc;
+  },
+  { match: 0, 'documented-drift': 0, mismatch: 0, 'missing-canonical': 0, 'missing-reference': 0 },
+);
 console.log(`AndroidX audit @ ${androidX.revision}`);
-console.log(`match=${summary.match} mismatch=${summary.mismatch} missingCanonical=${summary['missing-canonical']} missingReference=${summary['missing-reference']}`);
-for (const result of results.filter((item) => item.status !== 'match')) console.error(`- ${result.status}: ${result.canonical} <- ${result.reference}; canonical=${JSON.stringify(result.canonicalValue)} reference=${JSON.stringify(result.referenceValue)}`);
-if (hasAuditDrift(results)) process.exitCode = 1;
+console.log(
+  `match=${summary.match} documentedDrift=${summary['documented-drift']} mismatch=${summary.mismatch} missingCanonical=${summary['missing-canonical']} missingReference=${summary['missing-reference']}`,
+);
+for (const result of results.filter((item) => item.status !== 'match')) {
+  const prefix = result.status === 'documented-drift' ? `- documented-drift(#${result.issue}/${result.decisionId})` : `- ${result.status}`;
+  console.error(
+    `${prefix}: ${result.canonical} <- ${result.reference}; canonical=${JSON.stringify(result.canonicalValue)} reference=${JSON.stringify(result.referenceValue)}`,
+  );
+}
+if (hasAuditDrift(results.filter((result) => result.status !== 'documented-drift'))) process.exitCode = 1;
