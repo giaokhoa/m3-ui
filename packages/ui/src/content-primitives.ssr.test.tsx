@@ -12,6 +12,7 @@ import {
   HorizontalDivider,
   ListItem,
   ListItemSelectionGroup,
+  SegmentedListItemGroup,
   Menu,
   MenuItem,
   MenuSubmenu,
@@ -93,7 +94,7 @@ describe('Lane 4 content primitive SSR contracts', () => {
       <>
         <ListItem>Passive item</ListItem>
         <ListItem onPress={() => {}}>Action item</ListItem>
-        <ListItemSelectionGroup aria-label="Server selection">
+        <ListItemSelectionGroup aria-label="Server selection" variant="segmented">
           <ListItem selectionMode="single" selected onPress={() => {}}>
             Selected item
           </ListItem>
@@ -101,6 +102,10 @@ describe('Lane 4 content primitive SSR contracts', () => {
             Other item
           </ListItem>
         </ListItemSelectionGroup>
+        <SegmentedListItemGroup>
+          <ListItem>Segmented passive item</ListItem>
+          <ListItem onPress={() => {}}>Segmented action item</ListItem>
+        </SegmentedListItemGroup>
       </>,
     );
 
@@ -109,6 +114,8 @@ describe('Lane 4 content primitive SSR contracts', () => {
     expect(html).toContain('Action item');
     expect(html).toContain('role="radiogroup"');
     expect(html).toContain('role="radio"');
+    expect(html).toContain('Segmented passive item');
+    expect(html).toContain('Segmented action item');
     expect(html).toContain('aria-checked="true"');
     expect(html).toContain('aria-checked="false"');
   });
