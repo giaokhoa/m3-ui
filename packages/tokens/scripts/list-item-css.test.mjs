@@ -13,7 +13,6 @@ test('ListItem semantic colors alias canonical runtime roles', async () => {
   const expected = {
     focusIndicatorColor: '{color.role.secondary}',
     itemContainerColor: '{color.role.surface}',
-    itemSegmentedContainerColor: '{color.role.surface}',
     itemLabelTextColor: '{color.role.onSurface}',
     itemLeadingIconColor: '{color.role.onSurfaceVariant}',
     itemTrailingIconColor: '{color.role.onSurfaceVariant}',
