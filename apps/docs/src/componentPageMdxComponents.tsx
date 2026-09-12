@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { MDXComponents } from 'mdx/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { getMaterialTypeCssProperties } from '@m3-ui/ui/typography';
@@ -247,7 +248,7 @@ function RelatedComponents({
   return (
     <nav className="docs-related" aria-label="Related components">
       {items.map((item) => (
-        <a className="docs-related__item" href={item.href} key={item.href}>
+        <Link className="docs-related__item" href={item.href} key={item.href}>
           <strong style={getMaterialTypeCssProperties('titleSmall')}>
             {item.label}
           </strong>
@@ -256,7 +257,7 @@ function RelatedComponents({
               {item.description}
             </span>
           ) : null}
-        </a>
+        </Link>
       ))}
     </nav>
   );

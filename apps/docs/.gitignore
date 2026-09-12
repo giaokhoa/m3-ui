@@ -1,3 +1,4 @@
+/out/
 /.next/
 /.source/
 /public/search-index.json
@@ -5,6 +6,7 @@
 /src/generated/api-reference.generated.json
 /src/generated/material-spec.generated.json
 /src/generated/live-examples.generated.json
+/src/generated/material-conformance.generated.json
 
 /next-env.d.ts
 *.tsbuildinfo

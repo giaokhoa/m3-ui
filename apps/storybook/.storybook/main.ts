@@ -8,8 +8,10 @@ const config: StorybookConfig = {
     options: {},
   },
   viteFinal(config) {
+    const storybookBasePath = process.env.STORYBOOK_BASE_PATH;
     return {
       ...config,
+      ...(storybookBasePath ? { base: storybookBasePath } : {}),
       build: {
         ...config.build,
         // Keep the native :dir() semantics used by RTL selectors.
