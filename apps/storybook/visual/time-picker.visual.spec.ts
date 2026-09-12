@@ -125,7 +125,7 @@ test.describe('Material 3 TimePicker browser contract', () => {
     await expect(dial).toHaveAttribute('tabindex', '-1');
   });
 
-  test('TimeInput commits valid input, rejects out-of-range draft, and advances focus', async ({ page }) => {
+  test('TimeInput commits valid input, preserves invalid raw draft, and advances focus', async ({ page }) => {
     await openStory(page, 'components-timepicker--input');
     const hour = page.getByRole('textbox', { name: 'Hour' });
     const minute = page.getByRole('textbox', { name: 'Minute' });
@@ -136,7 +136,7 @@ test.describe('Material 3 TimePicker browser contract', () => {
     await minute.fill('99');
     await expect(minute).toHaveAttribute('aria-invalid', 'true');
     await minute.blur();
-    await expect(minute).toHaveValue('59');
+    await expect(minute).toHaveValue('99');
   });
 
   test('dial and input share controlled time state in both directions', async ({ page }) => {
@@ -178,7 +178,18 @@ test.describe('Material 3 TimePicker browser contract', () => {
     const picker = page.locator('.time-picker');
     expect((await picker.boundingBox())?.width).toBeGreaterThan(256);
     await expect(picker.locator('.time-picker__dial')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    const vibrantField = await picker.locator('.time-picker__time-selector').first().boundingBox();
+    expect(vibrantField?.width).toBe(100);
+    expect(vibrantField?.height).toBe(120);
+    const vibrantPeriod = await picker.getByRole('radiogroup', { name: 'AM or PM' }).boundingBox();
+    expect(vibrantPeriod?.width).toBe(56);
+    expect(vibrantPeriod?.height).toBe(120);
     expect(await cssNumber(picker.locator('.time-picker__time-selector').first(), 'border-radius')).toBeGreaterThan(8);
+
+    await openStory(page, 'components-timepicker--vibrant-input');
+    const vibrantInput = page.getByRole('textbox', { name: 'Hour' });
+    expect((await vibrantInput.boundingBox())?.width).toBe(100);
+    expect((await vibrantInput.boundingBox())?.height).toBe(120);
 
     await openStory(page, 'components-timepicker--rtl');
     await expect(page.locator('.time-picker__dial')).toHaveCSS('direction', 'ltr');
@@ -186,4 +197,95 @@ test.describe('Material 3 TimePicker browser contract', () => {
     await expect(page.locator('.time-picker__track')).toHaveCSS('transition-duration', '0s');
     await expect(page.locator('.time-picker__dial-label').first()).toHaveCSS('transition-duration', '0s');
   });
+
+  test('TimeScroll reuses scroll-field keyboard, wheel, and pointer selection with accessible value text', async ({ page }) => {
+    await openStory(page, 'components-timepicker--scroll');
+    const hour = page.getByRole('spinbutton', { name: 'Hour' });
+    const minute = page.getByRole('spinbutton', { name: 'Minute' });
+    await expect(hour).toHaveAttribute('aria-valuetext', '10 AM');
+    await expect(minute).toHaveAttribute('aria-valuetext', '30 minutes');
+    expect((await hour.boundingBox())?.width).toBe(100);
+    expect((await hour.boundingBox())?.height).toBe(120);
+
+    await hour.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(hour).toHaveAttribute('aria-valuetext', '11 AM');
+
+    await minute.hover();
+    await page.mouse.wheel(0, 40);
+    await page.waitForTimeout(120);
+    await expect(minute).toHaveAttribute('aria-valuetext', '31 minutes');
+
+    const nextHour = hour.locator('[data-scroll-field-item][data-offset="1"]');
+    await nextHour.click();
+    await expect(hour).toHaveAttribute('aria-valuetext', '12 AM');
+  });
+
+  test('TimeScroll preserves normalized 24-hour state without an AM/PM control', async ({ page }) => {
+    await openStory(page, 'components-timepicker--scroll-twenty-four-hour');
+    const hour = page.getByRole('spinbutton', { name: 'Hour' });
+    const minute = page.getByRole('spinbutton', { name: 'Minute' });
+    await expect(hour).toHaveAttribute('aria-valuenow', '18');
+    await expect(hour).toHaveAttribute('aria-valuetext', '18 hours');
+    await expect(minute).toHaveAttribute('aria-valuenow', '45');
+    await expect(page.getByRole('radiogroup', { name: 'AM or PM' })).toHaveCount(0);
+    await hour.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(hour).toHaveAttribute('aria-valuetext', '19 hours');
+  });
+
+  test('controlled raw TimeInput draft remains distinct from the last valid time', async ({ page }) => {
+    await openStory(page, 'components-timepicker--draft-state');
+    const minute = page.getByRole('textbox', { name: 'Minute' });
+    await minute.fill('99');
+    await expect(minute).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByTestId('draft-raw-value')).toHaveText('10:99');
+    await expect(page.getByTestId('draft-time-value')).toHaveText('10:30');
+    await minute.blur();
+    await expect(minute).toHaveValue('99');
+    await expect(page.getByTestId('draft-time-value')).toHaveText('10:30');
+
+    await minute.fill('45');
+    await expect(page.getByTestId('draft-raw-value')).toHaveText('10:45');
+    await expect(page.getByTestId('draft-time-value')).toHaveText('10:45');
+  });
+
+  test('dial, input, and scroll modes preserve one controlled TimeOfDay while switching', async ({ page }) => {
+    await openStory(page, 'components-timepicker--mode-switch');
+    await expect(page.getByTestId('switch-time-value')).toHaveText('11:25');
+    await page.getByRole('button', { name: 'Scroll' }).click();
+    const minute = page.getByRole('spinbutton', { name: 'Minute' });
+    await minute.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.getByTestId('switch-time-value')).toHaveText('11:26');
+
+    await page.getByRole('button', { name: 'Input' }).click();
+    await expect(page.getByRole('textbox', { name: 'Minute' })).toHaveValue('26');
+    await page.getByRole('textbox', { name: 'Hour' }).fill('09');
+    await expect(page.getByTestId('switch-time-value')).toHaveText('09:26');
+
+    await page.getByRole('button', { name: 'Dial' }).click();
+    await expect(page.locator('.time-picker__time-selector').first()).toHaveText('09');
+    await expect(page.locator('.time-picker__time-selector').nth(1)).toHaveText('26');
+  });
+
+  test('TimeScroll keeps numeric fields LTR, period logically trailing in RTL, survives zoom, and reduces motion', async ({ page }) => {
+    await openStory(page, 'components-timepicker--scroll-rtl');
+    const root = page.getByTestId('time-scroll');
+    const fields = root.locator('.time-scroll__fields');
+    const period = root.getByRole('radiogroup', { name: 'AM or PM' });
+    await expect(fields).toHaveCSS('direction', 'ltr');
+    const fieldsBox = await fields.boundingBox();
+    const periodBox = await period.boundingBox();
+    expect(periodBox?.x ?? 0).toBeLessThan(fieldsBox?.x ?? 0);
+
+    await root.evaluate((element) => { (element as HTMLElement).style.zoom = '1.5'; });
+    const hourBox = await root.getByRole('spinbutton', { name: 'Hour' }).boundingBox();
+    const minuteBox = await root.getByRole('spinbutton', { name: 'Minute' }).boundingBox();
+    expect((hourBox?.x ?? 0) + (hourBox?.width ?? 0)).toBeLessThanOrEqual(minuteBox?.x ?? 0);
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(root.locator('.scroll-field__item').first()).toHaveCSS('transition-duration', '0s');
+  });
+
 });

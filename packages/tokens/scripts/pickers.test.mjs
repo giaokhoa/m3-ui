@@ -11,6 +11,14 @@ test('Style Dictionary emits current date and time picker token geometry', async
   assert.equal(token.ComponentTimeInputTimeFieldFocusOutlineWidth, '2px');
   assert.equal(token.ComponentTimePickerClockDialContainerSize, '256px');
   assert.equal(token.ComponentTimePickerTimeSelector24HVerticalContainerWidth, '114px');
+  assert.equal(token.ComponentTimePickerVibrantTimeFieldWidth, '100px');
+  assert.equal(token.ComponentTimePickerVibrantTimeFieldPortrait24Width, '132px');
+  assert.equal(token.ComponentTimePickerVibrantTimeFieldHeight, '120px');
+  assert.equal(token.ComponentTimePickerVibrantSeparatorWidth, '16px');
+  assert.equal(token.ComponentTimePickerVibrantPeriodSelectorWidth, '56px');
+  assert.equal(token.ComponentTimePickerVibrantPeriodSelectorHeight, '120px');
+  assert.equal(token.ComponentTimePickerVibrantPeriodSelectorPadding, '8px');
+  assert.equal(token.ComponentTimePickerVibrantPeriodSelectorLargePadding, '16px');
 });
 
 test('Style Dictionary preserves picker semantic roles and type keys', async () => {

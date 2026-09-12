@@ -21,9 +21,11 @@ test.describe('Material 3 Lane 7 picker shared conformance', () => {
     await openStory(page, 'conformance-pickers--dynamic-theme');
 
     const theme = page.locator('.picker-conformance-dynamic-theme');
-    const [surfaceContainerHigh, surfaceContainerHighest, primary] = await Promise.all([
+    const [surfaceContainerHigh, surfaceContainerHighest, surfaceContainer, surfaceContainerLowest, primary] = await Promise.all([
       resolvedColor(theme, 'var(--surface-container-high)'),
       resolvedColor(theme, 'var(--surface-container-highest)'),
+      resolvedColor(theme, 'var(--surface-container)'),
+      resolvedColor(theme, 'var(--surface-container-lowest)'),
       resolvedColor(theme, 'var(--primary)'),
     ]);
 
@@ -43,5 +45,12 @@ test.describe('Material 3 Lane 7 picker shared conformance', () => {
     await expect(
       timePicker.locator('.time-picker__dial-label[data-selected]'),
     ).toHaveCSS('background-color', primary);
+
+    const timeScroll = page.getByTestId('theme-time-scroll');
+    await expect(timeScroll).toHaveCSS('background-color', surfaceContainer);
+    await expect(timeScroll.getByRole('spinbutton', { name: 'Hour' })).toHaveCSS(
+      'background-color',
+      surfaceContainerLowest,
+    );
   });
 });

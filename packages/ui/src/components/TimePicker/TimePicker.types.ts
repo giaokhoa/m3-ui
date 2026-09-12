@@ -1,4 +1,5 @@
 export interface TimeOfDay { hour: number; minute: number }
+export interface TimeInputDraftValue { hour: string; minute: string }
 export type TimePickerPeriod = 'am' | 'pm';
 export type TimePickerSelection = 'hour' | 'minute';
 export type TimePickerLayout = 'auto' | 'horizontal' | 'vertical';

@@ -1,9 +1,9 @@
 ---
 title: Time pickers
-description: Material dial and keyboard time input with shared 24-hour state, 12/24-hour presentation, accessibility, and component-local orientation switching.
+description: Material dial, numeric input, and scroll-wheel time selection with one normalized time model and observable raw input drafts.
 ---
 
-Time pickers let users choose a time of day with a Material clock dial or keyboard-friendly numeric input. `TimePicker` and `TimeInput` share the same normalized `TimeOfDay` state so applications can switch presentation without translating values.
+Time pickers let users choose a time of day with a Material clock dial, native numeric input, or the current expressive scroll presentation. `TimePicker`, `TimeInput`, and `TimeScroll` all use the same normalized `TimeOfDay` value, so applications can switch presentations without translating the selected time.
 
 [Material 3 time pickers](https://m3.material.io/components/time-pickers/overview)
 
@@ -12,57 +12,88 @@ Time pickers let users choose a time of day with a Material clock dial or keyboa
 </ComponentPreview>
 
 ```tsx
-import { TimeInput, TimePicker, type TimeOfDay } from '@m3-ui/ui';
+import {
+  TimeInput,
+  TimePicker,
+  TimeScroll,
+  type TimeOfDay,
+} from '@m3-ui/ui';
 
 const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
 
 <TimePicker value={time} onChange={setTime} />
 <TimeInput value={time} onChange={setTime} />
+<TimeScroll value={time} onChange={setTime} />
 ```
 
 ## When to use
 
-Use the dial when spatial clock selection supports the task and `TimeInput` when direct keyboard entry is more efficient. Both represent a time of day, not a timezone-aware instant or scheduling object.
+Use the dial when spatial clock selection supports the task, `TimeInput` when direct keyboard entry is more efficient, and `TimeScroll` when the current expressive vertical-wheel presentation fits the product flow. All three represent a time of day, not a timezone-aware instant or scheduling object.
+
+A dialog, title, confirmation buttons, or a control that switches between dial/input/scroll modes remains application composition. The picker surfaces do not own product dialog lifecycle merely because Compose also provides dialog helpers around them.
 
 ## Shared time state
 
-`TimeOfDay` always stores normalized 24-hour values: `hour` is `0..23` and `minute` is `0..59`. Twelve-hour presentation changes what users see and how AM/PM is selected; it does not change the application state model.
+`TimeOfDay` always stores the **last valid** normalized 24-hour value: `hour` is `0..23` and `minute` is `0..59`. Twelve-hour presentation changes what users see and how AM/PM is selected; it does not change the application state model.
 
-Public normalization helpers expose the same conversion rules for application code instead of requiring duplicate 12/24-hour logic.
+This lets an application render any of the three presentations against one controlled value. Switching from dial to input to scroll does not require a second conversion layer.
+
+## Scroll selection
+
+`TimeScroll` maps the current Material `TimeScroll` capability to two existing `ScrollField` controls rather than creating another generic scrolling engine. The hour and minute wheels therefore reuse the shared keyboard, wheel, pointer-drag, focus, reduced-motion, and spinbutton semantics already owned by `ScrollField`.
+
+In 12-hour mode the hour wheel displays `1..12` and AM/PM remains a mutually exclusive radio group. Internally the public value is still normalized to `0..23`. In 24-hour mode the wheel exposes `00..23` and the AM/PM group is absent.
+
+The wheel fields expose accessible value text such as the selected hour/period and minute value in addition to their numeric spinbutton state. Numeric time fields remain left-to-right inside an RTL page while the AM/PM control stays on the logical trailing side.
 
 ## Dial behavior
 
 The active clock face uses slider-style semantics for hour or minute selection. Arrow keys adjust the active value; Enter/Space can advance the active selection according to the public interaction model. Pointer position maps to the corresponding hour/minute.
 
-In 12-hour mode, AM/PM is a mutually exclusive radio-group choice rather than a generic toggle. After an hour pointer selection completes, the picker advances to minute selection.
+In 12-hour mode, AM/PM is a radio-group choice rather than a generic toggle. After an hour pointer selection completes, the picker advances to minute selection.
 
-## Keyboard input
+## Raw input drafts
 
-`TimeInput` uses real numeric text-input fields with explicit hour/minute accessible names. Draft values are validated against the current 12- or 24-hour presentation, and invalid drafts expose semantic invalid state.
+`TimeInput` keeps native text-entry state separate from the last valid `TimeOfDay`. This matters while a user is partway through a value or has typed an out-of-range value: the application may need to observe or control the text exactly as entered without replacing the last valid time with an invalid model.
 
-The input experience may move focus from a completed hour field to minutes; that is component-local form behavior, not global keyboard navigation policy.
+Use `draftValue` / `onDraftValueChange` for a controlled raw draft, or `defaultDraftValue` for an uncontrolled initial draft. The draft shape is intentionally web-native:
+
+```ts
+interface TimeInputDraftValue {
+  hour: string;
+  minute: string;
+}
+```
+
+A valid draft updates `value`/`onChange`. An invalid draft remains visible and exposes `aria-invalid`, while `TimeOfDay` stays at its previous valid value. Blur does not silently conflate the invalid draft with that last valid time. Applications can choose when to reset, validate, submit, or replace the draft.
+
+The string contract is deliberate: unlike an integer-only Kotlin state object, it can represent browser-native intermediate states such as an empty field.
 
 ## 12-hour and 24-hour presentation
 
-Set `is24Hour` for `00..23` presentation and no AM/PM group. Without it, users interact with 12-hour values and AM/PM while the public value remains normalized to `0..23`.
+Set `is24Hour` for `00..23` presentation and no AM/PM group. Without it, users interact with 12-hour values and AM/PM while the public `TimeOfDay.hour` remains normalized to `0..23`.
 
-Do not store “2 PM” as a separate presentation-specific state shape when the component already provides the normalized model.
+The same rule applies to dial, input, and scroll presentations.
+
+## Expressive geometry
+
+Current expressive picker geometry is compiled from canonical DTCG through the TimePicker Style Dictionary adapter. The vibrant time fields, 24-hour portrait width, separator, period selector, and related spacing therefore remain immutable Material facts in the token pipeline rather than per-render React style constants.
+
+`variant="vibrant"` applies that expressive geometry to dial and input presentations. `TimeScroll` is the current vibrant scroll presentation by definition and does not add a redundant variant prop.
 
 ## Layout is component-local
 
-`layout` accepts `vertical`, `horizontal`, or `auto`. `auto` observes the picker's **immediate container** and switches orientation at the audited picker threshold.
+`TimePicker.layout` accepts `vertical`, `horizontal`, or `auto`. `auto` observes the dial picker's **immediate container** and switches orientation at the audited picker threshold.
 
-This is not Material window-size classification, does not consume `WindowAdaptiveInfo`, and does not participate in pane or navigation adaptation. Applications may force either orientation explicitly.
-
-## Visual variants
-
-`variant="standard"` uses the baseline picker family. `variant="vibrant"` exposes the audited expressive visual treatment while preserving the same time value and accessibility semantics.
+This is not Material window-size classification, does not consume `WindowAdaptiveInfo`, and does not participate in pane or navigation adaptation. `TimeInput` and `TimeScroll` keep their own presentation geometry instead of inheriting dial orientation switching.
 
 ## Accessibility
 
-Keep hour/minute fields clearly named and preserve the radio semantics of AM/PM in 12-hour mode. Do not add custom arrow-key handlers around the clock face that compete with the slider interaction contract.
+Keep hour/minute fields clearly named and preserve the radio semantics of AM/PM in 12-hour mode. Do not add application arrow-key or wheel handlers around `TimeScroll` that compete with the shared `ScrollField` interaction contract.
 
-Validation feedback should be textual when users need to understand an invalid time; color or shape state alone is not sufficient.
+Invalid `TimeInput` drafts expose semantic invalid state while the valid value remains stable. When users need an explanation beyond invalid state, provide textual validation feedback; color or shape alone is not sufficient.
+
+Large text/zoom must not reverse or overlap the hour/minute fields. Reduced-motion preferences remove ScrollField item transitions without changing the selected time model.
 
 ## API reference
 
@@ -72,7 +103,7 @@ Validation feedback should be textual when users need to understand an invalid t
 
 <MaterialParity component="time-picker" />
 
-Material supplies dial/input hierarchy, 12/24-hour presentation, shape, color, and picker interaction intent. Normalized React state, numeric input fields, slider/radio accessibility semantics, and local ResizeObserver-style orientation behavior are web adaptations—not adaptive window policy.
+The reviewed Compose mapping includes `TimePicker`, `TimeInput`, `TimeScroll`, and the separation between valid `TimePickerState.hour/minute` and raw `hourInput/minuteInput`. Material supplies the presentation hierarchy, geometry, state intent, and selection behavior. Normalized React `TimeOfDay`, browser string drafts, native numeric text inputs, slider/radio/spinbutton semantics, shared `ScrollField` interaction ownership, and local ResizeObserver dial orientation are intentional web mappings.
 
 ## Related components
 

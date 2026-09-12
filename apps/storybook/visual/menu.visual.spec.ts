@@ -182,6 +182,10 @@ test.describe('Material 3 Menu browser contract', () => {
 
     await expect(page.getByRole('menu')).toHaveCount(2);
     await expect(page.getByRole('menuitem', { name: 'Bold' })).toBeFocused();
+    const surfaces = page.locator('.menu-surface__clip');
+    expect(await surfaces.nth(1).evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(
+      await surfaces.nth(0).evaluate((element) => getComputedStyle(element).backgroundColor),
+    );
     await page.keyboard.press('Escape');
     await expect(page.getByRole('menu')).toHaveCount(1);
     await expect(format).toBeFocused();
