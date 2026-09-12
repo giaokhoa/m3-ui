@@ -153,7 +153,7 @@ export function createListItemCss(context) {
       ],
     ),
     ...rule(
-      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item',
+      ':is(.segmented-list-item-group, .list-item-selection-group--segmented) > .list-item:not([data-selected]):not([data-hovered]):not([data-focus-visible]):not([data-pressed]):not([data-dragged])',
       [
         line('--_list-item-container-color', get(`${base}.itemSegmentedContainerColor`)),
         line('--_list-item-shape', 'var(--_list-item-segmented-shape)'),

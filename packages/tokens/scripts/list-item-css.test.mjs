@@ -100,7 +100,7 @@ test('generated ListItem CSS owns immutable geometry typography paint and state 
   );
   assert.match(
     css,
-    /:is\(\.segmented-list-item-group, \.list-item-selection-group--segmented\) > \.list-item \{[^}]*--_list-item-container-color: var\(--surface\);[^}]*--_list-item-shape: var\(--_list-item-segmented-shape\);/s,
+    /:is\(\.segmented-list-item-group, \.list-item-selection-group--segmented\) > \.list-item:not\(\[data-selected\]\):not\(\[data-hovered\]\):not\(\[data-focus-visible\]\):not\(\[data-pressed\]\):not\(\[data-dragged\]\) \{[^}]*--_list-item-container-color: var\(--surface\);[^}]*--_list-item-shape: var\(--_list-item-segmented-shape\);/s,
   );
   assert.match(
     css,
