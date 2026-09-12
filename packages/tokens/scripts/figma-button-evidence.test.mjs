@@ -157,7 +157,7 @@ test('Button Figma conflicts stay explicit and tracked instead of silently rewri
       ['button-text-disabled-container', 406, 'resolved-runtime-adaptation'],
       ['button-outlined-disabled-presentation', 406, 'resolved-mixed-runtime-adaptation'],
       ['button-default-small-icon-size', 407, 'resolved-current-small-default'],
-      ['button-square-size-helper', 408, 'unresolved'],
+      ['button-square-size-helper', 408, 'resolved-square-helper'],
       ['button-storybook-spec-locks', 409, 'unresolved'],
     ],
   );

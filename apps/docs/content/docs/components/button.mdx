@@ -63,6 +63,23 @@ The public `size` API exposes the audited Material expressive size vocabulary: `
 
 Choose size from the surrounding component hierarchy and available touch target, not from arbitrary text length. Omitting `size` uses `small`, matching the current Material 3 Design Kit default. The legacy 40px/18px-icon baseline remains in the token source only as audited Compose classic / Material Web v0.192 reference evidence; it is not the public React default.
 
+### Round and square expressive shapes
+
+The current Material 3 Design Kit publishes both `Round` and `Square` Button types at every expressive size. Use the audited helper instead of duplicating corner radii:
+
+```tsx
+<Button
+  size="medium"
+  shapes={buttonShapesForSize('medium', 'square')}
+>
+  Square medium
+</Button>
+```
+
+`buttonShapesForSize(size)` remains the Round default. Passing `'square'` selects the current size-specific Square container while preserving the same audited pressed-shape target for that size.
+
+Compose also has an Android precision-pointer device policy that can compact the default Small Button when an enabled feature flag detects both a physical keyboard and mouse. m3-ui does **not** infer that policy from CSS `pointer: fine`, hover capability, or the current pointer event because those web signals are not semantically equivalent to Compose's device inventory rule. Choose a Button `size` explicitly when a web product needs a denser control policy.
+
 ## Behavior and states
 
 Material hover, focus, press, and disabled presentation is driven by real browser interaction state. React Aria owns the button interaction contract; canonical Material tokens, ripple, shape, color, elevation, and motion own presentation.

@@ -133,6 +133,30 @@ export const ExpressiveShapeMorph: Story = {
   ),
 };
 
+export const ExpressiveSquareShapes: Story = {
+  render: () => (
+    <div className="storybook-center">
+      <div className="storybook-stack">
+        <Button size="extraSmall" shapes={buttonShapesForSize('extraSmall', 'square')}>
+          Square extra small
+        </Button>
+        <Button size="small" shapes={buttonShapesForSize('small', 'square')}>
+          Square small
+        </Button>
+        <Button size="medium" shapes={buttonShapesForSize('medium', 'square')}>
+          Square medium
+        </Button>
+        <Button size="large" shapes={buttonShapesForSize('large', 'square')}>
+          Square large
+        </Button>
+        <Button size="extraLarge" shapes={buttonShapesForSize('extraLarge', 'square')}>
+          Square extra large
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
 export const ContentLengths: Story = {
   render: () => (
     <div className="storybook-center">

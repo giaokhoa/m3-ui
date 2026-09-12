@@ -132,6 +132,40 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('expressive square shape family', async ({ page }) => {
+    await openStory(page, 'components-button--expressive-square-shapes');
+    await expect(page.locator('#storybook-root')).toHaveScreenshot(
+      'button-expressive-square-shapes.png',
+    );
+  });
+
+  test('expressive square shapes preserve the audited idle and pressed matrix', async ({ page }) => {
+    await openStory(page, 'components-button--expressive-square-shapes');
+    const cases = [
+      ['Square extra small', '12px', '8px'],
+      ['Square small', '12px', '8px'],
+      ['Square medium', '16px', '12px'],
+      ['Square large', '28px', '16px'],
+      ['Square extra large', '28px', '16px'],
+    ] as const;
+
+    for (const [name, idleRadius, pressedRadius] of cases) {
+      const button = page.getByRole('button', { name, exact: true });
+      await expect(button).toBeVisible();
+      await expect(button).toHaveCSS('--_button-container-radius', idleRadius);
+      const box = await button.boundingBox();
+      if (!box) throw new Error(`${name} has no bounding box`);
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      try {
+        await expect(button).toHaveCSS('--_button-container-radius', pressedRadius);
+      } finally {
+        await page.mouse.up();
+      }
+      await expect(button).toHaveCSS('--_button-container-radius', idleRadius);
+    }
+  });
+
   test('expressive pressed shape', async ({ page }) => {
     await openStory(page, 'components-button--expressive-shape-morph');
     const button = page.getByRole('button', { name: 'Press medium' });
