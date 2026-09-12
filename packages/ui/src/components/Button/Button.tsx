@@ -18,8 +18,8 @@ export interface ButtonProps extends AriaButtonProps {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   /**
-   * Applies AndroidX Material3 expressive size helper geometry. Omit this prop to
-   * keep the common non-expressive baseline defaults.
+   * Material 3 Button size. Defaults to `small`, matching the current Material 3
+   * Design Kit component-set default and audited current Small size tokens.
    */
   size?: ButtonSize;
   /**
@@ -44,7 +44,7 @@ function ButtonImpl({
   style,
   startIcon,
   endIcon,
-  size,
+  size = 'small',
   shapes,
   onPressStart,
   onPressEnd,

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-12",
+  "issue": 407,
+  "decision": {
+    "publicDefaultSize": "small",
+    "disposition": "current-design-default-before-publication",
+    "packageState": {
+      "private": true,
+      "version": "0.0.0",
+      "published": false
+    },
+    "reason": "All five current Figma Button component sets default Size=Small, and the latest Material Web Small token family agrees with Compose expressive Small on 40px/dp height, 20px/dp icon size, and 16px/dp horizontal spacing. The project has no published compatibility contract yet, so the React default is corrected before release while legacy baseline tokens remain source evidence."
+  },
+  "figma": {
+    "source": "Material 3 Design Kit 1.25",
+    "componentSets": [
+      "filled",
+      "elevated",
+      "filledTonal",
+      "outlined",
+      "text"
+    ],
+    "allSetsDefault": {
+      "type": "Round",
+      "size": "Small",
+      "state": "Enabled"
+    },
+    "small": {
+      "containerHeight": 40,
+      "iconSize": 20,
+      "paddingInline": 16,
+      "paddingBlock": 10,
+      "iconSpacing": 8,
+      "typography": "labelLarge"
+    },
+    "outerInteractionFrameHeight": 48
+  },
+  "compose": {
+    "revision": "059f5aff7b57aa6dc164065e53c55934bec4ee22",
+    "classic": {
+      "containerHeight": 40,
+      "iconSize": 18,
+      "paddingInline": 24,
+      "paddingBlock": 8,
+      "iconLeadingPadding": 16,
+      "labelTypography": "labelLarge"
+    },
+    "expressiveSmall": {
+      "containerHeight": 40,
+      "iconSize": 20,
+      "paddingInline": 16,
+      "paddingBlock": 10,
+      "iconSpacing": 8,
+      "labelTypography": "labelLarge"
+    },
+    "iconSizeTodo": "ButtonDefaults.IconSize is hard-coded 18.dp with TODO to update from corrected BaselineButtonTokens; ButtonDefaults.SmallIconSize uses ButtonSmallTokens.IconSize."
+  },
+  "materialWeb": {
+    "revision": "cac97678831d48d4eb4a606ca50f92673a1dc20c",
+    "latestSmall": {
+      "generatedVersion": "34.0.21",
+      "containerHeight": 40,
+      "iconSize": 20,
+      "paddingInline": 16,
+      "iconSpacing": 8
+    },
+    "publicRuntime": {
+      "tokenGeneration": "v0_192",
+      "containerHeight": 40,
+      "iconSize": 18,
+      "paddingInline": 24,
+      "sizeProperty": false
+    },
+    "disposition": "public runtime adapter is legacy-source evidence; latest size family is the current web token reference"
+  },
+  "canonical": {
+    "reactDefaultSize": "small",
+    "small": {
+      "containerHeight": 40,
+      "iconSize": 20,
+      "paddingInline": 16,
+      "paddingBlock": 10,
+      "iconSpacing": 8,
+      "typography": "labelLarge"
+    },
+    "legacyBaselineRetained": true,
+    "legacyBaselineRole": "source-reference fallback for Compose classic / Material Web v0_192 audits, not public React default"
+  }
+}

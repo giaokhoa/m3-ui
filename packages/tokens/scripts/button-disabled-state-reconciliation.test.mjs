@@ -94,7 +94,7 @@ test('Figma issue-406 findings carry resolved dispositions while later Button au
   assert.equal(records.get('button-disabled-content-role')?.status, 'resolved-web-reference');
   assert.equal(records.get('button-text-disabled-container')?.status, 'resolved-runtime-adaptation');
   assert.equal(records.get('button-outlined-disabled-presentation')?.status, 'resolved-mixed-runtime-adaptation');
-  assert.equal(records.get('button-default-small-icon-size')?.status, 'unresolved');
+  assert.equal(records.get('button-default-small-icon-size')?.status, 'resolved-current-small-default');
   assert.equal(records.get('button-square-size-helper')?.status, 'unresolved');
   assert.equal(records.get('button-storybook-spec-locks')?.status, 'unresolved');
 });

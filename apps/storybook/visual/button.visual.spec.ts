@@ -88,6 +88,43 @@ test.describe('Material 3 Button visual parity', () => {
     );
   });
 
+  test('omitted size resolves to the same current Small contract as explicit size=small', async ({ page }) => {
+    const defaultButton = await openDefaultButton(page);
+    await expect(defaultButton).toHaveAttribute('data-size', 'small');
+    const defaultContract = await defaultButton.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        minHeight: style.getPropertyValue('--_button-min-height').trim(),
+        paddingBlock: style.getPropertyValue('--_button-padding-block').trim(),
+        paddingInlineStart: style.getPropertyValue('--_button-padding-inline-start').trim(),
+        paddingInlineEnd: style.getPropertyValue('--_button-padding-inline-end').trim(),
+        iconSize: style.getPropertyValue('--_button-icon-size').trim(),
+        iconSpacing: style.getPropertyValue('--_button-icon-spacing').trim(),
+        fontSize: style.getPropertyValue('--_button-font-size').trim(),
+        lineHeight: style.getPropertyValue('--_button-line-height').trim(),
+      };
+    });
+
+    await openStory(page, 'components-button--expressive-sizes');
+    const explicitSmall = page.getByRole('button', { name: 'Small', exact: true });
+    await expect(explicitSmall).toHaveAttribute('data-size', 'small');
+    const explicitSmallContract = await explicitSmall.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        minHeight: style.getPropertyValue('--_button-min-height').trim(),
+        paddingBlock: style.getPropertyValue('--_button-padding-block').trim(),
+        paddingInlineStart: style.getPropertyValue('--_button-padding-inline-start').trim(),
+        paddingInlineEnd: style.getPropertyValue('--_button-padding-inline-end').trim(),
+        iconSize: style.getPropertyValue('--_button-icon-size').trim(),
+        iconSpacing: style.getPropertyValue('--_button-icon-spacing').trim(),
+        fontSize: style.getPropertyValue('--_button-font-size').trim(),
+        lineHeight: style.getPropertyValue('--_button-line-height').trim(),
+      };
+    });
+
+    expect(defaultContract).toEqual(explicitSmallContract);
+  });
+
   test('expressive size family', async ({ page }) => {
     await openStory(page, 'components-button--expressive-sizes');
     await expect(page.locator('#storybook-root')).toHaveScreenshot(
