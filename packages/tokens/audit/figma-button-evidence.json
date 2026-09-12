@@ -1,0 +1,415 @@
+{
+  "source": {
+    "kind": "design-reference",
+    "name": "Material 3 Design Kit",
+    "libraryKey": "lk-5a31d104cabc6a74d4edf6425e7bc6575e9c0f18cda7efb746193aef4d915b077d115c985e6cf49d36d97d455a17d5127a2cbbfbc618b8a70a38669dccb61462",
+    "version": "1.25",
+    "releasedAt": "2026-05-19",
+    "verifiedAt": "2026-09-12"
+  },
+  "method": {
+    "tool": "Figma MCP get_libraries + search_design_system + use_figma + get_variable_defs",
+    "scope": "published Material 3 Design Kit Button component sets",
+    "sourceLibraryReadOnly": true,
+    "scratchFileKeyPersisted": false,
+    "note": "A temporary user-owned Figma design file was used only as read/import context. Its file key is intentionally not persisted. Published component-set keys and observed values are sufficient to repeat the review."
+  },
+  "componentSets": {
+    "filled": {
+      "name": "Button",
+      "key": "ab924dce8b851fd820bd0d56da24a9c489311ae6",
+      "updatedAt": "2026-05-19T18:16:30Z"
+    },
+    "elevated": {
+      "name": "Button - elevated",
+      "key": "83034000281dcf9f147679e07ef11d2b65e311dc",
+      "updatedAt": "2026-05-19T18:15:04Z"
+    },
+    "filledTonal": {
+      "name": "Button - tonal",
+      "key": "bc43537f1f7aec7e0c159679f9a721e7aab9f100",
+      "updatedAt": "2026-05-19T18:14:52Z"
+    },
+    "outlined": {
+      "name": "Button - outline",
+      "key": "dd2040219668454df5aa170434636aa823624c1a",
+      "updatedAt": "2026-05-19T18:16:30Z",
+      "publishedPressedVariantSpelling": "Presssed"
+    },
+    "text": {
+      "name": "Button - text",
+      "key": "c94bd76a8dbf75d7885f3015ad8474d898fca25b",
+      "updatedAt": "2026-05-19T18:15:04Z"
+    }
+  },
+  "variantContract": {
+    "types": [
+      "Round",
+      "Square"
+    ],
+    "sizes": [
+      "XSmall",
+      "Small",
+      "Medium",
+      "Large",
+      "XLarge"
+    ],
+    "states": [
+      "Enabled",
+      "Hovered",
+      "Focused",
+      "Pressed",
+      "Disabled"
+    ],
+    "variantsPerSet": 50,
+    "properties": [
+      "Label text",
+      "Show icon",
+      "Icon",
+      "Show focus indicator",
+      "Type",
+      "Size",
+      "State"
+    ]
+  },
+  "sizes": {
+    "extraSmall": {
+      "figmaName": "XSmall",
+      "outerFrameHeight": 48,
+      "containerHeight": 32,
+      "paddingBlock": 6,
+      "paddingInline": 12,
+      "iconSize": 20,
+      "iconSpacing": 4,
+      "typography": "labelLarge",
+      "typographyMetrics": {
+        "fontSize": 14,
+        "lineHeight": 20,
+        "weight": 500,
+        "letterSpacing": 0.1
+      }
+    },
+    "small": {
+      "figmaName": "Small",
+      "outerFrameHeight": 48,
+      "containerHeight": 40,
+      "paddingBlock": 10,
+      "paddingInline": 16,
+      "iconSize": 20,
+      "iconSpacing": 8,
+      "typography": "labelLarge",
+      "typographyMetrics": {
+        "fontSize": 14,
+        "lineHeight": 20,
+        "weight": 500,
+        "letterSpacing": 0.1
+      }
+    },
+    "medium": {
+      "figmaName": "Medium",
+      "outerFrameHeight": 56,
+      "containerHeight": 56,
+      "paddingBlock": 16,
+      "paddingInline": 24,
+      "iconSize": 24,
+      "iconSpacing": 8,
+      "typography": "titleMedium",
+      "typographyMetrics": {
+        "fontSize": 16,
+        "lineHeight": 24,
+        "weight": 500,
+        "letterSpacing": 0.15
+      }
+    },
+    "large": {
+      "figmaName": "Large",
+      "outerFrameHeight": 96,
+      "containerHeight": 96,
+      "paddingBlock": 32,
+      "paddingInline": 48,
+      "iconSize": 32,
+      "iconSpacing": 12,
+      "typography": "headlineSmall",
+      "typographyMetrics": {
+        "fontSize": 24,
+        "lineHeight": 32,
+        "weight": 400,
+        "letterSpacing": 0
+      }
+    },
+    "extraLarge": {
+      "figmaName": "XLarge",
+      "outerFrameHeight": 136,
+      "containerHeight": 136,
+      "paddingBlock": 48,
+      "paddingInline": 64,
+      "iconSize": 40,
+      "iconSpacing": 16,
+      "typography": "headlineLarge",
+      "typographyMetrics": {
+        "fontSize": 32,
+        "lineHeight": 40,
+        "weight": 400,
+        "letterSpacing": 0
+      }
+    }
+  },
+  "shapes": {
+    "extraSmall": {
+      "round": {
+        "enabled": {
+          "semantic": "full",
+          "radius": 100
+        },
+        "pressed": {
+          "semantic": "small",
+          "radius": 8
+        }
+      },
+      "square": {
+        "enabled": {
+          "semantic": "medium",
+          "radius": 12
+        },
+        "pressed": {
+          "semantic": "small",
+          "radius": 8
+        }
+      }
+    },
+    "small": {
+      "round": {
+        "enabled": {
+          "semantic": "full",
+          "radius": 100
+        },
+        "pressed": {
+          "semantic": "small",
+          "radius": 8
+        }
+      },
+      "square": {
+        "enabled": {
+          "semantic": "medium",
+          "radius": 12
+        },
+        "pressed": {
+          "semantic": "small",
+          "radius": 8
+        }
+      }
+    },
+    "medium": {
+      "round": {
+        "enabled": {
+          "semantic": "full",
+          "radius": 100
+        },
+        "pressed": {
+          "semantic": "medium",
+          "radius": 12
+        }
+      },
+      "square": {
+        "enabled": {
+          "semantic": "large",
+          "radius": 16
+        },
+        "pressed": {
+          "semantic": "medium",
+          "radius": 12
+        }
+      }
+    },
+    "large": {
+      "round": {
+        "enabled": {
+          "semantic": "full",
+          "radius": 100
+        },
+        "pressed": {
+          "semantic": "large",
+          "radius": 16
+        }
+      },
+      "square": {
+        "enabled": {
+          "semantic": "extraLarge",
+          "radius": 28
+        },
+        "pressed": {
+          "semantic": "large",
+          "radius": 16
+        }
+      }
+    },
+    "extraLarge": {
+      "round": {
+        "enabled": {
+          "semantic": "full",
+          "radius": 100
+        },
+        "pressed": {
+          "semantic": "large",
+          "radius": 16
+        }
+      },
+      "square": {
+        "enabled": {
+          "semantic": "extraLarge",
+          "radius": 28
+        },
+        "pressed": {
+          "semantic": "large",
+          "radius": 16
+        }
+      }
+    }
+  },
+  "smallStates": {
+    "stateLayerOpacity": {
+      "hovered": 0.08,
+      "focused": 0.1
+    },
+    "filled": {
+      "enabled": {
+        "containerRole": "primary",
+        "contentRole": "onPrimary"
+      },
+      "stateLayerRole": "onPrimary",
+      "disabled": {
+        "containerRole": "onSurface",
+        "containerOpacity": 0.1,
+        "contentRole": "onSurface",
+        "contentOpacity": 0.38
+      }
+    },
+    "elevated": {
+      "enabled": {
+        "containerRole": "surfaceContainerLow",
+        "contentRole": "primary",
+        "elevation": "level1"
+      },
+      "stateLayerRole": "primary",
+      "disabled": {
+        "containerRole": "onSurface",
+        "containerOpacity": 0.1,
+        "contentRole": "onSurface",
+        "contentOpacity": 0.38,
+        "elevation": "level0"
+      }
+    },
+    "filledTonal": {
+      "enabled": {
+        "containerRole": "secondaryContainer",
+        "contentRole": "onSecondaryContainer"
+      },
+      "stateLayerRole": "onSecondaryContainer",
+      "disabled": {
+        "containerRole": "onSurface",
+        "containerOpacity": 0.1,
+        "contentRole": "onSurface",
+        "contentOpacity": 0.38
+      }
+    },
+    "outlined": {
+      "enabled": {
+        "containerRole": "transparent",
+        "contentRole": "onSurfaceVariant",
+        "outlineRole": "outlineVariant",
+        "outlineOpacity": 1
+      },
+      "stateLayerRole": "onSurfaceVariant",
+      "disabled": {
+        "containerRole": "onSurface",
+        "containerOpacity": 0.1,
+        "contentRole": "onSurface",
+        "contentOpacity": 0.38,
+        "outlineRole": "outlineVariant",
+        "outlineOpacity": 1
+      }
+    },
+    "text": {
+      "enabled": {
+        "containerRole": "transparent",
+        "contentRole": "primary"
+      },
+      "stateLayerRole": "primary",
+      "disabled": {
+        "containerRole": "onSurface",
+        "containerOpacity": 0.1,
+        "contentRole": "onSurface",
+        "contentOpacity": 0.38
+      }
+    },
+    "pressedStaticMock": {
+      "stateLayerOpacity": 0.08,
+      "rippleOpacity": 0.1,
+      "note": "All five published Button Pressed variants keep an 0.08 state-layer fill and add a separate 0.10 Ripple vector. The 0.10 ripple aligns with Compose StateTokens.PressedStateLayerOpacity and Material Web md-sys-state pressed-state-layer-opacity."
+    }
+  },
+  "reconciliation": {
+    "matches": [
+      "expressive-size-container-heights",
+      "expressive-size-padding",
+      "expressive-size-icon-sizes",
+      "expressive-size-icon-spacing",
+      "expressive-size-typography",
+      "round-pressed-shape-scale",
+      "state-layer-opacities",
+      "enabled-variant-color-roles"
+    ],
+    "trackedDrift": [
+      {
+        "id": "button-disabled-content-role",
+        "issue": 406,
+        "figma": "onSurface @ 0.38",
+        "materialWeb": "on-surface @ 0.38",
+        "compose": "onSurfaceVariant @ 0.38",
+        "canonical": "onSurfaceVariant @ 0.38",
+        "status": "unresolved"
+      },
+      {
+        "id": "button-text-disabled-container",
+        "issue": 406,
+        "figma": "onSurface @ 0.10",
+        "materialWeb": "on-surface @ 0.10",
+        "compose": "transparent",
+        "canonical": "transparent",
+        "status": "unresolved"
+      },
+      {
+        "id": "button-outlined-disabled-presentation",
+        "issue": 406,
+        "figma": "onSurface @ 0.10 container + outlineVariant @ 1 + onSurface @ 0.38 content",
+        "materialWeb": "generic on-surface container @ 0.10 + outline-variant disabled outline + on-surface content @ 0.38",
+        "compose": "transparent container + Compose disabled outline/content defaults",
+        "canonical": "transparent container + outlineVariant @ 0.10 + onSurfaceVariant @ 0.38 content",
+        "status": "unresolved"
+      },
+      {
+        "id": "button-default-small-icon-size",
+        "issue": 407,
+        "figma": "Small icon = 20",
+        "materialWeb": "small/default icon = 20",
+        "compose": "ButtonDefaults.IconSize = 18dp with upstream TODO; SmallIconSize = 20dp",
+        "canonical": "legacy baseline icon = 18; explicit size=small icon = 20",
+        "status": "unresolved"
+      },
+      {
+        "id": "button-square-size-helper",
+        "issue": 408,
+        "figma": "Round/Square are published for all five sizes",
+        "canonical": "public buttonShapesForSize() exposes only round -> pressed mapping; custom square values can be authored manually",
+        "status": "unresolved"
+      },
+      {
+        "id": "button-storybook-spec-locks",
+        "issue": 409,
+        "figma": "reviewed component values are now available as independent design evidence",
+        "canonical": "browser snapshots and some runtime tests still duplicate literals or interaction-history outcomes",
+        "status": "unresolved"
+      }
+    ]
+  }
+}
