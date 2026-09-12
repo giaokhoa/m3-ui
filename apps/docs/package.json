@@ -15,7 +15,7 @@
     "start": "next start --hostname 0.0.0.0 --port 4173",
     "test": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && pnpm docs:lint && node --test scripts/*.test.mjs scripts/material-conformance.node-tests.mjs",
     "typecheck": "pnpm api:generate && pnpm spec:generate && pnpm examples:generate && node scripts/build-docs-data.mjs && next typegen && tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf .next .source dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json src/generated/live-examples.generated.json public/search-index.json"
+    "clean": "rm -rf .next .source dist src/generated/docs-navigation.json src/generated/api-reference.generated.json src/generated/material-spec.generated.json src/generated/live-examples.generated.json src/generated/material-conformance.generated.json public/search-index.json"
   },
   "dependencies": {
     "@m3-ui/ui": "workspace:*",

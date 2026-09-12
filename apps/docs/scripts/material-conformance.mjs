@@ -184,6 +184,93 @@ function validateProvenance({ family, componentProvenanceIds, pathExists, errors
   validateEvidencePaths({ paths, label: `${family.id}.provenance`, pathExists, errors });
 }
 
+function validateCapabilities({ family, publicSymbols, pathExists, errors }) {
+  if (family.capabilities === undefined) return;
+  if (!Array.isArray(family.capabilities) || family.capabilities.length === 0) {
+    errors.push(`${family.id}: reviewed capabilities must contain at least one semantic capability`);
+    return;
+  }
+
+  const capabilityIds = new Set();
+  const publicSymbolNames = new Set(publicSymbols.map((item) => item.name));
+  for (const capability of family.capabilities) {
+    const label = `${family.id}.capability.${String(capability?.id ?? '<missing>')}`;
+    if (typeof capability?.id !== 'string' || capability.id.trim() === '') {
+      errors.push(`${family.id}: reviewed capabilities need a non-empty id`);
+      continue;
+    }
+    if (capabilityIds.has(capability.id)) {
+      errors.push(`${family.id}: duplicate reviewed capability id "${capability.id}"`);
+    }
+    capabilityIds.add(capability.id);
+    if (typeof capability.label !== 'string' || capability.label.trim() === '') {
+      errors.push(`${label}: capability needs a human-readable label`);
+    }
+    if (!['supported', 'adapted', 'excluded', 'gap'].includes(capability.status)) {
+      errors.push(`${label}: invalid capability status "${String(capability.status)}"`);
+      continue;
+    }
+
+    const paths = evidencePaths(capability);
+    if (paths.length === 0) errors.push(`${label}: reviewed capabilities need concrete evidence`);
+    validateEvidencePaths({ paths, label, pathExists, errors });
+
+    const mappedSymbols = Array.isArray(capability.publicSymbols) ? capability.publicSymbols : [];
+    if (capability.status === 'supported' && mappedSymbols.length === 0) {
+      errors.push(`${label}: supported capabilities need at least one public m3-ui symbol mapping`);
+    }
+    for (const symbol of mappedSymbols) {
+      if (typeof symbol !== 'string' || symbol.trim() === '') {
+        errors.push(`${label}: publicSymbols entries must be non-empty strings`);
+      } else if (!publicSymbolNames.has(symbol)) {
+        errors.push(`${label}: mapped public symbol "${symbol}" is not owned by family ${family.id}`);
+      }
+    }
+
+    if (['adapted', 'excluded', 'gap'].includes(capability.status)) {
+      if (typeof capability.reason !== 'string' || capability.reason.trim() === '') {
+        errors.push(`${label}: ${capability.status} capabilities need a concrete reason`);
+      }
+    }
+    if (capability.status === 'gap') {
+      if (!Number.isInteger(capability.gapIssue) || capability.gapIssue <= 0) {
+        errors.push(`${label}: capability gaps need a positive gapIssue`);
+      }
+    } else if (Object.hasOwn(capability, 'gapIssue')) {
+      errors.push(`${label}: ${capability.status} capabilities must not retain gapIssue`);
+    }
+  }
+}
+
+function validateReleaseFindings({ registry, familyIds, pathExists, errors }) {
+  const findings = registry.reviewedReleaseFindings;
+  if (findings === undefined) return;
+  if (!Array.isArray(findings) || findings.length === 0) {
+    errors.push('reviewedReleaseFindings must contain at least one disposition when present');
+    return;
+  }
+  const ids = new Set();
+  for (const finding of findings) {
+    const label = `release-finding.${String(finding?.id ?? '<missing>')}`;
+    if (typeof finding?.id !== 'string' || finding.id.trim() === '') {
+      errors.push('reviewed release findings need a non-empty id');
+      continue;
+    }
+    if (ids.has(finding.id)) errors.push(`duplicate reviewed release finding id: ${finding.id}`);
+    ids.add(finding.id);
+    if (!familyIds.has(finding.family)) errors.push(`${label}: unknown family "${String(finding.family)}"`);
+    if (!['supported', 'adapted', 'excluded'].includes(finding.status)) {
+      errors.push(`${label}: invalid disposition "${String(finding.status)}"`);
+    }
+    if (typeof finding.reason !== 'string' || finding.reason.trim() === '') {
+      errors.push(`${label}: disposition needs a concrete reason`);
+    }
+    const paths = evidencePaths(finding);
+    if (paths.length === 0) errors.push(`${label}: disposition needs concrete evidence`);
+    validateEvidencePaths({ paths, label, pathExists, errors });
+  }
+}
+
 function classifyExport(entry, classifiers) {
   return classifiers.filter((classifier) => matchesSource(entry, classifier));
 }
@@ -209,7 +296,7 @@ export function validateMaterialConformance({
   const nonComponents = registry.nonComponents ?? [];
   const classifiers = [...families, ...nonComponents];
 
-  if (registry.schemaVersion !== 1) {
+  if (registry.schemaVersion !== 2) {
     errors.push(`Unsupported conformance registry schema: ${registry.schemaVersion}`);
   }
   if (!Number.isInteger(registry.parentIssue) || registry.parentIssue <= 0) {
@@ -228,6 +315,13 @@ export function validateMaterialConformance({
       errors.push(`${classifier.id}: sourcePrefixes must contain at least one source-module prefix`);
     }
   }
+
+  validateReleaseFindings({
+    registry,
+    familyIds: new Set(families.map((family) => family.id)),
+    pathExists,
+    errors,
+  });
 
   for (const family of families) {
     if (!['component', 'layout'].includes(family.kind)) {
@@ -277,6 +371,15 @@ export function validateMaterialConformance({
     }
   }
 
+  for (const family of families) {
+    validateCapabilities({
+      family,
+      publicSymbols: familySymbols.get(family.id) ?? [],
+      pathExists,
+      errors,
+    });
+  }
+
   const layoutExports = Object.entries(layoutModel?.exports ?? {});
   const rootExportNames = new Set(rootExports.map(([name]) => name));
   const layoutSymbolNamesByFamily = new Map(
@@ -316,8 +419,9 @@ export function validateMaterialConformance({
 
   return {
     report: {
-      schemaVersion: 1,
+      schemaVersion: registry.schemaVersion,
       parentIssue: registry.parentIssue,
+      reviewedReleaseFindings: registry.reviewedReleaseFindings ?? [],
       generatedFrom: {
         root: rootModel?.entrypoint ?? registry.rootEntrypoint,
         layout: layoutModel?.entrypoint ?? registry.layoutEntrypoint,
@@ -329,6 +433,7 @@ export function validateMaterialConformance({
         provenance: family.provenance,
         publicSymbols: familySymbols.get(family.id) ?? [],
         dimensions: family.dimensions,
+        capabilities: family.capabilities ?? [],
       })),
       nonComponents: nonComponents.map((classification) => ({
         id: classification.id,

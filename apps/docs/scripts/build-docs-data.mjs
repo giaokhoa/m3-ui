@@ -11,6 +11,7 @@ register({
 });
 
 const { source } = await import('../src/lib/source.ts');
+const { buildMaterialConformanceReport } = await import('./material-conformance.mjs');
 
 function textValue(value) {
   if (typeof value === 'string') return value;
@@ -55,6 +56,17 @@ function normalizeNode(node) {
   return undefined;
 }
 
+const { report: materialConformanceReport, errors: materialConformanceErrors } =
+  buildMaterialConformanceReport();
+if (materialConformanceErrors.length > 0) {
+  throw new Error(
+    `Failed to build Material conformance data:
+${materialConformanceErrors
+      .map((error) => `- ${error}`)
+      .join('\n')}`,
+  );
+}
+
 const tree = source.getPageTree();
 const navigation = {
   name: textValue(tree.name) ?? 'm3-ui',
@@ -79,6 +91,11 @@ await Promise.all([
   writeFile(
     resolve(generatedDir, 'docs-navigation.json'),
     `${JSON.stringify(navigation, null, 2)}\n`,
+    'utf8',
+  ),
+  writeFile(
+    resolve(generatedDir, 'material-conformance.generated.json'),
+    `${JSON.stringify(materialConformanceReport, null, 2)}\n`,
     'utf8',
   ),
   writeFile(

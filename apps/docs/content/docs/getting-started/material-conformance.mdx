@@ -38,6 +38,14 @@ Conformance is best read as separate dimensions rather than a single percentage:
 
 The parity catalog records these dimensions independently and distinguishes intentional adaptations from known gaps.
 
+## Reviewed capability coverage
+
+Conformance also audits the reviewed **capability surface**, not only the exports that already exist. A reviewed family records semantic capability groups such as submenu support, segmented list composition, tooltip caret, contained/docked search variants, or TimePicker scroll selection in the same machine-readable conformance registry that owns its public family and evidence.
+
+A capability can be `supported`, `adapted`, `excluded`, or an explicitly tracked `gap`. Supported capabilities must map to public `m3-ui` symbols and concrete evidence. Adapted/excluded capabilities require a concrete reason plus evidence. The completion gate resolves those symbol mappings against the actual TypeScript public entrypoint, so deleting a reviewed public capability fails CI even when every remaining export is still fully tested.
+
+This contract is behavior-level. It does not freeze AndroidX source hashes, Kotlin call graphs, exact export counts, or implementation regexes as the definition of parity.
+
 ## Adaptation versus gap
 
 An **adaptation** is an intentional browser-native mapping that preserves the Material contract while using the correct web primitive.

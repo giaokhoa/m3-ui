@@ -138,7 +138,7 @@ export function resolveComponentProvenance(
       visual:
         override.fidelity?.visual ?? {
           status: 'partial',
-          summary: metadata.implementation,
+          summary: `Legacy visual fidelity has not received an explicit reviewed disposition. Current implementation evidence: ${metadata.implementation}`,
         },
       behavior:
         override.fidelity?.behavior ?? {

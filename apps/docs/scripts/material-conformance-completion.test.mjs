@@ -71,6 +71,56 @@ test('completed Material 3 conformance program remains gap-free across actual pu
     }
   }
 
+  const capabilityReviewedFamilies = report.families.filter(
+    (family) => family.capabilities.length > 0,
+  );
+  assert.ok(
+    capabilityReviewedFamilies.length > 0,
+    'completed conformance must retain reviewed upstream capability coverage',
+  );
+  for (const family of capabilityReviewedFamilies) {
+    for (const capability of family.capabilities) {
+      const label = `${family.id}.capability.${capability.id}`;
+      assert.notEqual(
+        capability.status,
+        'gap',
+        `${label} reintroduced a reviewed public capability gap`,
+      );
+      assert.ok(
+        nonEmptyStrings(capability.evidence),
+        `${label} must retain concrete evidence`,
+      );
+      if (capability.status === 'supported') {
+        assert.ok(
+          nonEmptyStrings(capability.publicSymbols),
+          `${label} must retain a public m3-ui mapping`,
+        );
+      }
+      if (capability.status === 'adapted' || capability.status === 'excluded') {
+        assert.ok(
+          typeof capability.reason === 'string' && capability.reason.trim() !== '',
+          `${label} must retain a concrete ${capability.status} reason`,
+        );
+      }
+    }
+  }
+
+  assert.ok(
+    report.reviewedReleaseFindings.length > 0,
+    'the completed 1.5.x release-note sweep must retain explicit dispositions',
+  );
+  for (const finding of report.reviewedReleaseFindings) {
+    assert.ok(
+      ['supported', 'adapted', 'excluded'].includes(finding.status),
+      `${finding.id} must retain a final release-note disposition`,
+    );
+    assert.ok(
+      typeof finding.reason === 'string' && finding.reason.trim() !== '',
+      `${finding.id} must retain its disposition reason`,
+    );
+    assert.ok(nonEmptyStrings(finding.evidence), `${finding.id} must retain evidence`);
+  }
+
   assert.ok(
     report.nonComponents.length > 0,
     'public non-component infrastructure must remain explicitly classified',

@@ -1,6 +1,6 @@
 ---
 title: Menus
-description: Material anchored menus, sections, menu items, and read-only exposed menus with browser focus and dismissal semantics.
+description: Material anchored menus, expressive selection/groups, read-only exposed menus, and editable/read-only exposed comboboxes with browser-native semantics.
 ---
 
 Menus present a temporary list of actions or choices anchored to a trigger. Material defines the visual menu surface and item anatomy; React Aria supplies the browser menu interaction model.
@@ -98,21 +98,45 @@ Do not attach a competing Arrow/Escape handler to submenu triggers; the wrapper 
 
 The anchor communicates popup/expanded state and can open from pointer or keyboard activation. It is intentionally not an editable combobox or autocomplete. Do not describe users as typing into it or filtering options unless a separate editable public API is composed.
 
+## Exposed dropdown menu
+
+`ExposedDropdownMenu` is a **separate** public surface for combobox/listbox selection. It supports both editable and read-only input behavior while keeping the popup options in a listbox rather than pretending an editable text input is a menu trigger.
+
+```tsx
+<ExposedDropdownMenu
+  aria-label="Density"
+  label="Density"
+  items={densityOptions}
+  value={density}
+  onSelectionChange={(value) => setDensity(value)}
+  isOpen={isOpen}
+  onOpenChange={setIsOpen}
+  inputValue={query}
+  onInputChange={setQuery}
+/>
+```
+
+When `inputValue`/`onInputChange` are supplied, users can edit the combobox text and the application owns filtering, remote search, or any other query policy. The component does **not** silently filter `items`; this keeps text editing and data policy explicit.
+
+For a non-editable combobox/listbox presentation, set `isReadOnly` (or omit the editable input contract). This read-only mode is still `ExposedDropdownMenu` combobox/listbox semantics and is distinct from `ExposedMenu`, whose anchor remains a read-only menu disclosure.
+
 ## Accessibility
 
 Give menu triggers and menus meaningful names. Keep item labels usable for typeahead and accessible naming. Let the menu interaction model own arrow-key navigation and focus restoration rather than attaching competing keyboard handlers.
 
-For `ExposedMenu`, preserve its read-only menu relationship; a text-field appearance does not make it a text input.
+For `ExposedMenu`, preserve its read-only menu relationship; a text-field appearance does not make it a text input. For `ExposedDropdownMenu`, preserve the combobox/listbox relationship, keep editing focus on the input, and leave filtering policy to application code.
 
 ## API reference
 
 <ApiReference name="Menu" />
 
+<ApiReference name="ExposedDropdownMenu" />
+
 ## Material fidelity and web adaptation
 
 <MaterialParity component="menu" />
 
-Material supplies surface, anatomy, spacing, state presentation, and visual hierarchy. React Aria supplies menu/menuitem focus, keyboard, popup positioning, dismissal, and restoration semantics. The exposed-menu text-field anchor is a deliberate read-only web composition.
+Material supplies surface, anatomy, spacing, state presentation, and visual hierarchy. React Aria supplies menu/menuitem focus, keyboard, popup positioning, dismissal, and restoration semantics. `ExposedMenu` is the deliberate read-only menu composition; `ExposedDropdownMenu` separately maps exposed selection to browser combobox/listbox semantics and supports editable or read-only input behavior.
 
 ## Related components
 
