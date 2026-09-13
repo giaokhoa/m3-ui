@@ -39,6 +39,16 @@ test.describe('Material 3 SearchBar browser contract', () => {
     await expect(input).toBeFocused();
   });
 
+  test('clear action supports virtual activation without a second value owner', async ({ page }) => {
+    await openStory(page, 'components-searchbar--default');
+    const input = page.getByRole('searchbox', { name: 'Search' });
+    await input.fill('virtual');
+    await page.getByRole('button', { name: 'Clear search' }).dispatchEvent('click', { detail: 0 });
+    await expect(input).toHaveValue('');
+    await expect(page.getByTestId('query-value')).toHaveText('');
+    await expect(input).toBeFocused();
+  });
+
   test('docked expanded surface uses the 56px header, moves focus and dismisses outside/Escape', async ({ page }) => {
     await openStory(page, 'components-searchbar--docked-expanded');
     const view = page.getByTestId('search-view-docked');
@@ -88,6 +98,7 @@ test.describe('Material 3 SearchBar browser contract', () => {
     await trigger.evaluate((element) => (element as HTMLInputElement).blur());
     await trigger.focus();
     await expect(page.getByTestId('search-view-docked-gap')).toBeVisible();
+    // The Material scrim is outside the overlay ref; RAC useOverlay owns dismissal.
     await page.locator('.search-view__docked-gap-scrim').click({ position: { x: 1, y: 1 } });
     await expect(page.getByTestId('search-view-docked-gap')).toHaveCount(0);
   });

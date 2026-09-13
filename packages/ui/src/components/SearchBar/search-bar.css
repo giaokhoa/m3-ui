@@ -30,6 +30,8 @@
   margin: 0;
 }
 
+.search-bar__field { display: contents; }
+
 .search-bar__input {
   min-width: 0;
   flex: 1;
@@ -77,6 +79,7 @@
 .search-bar__clear:hover { background: color-mix(in srgb, var(--on-surface) 8%, transparent); }
 .search-bar__clear:active { background: color-mix(in srgb, var(--on-surface) 12%, transparent); }
 .search-bar__clear:focus-visible { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.search-bar__field[data-empty] .search-bar__clear { display: none; }
 
 .search-view-overlay {
   position: fixed;
