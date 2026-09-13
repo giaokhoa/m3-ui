@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "test": {
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "build"
+      ]
+    }
+  }
+}

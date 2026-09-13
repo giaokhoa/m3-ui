@@ -44,11 +44,11 @@ test('Storybook declares and CI builds its direct generated-token test dependenc
   const workflow = await readFile(new URL('.github/workflows/ci.yml', repoRoot), 'utf8');
   const visualJob = workflow.slice(workflow.indexOf('  visual:'), workflow.indexOf('  docs-browser:'));
   assert.match(visualJob, /Build generated token test dependency/);
-  assert.match(visualJob, /pnpm --filter @m3-ui\/tokens build/);
+  assert.match(visualJob, /pnpm exec turbo run build --filter=@m3-ui\/tokens/);
   assert.ok(
-    visualJob.indexOf('pnpm --filter @m3-ui/tokens build') <
+    visualJob.indexOf('pnpm exec turbo run build --filter=@m3-ui/tokens') <
       visualJob.indexOf('pnpm --filter @m3-ui/storybook exec playwright test'),
-    'visual CI must build token dist before Playwright imports @m3-ui/tokens',
+    'visual CI must build token dist through Turbo before Playwright imports @m3-ui/tokens',
   );
 });
 

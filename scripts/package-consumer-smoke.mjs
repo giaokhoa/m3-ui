@@ -145,8 +145,7 @@ try {
   await mkdir(unpackDir, { recursive: true });
   await mkdir(consumerDir, { recursive: true });
 
-  run(pnpm, ['--filter', '@m3-ui/tokens', 'build']);
-  run(pnpm, ['--filter', '@m3-ui/ui', 'build']);
+  run(pnpm, ['exec', 'turbo', 'run', 'build', '--filter=@m3-ui/ui']);
 
   const tokensTarball = await packPackage(join(repoRoot, 'packages/tokens'), packDir);
   const uiTarball = await packPackage(join(repoRoot, 'packages/ui'), packDir);

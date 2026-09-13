@@ -76,27 +76,32 @@ pnpm dev
 pnpm build
 ```
 
-Useful package commands:
+Useful graph-aware commands:
 
 ```bash
-pnpm --filter @m3-ui/ui test
-pnpm --filter @m3-ui/ui typecheck
-pnpm --filter @m3-ui/ui build
+pnpm test
+pnpm typecheck
+pnpm clean
+
+pnpm exec turbo run test --filter=@m3-ui/ui
+pnpm exec turbo run typecheck --filter=@m3-ui/ui
+pnpm exec turbo run build --filter=@m3-ui/ui
 
 pnpm --filter @m3-ui/tokens validate
-pnpm --filter @m3-ui/tokens test
+pnpm exec turbo run test --filter=@m3-ui/tokens
 pnpm --filter @m3-ui/tokens audit:androidx
 
-pnpm --filter @m3-ui/docs dev
-pnpm --filter @m3-ui/docs build
+pnpm exec turbo run dev --filter=@m3-ui/docs
+pnpm exec turbo run build --filter=@m3-ui/docs
 
-pnpm --filter @m3-ui/storybook dev
-pnpm --filter @m3-ui/storybook test:visual
+pnpm exec turbo run dev --filter=@m3-ui/storybook
+pnpm test:visual
+pnpm test:docs-browser
 ```
 
-`pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port `4173` and Storybook on `6006`.
+`pnpm dev` runs workspace development tasks through Turborepo. The docs app listens on port `4173` and Storybook on `6006`. Build, test, typecheck, clean, docs generation, and browser checks use the same task graph; package scripts own task implementations while dependency ordering stays in Turbo.
 
-Preview runners can use `npm run dev -- --host 0.0.0.0 --port 4173 --strictPort` after installing and building the workspace. The root launcher generates the docs data and adapts those flags to the Next.js docs server; the requested port must be available.
+Preview runners that pass Vite-style host flags can target the docs package through the graph with `pnpm exec turbo run dev:preview --filter=@m3-ui/docs -- --host 0.0.0.0 --port 4173 --strictPort`. The docs package owns that argument adapter; the requested port must be available.
 
 ## Package distribution readiness
 
