@@ -35,29 +35,22 @@ async function waitForTooltipSettled(tooltip: Locator) {
 }
 
 async function caretPaint(tooltip: Locator) {
-  return tooltip.evaluate((element) => {
-    const tooltipStyle = getComputedStyle(element);
-    const caretStyle = getComputedStyle(element, '::after');
+  const caret = tooltip.locator(':scope > .tooltip-caret');
+  const style = await caret.evaluate((element) => {
+    const computed = getComputedStyle(element);
     return {
-      background: caretStyle.backgroundColor,
-      content: caretStyle.content,
-      height: caretStyle.height,
-      surfaceBackground: tooltipStyle.backgroundColor,
-      width: caretStyle.width,
+      background: computed.backgroundColor,
+      height: computed.height,
+      width: computed.width,
     };
   });
-}
-
-async function caretInsets(tooltip: Locator) {
-  return tooltip.evaluate((element) => {
-    const caretStyle = getComputedStyle(element, '::after');
-    return {
-      bottom: caretStyle.bottom,
-      left: caretStyle.left,
-      right: caretStyle.right,
-      top: caretStyle.top,
-    };
-  });
+  return {
+    ...style,
+    placement: await caret.getAttribute('data-placement'),
+    surfaceBackground: await tooltip.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  };
 }
 
 async function hoverDefault(page: Page) {
@@ -73,6 +66,7 @@ async function hoverDefault(page: Page) {
 
 async function hoverRich(page: Page) {
   await openStory(page, 'components-tooltip--rich');
+  await primePointerModality(page);
   const trigger = page.getByTestId('rich-tooltip-trigger');
   await trigger.hover();
   const tooltip = page.getByTestId('rich-tooltip');
@@ -81,7 +75,7 @@ async function hoverRich(page: Page) {
   return {
     trigger,
     tooltip,
-    dialog: tooltip.getByRole('dialog'),
+    dialog: tooltip,
     action: page.getByTestId('rich-tooltip-action'),
   };
 }
@@ -218,11 +212,12 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
       await waitForTooltipSettled(tooltip);
       await expect(tooltip).toHaveAttribute('data-caret', 'true');
       await expect(tooltip).toHaveAttribute('data-placement', item.placement);
-      expect(await caretPaint(tooltip)).toEqual({
-        background: (await caretPaint(tooltip)).surfaceBackground,
-        content: '""',
+      const paint = await caretPaint(tooltip);
+      expect(paint).toEqual({
+        background: paint.surfaceBackground,
         height: item.height,
-        surfaceBackground: (await caretPaint(tooltip)).surfaceBackground,
+        placement: (await tooltip.getAttribute('data-placement'))?.split(' ')[0],
+        surfaceBackground: paint.surfaceBackground,
         width: item.width,
       });
     }
@@ -231,7 +226,7 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
   test('caret remains absent by default', async ({ page }) => {
     const { tooltip } = await hoverDefault(page);
     await expect(tooltip).not.toHaveAttribute('data-caret');
-    expect((await caretPaint(tooltip)).content).toBe('none');
+    await expect(tooltip.locator(':scope > .tooltip-caret')).toHaveCount(0);
   });
 
   test('caret follows RAC collision flips on every viewport edge', async ({ page }) => {
@@ -252,7 +247,10 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
       await expect(tooltip).toBeVisible();
       await waitForTooltipSettled(tooltip);
       await expect(tooltip).toHaveAttribute('data-placement', item.placement);
-      expect((await caretPaint(tooltip)).content).toBe('""');
+      await expect(tooltip.locator(':scope > .tooltip-caret')).toHaveAttribute(
+        'data-placement',
+        item.placement,
+      );
     }
   });
 
@@ -263,12 +261,18 @@ test.describe('Material 3 PlainTooltip browser contract', () => {
     await page.getByTestId('caret-rtl-start-trigger').hover();
     const startTooltip = page.getByTestId('caret-rtl-start');
     await expect(startTooltip).toHaveAttribute('data-placement', /right/);
-    expect((await caretInsets(startTooltip)).left).toBe('-8px');
+    await expect(startTooltip.locator(':scope > .tooltip-caret')).toHaveAttribute(
+      'data-placement',
+      'right',
+    );
 
     await page.getByTestId('caret-rtl-end-trigger').hover();
     const endTooltip = page.getByTestId('caret-rtl-end');
     await expect(endTooltip).toHaveAttribute('data-placement', /left/);
-    expect((await caretInsets(endTooltip)).right).toBe('-8px');
+    await expect(endTooltip.locator(':scope > .tooltip-caret')).toHaveAttribute(
+      'data-placement',
+      'left',
+    );
   });
 
   test('caret inherits plain tooltip container paint across light dark and dynamic themes', async ({ page }) => {
@@ -357,8 +361,9 @@ test.describe('Material 3 RichTooltip browser contract', () => {
     await expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(trigger).toHaveAttribute('aria-controls', dialogId ?? '');
+    await expect(trigger).toHaveAttribute('aria-describedby', /.+/);
     await expect(dialog).toHaveAttribute('role', 'dialog');
-    await expect(dialog).toHaveAttribute('aria-describedby', /.+/);
+    await expect(dialog).toHaveAttribute('aria-labelledby', /.+/);
 
     await action.click();
     await expect(tooltip).toBeHidden();
@@ -391,8 +396,49 @@ test.describe('Material 3 RichTooltip browser contract', () => {
     await expect(tooltip).toBeVisible();
   });
 
+  test('Escape closes the rich tooltip and returns focus to its trigger', async ({ page }) => {
+    await openStory(page, 'components-tooltip--rich');
+    const trigger = page.getByTestId('rich-tooltip-trigger');
+    const tooltip = page.getByTestId('rich-tooltip');
+    const action = page.getByTestId('rich-tooltip-action');
+
+    await page.keyboard.press('Tab');
+    await expect(trigger).toBeFocused();
+    await expect(tooltip).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(action).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(tooltip).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test('long press opens persistent rich tooltip for touch input', async ({ page }) => {
+    await openStory(page, 'components-tooltip--rich');
+    const trigger = page.getByTestId('rich-tooltip-trigger');
+    const tooltip = page.getByTestId('rich-tooltip');
+    const box = await trigger.boundingBox();
+    expect(box).not.toBeNull();
+
+    const pointer = {
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: (box?.x ?? 0) + (box?.width ?? 0) / 2,
+      clientY: (box?.y ?? 0) + (box?.height ?? 0) / 2,
+    };
+    await trigger.dispatchEvent('pointerdown', pointer);
+    await page.waitForTimeout(650);
+    await expect(tooltip).toBeVisible();
+    await trigger.dispatchEvent('pointerup', { ...pointer, buttons: 0 });
+    await expect(tooltip).toBeVisible();
+  });
+
   test('rich tooltip caret uses canonical geometry and surface paint', async ({ page }) => {
     await openStory(page, 'components-tooltip--rich-caret');
+    await primePointerModality(page);
     const trigger = page.getByTestId('rich-caret-trigger');
     await trigger.hover();
     const tooltip = page.getByTestId('rich-caret');
@@ -403,18 +449,19 @@ test.describe('Material 3 RichTooltip browser contract', () => {
     const paint = await caretPaint(tooltip);
     expect(paint).toEqual({
       background: paint.surfaceBackground,
-      content: '""',
       height: '8px',
+      placement: 'top',
       surfaceBackground: paint.surfaceBackground,
       width: '16px',
     });
-    await expect(tooltip.getByRole('dialog')).toBeVisible();
+    await expect(tooltip).toHaveAttribute('role', 'dialog');
   });
 
   test('text-only rich tooltip keeps Compose 4px block padding and closes on pointer exit when non-persistent', async ({
     page,
   }) => {
     await openStory(page, 'components-tooltip--rich-text-only');
+    await primePointerModality(page);
     const trigger = page.getByTestId('rich-text-only-trigger');
     await trigger.hover();
     const tooltip = page.getByTestId('rich-text-only-tooltip');

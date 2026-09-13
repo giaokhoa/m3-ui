@@ -1,28 +1,28 @@
 import clsx from 'clsx';
 import {
-  Children,
-  cloneElement,
   createContext,
-  isValidElement,
   useCallback,
   useContext,
-  useEffect,
   useId,
   useMemo,
   useRef,
   useState,
   type ComponentProps,
   type CSSProperties,
-  type ReactElement,
+  type KeyboardEventHandler,
+  type KeyboardEvent,
   type ReactNode,
-  type RefObject,
 } from 'react';
+import { useInteractOutside } from 'react-aria/useInteractOutside';
 import {
+  OverlayArrow as AriaOverlayArrow,
+  OverlayTriggerStateContext,
   Popover as AriaPopover,
+  PreviewTrigger as AriaPreviewTrigger,
   Tooltip as AriaTooltip,
   TooltipTrigger as AriaTooltipTrigger,
-  useLocale,
   type PopoverProps as AriaPopoverProps,
+  type PreviewTriggerProps as AriaPreviewTriggerProps,
   type TooltipProps as AriaTooltipProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
@@ -41,7 +41,7 @@ import './tooltip.css';
 export interface PlainTooltipProps
   extends AriaTooltipProps,
     PlainTooltipStyleOptions {
-  /** Render the default Material 3 caret using the resolved React Aria placement. */
+  /** Render the default Material 3 caret using React Aria OverlayArrow. */
   caret?: boolean;
 }
 
@@ -51,45 +51,37 @@ type TooltipPlacement = NonNullable<AriaTooltipProps['placement']>;
 
 function resolvedTooltipPlacement(
   placement: TooltipPlacement,
-  direction: 'ltr' | 'rtl',
+  dir: string | undefined,
 ): TooltipPlacement {
-  if (placement === 'start') return direction === 'rtl' ? 'right' : 'left';
-  if (placement === 'end') return direction === 'rtl' ? 'left' : 'right';
+  // RAC resolves logical placement from I18nProvider/useLocale. Only map an
+  // explicit per-component dir override, which RAC positioning does not read.
+  if (dir === 'rtl' && placement === 'start') return 'right';
+  if (dir === 'rtl' && placement === 'end') return 'left';
+  if (dir === 'ltr' && placement === 'start') return 'left';
+  if (dir === 'ltr' && placement === 'end') return 'right';
   return placement;
 }
 
-const focusableSelector = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',');
-
-function firstFocusableWithin(element: HTMLElement | null) {
-  return element?.querySelector<HTMLElement>(focusableSelector) ?? null;
+function TooltipCaret() {
+  return <AriaOverlayArrow className="tooltip-caret" aria-hidden="true" />;
 }
 
-interface RichTooltipContextValue {
-  dialogId: string;
-  dialogRef: RefObject<HTMLElement | null>;
-  isOpen: boolean;
-  isPersistent: boolean;
-  setOpen: (isOpen: boolean) => void;
-  triggerRef: RefObject<HTMLSpanElement | null>;
+interface RichTooltipPersistenceContextValue {
+  allowDismiss: () => void;
 }
 
-const RichTooltipContext = createContext<RichTooltipContextValue | null>(null);
+const RichTooltipPersistenceContext =
+  createContext<RichTooltipPersistenceContextValue | null>(null);
 
-export interface RichTooltipTriggerProps {
+export interface RichTooltipTriggerProps
+  extends Pick<AriaPreviewTriggerProps, 'closeDelay' | 'delay' | 'isDisabled'> {
   children: ReactNode;
   isOpen?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   /**
-   * Matches Compose tooltip state guidance: actionable rich tooltips should be
-   * persistent and dismiss through an action, Escape or outside interaction.
+   * Matches Compose TooltipState: persistent rich tooltips only dismiss via
+   * explicit action, Escape, or outside interaction.
    */
   isPersistent?: boolean;
   className?: string;
@@ -111,7 +103,7 @@ type RichPopoverProps = Omit<
 export interface RichTooltipProps
   extends RichPopoverProps,
     RichTooltipStyleOptions {
-  /** Render the default Material 3 caret using the resolved React Aria placement. */
+  /** Render the default Material 3 caret using React Aria OverlayArrow. */
   caret?: boolean;
   title?: ReactNode;
   action?: ReactNode | ((close: () => void) => ReactNode);
@@ -131,6 +123,7 @@ export function TooltipTrigger(props: TooltipTriggerProps) {
 
 export function PlainTooltip({
   caret = false,
+  children,
   containerColor,
   contentColor,
   shape,
@@ -144,14 +137,13 @@ export function PlainTooltip({
   ...props
 }: PlainTooltipProps) {
   const themePortalContainer = useThemePortalContainer();
-  const { direction } = useLocale();
 
   return (
     <AriaTooltip
       {...props}
       data-caret={caret || undefined}
       dir={dir}
-      placement={resolvedTooltipPlacement(placement, dir === 'rtl' || dir === 'ltr' ? dir : direction)}
+      placement={resolvedTooltipPlacement(placement, dir)}
       offset={offset}
       UNSTABLE_portalContainer={
         UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
@@ -174,49 +166,53 @@ export function PlainTooltip({
           ...(userStyle as CSSProperties | undefined),
         };
       }}
-    />
+    >
+      {(renderProps) => (
+        <>
+          {caret ? <TooltipCaret /> : null}
+          {typeof children === 'function' ? children(renderProps) : children}
+        </>
+      )}
+    </AriaTooltip>
   );
 }
 
-function focusIsWithin(
-  triggerRef: RefObject<HTMLSpanElement | null>,
-  dialogRef: RefObject<HTMLElement | null>,
-) {
-  const activeElement = document.activeElement;
-  return Boolean(
-    activeElement &&
-      (triggerRef.current?.contains(activeElement) ||
-        dialogRef.current?.contains(activeElement)),
-  );
+interface PersistentPreviewTriggerProps {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  isOpen?: boolean;
+  defaultOpen: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
+  delay?: number;
+  closeDelay?: number;
+  isDisabled?: boolean;
 }
 
-/**
- * Rich tooltips are interactive overlays, so they cannot use the ARIA tooltip
- * pattern. This trigger keeps Compose mouse-hover/keyboard-focus invocation,
- * exposes dialog relationships on the real anchor, and keeps persistent
- * hover/focus travel explicit while RAC owns portal placement and Escape.
- */
-export function RichTooltipTrigger({
+function PersistentPreviewTrigger({
   children,
-  isOpen: controlledOpen,
-  defaultOpen = false,
-  onOpenChange,
-  isPersistent = true,
   className,
   style,
-}: RichTooltipTriggerProps) {
-  const items = Children.toArray(children);
-  if (items.length !== 2) {
-    throw new Error('RichTooltipTrigger expects exactly one trigger and one RichTooltip child.');
-  }
-
+  isOpen: controlledOpen,
+  defaultOpen,
+  onOpenChange,
+  delay,
+  closeDelay,
+  isDisabled,
+}: PersistentPreviewTriggerProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = controlledOpen ?? uncontrolledOpen;
-  const triggerRef = useRef<HTMLSpanElement>(null);
-  const dialogRef = useRef<HTMLElement>(null);
-  const dialogId = useId();
-  const setOpen = useCallback(
+  const allowDismissRef = useRef(false);
+
+  const allowDismiss = useCallback(() => {
+    allowDismissRef.current = true;
+  }, []);
+
+  const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
+      if (!nextOpen && !allowDismissRef.current) return;
+      allowDismissRef.current = false;
+
       if (controlledOpen === undefined) {
         setUncontrolledOpen(nextOpen);
       }
@@ -225,69 +221,84 @@ export function RichTooltipTrigger({
     [controlledOpen, onOpenChange],
   );
 
-  const context = useMemo<RichTooltipContextValue>(
-    () => ({
-      dialogId,
-      dialogRef,
-      isOpen,
-      isPersistent,
-      setOpen,
-      triggerRef,
-    }),
-    [dialogId, isOpen, isPersistent, setOpen],
+  const persistenceContext = useMemo(
+    () => ({ allowDismiss }),
+    [allowDismiss],
   );
 
-  const [trigger, tooltip] = items;
-  const enhancedTrigger = isValidElement(trigger)
-    ? cloneElement(trigger as ReactElement<Record<string, unknown>>, {
-        'aria-controls': dialogId,
-        'aria-expanded': isOpen,
-        'aria-haspopup': 'dialog',
-      })
-    : trigger;
+  const handleKeyDownCapture: KeyboardEventHandler<HTMLSpanElement> = (event) => {
+    if (event.key === 'Escape') allowDismiss();
+  };
 
   return (
-    <RichTooltipContext.Provider value={context}>
+    <RichTooltipPersistenceContext.Provider value={persistenceContext}>
       <span
-        ref={triggerRef}
         className={clsx('rich-tooltip-trigger', className)}
         style={style}
-        onBlurCapture={() => {
-          window.requestAnimationFrame(() => {
-            if (!focusIsWithin(triggerRef, dialogRef)) setOpen(false);
-          });
-        }}
-        onFocusCapture={(event) => {
-          const target = event.target as HTMLElement;
-          if (!target.matches(':focus-visible')) return;
-
-          setOpen(true);
-        }}
-        onKeyDownCapture={(event) => {
-          if (event.key !== 'Tab' || event.shiftKey || !isOpen) return;
-
-          const firstFocusable = firstFocusableWithin(dialogRef.current);
-          if (!firstFocusable) return;
-
-          event.preventDefault();
-          firstFocusable.focus();
-        }}
-        onPointerEnter={(event) => {
-          if (event.pointerType === 'mouse') {
-            setOpen(true);
-          }
-        }}
-        onPointerLeave={(event) => {
-          if (event.pointerType !== 'mouse' || isPersistent) return;
-          window.requestAnimationFrame(() => {
-            if (!dialogRef.current?.matches(':hover')) setOpen(false);
-          });
-        }}
+        onKeyDownCapture={handleKeyDownCapture}
       >
-        {enhancedTrigger}
+        <AriaPreviewTrigger
+          isOpen={isOpen}
+          onOpenChange={handleOpenChange}
+          delay={delay}
+          closeDelay={closeDelay}
+          isDisabled={isDisabled}
+        >
+          {children}
+        </AriaPreviewTrigger>
       </span>
-      {tooltip}
-    </RichTooltipContext.Provider>
+    </RichTooltipPersistenceContext.Provider>
+  );
+}
+
+/**
+ * Rich tooltips delegate hover, focus, safe-area, Tab, long-press/touch,
+ * Escape and focus restoration to RAC PreviewTrigger. The persistent adapter
+ * only filters automatic hover/focus close requests because PreviewTrigger
+ * does not expose Compose's explicit-dismiss persistence mode.
+ */
+export function RichTooltipTrigger({
+  children,
+  isOpen,
+  defaultOpen = false,
+  onOpenChange,
+  isPersistent = true,
+  className,
+  style,
+  delay,
+  closeDelay,
+  isDisabled,
+}: RichTooltipTriggerProps) {
+  if (isPersistent) {
+    return (
+      <PersistentPreviewTrigger
+        isOpen={isOpen}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        className={className}
+        style={style}
+        delay={delay}
+        closeDelay={closeDelay}
+        isDisabled={isDisabled}
+      >
+        {children}
+      </PersistentPreviewTrigger>
+    );
+  }
+
+  return (
+    <span className={clsx('rich-tooltip-trigger', className)} style={style}>
+      <AriaPreviewTrigger
+        isOpen={isOpen}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        delay={delay}
+        closeDelay={closeDelay}
+        isDisabled={isDisabled}
+      >
+        {children}
+      </AriaPreviewTrigger>
+    </span>
   );
 }
 
@@ -308,69 +319,70 @@ export function RichTooltip({
   dir,
   offset = richTooltipRuntime.spacingBetweenTooltipAndAnchor,
   shouldCloseOnInteractOutside,
+  render,
   className,
   style,
   UNSTABLE_portalContainer,
   ...props
 }: RichTooltipProps) {
-  const context = useContext(RichTooltipContext);
+  const persistence = useContext(RichTooltipPersistenceContext);
+  const overlayState = useContext(OverlayTriggerStateContext);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const themePortalContainer = useThemePortalContainer();
-  const { direction } = useLocale();
-  if (!context) {
+
+  if (!overlayState) {
     throw new Error('RichTooltip must be rendered inside RichTooltipTrigger.');
   }
 
   const titleId = useId();
   const textId = useId();
-  const close = useCallback(() => context.setOpen(false), [context.setOpen]);
+
+  const close = useCallback(() => {
+    persistence?.allowDismiss();
+    overlayState.close();
+  }, [overlayState, persistence]);
+
+  useInteractOutside({
+    ref: popoverRef,
+    isDisabled: !persistence,
+    onInteractOutside: (event) => {
+      const target = event.target as Element | null;
+      if (!target || shouldCloseOnInteractOutside?.(target) === false) return;
+
+      // PreviewTrigger intentionally renders a non-modal Popover, for which
+      // usePopover disables outside dismissal. Material persistent rich
+      // tooltips still dismiss outside, so use React Aria's interaction hook
+      // rather than recreating document-level pointer handling here.
+      persistence?.allowDismiss();
+      overlayState.close();
+    },
+  });
+
   const labelledBy = dialogLabel ? undefined : title ? titleId : textId;
-
-  useEffect(() => {
-    if (!context.isOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (
-        context.triggerRef.current?.contains(target) ||
-        context.dialogRef.current?.contains(target)
-      ) {
-        return;
-      }
-      if (
-        shouldCloseOnInteractOutside &&
-        !shouldCloseOnInteractOutside(target)
-      ) {
-        return;
-      }
-
-      context.setOpen(false);
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown, true);
-    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
-  }, [
-    context.dialogRef,
-    context.isOpen,
-    context.setOpen,
-    context.triggerRef,
-    shouldCloseOnInteractOutside,
-  ]);
 
   return (
     <AriaPopover
       {...props}
-      isNonModal
-      isOpen={context.isOpen}
-      onOpenChange={context.setOpen}
-      triggerRef={context.triggerRef}
       dir={dir}
-      placement={resolvedTooltipPlacement(placement, dir === 'rtl' || dir === 'ltr' ? dir : direction)}
+      placement={resolvedTooltipPlacement(placement, dir)}
       offset={offset}
-      shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      ref={popoverRef}
+      render={(domProps, renderProps) => {
+        const popoverProps = {
+          ...domProps,
+          onKeyDownCapture: (event: KeyboardEvent<HTMLDivElement>) => {
+            if (event.key === 'Escape') persistence?.allowDismiss();
+            domProps.onKeyDownCapture?.(event);
+          },
+        };
+        return render ? render(popoverProps, renderProps) : <div {...popoverProps} />;
+      }}
       UNSTABLE_portalContainer={
         UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
       }
+      aria-label={dialogLabel}
+      aria-labelledby={labelledBy}
+      aria-describedby={title ? textId : undefined}
       data-caret={caret || undefined}
       data-has-action={action ? true : undefined}
       data-has-title={title ? true : undefined}
@@ -395,58 +407,26 @@ export function RichTooltip({
         };
       }}
     >
+      {caret ? <TooltipCaret /> : null}
       <Elevation
         level={richTooltipTokens.containerElevation}
         shadowColor={shadowColor ?? richTooltipTokens.containerShadowColor}
       />
-      {/*
-       * RAC Dialog intentionally auto-focuses itself and enables focus containment.
-       * Rich tooltips must remain non-modal and keep keyboard focus on their anchor
-       * when opened, so the dialog semantics live directly on this DOM section.
-       */}
-      <section
-        ref={context.dialogRef}
-        id={context.dialogId}
-        role="dialog"
-        tabIndex={-1}
-        aria-label={dialogLabel}
-        aria-labelledby={labelledBy}
-        aria-describedby={title ? textId : undefined}
-        className="rich-tooltip__dialog"
-      >
-        <div
-          className="rich-tooltip__content"
-          onBlurCapture={() => {
-            window.requestAnimationFrame(() => {
-              if (!focusIsWithin(context.triggerRef, context.dialogRef)) close();
-            });
-          }}
-          onFocusCapture={() => context.setOpen(true)}
-          onPointerEnter={(event) => {
-            if (event.pointerType === 'mouse') context.setOpen(true);
-          }}
-          onPointerLeave={(event) => {
-            if (event.pointerType !== 'mouse' || context.isPersistent) return;
-            window.requestAnimationFrame(() => {
-              if (!context.triggerRef.current?.matches(':hover')) close();
-            });
-          }}
-        >
-          {title ? (
-            <div id={titleId} className="rich-tooltip__title">
-              {title}
-            </div>
-          ) : null}
-          <div id={textId} className="rich-tooltip__text">
-            {children}
+      <div className="rich-tooltip__content">
+        {title ? (
+          <div id={titleId} className="rich-tooltip__title">
+            {title}
           </div>
-          {action ? (
-            <div className="rich-tooltip__action">
-              {typeof action === 'function' ? action(close) : action}
-            </div>
-          ) : null}
+        ) : null}
+        <div id={textId} className="rich-tooltip__text">
+          {children}
         </div>
-      </section>
+        {action ? (
+          <div className="rich-tooltip__action">
+            {typeof action === 'function' ? action(close) : action}
+          </div>
+        ) : null}
+      </div>
     </AriaPopover>
   );
 }

@@ -30,7 +30,7 @@ Keep plain tooltip content non-interactive. If users must move focus into the ov
 
 ## Rich tooltip
 
-`RichTooltip` may contain an action, so exposing it as ARIA `tooltip` would be incorrect. The rich trigger communicates popup/expanded/control relationships, while the rich surface uses non-modal dialog-style semantics.
+`RichTooltip` may contain an action, so exposing it as ARIA `tooltip` would be incorrect. It is built on React Aria `PreviewTrigger` + `Popover`: React Aria owns hover/focus timing, long press, safe-area pointer travel, Tab focus travel, popup relationships, Escape behavior, and non-modal dialog semantics.
 
 ```tsx
 <RichTooltipTrigger>
@@ -44,7 +44,7 @@ Keep plain tooltip content non-interactive. If users must move focus into the ov
 </RichTooltipTrigger>
 ```
 
-Focus may move into the rich action without modal focus containment. Escape, outside interaction, or the explicit action can dismiss according to the public trigger/surface behavior.
+Focus may move into the rich action without modal focus containment. Escape returns focus to the trigger and touch users can open the preview with a long press. `isPersistent` defaults to `true` for Material rich tooltips. React Aria does not expose an equivalent persistent-preview option, and PreviewTrigger intentionally uses a non-dismissable non-modal Popover, so m3-ui retains a small close-filter adapter plus React Aria `useInteractOutside` for Material's outside-dismiss behavior. No document-level pointer listener is implemented by m3-ui.
 
 ## Caret
 
@@ -59,7 +59,7 @@ Both `PlainTooltip` and `RichTooltip` accept an opt-in `caret` prop. It is off b
 </TooltipTrigger>
 ```
 
-The default Material caret is 16×8 px and inherits the tooltip container color. The caret is presentational CSS only: it does not add focusable or accessibility content, and React Aria remains responsible for popup measurement, collision handling, and resolved placement. When a collision flips the popup, the caret follows the resolved `data-placement`. Logical `start`/`end` placement mirrors for RTL using the explicit `dir` when supplied, otherwise the React Aria locale direction.
+The default Material caret is 16×8 px and inherits the tooltip container color. It is rendered through React Aria `OverlayArrow`, so React Aria owns arrow coordinates, collision flips, and resolved placement while Material supplies only triangle geometry and paint. Logical `start`/`end` placement follows React Aria locale direction; the explicit per-component `dir` override is adapted for compatibility because RAC positioning reads locale direction rather than the local DOM attribute.
 
 ## Portals and theme context
 
