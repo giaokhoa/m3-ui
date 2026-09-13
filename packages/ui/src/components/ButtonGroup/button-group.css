@@ -61,21 +61,27 @@
   fill: currentColor;
 }
 
-.button-group__menu {
-  position: absolute;
-  z-index: 20;
-  inset-block-start: 100%;
-  inset-inline-end: 0;
-  display: grid;
-  inline-size: max-content;
-  overflow: hidden;
+.button-group__menu-popover {
+  min-inline-size: 0;
+}
+
+.button-group__menu-popover .menu-surface {
   border-radius: var(--_button-group-menu-container-radius);
+}
+
+.button-group__menu-popover .menu-surface__clip {
   background: var(--_button-group-menu-container-color);
   color: var(--_button-group-menu-item-color);
 }
 
+.button-group__menu {
+  display: grid;
+  inline-size: max-content;
+  padding-block: 0;
+  overflow: hidden;
+}
+
 .button-group__menu-item {
-  position: relative;
   display: flex;
   box-sizing: border-box;
   align-items: center;
@@ -83,25 +89,22 @@
   min-block-size: var(--_button-group-menu-item-height);
   padding-inline-start: var(--_button-group-menu-item-padding-start);
   padding-inline-end: var(--_button-group-menu-item-padding-end);
-  border: 0;
-  outline: 0;
   background: var(--_button-group-menu-item-container-color);
   color: var(--_button-group-menu-item-color);
-  font: inherit;
-  text-align: start;
   cursor: pointer;
+  opacity: 1;
   --ripple-color: currentColor;
 }
 
-.button-group__menu-item:disabled {
+.button-group__menu-item[data-disabled] {
   color: color-mix(in srgb, var(--_button-group-menu-item-disabled-color) var(--_button-group-menu-item-disabled-opacity), transparent);
   cursor: default;
+  opacity: 1;
 }
 
-.button-group__menu-icon,
-.button-group__menu-label {
-  position: relative;
-  z-index: 1;
+.button-group__menu-item > .menu-item__leading {
+  min-inline-size: var(--_button-group-menu-item-icon-size);
+  color: inherit;
 }
 
 .button-group__menu-icon {
@@ -111,17 +114,20 @@
   flex: none;
 }
 
+.button-group__menu-icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+
 .button-group--connected .button-group__row {
   align-items: center;
 }
 
 .button-group__connected-item {
   min-block-size: var(--_button-group-height);
-  overflow: hidden;
   border-radius: var(--_button-group-inner-corner);
-  transition:
-    border-radius var(--_button-group-motion-duration) var(--_button-group-motion-easing),
-    box-shadow var(--_button-group-motion-duration) var(--_button-group-motion-easing);
+  transition: border-radius var(--_button-group-motion-duration) var(--_button-group-motion-easing);
   --ripple-color: var(--_button-content-color);
 }
 
@@ -165,7 +171,7 @@
 }
 
 @media (forced-colors: active) {
-  .button-group__menu {
+  .button-group__menu-popover .menu-surface {
     border: 1px solid CanvasText;
   }
 

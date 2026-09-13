@@ -1,15 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buttonGroupOverflowMenuElevation,
   defaultButtonGroupExpandedRatio,
   distributePressedWidths,
   visiblePrefixCount,
 } from './ButtonGroup.defaults';
 
 describe('ButtonGroup runtime defaults', () => {
-  it('keeps only runtime ratio and semantic overflow elevation beside the consumer', () => {
+  it('keeps the pressed-width multiplier at the runtime boundary', () => {
     expect(defaultButtonGroupExpandedRatio).toBe(0.15);
-    expect(buttonGroupOverflowMenuElevation).toBe('level2');
   });
 
   it('expands a middle item by borrowing half from each neighbor', () => {
