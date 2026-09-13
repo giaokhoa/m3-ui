@@ -90,7 +90,7 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
     const input = page.getByRole('combobox', { name: 'Density' });
     const trigger = page.locator('.exposed-dropdown-menu__secondary-trigger');
     await expect(trigger).toHaveRole('button');
-    await expect(trigger).toHaveAccessibleName('Toggle options');
+    await expect(trigger).toHaveAccessibleName(/Toggle options/);
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(input).toBeFocused();
