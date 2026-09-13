@@ -103,9 +103,9 @@ The documentation application uses this pattern in its own `DocsThemeProvider`: 
 
 ## Theme-aware portals
 
-Material overlays often render outside the normal DOM subtree. `ThemeProvider` therefore creates a second themed container under `document.body` and exposes it internally as the portal target for theme-aware components.
+Material overlays often render outside the normal DOM subtree. `ThemeProvider` therefore creates a second themed container under `document.body` and registers it once with React Aria's `UNSAFE_PortalProvider`. React Aria overlays beneath the theme boundary inherit that container automatically rather than each m3-ui component forwarding a private portal-context value.
 
-The normal provider wrapper and portal container receive the same `data-m3-theme`, `data-theme`, dynamic color variables, and `style` override object. Dialogs, menus, sheets, tooltips, and other library surfaces rendered through that container therefore resolve the same theme roles as nearby non-portaled content.
+The normal provider wrapper and portal container receive the same `data-m3-theme`, `data-theme`, dynamic color variables, and `style` override object. Dialogs, menus, sheets, tooltips, and other library surfaces rendered through that container therefore resolve the same theme roles as nearby non-portaled content. Nested `ThemeProvider` instances install the nearest portal target for their descendants. Existing component APIs that expose an explicit `UNSTABLE_portalContainer` still override the provider when an application needs a different host.
 
 A `className` passed to `ThemeProvider` belongs to the normal wrapper only. If a theme override must also reach library portals, put the semantic custom-property override in the provider `style` object rather than relying on a wrapper-only class selector.
 
