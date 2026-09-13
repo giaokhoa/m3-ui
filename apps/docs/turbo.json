@@ -1,0 +1,53 @@
+{
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "generate": {
+      "outputs": [
+        "src/generated/**",
+        "public/search-index.json"
+      ]
+    },
+    "build": {
+      "env": [
+        "M3_UI_GITHUB_PAGES",
+        "M3_UI_DOCS_BASE_PATH"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "out/**"
+      ],
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "generate"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "generate"
+      ]
+    },
+    "dev:preview": {
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "generate"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "generate"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "$TURBO_EXTENDS$",
+        "generate"
+      ]
+    }
+  }
+}

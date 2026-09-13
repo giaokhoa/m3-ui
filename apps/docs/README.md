@@ -144,11 +144,13 @@ Semantic documentation tables are docs adapters rather than Material components.
 ## Development
 
 ```bash
-pnpm --filter @m3-ui/docs api:generate
-pnpm --filter @m3-ui/docs dev
-pnpm --filter @m3-ui/docs build
-pnpm --filter @m3-ui/docs test
-pnpm --filter @m3-ui/docs typecheck
+pnpm exec turbo run generate --filter=@m3-ui/docs
+pnpm exec turbo run dev --filter=@m3-ui/docs
+pnpm exec turbo run build --filter=@m3-ui/docs
+pnpm exec turbo run test --filter=@m3-ui/docs
+pnpm exec turbo run typecheck --filter=@m3-ui/docs
 ```
+
+Docs generation is a first-class Turbo task and is a dependency of docs dev/build/test/typecheck. The package-level `api:generate`, `spec:generate`, and `examples:generate` scripts remain focused generator entry points, while normal lifecycle commands should run through Turbo so generated data and workspace dependencies are prepared by the graph.
 
 The Next.js development server listens on port `4173`.

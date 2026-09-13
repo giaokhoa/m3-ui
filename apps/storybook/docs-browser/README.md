@@ -14,10 +14,10 @@ pnpm --filter @m3-ui/storybook exec playwright install --only-shell chromium
 Run the production-like docs browser suite:
 
 ```bash
-pnpm --filter @m3-ui/storybook test:docs-browser
+pnpm test:docs-browser
 ```
 
-The command asks Turborepo to build `@m3-ui/docs` together with its workspace dependency closure, starts the production Next.js server on port `4173`, and runs `playwright.docs.config.ts` against it. This keeps clean-checkout execution aligned with the repository build graph instead of assuming `@m3-ui/ui` is already built. When iterating locally, an already-running server on that port may be reused by Playwright after the build completes.
+The root command delegates to Turborepo. The `test:docs-browser` task depends on `@m3-ui/docs#build`, then the Storybook package starts the production Next.js server on port `4173` and runs `playwright.docs.config.ts` against it. This keeps clean-checkout execution aligned with the repository build graph instead of assuming `@m3-ui/ui` is already built. When iterating locally, an already-running server on that port may be reused by Playwright after the build completes.
 
 ## What the suite owns
 

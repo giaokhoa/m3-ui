@@ -3,8 +3,8 @@
   "private": true,
   "packageManager": "pnpm@12.3.4",
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "build": "turbo build",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
     "test:package-consumer": "node scripts/package-consumer-smoke.mjs",
     "test:package-policy": "node scripts/package-policy-check.mjs",
     "changeset": "pnpm dlx @changesets/cli@3.0.2",
@@ -13,7 +13,13 @@
     "test:actions-pins": "node scripts/github-actions-pin-check.mjs",
     "test:actions-credentials": "node scripts/github-actions-credential-check.mjs",
     "pages:build": "node scripts/build-pages.mjs",
-    "pages:verify": "node scripts/verify-pages-artifact.mjs"
+    "pages:verify": "node scripts/verify-pages-artifact.mjs",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean",
+    "test:docs-browser": "turbo run test:docs-browser --filter=@m3-ui/storybook",
+    "test:visual": "turbo run test:visual --filter=@m3-ui/storybook",
+    "test:turbo-policy": "node scripts/turbo-policy-check.mjs"
   },
   "devDependencies": {
     "turbo": "^2.10.12",

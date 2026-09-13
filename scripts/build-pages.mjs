@@ -22,15 +22,21 @@ function run(args, extraEnv = {}) {
 }
 
 await rm(pagesRoot, { recursive: true, force: true });
-run(['--filter', '@m3-ui/tokens', 'build']);
-run(['--filter', '@m3-ui/ui', 'build']);
-run(['--filter', '@m3-ui/docs', 'build'], {
-  M3_UI_GITHUB_PAGES: 'true',
-  M3_UI_DOCS_BASE_PATH: basePath,
-});
-run(['--filter', '@m3-ui/storybook', 'build'], {
-  STORYBOOK_BASE_PATH: `${basePath}/storybook/`,
-});
+run(
+  [
+    'exec',
+    'turbo',
+    'run',
+    'build',
+    '--filter=@m3-ui/docs',
+    '--filter=@m3-ui/storybook',
+  ],
+  {
+    M3_UI_GITHUB_PAGES: 'true',
+    M3_UI_DOCS_BASE_PATH: basePath,
+    STORYBOOK_BASE_PATH: `${basePath}/storybook/`,
+  },
+);
 
 await mkdir(pagesRoot, { recursive: true });
 await cp(resolve(repoRoot, 'apps/docs/out'), pagesRoot, { recursive: true });
