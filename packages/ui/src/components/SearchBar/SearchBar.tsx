@@ -2,7 +2,6 @@ import '@m3-ui/tokens/elevation.css';
 import {
   createContext,
   forwardRef,
-  useCallback,
   useContext,
   useRef,
   type CSSProperties,
@@ -10,14 +9,19 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react';
-import { FocusScope } from 'react-aria';
+import {
+  FocusScope,
+  Overlay as AriaOverlay,
+  mergeProps,
+  useOverlay,
+  useOverlayPosition,
+} from 'react-aria';
 import {
   Button as AriaButton,
   Dialog as AriaDialog,
   Input as AriaInput,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
-  Popover as AriaPopover,
   SearchField as AriaSearchField,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
@@ -205,15 +209,12 @@ export interface SearchBarProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function SearchBar({ state, children, className, style, ...props }: SearchBarProps) {
-  const setTriggerRef = useCallback((node: HTMLDivElement | null) => {
-    if (state.registerTrigger) state.registerTrigger(node);
-    else if (state.triggerRef) state.triggerRef.current = node;
-  }, [state.registerTrigger, state.triggerRef]);
-
   return (
     <div
       {...props}
-      ref={setTriggerRef}
+      ref={(node) => {
+        if (state.triggerRef) state.triggerRef.current = node;
+      }}
       data-elevation={searchBarTokens.containerElevation}
       data-state={state.value}
       className={join('search-bar', 'elevation-host', className)}
@@ -275,6 +276,48 @@ function useDockedSearchTriggerRef(state: SearchBarState) {
   return state.triggerRef ?? fallbackTriggerRef;
 }
 
+interface DockedSearchOverlayOptions {
+  state: SearchBarState;
+  offset: number;
+  onDismiss?: () => void;
+}
+
+function useDockedSearchOverlay({
+  state,
+  offset,
+  onDismiss,
+}: DockedSearchOverlayOptions) {
+  const triggerRef = useDockedSearchTriggerRef(state);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const dismiss = () => {
+    prepareSearchBarFocusRestore(triggerRef);
+    state.collapse();
+    onDismiss?.();
+  };
+  const { overlayProps: dismissalProps } = useOverlay(
+    {
+      isOpen: state.isExpanded,
+      onClose: dismiss,
+      isDismissable: true,
+    },
+    overlayRef,
+  );
+  const { overlayProps: positionProps } = useOverlayPosition({
+    targetRef: triggerRef,
+    overlayRef,
+    placement: 'bottom start',
+    offset,
+    isOpen: state.isExpanded,
+    onClose: dismiss,
+  });
+
+  return {
+    dismiss,
+    overlayRef,
+    overlayProps: mergeProps(dismissalProps, positionProps),
+  };
+}
+
 export type ExpandedDockedSearchBarProps = ExpandedSearchBarBaseProps;
 
 export function ExpandedDockedSearchBar({
@@ -287,36 +330,39 @@ export function ExpandedDockedSearchBar({
   ...props
 }: ExpandedDockedSearchBarProps) {
   const themePortalContainer = useThemePortalContainer();
-  const triggerRef = useDockedSearchTriggerRef(state);
-  const dismiss = () => {
-    prepareSearchBarFocusRestore(triggerRef);
-    state.collapse();
-    onDismiss?.();
-  };
+  const {
+    dismiss,
+    overlayRef,
+    overlayProps,
+  } = useDockedSearchOverlay({ state, offset: 8, onDismiss });
+  const mergedProps = mergeProps(props, overlayProps) as HTMLAttributes<HTMLDivElement>;
+
+  if (!state.isExpanded) return null;
 
   return (
-    <AriaPopover
-      {...props}
-      triggerRef={triggerRef}
-      isOpen={state.isExpanded}
-      placement="bottom start"
-      offset={8}
-      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
-      onOpenChange={(open) => {
-        if (!open) dismiss();
-      }}
-      data-elevation={searchViewTokens.containerElevation}
-      data-state="expanded"
-      className={join('search-view', 'search-view--docked', 'elevation-host', className)}
-      style={{ ...getSearchViewStyle('docked'), ...(style as CSSProperties | undefined) }}
-    >
-      <FocusScope autoFocus>
-        <div className="search-view__header">
-          <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
+    <AriaOverlay portalContainer={themePortalContainer ?? undefined}>
+      <FocusScope autoFocus restoreFocus>
+        <div
+          {...mergedProps}
+          ref={overlayRef}
+          role="dialog"
+          aria-label={props['aria-label'] ?? 'Search'}
+          data-elevation={searchViewTokens.containerElevation}
+          data-state="expanded"
+          className={join('search-view', 'search-view--docked', 'elevation-host', className)}
+          style={{
+            ...(mergedProps.style as CSSProperties | undefined),
+            ...getSearchViewStyle('docked'),
+            ...(style as CSSProperties | undefined),
+          }}
+        >
+          <div className="search-view__header">
+            <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
+          </div>
+          <div className="search-view__results">{children}</div>
         </div>
-        <div className="search-view__results">{children}</div>
       </FocusScope>
-    </AriaPopover>
+    </AriaOverlay>
   );
 }
 
@@ -340,47 +386,43 @@ export function ExpandedDockedSearchBarWithGap({
   ...props
 }: ExpandedDockedSearchBarWithGapProps) {
   const themePortalContainer = useThemePortalContainer();
-  const triggerRef = useDockedSearchTriggerRef(state);
-  const dismiss = () => {
-    prepareSearchBarFocusRestore(triggerRef);
-    state.collapse();
-    onDismiss?.();
-  };
+  const {
+    dismiss,
+    overlayRef,
+    overlayProps,
+  } = useDockedSearchOverlay({ state, offset: 0, onDismiss });
+  const mergedProps = mergeProps(props, overlayProps) as HTMLAttributes<HTMLDivElement>;
   const overrides = {
     ...(dropdownGap === undefined ? {} : { '--_search-view-gap': cssLength(dropdownGap) }),
-  } as CSSProperties & Record<`--${string}`, string | number>;
+  } as CSSProperties & Record<string, string | number>;
   const scrimStyle = dropdownScrimColor === undefined
     ? undefined
-    : ({ '--_search-view-scrim-color': dropdownScrimColor } as CSSProperties & Record<`--${string}`, string | number>);
+    : ({ '--_search-view-scrim-color': dropdownScrimColor } as CSSProperties & Record<string, string | number>);
+
+  if (!state.isExpanded) return null;
 
   return (
-    <>
-      {state.isExpanded ? (
+    <AriaOverlay portalContainer={themePortalContainer ?? undefined}>
+      <div
+        className="search-view__docked-gap-scrim"
+        aria-hidden="true"
+        style={scrimStyle}
+      />
+      <FocusScope autoFocus restoreFocus>
         <div
-          className="search-view__docked-gap-scrim"
-          aria-hidden="true"
-          style={scrimStyle}
-        />
-      ) : null}
-      <AriaPopover
-        {...props}
-        triggerRef={triggerRef}
-        isOpen={state.isExpanded}
-        placement="bottom start"
-          offset={0}
-        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
-        onOpenChange={(open) => {
-          if (!open) dismiss();
-        }}
-        data-state="expanded"
-        className={join('search-view', 'search-view--docked-gap', className)}
-        style={{
-          ...getSearchViewStyle('docked'),
-          ...overrides,
-          ...(style as CSSProperties | undefined),
-        }}
-      >
-        <FocusScope autoFocus>
+          {...mergedProps}
+          ref={overlayRef}
+          role="dialog"
+          aria-label={props['aria-label'] ?? 'Search'}
+          data-state="expanded"
+          className={join('search-view', 'search-view--docked-gap', className)}
+          style={{
+            ...(mergedProps.style as CSSProperties | undefined),
+            ...getSearchViewStyle('docked'),
+            ...overrides,
+            ...(style as CSSProperties | undefined),
+          }}
+        >
           <div
             className="search-view__header elevation-host"
             data-elevation={searchViewTokens.containerElevation}
@@ -393,9 +435,9 @@ export function ExpandedDockedSearchBarWithGap({
           >
             {children}
           </div>
-        </FocusScope>
-      </AriaPopover>
-    </>
+        </div>
+      </FocusScope>
+    </AriaOverlay>
   );
 }
 

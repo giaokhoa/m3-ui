@@ -98,7 +98,7 @@ test.describe('Material 3 SearchBar browser contract', () => {
     await trigger.evaluate((element) => (element as HTMLInputElement).blur());
     await trigger.focus();
     await expect(page.getByTestId('search-view-docked-gap')).toBeVisible();
-    // The Material scrim is outside the Popover; RAC owns the dismissal listener.
+    // The Material scrim is outside the overlay ref; RAC useOverlay owns dismissal.
     await page.locator('.search-view__docked-gap-scrim').click({ position: { x: 1, y: 1 } });
     await expect(page.getByTestId('search-view-docked-gap')).toHaveCount(0);
   });
