@@ -10,6 +10,7 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react';
+import { FocusScope } from 'react-aria';
 import {
   Button as AriaButton,
   Dialog as AriaDialog,
@@ -309,10 +310,12 @@ export function ExpandedDockedSearchBar({
       className={join('search-view', 'search-view--docked', 'elevation-host', className)}
       style={{ ...getSearchViewStyle('docked'), ...(style as CSSProperties | undefined) }}
     >
-      <div className="search-view__header">
-        <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
-      </div>
-      <div className="search-view__results">{children}</div>
+      <FocusScope autoFocus>
+        <div className="search-view__header">
+          <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
+        </div>
+        <div className="search-view__results">{children}</div>
+      </FocusScope>
     </AriaPopover>
   );
 }
@@ -377,18 +380,20 @@ export function ExpandedDockedSearchBarWithGap({
           ...(style as CSSProperties | undefined),
         }}
       >
-        <div
-          className="search-view__header elevation-host"
-          data-elevation={searchViewTokens.containerElevation}
-        >
-          <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
-        </div>
-        <div
-          className="search-view__docked-dropdown elevation-host"
-          data-elevation={searchViewTokens.containerElevation}
-        >
-          {children}
-        </div>
+        <FocusScope autoFocus>
+          <div
+            className="search-view__header elevation-host"
+            data-elevation={searchViewTokens.containerElevation}
+          >
+            <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
+          </div>
+          <div
+            className="search-view__docked-dropdown elevation-host"
+            data-elevation={searchViewTokens.containerElevation}
+          >
+            {children}
+          </div>
+        </FocusScope>
       </AriaPopover>
     </>
   );

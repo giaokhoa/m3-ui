@@ -98,8 +98,8 @@ test.describe('Material 3 SearchBar browser contract', () => {
     await trigger.evaluate((element) => (element as HTMLInputElement).blur());
     await trigger.focus();
     await expect(page.getByTestId('search-view-docked-gap')).toBeVisible();
-    // The Material scrim is paint-only; RAC's modal Popover owns outside pointer dismissal.
-    await page.mouse.click(1, 1);
+    // The Material scrim is outside the Popover; RAC owns the dismissal listener.
+    await page.locator('.search-view__docked-gap-scrim').click({ position: { x: 1, y: 1 } });
     await expect(page.getByTestId('search-view-docked-gap')).toHaveCount(0);
   });
 
