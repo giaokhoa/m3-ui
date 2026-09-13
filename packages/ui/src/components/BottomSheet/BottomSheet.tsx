@@ -13,6 +13,7 @@ import {
   type TransitionEvent as ReactTransitionEvent,
 } from 'react';
 import {
+  Dialog as AriaDialog,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
@@ -533,7 +534,6 @@ export function ModalBottomSheet({
   }
 
   const themePortalContainer = useThemePortalContainer();
-  const modalRef = useRef<HTMLDivElement>(null);
   const [overlayOpen, setOverlayOpen] = useState(true);
   const pendingDismissRef = useRef(false);
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -581,20 +581,6 @@ export function ModalBottomSheet({
     if (sheetState.currentValue === SheetValue.Hidden) {
       sheetState.show();
     }
-    if (typeof window === 'undefined') return;
-
-    const frame = window.requestAnimationFrame(() => {
-      const dialog =
-        modalRef.current?.querySelector<HTMLElement>('[role="dialog"]');
-      if (!dialog) return;
-
-      const activeElement = document.activeElement;
-      if (!activeElement || !dialog.contains(activeElement)) {
-        dialog.focus({ preventScroll: true });
-      }
-    });
-
-    return () => window.cancelAnimationFrame(frame);
   }, [sheetState]);
 
   useEffect(
@@ -646,17 +632,19 @@ export function ModalBottomSheet({
         scrimAlpha: scrimVisible ? 1 : 0,
       })}
     >
-      <AriaModal ref={modalRef} className="modal-bottom-sheet-modal">
-        <BottomSheet
-          {...sheetProps}
-          state={sheetState}
-          elevation={'modal' satisfies BottomSheetElevation}
-          role="dialog"
-          aria-modal="true"
-          tabIndex={sheetProps.tabIndex ?? -1}
-          onDismissRequest={requestDismiss}
-          onTransitionEnd={handleTransitionEnd}
-        />
+      <AriaModal className="modal-bottom-sheet-modal">
+        <AriaDialog
+          aria-label={sheetProps['aria-label'] ?? 'Bottom sheet'}
+          className="modal-bottom-sheet-dialog"
+        >
+          <BottomSheet
+            {...sheetProps}
+            state={sheetState}
+            elevation={'modal' satisfies BottomSheetElevation}
+            onDismissRequest={requestDismiss}
+            onTransitionEnd={handleTransitionEnd}
+          />
+        </AriaDialog>
       </AriaModal>
     </AriaModalOverlay>
   );

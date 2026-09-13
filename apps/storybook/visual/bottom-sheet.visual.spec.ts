@@ -184,7 +184,18 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     await openStory(page, 'components-bottomsheet--modal');
     const { sheet } = await openModalSheet(page);
     const elevation = await elevationPaint(sheet);
-    await expect(page.getByRole('dialog', { name: 'Modal places' })).toBeVisible();
+    const dialog = page.getByRole('dialog', { name: 'Modal places' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeFocused();
+    await page.keyboard.press('Tab');
+    const handle = page.getByRole('button', { name: 'Expand bottom sheet' });
+    await expect(handle).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect
+      .poll(() =>
+        dialog.evaluate((element) => element.contains(document.activeElement)),
+      )
+      .toBe(true);
     await expect(elevation).toHaveAttribute('data-elevation', 'level1');
 
     const overlay = page.locator('.modal-bottom-sheet-overlay');
@@ -204,7 +215,6 @@ test.describe('Material 3 BottomSheet browser contract', () => {
     expect(visual.scrimTiming).toContain('linear(');
     expect(await elevation.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
     expect(visual.activeInsideDialog).toBe(true);
-    await expect(sheet).toHaveAttribute('aria-modal', 'true');
   });
 
   test('outside dismiss hides first, then calls back and restores trigger focus', async ({

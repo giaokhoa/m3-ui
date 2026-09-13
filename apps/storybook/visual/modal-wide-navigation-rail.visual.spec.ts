@@ -73,17 +73,22 @@ test.describe('Material 3 ModalWideNavigationRail browser contract', () => {
   test('moves focus into the modal and Escape collapses it', async ({ page }) => {
     await openStory(page, 'components-widenavigationrail--modal');
     const host = page.getByTestId('modal-wide-navigation-rail-host');
-    await page.getByTestId('modal-wide-navigation-rail-toggle').click();
+    const toggle = page.getByTestId('modal-wide-navigation-rail-toggle');
+    await toggle.click();
 
     const overlay = page.locator('.modal-wide-navigation-rail-overlay');
+    const dialog = page.getByRole('dialog', { name: 'Modal primary destinations' });
     const headerButton = overlay.getByRole('button', {
       name: 'Toggle navigation rail',
     });
     await expect(overlay).toBeVisible();
+    await expect(dialog).toBeFocused();
+    await page.keyboard.press('Tab');
     await expect(headerButton).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(host).toHaveAttribute('data-state', 'collapsed');
     await expect(overlay).toHaveCount(0);
+    await expect(toggle).toBeFocused();
     await expect(page.locator('.modal-wide-navigation-rail__collapsed-rail').getByRole('tab')).toHaveCount(4);
   });
 

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  Dialog as AriaDialog,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
@@ -69,15 +70,6 @@ interface ActiveDrag {
   width: number;
   moved: boolean;
 }
-
-const focusableSelector = [
-  'button:not([disabled])',
-  '[href]',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',');
 
 function durationToMilliseconds(duration: string): number {
   const normalized = duration.trim();
@@ -139,7 +131,7 @@ export function ModalWideNavigationRail({
   const [overlayMounted, setOverlayMounted] = useState(false);
   const [visualExpanded, setVisualExpanded] = useState(false);
   const [dragOffset, setDragOffset] = useState<number | null>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLElement>(null);
   const dragRef = useRef<ActiveDrag | null>(null);
   const suppressClickRef = useRef(false);
   const suppressClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -211,16 +203,6 @@ export function ModalWideNavigationRail({
         : WideNavigationRailValue.Collapsed,
     );
   }, [hideOnCollapse, modalRailState, visualExpanded]);
-
-  useEffect(() => {
-    if (!overlayMounted || !visualExpanded) return;
-    const frame = requestAnimationFrame(() => {
-      frameRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus({
-        preventScroll: true,
-      });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [overlayMounted, visualExpanded]);
 
   useEffect(
     () => () => {
@@ -377,8 +359,9 @@ export function ModalWideNavigationRail({
           }
         />
         <AriaModal className="modal-wide-navigation-rail__modal">
-          <div
+          <AriaDialog
             ref={frameRef}
+            aria-label={ariaLabel}
             className="modal-wide-navigation-rail__frame"
             data-dragging={dragOffset !== null || undefined}
             data-expanded={visualExpanded || undefined}
@@ -412,7 +395,7 @@ export function ModalWideNavigationRail({
             >
               {children}
             </WideNavigationRail>
-          </div>
+          </AriaDialog>
         </AriaModal>
       </AriaModalOverlay>
     </div>

@@ -13,6 +13,7 @@ import {
 } from 'react';
 import {
   Button as AriaButton,
+  Dialog as AriaDialog,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
   type ButtonProps as AriaButtonProps,
@@ -105,15 +106,6 @@ interface ActiveDrag {
   moved: boolean;
 }
 
-const focusableSelector = [
-  'button:not([disabled])',
-  '[href]',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',');
-
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(maximum, Math.max(minimum, value));
 }
@@ -128,7 +120,7 @@ function durationToMilliseconds(duration: string): number {
 }
 
 function useDrawerWidth(
-  frameRef: React.RefObject<HTMLDivElement | null>,
+  frameRef: React.RefObject<HTMLElement | null>,
   active = true,
 ) {
   const [width, setWidth] = useState(navigationDrawerRuntime.maximumDrawerWidth);
@@ -157,14 +149,19 @@ function useDrawerWidth(
   return { width, ready };
 }
 
-function useFocusFirstWhenOpen(
+function useDismissibleDrawerFocusWhenOpen(
   state: DrawerState,
   frameRef: React.RefObject<HTMLDivElement | null>,
 ) {
+  // DismissibleNavigationDrawer is not a modal/overlay and therefore has no RAC
+  // FocusScope/Dialog owner. Preserve its explicit focus entry until a supported
+  // non-modal navigation primitive owns this behavior.
   useEffect(() => {
     if (!state.isOpen || typeof window === 'undefined') return;
     const frame = window.requestAnimationFrame(() => {
-      const first = frameRef.current?.querySelector<HTMLElement>(focusableSelector);
+      const first = frameRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
       first?.focus({ preventScroll: true });
     });
     return () => window.cancelAnimationFrame(frame);
@@ -449,7 +446,7 @@ export function DismissibleNavigationDrawer({
   const { width: drawerWidth, ready } = useDrawerWidth(frameRef);
   const gesture = useDrawerGesture(drawerState, drawerWidth, gesturesEnabled);
   const offset = gesture.dragOffset ?? (drawerState.isOpen ? 0 : -drawerWidth);
-  useFocusFirstWhenOpen(drawerState, frameRef);
+  useDismissibleDrawerFocusWhenOpen(drawerState, frameRef);
 
   const rootStyle: NavigationDrawerStyle = {
     ...getNavigationDrawerMotionStyle(offset, drawerWidth),
@@ -506,7 +503,7 @@ export function ModalNavigationDrawer({
   useSyncExternalStore(drawerState.subscribe, drawerState.getSnapshot, drawerState.getSnapshot);
 
   const themePortalContainer = useThemePortalContainer();
-  const frameRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLElement>(null);
   const [keepOverlayMounted, setKeepOverlayMounted] = useState(drawerState.isOpen);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const overlayActive = keepOverlayMounted || drawerState.isOpen;
@@ -516,7 +513,6 @@ export function ModalNavigationDrawer({
   const anchors = calculateDrawerAnchors(drawerWidth);
   const fraction = calculateDrawerFraction(offset, anchors);
   const overlayVisible = overlayActive || gesture.isDragging;
-  useFocusFirstWhenOpen(drawerState, frameRef);
 
   const clearCloseTimer = () => {
     if (closeTimerRef.current !== null) {
@@ -559,7 +555,7 @@ export function ModalNavigationDrawer({
     ...motionStyle,
   };
 
-  const handleSheetTransitionEnd = (event: ReactTransitionEvent<HTMLDivElement>) => {
+  const handleSheetTransitionEnd = (event: ReactTransitionEvent<HTMLElement>) => {
     if (
       event.target === event.currentTarget &&
       event.propertyName === 'transform' &&
@@ -611,14 +607,15 @@ export function ModalNavigationDrawer({
         onPointerUp={gesture.finish}
       >
         <AriaModal className="modal-navigation-drawer__modal">
-          <div
+          <AriaDialog
             ref={frameRef}
+            aria-label="Navigation menu"
             className="modal-navigation-drawer__sheet-frame"
             style={motionStyle}
             onTransitionEnd={handleSheetTransitionEnd}
           >
             {drawerContent}
-          </div>
+          </AriaDialog>
         </AriaModal>
       </AriaModalOverlay>
     </div>
