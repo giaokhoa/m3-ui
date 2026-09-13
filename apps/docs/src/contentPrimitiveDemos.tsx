@@ -41,19 +41,15 @@ export function ListItemPreview() {
           Open changelog
         </ListItem>
       </div>
-      <ListItemSelectionGroup aria-label="Mailbox destination">
-        <ListItem
-          onPress={() => setDestination('inbox')}
-          selected={destination === 'inbox'}
-          selectionMode="single"
-        >
+      <ListItemSelectionGroup
+        aria-label="Mailbox destination"
+        onChange={setDestination}
+        value={destination}
+      >
+        <ListItem selectionMode="single" value="inbox">
           Inbox
         </ListItem>
-        <ListItem
-          onPress={() => setDestination('archive')}
-          selected={destination === 'archive'}
-          selectionMode="single"
-        >
+        <ListItem selectionMode="single" value="archive">
           Archive
         </ListItem>
       </ListItemSelectionGroup>
