@@ -132,8 +132,8 @@ test.describe('Material 3 DatePicker browser contract', () => {
     await expect(current).toBeFocused();
 
     await page.keyboard.press('ArrowRight');
-    await expect(current).toHaveAttribute('aria-selected', 'false');
-    await expect(next).toHaveAttribute('aria-selected', 'true');
+    await expect(current).toHaveAttribute('aria-selected', 'true');
+    await expect(next).toHaveAttribute('data-focused', 'true');
     await page.keyboard.press('Enter');
 
     await expect(calendar.locator('.date-picker__month-heading')).toContainText('2027');
