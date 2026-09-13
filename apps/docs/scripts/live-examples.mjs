@@ -88,7 +88,6 @@ export function buildLiveExampleModel({ sourcePath, repoRoot = process.cwd() }) 
     .map((node) => ({
       node,
       locals: importedLocalNames(node),
-      text: node.getText(sourceFile),
     }));
   const functions = new Map();
   for (const statement of sourceFile.statements) {
@@ -107,8 +106,36 @@ export function buildLiveExampleModel({ sourcePath, repoRoot = process.cwd() }) 
     }
     const used = identifierNames(declaration);
     const importText = imports
-      .filter(({ locals }) => locals.some((name) => used.has(name)))
-      .map(({ text }) => text);
+      .map(({ node, locals }) => {
+        if (!locals.some((name) => used.has(name))) return null;
+        const clause = node.importClause;
+        if (!clause) return node.getText(sourceFile);
+
+        const parts = [];
+        if (clause.name && used.has(clause.name.text)) parts.push(clause.name.text);
+        const bindings = clause.namedBindings;
+        if (bindings && ts.isNamespaceImport(bindings) && used.has(bindings.name.text)) {
+          parts.push(`* as ${bindings.name.text}`);
+        } else if (bindings && ts.isNamedImports(bindings)) {
+          const selected = bindings.elements.filter((element) => used.has(element.name.text));
+          if (selected.length) {
+            parts.push(
+              `{ ${selected
+                .map((element) => {
+                  const binding = element.propertyName
+                    ? `${element.propertyName.text} as ${element.name.text}`
+                    : element.name.text;
+                  return element.isTypeOnly ? `type ${binding}` : binding;
+                })
+                .join(', ')} }`,
+            );
+          }
+        }
+        if (!parts.length) return null;
+        const typePrefix = clause.isTypeOnly ? 'type ' : '';
+        return `import ${typePrefix}${parts.join(', ')} from ${node.moduleSpecifier.getText(sourceFile)};`;
+      })
+      .filter(Boolean);
     examples[id] = {
       component,
       source: [...importText, declaration.getText(sourceFile)].join('\n\n'),

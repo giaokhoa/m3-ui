@@ -15,6 +15,11 @@ import {
 export const componentProvenanceOverrides: Partial<
   Record<AllComponentDocId, ComponentProvenanceOverride>
 > = {
+  button: {
+    material: {
+      spec: 'https://m3.material.io/components/buttons/specs',
+    },
+  },
   chip: {
     knownGaps: [
       'InputChip does not currently expose an independent trailing remove action; trailing visuals remain presentational rather than a second interactive target.',
