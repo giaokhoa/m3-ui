@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type Key,
   type ReactNode,
   type RefObject,
 } from 'react';
@@ -346,7 +345,7 @@ function YearOption({
   label,
   onPressEnd,
 }: {
-  id: Key;
+  id: string | number;
   selected: boolean;
   selectedRef: RefObject<HTMLDivElement | null>;
   label: string;
