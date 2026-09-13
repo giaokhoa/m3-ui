@@ -2,6 +2,7 @@ import '@m3-ui/tokens/elevation.css';
 import {
   createContext,
   forwardRef,
+  useCallback,
   useContext,
   useRef,
   type CSSProperties,
@@ -54,9 +55,13 @@ function prepareSearchBarFocusRestore(triggerRef: SearchBarState['triggerRef']) 
   if (!triggerRef) return;
   const guardedRef = triggerRef as SearchBarTriggerRef;
   guardedRef[searchBarFocusRestoreGuard] = true;
-  setTimeout(() => {
-    guardedRef[searchBarFocusRestoreGuard] = false;
-  }, 0);
+  // RAC FocusScope restores focus in requestAnimationFrame after the overlay
+  // unmounts. Keep the guard through that frame, then clear it on the next one.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      guardedRef[searchBarFocusRestoreGuard] = false;
+    });
+  });
 }
 
 function consumeSearchBarFocusRestore(triggerRef: SearchBarState['triggerRef']) {
@@ -199,12 +204,15 @@ export interface SearchBarProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function SearchBar({ state, children, className, style, ...props }: SearchBarProps) {
+  const setTriggerRef = useCallback((node: HTMLDivElement | null) => {
+    if (state.registerTrigger) state.registerTrigger(node);
+    else if (state.triggerRef) state.triggerRef.current = node;
+  }, [state.registerTrigger, state.triggerRef]);
+
   return (
     <div
       {...props}
-      ref={(node) => {
-        if (state.triggerRef) state.triggerRef.current = node;
-      }}
+      ref={setTriggerRef}
       data-elevation={searchBarTokens.containerElevation}
       data-state={state.value}
       className={join('search-bar', 'elevation-host', className)}
@@ -291,7 +299,6 @@ export function ExpandedDockedSearchBar({
       triggerRef={triggerRef}
       isOpen={state.isExpanded}
       placement="bottom start"
-      isNonModal
       offset={8}
       UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
@@ -357,8 +364,7 @@ export function ExpandedDockedSearchBarWithGap({
         triggerRef={triggerRef}
         isOpen={state.isExpanded}
         placement="bottom start"
-        isNonModal
-        offset={0}
+          offset={0}
         UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         onOpenChange={(open) => {
           if (!open) dismiss();
