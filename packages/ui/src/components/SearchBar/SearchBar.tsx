@@ -44,6 +44,28 @@ function cssLength(value: string | number): string {
 // SearchBarInput still participates in React Aria's modal FocusScope.
 const SearchBarInputAutoFocusContext = createContext(false);
 const SearchBarExpandedDismissContext = createContext<(() => void) | null>(null);
+const searchBarFocusRestoreGuard = Symbol('searchBarFocusRestoreGuard');
+
+type SearchBarTriggerRef = NonNullable<SearchBarState['triggerRef']> & {
+  [searchBarFocusRestoreGuard]?: boolean;
+};
+
+function prepareSearchBarFocusRestore(triggerRef: SearchBarState['triggerRef']) {
+  if (!triggerRef) return;
+  const guardedRef = triggerRef as SearchBarTriggerRef;
+  guardedRef[searchBarFocusRestoreGuard] = true;
+  setTimeout(() => {
+    guardedRef[searchBarFocusRestoreGuard] = false;
+  }, 0);
+}
+
+function consumeSearchBarFocusRestore(triggerRef: SearchBarState['triggerRef']) {
+  if (!triggerRef) return false;
+  const guardedRef = triggerRef as SearchBarTriggerRef;
+  if (!guardedRef[searchBarFocusRestoreGuard]) return false;
+  guardedRef[searchBarFocusRestoreGuard] = false;
+  return true;
+}
 
 function ExpandedSearchInput({
   children,
@@ -155,7 +177,9 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
             }}
             onFocus={(event) => {
               props.onFocus?.(event);
-              state?.expand();
+              if (!consumeSearchBarFocusRestore(state?.triggerRef)) {
+                state?.expand();
+              }
             }}
           />
           {clearable && !disabled && !readOnly ? (
@@ -256,6 +280,7 @@ export function ExpandedDockedSearchBar({
   const themePortalContainer = useThemePortalContainer();
   const triggerRef = useDockedSearchTriggerRef(state);
   const dismiss = () => {
+    prepareSearchBarFocusRestore(triggerRef);
     state.collapse();
     onDismiss?.();
   };
@@ -307,6 +332,7 @@ export function ExpandedDockedSearchBarWithGap({
   const themePortalContainer = useThemePortalContainer();
   const triggerRef = useDockedSearchTriggerRef(state);
   const dismiss = () => {
+    prepareSearchBarFocusRestore(triggerRef);
     state.collapse();
     onDismiss?.();
   };
