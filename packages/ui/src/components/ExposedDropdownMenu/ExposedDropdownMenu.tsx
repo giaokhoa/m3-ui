@@ -24,7 +24,6 @@ import {
   type InputProps as AriaInputProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { menuContainerElevation, menuRuntime } from '../Menu/Menu.defaults';
 import '../Menu/menu.css';
 import {
@@ -257,7 +256,6 @@ export function ExposedDropdownMenu<T = unknown>({
 }: ExposedDropdownMenuProps<T>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const syncingOpenRef = useRef(false);
-  const themePortalContainer = useThemePortalContainer();
   const selectedItem = useMemo(
     () => items.find((item) => item.value === value),
     [items, value],
@@ -339,7 +337,6 @@ export function ExposedDropdownMenu<T = unknown>({
         offset={4}
         containerPadding={menuRuntime.viewportMargin}
         shouldFlip
-        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-dropdown-menu__popover"
         style={matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : undefined}
       >
