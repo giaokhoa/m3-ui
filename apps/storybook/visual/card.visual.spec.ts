@@ -81,6 +81,17 @@ test.describe('Material 3 Card parity', () => {
     await expect(count).toHaveText('Card presses: 3');
   });
 
+  test('virtual activation uses one normalized React Aria press lifecycle', async ({ page }) => {
+    await openStory(page, 'components-card--clickable');
+    const card = page.locator('.card').first();
+    const count = page.getByTestId('card-press-count');
+
+    await card.evaluate((element: HTMLElement) => element.click());
+
+    await expect(count).toHaveText('Card presses: 1');
+    await expect(card.locator('.ripple__wave')).toHaveCount(1);
+  });
+
   test('uses latest interaction to animate filled and elevated hover elevations', async ({ page }) => {
     await openStory(page, 'components-card--clickable');
     const cards = page.locator('.card');
@@ -186,8 +197,15 @@ test.describe('Material 3 Card parity', () => {
     const cardCount = page.getByTestId('nested-card-count');
     const buttonCount = page.getByTestId('nested-button-count');
 
-    await page.getByRole('button', { name: 'Child action' }).click();
+    const child = page.getByRole('button', { name: 'Child action' });
+
+    await child.click();
     await expect(buttonCount).toHaveText('Button presses: 1');
+    await expect(cardCount).toHaveText('Card presses: 0');
+
+    await child.focus();
+    await page.keyboard.press('Enter');
+    await expect(buttonCount).toHaveText('Button presses: 2');
     await expect(cardCount).toHaveText('Card presses: 0');
 
     await page.getByText('Card with child action').click();

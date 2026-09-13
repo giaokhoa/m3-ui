@@ -1,21 +1,12 @@
 import clsx from 'clsx';
-import {
-  type CSSProperties,
-  type FocusEvent,
-  type HTMLAttributes,
-  type KeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-  useRef,
-  useState,
-} from 'react';
+import { type CSSProperties, type HTMLAttributes, type ReactNode, useRef } from 'react';
+import { useFocusRing } from 'react-aria/useFocusRing';
+import { useHover } from 'react-aria/useHover';
+import { usePress } from 'react-aria/usePress';
+import { mergeProps } from 'react-aria';
 import { Elevation, type ElevationLevel } from '../../internal/elevation';
-import {
-  Ripple,
-  useRipple,
-  type RipplePointerType,
-  type RipplePressEvent,
-} from '../../internal/ripple';
+import { suppressNestedInteractivePresses } from '../../internal/nestedInteractivePress';
+import { Ripple, useRipple } from '../../internal/ripple';
 import {
   AbsoluteTonalElevationProvider,
   useAbsoluteTonalElevation,
@@ -62,33 +53,6 @@ export interface SurfaceProps
   shadowElevation?: ElevationLevel;
   interaction?: SurfaceInteraction;
   isDisabled?: boolean;
-}
-
-const nestedInteractiveSelector =
-  'a[href],button,input,select,textarea,summary,[contenteditable="true"],[role="button"],[role="link"],[role="checkbox"],[role="radio"],[role="switch"],[role="option"]';
-
-function isNestedInteractive(target: EventTarget | null, root: HTMLElement): boolean {
-  if (!(target instanceof Element)) return false;
-  const interactive = target.closest(nestedInteractiveSelector);
-  return interactive !== null && interactive !== root && root.contains(interactive);
-}
-
-function ripplePointerType(pointerType: string): RipplePointerType {
-  if (pointerType === 'pen' || pointerType === 'touch') return pointerType;
-  return 'mouse';
-}
-
-function toRipplePressEvent(
-  event: ReactPointerEvent<HTMLDivElement>,
-  target: Element,
-): RipplePressEvent {
-  const bounds = target.getBoundingClientRect();
-  return {
-    pointerType: ripplePointerType(event.pointerType),
-    target,
-    x: event.clientX - bounds.left,
-    y: event.clientY - bounds.top,
-  };
 }
 
 function activate(interaction: SurfaceInteraction | undefined): void {
@@ -139,14 +103,45 @@ export function Surface({
   onPointerUp,
   ...props
 }: SurfaceProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const parentAbsoluteElevation = useAbsoluteTonalElevation();
   const absoluteElevation =
     parentAbsoluteElevation + elevationLevelToPx(tonalElevation);
   const interactive = interaction !== undefined;
+  const disabled = interactive && isDisabled;
   const ripple = useRipple();
-  const keyPressed = useRef<string | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocusVisible, setIsFocusVisible] = useState(false);
+  const ripplePressProps = ripple.getPressProps();
+  const { pressProps } = usePress({
+    ref: rootRef,
+    isDisabled: !interactive || disabled,
+    allowTextSelectionOnPress: true,
+    onPress: () => activate(interaction),
+    ...ripplePressProps,
+  });
+  const { hoverProps, isHovered } = useHover({
+    isDisabled: !interactive || disabled,
+  });
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const callerEventProps = {
+    onBlur,
+    onFocus,
+    onKeyDown,
+    onKeyUp,
+    onPointerCancel,
+    onPointerDown,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerUp,
+  };
+  const interactionProps = interactive
+    ? mergeProps(
+        suppressNestedInteractivePresses(pressProps),
+        hoverProps,
+        focusProps,
+        callerEventProps,
+      )
+    : callerEventProps;
+
   const resolvedStyle: CSSProperties = {
     borderRadius: shape,
     background: getSurfaceBackground(color, absoluteElevation),
@@ -159,114 +154,19 @@ export function Surface({
   const semantics = interactionSemantics(interaction);
   const resolvedClassName = clsx('surface', className);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (
-      interactive &&
-      !isDisabled &&
-      event.target === event.currentTarget &&
-      !event.repeat &&
-      (event.key === 'Enter' || event.key === ' ')
-    ) {
-      if (event.key === ' ') event.preventDefault();
-      keyPressed.current = event.key;
-      ripple.onPressStart({
-        pointerType: 'keyboard',
-        target: ripple.containerRef.current ?? event.currentTarget,
-        x: 0,
-        y: 0,
-      });
-      if (event.key === 'Enter') activate(interaction);
-    }
-    onKeyDown?.(event);
-  };
-
-  const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (
-      interactive &&
-      !isDisabled &&
-      keyPressed.current === event.key &&
-      event.key === ' '
-    ) {
-      event.preventDefault();
-      activate(interaction);
-    }
-    if (keyPressed.current === event.key) {
-      keyPressed.current = null;
-      ripple.onPressEnd();
-    }
-    onKeyUp?.(event);
-  };
-
-  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      setIsFocusVisible(event.currentTarget.matches(':focus-visible'));
-    }
-    onFocus?.(event);
-  };
-
-  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      setIsFocusVisible(false);
-      keyPressed.current = null;
-      ripple.onPressEnd();
-    }
-    onBlur?.(event);
-  };
-
   return (
     <AbsoluteTonalElevationProvider value={absoluteElevation}>
       <div
         {...props}
         {...semantics}
-        aria-disabled={interactive && isDisabled ? true : undefined}
+        {...interactionProps}
+        ref={rootRef}
+        aria-disabled={disabled ? true : undefined}
         className={resolvedClassName}
-        data-disabled={interactive && isDisabled ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
         data-interactive={interactive ? '' : undefined}
-        onBlur={handleBlur}
-        onClick={(event) => {
-          if (
-            interactive &&
-            !isDisabled &&
-            !isNestedInteractive(event.target, event.currentTarget)
-          ) {
-            activate(interaction);
-          }
-        }}
-        onFocus={handleFocus}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        onPointerCancel={(event) => {
-          ripple.onPressEnd();
-          onPointerCancel?.(event);
-        }}
-        onPointerDown={(event) => {
-          if (
-            interactive &&
-            !isDisabled &&
-            event.isPrimary &&
-            event.button === 0 &&
-            !isNestedInteractive(event.target, event.currentTarget)
-          ) {
-            const target = ripple.containerRef.current ?? event.currentTarget;
-            ripple.onPressStart(toRipplePressEvent(event, target));
-          }
-          onPointerDown?.(event);
-        }}
-        onPointerEnter={(event) => {
-          if (interactive && !isDisabled) setIsHovered(true);
-          onPointerEnter?.(event);
-        }}
-        onPointerLeave={(event) => {
-          setIsHovered(false);
-          ripple.onPressEnd();
-          onPointerLeave?.(event);
-        }}
-        onPointerUp={(event) => {
-          ripple.onPressEnd();
-          onPointerUp?.(event);
-        }}
         style={resolvedStyle}
-        tabIndex={tabIndex ?? (interactive && !isDisabled ? 0 : undefined)}
+        tabIndex={tabIndex ?? (interactive && !disabled ? 0 : undefined)}
       >
         <Elevation level={shadowElevation} />
         {interactive ? (
@@ -274,8 +174,8 @@ export function Surface({
             controller={ripple}
             focusRingRadius={shape}
             state={{
-              isFocusVisible: !isDisabled && isFocusVisible,
-              isHovered: !isDisabled && isHovered,
+              isFocusVisible: !disabled && isFocusVisible,
+              isHovered,
             }}
           />
         ) : null}

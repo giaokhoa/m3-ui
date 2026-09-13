@@ -39,11 +39,47 @@ test.describe('Material 3 Surface parity', () => {
     await expect(count).toHaveText('3');
   });
 
-  test('disabled clickable surface is removed from tab order', async ({ page }) => {
+  test('virtual activation uses one normalized React Aria press lifecycle', async ({ page }) => {
+    await openStory(page, 'components-surface--clickable');
+    const surface = page.getByRole('button', { name: 'Clickable' });
+    const count = page.getByTestId('click-count');
+
+    await surface.evaluate((element: HTMLElement) => element.click());
+
+    await expect(count).toHaveText('1');
+    await expect(surface.locator('.ripple__wave')).toHaveCount(1);
+  });
+
+  test('disabled clickable surface is removed from tab order and suppresses activation', async ({ page }) => {
     await openStory(page, 'components-surface--disabled-clickable');
     const surface = page.getByRole('button', { name: 'Disabled' });
+    const count = page.getByTestId('disabled-click-count');
     await expect(surface).toHaveAttribute('aria-disabled', 'true');
     await expect(surface).not.toHaveAttribute('tabindex');
+
+    await surface.evaluate((element: HTMLElement) => element.click());
+
+    await expect(count).toHaveText('0');
+    await expect(surface.locator('.ripple__wave')).toHaveCount(0);
+  });
+
+  test('nested interactive controls never activate the parent Surface', async ({ page }) => {
+    await openStory(page, 'components-surface--nested-action');
+    const surfaceCount = page.getByTestId('nested-surface-count');
+    const buttonCount = page.getByTestId('nested-surface-button-count');
+    const child = page.getByRole('button', { name: 'Child action', exact: true });
+
+    await child.click();
+    await expect(buttonCount).toHaveText('1');
+    await expect(surfaceCount).toHaveText('0');
+
+    await child.focus();
+    await page.keyboard.press('Enter');
+    await expect(buttonCount).toHaveText('2');
+    await expect(surfaceCount).toHaveText('0');
+
+    await surfaceCount.click();
+    await expect(surfaceCount).toHaveText('1');
   });
 
   test('selection and toggle roles expose real web state', async ({ page }) => {
