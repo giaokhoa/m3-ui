@@ -120,9 +120,6 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
     const expandedDismiss = useContext(SearchBarExpandedDismissContext);
     const shouldAutoFocus = props.autoFocus ?? expandedAutoFocus;
     const setRef = (node: HTMLInputElement | null) => {
-      if (!expandedAutoFocus && state?.triggerRef) {
-        state.triggerRef.current = node;
-      }
       if (typeof forwardedRef === 'function') forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     };
@@ -205,6 +202,9 @@ export function SearchBar({ state, children, className, style, ...props }: Searc
   return (
     <div
       {...props}
+      ref={(node) => {
+        if (state.triggerRef) state.triggerRef.current = node;
+      }}
       data-elevation={searchBarTokens.containerElevation}
       data-state={state.value}
       className={join('search-bar', 'elevation-host', className)}
@@ -344,43 +344,47 @@ export function ExpandedDockedSearchBarWithGap({
     : ({ '--_search-view-scrim-color': dropdownScrimColor } as CSSProperties & Record<`--${string}`, string | number>);
 
   return (
-    <AriaPopover
-      {...props}
-      triggerRef={triggerRef}
-      isOpen={state.isExpanded}
-      placement="bottom start"
-      isNonModal
-      offset={0}
-      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
-      onOpenChange={(open) => {
-        if (!open) dismiss();
-      }}
-      data-state="expanded"
-      className={join('search-view', 'search-view--docked-gap', className)}
-      style={{
-        ...getSearchViewStyle('docked'),
-        ...overrides,
-        ...(style as CSSProperties | undefined),
-      }}
-    >
-      <div
-        className="search-view__docked-gap-scrim"
-        aria-hidden="true"
-        style={scrimStyle}
-      />
-      <div
-        className="search-view__header elevation-host"
-        data-elevation={searchViewTokens.containerElevation}
+    <>
+      {state.isExpanded ? (
+        <div
+          className="search-view__docked-gap-scrim"
+          aria-hidden="true"
+          style={scrimStyle}
+        />
+      ) : null}
+      <AriaPopover
+        {...props}
+        triggerRef={triggerRef}
+        isOpen={state.isExpanded}
+        placement="bottom start"
+        isNonModal
+        offset={0}
+        UNSTABLE_portalContainer={themePortalContainer ?? undefined}
+        onOpenChange={(open) => {
+          if (!open) dismiss();
+        }}
+        data-state="expanded"
+        className={join('search-view', 'search-view--docked-gap', className)}
+        style={{
+          ...getSearchViewStyle('docked'),
+          ...overrides,
+          ...(style as CSSProperties | undefined),
+        }}
       >
-        <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
-      </div>
-      <div
-        className="search-view__docked-dropdown elevation-host"
-        data-elevation={searchViewTokens.containerElevation}
-      >
-        {children}
-      </div>
-    </AriaPopover>
+        <div
+          className="search-view__header elevation-host"
+          data-elevation={searchViewTokens.containerElevation}
+        >
+          <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
+        </div>
+        <div
+          className="search-view__docked-dropdown elevation-host"
+          data-elevation={searchViewTokens.containerElevation}
+        >
+          {children}
+        </div>
+      </AriaPopover>
+    </>
   );
 }
 

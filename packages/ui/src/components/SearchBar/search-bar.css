@@ -115,8 +115,7 @@
 .search-view__docked-gap-scrim {
   position: fixed;
   inset: 0;
-  z-index: -1;
-  pointer-events: none;
+  z-index: 999;
   background: var(--_search-view-scrim-color);
 }
 

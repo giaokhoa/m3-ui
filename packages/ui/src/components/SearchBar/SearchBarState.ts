@@ -6,7 +6,7 @@ export interface SearchBarState {
   readonly value: SearchBarValue;
   readonly isExpanded: boolean;
   /**
-   * Anchor/focus-return target for framework-owned docked overlays.
+   * Stable SearchBar surface anchor for framework-owned docked overlays.
    * Custom SearchBarState implementations may omit this, but docked search
    * should use useSearchBarState for RAC positioning and focus restoration.
    */
