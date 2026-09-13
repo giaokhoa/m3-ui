@@ -8,11 +8,11 @@ import {
   type HTMLAttributes,
   type PropsWithChildren,
 } from 'react';
+import { UNSAFE_PortalProvider } from 'react-aria';
 import { createPortal } from 'react-dom';
 import { getBaselineColorScheme } from './baseline';
 import { schemeToCssVariables } from './cssVariables';
 import { createDynamicColorScheme } from './dynamic';
-import { ThemePortalContainerContext } from './ThemePortalContext';
 import type { ColorScheme, ThemeMode } from './types';
 
 const defaultFontStylesheet =
@@ -95,7 +95,7 @@ export function ThemeProvider({
 
   return (
     <ThemeContext.Provider value={value}>
-      <ThemePortalContainerContext.Provider value={portalContainer}>
+      <UNSAFE_PortalProvider getContainer={() => portalContainer}>
         <link
           href={defaultFontStylesheet}
           precedence="m3-font"
@@ -116,7 +116,7 @@ export function ThemeProvider({
               />,
               document.body,
             )}
-      </ThemePortalContainerContext.Provider>
+      </UNSAFE_PortalProvider>
     </ThemeContext.Provider>
   );
 }
