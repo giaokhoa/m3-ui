@@ -93,13 +93,49 @@ test.describe('Material 3 ButtonGroup browser contract', () => {
     expect(visibleCount).toBeGreaterThan(0);
     expect(visibleCount).toBeLessThan(6);
     await trigger.click();
-    const menu = group.getByRole('menu');
+    const menu = page.getByRole('menu');
     await expect(menu).toBeVisible();
     const menuItems = menu.getByRole('menuitem');
     expect(await menuItems.count()).toBe(6 - visibleCount);
-    const expectedLabel = await menuItems.last().textContent();
-    await menuItems.last().click();
+    const enabledItem = menu.locator('[role="menuitem"]:not([aria-disabled="true"])').first();
+    const expectedLabel = await enabledItem.textContent();
+    await enabledItem.click();
     await expect(page.getByTestId('last-action')).toHaveText((expectedLabel ?? '').trim().toLowerCase());
+    await expect(menu).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+  });
+
+  test('RAC overflow owns focus entry, Escape restoration and outside dismissal', async ({ page }) => {
+    await openStory(page, 'components-buttongroup--overflow');
+    const trigger = page.getByRole('button', { name: 'More options' });
+
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+
+    const menu = page.getByRole('menu');
+    const firstItem = menu.getByRole('menuitem').first();
+    await expect(menu).toBeVisible();
+    await expect(firstItem).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(menu).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+
+    await trigger.click();
+    await expect(page.getByRole('menu')).toBeVisible();
+    await page.mouse.click(8, 8);
+    await expect(page.getByRole('menu')).toHaveCount(0);
+  });
+
+  test('disabled overflow item remains disabled and cannot execute its action', async ({ page }) => {
+    await openStory(page, 'components-buttongroup--overflow');
+    const trigger = page.getByRole('button', { name: 'More options' });
+    await trigger.click();
+
+    const disabledItem = page.getByRole('menuitem', { name: 'Zeta' });
+    await expect(disabledItem).toHaveAttribute('aria-disabled', 'true');
+    await disabledItem.click({ force: true });
+    await expect(page.getByTestId('last-action')).toHaveText('none');
   });
 
   test('resize moves items in and out of overflow without duplicates or lost ordering', async ({ page }) => {

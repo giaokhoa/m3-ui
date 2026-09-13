@@ -12,7 +12,7 @@ export function createButtonGroupCss(context) {
   const get = tokenReader(context, 'ButtonGroup CSS');
   const line = (name, value) => `  ${name}: ${cssValue(value)};`;
   const rules = [
-    '.button-group {',
+    '.button-group, .button-group__menu-popover {',
     line('--_button-group-motion-duration', get('motion.spring.fastSpatial.duration')),
     line('--_button-group-motion-easing', get('motion.spring.fastSpatial.easing')),
     line('--_button-group-full-corner', get('shape.full')),

@@ -44,6 +44,7 @@ function OverflowDemo() {
   const items: ButtonGroupActionItem[] = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta'].map((label) => ({
     id: label.toLowerCase(),
     label,
+    isDisabled: label === 'Zeta',
     onAction: () => setLastAction(label.toLowerCase()),
   }));
   return (

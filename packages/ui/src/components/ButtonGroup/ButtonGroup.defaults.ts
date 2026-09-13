@@ -1,12 +1,7 @@
 import * as token from '@m3-ui/tokens';
-import type { ElevationLevel } from '../../internal/elevation';
 import type { ButtonSize } from '../Button/Button.types';
 
 export type ButtonGroupSize = ButtonSize;
-
-/** Shared Elevation needs the overflow surface level at runtime; paint is generated CSS. */
-export const buttonGroupOverflowMenuElevation =
-  token.ComponentMenuBaseContainerElevation as ElevationLevel;
 
 /** Runtime width redistribution ratio consumed by DOM measurement arithmetic. */
 export const defaultButtonGroupExpandedRatio =

@@ -19,6 +19,7 @@ export const styleEntries = {
     'src/internal/ripple/ripple.css',
     'src/components/Button/button.css',
     'src/components/IconButton/icon-button.css',
+    'src/components/Menu/menu.css',
     'src/components/ButtonGroup/button-group.css',
   ],
   card: [
