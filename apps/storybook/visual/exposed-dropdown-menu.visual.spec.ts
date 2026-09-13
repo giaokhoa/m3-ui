@@ -95,6 +95,14 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
     await expect(page.getByRole('listbox')).toBeVisible();
   });
 
+  test('virtual click opens the read-only field without pointer input', async ({ page }) => {
+    await openStory(page, 'components-exposeddropdownmenu--filled-read-only');
+    const input = page.getByRole('combobox', { name: 'Density' });
+    await input.evaluate((node) => (node as HTMLInputElement).click());
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('listbox')).toBeVisible();
+  });
+
   test('RTL uses logical alignment and selected value participates in forms', async ({ page }) => {
     await openStory(page, 'components-exposeddropdownmenu--rtl');
     await page.getByRole('combobox', { name: 'Density' }).click();
@@ -105,5 +113,19 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
     await page.getByRole('option', { name: 'Comfortable' }).click();
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByTestId('form-value')).toHaveText('comfortable');
+  });
+});
+
+test.describe('Material 3 ExposedDropdownMenu touch contract', () => {
+  test.use({ hasTouch: true });
+
+  test('touch tap opens and selects a read-only option', async ({ page }) => {
+    await openStory(page, 'components-exposeddropdownmenu--filled-read-only');
+    const input = page.getByRole('combobox', { name: 'Density' });
+    await input.tap();
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await page.getByRole('option', { name: 'Comfortable' }).tap();
+    await expect(page.getByTestId('selected-value')).toHaveText('comfortable');
+    await expect(input).toBeFocused();
   });
 });

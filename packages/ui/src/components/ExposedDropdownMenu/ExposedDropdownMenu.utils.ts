@@ -9,8 +9,8 @@ export interface AnchorBounds {
 }
 
 /**
- * Mirrors AndroidX exposed dropdown sizing: constrain the popup to the larger
- * visible region above or below the anchor, keeping a viewport margin.
+ * @deprecated ExposedDropdownMenu now delegates live popup geometry to React Aria Popover.
+ * Retained as a public compatibility helper for callers that use the calculation directly.
  */
 export function calculateExposedDropdownMaxHeight(
   viewport: VisibleViewport,
