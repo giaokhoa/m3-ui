@@ -68,6 +68,7 @@
     "@m3-ui/tokens": "workspace:*",
     "@material/material-color-utilities": "0.4.0",
     "clsx": "2.1.1",
+    "react-aria": "3.52.1",
     "react-aria-components": "^1.21.1"
   },
   "devDependencies": {

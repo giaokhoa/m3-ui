@@ -23,7 +23,7 @@ The React Card family preserves the Material 3 Compose Card semantic defaults wh
 
 Immutable Card shape, minimum interactive size, variant colors, disabled composites and outlined border defaults live in canonical Card DTCG and are serialized by the generated `@m3-ui/tokens/card.css` adapter. `card.css` owns structural rendering and state selectors.
 
-Runtime TypeScript is limited to the native clickable-Card behavior needed by the roleless rich-content host, current hover/focus/press booleans at that native host boundary, ripple wave lifecycle, and real per-instance overrides such as the `shape` prop or caller `style`. Common interaction precedence, semantic elevation selection, and elevation transition history belong to shared `Elevation`, not a Card-local interaction-ordering layer.
+Runtime TypeScript is limited to the roleless rich-content host boundary, React Aria Hook integration, the narrow nested-interactive filter that keeps child controls independent, ripple wave lifecycle, and real per-instance overrides such as the `shape` prop or caller `style`. `usePress`, `useHover`, and `useFocusRing` own generic press/hover/focus-visible behavior; common interaction precedence, semantic elevation selection, and elevation transition history belong to shared `Elevation`, not a Card-local interaction-ordering layer.
 
 ## Default variants
 
@@ -58,7 +58,7 @@ The generated `HoverOutlineColor`, `FocusOutlineColor`, and `PressedOutlineColor
 
 ## Elevation motion
 
-Clickable Card is a native/non-RAC host because its roleless rich-content semantics and nested interactive descendants do not map safely to a native button wrapper. The host tracks only current hover/focus/press booleans needed for its own pointer/keyboard behavior. Shared `Elevation` receives those current booleans plus the Card semantic level set, applies the repository precedence `disabled > pressed > hovered > focused > default`, and owns any previous-state bookkeeping needed for incoming/outgoing motion.
+Clickable Card remains a custom `div` host because its roleless rich-content semantics and nested interactive descendants do not map safely to a native button wrapper. Generic interaction semantics come from React Aria Hooks: `usePress` owns pointer/keyboard/virtual activation and pressed state, `useHover` owns normalized hover state, and `useFocusRing` owns focus/focus-visible state. Shared `Elevation` receives that current normalized state plus the Card semantic level set, applies the repository precedence `disabled > pressed > hovered > focused > default`, and owns any previous-state bookkeeping needed for incoming/outgoing motion.
 
 The shared elevation primitive uses the pinned Material 3 internal tween selection:
 
@@ -79,7 +79,7 @@ Compose's clickable `Surface` provides click semantics but intentionally sets no
 - uses `aria-disabled` and removes disabled cards from sequential keyboard focus;
 - ignores presses originating from nested interactive descendants so a child Button/Link does not also activate the card parent.
 
-A native `<button>` wrapper is deliberately not used because rich cards commonly contain nested actions, which would create invalid HTML and flattened accessibility semantics. For the same reason Card keeps a narrow native press adapter instead of inventing a RAC semantic host that changes the content model. That adapter owns Card activation/nested-target filtering and normalizes pointer/keyboard/virtual coordinates into shared Ripple wave lifecycle; Ripple receives current hover/focus-visible indication directly and does not own a second interaction state machine.
+A native `<button>` wrapper is deliberately not used because rich cards commonly contain nested actions, which would create invalid HTML and flattened accessibility semantics. Card therefore uses React Aria Hooks directly on the custom host rather than inventing another semantic wrapper. The only custom interaction adapter is a shared nested-interactive event filter that prevents descendant buttons/links/inputs from beginning or committing the parent press. Pointer, keyboard, virtual/screen-reader activation, disabled suppression, press coordinates and pressed state remain React Aria responsibilities, and normalized PressEvents flow directly into shared Ripple through `useRipple().getPressProps()`.
 
 The clickable surface uses the shared bounded Ripple. Opacity focus is rendered as the normal state layer; `ThemeProvider rippleFocus="inset-ring"` moves keyboard focus to the shared inset focus ring using the card shape.
 

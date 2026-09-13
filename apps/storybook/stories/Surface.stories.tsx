@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Surface, ThemeProvider } from '@m3-ui/ui';
+import { Button, Surface, ThemeProvider } from '@m3-ui/ui';
 
 const meta = {
   title: 'Components/Surface',
@@ -46,7 +46,10 @@ export const Clickable: Story = {
 };
 
 export const DisabledClickable: Story = {
-  render: () => <div className="storybook-center"><Surface interaction={{ kind: 'clickable', onPress: () => {} }} isDisabled shape={12} style={box}>Disabled</Surface></div>,
+  render: () => {
+    const [count, setCount] = useState(0);
+    return <div className="storybook-center" style={{ gap: 16 }}><span data-testid="disabled-click-count">{count}</span><Surface interaction={{ kind: 'clickable', onPress: () => setCount((v) => v + 1) }} isDisabled shape={12} style={box}>Disabled</Surface></div>;
+  },
 };
 
 export const Selectable: Story = {
@@ -65,6 +68,14 @@ export const Toggleable: Story = {
 
 export const Nested: Story = {
   render: () => <div className="storybook-center"><Surface tonalElevation="level1" shape={20} style={{ padding: 24 }} data-testid="outer-surface"><Surface tonalElevation="level2" shape={12} style={box} data-testid="inner-surface">Nested tonal elevation</Surface></Surface></div>,
+};
+
+export const NestedAction: Story = {
+  render: () => {
+    const [surfaceCount, setSurfaceCount] = useState(0);
+    const [buttonCount, setButtonCount] = useState(0);
+    return <div className="storybook-center"><Surface interaction={{ kind: 'clickable', onPress: () => setSurfaceCount((v) => v + 1) }} shape={12} style={box}><span data-testid="nested-surface-count">{surfaceCount}</span><span data-testid="nested-surface-button-count">{buttonCount}</span><Button onPress={() => setButtonCount((v) => v + 1)}>Child action</Button></Surface></div>;
+  },
 };
 
 export const ThemeMatrix: Story = {
