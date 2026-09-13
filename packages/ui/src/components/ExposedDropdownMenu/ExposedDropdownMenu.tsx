@@ -1,25 +1,36 @@
 import '@m3-ui/tokens/menu.css';
 import clsx from 'clsx';
 import {
-  useCallback,
+  useContext,
   useEffect,
-  useId,
   useMemo,
   useRef,
-  useState,
   type ComponentProps,
   type CSSProperties,
-  type KeyboardEvent,
+  type MutableRefObject,
   type ReactNode,
   type Ref,
 } from 'react';
-import { Popover as AriaPopover } from 'react-aria-components';
+import {
+  Button as AriaButton,
+  ComboBox as AriaComboBox,
+  ComboBoxStateContext,
+  Group as AriaGroup,
+  InputContext,
+  ListBox as AriaListBox,
+  ListBoxItem as AriaListBoxItem,
+  Popover as AriaPopover,
+  useContextProps,
+  type InputProps as AriaInputProps,
+} from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { menuContainerElevation, menuRuntime } from '../Menu/Menu.defaults';
 import '../Menu/menu.css';
-import { OutlinedTextField, TextField } from '../TextField';
-import { calculateExposedDropdownMaxHeight } from './ExposedDropdownMenu.utils';
+import {
+  getTextFieldStaticClassName,
+  TextFieldContent,
+} from '../TextField/TextField';
 import './exposed-dropdown-menu.css';
 
 export interface ExposedDropdownMenuItem<T = unknown> {
@@ -33,62 +44,6 @@ export interface ExposedDropdownMenuItemRenderState {
   isActive: boolean;
   isSelected: boolean;
   isDisabled: boolean;
-}
-
-interface DropdownMenuItemProps<T> {
-  item: ExposedDropdownMenuItem<T>;
-  index: number;
-  isSelected: boolean;
-  isActive: boolean;
-  disabled: boolean;
-  optionIdPrefix: string;
-  setActiveIndex: (index: number) => void;
-  selectIndex: (index: number) => void;
-  renderItem?: (
-    item: ExposedDropdownMenuItem<T>,
-    state: ExposedDropdownMenuItemRenderState,
-  ) => ReactNode;
-}
-
-function DropdownMenuItem<T>({
-  item,
-  index,
-  isSelected,
-  isActive,
-  disabled,
-  optionIdPrefix,
-  setActiveIndex,
-  selectIndex,
-  renderItem,
-}: DropdownMenuItemProps<T>) {
-  return (
-    <div
-      id={`${optionIdPrefix}-${index}`}
-      role="option"
-      aria-selected={isSelected}
-      aria-disabled={disabled || undefined}
-      data-selected={isSelected || undefined}
-      data-focused={isActive || undefined}
-      data-disabled={disabled || undefined}
-      className="menu-item exposed-dropdown-menu__option"
-      onMouseEnter={() => {
-        if (!disabled) setActiveIndex(index);
-      }}
-      onClick={() => selectIndex(index)}
-    >
-      <span className="menu-item__body">
-        <span className="menu-item__label">
-          {renderItem
-            ? renderItem(item, {
-                isActive,
-                isSelected,
-                isDisabled: disabled,
-              })
-            : item.label}
-        </span>
-      </span>
-    </div>
-  );
 }
 
 export interface ExposedDropdownMenuAnchorRenderProps {
@@ -132,22 +87,145 @@ export interface ExposedDropdownMenuProps<T = unknown> {
   'aria-label'?: string;
 }
 
-function firstEnabledIndex<T>(items: readonly ExposedDropdownMenuItem<T>[]) {
-  return items.findIndex((item) => !item.isDisabled);
+interface DefaultAnchorProps {
+  description?: ReactNode;
+  errorMessage?: ReactNode;
+  inputRef: Ref<HTMLInputElement>;
+  isReadOnly: boolean;
+  label?: ReactNode;
+  placeholder?: string;
+  secondaryTrigger?: ReactNode;
+  secondaryTriggerLabel: string;
+  supportingText?: ReactNode;
+  variant: 'filled' | 'outlined';
 }
 
-function nextEnabledIndex<T>(
-  items: readonly ExposedDropdownMenuItem<T>[],
-  current: number,
-  delta: 1 | -1,
-) {
-  if (items.length === 0) return -1;
-  let index = current;
-  for (let count = 0; count < items.length; count += 1) {
-    index = (index + delta + items.length) % items.length;
-    if (!items[index]?.isDisabled) return index;
-  }
-  return -1;
+function DefaultAnchor({
+  description,
+  errorMessage,
+  inputRef,
+  isReadOnly,
+  label,
+  placeholder,
+  secondaryTrigger,
+  secondaryTriggerLabel,
+  supportingText,
+  variant,
+}: DefaultAnchorProps) {
+  const state = useContext(ComboBoxStateContext);
+  const trailing = secondaryTrigger != null ? (
+    <span aria-hidden="true" className="exposed-dropdown-menu__secondary-trigger-slot" />
+  ) : (
+    <span aria-hidden="true" className="exposed-dropdown-menu__chevron">
+      ▾
+    </span>
+  );
+
+  const anchorClassName = clsx(
+    'exposed-dropdown-menu__anchor',
+    getTextFieldStaticClassName({
+      variant,
+      label,
+      trailingIcon: trailing,
+      isMultiline: false,
+    }),
+  );
+
+  return (
+    <AriaGroup className={anchorClassName}>
+      <TextFieldContent
+        variant={variant}
+        label={label}
+        description={description}
+        supportingText={supportingText}
+        errorMessage={errorMessage as never}
+        placeholder={placeholder}
+        isMultiline={false}
+        trailingIcon={trailing}
+        inputRef={inputRef}
+        inputProps={{
+          readOnly: isReadOnly,
+          onClick: () => {
+            if (isReadOnly) {
+              state?.toggle(null, 'manual');
+            } else if (!state?.isOpen) {
+              state?.open(null, 'manual');
+            }
+          },
+        }}
+      />
+      {secondaryTrigger != null ? (
+        <AriaButton
+          aria-label={secondaryTriggerLabel}
+          className="exposed-dropdown-menu__secondary-trigger"
+        >
+          {secondaryTrigger}
+        </AriaButton>
+      ) : null}
+    </AriaGroup>
+  );
+}
+
+interface CustomAnchorProps {
+  isDisabled: boolean;
+  isReadOnly: boolean;
+  renderAnchor: (props: ExposedDropdownMenuAnchorRenderProps) => ReactNode;
+}
+
+function CustomAnchor({ isDisabled, isReadOnly, renderAnchor }: CustomAnchorProps) {
+  const state = useContext(ComboBoxStateContext);
+  const localRef = useRef<HTMLInputElement>(null);
+  const [contextInputProps, inputRef] = useContextProps(
+    {} as AriaInputProps,
+    localRef,
+    InputContext,
+  );
+  const contextOnClick = contextInputProps.onClick;
+  const inputProps = {
+    ...contextInputProps,
+    readOnly: isReadOnly || contextInputProps.readOnly,
+    onClick: (event: React.MouseEvent<HTMLInputElement>) => {
+      contextOnClick?.(event);
+      if (event.defaultPrevented) return;
+      if (isReadOnly) {
+        state?.toggle(null, 'manual');
+      } else if (!state?.isOpen) {
+        state?.open(null, 'manual');
+      }
+    },
+  } as unknown as ComponentProps<'input'>;
+
+  return (
+    <AriaGroup className="exposed-dropdown-menu__anchor">
+      {renderAnchor({
+        inputRef,
+        value: state?.inputValue ?? '',
+        isOpen: state?.isOpen ?? false,
+        isDisabled,
+        isReadOnly,
+        inputProps,
+        onPress: () => state?.toggle(null, 'manual'),
+      })}
+    </AriaGroup>
+  );
+}
+
+interface ControlledOpenBridgeProps {
+  isOpen: boolean;
+  syncingRef: MutableRefObject<boolean>;
+}
+
+function ControlledOpenBridge({ isOpen, syncingRef }: ControlledOpenBridgeProps) {
+  const state = useContext(ComboBoxStateContext);
+
+  useEffect(() => {
+    if (!state || state.isOpen === isOpen) return;
+    syncingRef.current = true;
+    state.setOpen(isOpen);
+    syncingRef.current = false;
+  }, [isOpen, state, syncingRef]);
+
+  return null;
 }
 
 export function ExposedDropdownMenu<T = unknown>({
@@ -177,321 +255,127 @@ export function ExposedDropdownMenu<T = unknown>({
   renderAnchor,
   'aria-label': ariaLabel,
 }: ExposedDropdownMenuProps<T>) {
-  const popupId = useId();
-  const optionIdPrefix = useId();
-  const anchorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const syncingOpenRef = useRef(false);
   const themePortalContainer = useThemePortalContainer();
-  const [internalInputValue, setInternalInputValue] = useState('');
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [maxHeight, setMaxHeight] = useState<number>();
-
-  const selectedIndex = useMemo(
-    () => items.findIndex((item) => item.value === value),
+  const selectedItem = useMemo(
+    () => items.find((item) => item.value === value),
     [items, value],
   );
-  const selectedItem = selectedIndex >= 0 ? items[selectedIndex] : undefined;
+  const itemByValue = useMemo(
+    () => new Map(items.map((item) => [item.value, item] as const)),
+    [items],
+  );
+  const disabledKeys = useMemo(
+    () => items.filter((item) => item.isDisabled).map((item) => item.value),
+    [items],
+  );
   const isReadOnly = readOnlyProp ?? (inputValue === undefined && onInputChange === undefined);
-  const editableValue = inputValue ?? internalInputValue;
-  const displayValue = isReadOnly ? (selectedItem?.label ?? '') : editableValue;
   const effectiveOpen = isOpen && !isDisabled;
+  const accessibleLabel = ariaLabel ?? (typeof label === 'string' ? label : undefined);
+  const comboAriaLabel = renderAnchor == null && label != null ? undefined : accessibleLabel;
 
-  const setInput = useCallback(
-    (next: string) => {
-      if (inputValue === undefined) setInternalInputValue(next);
-      onInputChange?.(next);
-    }, [inputValue, onInputChange],
-  );
-
-  const open = useCallback(() => {
-    if (isDisabled) return;
-    const initial = selectedIndex >= 0 && !items[selectedIndex]?.isDisabled
-      ? selectedIndex
-      : firstEnabledIndex(items);
-    setActiveIndex(initial);
-    onOpenChange(true);
-  }, [isDisabled, items, onOpenChange, selectedIndex]);
-
-  const close = useCallback(() => {
-    onOpenChange(false);
-    setActiveIndex(-1);
-  }, [onOpenChange]);
-
-  const selectIndex = useCallback(
-    (index: number) => {
-      const item = items[index];
-      if (!item || item.isDisabled) return;
-      onSelectionChange(item.value, item);
-      if (!isReadOnly) setInput(item.label);
-      close();
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }, [close, isReadOnly, items, onSelectionChange, setInput],
-  );
-
-  const onInputKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>) => {
-      if (isDisabled) return;
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-        event.preventDefault();
-        const delta = event.key === 'ArrowDown' ? 1 : -1;
-        if (!effectiveOpen) {
-          open();
-          return;
-        }
-        setActiveIndex((current) =>
-          nextEnabledIndex(items, current < 0 ? selectedIndex : current, delta),
-        );
-        return;
-      }
-      if (event.key === 'Home' && effectiveOpen) {
-        event.preventDefault();
-        setActiveIndex(firstEnabledIndex(items));
-        return;
-      }
-      if (event.key === 'End' && effectiveOpen) {
-        event.preventDefault();
-        for (let index = items.length - 1; index >= 0; index -= 1) {
-          if (!items[index]?.isDisabled) {
-            setActiveIndex(index);
-            break;
-          }
-        }
-        return;
-      }
-      if (event.key === 'Enter') {
-        if (effectiveOpen && activeIndex >= 0) {
-          event.preventDefault();
-          selectIndex(activeIndex);
-        } else if (isReadOnly) {
-          event.preventDefault();
-          open();
-        }
-        return;
-      }
-      if (event.key === ' ' && isReadOnly && !effectiveOpen) {
-        event.preventDefault();
-        open();
-        return;
-      }
-      if (event.key === 'Escape' && effectiveOpen) {
-        event.preventDefault();
-        close();
-      }
-    }, [
-      activeIndex,
-      close,
-      effectiveOpen,
-      isDisabled,
-      isReadOnly,
-      items,
-      open,
-      selectIndex,
-      selectedIndex,
-    ],
-  );
-
-  useEffect(() => {
-    if (!effectiveOpen) return;
-    const update = () => {
-      const bounds = anchorRef.current?.getBoundingClientRect();
-      if (!bounds) return;
-      const viewport = window.visualViewport;
-      const top = viewport?.offsetTop ?? 0;
-      const bottom = top + (viewport?.height ?? window.innerHeight);
-      setMaxHeight(
-        calculateExposedDropdownMaxHeight(
-          { top, bottom },
-          { top: bounds.top, bottom: bounds.bottom },
-          menuRuntime.viewportMargin,
-        ),
-      );
-    };
-    update();
-    const viewport = window.visualViewport;
-    viewport?.addEventListener('resize', update);
-    viewport?.addEventListener('scroll', update);
-    window.addEventListener('resize', update);
-    window.addEventListener('scroll', update, true);
-    const observer = new ResizeObserver(update);
-    if (anchorRef.current) observer.observe(anchorRef.current);
-    return () => {
-      viewport?.removeEventListener('resize', update);
-      viewport?.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-      window.removeEventListener('scroll', update, true);
-      observer.disconnect();
-    };
-  }, [effectiveOpen]);
-
-  useEffect(() => {
-    if (!effectiveOpen) return;
-    const onPointerDown = (event: PointerEvent) => {
-      const path = event.composedPath();
-      const anchor = anchorRef.current;
-      const popup = document.getElementById(popupId);
-      if ((anchor && path.includes(anchor)) || (popup && path.includes(popup))) return;
-      close();
-    };
-    document.addEventListener('pointerdown', onPointerDown, true);
-    return () => document.removeEventListener('pointerdown', onPointerDown, true);
-  }, [close, effectiveOpen, popupId]);
-
-  useEffect(() => {
-    if (!isReadOnly && inputValue === undefined && internalInputValue === '' && selectedItem) {
-      setInternalInputValue(selectedItem.label);
-    }
-  }, [inputValue, internalInputValue, isReadOnly, selectedItem]);
-
-  const activeDescendant =
-    effectiveOpen && activeIndex >= 0 ? `${optionIdPrefix}-${activeIndex}` : undefined;
-  const inputProps: ComponentProps<'input'> = {
-    role: 'combobox',
-    'aria-autocomplete': isReadOnly ? 'none' : 'list',
-    'aria-expanded': effectiveOpen,
-    'aria-controls': popupId,
-    'aria-activedescendant': activeDescendant,
-    'aria-haspopup': 'listbox',
-    onKeyDown: onInputKeyDown,
-    onFocus: () => {
-      if (!isReadOnly && !effectiveOpen) open();
-    },
-    onClick: () => {
-      if (isReadOnly) {
-        if (effectiveOpen) close();
-        else open();
-      } else if (!effectiveOpen) {
-        open();
-      }
-    },
-  };
-
-  const secondary = secondaryTrigger != null ? (
-    <button
-      type="button"
-      className="exposed-dropdown-menu__secondary-trigger"
-      aria-label={secondaryTriggerLabel}
-      aria-haspopup="listbox"
-      aria-expanded={effectiveOpen}
-      aria-controls={popupId}
-      disabled={isDisabled}
-      onPointerDown={(event) => event.stopPropagation()}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (effectiveOpen) close();
-        else open();
-        requestAnimationFrame(() => inputRef.current?.focus());
-      }}
-    >
-      {secondaryTrigger}
-    </button>
-  ) : (
-    <span aria-hidden="true" className="exposed-dropdown-menu__chevron">
-      ▾
-    </span>
-  );
-
-  const defaultAnchor = (() => {
-    const Field = variant === 'outlined' ? OutlinedTextField : TextField;
-    return (
-      <Field
-        aria-label={ariaLabel}
-        label={label}
-        description={description}
-        supportingText={supportingText}
-        errorMessage={errorMessage as never}
-        placeholder={placeholder}
-        value={displayValue}
-        onChange={(next) => {
-          if (isReadOnly) return;
-          setInput(next);
-          if (!effectiveOpen) open();
-        }}
-        isReadOnly={isReadOnly}
-        isDisabled={isDisabled}
-        isRequired={isRequired}
-        isMultiline={false}
-        trailingIcon={secondary}
-        inputRef={inputRef}
-        inputProps={inputProps}
-      />
-    );
-  })();
+  const controlledInputValue = isReadOnly ? (selectedItem?.label ?? '') : inputValue;
+  const defaultInputValue =
+    !isReadOnly && inputValue === undefined ? (selectedItem?.label ?? '') : undefined;
+  const comboValue =
+    !isReadOnly &&
+    inputValue !== undefined &&
+    selectedItem != null &&
+    inputValue !== selectedItem.label
+      ? null
+      : value || null;
 
   return (
-    <div
-      ref={anchorRef}
+    <AriaComboBox
+      aria-label={accessibleLabel}
+      items={items}
+      value={comboValue}
+      onChange={(nextValue) => {
+        if (typeof nextValue !== 'string') return;
+        const item = itemByValue.get(nextValue);
+        if (!item) return;
+        onSelectionChange(item.value, item);
+        if (!isReadOnly) onInputChange?.(item.label);
+      }}
+      inputValue={controlledInputValue}
+      defaultInputValue={defaultInputValue}
+      onInputChange={isReadOnly ? undefined : onInputChange}
+      disabledKeys={disabledKeys}
+      allowsCustomValue={!isReadOnly}
+      menuTrigger={isReadOnly ? 'manual' : 'focus'}
+      onOpenChange={(nextOpen) => {
+        if (!syncingOpenRef.current) onOpenChange(nextOpen);
+      }}
+      isDisabled={isDisabled}
+      isRequired={isRequired}
       className={clsx('exposed-dropdown-menu', className)}
       style={style}
-      data-open={effectiveOpen || undefined}
-      data-readonly={isReadOnly || undefined}
     >
+      <ControlledOpenBridge isOpen={effectiveOpen} syncingRef={syncingOpenRef} />
       {name ? <input type="hidden" name={name} value={value} /> : null}
-      {renderAnchor
-        ? renderAnchor({
-            inputRef,
-            value: displayValue,
-            isOpen: effectiveOpen,
-            isDisabled,
-            isReadOnly,
-            inputProps,
-            onPress: effectiveOpen ? close : open,
-          })
-        : defaultAnchor}
+      {renderAnchor ? (
+        <CustomAnchor
+          isDisabled={isDisabled}
+          isReadOnly={isReadOnly}
+          renderAnchor={renderAnchor}
+        />
+      ) : (
+        <DefaultAnchor
+          description={description}
+          errorMessage={errorMessage}
+          inputRef={inputRef}
+          isReadOnly={isReadOnly}
+          label={label}
+          placeholder={placeholder}
+          secondaryTrigger={secondaryTrigger}
+          secondaryTriggerLabel={secondaryTriggerLabel}
+          supportingText={supportingText}
+          variant={variant}
+        />
+      )}
       <AriaPopover
-        isNonModal
-        isOpen={effectiveOpen}
-        onOpenChange={(next) => {
-          if (next) open();
-          else close();
-        }}
-        triggerRef={anchorRef}
         placement="bottom start"
         offset={4}
         containerPadding={menuRuntime.viewportMargin}
         shouldFlip
         UNSTABLE_portalContainer={themePortalContainer ?? undefined}
         className="menu-popover exposed-dropdown-menu__popover"
-        style={{
-          ...(matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : null),
-          ...(maxHeight != null ? { maxHeight } : null),
-        }}
+        style={matchAnchorWidth ? { inlineSize: 'var(--trigger-width)' } : undefined}
       >
         <div className="menu-surface">
           <Elevation level={menuContainerElevation} />
           <div className="menu-surface__clip">
-            <div
-              id={popupId}
-              role="listbox"
-              aria-label={ariaLabel ?? (typeof label === 'string' ? label : 'Options')}
+            <AriaListBox<ExposedDropdownMenuItem<T>>
+              aria-label={accessibleLabel ?? 'Options'}
               className="menu exposed-dropdown-menu__listbox"
-              onMouseDown={(event) => {
-                if (!isReadOnly) event.preventDefault();
-              }}
             >
-              {items.map((item, index) => {
-                const isSelected = item.value === value;
-                const isActive = index === activeIndex;
-                const disabled = Boolean(item.isDisabled);
-                return (
-                  <DropdownMenuItem
-                    key={item.value}
-                    item={item}
-                    index={index}
-                    isSelected={isSelected}
-                    isActive={isActive}
-                    disabled={disabled}
-                    optionIdPrefix={optionIdPrefix}
-                    setActiveIndex={setActiveIndex}
-                    selectIndex={selectIndex}
-                    renderItem={renderItem}
-                  />
-                );
-              })}
-            </div>
+              {(item) => (
+                <AriaListBoxItem
+                  id={item.value}
+                  textValue={item.label}
+                  isDisabled={item.isDisabled}
+                  className="menu-item exposed-dropdown-menu__option"
+                >
+                  {({ isDisabled: itemDisabled, isFocused, isSelected }) => (
+                    <span className="menu-item__body">
+                      <span className="menu-item__label">
+                        {renderItem
+                          ? renderItem(item, {
+                              isActive: isFocused,
+                              isSelected,
+                              isDisabled: itemDisabled,
+                            })
+                          : item.label}
+                      </span>
+                    </span>
+                  )}
+                </AriaListBoxItem>
+              )}
+            </AriaListBox>
           </div>
         </div>
       </AriaPopover>
-    </div>
+    </AriaComboBox>
   );
 }

@@ -88,10 +88,20 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
   test('secondary trigger reports expanded state and returns focus to editable anchor contract', async ({ page }) => {
     await openStory(page, 'components-exposeddropdownmenu--secondary-trigger');
     const input = page.getByRole('combobox', { name: 'Density' });
-    const trigger = page.getByRole('button', { name: 'Toggle options' });
+    const trigger = page.locator('.exposed-dropdown-menu__secondary-trigger');
+    await expect(trigger).toHaveRole('button');
+    await expect(trigger).toHaveAccessibleName(/Toggle options/);
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(input).toBeFocused();
+    await expect(page.getByRole('listbox')).toBeVisible();
+  });
+
+  test('virtual click opens the read-only field without pointer input', async ({ page }) => {
+    await openStory(page, 'components-exposeddropdownmenu--filled-read-only');
+    const input = page.getByRole('combobox', { name: 'Density' });
+    await input.evaluate((node) => (node as HTMLInputElement).click());
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
     await expect(page.getByRole('listbox')).toBeVisible();
   });
 
@@ -105,5 +115,19 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
     await page.getByRole('option', { name: 'Comfortable' }).click();
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByTestId('form-value')).toHaveText('comfortable');
+  });
+});
+
+test.describe('Material 3 ExposedDropdownMenu touch contract', () => {
+  test.use({ hasTouch: true });
+
+  test('touch tap opens and selects a read-only option', async ({ page }) => {
+    await openStory(page, 'components-exposeddropdownmenu--filled-read-only');
+    const input = page.getByRole('combobox', { name: 'Density' });
+    await input.tap();
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await page.getByRole('option', { name: 'Comfortable' }).tap();
+    await expect(page.getByTestId('selected-value')).toHaveText('comfortable');
+    await expect(input).toBeFocused();
   });
 });

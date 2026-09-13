@@ -4,8 +4,16 @@
   inline-size: 100%;
 }
 
-.exposed-dropdown-menu > .text-field {
+.exposed-dropdown-menu__anchor {
+  position: relative;
   inline-size: 100%;
+}
+
+.exposed-dropdown-menu__secondary-trigger {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: calc((var(--_text-field-min-height) - 40px) / 2);
+  inset-inline-end: 4px;
 }
 
 .exposed-dropdown-menu__popover {

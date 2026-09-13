@@ -36,18 +36,61 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
 }
 
 export type OutlinedTextFieldProps = TextFieldProps;
-type TextFieldVariant = 'filled' | 'outlined';
+export type TextFieldVariant = 'filled' | 'outlined';
 
 function joinClassNames(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
 }
 
-export interface TextFieldImplProps extends TextFieldProps {
+export interface TextFieldVisualState {
   variant: TextFieldVariant;
-  inputType?: HTMLInputTypeAttribute;
+  label?: ReactNode;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  isMultiline?: boolean;
 }
 
-export function TextFieldImpl({
+export function getTextFieldStaticClassName({
+  variant,
+  label,
+  leadingIcon,
+  trailingIcon,
+  isMultiline = true,
+}: TextFieldVisualState) {
+  return joinClassNames(
+    'text-field',
+    `text-field--${variant}`,
+    label ? 'text-field--with-label' : null,
+    leadingIcon ? 'text-field--with-leading' : null,
+    trailingIcon ? 'text-field--with-trailing' : null,
+    isMultiline ? 'text-field--multiline' : null,
+  );
+}
+
+export interface TextFieldContentProps {
+  variant: TextFieldVariant;
+  label?: ReactNode;
+  description?: ReactNode;
+  supportingText?: ReactNode;
+  errorMessage?: FieldErrorProps['children'];
+  placeholder?: string;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  isMultiline?: boolean;
+  rows?: number;
+  inputType?: HTMLInputTypeAttribute;
+  inputProps?: Omit<ComponentProps<typeof Input>, 'className'>;
+  inputRef?: Ref<HTMLInputElement>;
+}
+
+/**
+ * Material TextField visual/content layer. It intentionally does not create a
+ * field state owner, so compound RAC controls can reuse the Material surface
+ * while their parent provides Label/Input/Text/FieldError contexts.
+ */
+export function TextFieldContent({
   variant,
   label,
   description,
@@ -60,23 +103,12 @@ export function TextFieldImpl({
   suffix,
   isMultiline = true,
   rows,
-  className,
   inputType,
   inputProps,
   inputRef,
-  ...props
-}: TextFieldImplProps) {
+}: TextFieldContentProps) {
   const resolvedSupportingText = supportingText ?? description;
   const controlPlaceholder = placeholder ?? (label ? ' ' : undefined);
-
-  const staticClasses = joinClassNames(
-    'text-field',
-    `text-field--${variant}`,
-    label ? 'text-field--with-label' : null,
-    leadingIcon ? 'text-field--with-leading' : null,
-    trailingIcon ? 'text-field--with-trailing' : null,
-    isMultiline ? 'text-field--multiline' : null,
-  );
 
   const inputRow = (
     <div className="text-field__input-row">
@@ -108,14 +140,7 @@ export function TextFieldImpl({
   ) : null;
 
   return (
-    <AriaTextField
-      {...props}
-      className={(renderProps) => {
-        const userClassName =
-          typeof className === 'function' ? className(renderProps) : className;
-        return joinClassNames(staticClasses, userClassName);
-      }}
-    >
+    <>
       {variant === 'filled' ? (
         <div className="text-field__container">
           {leading}
@@ -146,6 +171,68 @@ export function TextFieldImpl({
         </Text>
       ) : null}
       <FieldError className="text-field__error">{errorMessage}</FieldError>
+    </>
+  );
+}
+
+export interface TextFieldImplProps extends TextFieldProps {
+  variant: TextFieldVariant;
+  inputType?: HTMLInputTypeAttribute;
+}
+
+export function TextFieldImpl({
+  variant,
+  label,
+  description,
+  supportingText,
+  errorMessage,
+  placeholder,
+  leadingIcon,
+  trailingIcon,
+  prefix,
+  suffix,
+  isMultiline = true,
+  rows,
+  className,
+  inputType,
+  inputProps,
+  inputRef,
+  ...props
+}: TextFieldImplProps) {
+  const staticClasses = getTextFieldStaticClassName({
+    variant,
+    label,
+    leadingIcon,
+    trailingIcon,
+    isMultiline,
+  });
+
+  return (
+    <AriaTextField
+      {...props}
+      className={(renderProps) => {
+        const userClassName =
+          typeof className === 'function' ? className(renderProps) : className;
+        return joinClassNames(staticClasses, userClassName);
+      }}
+    >
+      <TextFieldContent
+        variant={variant}
+        label={label}
+        description={description}
+        supportingText={supportingText}
+        errorMessage={errorMessage}
+        placeholder={placeholder}
+        leadingIcon={leadingIcon}
+        trailingIcon={trailingIcon}
+        prefix={prefix}
+        suffix={suffix}
+        isMultiline={isMultiline}
+        rows={rows}
+        inputType={inputType}
+        inputProps={inputProps}
+        inputRef={inputRef}
+      />
     </AriaTextField>
   );
 }
