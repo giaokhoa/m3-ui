@@ -20,8 +20,23 @@ test('live example source is derived deterministically from the rendered TSX com
   assert.ok(example);
   assert.match(example.source, /import \{ Button \} from '@m3-ui\/ui';/);
   assert.match(example.source, /export function ButtonBasicLiveExample\(\)/);
-  assert.match(example.source, /<Button>Save changes<\/Button>/);
+  assert.match(example.source, /<Button onPress=\{\(\) => \{\}\}>Save changes<\/Button>/);
   assert.equal(stableLiveExampleJson(model), stableLiveExampleJson(model));
+});
+
+test('generated source prunes unused named imports per example', () => {
+  const model = buildLiveExampleModel({
+    sourcePath: registryPath,
+    repoRoot: resolve(appDir, '../..'),
+  });
+  const shapes = model.examples['button-shapes'];
+
+  assert.ok(shapes);
+  assert.match(
+    shapes.source,
+    /import \{ Button, buttonShapesForSize \} from '@m3-ui\/ui';/,
+  );
+  assert.doesNotMatch(shapes.source, /ElevatedButton|FilledTonalButton|TextButton/);
 });
 
 test('changing the rendered component changes generated source without a second snippet', () => {

@@ -1,102 +1,143 @@
 ---
 title: Button
-description: Material 3 button hierarchy, variants, expressive sizes, interaction states, and browser button semantics.
+description: Material 3 button specification, hierarchy, usage guidance, expressive sizes and shapes, states, accessibility, and copyable React examples.
 ---
 
-Buttons let users trigger actions. Material 3 uses button variants to communicate action hierarchy; choose the variant from the importance and context of the action rather than styling every action independently.
+<ComponentHero
+  eyebrow="Actions"
+  definition="Buttons let people initiate actions. Choose the variant from the action's importance and context, then let canonical Material tokens own the visual treatment."
+/>
 
-[Material 3 buttons](https://m3.material.io/components/buttons/overview)
+<SourceLinks
+  links={[
+    {
+      label: 'Material 3 Buttons overview',
+      href: 'https://m3.material.io/components/buttons/overview',
+      kind: 'spec',
+    },
+    {
+      label: 'Material 3 Buttons specs',
+      href: 'https://m3.material.io/components/buttons/specs',
+      kind: 'spec',
+    },
+    {
+      label: 'Material Web Button guidance',
+      href: 'https://github.com/material-components/material-web/blob/main/docs/components/button.md',
+      kind: 'web',
+    },
+    {
+      label: 'Android Developers Material 3 Button',
+      href: 'https://developer.android.com/develop/ui/compose/components/button',
+      kind: 'compose',
+    },
+  ]}
+/>
 
-<ComponentPreview>
-  <Button>Filled</Button>
-  <ElevatedButton>Elevated</ElevatedButton>
-  <FilledTonalButton>Filled tonal</FilledTonalButton>
-  <OutlinedButton>Outlined</OutlinedButton>
-  <TextButton>Text</TextButton>
-</ComponentPreview>
+## Quick start
 
-```tsx
-import { Button } from '@m3-ui/ui';
+Use `onPress` for the action callback. Omitting `size` uses the current Material 3 `small` Button contract.
 
-<Button onPress={save}>Save</Button>
-```
+<LiveExample example="button-basic" title="Basic filled Button" sourceInitiallyOpen />
 
-## When to use
+## Material 3 specification
 
-Use buttons for actions such as saving, confirming, creating, retrying, or opening an action flow. Use links for navigation to another document or URL. Prefer the dedicated `IconButton` family when the action is intentionally icon-only, and use FABs only for a screen-level high-priority action.
+The Material 3 overview and specs pages above are the normative design sources for Button hierarchy and guidance. The tables below are generated from m3-ui's canonical Button token graph, which is reconciled against the audited Material 3 Design Kit, Material Web, and pinned AndroidX Compose sources. Canonical values are generated here rather than copied into prose.
 
-Keep one clear hierarchy within a surface. Multiple equally prominent filled buttons compete for attention and weaken the Material action structure.
+### Canonical implementation table
 
-## Variants
+<MaterialSpecTable family="button" groups={['size', 'shape', 'icon', 'color', 'elevation']} />
 
-| Public component | Material role | Typical emphasis |
+For source disagreements and web adaptations, see **Material fidelity and web adaptation** near the end of this page. In particular, disabled presentation, the current Small default, Square shapes, and the Android-only precision-pointer policy all have explicit reconciliations rather than hidden overrides.
+
+## Usage and variant hierarchy
+
+Material's Button family has five common variants. Choose the variant for the action's emphasis; do not choose one only because its decoration looks more prominent.
+
+| Public component | Material guidance | Typical use |
 | --- | --- | --- |
-| `Button` | Filled | Highest emphasis for a primary action |
-| `ElevatedButton` | Elevated | High emphasis when separation from the surrounding surface is useful |
-| `FilledTonalButton` | Filled tonal | Medium emphasis with a softer container |
-| `OutlinedButton` | Outlined | Medium emphasis without a filled container |
-| `TextButton` | Text | Lowest emphasis for supplementary actions |
+| `Button` | Filled, high emphasis | Important final or primary actions such as Save, Confirm, or Join now |
+| `FilledTonalButton` | Middle ground between filled and outlined | A significant or lower-priority action that needs more emphasis than an outline |
+| `OutlinedButton` | Medium emphasis | Important but non-primary alternatives such as Back or Cancel |
+| `TextButton` | Lowest emphasis | Supplementary and low-priority actions, especially alongside stronger actions |
+| `ElevatedButton` | Tonal-style container with elevation | Use when the action needs visual separation from a patterned or difficult background, not simply to make it look more important |
 
-Use the component family rather than reproducing Material container, state-layer, or elevation values in application CSS.
+<LiveExample example="button-variants" title="Material Button variants" sourceInitiallyOpen />
 
-## Icons
+### Labels
 
-`startIcon` and `endIcon` are decorative slots around the action label.
+Material guidance says a Button label should describe the action that will occur. Prefer concise action wording such as **Save**, **Confirm**, **Next**, or **Back** over labels that do not explain the result.
 
-```tsx
-<Button startIcon={<SaveIcon />}>Save</Button>
-```
+### Icons
 
-The component keeps these icon slots out of the accessibility tree so the visible action text remains the stable accessible name.
+An icon is optional. Use it when it helps communicate the action or draws useful attention to it; keep visible text as the stable action label.
+
+<LiveExample example="button-icons" title="Buttons with start and end icons" sourceInitiallyOpen />
+
+## Do and don't
+
+<GuidanceCallout title="Material — Do" kind="guidance">
+  <ul>
+    <li>Choose Filled, Tonal, Outlined, Text, or Elevated according to the action emphasis.</li>
+    <li>Use a label that describes the action that will happen when the Button is activated.</li>
+    <li>Add an icon only when it helps clarify the action; keep the label as the primary content.</li>
+    <li>Use Elevated when the Button needs separation from a patterned or visually difficult background.</li>
+  </ul>
+</GuidanceCallout>
+
+<GuidanceCallout title="Material — Don't" kind="caution">
+  <ul>
+    <li>Do not use Elevated only to make an action look more important; Material recommends limiting elevation to avoid excessive shadow.</li>
+    <li>Do not give actions with different priorities the same emphasis when that obscures the action hierarchy.</li>
+    <li>Do not choose a variant only for its color or decoration; the variant should communicate action priority and context.</li>
+  </ul>
+</GuidanceCallout>
+
+<GuidanceCallout title="m3-ui / web — Do" kind="web">
+  <ul>
+    <li>Use `onPress` and let React Aria own keyboard, pointer, focus-visible, and disabled semantics.</li>
+    <li>Use `size`, `buttonShapesForSize()`, variant components, and theme tokens instead of copying padding, radius, elevation, or state colors.</li>
+    <li>Use a link or anchor for navigation; use Button for an action.</li>
+    <li>Use `IconButton` when the action is intentionally icon-only, and provide an accessible label.</li>
+  </ul>
+</GuidanceCallout>
+
+<GuidanceCallout title="m3-ui / web — Don't" kind="caution">
+  <ul>
+    <li>Do not attach an independent click handler to child content inside a Button; the root Button must remain the single action owner.</li>
+    <li>Do not override geometry or state presentation in application CSS to imitate another Button variant.</li>
+    <li>Do not infer Android precision-pointer compaction from `pointer: fine`, hover capability, or the current pointer event.</li>
+  </ul>
+</GuidanceCallout>
 
 ## Expressive sizes
 
-The public `size` API exposes the audited Material expressive size vocabulary: `extraSmall`, `small`, `medium`, `large`, and `extraLarge`.
+The public `size` API exposes `extraSmall`, `small`, `medium`, `large`, and `extraLarge`. Size changes the Material geometry, icon scale, spacing, and label type role as one contract; avoid changing those dimensions independently.
 
-<ComponentPreview>
-  <Button size="extraSmall">Extra small</Button>
-  <Button size="small">Small</Button>
-  <Button size="medium">Medium</Button>
-  <Button size="large">Large</Button>
-  <Button size="extraLarge">Extra large</Button>
-</ComponentPreview>
+<LiveExample example="button-sizes" title="Material expressive Button sizes" sourceInitiallyOpen />
 
-Choose size from the surrounding component hierarchy and available touch target, not from arbitrary text length. Omitting `size` uses `small`, matching the current Material 3 Design Kit default. The legacy 40px/18px-icon baseline remains in the token source only as audited Compose classic / Material Web v0.192 reference evidence; it is not the public React default.
+Omitting `size` uses `small`, matching the current Material 3 Design Kit component-set default. The legacy baseline remains in the token source as audited Compose-classic / Material-Web-runtime evidence; it is not the public React default.
 
-### Round and square expressive shapes
+## Round and Square shapes
 
-The current Material 3 Design Kit publishes both `Round` and `Square` Button types at every expressive size. Use the audited helper instead of duplicating corner radii:
+The current Material 3 Design Kit publishes both Round and Square Button types for every expressive size. Use the audited helper instead of copying corner radii.
 
-```tsx
-<Button
-  size="medium"
-  shapes={buttonShapesForSize('medium', 'square')}
->
-  Square medium
-</Button>
-```
+<LiveExample example="button-shapes" title="Round and Square Button shapes" sourceInitiallyOpen />
 
-`buttonShapesForSize(size)` remains the Round default. Passing `'square'` selects the current size-specific Square container while preserving the same audited pressed-shape target for that size.
-
-Compose also has an Android precision-pointer device policy that can compact the default Small Button when an enabled feature flag detects both a physical keyboard and mouse. m3-ui does **not** infer that policy from CSS `pointer: fine`, hover capability, or the current pointer event because those web signals are not semantically equivalent to Compose's device inventory rule. Choose a Button `size` explicitly when a web product needs a denser control policy.
+`buttonShapesForSize(size)` uses Round. Pass `'square'` as the second argument for the size-specific Square container. Both forms keep the audited pressed-shape target for that size.
 
 ## Behavior and states
 
-Material hover, focus, press, and disabled presentation is driven by real browser interaction state. React Aria owns the button interaction contract; canonical Material tokens, ripple, shape, color, elevation, and motion own presentation.
+React Aria owns the current browser interaction state. Material tokens, ripple, shape, color, elevation, and motion own presentation for hover, keyboard focus, press, and disabled state.
 
-<ComponentPreview>
-  <Button>Enabled</Button>
-  <Button isDisabled>Disabled</Button>
-  <OutlinedButton>Keyboard focusable</OutlinedButton>
-</ComponentPreview>
+<LiveExample example="button-states" title="Enabled and disabled Button states" sourceInitiallyOpen />
 
-Do not add independent click handlers to child content. The button is the single action owner.
+The Button is the single action owner. Do not add a second press/click engine inside the content tree.
 
 ## Accessibility
 
-`Button` uses button semantics with keyboard activation, disabled handling, and focus-visible behavior supplied by React Aria. Prefer visible action text that describes the result of activation.
+`Button` uses browser button semantics with keyboard activation, disabled handling, and focus-visible behavior supplied by React Aria. Use visible action text that describes the result of activation.
 
-When an action must be icon-only, use an icon-button component and supply an accessible label. Do not remove button text visually while leaving an ambiguous accessible name.
+`startIcon` and `endIcon` are decorative slots and are kept out of the accessibility tree so the visible action label remains the stable accessible name. When an action must be icon-only, use the dedicated [Icon button](/docs/components/icon-button) family and provide an accessible label.
 
 ## API reference
 
@@ -106,7 +147,9 @@ When an action must be icon-only, use an icon-button component and supply an acc
 
 <MaterialParity component="button" />
 
-Material 3 is the source for button hierarchy, visual variants, shape, state treatment, and expressive sizing. Browser/React Aria semantics intentionally supply native web activation, pointer hover, keyboard focus, and event lifecycles rather than mechanically porting Compose runtime primitives.
+Material 3 is authoritative for Button hierarchy, visual variants, shape, state treatment, and expressive sizing. Browser/React Aria semantics intentionally supply native web activation, pointer hover, keyboard focus, and event lifecycles rather than mechanically porting Compose runtime primitives.
+
+The current Compose precision-pointer policy is intentionally not mapped to a CSS media query: its Android trigger depends on an enabled feature flag and physical keyboard + mouse device inventory, which is not equivalent to `pointer: fine` on the web. Choose `size` explicitly when a product needs a denser web control policy.
 
 ## Related components
 
