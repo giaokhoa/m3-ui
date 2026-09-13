@@ -43,12 +43,21 @@ function cssLength(value: string | number): string {
 // inputField may be composed through arbitrary wrappers while the actual
 // SearchBarInput still participates in React Aria's modal FocusScope.
 const SearchBarInputAutoFocusContext = createContext(false);
+const SearchBarExpandedDismissContext = createContext<(() => void) | null>(null);
 
-function ExpandedSearchInput({ children }: { children: ReactNode }) {
+function ExpandedSearchInput({
+  children,
+  onDismiss,
+}: {
+  children: ReactNode;
+  onDismiss: () => void;
+}) {
   return (
-    <SearchBarInputAutoFocusContext.Provider value>
-      {children}
-    </SearchBarInputAutoFocusContext.Provider>
+    <SearchBarExpandedDismissContext.Provider value={onDismiss}>
+      <SearchBarInputAutoFocusContext.Provider value>
+        {children}
+      </SearchBarInputAutoFocusContext.Provider>
+    </SearchBarExpandedDismissContext.Provider>
   );
 }
 
@@ -77,6 +86,7 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
       disabled,
       readOnly,
       required,
+      onKeyDownCapture,
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy,
       'aria-describedby': ariaDescribedBy,
@@ -85,6 +95,7 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
     forwardedRef,
   ) {
     const expandedAutoFocus = useContext(SearchBarInputAutoFocusContext);
+    const expandedDismiss = useContext(SearchBarExpandedDismissContext);
     const shouldAutoFocus = props.autoFocus ?? expandedAutoFocus;
     const setRef = (node: HTMLInputElement | null) => {
       if (!expandedAutoFocus && state?.triggerRef) {
@@ -126,6 +137,22 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
             type="search"
             className="search-bar__input"
             autoFocus={shouldAutoFocus}
+            onKeyDownCapture={(event) => {
+              onKeyDownCapture?.(event);
+              if (
+                event.key === 'Escape'
+                && expandedDismiss
+                && !event.defaultPrevented
+              ) {
+                // RAC SearchField intentionally consumes Escape to clear a
+                // non-empty query. Material expanded search dismisses the
+                // search view instead, so intercept Escape locally before the
+                // SearchField shortcut without restoring document listeners.
+                event.preventDefault();
+                event.stopPropagation();
+                expandedDismiss();
+              }
+            }}
             onFocus={(event) => {
               props.onFocus?.(event);
               state?.expand();
@@ -228,6 +255,10 @@ export function ExpandedDockedSearchBar({
 }: ExpandedDockedSearchBarProps) {
   const themePortalContainer = useThemePortalContainer();
   const triggerRef = useDockedSearchTriggerRef(state);
+  const dismiss = () => {
+    state.collapse();
+    onDismiss?.();
+  };
 
   return (
     <AriaPopover
@@ -235,13 +266,11 @@ export function ExpandedDockedSearchBar({
       triggerRef={triggerRef}
       isOpen={state.isExpanded}
       placement="bottom start"
+      isNonModal
       offset={8}
       UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
-        if (!open) {
-          state.collapse();
-          onDismiss?.();
-        }
+        if (!open) dismiss();
       }}
       data-elevation={searchViewTokens.containerElevation}
       data-state="expanded"
@@ -249,7 +278,7 @@ export function ExpandedDockedSearchBar({
       style={{ ...getSearchViewStyle('docked'), ...(style as CSSProperties | undefined) }}
     >
       <div className="search-view__header">
-        <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+        <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
       </div>
       <div className="search-view__results">{children}</div>
     </AriaPopover>
@@ -277,6 +306,10 @@ export function ExpandedDockedSearchBarWithGap({
 }: ExpandedDockedSearchBarWithGapProps) {
   const themePortalContainer = useThemePortalContainer();
   const triggerRef = useDockedSearchTriggerRef(state);
+  const dismiss = () => {
+    state.collapse();
+    onDismiss?.();
+  };
   const overrides = {
     ...(dropdownGap === undefined ? {} : { '--_search-view-gap': cssLength(dropdownGap) }),
   } as CSSProperties & Record<`--${string}`, string | number>;
@@ -290,13 +323,11 @@ export function ExpandedDockedSearchBarWithGap({
       triggerRef={triggerRef}
       isOpen={state.isExpanded}
       placement="bottom start"
+      isNonModal
       offset={0}
       UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
-        if (!open) {
-          state.collapse();
-          onDismiss?.();
-        }
+        if (!open) dismiss();
       }}
       data-state="expanded"
       className={join('search-view', 'search-view--docked-gap', className)}
@@ -315,7 +346,7 @@ export function ExpandedDockedSearchBarWithGap({
         className="search-view__header elevation-host"
         data-elevation={searchViewTokens.containerElevation}
       >
-        <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+        <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
       </div>
       <div
         className="search-view__docked-dropdown elevation-host"
@@ -348,6 +379,10 @@ function FullScreenSearchSurface({
   ...props
 }: FullScreenSearchSurfaceProps) {
   const themePortalContainer = useThemePortalContainer();
+  const dismiss = () => {
+    state.collapse();
+    onDismiss?.();
+  };
 
   return (
     <AriaModalOverlay
@@ -355,10 +390,7 @@ function FullScreenSearchSurface({
       isDismissable={isDismissable}
       UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
-        if (!open) {
-          state.collapse();
-          onDismiss?.();
-        }
+        if (!open) dismiss();
       }}
       className="search-view-overlay"
     >
@@ -382,10 +414,10 @@ function FullScreenSearchSurface({
             <div className="search-view__header">
               {contained ? (
                 <div className="search-view__contained-bar">
-                  <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+                  <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
                 </div>
               ) : (
-                <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
+                <ExpandedSearchInput onDismiss={dismiss}>{inputField}</ExpandedSearchInput>
               )}
             </div>
             <div className="search-view__results">{children}</div>
