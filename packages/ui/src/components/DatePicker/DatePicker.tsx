@@ -344,16 +344,16 @@ function YearOption({
   selected,
   selectedRef,
   label,
-  onAction,
+  onPressEnd,
 }: {
   id: Key;
   selected: boolean;
   selectedRef: RefObject<HTMLDivElement | null>;
   label: string;
-  onAction: () => void;
+  onPressEnd: () => void;
 }) {
   const ripple = useRipple();
-  const ripplePressProps = ripple.getPressProps();
+  const ripplePressProps = ripple.getPressProps({ onPressEnd });
   return (
     <AriaListBoxItem
       {...ripplePressProps}
@@ -361,7 +361,6 @@ function YearOption({
       ref={selected ? selectedRef : undefined}
       textValue={label}
       className="date-picker__year"
-      onAction={onAction}
     >
       {(renderProps) => (
         <>
@@ -418,7 +417,7 @@ function YearPicker({ yearRange, onClose }: {
                 selected={picker.value === item.id}
                 selectedRef={selectedRef}
                 label={item.formatted}
-                onAction={onClose}
+                onPressEnd={onClose}
               />
             )}
           </AriaListBox>
