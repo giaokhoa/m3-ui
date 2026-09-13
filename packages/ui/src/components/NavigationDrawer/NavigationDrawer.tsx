@@ -19,7 +19,6 @@ import {
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   getDismissibleDrawerSheetStyle,
   getModalDrawerSheetStyle,
@@ -502,7 +501,6 @@ export function ModalNavigationDrawer({
   const drawerState = state ?? internalState;
   useSyncExternalStore(drawerState.subscribe, drawerState.getSnapshot, drawerState.getSnapshot);
 
-  const themePortalContainer = useThemePortalContainer();
   const frameRef = useRef<HTMLElement>(null);
   const [keepOverlayMounted, setKeepOverlayMounted] = useState(drawerState.isOpen);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -585,9 +583,7 @@ export function ModalNavigationDrawer({
         onOpenChange={(open) => {
           if (!open) drawerState.close();
         }}
-        UNSTABLE_portalContainer={
-          UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
-        }
+        UNSTABLE_portalContainer={UNSTABLE_portalContainer}
         className="modal-navigation-drawer-overlay"
         data-dragging={gesture.isDragging || undefined}
         data-state={drawerState.currentValue}

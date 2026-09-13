@@ -26,7 +26,6 @@ import {
   type TooltipProps as AriaTooltipProps,
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   getPlainTooltipStyle,
   getRichTooltipStyle,
@@ -136,7 +135,6 @@ export function PlainTooltip({
   UNSTABLE_portalContainer,
   ...props
 }: PlainTooltipProps) {
-  const themePortalContainer = useThemePortalContainer();
 
   return (
     <AriaTooltip
@@ -145,9 +143,7 @@ export function PlainTooltip({
       dir={dir}
       placement={resolvedTooltipPlacement(placement, dir)}
       offset={offset}
-      UNSTABLE_portalContainer={
-        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
-      }
+      UNSTABLE_portalContainer={UNSTABLE_portalContainer}
       className={(renderProps) => {
         const userClassName =
           typeof className === 'function' ? className(renderProps) : className;
@@ -328,7 +324,6 @@ export function RichTooltip({
   const persistence = useContext(RichTooltipPersistenceContext);
   const overlayState = useContext(OverlayTriggerStateContext);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const themePortalContainer = useThemePortalContainer();
 
   if (!overlayState) {
     throw new Error('RichTooltip must be rendered inside RichTooltipTrigger.');
@@ -377,9 +372,7 @@ export function RichTooltip({
         };
         return render ? render(popoverProps, renderProps) : <div {...popoverProps} />;
       }}
-      UNSTABLE_portalContainer={
-        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
-      }
+      UNSTABLE_portalContainer={UNSTABLE_portalContainer}
       aria-label={dialogLabel}
       aria-labelledby={labelledBy}
       aria-describedby={title ? textId : undefined}

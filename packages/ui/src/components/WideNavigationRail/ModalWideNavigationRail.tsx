@@ -14,7 +14,6 @@ import {
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { Scrim } from '../Scrim';
 import {
   WideNavigationRail,
@@ -112,7 +111,6 @@ export function ModalWideNavigationRail({
     railState.getSnapshot,
   );
 
-  const themePortalContainer = useThemePortalContainer();
   const expanded = railState.targetValue === WideNavigationRailValue.Expanded;
   const [collapsedRailState] = useState(
     () =>
@@ -333,9 +331,7 @@ export function ModalWideNavigationRail({
         onOpenChange={(open) => {
           if (!open && shouldDismissOnEscape) railState.collapse();
         }}
-        UNSTABLE_portalContainer={
-          UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
-        }
+        UNSTABLE_portalContainer={UNSTABLE_portalContainer}
         className="modal-wide-navigation-rail-overlay"
         data-dragging={dragOffset !== null || undefined}
         data-expanded={visualExpanded || undefined}

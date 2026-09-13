@@ -11,7 +11,6 @@ import {
   Text as AriaText,
 } from 'react-aria-components';
 import { Elevation, type ElevationLevel } from '../../internal/elevation';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { TextButton, type ButtonProps } from '../Button';
 import { getDialogOverlayStyle, getDialogStyle, type DialogOverlayStyleOptions, type DialogStyleOptions } from './Dialog.defaults';
 import './dialog.css';
@@ -46,12 +45,11 @@ export function DialogOverlay({
   UNSTABLE_portalContainer,
   ...props
 }: DialogOverlayProps) {
-  const themePortalContainer = useThemePortalContainer();
   return (
     <AriaModalOverlay
       {...props}
       isDismissable={isDismissable}
-      UNSTABLE_portalContainer={UNSTABLE_portalContainer ?? themePortalContainer ?? undefined}
+      UNSTABLE_portalContainer={UNSTABLE_portalContainer}
       className={(renderProps) => {
         const userClassName = typeof className === 'function' ? className(renderProps) : className;
         return clsx('dialog-overlay', userClassName);
