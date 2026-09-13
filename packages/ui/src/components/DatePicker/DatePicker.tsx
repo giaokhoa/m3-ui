@@ -24,6 +24,8 @@ import {
   DateSegment,
   I18nProvider,
   Label,
+  ListBox as AriaListBox,
+  ListBoxItem as AriaListBoxItem,
   RangeCalendar as AriaRangeCalendar,
   RangeCalendarStateContext,
 } from 'react-aria-components';
@@ -337,29 +339,25 @@ function CalendarNavigation({
 }
 
 function YearOption({
+  id,
   selected,
   selectedRef,
   label,
-  onPress,
 }: {
+  id: string | number;
   selected: boolean;
-  selectedRef: RefObject<HTMLButtonElement | null>;
-  label: ReactNode;
-  onPress: () => void;
+  selectedRef: RefObject<HTMLDivElement | null>;
+  label: string;
 }) {
   const ripple = useRipple();
   const ripplePressProps = ripple.getPressProps();
   return (
-    <AriaButton
+    <AriaListBoxItem
       {...ripplePressProps}
-      slot={null}
+      id={id}
       ref={selected ? selectedRef : undefined}
+      textValue={label}
       className="date-picker__year"
-      data-selected={selected || undefined}
-      render={(domProps) => (
-        <button {...domProps} role="option" aria-selected={selected} />
-      )}
-      onPress={onPress}
     >
       {(renderProps) => (
         <>
@@ -374,43 +372,55 @@ function YearOption({
           <span className="date-picker__year-label">{label}</span>
         </>
       )}
-    </AriaButton>
+    </AriaListBoxItem>
   );
 }
 
-function YearPicker({ yearRange, onChoose, onClose }: {
+function YearPicker({ yearRange, onClose }: {
   yearRange: readonly [number, number];
-  onChoose: (value: DatePickerDate) => void;
   onClose: () => void;
 }) {
-  const selectedRef = useRef<HTMLButtonElement>(null);
+  const selectedRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     selectedRef.current?.scrollIntoView({ block: 'center' });
   }, []);
   const visibleYears = Math.max(20, (yearRange[1] - yearRange[0] + 1) * 2 + 1);
   return (
     <AriaCalendarYearPicker visibleYears={visibleYears}>
-      {(picker) => (
-        <div className="date-picker__year-picker" role="listbox" aria-label="Choose year" data-testid="date-picker-year-picker">
-          {picker.items
-            .filter((item) => item.date.year >= yearRange[0] && item.date.year <= yearRange[1])
-            .map((item) => {
-              const selected = picker.value === item.id;
-              return (
-                <YearOption
-                  key={item.id}
-                  selected={selected}
-                  selectedRef={selectedRef}
-                  label={item.formatted}
-                  onPress={() => {
-                    onChoose(item.date.toString());
-                    onClose();
-                  }}
-                />
-              );
-            })}
-        </div>
-      )}
+      {(picker) => {
+        const items = picker.items.filter(
+          (item) => item.date.year >= yearRange[0] && item.date.year <= yearRange[1],
+        );
+        return (
+          <AriaListBox
+            aria-label="Choose year"
+            className="date-picker__year-picker"
+            data-testid="date-picker-year-picker"
+            items={items}
+            layout="grid"
+            selectionMode="single"
+            selectionBehavior="toggle"
+            selectedKeys={[picker.value]}
+            disallowEmptySelection
+            onSelectionChange={(selection) => {
+              if (selection === 'all') return;
+              const key = selection.values().next().value;
+              if (key === undefined || key === picker.value) return;
+              picker.onChange(key);
+              onClose();
+            }}
+          >
+            {(item) => (
+              <YearOption
+                id={item.id}
+                selected={picker.value === item.id}
+                selectedRef={selectedRef}
+                label={item.formatted}
+              />
+            )}
+          </AriaListBox>
+        );
+      }}
     </AriaCalendarYearPicker>
   );
 }
@@ -546,7 +556,7 @@ function SingleCalendarBody(props: CalendarBodyBase & { value: DatePickerDate | 
       <CalendarSync value={props.value} displayedMonth={props.displayedMonth} isRange={false} />
       <CalendarNavigation yearRange={props.yearRange} displayedMonth={props.displayedMonth} locale={props.locale} onToggleYears={() => setShowYears((v) => !v)} />
       <div hidden={showYears}><DateGrid /></div>
-      {showYears && <YearPicker yearRange={props.yearRange} onChoose={props.onDisplayedMonthChange} onClose={() => setShowYears(false)} />}
+      {showYears && <YearPicker yearRange={props.yearRange} onClose={() => setShowYears(false)} />}
     </AriaCalendar>
   );
 }
@@ -566,7 +576,7 @@ function RangeCalendarBody(props: CalendarBodyBase & { value: DatePickerRangeVal
       <CalendarSync value={props.value} displayedMonth={props.displayedMonth} isRange />
       <CalendarNavigation yearRange={props.yearRange} displayedMonth={props.displayedMonth} locale={props.locale} onToggleYears={() => setShowYears((v) => !v)} />
       <div hidden={showYears}><DateGrid /></div>
-      {showYears && <YearPicker yearRange={props.yearRange} onChoose={props.onDisplayedMonthChange} onClose={() => setShowYears(false)} />}
+      {showYears && <YearPicker yearRange={props.yearRange} onClose={() => setShowYears(false)} />}
     </AriaRangeCalendar>
   );
 }

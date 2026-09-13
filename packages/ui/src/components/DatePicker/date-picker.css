@@ -133,7 +133,7 @@
   padding: 8px 24px 24px;
   animation: date-picker-year-enter var(--_date-picker-effects-in-duration) var(--_date-picker-effects-in-easing) both;
 }
-.date-picker__year { position: relative; min-block-size: 36px; overflow: hidden; border: 0; border-radius: 999px; background: transparent; color: var(--on-surface-variant); cursor: pointer; font-family: var(--_date-picker-body-font-family); font-size: var(--_date-picker-body-font-size); --ripple-color: currentColor; }
+.date-picker__year { position: relative; display: flex; box-sizing: border-box; min-block-size: 36px; align-items: center; justify-content: center; overflow: hidden; border: 0; border-radius: 999px; padding: 0; background: transparent; color: var(--on-surface-variant); cursor: pointer; font-family: var(--_date-picker-body-font-family); font-size: var(--_date-picker-body-font-size); --ripple-color: currentColor; }
 .date-picker__year[data-selected] { background: var(--primary); color: var(--on-primary); }
 .date-picker__year-label { position: relative; z-index: 1; }
 

@@ -120,6 +120,26 @@ test.describe('Material 3 DatePicker browser contract', () => {
     await expect(calendar.locator('.date-picker__month-heading')).toContainText('2027');
   });
 
+  test('year chooser delegates grid keyboard navigation and selection to RAC', async ({ page }) => {
+    await openStory(page, 'components-datepicker--calendar');
+    const calendar = page.getByTestId('date-picker');
+    await calendar.getByRole('button', { name: 'Choose year' }).click();
+
+    const listbox = calendar.getByRole('listbox', { name: 'Choose year' });
+    const current = listbox.getByRole('option', { name: '2026' });
+    const next = listbox.getByRole('option', { name: '2027' });
+    await current.focus();
+    await expect(current).toBeFocused();
+
+    await page.keyboard.press('ArrowRight');
+    await expect(current).toHaveAttribute('aria-selected', 'true');
+    await expect(next).toHaveAttribute('data-focused', 'true');
+    await page.keyboard.press('Enter');
+
+    await expect(calendar.locator('.date-picker__month-heading')).toContainText('2027');
+    await expect(listbox).toBeHidden();
+  });
+
   test('keyboard calendar navigation moves and selects the adjacent date', async ({ page }) => {
     await openStory(page, 'components-datepicker--controlled');
     const selected = page.locator('.date-picker__cell[data-selected]');
