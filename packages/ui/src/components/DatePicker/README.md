@@ -25,6 +25,8 @@ That host-paint arrangement is an implementation detail, not the semantic DatePi
 
 Calendar/date state, year-range validation, locale formatting, React Aria focus/selection state, month navigation, year chooser behavior, display-mode transitions, and reduced-motion behavior remain runtime concerns. Elevation work should preserve those observable mechanics rather than freeze the current wrapper/root structure.
 
+The year chooser composes React Aria `CalendarYearPicker` with a `ListBox`/`ListBoxItem` grid. `CalendarYearPicker` owns the available year items and selected key, while the ListBox owns option semantics, focus, keyboard navigation, and selection behavior. Material code supplies only the three-column presentation, Ripple paint, selected styling, scroll-to-current-year behavior, and closing the chooser after an item action; do not hand-author `role="listbox"`/`role="option"` or a parallel year-navigation state machine.
+
 Modal DatePicker remains semantically `level0` even in isolated stories; the standalone story does not change its role as dialog content. Docked DatePicker remains canonical `level3` unless the Material/token source changes.
 
 ## CSS packaging
