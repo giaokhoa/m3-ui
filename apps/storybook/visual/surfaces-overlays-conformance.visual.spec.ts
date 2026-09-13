@@ -79,7 +79,9 @@ test.describe('Material 3 Lane 5 shared conformance', () => {
     await sheetTrigger.click();
     const sheet = page.getByTestId('theme-modal-sheet');
     await expect(sheet).toHaveAttribute('data-state', 'partially-expanded');
-    await expect(page.getByRole('dialog', { name: 'Dynamic sheet' })).toBeVisible();
+    const sheetDialog = page.getByRole('dialog', { name: 'Dynamic sheet' });
+    await expect(sheetDialog).toBeVisible();
+    await expect(sheetDialog).toBeFocused();
 
     const sheetPortal = page.locator(themePortalSelector).filter({ has: sheet });
     await expect(sheetPortal).toHaveCount(1);

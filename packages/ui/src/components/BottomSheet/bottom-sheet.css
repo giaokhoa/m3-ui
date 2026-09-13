@@ -110,6 +110,17 @@
 
 .modal-bottom-sheet-modal { display: contents; }
 
+.modal-bottom-sheet-dialog {
+  position: absolute;
+  inset: 0;
+  outline: none;
+  pointer-events: none;
+}
+
+.modal-bottom-sheet-dialog > .bottom-sheet:not([data-state='hidden']) {
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bottom-sheet,
   .bottom-sheet[data-ready]:not([data-dragging]),

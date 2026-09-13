@@ -95,10 +95,16 @@ test.describe('Material 3 NavigationDrawer browser contract', () => {
     await opener.click();
     const overlay = page.locator('.modal-navigation-drawer-overlay');
     const sheet = page.getByTestId('modal-drawer-sheet');
+    const dialog = page.getByRole('dialog', { name: 'Navigation menu' });
     const firstItem = page.getByTestId('drawer-item-home');
+    const lastItem = page.getByTestId('drawer-item-favorites');
     await expect(overlay).toBeVisible();
     await waitForDrawerMotion(page);
+    await expect(dialog).toBeFocused();
+    await page.keyboard.press('Tab');
     await expect(firstItem).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(lastItem).toBeFocused();
 
     const visual = await sheet.evaluate((element) => {
       const style = getComputedStyle(element);
