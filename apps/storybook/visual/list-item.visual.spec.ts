@@ -68,18 +68,55 @@ test.describe('Material 3 ListItem browser contract', () => {
     await expect(item.locator('.list-item__supporting')).toHaveText('Pressed 1 times');
   });
 
-  test('single selection uses radio semantics and arrow-key selection in a group', async ({ page }) => {
+  test('single selection delegates radio semantics and arrow-key selection to RAC', async ({ page }) => {
     await openStory(page, 'components-listitem--single-selection');
-    const alpha = page.getByTestId('single-alpha');
-    const beta = page.getByTestId('single-beta');
-    await expect(alpha).toHaveAttribute('role', 'radio');
-    await expect(alpha).toHaveAttribute('aria-checked', 'true');
-    await expect(beta).toHaveAttribute('aria-checked', 'false');
+    const alpha = page.getByRole('radio', { name: 'alpha' });
+    const beta = page.getByRole('radio', { name: 'beta' });
+    await expect(alpha).toBeChecked();
+    await expect(beta).not.toBeChecked();
     await alpha.focus();
     await page.keyboard.press('ArrowDown');
     await expect(beta).toBeFocused();
-    await expect(beta).toHaveAttribute('aria-checked', 'true');
+    await expect(beta).toBeChecked();
+    await expect(page.getByTestId('single-beta')).toHaveAttribute('data-selected', 'true');
     await expect(page.getByTestId('single-selection-value')).toHaveText('Selected: beta');
+  });
+
+  test('single selection skips disabled radios using RAC navigation', async ({ page }) => {
+    await openStory(page, 'components-listitem--single-selection-disabled');
+    const alpha = page.getByRole('radio', { name: 'alpha' });
+    const beta = page.getByRole('radio', { name: 'beta' });
+    const gamma = page.getByRole('radio', { name: 'gamma' });
+
+    await expect(beta).toBeDisabled();
+    await alpha.focus();
+    await page.keyboard.press('ArrowDown');
+
+    await expect(gamma).toBeFocused();
+    await expect(gamma).toBeChecked();
+    await expect(page.getByTestId('single-disabled-value')).toHaveText('Selected: gamma');
+  });
+
+  test('single selection follows RAC RTL arrow semantics', async ({ browser }) => {
+    const context = await browser.newContext({
+      baseURL: 'http://127.0.0.1:6006',
+      colorScheme: 'light',
+      locale: 'ar-EG',
+      reducedMotion: 'no-preference',
+      viewport: { width: 1024, height: 768 },
+    });
+    const page = await context.newPage();
+    await openStory(page, 'components-listitem--single-selection-rtl');
+    const alpha = page.getByRole('radio', { name: 'alpha' });
+    const beta = page.getByRole('radio', { name: 'beta' });
+
+    await beta.focus();
+    await page.keyboard.press('ArrowRight');
+
+    await expect(alpha).toBeFocused();
+    await expect(alpha).toBeChecked();
+    await expect(page.getByTestId('single-rtl-value')).toHaveText('Selected: alpha');
+    await context.close();
   });
 
   test('multi selection uses checkbox semantics and toggles checked state', async ({ page }) => {
@@ -180,18 +217,21 @@ test.describe('Material 3 ListItem browser contract', () => {
     });
   });
 
-  test('segmented single selection preserves radio roving-focus behavior', async ({ page }) => {
+  test('segmented single selection preserves RAC radio roving-focus behavior', async ({ page }) => {
     await openStory(page, 'components-listitem--segmented-single-selection');
-    const alpha = page.getByTestId('segmented-single-alpha');
-    const beta = page.getByTestId('segmented-single-beta');
+    const alpha = page.getByRole('radio', { name: 'alpha' });
+    const beta = page.getByRole('radio', { name: 'beta' });
 
-    await expect(alpha).toHaveAttribute('role', 'radio');
-    await expect(alpha).toHaveAttribute('aria-checked', 'true');
+    await expect(alpha).toBeChecked();
     await alpha.focus();
     await page.keyboard.press('ArrowDown');
 
     await expect(beta).toBeFocused();
-    await expect(beta).toHaveAttribute('aria-checked', 'true');
+    await expect(beta).toBeChecked();
+    await expect(page.getByTestId('segmented-single-beta')).toHaveAttribute(
+      'data-selected',
+      'true',
+    );
     await expect(page.getByTestId('segmented-single-value')).toHaveText(
       'Selected: beta',
     );

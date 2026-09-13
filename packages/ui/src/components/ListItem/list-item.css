@@ -64,7 +64,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.list-item--interactive:disabled {
+.list-item--interactive:disabled,
+.list-item--interactive[data-disabled] {
   cursor: default;
 }
 
@@ -157,7 +158,8 @@
   );
 }
 
-.list-item--interactive:focus-visible {
+.list-item--interactive:focus-visible,
+.list-item--interactive[data-focus-visible] {
   outline: var(--_list-item-focus-indicator-thickness) solid var(--_list-item-focus-indicator-color);
   outline-offset: var(--_list-item-focus-indicator-outline-offset);
 }

@@ -2,16 +2,17 @@ import '@m3-ui/tokens/elevation.css';
 import '@m3-ui/tokens/list-item.css';
 import clsx from 'clsx';
 import {
-  createContext,
-  useContext,
   type CSSProperties,
   type HTMLAttributes,
-  type KeyboardEvent,
   type ReactNode,
 } from 'react';
 import {
   Button as AriaButton,
+  Radio as AriaRadio,
+  RadioGroup as AriaRadioGroup,
   type ButtonProps as AriaButtonProps,
+  type RadioGroupProps as AriaRadioGroupProps,
+  type RadioProps as AriaRadioProps,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
@@ -52,8 +53,9 @@ export interface ActionListItemProps extends CommonListItemProps {
 
 export interface SingleSelectionListItemProps extends CommonListItemProps {
   selectionMode: 'single';
-  selected: boolean;
-  onPress: NonNullable<AriaButtonProps['onPress']>;
+  value: string;
+  onPress?: AriaRadioProps['onPress'];
+  selected?: never;
   onSelectionChange?: never;
 }
 
@@ -91,78 +93,29 @@ export function SegmentedListItemGroup({
 }
 
 export interface ListItemSelectionGroupProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<AriaRadioGroupProps, 'children' | 'className'> {
   children: ReactNode;
   variant?: 'standard' | 'segmented';
+  className?: string;
 }
-
-const SingleSelectionGroupContext = createContext(false);
 
 export function ListItemSelectionGroup({
   children,
   variant = 'standard',
   className,
-  onKeyDown,
   ...props
 }: ListItemSelectionGroupProps) {
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    if (
-      ![
-        'ArrowDown',
-        'ArrowUp',
-        'ArrowLeft',
-        'ArrowRight',
-        'Home',
-        'End',
-      ].includes(event.key)
-    ) {
-      return;
-    }
-
-    const items = Array.from(
-      event.currentTarget.querySelectorAll<HTMLButtonElement>(
-        '[role="radio"]:not([disabled])',
-      ),
-    );
-    if (items.length === 0) return;
-    const current = document.activeElement as HTMLButtonElement | null;
-    const currentIndex = current ? items.indexOf(current) : -1;
-    let nextIndex = currentIndex;
-
-    if (event.key === 'Home') nextIndex = 0;
-    else if (event.key === 'End') nextIndex = items.length - 1;
-    else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-      nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % items.length;
-    } else {
-      nextIndex =
-        currentIndex < 0
-          ? items.length - 1
-          : (currentIndex - 1 + items.length) % items.length;
-    }
-
-    event.preventDefault();
-    const next = items[nextIndex];
-    next?.focus();
-    next?.click();
-  };
-
   return (
-    <SingleSelectionGroupContext.Provider value>
-      <div
-        {...props}
-        className={clsx(
-          'list-item-selection-group',
-          variant === 'segmented' && 'list-item-selection-group--segmented',
-          className,
-        )}
-        role="radiogroup"
-        onKeyDown={handleKeyDown}
-      >
-        {children}
-      </div>
-    </SingleSelectionGroupContext.Provider>
+    <AriaRadioGroup
+      {...props}
+      className={clsx(
+        'list-item-selection-group',
+        variant === 'segmented' && 'list-item-selection-group--segmented',
+        className,
+      )}
+    >
+      {children}
+    </AriaRadioGroup>
   );
 }
 
@@ -243,11 +196,11 @@ export function ListItem(props: ListItemProps) {
     overline,
     supportingText,
   );
-  const selected = 'selected' in props ? Boolean(props.selected) : false;
   const selectionMode: ListItemSelectionMode | undefined =
     'selectionMode' in props ? props.selectionMode : undefined;
-  const inSingleSelectionGroup = useContext(SingleSelectionGroupContext);
-  const interactive = 'onPress' in props || selectionMode === 'multiple';
+  const selected =
+    selectionMode === 'multiple' ? Boolean(props.selected) : false;
+  const interactive = 'onPress' in props || selectionMode != null;
   const elevationLevel = getListItemElevationLevel(isDragged);
 
   if (!interactive) {
@@ -276,6 +229,43 @@ export function ListItem(props: ListItemProps) {
 
   const ripple = useRipple({ origin: 'press' });
   const ripplePressProps = ripple.getPressProps();
+
+  if ('selectionMode' in props && props.selectionMode === 'single') {
+    return (
+      <AriaRadio
+        {...ripplePressProps}
+        aria-label={ariaLabel}
+        className={clsx(
+          'list-item',
+          'list-item--interactive',
+          'elevation-host',
+          className,
+        )}
+        data-dragged={isDragged || undefined}
+        data-elevation={elevationLevel}
+        data-lines={lineCount}
+        data-testid={testId}
+        isDisabled={isDisabled}
+        onPress={props.onPress}
+        style={style}
+        value={props.value}
+      >
+        {(renderProps) => (
+          <ListItemContent
+            children={children}
+            leading={leading}
+            trailing={trailing}
+            overline={overline}
+            supportingText={supportingText}
+            ripple={ripple}
+            isFocusVisible={renderProps.isFocusVisible}
+            isHovered={renderProps.isHovered}
+          />
+        )}
+      </AriaRadio>
+    );
+  }
+
   const suppliedOnPress = 'onPress' in props ? props.onPress : undefined;
   const handlePress: AriaButtonProps['onPress'] = (event) => {
     if (
@@ -307,19 +297,9 @@ export function ListItem(props: ListItemProps) {
       onPress={handlePress}
       render={(domProps) => {
         const semantics =
-          selectionMode === 'single'
-            ? {
-                role: 'radio' as const,
-                'aria-checked': selected,
-                tabIndex: inSingleSelectionGroup
-                  ? selected
-                    ? 0
-                    : -1
-                  : domProps.tabIndex,
-              }
-            : selectionMode === 'multiple'
-              ? { role: 'checkbox' as const, 'aria-checked': selected }
-              : {};
+          selectionMode === 'multiple'
+            ? { role: 'checkbox' as const, 'aria-checked': selected }
+            : {};
         return <button {...domProps} {...semantics} />;
       }}
       style={style}

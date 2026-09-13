@@ -66,9 +66,75 @@ export const SingleSelection: Story = {
     return (
       <Stage>
         <div data-testid="single-selection-value">Selected: {selected}</div>
-        <ListItemSelectionGroup aria-label="Single choice">
+        <ListItemSelectionGroup
+          aria-label="Single choice"
+          onChange={setSelected}
+          value={selected}
+        >
           {['alpha', 'beta', 'gamma'].map((value) => (
-            <ListItem key={value} data-testid={`single-${value}`} selectionMode="single" selected={selected === value} onPress={() => setSelected(value)} leading={personIcon}>{value}</ListItem>
+            <ListItem
+              key={value}
+              data-testid={`single-${value}`}
+              selectionMode="single"
+              value={value}
+              leading={personIcon}
+            >
+              {value}
+            </ListItem>
+          ))}
+        </ListItemSelectionGroup>
+      </Stage>
+    );
+  },
+};
+
+export const SingleSelectionDisabled: Story = {
+  render: () => {
+    const [selected, setSelected] = useState('alpha');
+    return (
+      <Stage>
+        <div data-testid="single-disabled-value">Selected: {selected}</div>
+        <ListItemSelectionGroup
+          aria-label="Single choice with disabled item"
+          onChange={setSelected}
+          value={selected}
+        >
+          <ListItem selectionMode="single" value="alpha" leading={personIcon}>
+            alpha
+          </ListItem>
+          <ListItem selectionMode="single" value="beta" isDisabled leading={personIcon}>
+            beta
+          </ListItem>
+          <ListItem selectionMode="single" value="gamma" leading={personIcon}>
+            gamma
+          </ListItem>
+        </ListItemSelectionGroup>
+      </Stage>
+    );
+  },
+};
+
+export const SingleSelectionRTL: Story = {
+  render: () => {
+    const [selected, setSelected] = useState('beta');
+    return (
+      <Stage dir="rtl">
+        <div data-testid="single-rtl-value">Selected: {selected}</div>
+        <ListItemSelectionGroup
+          aria-label="RTL single choice"
+          onChange={setSelected}
+          orientation="horizontal"
+          value={selected}
+        >
+          {['alpha', 'beta', 'gamma'].map((value) => (
+            <ListItem
+              key={value}
+              selectionMode="single"
+              value={value}
+              leading={personIcon}
+            >
+              {value}
+            </ListItem>
           ))}
         </ListItemSelectionGroup>
       </Stage>
@@ -100,6 +166,8 @@ export const SegmentedSingleSelection: Story = {
         <div data-testid="segmented-single-value">Selected: {selected}</div>
         <ListItemSelectionGroup
           aria-label="Segmented single choice"
+          onChange={setSelected}
+          value={selected}
           variant="segmented"
         >
           {['alpha', 'beta', 'gamma'].map((value) => (
@@ -107,8 +175,7 @@ export const SegmentedSingleSelection: Story = {
               key={value}
               data-testid={`segmented-single-${value}`}
               selectionMode="single"
-              selected={selected === value}
-              onPress={() => setSelected(value)}
+              value={value}
               leading={personIcon}
             >
               {value}

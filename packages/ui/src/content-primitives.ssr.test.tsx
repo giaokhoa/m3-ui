@@ -94,11 +94,15 @@ describe('Lane 4 content primitive SSR contracts', () => {
       <>
         <ListItem>Passive item</ListItem>
         <ListItem onPress={() => {}}>Action item</ListItem>
-        <ListItemSelectionGroup aria-label="Server selection" variant="segmented">
-          <ListItem selectionMode="single" selected onPress={() => {}}>
+        <ListItemSelectionGroup
+          aria-label="Server selection"
+          value="selected"
+          variant="segmented"
+        >
+          <ListItem selectionMode="single" value="selected">
             Selected item
           </ListItem>
-          <ListItem selectionMode="single" selected={false} onPress={() => {}}>
+          <ListItem selectionMode="single" value="other">
             Other item
           </ListItem>
         </ListItemSelectionGroup>
@@ -113,11 +117,12 @@ describe('Lane 4 content primitive SSR contracts', () => {
     expect(html).toContain('<button');
     expect(html).toContain('Action item');
     expect(html).toContain('role="radiogroup"');
-    expect(html).toContain('role="radio"');
+    expect(html).toContain('type="radio"');
     expect(html).toContain('Segmented passive item');
     expect(html).toContain('Segmented action item');
-    expect(html).toContain('aria-checked="true"');
-    expect(html).toContain('aria-checked="false"');
+    expect(html).toContain('checked=""');
+    expect(html).toContain('value="selected"');
+    expect(html).toContain('value="other"');
   });
 
   it('renders Badge content and both Divider orientations without interaction semantics', () => {
