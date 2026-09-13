@@ -3,19 +3,20 @@ import {
   createContext,
   forwardRef,
   useContext,
-  useEffect,
   useRef,
   type CSSProperties,
-  type FormEvent,
   type HTMLAttributes,
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react';
 import {
+  Button as AriaButton,
   Dialog as AriaDialog,
   Input as AriaInput,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
+  Popover as AriaPopover,
+  SearchField as AriaSearchField,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
 import { useThemePortalContainer } from '../../theme/ThemePortalContext';
@@ -42,7 +43,6 @@ function cssLength(value: string | number): string {
 // inputField may be composed through arbitrary wrappers while the actual
 // SearchBarInput still participates in React Aria's modal FocusScope.
 const SearchBarInputAutoFocusContext = createContext(false);
-const searchBarFocusReturnTargets = new WeakMap<() => void, HTMLElement>();
 
 function ExpandedSearchInput({ children }: { children: ReactNode }) {
   return (
@@ -75,84 +75,71 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarInputProps>(
       onSearch,
       className,
       disabled,
+      readOnly,
+      required,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
       ...props
     },
     forwardedRef,
   ) {
-    const localRef = useRef<HTMLInputElement | null>(null);
     const expandedAutoFocus = useContext(SearchBarInputAutoFocusContext);
     const shouldAutoFocus = props.autoFocus ?? expandedAutoFocus;
     const setRef = (node: HTMLInputElement | null) => {
-      localRef.current = node;
+      if (!expandedAutoFocus && state?.triggerRef) {
+        state.triggerRef.current = node;
+      }
       if (typeof forwardedRef === 'function') forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     };
-
-    // ModalOverlay is SSR-gated, so the expanded input may mount after its
-    // wrapper effects have already run. Own initial focus at the input mount
-    // itself before the dialog fallback decides whether it needs focus.
-    useEffect(() => {
-      if (!shouldAutoFocus || disabled) return;
-      localRef.current?.focus({ preventScroll: true });
-    }, [shouldAutoFocus, disabled]);
-
-    const submit = (event: FormEvent) => {
-      event.preventDefault();
-      onSearch?.(localRef.current?.value ?? '');
-    };
+    const searchValue = value == null ? undefined : String(value);
+    const initialSearchValue = defaultValue == null ? undefined : String(defaultValue);
 
     return (
       <form
         role="search"
         className={join('search-bar__input-shell', className)}
-        onSubmit={submit}
         data-disabled={disabled || undefined}
       >
-        {leadingIcon ? (
-          <span className="search-bar__icon search-bar__icon--leading" aria-hidden="true">
-            {leadingIcon}
-          </span>
-        ) : null}
-        <AriaInput
-          {...props}
-          ref={setRef}
-          type="search"
-          className="search-bar__input"
-          value={value}
-          defaultValue={defaultValue}
-          disabled={disabled}
-          autoFocus={shouldAutoFocus}
-          onFocus={(event) => {
-            props.onFocus?.(event);
-            if (state && !expandedAutoFocus) {
-              searchBarFocusReturnTargets.set(state.collapse, event.currentTarget);
-            }
-            state?.expand();
-          }}
-          onChange={(event) => onValueChange?.(event.currentTarget.value)}
-        />
-        {clearable && !disabled ? (
-          <button
-            type="button"
-            className="search-bar__clear"
-            aria-label="Clear search"
-            onClick={() => {
-              if (value !== undefined) onValueChange?.('');
-              else if (localRef.current) {
-                localRef.current.value = '';
-                onValueChange?.('');
-              }
-              localRef.current?.focus();
+        <AriaSearchField
+          className="search-bar__field"
+          value={searchValue}
+          defaultValue={initialSearchValue}
+          onChange={onValueChange}
+          onSubmit={onSearch}
+          isDisabled={disabled}
+          isReadOnly={readOnly}
+          isRequired={required}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+        >
+          {leadingIcon ? (
+            <span className="search-bar__icon search-bar__icon--leading" aria-hidden="true">
+              {leadingIcon}
+            </span>
+          ) : null}
+          <AriaInput
+            {...props}
+            ref={setRef}
+            type="search"
+            className="search-bar__input"
+            autoFocus={shouldAutoFocus}
+            onFocus={(event) => {
+              props.onFocus?.(event);
+              state?.expand();
             }}
-          >
-            ×
-          </button>
-        ) : null}
-        {trailingIcon ? (
-          <span className="search-bar__icon search-bar__icon--trailing" aria-hidden="true">
-            {trailingIcon}
-          </span>
-        ) : null}
+          />
+          {clearable && !disabled && !readOnly ? (
+            <AriaButton className="search-bar__clear">×</AriaButton>
+          ) : null}
+          {trailingIcon ? (
+            <span className="search-bar__icon search-bar__icon--trailing" aria-hidden="true">
+              {trailingIcon}
+            </span>
+          ) : null}
+        </AriaSearchField>
       </form>
     );
   },
@@ -223,38 +210,9 @@ interface ExpandedSearchBarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>
   onDismiss?: () => void;
 }
 
-function useDockedSearchDismiss(
-  root: React.RefObject<HTMLDivElement | null>,
-  state: SearchBarState,
-  onDismiss?: () => void,
-) {
-  useEffect(() => {
-    if (!state.isExpanded) return;
-
-    const dismiss = (restore: boolean) => {
-      const target = searchBarFocusReturnTargets.get(state.collapse);
-      if (restore && target?.isConnected) target.focus({ preventScroll: true });
-      searchBarFocusReturnTargets.delete(state.collapse);
-      state.collapse();
-      onDismiss?.();
-    };
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (root.current && !root.current.contains(event.target as Node)) {
-        dismiss(false);
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') dismiss(true);
-    };
-
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [root, state, onDismiss]);
+function useDockedSearchTriggerRef(state: SearchBarState) {
+  const fallbackTriggerRef = useRef<Element | null>(null);
+  return state.triggerRef ?? fallbackTriggerRef;
 }
 
 export type ExpandedDockedSearchBarProps = ExpandedSearchBarBaseProps;
@@ -268,14 +226,23 @@ export function ExpandedDockedSearchBar({
   onDismiss,
   ...props
 }: ExpandedDockedSearchBarProps) {
-  const root = useRef<HTMLDivElement | null>(null);
-  useDockedSearchDismiss(root, state, onDismiss);
+  const themePortalContainer = useThemePortalContainer();
+  const triggerRef = useDockedSearchTriggerRef(state);
 
-  if (!state.isExpanded) return null;
   return (
-    <div
+    <AriaPopover
       {...props}
-      ref={root}
+      triggerRef={triggerRef}
+      isOpen={state.isExpanded}
+      placement="bottom start"
+      offset={8}
+      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
+      onOpenChange={(open) => {
+        if (!open) {
+          state.collapse();
+          onDismiss?.();
+        }
+      }}
       data-elevation={searchViewTokens.containerElevation}
       data-state="expanded"
       className={join('search-view', 'search-view--docked', 'elevation-host', className)}
@@ -285,7 +252,7 @@ export function ExpandedDockedSearchBar({
         <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
       </div>
       <div className="search-view__results">{children}</div>
-    </div>
+    </AriaPopover>
   );
 }
 
@@ -308,10 +275,8 @@ export function ExpandedDockedSearchBarWithGap({
   dropdownScrimColor,
   ...props
 }: ExpandedDockedSearchBarWithGapProps) {
-  const root = useRef<HTMLDivElement | null>(null);
-  useDockedSearchDismiss(root, state, onDismiss);
-
-  if (!state.isExpanded) return null;
+  const themePortalContainer = useThemePortalContainer();
+  const triggerRef = useDockedSearchTriggerRef(state);
   const overrides = {
     ...(dropdownGap === undefined ? {} : { '--_search-view-gap': cssLength(dropdownGap) }),
   } as CSSProperties & Record<`--${string}`, string | number>;
@@ -320,37 +285,45 @@ export function ExpandedDockedSearchBarWithGap({
     : ({ '--_search-view-scrim-color': dropdownScrimColor } as CSSProperties & Record<`--${string}`, string | number>);
 
   return (
-    <>
+    <AriaPopover
+      {...props}
+      triggerRef={triggerRef}
+      isOpen={state.isExpanded}
+      placement="bottom start"
+      offset={0}
+      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
+      onOpenChange={(open) => {
+        if (!open) {
+          state.collapse();
+          onDismiss?.();
+        }
+      }}
+      data-state="expanded"
+      className={join('search-view', 'search-view--docked-gap', className)}
+      style={{
+        ...getSearchViewStyle('docked'),
+        ...overrides,
+        ...(style as CSSProperties | undefined),
+      }}
+    >
       <div
         className="search-view__docked-gap-scrim"
         aria-hidden="true"
         style={scrimStyle}
       />
       <div
-        {...props}
-        ref={root}
-        data-state="expanded"
-        className={join('search-view', 'search-view--docked-gap', className)}
-        style={{
-          ...getSearchViewStyle('docked'),
-          ...overrides,
-          ...(style as CSSProperties | undefined),
-        }}
+        className="search-view__header elevation-host"
+        data-elevation={searchViewTokens.containerElevation}
       >
-        <div
-          className="search-view__header elevation-host"
-          data-elevation={searchViewTokens.containerElevation}
-        >
-          <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
-        </div>
-        <div
-          className="search-view__docked-dropdown elevation-host"
-          data-elevation={searchViewTokens.containerElevation}
-        >
-          {children}
-        </div>
+        <ExpandedSearchInput>{inputField}</ExpandedSearchInput>
       </div>
-    </>
+      <div
+        className="search-view__docked-dropdown elevation-host"
+        data-elevation={searchViewTokens.containerElevation}
+      >
+        {children}
+      </div>
+    </AriaPopover>
   );
 }
 
