@@ -467,7 +467,6 @@ function FullScreenSearchSurface({
     <AriaModalOverlay
       isOpen={state.isExpanded}
       isDismissable={isDismissable}
-      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
         if (!open) dismiss();
       }}
