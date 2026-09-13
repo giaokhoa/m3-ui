@@ -35,7 +35,7 @@ React Aria remains the source of truth for hover, focus-visible, press and disab
 
 ## Segmented composition
 
-`SegmentedListItemGroup` is the presentation boundary for passive, action and multiple-selection rows. `ListItemSelectionGroup variant="segmented"` applies the same presentation while preserving the existing radiogroup/roving-focus contract for single selection. Neither path creates a second ListItem interaction engine.
+`SegmentedListItemGroup` is the presentation boundary for passive, action and multiple-selection rows. `ListItemSelectionGroup` is a React Aria `RadioGroup`, and `ListItem selectionMode="single"` is a React Aria `Radio`; controlled/uncontrolled value, radio ARIA, roving focus, arrow-key navigation, RTL and disabled-item behavior therefore stay RAC-owned. `variant="segmented"` applies the same Material presentation without creating a second ListItem interaction engine.
 
 The generated ListItem CSS owns `component.list.base.segmentedGap`, `itemSegmentedContainerColor`, `itemContainerExpressiveShape` and `containerShape`. DOM position provides first/middle/last/only idle geometry: the middle shape remains the expressive base shape while the list container shape overrides only the outer corners of the first/last item. Hover, focus-visible, press, selected and dragged states intentionally replace all four corners with their full state shape, matching `ListItemDefaults.segmentedShapes(index, count)` plus the normal ListItem interaction shape resolver.
 
