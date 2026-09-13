@@ -20,6 +20,21 @@ If token files, Style Dictionary, generated token output, token audits, or gener
 
 Read subsystem/component READMEs referenced by those skills before editing the corresponding subsystem.
 
+## React Aria capability check
+
+For interaction, accessibility, focus, keyboard, press, selection, collection, overlay, drag-and-drop, or other generic web-behavior work in Material components, follow this order before introducing custom behavior:
+
+1. Read `.agents/skills/material3-parity/SKILL.md`; it remains authoritative for Material ownership, tokens, defaults, theme mapping, and Material-specific behavior.
+2. Restore/install the locked official React Aria skill when needed (`npx skills experimental_install`) and consult `.agents/skills/react-aria/SKILL.md` plus the current official Working with AI entrypoint: https://react-aria.adobe.com/ai.
+3. Use https://react-aria.adobe.com/llms.txt and the linked markdown docs to confirm current React Aria capabilities instead of relying on memory or older APIs.
+4. Prefer high-level React Aria Components when they can express the required DOM and behavior.
+5. When custom DOM is required, prefer the corresponding React Aria Hooks before writing lower-level keyboard/focus/press/overlay logic.
+6. Before adding a custom generic interaction state machine, document the concrete observable requirement that React Aria Components and Hooks cannot satisfy. A difference in implementation shape is not sufficient justification.
+
+The React Aria skill answers what RAC currently provides; the local Material parity skill answers how m3-ui maps Material semantics to the web. Do not duplicate or override Material ownership rules in React Aria guidance.
+
+React Aria's MCP server runs as `npx @react-aria/mcp@latest`. No MCP client configuration is committed in this repository: the upstream Codex setup is explicitly user-local in `~/.codex/config.toml`, CLI clients manage their own user configuration, and the generic upstream guidance states that the configuration file/schema depends on the client. Committing an editor-specific MCP file here would therefore not be repository-portable. Agents may configure the server locally in their supported client without committing credentials or user settings.
+
 ## Research-to-implementation workflow
 
 For research- or audit-driven work that leads to repository changes, use this issue/PR workflow before parallel implementation begins:
