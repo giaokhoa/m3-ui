@@ -151,7 +151,8 @@
 .docs-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  inline-size: min(100%, 1440px);
+  inline-size: 100%;
+  max-inline-size: 1760px;
   min-block-size: 100%;
   margin-inline: auto;
 }
@@ -165,10 +166,10 @@
 }
 
 .docs-main__inner {
-  inline-size: min(100%, 84ch);
+  inline-size: min(100%, 1120px);
   margin-inline: auto;
   padding-block: 32px 80px;
-  padding-inline: min(5vw, 40px);
+  padding-inline: clamp(16px, 4vw, 64px);
 }
 
 .docs-breadcrumbs {

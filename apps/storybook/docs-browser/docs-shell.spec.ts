@@ -45,50 +45,83 @@ async function assertPersistentDesktopGeometry(page: Page, showToc: boolean) {
   const rail = page.locator('.docs-global-navigation');
   const drawer = page.locator('.docs-permanent-drawer .docs-sidebar');
   const workspace = page.locator('.docs-permanent-drawer .docs-workspace');
+  const main = page.locator('.docs-permanent-drawer .docs-main');
   const mainInner = page.locator('.docs-permanent-drawer .docs-main__inner');
+  const article = page.locator('.docs-permanent-drawer .docs-article');
+  const prose = page.locator('.docs-permanent-drawer .docs-article > .docs-paragraph').first();
+  const wideExample = page.locator('.docs-permanent-drawer .docs-live-example').first();
 
   await expect(rail).toBeVisible();
   await expect(drawer).toBeVisible();
   await expect(workspace).toBeVisible();
+  await expect(main).toBeVisible();
   await expect(mainInner).toBeVisible();
+  await expect(article).toBeVisible();
+  await expect(prose).toBeVisible();
+  await expect(wideExample).toBeVisible();
 
-  const [railBox, drawerBox, workspaceBox, mainInnerBox] = await Promise.all([
+  const [
+    railBox,
+    drawerBox,
+    workspaceBox,
+    mainBox,
+    mainInnerBox,
+    articleBox,
+    proseBox,
+    wideExampleBox,
+  ] = await Promise.all([
     rail.boundingBox(),
     drawer.boundingBox(),
     workspace.boundingBox(),
+    main.boundingBox(),
     mainInner.boundingBox(),
+    article.boundingBox(),
+    prose.boundingBox(),
+    wideExample.boundingBox(),
   ]);
 
-  expect(railBox).not.toBeNull();
-  expect(drawerBox).not.toBeNull();
-  expect(workspaceBox).not.toBeNull();
-  expect(mainInnerBox).not.toBeNull();
+  for (const box of [
+    railBox,
+    drawerBox,
+    workspaceBox,
+    mainBox,
+    mainInnerBox,
+    articleBox,
+    proseBox,
+    wideExampleBox,
+  ]) {
+    expect(box).not.toBeNull();
+  }
 
   const railEnd = railBox!.x + railBox!.width;
   const drawerEnd = drawerBox!.x + drawerBox!.width;
+  const mainCenter = mainBox!.x + mainBox!.width / 2;
+  const innerCenter = mainInnerBox!.x + mainInnerBox!.width / 2;
 
   expect(
     Math.abs(drawerBox!.x - railEnd),
     'persistent contextual navigation should be adjacent to the global rail',
   ).toBeLessThanOrEqual(2);
+  expect(workspaceBox!.x).toBeGreaterThanOrEqual(drawerEnd - 2);
   expect(
-    Math.abs(workspaceBox!.x - drawerEnd),
-    'workspace should start at the contextual navigation edge',
+    Math.abs(innerCenter - mainCenter),
+    'primary docs content should stay balanced inside the available main pane',
   ).toBeLessThanOrEqual(2);
   expect(
-    Math.abs(mainInnerBox!.x - workspaceBox!.x),
-    'article column should stay anchored instead of re-centering in the remaining viewport',
-  ).toBeLessThanOrEqual(2);
-  expect(mainInnerBox!.width).toBeLessThanOrEqual(workspaceBox!.width);
+    articleBox!.width / mainBox!.width,
+    'primary docs content should use most of the available main pane',
+  ).toBeGreaterThanOrEqual(0.72);
+  expect(
+    wideExampleBox!.width - proseBox!.width,
+    'wide docs artifacts should not be constrained to the prose reading measure',
+  ).toBeGreaterThanOrEqual(96);
 
   if (showToc) {
     const toc = page.getByRole('complementary', { name: 'On this page' });
     await expect(toc).toBeVisible();
     const tocBox = await toc.boundingBox();
     expect(tocBox).not.toBeNull();
-    expect(tocBox!.x).toBeGreaterThanOrEqual(
-      mainInnerBox!.x + mainInnerBox!.width - 1,
-    );
+    expect(tocBox!.x).toBeGreaterThanOrEqual(mainBox!.x + mainBox!.width - 1);
     expect(tocBox!.x + tocBox!.width).toBeLessThanOrEqual(
       workspaceBox!.x + workspaceBox!.width + 1,
     );
@@ -178,7 +211,7 @@ test('expanded uses the global rail with contextual navigation on demand', async
   runtime.assertClean();
 });
 
-test('large desktop keeps persistent navigation adjacent to the article', async ({
+test('large desktop gives the primary article a balanced adaptive pane', async ({
   page,
 }, testInfo) => {
   const runtime = installRuntimeGuard(page);
@@ -199,7 +232,7 @@ test('large desktop keeps persistent navigation adjacent to the article', async 
   runtime.assertClean();
 });
 
-test('extra-large desktop adds an independent TOC without shifting the article', async ({
+test('extra-large desktop keeps a wide primary pane with an independent TOC', async ({
   page,
 }, testInfo) => {
   const runtime = installRuntimeGuard(page);
