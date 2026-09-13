@@ -88,7 +88,9 @@ test.describe('Material 3 ExposedDropdownMenu browser contract', () => {
   test('secondary trigger reports expanded state and returns focus to editable anchor contract', async ({ page }) => {
     await openStory(page, 'components-exposeddropdownmenu--secondary-trigger');
     const input = page.getByRole('combobox', { name: 'Density' });
-    const trigger = page.getByRole('button', { name: 'Toggle options' });
+    const trigger = page.locator('.exposed-dropdown-menu__secondary-trigger');
+    await expect(trigger).toHaveRole('button');
+    await expect(trigger).toHaveAccessibleName('Toggle options');
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(input).toBeFocused();
