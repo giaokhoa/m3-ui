@@ -19,7 +19,6 @@ import {
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import {
   bottomSheetRuntime,
   getBottomSheetElevationLevel,
@@ -533,7 +532,6 @@ export function ModalBottomSheet({
     throw new Error('ModalBottomSheet requires Hidden to be an enabled sheet value.');
   }
 
-  const themePortalContainer = useThemePortalContainer();
   const [overlayOpen, setOverlayOpen] = useState(true);
   const pendingDismissRef = useRef(false);
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -622,9 +620,7 @@ export function ModalBottomSheet({
       onOpenChange={(open) => {
         if (!open) requestDismiss();
       }}
-      UNSTABLE_portalContainer={
-        UNSTABLE_portalContainer ?? themePortalContainer ?? undefined
-      }
+      UNSTABLE_portalContainer={UNSTABLE_portalContainer}
       className="modal-bottom-sheet-overlay"
       style={getModalBottomSheetOverlayStyle({
         scrimColor,

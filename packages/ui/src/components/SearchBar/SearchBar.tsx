@@ -25,7 +25,6 @@ import {
   SearchField as AriaSearchField,
 } from 'react-aria-components';
 import '../../internal/elevation/elevation.css';
-import { useThemePortalContainer } from '../../theme/ThemePortalContext';
 import { clampScrollFraction } from '../TopAppBar/TopAppBar.defaults';
 import {
   appBarWithSearchTokens,
@@ -329,7 +328,6 @@ export function ExpandedDockedSearchBar({
   onDismiss,
   ...props
 }: ExpandedDockedSearchBarProps) {
-  const themePortalContainer = useThemePortalContainer();
   const {
     dismiss,
     overlayRef,
@@ -340,7 +338,7 @@ export function ExpandedDockedSearchBar({
   if (!state.isExpanded) return null;
 
   return (
-    <AriaOverlay portalContainer={themePortalContainer ?? undefined}>
+    <AriaOverlay>
       <FocusScope autoFocus restoreFocus>
         <div
           {...mergedProps}
@@ -385,7 +383,6 @@ export function ExpandedDockedSearchBarWithGap({
   dropdownScrimColor,
   ...props
 }: ExpandedDockedSearchBarWithGapProps) {
-  const themePortalContainer = useThemePortalContainer();
   const {
     dismiss,
     overlayRef,
@@ -402,7 +399,7 @@ export function ExpandedDockedSearchBarWithGap({
   if (!state.isExpanded) return null;
 
   return (
-    <AriaOverlay portalContainer={themePortalContainer ?? undefined}>
+    <AriaOverlay>
       <div
         className="search-view__docked-gap-scrim"
         aria-hidden="true"
@@ -461,7 +458,6 @@ function FullScreenSearchSurface({
   contained = false,
   ...props
 }: FullScreenSearchSurfaceProps) {
-  const themePortalContainer = useThemePortalContainer();
   const dismiss = () => {
     state.collapse();
     onDismiss?.();
@@ -471,7 +467,6 @@ function FullScreenSearchSurface({
     <AriaModalOverlay
       isOpen={state.isExpanded}
       isDismissable={isDismissable}
-      UNSTABLE_portalContainer={themePortalContainer ?? undefined}
       onOpenChange={(open) => {
         if (!open) dismiss();
       }}

@@ -60,16 +60,19 @@ interface ThemeContextValue {
 
 ## Portal theming
 
-Material overlays rendered through portals need the same scoped theme as ordinary descendants. `ThemeProvider` creates a themed portal container under `document.body` and exposes it through `ThemePortalContainerContext`.
+Material overlays rendered through portals need the same scoped theme as ordinary descendants. `ThemeProvider` creates a themed portal container under `document.body` and installs React Aria's `UNSAFE_PortalProvider` once at the theme boundary. RAC overlays beneath that provider inherit the nearest theme portal target without every component threading `UNSTABLE_portalContainer` manually.
 
-The provider scope and portal scope receive the same `data-m3-theme`, `data-theme` and runtime override style object, so dialogs, menus, sheets and other portal surfaces resolve the same Material roles.
+The provider scope and portal scope receive the same `data-m3-theme`, `data-theme` and runtime override style object, so dialogs, menus, sheets and other portal surfaces resolve the same Material roles. Nested `ThemeProvider` instances install their own nearest portal provider, which keeps nested dynamic colors and light/dark modes isolated. Public component props that already expose `UNSTABLE_portalContainer` remain supported as explicit caller overrides; components with no public override rely only on the provider default.
+
+The RAC API is intentionally marked `UNSAFE`. m3-ui limits it to the existing root-level themed host under `document.body` (or the explicit application-owned `portalContainer`) rather than allowing arbitrary component-local portal targets. This preserves the existing stacking/accessibility boundary while removing duplicate routing plumbing. React Aria still owns grouped popover behavior such as Menu submenus, so nested submenu popovers are not given their own container override.
+
+During SSR, the provider getter resolves to `null`; an internally owned portal host is created only in the browser. Applications that own a stable external host can continue passing `portalContainer`, including `null` during SSR when that matches the first client render.
 
 ## Current files
 
 ```text
 theme/
 ├── ThemeProvider.tsx          provider, context and themed portal scope
-├── ThemePortalContext.ts      portal-container context
 ├── baseline.ts                generated-token ColorScheme JavaScript view
 ├── dynamic.ts                 Material Color Utilities dynamic scheme generation
 ├── cssVariables.ts            runtime ColorScheme -> scoped CSS role variables
