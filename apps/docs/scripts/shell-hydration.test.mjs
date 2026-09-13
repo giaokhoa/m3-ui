@@ -46,12 +46,22 @@ test('desktop navigation panes align at a semantic divider', async () => {
   );
   assert.match(
     shellCss,
-    /\.docs-workspace\s*\{[^}]*margin-inline:\s*auto;/s,
-    'non-persistent layouts should retain the bounded centered workspace',
+    /\.docs-workspace\s*\{[^}]*inline-size:\s*100%;[^}]*max-inline-size:\s*1760px;[^}]*margin-inline:\s*auto;/s,
+    'desktop workspace should stay centered while flexing up to the reviewed wide-layout bound',
+  );
+  assert.match(
+    shellCss,
+    /\.docs-main__inner\s*\{[^}]*inline-size:\s*min\(100%,\s*1120px\);[^}]*margin-inline:\s*auto;/s,
+    'primary docs content should be balanced inside the available main pane',
+  );
+  assert.doesNotMatch(
+    globalCss,
+    /\.docs-permanent-drawer \.docs-workspace,\s*\.docs-permanent-drawer \.docs-main__inner/s,
+    'persistent navigation must not pin the primary content pane to the inline-start edge',
   );
   assert.match(
     globalCss,
-    /\.docs-permanent-drawer \.docs-workspace,\s*\.docs-permanent-drawer \.docs-main__inner\s*\{[^}]*margin-inline-start:\s*0;[^}]*margin-inline-end:\s*auto;/s,
-    'persistent desktop content should anchor to the contextual navigation edge',
+    /\.docs-article > \.docs-paragraph,\s*\.docs-article > ul,\s*\.docs-article > ol\s*\{[^}]*max-inline-size:\s*74ch;/s,
+    'readable prose measure should be bounded independently from wide documentation artifacts',
   );
 });
