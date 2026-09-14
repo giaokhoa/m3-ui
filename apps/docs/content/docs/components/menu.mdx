@@ -96,7 +96,7 @@ Do not attach a competing Arrow/Escape handler to submenu triggers; the wrapper 
 </ExposedMenu>
 ```
 
-The anchor communicates popup/expanded state and can open from pointer or keyboard activation. It is intentionally not an editable combobox or autocomplete. Do not describe users as typing into it or filtering options unless a separate editable public API is composed.
+The anchor is a React Aria menu button rendered with the Material filled TextField presentation. React Aria `MenuTrigger` owns press normalization, ArrowDown/Enter/Space opening, popup/expanded ARIA, first-item focus, Escape/outside dismissal, and trigger focus restoration. It is intentionally not an editable textbox, combobox, or autocomplete. Do not attach competing pointer/keyboard/focus handlers or describe users as typing into it or filtering options unless a separate editable public API is composed.
 
 ## Exposed dropdown menu
 
@@ -124,7 +124,7 @@ For a non-editable combobox/listbox presentation, set `isReadOnly` (or omit the 
 
 Give menu triggers and menus meaningful names. Keep item labels usable for typeahead and accessible naming. Let the menu interaction model own arrow-key navigation and focus restoration rather than attaching competing keyboard handlers.
 
-For `ExposedMenu`, preserve its read-only menu relationship; a text-field appearance does not make it a text input. For `ExposedDropdownMenu`, preserve the combobox/listbox relationship, keep editing focus on the input, and leave filtering policy to application code.
+For `ExposedMenu`, preserve its read-only menu-button relationship; a text-field appearance does not make it a text input. For `ExposedDropdownMenu`, preserve the combobox/listbox relationship, keep editing focus on the input, and leave filtering policy to application code.
 
 ## API reference
 

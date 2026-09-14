@@ -1,15 +1,12 @@
 import '@m3-ui/tokens/menu.css';
 import clsx from 'clsx';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactElement,
-  type ReactNode,
+import type {
+  CSSProperties,
+  ReactElement,
+  ReactNode,
 } from 'react';
 import {
+  Button as AriaButton,
   Header as AriaHeader,
   Menu as AriaMenu,
   MenuItem as AriaMenuItem,
@@ -23,7 +20,7 @@ import {
 } from 'react-aria-components';
 import { Elevation } from '../../internal/elevation';
 import { Ripple, useRipple } from '../../internal/ripple';
-import { TextField } from '../TextField';
+import { getTextFieldStaticClassName } from '../TextField/TextField';
 import { menuContainerElevation, menuRuntime } from './Menu.defaults';
 import './menu.css';
 
@@ -268,15 +265,69 @@ export interface ExposedMenuProps<T extends object>
   trailingIcon?: ReactNode;
 }
 
+function ExposedMenuTrigger({
+  label,
+  value,
+  isDisabled,
+  trailingIcon,
+}: {
+  label?: ReactNode;
+  value: string;
+  isDisabled: boolean;
+  trailingIcon?: ReactNode;
+}) {
+  const textFieldClassName = getTextFieldStaticClassName({
+    variant: 'filled',
+    label,
+    trailingIcon,
+    isMultiline: false,
+  });
+
+  return (
+    <AriaButton
+      isDisabled={isDisabled}
+      className={clsx(textFieldClassName, 'exposed-menu__trigger')}
+    >
+      {(renderProps) => (
+        <span className="text-field__container">
+          <span className="text-field__content">
+            {label != null ? (
+              <span className="text-field__label">{label}</span>
+            ) : null}
+            <span className="text-field__input-row">
+              <span
+                className="text-field__control text-field__input"
+                data-focused={renderProps.isFocused || undefined}
+              >
+                {value}
+              </span>
+            </span>
+          </span>
+          {trailingIcon != null ? (
+            <span
+              className="text-field__icon text-field__icon--trailing"
+              aria-hidden="true"
+            >
+              {trailingIcon}
+            </span>
+          ) : null}
+          <span className="text-field__indicator" aria-hidden="true" />
+        </span>
+      )}
+    </AriaButton>
+  );
+}
+
 /**
- * Read-only exposed/select-style menu. The anchor is the existing Material
- * TextField rather than a forked input renderer. This is intentionally a menu,
- * not an editable combobox/autocomplete.
+ * Read-only exposed/select-style menu. React Aria MenuTrigger owns the
+ * press/keyboard/open/focus lifecycle while Material reuses the filled
+ * TextField presentation for the trigger. This is intentionally a menu, not an
+ * editable combobox/autocomplete.
  */
 export function ExposedMenu<T extends object>({
   label,
   value,
-  isOpen: controlledOpen,
+  isOpen,
   defaultOpen = false,
   onOpenChange,
   isDisabled = false,
@@ -286,89 +337,38 @@ export function ExposedMenu<T extends object>({
   trailingIcon = '▾',
   ...menuProps
 }: ExposedMenuProps<T>) {
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const isOpen = controlledOpen ?? uncontrolledOpen;
-
-  const focusAnchor = useCallback(() => {
-    anchorRef.current?.querySelector<HTMLInputElement>('input')?.focus();
-  }, []);
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (controlledOpen === undefined) setUncontrolledOpen(next);
-      onOpenChange?.(next);
-    },
-    [controlledOpen, onOpenChange],
-  );
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const frame = requestAnimationFrame(() => {
-      const menu = document.querySelector<HTMLElement>('[data-exposed-menu="true"]');
-      menu?.focus();
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [isOpen]);
-
   return (
-    <div
-      ref={anchorRef}
-      className={clsx('exposed-menu', className)}
-      style={style}
-      onPointerDownCapture={(event) => {
-        if (isDisabled || event.button !== 0) return;
-        event.preventDefault();
-        setOpen(!isOpen);
-      }}
-      onKeyDownCapture={(event) => {
-        if (isDisabled) return;
-        if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          setOpen(true);
-        }
-        if (event.key === 'Escape' && isOpen) {
-          event.preventDefault();
-          setOpen(false);
-          focusAnchor();
-        }
-      }}
-    >
-      <TextField
-        label={label}
-        value={value}
-        isReadOnly
-        isDisabled={isDisabled}
-        isMultiline={false}
-        trailingIcon={trailingIcon}
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-      />
-      <AriaPopover
+    <div className={clsx('exposed-menu', className)} style={style}>
+      <AriaMenuTrigger
         isOpen={isOpen}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) requestAnimationFrame(focusAnchor);
-        }}
-        triggerRef={anchorRef}
-        placement="bottom start"
-        offset={4}
-        containerPadding={menuRuntime.viewportMargin}
-        className="menu-popover exposed-menu__popover"
-        style={
-          matchAnchorWidth && anchorRef.current
-            ? { minWidth: anchorRef.current.getBoundingClientRect().width }
-            : undefined
-        }
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
       >
-        <MenuSurface>
-          <AriaMenu
-            {...menuProps}
-            autoFocus="first"
-            data-exposed-menu="true"
-            className="menu"
-          />
-        </MenuSurface>
-      </AriaPopover>
+        <ExposedMenuTrigger
+          label={label}
+          value={value}
+          isDisabled={isDisabled}
+          trailingIcon={trailingIcon}
+        />
+        <AriaPopover
+          placement="bottom start"
+          offset={4}
+          containerPadding={menuRuntime.viewportMargin}
+          className={clsx(
+            'menu-popover',
+            'exposed-menu__popover',
+            matchAnchorWidth && 'exposed-menu__popover--match-anchor',
+          )}
+        >
+          <MenuSurface>
+            <AriaMenu
+              {...menuProps}
+              autoFocus="first"
+              className="menu"
+            />
+          </MenuSurface>
+        </AriaPopover>
+      </AriaMenuTrigger>
     </div>
   );
 }

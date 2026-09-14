@@ -148,7 +148,28 @@
   inline-size: 100%;
 }
 
-.exposed-menu__popover {
+.exposed-menu__trigger {
+  appearance: none;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+}
+
+.exposed-menu__trigger[data-disabled] {
+  cursor: not-allowed;
+}
+
+.exposed-menu__trigger .text-field__control {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exposed-menu__popover--match-anchor {
   inline-size: var(--trigger-width);
 }
 

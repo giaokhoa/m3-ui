@@ -14,7 +14,9 @@ Read this file before changing Menu surface layering, elevation rendering, clipp
 
 ## Current rendering
 
-Standard `Menu` and `ExposedMenu` currently share the same paint/clip surface implementation. The positioned Popover remains non-clipping so the outer level2 shadow is visible.
+Standard `Menu` and `ExposedMenu` share the same paint/clip surface implementation. The positioned Popover remains non-clipping so the outer level2 shadow is visible.
+
+`ExposedMenu` is a React Aria `MenuTrigger` with a React Aria `Button` that reuses the filled TextField presentation classes. React Aria owns trigger press normalization, ArrowDown/Enter/Space opening, `aria-haspopup`/`aria-expanded`, initial menu focus, Escape/outside dismissal, and trigger focus restoration. Material code owns only the TextField-looking trigger structure, current-value paint, menu surface, and optional trigger-width matching via Popover's `--trigger-width`. Do not reintroduce a readonly input, document query, requestAnimationFrame focus handoff, or component-local open/keyboard state machine.
 
 Expressive selection remains React Aria-owned: `selectionMode="single"` yields radio-style menu semantics and `selectionMode="multiple"` yields checkbox-style menu semantics. `MenuItem.selectedLeading` changes only the Material leading visual for selected items. `MenuSection variant="segmented"` owns positional group/item geometry; `tone="vibrant"` switches the group and item roles to the canonical vibrant token family.
 
