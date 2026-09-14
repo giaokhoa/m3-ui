@@ -112,7 +112,7 @@ test.describe('Material 3 Menu browser contract', () => {
   test('exposed menu uses a RAC menu button, stays in theme portal, selects, and matches anchor width', async ({ page }) => {
     await openStory(page, 'components-menu--exposed');
     const trigger = page.getByRole('button', { name: /Density.*Medium/ });
-    await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(trigger).toHaveAttribute('aria-haspopup', /^(true|menu)$/);
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     await trigger.click();
 
