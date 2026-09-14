@@ -218,6 +218,46 @@ function ExposedDemo() {
 
 export const Exposed: Story = { render: () => <ExposedDemo /> };
 
+function ControlledExposedDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ padding: 80, width: 280 }}>
+      <output data-testid="exposed-controlled-open">{String(open)}</output>
+      <ExposedMenu
+        aria-label="Controlled density"
+        label="Density"
+        value="Medium"
+        isOpen={open}
+        onOpenChange={setOpen}
+      >
+        <MenuItem id="Compact">Compact</MenuItem>
+        <MenuItem id="Medium">Medium</MenuItem>
+        <MenuItem id="Comfortable">Comfortable</MenuItem>
+      </ExposedMenu>
+    </div>
+  );
+}
+
+export const ExposedControlled: Story = {
+  render: () => <ControlledExposedDemo />,
+};
+
+export const ExposedDisabled: Story = {
+  render: () => (
+    <div style={{ padding: 80, width: 280 }}>
+      <ExposedMenu
+        aria-label="Disabled density"
+        label="Density"
+        value="Medium"
+        isDisabled
+      >
+        <MenuItem id="Compact">Compact</MenuItem>
+        <MenuItem id="Medium">Medium</MenuItem>
+      </ExposedMenu>
+    </div>
+  ),
+};
+
 export const EdgePlacement: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
