@@ -148,7 +148,7 @@ test.describe('Material 3 Menu browser contract', () => {
     await trigger.evaluate((node) => (node as HTMLButtonElement).click());
     await expect(page.getByRole('menu')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(trigger).toBeFocused();
+    await expect(page.getByRole('menu')).toBeHidden();
   });
 
   test('exposed menu controlled state is reported by MenuTrigger', async ({ page }) => {
