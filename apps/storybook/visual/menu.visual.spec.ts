@@ -109,23 +109,64 @@ test.describe('Material 3 Menu browser contract', () => {
     expect((labelBox?.x ?? 0) + (labelBox?.width ?? 0)).toBeLessThan(trailingBox?.x ?? 0);
   });
 
-  test('exposed menu reuses TextField anchor, stays in theme portal, selects, and matches anchor width', async ({ page }) => {
+  test('exposed menu uses a RAC menu button, stays in theme portal, selects, and matches anchor width', async ({ page }) => {
     await openStory(page, 'components-menu--exposed');
-    const field = page.getByRole('textbox', { name: 'Density' });
-    await field.click();
+    const trigger = page.getByRole('button', { name: /Density.*Medium/ });
+    await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await trigger.click();
+
     const menu = page.getByRole('menu');
     const popover = page.locator('.exposed-menu__popover');
     await expect(menu).toBeVisible();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator(`${themePortalSelector} .exposed-menu__popover`)).toBeVisible();
     await expect(popover).not.toHaveAttribute('data-entering');
     await expect(popover).toHaveCSS('transform', 'none');
-    const fieldBox = await field
-      .locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " text-field ")][1]')
-      .boundingBox();
+    const triggerBox = await trigger.boundingBox();
     const popoverBox = await popover.boundingBox();
-    expect(Math.abs((fieldBox?.width ?? 0) - (popoverBox?.width ?? 0))).toBeLessThan(2);
+    expect(Math.abs((triggerBox?.width ?? 0) - (popoverBox?.width ?? 0))).toBeLessThan(2);
+
     await page.getByRole('menuitem', { name: 'Comfortable' }).click();
-    await expect(field).toHaveValue('Comfortable');
+    await expect(page.getByRole('button', { name: /Density.*Comfortable/ })).toBeFocused();
+  });
+
+  test('exposed menu delegates keyboard opening, first-item focus, Escape, and restoration to RAC', async ({ page }) => {
+    await openStory(page, 'components-menu--exposed');
+    const trigger = page.getByRole('button', { name: /Density.*Medium/ });
+    await trigger.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.getByRole('menuitem').first()).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test('exposed menu supports virtual activation through the RAC press contract', async ({ page }) => {
+    await openStory(page, 'components-menu--exposed');
+    const trigger = page.getByRole('button', { name: /Density.*Medium/ });
+    await trigger.evaluate((node) => (node as HTMLButtonElement).click());
+    await expect(page.getByRole('menu')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toBeFocused();
+  });
+
+  test('exposed menu controlled state is reported by MenuTrigger', async ({ page }) => {
+    await openStory(page, 'components-menu--exposed-controlled');
+    const trigger = page.getByRole('button', { name: /Density.*Medium/ });
+    await trigger.click();
+    await expect(page.getByTestId('exposed-controlled-open')).toHaveText('true');
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('exposed-controlled-open')).toHaveText('false');
+    await expect(trigger).toBeFocused();
+  });
+
+  test('disabled exposed menu trigger is non-interactive', async ({ page }) => {
+    await openStory(page, 'components-menu--exposed-disabled');
+    const trigger = page.getByRole('button', { name: /Density.*Medium/ });
+    await expect(trigger).toBeDisabled();
+    await trigger.click({ force: true });
+    await expect(page.getByRole('menu')).toBeHidden();
   });
 
   test('RTL keeps logical start alignment', async ({ page }) => {
