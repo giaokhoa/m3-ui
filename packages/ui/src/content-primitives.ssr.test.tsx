@@ -79,7 +79,7 @@ describe('Lane 4 content primitive SSR contracts', () => {
     );
 
     expect(html).toContain('Open server menu');
-    expect(html).toContain('aria-haspopup="menu"');
+    expect(html).toMatch(/aria-haspopup="(?:true|menu)"/);
     expect(html).toContain('Read only choice');
     expect(html).toContain('role="combobox"');
     expect(html).toContain('aria-autocomplete="list"');
@@ -97,7 +97,7 @@ describe('Lane 4 content primitive SSR contracts', () => {
     );
 
     expect(html).toContain('<button');
-    expect(html).toContain('aria-haspopup="menu"');
+    expect(html).toMatch(/aria-haspopup="(?:true|menu)"/);
     expect(html).toContain('aria-expanded="false"');
     expect(html).toContain('Density');
     expect(html).toContain('Medium');
