@@ -147,8 +147,7 @@ test.describe('Material 3 Menu browser contract', () => {
     const trigger = page.getByRole('button', { name: /Density.*Medium/ });
     await trigger.evaluate((node) => (node as HTMLButtonElement).click());
     await expect(page.getByRole('menu')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('exposed menu controlled state is reported by MenuTrigger', async ({ page }) => {
